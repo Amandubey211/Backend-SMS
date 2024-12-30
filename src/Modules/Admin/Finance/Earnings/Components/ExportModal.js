@@ -5,11 +5,11 @@ import { useSelector } from "react-redux";
 
 const ExportModal = ({ visible, onClose, dataToExport, title, sheet }) => {
   const [fileType, setFileType] = useState("");
-  const {schoolName}=useSelector((store)=>store.common.user.userDetails);
+  const { schoolName } = useSelector((store) => store.common.user.userDetails);
   if (!visible) return null;
 
   const handleExport = (
-    dataToExport=[{"name":"Akash"}],
+    dataToExport = [{ name: "Akash" }],
     title = "ExportedData",
     sheet = "sheet1"
   ) => {

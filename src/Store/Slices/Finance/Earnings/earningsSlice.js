@@ -28,7 +28,7 @@ const initialState = {
   totalPaidAmount: 0,
   unpaidRevenue: 0,
   // New state fields for dynamic data
-  expenseGraph: [],
+  earningGraph: [],
   cardDataRevenue: [],
 };
 
@@ -171,7 +171,7 @@ const earningsSlice = createSlice({
       })
       .addCase(fetchEarningGraph.fulfilled, (state, action) => {
         state.graphLoading = false;
-        state.expenseGraph = action.payload || [];
+        state.earningGraph = action.payload || [];
         state.graphError = false;
       })
       .addCase(fetchEarningGraph.rejected, (state, action) => {

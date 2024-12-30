@@ -68,7 +68,14 @@ const StudentFeesSummaryTable = () => {
       render: (subCategory) => subCategory || "N/A",
     },
     {
-      title: "Amount",
+      title: "Total Amount",
+      dataIndex: "total_amount",
+      key: "total_amount",
+      sorter: (a, b) => (a.total_amount || 0) - (b.total_amount || 0),
+      render: (value) => (value ? `${value} QAR` : "N/A"),
+    },
+    {
+      title: "Final Amount",
       dataIndex: "final_amount",
       key: "final_amount",
       sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
@@ -130,7 +137,7 @@ const StudentFeesSummaryTable = () => {
               className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
             onClick={() => navigate("/finance/studentfees/total-revenue")}
           >
-            View More {totalRecords}
+            View More ({totalRecords})
           </Button>
         </div>
       </div>

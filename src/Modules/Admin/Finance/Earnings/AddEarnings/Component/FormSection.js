@@ -70,8 +70,9 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                   key={index}
                   name={name}
                   label={label}
-                  onChange={(e) =>
-                    setFieldValue(name, e.target.files[0] || null)
+                  value={getNestedValue(values, name)}
+                  onChange={
+                    (e) => setFieldValue(name, e.target.value || null) // Set to URL string
                   }
                   {...rest}
                 />

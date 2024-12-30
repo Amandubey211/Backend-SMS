@@ -69,15 +69,24 @@ const RecentQuotation = () => {
             key: "discount",
             render: (value, record) =>
                 record.discountType === "percentage" ? (
-                  <Tag color="purple" className="text-xs">
-                    {value || 0}%
-                  </Tag>
+                    <Tag color="purple" className="text-xs">
+                        {value || 0}%
+                    </Tag>
                 ) : (
-                  <Tag color="orange" className="text-xs">
-                    {value || 0} QR
-                  </Tag>
+                    <Tag color="orange" className="text-xs">
+                        {value || 0} QR
+                    </Tag>
                 ),
             width: 100,
+            ellipsis: true,
+        },
+        {
+            title: "Total Amount (QR)",
+            dataIndex: "total_amount",
+            key: "total_amount",
+            sorter: (a, b) => (a.total_amount || 0) - (b.total_amount || 0),
+            render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+            width: 120,
             ellipsis: true,
         },
         {
@@ -89,7 +98,34 @@ const RecentQuotation = () => {
             width: 120,
             ellipsis: true,
         },
-
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (status) => {
+                let color = "default";
+                switch (status) {
+                    case "accept":
+                        color = "green";
+                        break;
+                    case "pending":
+                        color = "yellow";
+                        break;
+                    case "reject":
+                        color = "red";
+                        break;
+                    default:
+                        color = "default";
+                }
+                return (
+                    <Tag color={color} className="text-xs capitalize">
+                        {status || "N/A"}
+                    </Tag>
+                );
+            },
+            width: 80,
+            ellipsis: true,
+        },
     ];
 
     // Transform incomes data to table dataSource and limit to 5 records
@@ -101,8 +137,9 @@ const RecentQuotation = () => {
         discount: quotation.discount || 0,
         discountType: quotation.discountType || "percentage",
         final_amount: quotation.final_amount || 0,
+        total_amount: quotation.total_amount || 0,
+        status: quotation.status || 0,
     }));
-    console.log("totalRecords", totalRecords);
 
     return (
         <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">

@@ -5,8 +5,12 @@ import { fetchInvoice, fetchInvoiceCard, fetchInvoiceByNumber } from "./invoice.
 
 const initialState = {
   invoices: [],
+
   invoiceDetails: null,
   cardData: {},
+
+  invoiceData: {},
+ 
   loading: false,
   error: null,
   pagination: {},
@@ -21,9 +25,15 @@ const invoiceSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+
     clearInvoiceDetails: (state) => { // Added for clearing specific invoice details
       state.invoiceDetails = null;
     },
+
+    setInvoiceData : (state,action)=>{
+      state.invoiceData =action.payload
+    }
+
   },
   extraReducers: (builder) => {
     builder
@@ -76,6 +86,12 @@ const invoiceSlice = createSlice({
   },
 });
 
-export const { clearInvoices, clearInvoiceDetails } = invoiceSlice.actions;
+
+export const {
+  clearInvoices,
+  setInvoiceData,
+  clearInvoiceDetails
+} = invoiceSlice.actions;
+
 
 export default invoiceSlice.reducer;
