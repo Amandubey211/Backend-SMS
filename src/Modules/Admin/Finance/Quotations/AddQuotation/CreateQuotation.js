@@ -21,31 +21,6 @@ const CreateQuotation = () => {
   const { readOnly, selectedQuotation } = useSelector((state) => state.admin.quotations);
   const navigate = useNavigate();
 
-  const initialValues = selectedQuotation || {
-    receiver: {
-      name: "",
-      email: "",
-      address: "",
-      phone: ""
-    },
-    lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
-    date: selectedQuotation?.date ? formatDate(selectedQuotation.date) : formatDate(new Date()),
-    dueDate: "",
-    purpose: "",
-    status: "pending",
-    total_amount: 0,
-    tax: 0,
-    discountType: "percentage",
-    discount: 0,
-    final_amount: 0,
-    document: null,
-    paymentMode: "",
-    paymentStatus: "",
-    remainingAmount: 0,
-    remark: "",
-    govtRefNumber: ""
-  };
-
   const validationSchema = Yup.object().shape({
     receiver: Yup.object().shape({
       name: Yup.string().required("Receiver Name is required"),
@@ -86,14 +61,39 @@ const CreateQuotation = () => {
       setSubmitting(false);
     }
   };
-  
+
   // Format selectedQuotation.date before passing to Formik
   const formattedQuotation = {
-    ...selectedQuotation,
-    date: selectedQuotation?.date ? formatDate(selectedQuotation.date) : "",
-    dueDate: selectedQuotation?.dueDate ? formatDate(selectedQuotation.dueDate) : "",
-    lineItems: selectedQuotation?.lineItems || [{ revenueType: "", quantity: 1, amount: 0 }] 
+    receiver: selectedQuotation?.receiver || {
+      name: "",
+      email: "",
+      address: "",
+      phone: "",
+    },
+    lineItems:
+      selectedQuotation?.lineItems || [{ revenueType: "", quantity: 1, amount: 0 }],
+    date: selectedQuotation?.date
+      ? formatDate(selectedQuotation.date)
+      : formatDate(new Date()), 
+    dueDate: selectedQuotation?.dueDate
+      ? formatDate(selectedQuotation.dueDate)
+      : formatDate(new Date()),
+    purpose: selectedQuotation?.purpose || "",
+    status: selectedQuotation?.status || "pending",
+    total_amount: selectedQuotation?.total_amount || 0,
+    tax: selectedQuotation?.tax || 0,
+    discountType: selectedQuotation?.discountType || "percentage",
+    discount: selectedQuotation?.discount || 0,
+    final_amount: selectedQuotation?.final_amount || 0,
+    document: selectedQuotation?.document || null,
+    paymentMode: selectedQuotation?.paymentMode || "",
+    paymentStatus: selectedQuotation?.paymentStatus || "",
+    remainingAmount: selectedQuotation?.remainingAmount || 0,
+    remark: selectedQuotation?.remark || "",
+    govtRefNumber: selectedQuotation?.govtRefNumber || "",
   };
+  
+  console.log("Initial Values:", formattedQuotation);
 
   return (
     <Layout>
@@ -111,7 +111,7 @@ const CreateQuotation = () => {
             onSubmit={handleSubmit}
             enableReinitialize
           >
-            {({ values, setFieldValue, isSubmitting }) => (
+            {({ values, setFieldValue, resetForm, isSubmitting }) => (
               <Form>
                 <div className="flex justify-between gap-4 mb-6">
                   <h1 className="text-2xl font-semibold">
@@ -119,7 +119,8 @@ const CreateQuotation = () => {
                   </h1>
                   {!readOnly && (<div className="gap-4">
                     <button
-                      type="reset"
+                      type="button"
+                      onClick={() => resetForm({ values: formattedQuotation })}
                       className="border border-gray-300 text-gray-700 px-4 py-2 mx-2 rounded-md hover:bg-gray-100"
                     >
                       Reset
