@@ -6,35 +6,43 @@ import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addQuotation } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import toast from "react-hot-toast";
 import Layout from "../../../../../Components/Common/Layout";
+import { useNavigate } from "react-router-dom";
 
 const CreateQuotation = () => {
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0]; // Format to YYYY-MM-DD
+  };
   const [loading, setLoading] = useState(false);
-  const initialValues = {
-    notes: "",
+  const { readOnly, selectedQuotation } = useSelector((state) => state.admin.quotations);
+  const navigate = useNavigate();
+
+  const initialValues = selectedQuotation || {
     receiver: {
       name: "",
       email: "",
       address: "",
-      phone:""
+      phone: ""
     },
+    lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
+    date: selectedQuotation?.date ? formatDate(selectedQuotation.date) : formatDate(new Date()),
+    dueDate: "",
     purpose: "",
     status: "pending",
-    lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
-    quotationDate: "",
-    subAmount: 0,
+    total_amount: 0,
     tax: 0,
     discountType: "percentage",
     discount: 0,
-    finalAmount: 0,
+    final_amount: 0,
     document: null,
     paymentMode: "",
     paymentStatus: "",
     remainingAmount: 0,
-    remarks: "",
+    remark: "",
     govtRefNumber: ""
   };
 
@@ -48,7 +56,7 @@ const CreateQuotation = () => {
       Yup.object().shape({
         category: Yup.string().required("Category is required"),
         quantity: Yup.number().min(1, "Quantity must be at least 1").required(),
-        rate: Yup.number().min(0, "Rate must be positive").required(),
+        amount: Yup.number().min(0, "Rate must be positive").required(),
       })
     ),
     discountType: Yup.string()
@@ -57,17 +65,20 @@ const CreateQuotation = () => {
     discount: Yup.number()
       .min(0, "Discount must be positive")
       .required("Discount is required"),
-    quotationDate: Yup.string().required("Quotation Date is required"),
-    finalAmount: Yup.number().min(0, "Final amount must be positive"),
+    date: Yup.string().required("Quotation Date is required"),
+    final_amount: Yup.number().min(0, "Final amount must be positive"),
     remainingAmount: Yup.number().min(0, "Remaining amount must be positive"),
   });
 
   const dispatch = useDispatch()
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    if (readOnly) return;
     setLoading(true);
     try {
       await dispatch(addQuotation(values)).unwrap(); // Unwraps the promise to catch errors more effectively
+      toast.success("Quotation created successfully!");
       resetForm(); // Resets the form to initial values
+      navigate("/finance/quotations/quotations-list")
     } catch (error) {
       toast.error(error || "Failed to create quotation.");
     } finally {
@@ -75,36 +86,43 @@ const CreateQuotation = () => {
       setSubmitting(false);
     }
   };
+  
+  // Format selectedQuotation.date before passing to Formik
+  const formattedQuotation = {
+    ...selectedQuotation,
+    date: selectedQuotation?.date ? formatDate(selectedQuotation.date) : "",
+    dueDate: selectedQuotation?.dueDate ? formatDate(selectedQuotation.dueDate) : "",
+    lineItems: selectedQuotation?.lineItems || [{ revenueType: "", quantity: 1, amount: 0 }] 
+  };
 
   return (
     <Layout>
       <DashLayout>
         <div className="p-6 min-h-screen">
-
+          {readOnly && (
+            <div className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded-md mb-4">
+              Currently in read-only mode. You cannot edit these fields.
+            </div>
+          )}
           {/* Form Section */}
           <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
+            initialValues={formattedQuotation}
+            validationSchema={!readOnly ? validationSchema : null}
             onSubmit={handleSubmit}
+            enableReinitialize
           >
             {({ values, setFieldValue, isSubmitting }) => (
               <Form>
                 <div className="flex justify-between gap-4 mb-6">
-                  <div>
-                    <h1 className="text-2xl font-semibold mb-6">Create Quotation</h1>
-                  </div>
-                  <div className="gap-4">
+                  <h1 className="text-2xl font-semibold">
+                    {readOnly ? "View Quotation" : "Create Quotation"}
+                  </h1>
+                  {!readOnly && (<div className="gap-4">
                     <button
                       type="reset"
-                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                    >
-                      Reset
-                    </button>
-                    <button
-                      type="button"
                       className="border border-gray-300 text-gray-700 px-4 py-2 mx-2 rounded-md hover:bg-gray-100"
                     >
-                      Preview
+                      Reset
                     </button>
                     <button
                       type="submit"
@@ -116,36 +134,54 @@ const CreateQuotation = () => {
                       }}
                     >
                       {loading ? 'Loading..' : 'Save Quotation'}
-                    </button></div>
+                    </button></div>)}
                 </div>
                 {/* Quotation From Section */}
                 <h2 className="text-lg font-semibold mb-4">Quotation To</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                   <TextInput
                     name="receiver.name"
-                    label="Receiver Name"
+                    label="Receiver Name *"
                     placeholder="Enter receiver's name"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
                     name="receiver.address"
                     label="Address"
                     placeholder="Enter Address"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
                     name="receiver.phone"
                     label="Contact Number"
                     placeholder="Enter contact number"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
                     name="receiver.email"
-                    label="Mail ID"
-                    placeholder="Enter mail ID"
+                    label="Email Id"
+                    placeholder="Enter receiver's email"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
                     name="purpose"
                     label="Purpose"
                     placeholder="Enter purpose"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
+                  <TextInput name="date"
+                    label="Quotation Date *"
+                    placeholder="Enter date"
+                    type="date"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
                 </div>
 
                 {/* Quotation Details Section */}
@@ -170,6 +206,8 @@ const CreateQuotation = () => {
                                   "financial_investment_revenue",
                                   "Penalties",
                                   "Other",]}
+                                readOnly={readOnly}
+                                disabled={readOnly}
                               />
                             </div>
 
@@ -179,28 +217,33 @@ const CreateQuotation = () => {
                                 label="Quantity"
                                 type="number"
                                 placeholder="Enter Quantity"
+                                readOnly={readOnly}
+                                disabled={readOnly}
                               />
                             </div>
                             <div className="col-span-3">
                               <TextInput
                                 name={`lineItems.${index}.amount`}
-                                label="Amount"
+                                label="Amount *"
                                 type="number"
                                 placeholder="Enter Amount"
+                                readOnly={readOnly}
+                                disabled={readOnly}
                               />
                             </div>
                             <div className="col-span-2 flex items-center justify-center">
-                              <button
-                                type="button"
-                                onClick={() => remove(index)}
-                                className="text-red-500 hover:text-red-700"
-                              >
-                                ✖
-                              </button>
+                              {!readOnly &&
+                                (<button
+                                  type="button"
+                                  onClick={() => remove(index)}
+                                  className="text-red-500 hover:text-red-700"
+                                >
+                                  ✖
+                                </button>)}
                             </div>
                           </div>
                         ))}
-                        <div className="flex justify-center items-center flex-col mt-4">
+                        {!readOnly && (<div className="flex justify-center items-center flex-col mt-4">
                           <button
                             type="button"
                             onClick={() =>
@@ -214,7 +257,7 @@ const CreateQuotation = () => {
                             <span className="text-white text-lg">+</span>
                           </button>
                           <span className="text-gray-600 text-sm mt-2">Add Item</span>
-                        </div>
+                        </div>)}
                       </>
                     )}
                   </FieldArray>
@@ -222,44 +265,63 @@ const CreateQuotation = () => {
 
                 {/* Additional Details Section */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <TextInput name="quotationDate" label="Quotation Date" placeholder="Enter date and time" type="datetime-local" />
                   <TextInput
-                    name="subAmount"
-                    label="Sub Amount"
+                    name="dueDate"
+                    label="Due date"
+                    placeholder="Enter Due date"
+                    type="date"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+                  <TextInput
+                    name="total_amount"
+                    label="Sub Amount *"
                     placeholder="Enter sub total"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
                     name="tax"
-                    label="Tax (Inc/Exc)"
+                    label="Tax (Inc/Exc) *"
                     placeholder="Enter tax percentage"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <SelectInput
                     name="discountType"
                     label="Discount Type"
                     options={["percentage", "amount"]}
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
-
                   <TextInput
                     name="discount"
                     label={`Discount (${values.discountType === "percentage" ? "%" : "Amount"})`}
                     placeholder={`Enter discount ${values.discountType}`}
                     type="number"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
-                    name="finalAmount"
-                    label="Final Amount (After tax/discount)"
+                    name="final_amount"
+                    label="Final Amount (After tax/discount) *"
                     placeholder="Enter final amount"
-                    readOnly
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <TextInput
                     name="govtRefNumber"
                     label="Govt Reference Number"
                     placeholder="Enter Govt Reference Number"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <FileInput
                     name="document"
                     label="Add Document (if any)"
                     placeholder="Upload file"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                   <SelectInput
                     name='status'
@@ -267,6 +329,15 @@ const CreateQuotation = () => {
                     options={["pending",
                       "accept",
                       "reject",]}
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+                  <TextInput
+                    name="remark"
+                    label="Remark"
+                    placeholder="Enter remark(if any)"
+                    readOnly={readOnly}
+                    disabled={readOnly}
                   />
                 </div>
               </Form>
