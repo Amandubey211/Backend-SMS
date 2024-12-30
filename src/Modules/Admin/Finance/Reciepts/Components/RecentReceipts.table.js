@@ -32,7 +32,7 @@ const RecentReceipts = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [dataFetched, setDataFetched] = useState(false);
-
+  const [fetching, setFetching] = useState(true);
   // For canceling a receipt
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedReceiptId, setSelectedReceiptId] = useState(null);
@@ -49,7 +49,11 @@ const RecentReceipts = () => {
   // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
-      dispatch(fetchAllReceipts({ limit: 5, fetchLatest: true })); // Fetch latest 5 entries
+      setFetching(true); // Start fetching
+      dispatch(fetchAllReceipts({ limit: 5, fetchLatest: true }))
+        .unwrap()
+        .then(() => setFetching(false)) // Mark fetching as complete
+        .catch(() => setFetching(false));
       setDataFetched(true);
     }
   }, [dispatch, dataFetched]);
@@ -295,7 +299,7 @@ const RecentReceipts = () => {
   ];
 
   // -------------------- Loading / Error States --------------------
-  if (loading) {
+  if (fetching || loading) {
     return (
       <div style={{ textAlign: "center", padding: "16px" }}>
         <Spinner />
@@ -312,7 +316,7 @@ const RecentReceipts = () => {
     );
   }
 
-  if (filteredData.length === 0) {
+  if (!fetching && filteredData.length === 0) {
     return (
       <div style={{ textAlign: "center", color: "#999", marginTop: "16px" }}>
         <ExclamationCircleOutlined style={{ fontSize: "48px" }} />

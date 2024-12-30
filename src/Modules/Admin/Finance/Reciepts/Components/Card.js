@@ -3,7 +3,7 @@ import React from "react";
 const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
   return (
     <div
-      className={`rounded-lg p-6 shadow-md border`}
+      className={`rounded-lg p-6 shadow-md border cursor-pointer hover:shadow-lg transform transition-transform duration-300 hover:scale-105`}
       style={{
         background:
           "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
@@ -23,15 +23,20 @@ const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
           <p className="text-2xl font-bold text-purple-800">
             {count}{" "}
             <span
-              className={`${tag === "receipts" || tag === "receipt" ? "text-xs" : "text-purple-800"
-                }`}
+              className={`${
+                tag === "receipts" || tag === "receipt"
+                  ? "text-xs"
+                  : "text-purple-800"
+              }`}
             >
-              {tag === "receipts" || tag === "receipt" ? (count > 1 ? "receipts" : "receipt") : tag}
+              {tag === "receipts" || tag === "receipt"
+                ? count > 1
+                  ? "receipts"
+                  : "receipt"
+                : tag}
             </span>
           </p>
         </div>
-
-
       )}
     </div>
   );
