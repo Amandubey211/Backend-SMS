@@ -6,7 +6,7 @@ export const categories = [
   "Financial Investments",
   // "Library-Based Revenue",
   // "Penalties",
-  // "Other",
+  // //"Other",
 ];
 
 export const subCategories = {
@@ -19,31 +19,31 @@ export const subCategories = {
     "Certificate Fees",
     "Meal Fees",
     "Application Fees",
-    "Other",
+    //"Other",
   ],
   "Facility-Based Revenue": [
     "Rent Income",
     "Exam Center Fees",
     "Parking Fees",
-    "Other",
+    //"Other",
   ],
   "Service-Based Revenue": [
     "Stationery Fees",
-    "Other Facility Fees",
+    //"Other Facility Fees",
     "Subscription Fees",
     "Workshop/Training Fees",
     "Canteen Profit",
-    "Other",
+    //"Other",
   ],
   "Community and External Revenue": [
     "Donations",
     "Fundraising/Sponsorships",
-    "Other",
+    //"Other",
   ],
-  "Financial Investments": ["Investments", "Other"],
-  // "Library-Based Revenue": ["Library Fees", "Membership Fees", "Other"],
-  // Penalties: ["Late Fees", "Fines", "Other"],
-  // Other: ["Other"],
+  "Financial Investments": ["Investments"],
+  // "Library-Based Revenue": ["Library Fees", "Membership Fees", //"Other"],
+  // Penalties: ["Late Fees", "Fines", //"Other"],
+  // Other: [//"Other"],
 };
 
 export const academicYears = [

@@ -171,63 +171,72 @@ const TotalRevenueList = () => {
   };
 
   // Render action buttons (View, Edit, Delete) for each row
-  const renderActionIcons = (record) => (
-    <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
-      <Tooltip title="View">
-        <Button
-          type="link"
-          icon={<EyeOutlined />}
-          onClick={() => {
-            const incomeToView = incomeIdMap[record.key];
-            if (incomeToView) {
-              dispatch(setReadOnly(true)); // Set readOnly to true for viewing
-              dispatch(setSelectedIncome(incomeToView)); // Dispatch the selected income to Redux
-              navigate("/finance/earning/add"); // Navigate to view page
-            } else {
-              toast.error("Selected income not found.");
-            }
-          }}
-          className="text-gray-600 hover:text-gray-800 p-0"
-          aria-label="View"
-        />
-      </Tooltip>
-      <Tooltip title="Edit">
-        <Button
-          type="link"
-          icon={<EditOutlined />}
-          onClick={() => {
-            const incomeToEdit = incomeIdMap[record.key];
-            if (incomeToEdit) {
-              dispatch(setReadOnly(false)); // Set readOnly to false for editing
-              dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
-              navigate("/finance/earning/add"); // Navigate to edit page
-            } else {
-              toast.error("Selected income not found.");
-            }
-          }}
-          className="text-blue-600 hover:text-blue-800 p-0"
-          aria-label="Edit"
-        />
-      </Tooltip>
-      <Tooltip title="Delete">
-        <Button
-          type="link"
-          icon={<DeleteOutlined />}
-          onClick={() => {
-            const incomeToDelete = incomeIdMap[record.key];
-            if (incomeToDelete) {
-              setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
-              setIsDeleteModalVisible(true);
-            } else {
-              toast.error("Selected income not found.");
-            }
-          }}
-          className="text-red-600 hover:text-red-800 p-0"
-          aria-label="Delete"
-        />
-      </Tooltip>
-    </div>
-  );
+  const renderActionIcons = (record) => {
+    // Check if the category is "Student-Based Revenue"
+    const isStudentBased = record.categoryName === "Student-Based Revenue";
+
+    return (
+      <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+        {!isStudentBased && (
+          <>
+            <Tooltip title="View">
+              <Button
+                type="link"
+                icon={<EyeOutlined />}
+                onClick={() => {
+                  const incomeToView = incomeIdMap[record.key];
+                  if (incomeToView) {
+                    dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+                    dispatch(setSelectedIncome(incomeToView)); // Dispatch the selected income to Redux
+                    navigate("/finance/earning/add"); // Navigate to view page
+                  } else {
+                    toast.error("Selected income not found.");
+                  }
+                }}
+                className="text-gray-600 hover:text-gray-800 p-0"
+                aria-label="View"
+              />
+            </Tooltip>
+            <Tooltip title="Edit">
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => {
+                  const incomeToEdit = incomeIdMap[record.key];
+                  if (incomeToEdit) {
+                    dispatch(setReadOnly(false)); // Set readOnly to false for editing
+                    dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
+                    navigate("/finance/earning/add"); // Navigate to edit page
+                  } else {
+                    toast.error("Selected income not found.");
+                  }
+                }}
+                className="text-blue-600 hover:text-blue-800 p-0"
+                aria-label="Edit"
+              />
+            </Tooltip>
+          </>
+        )}
+        <Tooltip title="Delete">
+          <Button
+            type="link"
+            icon={<DeleteOutlined />}
+            onClick={() => {
+              const incomeToDelete = incomeIdMap[record.key];
+              if (incomeToDelete) {
+                setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
+                setIsDeleteModalVisible(true);
+              } else {
+                toast.error("Selected income not found.");
+              }
+            }}
+            className="text-red-600 hover:text-red-800 p-0"
+            aria-label="Delete"
+          />
+        </Tooltip>
+      </div>
+    );
+  };
 
   // Formatting functions with optional currency parameter
   const formatCurrency = (value, currency = "QR") =>
@@ -276,7 +285,6 @@ const TotalRevenueList = () => {
                 <Tooltip title="Not selectable">
                   <Checkbox disabled />
                 </Tooltip>
-                {/* <BlockOutlined className="ml-1 text-red-500" /> */}
               </div>
             );
           }
@@ -551,8 +559,6 @@ const TotalRevenueList = () => {
                 style={{
                   borderRadius: "0.375rem",
                   height: "35px",
-                  // borderColor: "#ff6bcb",
-                  // boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
                 }}
               />
             </div>
@@ -590,7 +596,7 @@ const TotalRevenueList = () => {
                 type="primary"
                 icon={<ExportOutlined />}
                 onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-3 rounded-md shadow-md"
+                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-3 rounded-md shadow-md"
               >
                 Export
               </Button>
@@ -636,7 +642,6 @@ const TotalRevenueList = () => {
                   dispatch(setCurrentPage(1)); // Optionally reset to first page
                 },
               }}
-              // Removed the conflicting onChange prop from the Table
               className="rounded-lg shadow text-xs"
               bordered
               size="small"
@@ -652,7 +657,6 @@ const TotalRevenueList = () => {
               onRow={(record) => ({
                 onClick: () => {
                   if (record.paymentStatus !== "unpaid") {
-                    // toast.error("Only unpaid records can be selected.");
                     return;
                   }
                   setSelectedRowKey(record.key);
