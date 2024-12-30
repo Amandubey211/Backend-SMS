@@ -4,8 +4,10 @@ import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentFeesMain from "./StudentFeesMain";
 import { Toaster } from "react-hot-toast";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentFeesDashboard = () => {
+  useNavHeading("Finance","Student Fess")
   return (
     <Layout title="Finance | Student Fees">
       <AdminDashLayout>

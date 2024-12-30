@@ -8,9 +8,11 @@ import { useDispatch } from "react-redux";
 import { addInvoice } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import toast from "react-hot-toast";
 import Layout from "../../../../../Components/Common/Layout";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const CreateNewInvoice = () => {
-  const [loading,setLoading] = useState(false)
+  const [loading,setLoading] = useState(false);
+  useNavHeading("Finance", "Invoices");
   const initialValues = {
     dueDate: "",
 
