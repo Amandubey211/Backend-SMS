@@ -25,7 +25,6 @@ export const addInvoice = createAsyncThunk(
   }
 );
 
-  );
   export const cancelInvoice = createAsyncThunk(
     "earnings/cancelInvoice",
     async (id, { dispatch, rejectWithValue }) => {
