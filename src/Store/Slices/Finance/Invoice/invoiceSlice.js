@@ -5,6 +5,7 @@ import { fetchInvoice, fetchInvoiceCard } from "./invoice.thunk";
 
 const initialState = {
   invoices: [],
+  invoiceData: {},
   cardData:{},
   loading: false,
   error: null,
@@ -21,6 +22,9 @@ const invoiceSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setInvoiceData : (state,action)=>{
+      state.invoiceData =action.payload
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -61,6 +65,7 @@ const invoiceSlice = createSlice({
 
 export const {
   clearInvoices,
+  setInvoiceData,
 
 } = invoiceSlice.actions;
 
