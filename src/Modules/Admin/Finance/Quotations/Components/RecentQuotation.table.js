@@ -98,7 +98,34 @@ const RecentQuotation = () => {
             width: 120,
             ellipsis: true,
         },
-
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (status) => {
+                let color = "default";
+                switch (status) {
+                    case "accept":
+                        color = "green";
+                        break;
+                    case "pending":
+                        color = "yellow";
+                        break;
+                    case "reject":
+                        color = "red";
+                        break;
+                    default:
+                        color = "default";
+                }
+                return (
+                    <Tag color={color} className="text-xs capitalize">
+                        {status || "N/A"}
+                    </Tag>
+                );
+            },
+            width: 80,
+            ellipsis: true,
+        },
     ];
 
     // Transform incomes data to table dataSource and limit to 5 records
@@ -111,6 +138,7 @@ const RecentQuotation = () => {
         discountType: quotation.discountType || "percentage",
         final_amount: quotation.final_amount || 0,
         total_amount: quotation.total_amount || 0,
+        status: quotation.status || 0,
     }));
 
     return (

@@ -271,7 +271,7 @@ const RecentQuotationList = () => {
                             </Button> */}
                             <button
                                 onClick={() => {
-                                    dispatch(clearSelectedQuotation)
+                                    dispatch(clearSelectedQuotation())
                                     dispatch(setReadOnly(false))
                                     navigate(
                                         "/finance/quotations/add-new-quotations"
