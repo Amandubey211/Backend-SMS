@@ -2,7 +2,17 @@ import React, { useCallback, useEffect, useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
-import { Alert, Button, Dropdown, Input, Menu, Modal, Spin, Table, Tag } from "antd";
+import {
+  Alert,
+  Button,
+  Dropdown,
+  Input,
+  Menu,
+  Modal,
+  Spin,
+  Table,
+  Tag,
+} from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import {
@@ -22,7 +32,6 @@ import {
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 import ReturnInvoice from "../../../../../../Utils/FinanceTemplate/ReturnInvoice";
-
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penality & Adjustment List");
@@ -46,11 +55,11 @@ const PenalityandAdjustmentList = () => {
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
   const [computedPageSize, setComputedPageSize] = useState(paze_size);
 
-    // Handle search input changes
-    const handleSearch = (e) => {
-      setSearchText(e.target.value);
-      dispatch(setCurrentPage(1));
-    };
+  // Handle search input changes
+  const handleSearch = (e) => {
+    setSearchText(e.target.value);
+    dispatch(setCurrentPage(1));
+  };
 
   const handleCancleReturnInvoice = (id) => {
     const params = {
@@ -87,8 +96,6 @@ const PenalityandAdjustmentList = () => {
     };
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage, pageSize, computedPageSize]);
-
-
 
   // Define table columns with fixed widths and ellipsis
   const columns = [
@@ -250,31 +257,31 @@ const PenalityandAdjustmentList = () => {
     adjustmentTotal: adjustment?.adjustmentAmount || 0,
     status: adjustment.isCancel ? "Cancelled" : "-",
     adjustedAt: adjustment?.adjustedAt || "N/A",
-    ...adjustment
+    ...adjustment,
   }));
 
   const transformAdjustmentData = (adjustmentData) =>
-    adjustmentData?.map((adjustment, index) => ({
+    adjustmentData?.map(({ _id, ...adjustment }, index) => ({
       sNo: index + 1,
       returnInvoiceNumber: adjustment?.returnInvoiceNumber || "N/A",
       refInvoiceNumber: adjustment?.invoiceId?.invoiceNumber || "N/A",
       receiver: adjustment?.invoiceId?.name || "N/A",
-      discount: adjustment?.discount || 0,
-      discountType: adjustment?.discountType || "percentage",
-      tax: adjustment?.tax || 0,
-      penalty: adjustment?.adjustmentPenalty || 0,
-      totalAmount: adjustment?.adjustmentTotal || 0,
-      finalAmount: adjustment?.adjustmentAmount || 0,
+      receiverEmail: adjustment?.invoiceId?.email || "N/A",
+      receiverPhone: adjustment?.invoiceId?.phone || "N/A",
+      receiverAddress: adjustment?.invoiceId?.address || "N/A",
+      tax: `${parseFloat(adjustment?.tax)} %` || 0,
+      discount:
+        (adjustment?.discountType === "percentage"
+          ? `${parseFloat(adjustment?.discount)} %`
+          : `${parseFloat(adjustment?.discount)} QR`) || 0,
+      discountType: parseFloat(adjustment?.discountType) || "percentage",
+      penalty: `${parseFloat(adjustment?.adjustmentPenalty)} QR` || 0,
+      totalAmount: `${parseFloat(adjustment?.adjustmentTotal)} QR` || 0,
+      finalAmount: `${parseFloat(adjustment?.adjustmentAmount)} QR` || 0,
       createdBy: adjustment?.adjustedBy?.adminName || "N/A",
       Date: adjustment?.adjustedAt || "N/A",
       academicYearDetails: adjustment?.academicYear?.year || "N/A",
     })) || [];
-
-
-
-
-
-  console.log("-=====---=-========>>>>>>>",selectedReturnInvoice)
 
   return (
     <Layout title={"Penality & Adjustment List | Student Diwan"}>
@@ -389,7 +396,7 @@ const PenalityandAdjustmentList = () => {
             title="Return Receipt Data"
             sheet="return_receipt_report"
           />
-           <Modal
+          <Modal
             visible={isPreviewVisible}
             title="Return Invoice Preview"
             footer={null}
