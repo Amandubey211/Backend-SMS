@@ -1,55 +1,74 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
+import InvoiceTextInput from "./Components/InvoiceTextInput";
 import ReturnItems from "./Components/ReturnItems";
-import FileInput from "./Components/FileInput";
-import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import { toast } from "react-hot-toast";
 import SelectInput from "../../PenaltiesandAdjustments/AddPenaltyAdjustment/Components/SelectInput";
+import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+import { Spin } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons"; // Import Ant Design Icons
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  useNavHeading("Finance", "Create Receipt");
 
-  // Check if we came from "View (Read-Only)"
-  const readOnly = location.state?.readOnly === true;
-  const receiptData = location.state?.receiptData || null;
+  const [invoiceNumberInput, setInvoiceNumberInput] = useState(""); // Track invoice input
+  const [invoiceStatus, setInvoiceStatus] = useState("idle"); // idle, loading, success, error
 
-  // --- Utility to parse existing receipt data ---
-  const parseReceiptData = (data) => {
-    return {
-      // Map backend fields to form fields
-      receiverName: data.receiver?.name || "",
-      mailId: data.receiver?.email || "",
-      contactNumber: data.receiver?.phone || "",
-      address: data.receiver?.address || "",
-      discountType: data.discountType || "",
-      tax: data.tax ? data.tax.toString() : "",
-      discount: data.discount ? data.discount.toString() : "",
-      penalty: data.penalty ? data.penalty.toString() : "",
+  const { invoiceDetails, invoiceFetchSuccess, error } = useSelector(
+    (state) => state.admin.invoices
+  );
 
-      govtRefNumber: data.govtRefNumber || "",
-      remark: data.remark || "",
-      invoiceNumber: data.invoiceNumber || "",
+  const formikRef = useRef();
 
-      // document: null, // can't populate an existing file
+  // Prefill form when invoice details are fetched successfully
+  useEffect(() => {
+    if (invoiceFetchSuccess && invoiceDetails) {
+      const prefilledValues = {
+        receiverName: invoiceDetails?.receiver?.name || "",
+        mailId: invoiceDetails?.receiver?.email || "",
+        contactNumber: invoiceDetails?.receiver?.phone || "",
+        address: invoiceDetails?.receiver?.address || "",
+        discountType: invoiceDetails?.discountType || "",
+        discount: invoiceDetails?.discount || "",
+        penalty: invoiceDetails?.penalty || "",
+        tax: invoiceDetails?.tax || "",
+        govtRefNumber: "",
+        remark: "",
+        invoiceNumber: invoiceDetails?.invoiceNumber || "",
+        items: invoiceDetails?.lineItems?.map((item) => ({
+          category: item?.revenueType || "",
+          quantity: item?.quantity || "",
+          totalAmount: item?.amount || "",
+        })) || [{ category: "", quantity: "", totalAmount: "" }],
+      };
 
-      items: Array.isArray(data.lineItems)
-        ? data.lineItems.map((item) => ({
-            category: item.revenueType || "",
-            quantity: item.quantity || "", // Ensure it's a string
-            totalAmount: item.total !== undefined ? item.total.toString() : "", // Convert to string if exists
-          }))
-        : [{ category: "", quantity: "", totalAmount: "" }],
-    };
+      formikRef.current.setValues(prefilledValues);
+      setInvoiceStatus("success");
+      dispatch(clearSelectedInvoiceNumber());
+    }
+  }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
+
+  // Handle API request for invoice details
+  const fetchInvoiceDetails = async (invoiceNumber) => {
+    if (invoiceNumber.trim() === "") return;
+    setInvoiceStatus("loading");
+    try {
+      await dispatch(fetchInvoiceByNumber(invoiceNumber)).unwrap();
+    } catch {
+      setInvoiceStatus("error");
+    }
   };
 
-  // --- Initial Values ---
   const blankInitialValues = {
     receiverName: "",
     mailId: "",
@@ -59,270 +78,221 @@ const CreateReceipt = () => {
     tax: "",
     discount: "",
     penalty: "",
-
     govtRefNumber: "",
     remark: "",
     invoiceNumber: "",
-
-    // document: null,
-    items: [{ category: "", quantity: "", totalAmount: null }],
+    items: [{ category: "", quantity: "", totalAmount: "" }],
   };
 
-  const initialValues = readOnly && receiptData
-    ? parseReceiptData(receiptData)
-    : blankInitialValues;
-
-  // --- Validation Schema ---
   const validationSchema = Yup.object().shape({
-    tax: Yup.number()
-      .typeError("Tax must be a number")
-      .integer("Tax must be an integer")
-      .min(0, "Tax must be positive")
-      .required("Tax is required"),
-    discountType: Yup.string()
-      .oneOf(["percentage", "amount"], "Invalid discount type")
-      .required("Discount type is required"),
-    discount: Yup.number()
-      .typeError("Discount must be a number")
-      .integer("Discount must be an integer")
-      .min(0, "Discount must be positive")
-      .required("Discount is required"),
-    penalty: Yup.number()
-      .typeError("Penalty must be a number")
-      .integer("Penalty must be an integer")
-      .min(0, "Penalty must be positive")
-      .required("Penalty is required"),
-  
-    contactNumber: Yup.string()
-      .required("Contact number is required"),
-    mailId: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    address: Yup.string()
-      .required("Address is required"),
-    receiverName: Yup.string()
-      .required("Name is required"),
+    invoiceNumber: Yup.string().required("Invoice number is required"),
+    receiverName: Yup.string().required("Name is required"),
+    mailId: Yup.string().email("Invalid email address").required("Email is required"),
+    contactNumber: Yup.string().required("Contact number is required"),
+    address: Yup.string().required("Address is required"),
+    discountType: Yup.string().oneOf(["percentage", "amount"]).required("Discount Type is required"),
+    discount: Yup.number().min(0, "Discount cannot be negative").required("Discount is required"),
+    penalty: Yup.number().min(0, "Penalty cannot be negative").required("Penalty is required"),
+    tax: Yup.number().min(0, "Tax cannot be negative").required("Tax is required"),
     items: Yup.array()
       .of(
         Yup.object().shape({
-          category: Yup.string()
-            .required("Category is required"),
-          quantity: Yup.number()
-            .typeError("Quantity must be a number")
-            .integer("Quantity must be an integer")
-            .min(1, "Quantity must be at least 1")
-            .required("Quantity is required"),
-          totalAmount: Yup.number()
-            .typeError("Total Amount must be a number")
-            .integer("Total Amount must be an integer")
-            .min(0, "Total Amount cannot be negative")
-            .required("Total Amount is required"),
+          category: Yup.string().required("Category is required"),
+          quantity: Yup.number().min(1, "Quantity must be at least 1").required("Quantity is required"),
+          totalAmount: Yup.number().min(0, "Total Amount cannot be negative").required("Total Amount is required"),
         })
       )
       .min(1, "At least one line item is required"),
   });
-  
 
-  // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    if (readOnly) {
-      setSubmitting(false);
-      return;
-    }
-  
-    // Ensure numerical fields are integers
     const formValues = {
-      tax: parseInt(values.tax, 10) || 0, // Convert to integer
-      discount: parseInt(values.discount, 10) || 0, // Convert to integer
-      penalty: parseInt(values.penalty, 10) || 0, // Convert to integer
-      discountType: values.discountType || "",
-      govtRefNumber: values.govtRefNumber || "",
-      remark: values.remark || "",
-      invoiceNumber: values.invoiceNumber || "",
       receiver: {
         name: values.receiverName,
         email: values.mailId,
         phone: values.contactNumber,
         address: values.address,
       },
+      discountType: values.discountType,
+      discount: Number(values.discount),
+      penalty: Number(values.penalty),
+      tax: Number(values.tax),
+      govtRefNumber: values.govtRefNumber,
+      remark: values.remark,
+      invoiceNumber: values.invoiceNumber,
       lineItems: values.items.map((item) => ({
         revenueType: item.category,
-        quantity: parseInt(item.quantity, 10) || 0, // Convert to integer
-        total: parseInt(item.totalAmount, 10) || 0, // Convert to integer
+        quantity: Number(item.quantity),
+        total: Number(item.totalAmount),
       })),
     };
-  
-    // Debugging: Log formValues
-    console.log("Submitting Form Values:", formValues);
-  
+
     dispatch(createReceipt(formValues))
       .unwrap()
-      .then((response) => {
-        if (response?.message === "Receipt created successfully") {
-          toast.success("Receipt created successfully!");
-          resetForm();
-          navigate("/finance/receipts/receipt-list");
-        } else {
-          toast.error("Failed to create receipt.");
-        }
+      .then(() => {
+        resetForm();
+        navigate("/finance/receipts/receipt-list");
       })
-      .catch((err) => {
-        console.error("Error creating receipt:", err);
-        toast.error("Error creating receipt.");
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+      .finally(() => setSubmitting(false));
   };
-  
 
   return (
     <DashLayout>
       <div className="p-6 min-h-screen">
-        {/* If read-only, show a top banner */}
-        {readOnly && (
-          <div className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded-md mb-4">
-            Currently in read-only mode. You cannot edit these fields.
-          </div>
-        )}
-
         <Formik
-          initialValues={initialValues}
+          innerRef={formikRef}
+          initialValues={blankInitialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
-          enableReinitialize
         >
-          {({ isSubmitting, resetForm, values, setFieldValue }) => (
-            <Form id="create-receipt-form">
-              {/* Header */}
-              <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-semibold">
-                  {readOnly ? "View Receipt" : "Create Receipts"}
-                </h1>
-                {!readOnly && (
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={() => resetForm()}
-                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                    >
-                      Reset
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 rounded-md text-white"
-                      style={{
-                        background: "linear-gradient(to right, #ec4899, #a855f7)",
-                      }}
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Creating..." : "Create Receipt"}
-                    </button>
-                  </div>
-                )}
+          {({ isSubmitting, values, setFieldValue, resetForm }) => (
+            <Form>
+              {/* Header with Buttons */}
+              <div className="flex justify-end mb-2 space-x-4">
+                <button
+                  type="reset"
+                  onClick={resetForm}
+                  className="px-4 py-2 rounded-md text-white transition duration-300"
+                  style={{
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                  }}
+                  onMouseEnter={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #a855f7, #ec4899)")
+                  }
+                  onMouseLeave={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #ec4899, #a855f7)")
+                  }
+                  disabled={isSubmitting}
+                >
+                  Reset
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-md text-white transition duration-300"
+                  style={{
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                  }}
+                  onMouseEnter={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #a855f7, #ec4899)")
+                  }
+                  onMouseLeave={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #ec4899, #a855f7)")
+                  }
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Create Receipt"}
+                </button>
               </div>
 
-              {/* Receiver Info */}
+
+
+
+              {/* Receiver Details */}
               <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
+              {/* Invoice Number */}
+              <div className="relative mb-6">
+                <InvoiceTextInput
+                  name="invoiceNumber"
+                  label="Invoice Number *"
+                  placeholder="Enter invoice number"
+                  onBlur={() => fetchInvoiceDetails(invoiceNumberInput)} // Fetch details on blur
+                  onChange={(e) => {
+                    setInvoiceNumberInput(e.target.value);
+                    setFieldValue("invoiceNumber", e.target.value); // Update Formik's value
+                  }}
+                  className="w-full md:w-1/3" // Adjust width
+                />
+                {/* Status Icon */}
+                <div className="absolute top-[2.3rem] right-4">
+                  {invoiceStatus === "loading" && <Spin size="small" />}
+                  {invoiceStatus === "success" && (
+                    <CheckCircleOutlined style={{ color: "green", fontSize: "20px" }} />
+                  )}
+                  {invoiceStatus === "error" && (
+                    <CloseCircleOutlined style={{ color: "red", fontSize: "20px" }} />
+                  )}
+                </div>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <TextInput
                   name="receiverName"
-                  label="Student Name *"
-                  placeholder="Enter name"
-                  disabled={readOnly}
+                  label="Receiver Name *"
+                  placeholder="Enter receiver name"
                 />
                 <TextInput
                   name="address"
                   label="Address *"
                   placeholder="Enter address"
-                  disabled={readOnly}
                 />
                 <TextInput
                   name="contactNumber"
                   label="Contact Number *"
                   placeholder="Enter contact number"
-                  disabled={readOnly}
                 />
                 <TextInput
                   name="mailId"
                   label="Email *"
                   placeholder="Enter email"
-                  disabled={readOnly}
                 />
               </div>
-
-              {/* Return Items */}
-              {/* Pass readOnly so we can disable those fields in ReturnItems */}
-              <ReturnItems
-                values={values}
-                setFieldValue={setFieldValue}
-                readOnly={readOnly}
-              />
 
               {/* Payment Info */}
               <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput
-                  name="tax"
-                  label="Tax *"
-                  placeholder="Enter tax amount"
-                  disabled={readOnly}
-                />
+                <TextInput name="tax" label="Tax *" placeholder="Enter tax" />
                 <TextInput
                   name="discount"
                   label="Discount *"
                   placeholder="Enter discount"
-                  disabled={readOnly}
                 />
                 <SelectInput
                   name="discountType"
                   label="Discount Type *"
                   options={[
                     { value: "percentage", label: "Percentage" },
-                    { value: "amount", label: "Fixed Amount" }, // Changed to "amount"
+                    { value: "amount", label: "Fixed Amount" },
                   ]}
-                  placeholder="Select discount type"
-                  disabled={readOnly}
                 />
-
                 <TextInput
                   name="penalty"
                   label="Penalty *"
                   placeholder="Enter penalty"
-                  disabled={readOnly}
                 />
-
-                {/* Optional fields */}
                 <TextInput
                   name="govtRefNumber"
                   label="Government Reference Number"
                   placeholder="Enter reference number"
-                  disabled={readOnly}
-                />
-                <TextInput
-                  name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
-                  label="Invoice Reference ID" // You can update the label if needed
-                  placeholder="Enter invoice reference number"
-                  disabled={readOnly}
                 />
                 <TextInput
                   name="remark"
                   label="Remarks"
-                  placeholder="Any remarks here"
-                  disabled={readOnly}
+                  placeholder="Add remarks"
                 />
-                {/* <FileInput
-                  name="document"
-                  label="Add Document (if any)"
-                  placeholder="Upload file"
-                  onChange={(e) => {
-                    if (!readOnly) {
-                      setFieldValue("document", e.currentTarget.files[0]);
-                    }
-                  }}
-                  disabled={readOnly}
-                /> */}
               </div>
+
+              {/* Items */}
+              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
+              <ReturnItems values={values} setFieldValue={setFieldValue} />
+
+              {/* Optionally, you can keep the buttons here as well if needed
+              <div className="flex justify-end mt-6">
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-md text-white"
+                  style={{
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                  }}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Create Receipt"}
+                </button>
+              </div>
+              */}
             </Form>
           )}
         </Formik>
@@ -332,4 +302,3 @@ const CreateReceipt = () => {
 };
 
 export default CreateReceipt;
-
