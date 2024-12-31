@@ -65,7 +65,7 @@ const CreateReceipt = () => {
     invoiceNumber: "",
 
     // document: null,
-    items: [{ category: "", quantity: "", totalAmount: "" }],
+    items: [{ category: "", quantity: "", totalAmount: null }],
   };
 
   const initialValues = readOnly && receiptData

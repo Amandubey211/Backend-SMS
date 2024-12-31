@@ -20,7 +20,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 // Your renamed Receipt component
-import Receipt from "./Receipt";
+import Receipt from "../../../../../Utils/FinanceTemplate/Receipt";
 
 const RecentReceipts = () => {
   const navigate = useNavigate();
