@@ -14,7 +14,7 @@ import {
   ExportOutlined,
 
 } from "@ant-design/icons";
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -88,88 +88,6 @@ const RecentReceiptsList = () => {
         };
     }, [isReceiptVisible]);
 
-    // --- Cancel Receipt Handler ---
-    const handleConfirmCancelReceipt = async () => {
-        setCancelLoading(true);
-        const result = await dispatch(cancelReceipt(selectedReceiptId));
-        if (result.payload === "Receipt cancel successfully") {
-            toast.success("Receipt canceled successfully!");
-            // Refetch receipts with current pagination
-            dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
-        } else {
-            toast.error("Failed to cancel receipt.");
-        }
-        setCancelLoading(false);
-        setModalVisible(false);
-    };
-
-    // --- Preview Receipt Handler ---
-    const handlePreview = (record) => {
-        setSelectedReceipt(record);
-        setReceiptVisible(true);
-    };
-
-    // --- View Receipt in Read-Only Mode Handler ---
-    const handleViewReadOnlyReceipt = (record) => {
-        navigate("/finance/receipts/add-new-receipt", {
-            state: {
-                readOnly: true,
-                receiptData: record,
-            },
-        });
-    };
-
-    // --- Delete Receipt Handler ---
-    const handleDeleteReceipt = async (record) => {
-        const confirmDelete = window.confirm("Are you sure you want to delete this receipt?");
-        if (!confirmDelete) return;
-
-        try {
-            const result = await dispatch(deleteReceipt(record._id));
-            if (result.payload === "Receipt Deleted successfully") {
-                toast.success("Receipt deleted successfully!");
-                // Refetch receipts with current pagination
-                dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
-            } else {
-                toast.error("Failed to delete receipt.");
-            }
-        } catch (err) {
-            console.error(err);
-            toast.error("An error occurred while deleting the receipt.");
-        }
-    };
-
-    // --- Download PDF from Preview Handler ---
-    const handleDownloadPDF = async () => {
-        try {
-            if (!selectedReceipt) return;
-
-            const pdfTitle = selectedReceipt.receiptNumber
-                ? `${selectedReceipt.receiptNumber}.pdf`
-                : "receipt.pdf";
-
-            const canvas = await html2canvas(popupRef.current, { scale: 2 });
-            const imgData = canvas.toDataURL("image/png");
-
-            const pdf = new jsPDF("p", "pt", "a4");
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-
-            const imgWidth = canvas.width;
-            const imgHeight = canvas.height;
-            const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-            const newWidth = imgWidth * ratio;
-            const newHeight = imgHeight * ratio;
-
-            pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-            pdf.save(pdfTitle);
-        } catch (error) {
-            console.error("Error generating PDF: ", error);
-            toast.error("Failed to generate PDF.");
-        }
-
-    };
-  }, [isReceiptVisible]);
 
   // --- Cancel Receipt ---
   const handleConfirmCancelReceipt = async () => {
@@ -698,7 +616,7 @@ const RecentReceiptsList = () => {
       )}
     </AdminLayout>
   );
-  
+
 };
 
 export default RecentReceiptsList;
