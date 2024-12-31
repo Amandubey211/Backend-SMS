@@ -10,7 +10,7 @@ import {
   DollarCircleOutlined,
 } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import moment from "moment"; // Replaced dayjs with moment
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
@@ -54,6 +54,7 @@ const SummaryRevenueList = () => {
     dispatch(fetchAllIncomes(params));
   }, [dispatch]);
 
+
   const filterOnchange = (e) => {
     const { name, value } = e.target;
 
@@ -74,7 +75,10 @@ const SummaryRevenueList = () => {
       [name]: value,
     }));
   };
-
+  useEffect(() => {
+    dispatch(fetchAllClasses())
+    dispatch(fetchAllIncomes(params));
+  }, [dispatch,params]);
   const handleDeleteSelected = () => {
     if (selectedRowIds.length > 0) {
       dispatch(deleteStudentFees({ ids: selectedRowIds })).then(() =>
@@ -268,6 +272,7 @@ const SummaryRevenueList = () => {
     }) || [];
 
   return (
+  
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
@@ -382,19 +387,22 @@ const SummaryRevenueList = () => {
             </div>
           </div>
           <div className="flex items-center space-y-4 flex-col">
-            <div>
-              <button
-                onClick={() => navigate("/finance/studentfees/add/form")}
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              >
-                <span className="text-gray-800 font-medium">Add New Fees</span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FaPlusCircle size={16} />
-                </div>
-              </button>
-            </div>
-            <div className="flex items-center space-x-4 flex-row">
-              {selectedRowIds?.length == 1 && (
+
+            
+           <div>
+           <button
+              onClick={() => navigate("/finance/studentfees/add/form")}
+              className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+            >
+              <span className="text-gray-800 font-medium">Add New Fees</span>
+              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+              <FiPlus size={16} />
+              </div>
+            </button>
+           </div>
+           <div className="flex items-center space-x-4 flex-row">
+           {selectedRowIds?.length == 1 && (
+
                 <Tooltip title="Create an invoice for the selected unpaid record">
                   <Button
                     icon={<DollarCircleOutlined />}

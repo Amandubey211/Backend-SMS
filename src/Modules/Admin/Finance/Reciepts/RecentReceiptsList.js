@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown, Input, Table, Tag, Tooltip } from "antd";
 import {
+
   MoreOutlined,
   ExclamationCircleOutlined,
   SearchOutlined,
@@ -10,8 +11,10 @@ import {
   FilePdfOutlined,
   MailOutlined,
   EyeOutlined,
+  ExportOutlined,
+
 } from "@ant-design/icons";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import {
@@ -25,66 +28,146 @@ import EmailModal from "../../../../Components/Common/EmailModal";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import { ExportOutlined } from "@ant-design/icons";
 
-// If you have a "Receipt" component for the preview
+
 import Receipt from "./Components/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 
 const RecentReceiptsList = () => {
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  useNavHeading("Finance", "Receipts List");
-  const {
-    receipts = [],
-    loading,
-    error,
-    pagination = {},
-  } = useSelector((state) => state.admin.receipts || {});
 
-  // Basic states
-  const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    useNavHeading("Finance", "Receipts List");
+    const { receipts = [], loading, error, pagination = {} } = useSelector(
+        (state) => state.admin.receipts || {}
+    );
 
-  // Cancel receipt states
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedReceiptId, setSelectedReceiptId] = useState(null);
-  const [cancelLoading, setCancelLoading] = useState(false);
+    // Basic states
+    const [searchQuery, setSearchQuery] = useState("");
 
-  // Email modal states
-  const [isEmailModalOpen, setEmailModalOpen] = useState(false);
+    // Cancel receipt states
+    const [modalVisible, setModalVisible] = useState(false);
+    const [selectedReceiptId, setSelectedReceiptId] = useState(null);
+    const [cancelLoading, setCancelLoading] = useState(false);
 
-  // Receipt preview states
-  const [isReceiptVisible, setReceiptVisible] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
+    // Email modal states
+    const [isEmailModalOpen, setEmailModalOpen] = useState(false);
 
-  // Export modal states
-  const [isExportModalOpen, setExportModalOpen] = useState(false);
+    // Receipt preview states
+    const [isReceiptVisible, setReceiptVisible] = useState(false);
+    const [selectedReceipt, setSelectedReceipt] = useState(null);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageLimit, setPageLimit] = useState(10);
+    // Export modal states
+    const [isExportModalOpen, setExportModalOpen] = useState(false);
 
-  // Ref for outside-click detection & PDF generation
-  const popupRef = useRef(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageLimit, setPageLimit] = useState(10);
 
-  // --- 1) Fetch receipts if empty ---
-  useEffect(() => {
-    dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
-  }, [dispatch, currentPage, pageLimit]);
+    // Ref for outside-click detection & PDF generation
+    const popupRef = useRef(null);
 
-  // --- 2) Close receipt preview modal on outside click ---
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (
-        popupRef.current &&
-        !popupRef.current.contains(event.target) &&
-        isReceiptVisible
-      ) {
-        setReceiptVisible(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+    // --- 1) Fetch receipts when component mounts or pagination changes ---
+    useEffect(() => {
+        dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
+    }, [dispatch, currentPage, pageLimit]);
+
+    // --- 2) Close receipt preview modal on outside click ---
+    useEffect(() => {
+        function handleClickOutside(event) {
+            if (
+                popupRef.current &&
+                !popupRef.current.contains(event.target) &&
+                isReceiptVisible
+            ) {
+                setReceiptVisible(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isReceiptVisible]);
+
+    // --- Cancel Receipt Handler ---
+    const handleConfirmCancelReceipt = async () => {
+        setCancelLoading(true);
+        const result = await dispatch(cancelReceipt(selectedReceiptId));
+        if (result.payload === "Receipt cancel successfully") {
+            toast.success("Receipt canceled successfully!");
+            // Refetch receipts with current pagination
+            dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
+        } else {
+            toast.error("Failed to cancel receipt.");
+        }
+        setCancelLoading(false);
+        setModalVisible(false);
+    };
+
+    // --- Preview Receipt Handler ---
+    const handlePreview = (record) => {
+        setSelectedReceipt(record);
+        setReceiptVisible(true);
+    };
+
+    // --- View Receipt in Read-Only Mode Handler ---
+    const handleViewReadOnlyReceipt = (record) => {
+        navigate("/finance/receipts/add-new-receipt", {
+            state: {
+                readOnly: true,
+                receiptData: record,
+            },
+        });
+    };
+
+    // --- Delete Receipt Handler ---
+    const handleDeleteReceipt = async (record) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this receipt?");
+        if (!confirmDelete) return;
+
+        try {
+            const result = await dispatch(deleteReceipt(record._id));
+            if (result.payload === "Receipt Deleted successfully") {
+                toast.success("Receipt deleted successfully!");
+                // Refetch receipts with current pagination
+                dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
+            } else {
+                toast.error("Failed to delete receipt.");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("An error occurred while deleting the receipt.");
+        }
+    };
+
+    // --- Download PDF from Preview Handler ---
+    const handleDownloadPDF = async () => {
+        try {
+            if (!selectedReceipt) return;
+
+            const pdfTitle = selectedReceipt.receiptNumber
+                ? `${selectedReceipt.receiptNumber}.pdf`
+                : "receipt.pdf";
+
+            const canvas = await html2canvas(popupRef.current, { scale: 2 });
+            const imgData = canvas.toDataURL("image/png");
+
+            const pdf = new jsPDF("p", "pt", "a4");
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+            const newWidth = imgWidth * ratio;
+            const newHeight = imgHeight * ratio;
+
+            pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
+            pdf.save(pdfTitle);
+        } catch (error) {
+            console.error("Error generating PDF: ", error);
+            toast.error("Failed to generate PDF.");
+        }
+
     };
   }, [isReceiptVisible]);
 
@@ -119,6 +202,7 @@ const RecentReceiptsList = () => {
       },
     });
   };
+
 
   // --- Delete receipt ---
   const handleDeleteReceipt = async (record) => {
@@ -287,6 +371,7 @@ const RecentReceiptsList = () => {
       receiverName.includes(q) ||
       paidAmount.includes(q) ||
       dateString.includes(q)
+
     );
   });
 
@@ -413,6 +498,7 @@ const RecentReceiptsList = () => {
               style={{ width: "250px" }}
             />
           </div>
+
 
           <div className="flex items-center space-x-4">
             <button
@@ -612,6 +698,7 @@ const RecentReceiptsList = () => {
       )}
     </AdminLayout>
   );
+  
 };
 
 export default RecentReceiptsList;

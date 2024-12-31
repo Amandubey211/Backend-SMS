@@ -170,7 +170,6 @@ export const updateReceipt = createAsyncThunk(
       formData.append("tax", payload.tax);
       formData.append("discount", payload.discount);
       formData.append("penalty", payload.penalty);
-      formData.append("totalPaidAmount", payload.totalPaidAmount);
       formData.append("govtRefNumber", payload.govtRefNumber);
       formData.append("remark", payload.remark);
       formData.append("schoolId", payload.schoolId);
