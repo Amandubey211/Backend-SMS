@@ -31,7 +31,7 @@ import {
 } from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
-import ReturnInvoice from "../../../../../../Utils/FinanceTemplate/ReturnInvoice";
+import ReturnInvoiceTemplate from "../../../../../../Utils/FinanceTemplate/ReturnInvoice";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Return Invoice List");
@@ -145,18 +145,23 @@ const PenalityandAdjustmentList = () => {
             ? value // Keep whole numbers as they are
             : value.toFixed(2) // Format decimals to two places
           : "0";
-        return <span className="text-xs text-green-600">{formattedValue} QR</span>;
+        return (
+          <span className="text-xs text-green-600">{formattedValue} QR</span>
+        );
       },
       width: 120,
       ellipsis: true,
       sorter: (a, b) => (a.adjustmentTotal || 0) - (b.adjustmentTotal || 0),
-    },    
+    },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (text) => (
-        <Tag color={text === "Cancelled" ? "red" : "purple"} className="text-xs">
+        <Tag
+          color={text === "Cancelled" ? "red" : "purple"}
+          className="text-xs"
+        >
           <span className="text-xs">{text || "Active"}</span>
         </Tag>
       ),
@@ -268,9 +273,7 @@ const PenalityandAdjustmentList = () => {
     status: adjustment?.isCancel ? "Cancelled" : "Active", // Use optional chaining
     adjustedAt: adjustment?.adjustedAt || "N/A",
     ...adjustment, // Spread other properties safely
-
   }));
-
 
   const transformAdjustmentData = (adjustmentData) =>
     adjustmentData?.map(({ _id, ...adjustment }, index) => ({
@@ -294,7 +297,6 @@ const PenalityandAdjustmentList = () => {
       Date: adjustment?.adjustedAt || "N/A",
       academicYearDetails: adjustment?.academicYear?.year || "N/A",
     })) || [];
-
 
   return (
     <Layout title={"Penality & Adjustment List | Student Diwan"}>
@@ -412,11 +414,31 @@ const PenalityandAdjustmentList = () => {
           <Modal
             visible={isPreviewVisible}
             title="Return Invoice Preview"
-            footer={null}
+            footer={null} // Remove footer buttons so we can customize
             onCancel={() => setPreviewVisible(false)}
             width={800}
+            style={{ position: "relative" }} // Allow absolute positioning of the button
           >
-            <ReturnInvoice data={selectedReturnInvoice} />
+            <div id="return-invoice-preview" style={{ position: "relative" }}>
+              <ReturnInvoiceTemplate data={selectedReturnInvoice} />
+
+              {/* Button inside the transparent part of the modal */}
+              <Button
+                key="download"
+                type="primary"
+                onClick={""}
+                style={{
+                  position: "absolute",
+                  right: "20px", // Position it on the right side
+                  top: "20px", // Position it on the top
+                  zIndex: 1000, // Ensure it's on top
+                  background:
+                    "linear-gradient(115deg,rgb(84, 123, 77),rgb(245, 28, 107))", // Gradient background
+                }}
+              >
+                Download PDF
+              </Button>
+            </div>
           </Modal>
         </div>
       </AdminDashLayout>

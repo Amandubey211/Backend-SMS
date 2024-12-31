@@ -2,7 +2,7 @@ import React from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 
-const ReturnInvoice = ({ data }) => {
+const ReturnInvoiceTemplate = ({ data }) => {
   if (!data) return null;
 
   const {
@@ -70,19 +70,21 @@ const ReturnInvoice = ({ data }) => {
         </div>
         <div>
           <p>
-            <strong>Receipt No:</strong>{" "}
+            <strong>Return Invoice No:</strong>{" "}
             {receiptNumber || "RNT0001-202412-0001"}
           </p>
           <p>
             <strong>Ref Invoice No:</strong> {"INV0001-202412-0001"}
           </p>
           <p>
-            <strong>Receipt Date:</strong> {formattedDate || "MM-DD-YYYY"}
+            <strong>Date:</strong> {formattedDate || "MM-DD-YYYY"}
           </p>
-          <p>
-            <strong>Govt Ref (if any):</strong>{" "}
-            {govtRefNumber || "GINV0001-202412-0001"}
-          </p>
+          {govtRefNumber && (
+            <p>
+              <strong>Govt Ref (if any):</strong>{" "}
+              {govtRefNumber || "GINV0001-202412-0001"}
+            </p>
+          )}
         </div>
       </div>
 
@@ -194,46 +196,57 @@ const ReturnInvoice = ({ data }) => {
         </tbody>
       </table>
 
-      {/* Total Invoice Amount */}
-      {/* Summary Table */}
-      <table className="w-full text-sm mt-4 bg-white border border-gray-300 rounded-md">
-        <tbody>
-          <tr className="bg-white">
-            <td className="p-2 border border-gray-300">Total Invoice Amount</td>
-            <td className="p-2 border border-gray-300 text-right">1,000 QAR</td>
-          </tr>
-          <tr className="bg-gray-50">
-            <td className="p-2 border border-gray-300">Return Amount</td>
-            <td className="p-2 border border-gray-300 text-right">200 QAR</td>
-          </tr>
-  
-          <tr className="font-bold text-gray-900 bg-gray-50">
-            <td className="p-2 border border-gray-300">Net Paid Amount</td>
-            <td className="p-2 border border-gray-300 text-right text-pink-600">
-              800 QAR
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      {/* Added ml-auto for right alignment */}
+      <div className="w-full flex justify-between items-start gap-x-2">
+        {/* Remark on the left */}
+        <div className="text-sm text-gray-700 w-2/3">
+          <p>
+            <strong>Remarks:</strong>
+          </p>
+          <ul className="list-disc px-5">
+            {[
+              "Thank you for doing business with us. If you have any questions, please contact us.",
+              "Ensure to retain this document for future reference.",
+              "For further details, reach out to our support team.",
+            ].map((defaultRemark, index) => (
+              <li key={index}>{defaultRemark}</li>
+            ))}
+            {remark && <li>{remark || "rrr"}</li>}
+          </ul>
+        </div>
+
+        {/* Table aligned to the right */}
+        <table className="text-sm  border border-gray-300 rounded-md w-1/2">
+          <tbody>
+            <tr className="bg-white">
+              <td className="p-2 border border-gray-300" colSpan="4">
+                Total Invoice Amount
+              </td>
+              <td className="p-2 border border-gray-300 text-right">
+                1,000 QAR
+              </td>
+            </tr>
+            <tr className="bg-gray-50">
+              <td className="p-2 border border-gray-300" colSpan="4">
+                Return Amount
+              </td>
+              <td className="p-2 border border-gray-300 text-right">200 QAR</td>
+            </tr>
+            <tr className="font-bold text-gray-900 bg-gray-50">
+              <td className="p-2 border border-gray-300" colSpan="4">
+                Net Paid Amount
+              </td>
+              <td className="p-2 border border-gray-300 text-right text-pink-600">
+                800 QAR
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* Remark */}
-
-      <div className="text-sm text-gray-700 my-4">
-        <p>
-          <strong>Remarks:</strong>
-        </p>
-        <ul className="list-disc pl-5">
-          {[
-            "Thank you for doing business with us. If you have any questions, please contact us.",
-            "Ensure to retain this document for future reference.",
-            "For further details, reach out to our support team.",
-          ].map((defaultRemark, index) => (
-            <li key={index}>{defaultRemark}</li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };
 
-export default ReturnInvoice;
+export default ReturnInvoiceTemplate;
