@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button, Modal, Tag, Pagination, Select } from "antd";
 import { ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import Invoice from "./Components/Invoice";
 import { useRef, useEffect } from "react";
@@ -225,7 +225,7 @@ const RecentInvoiceList = () => {
               >
                 <span className="text-gray-800 font-medium">Add New Invoice</span>
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FaPlusCircle size={16} />
+                <FiPlus size={16} />
                 </div>
               </button>
             </div>
