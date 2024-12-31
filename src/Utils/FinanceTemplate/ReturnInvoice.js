@@ -5,13 +5,12 @@ import IconLogo from "../../Assets/RBAC/Icon.svg";
 const ReturnInvoice = ({ data }) => {
   if (!data) return null;
 
-  // Destructure the fields for convenience
   const {
     receiptNumber,
     schoolName,
     date,
     receiver,
-    reciever, // some records have "reciever" key
+    reciever,
     tax,
     discount,
     penalty,
@@ -19,183 +18,220 @@ const ReturnInvoice = ({ data }) => {
     lineItems = [],
     remark,
     govtRefNumber,
+    paymentMethod,
+    paymentStatus,
+    createdBy,
   } = data;
 
-  // We'll use whichever is defined:
   const finalReceiver = reciever?.name ? reciever : receiver;
-
-  // Basic computed values:
   const formattedDate = date ? new Date(date).toLocaleDateString() : "N/A";
-  // If you need a "due date" or anything else, you'll have to define how you want to compute it.
-  // For demonstration, let's just re-use the same date for "Invoice/Receipt Date" and "Due Date".
-
-  // We'll compute Subtotal by summing all lineItems totals:
   const subtotal = lineItems.reduce((acc, item) => acc + (item.total || 0), 0);
-  // If you want a rate or quantity, you might do item.total / item.quantity (for example).
-
-  // If your business logic says totalPaidAmount might be different from the sum, handle that carefully.
-  // We'll assume totalPaidAmount is the final amount or read from lineItems + adjustments.
-
-  // Helper to compute final total
-  const totalAfterAdjustments = subtotal + (tax || 0) + (penalty || 0) - (discount || 0);
+  const totalAfterAdjustments =
+    subtotal + (tax || 0) + (penalty || 0) - (discount || 0);
 
   return (
-    <div className="">
+    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
-        <div className="w-full bg-pink-100 px-4 flex justify-between items-center">
+        <div className="w-full bg-pink-100 px-4 py-2 flex justify-between items-center rounded-t-lg">
           <div>
             <h1 className="font-bold text-lg">{schoolName || "School Name"}</h1>
             <p className="text-sm text-gray-500">
-              {/* If you have a school address, put it here. Otherwise static or blank. */}
               11th Street, Main Road, Pincode: 674258, Maharashtra, India
             </p>
           </div>
-          {/* Right Section for Images */}
           <div className="flex items-center space-x-4">
             <img src={IconLogo} alt="Icon Logo" className="w-8 h-8" />
-            <img src={StudentDiwanLogo} alt="Student Diwan" className="w-20 h-20" />
+            <img
+              src={StudentDiwanLogo}
+              alt="Student Diwan"
+              className="w-20 h-20"
+            />
           </div>
         </div>
         <div
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          RECEIPT
+          RETURN INVOICE
         </div>
       </div>
 
-      {/* Invoice/Receipt Information */}
-      <div className="text-sm text-gray-800 mb-4 grid grid-cols-2 gap-4">
+      {/* Invoice Details */}
+      <div className="text-sm text-gray-800 mb-4 flex justify-between">
         <div>
           <p>
             <strong>Bill To:</strong>
           </p>
-          <p>{finalReceiver?.name || "N/A"}</p>
-          <p>{finalReceiver?.address || ""}</p>
-          <p>{finalReceiver?.phone ? `Phone: ${finalReceiver?.phone}` : ""}</p>
+          <p>Name: {finalReceiver?.name || "Akash"}</p>
+          <p>Email: {finalReceiver?.email || "ak@gmail.com"}</p>
+          <p>Address: {finalReceiver?.address || "India"}</p>
+          <p>Phone no: {finalReceiver?.phone || "8965896589"}</p>
         </div>
         <div>
           <p>
-            <strong>Receipt Number:</strong> {receiptNumber}
+            <strong>Receipt No:</strong>{" "}
+            {receiptNumber || "RNT0001-202412-0001"}
           </p>
           <p>
-            <strong>Receipt Date:</strong> {formattedDate}
+            <strong>Ref Invoice No:</strong> {"INV0001-202412-0001"}
           </p>
           <p>
-            <strong>Due Date:</strong> {formattedDate}
+            <strong>Receipt Date:</strong> {formattedDate || "MM-DD-YYYY"}
           </p>
-          {/* Example: Government reference if you want to show it */}
           <p>
-            <strong>Govt Ref:</strong> {govtRefNumber || "N/A"}
+            <strong>Govt Ref (if any):</strong>{" "}
+            {govtRefNumber || "GINV0001-202412-0001"}
           </p>
         </div>
       </div>
 
-      {/* Student or Payer Information */}
-      {/* If your receipt is for a student, you can show additional info here.
-          If you do not have such data, you can remove this block or rename it. */}
-      <div className="border border-gray-300 rounded mb-6">
-        <table className="w-full text-sm">
-          <tbody>
-            <tr className="bg-gray-100">
-              <th className="p-2 text-left">Name:</th>
-              <td className="p-2">{finalReceiver?.name || "N/A"}</td>
-              <th className="p-2 text-left">Email:</th>
-              <td className="p-2">{finalReceiver?.email || "N/A"}</td>
-              <th className="p-2 text-left">Phone:</th>
-              <td className="p-2">{finalReceiver?.phone || "N/A"}</td>
-            </tr>
-          </tbody>
-        </table>
+      {/* Additional Details */}
+      <div className="mb-4">
+        <p>
+          <strong>Payment Method:</strong> {paymentMethod || "Cash"}
+        </p>
+        <p>
+          <strong>Payment Status:</strong> {paymentStatus || "Paid"}
+        </p>
       </div>
 
+      {/* Items Table */}
       {/* Items Table */}
       <table className="w-full text-sm mb-6 border border-gray-300">
         <thead>
           <tr className="bg-pink-200 text-left">
-            <th className="p-2">S.No</th>
-            <th className="p-2">Items</th>
-            <th className="p-2">Quantity</th>
-            <th className="p-2">Rate</th>
-            <th className="p-2">Amount (QAR)</th>
+            <th className="p-2 border border-gray-300">S.No</th>
+            <th className="p-2 border border-gray-300">Item Description</th>
+            <th className="p-2 border border-gray-300">Quantity</th>
+            <th className="p-2 border border-gray-300">Rate (QAR)</th>
+            <th className="p-2 border border-gray-300">Amount (QAR)</th>
           </tr>
         </thead>
         <tbody>
           {lineItems.length > 0 ? (
-            lineItems.map((item, index) => {
-              const rate =
-                item.quantity && Number(item.quantity) !== 0
-                  ? (item.total / Number(item.quantity)).toFixed(2)
-                  : item.total; // fallback
-              return (
-                <tr key={index}>
-                  <td className="p-2">{index + 1}</td>
-                  <td className="p-2">{item.revenueType || "N/A"}</td>
-                  <td className="p-2">{item.quantity || "1"}</td>
-                  <td className="p-2">{rate} QAR</td>
-                  <td className="p-2">{item.total} QAR</td>
-                </tr>
-              );
-            })
+            lineItems.map((item, index) => (
+              <tr
+                key={index}
+                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
+              >
+                <td className="p-2 border border-gray-300 text-center">
+                  {index + 1}
+                </td>
+                <td className="p-2 border border-gray-300">
+                  {item.revenueType || "N/A"}
+                </td>
+                <td className="p-2 border border-gray-300 text-center">
+                  {item.quantity || 1}
+                </td>
+                <td className="p-2 border border-gray-300 text-right">
+                  {(item.quantity
+                    ? (item.total / item.quantity).toFixed(2)
+                    : item.total || 0
+                  ).toLocaleString()}{" "}
+                  QAR
+                </td>
+                <td className="p-2 border border-gray-300 text-right">
+                  {(item.total || 0).toLocaleString()} QAR
+                </td>
+              </tr>
+            ))
           ) : (
             <tr>
-              <td className="p-2" colSpan="5">
-                No items.
+              <td
+                className="p-2 border border-gray-300 text-center"
+                colSpan="5"
+              >
+                No items found.
               </td>
             </tr>
           )}
-
-          {/* Subtotal row */}
+          {/* Subtotal Row */}
           <tr className="font-bold bg-gray-50">
-            <td className="p-2" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="4">
               Subtotal
             </td>
-            <td className="p-2">{subtotal} QAR</td>
+            <td className="p-2 border border-gray-300 text-right">
+              {subtotal.toLocaleString()} QAR
+            </td>
           </tr>
-          {/* Tax row */}
+          {/* Tax Row */}
           <tr>
-            <td className="p-2" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="4">
               Tax
             </td>
-            <td className="p-2">{tax || 0} QAR</td>
+            <td className="p-2 border border-gray-300 text-right">
+              {(tax || 0).toLocaleString()} QAR
+            </td>
           </tr>
-          {/* Penalty row */}
+          {/* Penalty Row */}
           <tr>
-            <td className="p-2" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="4">
               Penalty
             </td>
-            <td className="p-2">{penalty || 0} QAR</td>
+            <td className="p-2 border border-gray-300 text-right">
+              {(penalty || 0).toLocaleString()} QAR
+            </td>
           </tr>
-          {/* Discount row */}
+          {/* Discount Row */}
           <tr>
-            <td className="p-2" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="4">
               Discount
             </td>
-            <td className="p-2">{discount || 0} QAR</td>
-          </tr>
-          {/* Total row */}
-          <tr className="font-bold text-pink-600">
-            <td className="p-2" colSpan="4">
-              Total Amount
+            <td className="p-2 border border-gray-300 text-right">
+              -{(discount || 0).toLocaleString()} QAR
             </td>
-            <td className="p-2">
-              {totalAfterAdjustments} QAR
+          </tr>
+          {/* Final Total Row */}
+          <tr className="font-bold text-pink-600">
+            <td className="p-2 border border-gray-300" colSpan="4">
+              Final Amount
+            </td>
+            <td className="p-2 border border-gray-300 text-right">
+              {"200" || totalAfterAdjustments.toLocaleString()} QAR
             </td>
           </tr>
         </tbody>
       </table>
 
-      
+      {/* Total Invoice Amount */}
+      {/* Summary Table */}
+      <table className="w-full text-sm mt-4 bg-white border border-gray-300 rounded-md">
+        <tbody>
+          <tr className="bg-white">
+            <td className="p-2 border border-gray-300">Total Invoice Amount</td>
+            <td className="p-2 border border-gray-300 text-right">1,000 QAR</td>
+          </tr>
+          <tr className="bg-gray-50">
+            <td className="p-2 border border-gray-300">Return Amount</td>
+            <td className="p-2 border border-gray-300 text-right">200 QAR</td>
+          </tr>
+  
+          <tr className="font-bold text-gray-900 bg-gray-50">
+            <td className="p-2 border border-gray-300">Net Paid Amount</td>
+            <td className="p-2 border border-gray-300 text-right text-pink-600">
+              800 QAR
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-      {/* Remark Row */}
-      {remark && (
-        <div className="text-sm text-gray-700 my-2">
-          <p>
-            <strong>Remark:</strong> {remark}
-          </p>
-        </div>
-      )}
+      {/* Remark */}
+
+      <div className="text-sm text-gray-700 my-4">
+        <p>
+          <strong>Remarks:</strong>
+        </p>
+        <ul className="list-disc pl-5">
+          {[
+            "Thank you for doing business with us. If you have any questions, please contact us.",
+            "Ensure to retain this document for future reference.",
+            "For further details, reach out to our support team.",
+          ].map((defaultRemark, index) => (
+            <li key={index}>{defaultRemark}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };
