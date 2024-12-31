@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Table, Input, Dropdown, Tag } from "antd";
@@ -46,7 +46,6 @@ const RecentReceipts = () => {
   const popupRef = useRef(null);
 
   // -------------------- Lifecycle --------------------
-  // -------------------- Lifecycle --------------------
   useEffect(() => {
     if (!dataFetched) {
       setFetching(true); // Start fetching
@@ -57,8 +56,6 @@ const RecentReceipts = () => {
       setDataFetched(true);
     }
   }, [dispatch, dataFetched]);
-
-
 
   // Close modal if user clicks outside the popup
   useEffect(() => {
@@ -139,9 +136,13 @@ const RecentReceipts = () => {
     .filter((item) => {
       const receiptNumber = item.receiptNumber?.toLowerCase() || "";
       const receiverName =
-        item.reciever?.name?.toLowerCase() || item.receiver?.name?.toLowerCase() || "";
+        item.reciever?.name?.toLowerCase() ||
+        item.receiver?.name?.toLowerCase() ||
+        "";
       const paidAmount = item.totalPaidAmount?.toString() || "";
-      const dateString = item.date ? new Date(item.date).toLocaleDateString() : "";
+      const dateString = item.date
+        ? new Date(item.date).toLocaleDateString()
+        : "";
 
       return (
         receiptNumber.includes(searchQuery.toLowerCase()) ||
@@ -174,24 +175,11 @@ const RecentReceipts = () => {
       render: (_, record) =>
         record.reciever?.name || record.receiver?.name || "N/A",
     },
-    // {
-    //   title: "Tax",
-    //   dataIndex: "tax",
-    //   key: "tax",
-    //   sorter: (a, b) => (a.tax || 0) - (b.tax || 0),
-    //   render: (tax) => (
-    //     <Tag color="red" className="text-xs">
-    //       {tax || 0} QR
-    //     </Tag>
-    //   ),
-    //   width: 100,
-    //   ellipsis: true,
-    // },
     {
       title: "Discount",
       dataIndex: "discount",
       key: "discount",
-      sorter: (a, b) => (a.discount || 0) - (b.discount || 0), // Optional: Preserve sorting
+      sorter: (a, b) => (a.discount || 0) - (b.discount || 0),
       render: (value, record) =>
         record.discountType === "percentage" ? (
           <Tag color="purple" className="text-xs">
@@ -232,7 +220,6 @@ const RecentReceipts = () => {
         ),
       render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
     },
-    ,
     {
       title: "Status",
       dataIndex: "isCancel",
@@ -257,13 +244,13 @@ const RecentReceipts = () => {
       render: (date) =>
         date
           ? new Intl.DateTimeFormat("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }).format(new Date(date))
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }).format(new Date(date))
           : "N/A",
     },
-    // },
+    // Action Column (Uncomment and customize if needed)
     // {
     //   title: "Action",
     //   key: "action",
@@ -273,12 +260,12 @@ const RecentReceipts = () => {
     //         <Menu>
     //           {/* 1) Preview in a popup */}
     //           <Menu.Item onClick={() => handlePreview(record)}>Preview</Menu.Item>
-
+    //
     //           {/* 2) View as read-only in CreateReceipt */}
     //           <Menu.Item onClick={() => handleViewReadOnly(record)}>
     //             View (Read-Only)
     //           </Menu.Item>
-
+    //
     //           {/* 3) Cancel Receipt */}
     //           <Menu.Item
     //             onClick={() => {
@@ -297,33 +284,6 @@ const RecentReceipts = () => {
     //   ),
     // },
   ];
-
-  // -------------------- Loading / Error States --------------------
-  if (fetching || loading) {
-    return (
-      <div style={{ textAlign: "center", padding: "16px" }}>
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
-        <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-        <p>Unable to fetch the receipts.</p>
-      </div>
-    );
-  }
-
-  if (!fetching && filteredData.length === 0) {
-    return (
-      <div style={{ textAlign: "center", color: "#999", marginTop: "16px" }}>
-        <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-        <p>No receipts available.</p>
-      </div>
-    );
-  }
 
   // -------------------- Render --------------------
   return (
@@ -358,35 +318,54 @@ const RecentReceipts = () => {
         </div>
       </div>
 
+      {/* Loading Indicator */}
+      {fetching || loading ? (
+        <div style={{ textAlign: "center", padding: "16px" }}>
+          <Spinner />
+        </div>
+      ) : error ? (
+        <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
+          <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+          <p>Unable to fetch the receipts.</p>
+        </div>
+      ) : (
+        // The Receipts Table with Custom No Data
+        <Table
+          rowKey={(record) => record._id}
+          columns={columns}
+          dataSource={filteredData}
+          expandable={{
+            expandedRowRender: (record) => (
+              <div>
+                <strong>Line Items:</strong>
+                {record.lineItems && record.lineItems.length > 0 ? (
+                  <ul>
+                    {record.lineItems.map((item, index) => (
+                      <li key={index}>
+                        {item.revenueType}: {item.total} QR (Qty: {item.quantity})
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span>No line items available</span>
+                )}
+              </div>
+            ),
+          }}
+          size="small"
+          pagination={false} // Disable Ant Design pagination
+          locale={{
+            emptyText: (
+              <div className="flex flex-col items-center text-gray-500 text-xs py-4">
+                <ExclamationCircleOutlined style={{ fontSize: "48px", marginBottom: "8px" }} />
+                <span>No receipts available.</span>
+              </div>
+            ),
+          }}
+        />
+      )}
 
-      {/* The Receipts Table */}
-      <Table
-        rowKey={(record) => record._id}
-        columns={columns}
-        dataSource={filteredData}
-        expandable={{
-          expandedRowRender: (record) => (
-            <div>
-              <strong>Line Items:</strong>
-              {record.lineItems && record.lineItems.length > 0 ? (
-                <ul>
-                  {record.lineItems.map((item, index) => (
-                    <li key={index}>
-                      {item.revenueType}: {item.total} QR (Qty: {item.quantity})
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <span>No line items available</span>
-              )}
-            </div>
-          ),
-        }}
-        size='small'
-        pagination={false} // Disable Ant Design pagination
-      />
-
-      {/* Cancel Receipt Confirmation Modal (unchanged) */}
+      {/* Cancel Receipt Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={modalVisible}
         onClose={() => setModalVisible(false)}
@@ -434,8 +413,6 @@ const RecentReceipts = () => {
                 </button>
 
               </div>
-
-
 
               {/* Receipt Component */}
               <Receipt receiptData={selectedReceipt} />
