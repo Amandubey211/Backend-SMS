@@ -51,7 +51,7 @@ export const fetchAllReceipts = createAsyncThunk(
 
 
       const say=getAY();
-      const response = await getData(`/finance/revenue/all/receipt?say=${say}&page=${page}&limit=${limit}`); // Backend API with pagination
+      const response = await getData(`/finance/revenue/all/receipt?page=1&limit=${limit}`); // Backend API with pagination
 
       if (response?.data) {
         const { data, pagination } = response;

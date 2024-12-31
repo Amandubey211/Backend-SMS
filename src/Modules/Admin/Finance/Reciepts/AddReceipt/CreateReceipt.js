@@ -285,7 +285,7 @@ const CreateReceipt = () => {
 
               {/* Receiver Info */}
               <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 relative">
                 <TextInput
                   name="receiverName"
                   label="Student Name *"
