@@ -99,3 +99,14 @@ const generatePDFContent = (pdf, data, schoolName = "Student Diwan", fields = nu
     pdf.save(fileName);
   };
   
+
+  export const flattenObject = (obj, prefix = "") => 
+    Object.entries(obj || {}).reduce((acc, [key, value]) => {
+      const newKey = prefix ? `${prefix}.${key}` : key;
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        Object.assign(acc, flattenObject(value, newKey));
+      } else {
+        acc[newKey] = value;
+      }
+      return acc;
+    }, {});

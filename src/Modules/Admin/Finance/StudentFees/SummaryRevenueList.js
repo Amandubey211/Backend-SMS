@@ -1,11 +1,14 @@
-
-
-
 import React, { useState, useEffect } from "react";
 import { Table, Modal, Button, Spin, Alert, Tooltip, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { EditOutlined, DeleteOutlined, EyeOutlined, ExportOutlined, DollarCircleOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  ExportOutlined,
+  DollarCircleOutlined,
+} from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
 import moment from "moment"; // Replaced dayjs with moment
@@ -19,37 +22,38 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import { FaPlusCircle } from "react-icons/fa";
 import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
+import { flattenObject } from "../../../../Utils/xl";
+import ExportModal from "../Earnings/Components/ExportModal";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-    const {
-      incomes,
-      loading,
-      error,
-      totalRecords,
-      totalPages,
-      currentPage,
-    } = useSelector((state) => state.admin.earnings);
+  const { incomes, loading, error, totalRecords, totalPages, currentPage } =
+    useSelector((state) => state.admin.earnings);
   const [computedPageSize, setComputedPageSize] = useState(10);
   let sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
   const classList = useSelector((state) => state.admin.class.classes);
+  const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
   const [params, setParams] = useState({
-    limit:  computedPageSize,
+    limit: computedPageSize,
     categoryName: "Student-Based Revenue",
     includeDetails: true,
     classId: "",
     sectionId: "",
     subCategory: "",
-    page:currentPage
+    page: currentPage,
   });
 
   const [selectedRowIds, setSelectedRowIds] = useState([]); // To store selected rows
 
-  
+  useEffect(() => {
+    dispatch(fetchAllClasses());
+    dispatch(fetchAllIncomes(params));
+  }, [dispatch]);
+
 
   const filterOnchange = (e) => {
     const { name, value } = e.target;
@@ -77,8 +81,10 @@ const SummaryRevenueList = () => {
   }, [dispatch,params]);
   const handleDeleteSelected = () => {
     if (selectedRowIds.length > 0) {
-      dispatch(deleteStudentFees({ids:selectedRowIds})).then(()=>dispatch(fetchAllIncomes(params)));
-      setSelectedRowIds([]); 
+      dispatch(deleteStudentFees({ ids: selectedRowIds })).then(() =>
+        dispatch(fetchAllIncomes(params))
+      );
+      setSelectedRowIds([]);
     } else {
       console.log("No rows selected");
     }
@@ -96,10 +102,13 @@ const SummaryRevenueList = () => {
       title: "Student",
       dataIndex: "studentDetails",
       key: "studentDetails",
-      render: (studentDetails) =>
-        <Tooltip title={studentDetails?.firstName +' ' +studentDetails?.lastName}>
-        {studentDetails?.firstName?.slice(0, 10) + ".." || "N/A"}
+      render: (studentDetails) => (
+        <Tooltip
+          title={studentDetails?.firstName + " " + studentDetails?.lastName}
+        >
+          {studentDetails?.firstName?.slice(0, 10) + ".." || "N/A"}
         </Tooltip>
+      ),
     },
     {
       title: "Class",
@@ -113,14 +122,14 @@ const SummaryRevenueList = () => {
       key: "subCategory",
       render: (text) => <span>{text || "N/A"}</span>,
     },
-    
-          {
-            title: "Total Amount",
-            dataIndex: "total_amount",
-            key: "total_amount",
-            sorter: (a, b) => a.total_amount - b.total_amount,
-            render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
-          },
+
+    {
+      title: "Total Amount",
+      dataIndex: "total_amount",
+      key: "total_amount",
+      sorter: (a, b) => a.total_amount - b.total_amount,
+      render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
+    },
 
     {
       title: "Final Amount",
@@ -185,11 +194,8 @@ const SummaryRevenueList = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <div
-          className="flex space-x-1"
-          onClick={(e) => e.stopPropagation()}
-        >
-           <Tooltip title="View">
+        <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+          <Tooltip title="View">
             <Button
               type="link"
               icon={<EyeOutlined />}
@@ -211,7 +217,6 @@ const SummaryRevenueList = () => {
               aria-label="Edit"
             />
           </Tooltip>
-         
         </div>
       ),
     },
@@ -242,13 +247,37 @@ const SummaryRevenueList = () => {
     setSelectedRecord(null); // Clear selected record
   };
 
+  const transformStdFeeData = (incomes) =>
+    incomes?.map(({ _id, category, collectBy, document, ...income }, index) => {
+      const flattenedIncome = flattenObject(income);
+      return {
+        sNo: index + 1,
+        category: category?.categoryName || "N/A",
+        ...flattenedIncome,
+        subCategory: flattenedIncome["subCategory"] || "N/A",
+        description: flattenedIncome["description"] || "N/A",
+        paymentType: flattenedIncome["paymentType"] || "N/A",
+        paymentStatus: flattenedIncome["paymentStatus"] || "N/A",
+        tax: flattenedIncome["tax"] || "N/A",
+        penalty: flattenedIncome["penalty"] || 0,
+        discount: flattenedIncome["discount"] || 0,
+        discountType: flattenedIncome["discountType"] || "N/A",
+        paidAmount: flattenedIncome["paid_amount"] || 0,
+        remainingAmount: flattenedIncome["remaining_amount"] || 0,
+        totalAmount: flattenedIncome["total_amount"] || 0,
+        finalAmount: flattenedIncome["final_amount"] || 0,
+        academicYearDetails:
+          flattenedIncome["academicYearDetails.year"] || "N/A",
+      };
+    }) || [];
+
   return (
   
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
-        <div className="flex flex-col space-y-4">
+          <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-4">
               {/* Class Filter */}
               <div className="flex flex-col">
@@ -345,20 +374,20 @@ const SummaryRevenueList = () => {
                 <span className="text-gray-700">Unpaid</span>
               </label>
               <div className="flex items-center space-x-4 ">
-            {selectedRowIds.length > 0 && (
-              <Button
-                type="danger"
-                onClick={handleDeleteSelected}
-                icon={<DeleteOutlined />}
-              >
-                Delete Selected
-              </Button>
-            )}
-          </div>
+                {selectedRowIds.length > 0 && (
+                  <Button
+                    type="danger"
+                    onClick={handleDeleteSelected}
+                    icon={<DeleteOutlined />}
+                  >
+                    Delete Selected
+                  </Button>
+                )}
+              </div>
             </div>
-            
           </div>
           <div className="flex items-center space-y-4 flex-col">
+
             
            <div>
            <button
@@ -373,32 +402,31 @@ const SummaryRevenueList = () => {
            </div>
            <div className="flex items-center space-x-4 flex-row">
            {selectedRowIds?.length == 1 && (
+
                 <Tooltip title="Create an invoice for the selected unpaid record">
                   <Button
-                   
                     icon={<DollarCircleOutlined />}
                     onClick={() => {
-
-                        navigate("/finance/invoices/add-new-invoice")}}
-                     
-                  
-                 className="flex items-center  px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
+                      navigate("/finance/invoices/add-new-invoice");
+                    }}
+                    className="flex items-center  px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
                   >
                     Create Invoice
                   </Button>
                 </Tooltip>
               )}
-            <button
-              className="flex items-center  px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
-              onClick={() => console.log("Exporting data...")}
-            >
-              <ExportOutlined className="pr-2" /> Export
-            </button>
+              <Button
+                type="primary"
+                icon={<ExportOutlined />}
+                onClick={() => setIsExportModalVisible(true)}
+                className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+              >
+                Export
+              </Button>
             </div>
           </div>
-        
         </div>
-        
+
         <div className="mt-6">
           {loading ? (
             <Spinner />
@@ -409,38 +437,39 @@ const SummaryRevenueList = () => {
               rowSelection={rowSelection}
               dataSource={incomes}
               columns={columns}
-             pagination={{
-                             current: currentPage,
-                             total: totalRecords,
-                             pageSize: computedPageSize,
-                             showSizeChanger: true, 
-                             pageSizeOptions: ["5", "10", "20", "50"], 
-                             size: "small",
-                             showTotal: (total, range) =>
-                               `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                             onChange: (page, pageSize) => {
-                               dispatch(setCurrentPage(page)); 
-                               setComputedPageSize(pageSize); 
-                               dispatch(fetchAllIncomes({
-                                limit:  pageSize,
-                                categoryName: "Student-Based Revenue",
-                                includeDetails: true,
-                                classId: "",
-                                sectionId: "",
-                                subCategory: "",
-                                page:page
-                              }));
-                             },
-                             onShowSizeChange: (current, size) => {
-                               setComputedPageSize(size); 
-                               dispatch(setCurrentPage(1));
-                             },
-                           }}
+              pagination={{
+                current: currentPage,
+                total: totalRecords,
+                pageSize: computedPageSize,
+                showSizeChanger: true,
+                pageSizeOptions: ["5", "10", "20", "50"],
+                size: "small",
+                showTotal: (total, range) =>
+                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                onChange: (page, pageSize) => {
+                  dispatch(setCurrentPage(page));
+                  setComputedPageSize(pageSize);
+                  dispatch(
+                    fetchAllIncomes({
+                      limit: pageSize,
+                      categoryName: "Student-Based Revenue",
+                      includeDetails: true,
+                      classId: "",
+                      sectionId: "",
+                      subCategory: "",
+                      page: page,
+                    })
+                  );
+                },
+                onShowSizeChange: (current, size) => {
+                  setComputedPageSize(size);
+                  dispatch(setCurrentPage(1));
+                },
+              }}
               rowKey="_id"
               size="small"
             />
           )}
-        
         </div>
       </div>
       <Sidebar
@@ -456,6 +485,13 @@ const SummaryRevenueList = () => {
           />
         )}
       </Sidebar>
+      <ExportModal
+        visible={isExportModalVisible}
+        onClose={() => setIsExportModalVisible(false)}
+        dataToExport={transformStdFeeData(incomes)}
+        title="Student Fees Data"
+        sheet="student_fees_report"
+      />
     </AdminLayout>
   );
 };
