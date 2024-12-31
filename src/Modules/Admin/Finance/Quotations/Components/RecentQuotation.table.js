@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { fetchAllQuotations } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
+import Spinner from "../../../../../Components/Common/Spinner";
 
 
 const RecentQuotation = () => {
@@ -116,14 +117,14 @@ const RecentQuotation = () => {
                     className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
                     size="small"
                 >
-                    View More ({totalRecords})
+                    View More ({totalRecords - 5})
                 </Button>
             </div>
 
             {/* Loading Indicator */}
             {loading && (
                 <div className="flex justify-center">
-                    <Spin tip="Loading..." />
+                    <Spinner tip="Loading..." />
                 </div>
             )}
             {/* Error Message */}
