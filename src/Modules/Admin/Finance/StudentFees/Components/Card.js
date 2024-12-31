@@ -4,7 +4,6 @@ import PropTypes from "prop-types";
 import { useSelector } from "react-redux";
 
 const Card = ({ title, value, comparison, percentage, icon, trend }) => {
- 
   return (
     <div
       className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"

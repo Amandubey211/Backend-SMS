@@ -5,9 +5,9 @@ import React, { useState, useEffect } from "react";
 import { Table, Modal, Button, Spin, Alert, Tooltip, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { EditOutlined, DeleteOutlined, EyeOutlined, ExportOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, EyeOutlined, ExportOutlined, DollarCircleOutlined } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import moment from "moment"; // Replaced dayjs with moment
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
@@ -17,36 +17,39 @@ import NoDataFound from "../../../../Components/Common/NoDataFound";
 import EditStudentFeesForm from "./EditStudentFeesForm";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import { deleteStudentFees } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
-import { use } from "i18next";
+import { FaPlusCircle } from "react-icons/fa";
+import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
-  const { incomes, loading, error, totalRecords,totalPages } = useSelector(
-    (state) => state.admin.earnings
-  );
-
+    const {
+      incomes,
+      loading,
+      error,
+      totalRecords,
+      totalPages,
+      currentPage,
+    } = useSelector((state) => state.admin.earnings);
+  const [computedPageSize, setComputedPageSize] = useState(10);
   let sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
   const classList = useSelector((state) => state.admin.class.classes);
 
   const [params, setParams] = useState({
-    limit:  10,
+    limit:  computedPageSize,
     categoryName: "Student-Based Revenue",
     includeDetails: true,
     classId: "",
     sectionId: "",
     subCategory: "",
+    page:currentPage
   });
 
   const [selectedRowIds, setSelectedRowIds] = useState([]); // To store selected rows
 
-  useEffect(() => {
-    dispatch(fetchAllClasses());
-    dispatch(fetchAllIncomes(params));
-  }, [dispatch, params]);
+  
 
   const filterOnchange = (e) => {
     const { name, value } = e.target;
@@ -68,7 +71,10 @@ const SummaryRevenueList = () => {
       [name]: value,
     }));
   };
-
+  useEffect(() => {
+    dispatch(fetchAllClasses())
+    dispatch(fetchAllIncomes(params));
+  }, [dispatch,params]);
   const handleDeleteSelected = () => {
     if (selectedRowIds.length > 0) {
       dispatch(deleteStudentFees({ids:selectedRowIds})).then(()=>dispatch(fetchAllIncomes(params)));
@@ -107,33 +113,13 @@ const SummaryRevenueList = () => {
       key: "subCategory",
       render: (text) => <span>{text || "N/A"}</span>,
     },
-    {
-            title: "Status",
-            dataIndex: "paymentStatus",
-            key: "paymentStatus",
-            render: (status) => {
-              let color = "default";
-              switch (status) {
-                case "paid":
-                  color = "green";
-                  break;
-                case "partial":
-                  color = "yellow";
-                  break;
-                case "unpaid":
-                  color = "red";
-                  break;
-                default:
-                  color = "default";
-              }
-              return (
-                <Tag color={color} className="text-xs capitalize">
-                  {status || "N/A"}
-                </Tag>
-              );
-            },
-            width: 80,
-            ellipsis: true,
+    
+          {
+            title: "Total Amount",
+            dataIndex: "total_amount",
+            key: "total_amount",
+            sorter: (a, b) => a.total_amount - b.total_amount,
+            render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
           },
 
     {
@@ -144,14 +130,35 @@ const SummaryRevenueList = () => {
       render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
     },
     {
-      title: "Paid Amount",
-      dataIndex: "paid_amount",
-      key: "paid_amount",
-      sorter: (a, b) => a.paid_amount - b.paid_amount,
-      render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
+      title: "Status",
+      dataIndex: "paymentStatus",
+      key: "paymentStatus",
+      render: (status) => {
+        let color = "default";
+        switch (status) {
+          case "paid":
+            color = "green";
+            break;
+          case "partial":
+            color = "yellow";
+            break;
+          case "unpaid":
+            color = "red";
+            break;
+          default:
+            color = "default";
+        }
+        return (
+          <Tag color={color} className="text-xs capitalize">
+            {status || "N/A"}
+          </Tag>
+        );
+      },
+      width: 80,
+      ellipsis: true,
     },
     {
-      title: "Date",
+      title: "Paid Date",
       dataIndex: "paidDate",
       key: "paidDate",
       sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
@@ -236,6 +243,7 @@ const SummaryRevenueList = () => {
   };
 
   return (
+  
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
@@ -350,22 +358,43 @@ const SummaryRevenueList = () => {
             </div>
             
           </div>
-          <div className="flex items-center space-x-4">
-            <button
-              className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
-              onClick={() => console.log("Exporting data...")}
-            >
-              <ExportOutlined /> Export
-            </button>
-            <button
+          <div className="flex items-center space-y-4 flex-col">
+            
+           <div>
+           <button
               onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
-              <span className="text-gray-800 font-medium">Add New Fee</span>
+              <span className="text-gray-800 font-medium">Add New Fees</span>
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiUserPlus size={16} />
+              <FiPlus size={16} />
               </div>
             </button>
+           </div>
+           <div className="flex items-center space-x-4 flex-row">
+           {selectedRowIds?.length == 1 && (
+                <Tooltip title="Create an invoice for the selected unpaid record">
+                  <Button
+                   
+                    icon={<DollarCircleOutlined />}
+                    onClick={() => {
+
+                        navigate("/finance/invoices/add-new-invoice")}}
+                     
+                  
+                 className="flex items-center  px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
+                  >
+                    Create Invoice
+                  </Button>
+                </Tooltip>
+              )}
+            <button
+              className="flex items-center  px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
+              onClick={() => console.log("Exporting data...")}
+            >
+              <ExportOutlined className="pr-2" /> Export
+            </button>
+            </div>
           </div>
         
         </div>
@@ -380,15 +409,33 @@ const SummaryRevenueList = () => {
               rowSelection={rowSelection}
               dataSource={incomes}
               columns={columns}
-              pagination={{
-                current: currentPage,
-                pageSize: 10,
-                total: totalRecords,
-                onChange: (page) => {
-                  setCurrentPage(page);
-                  dispatch(fetchAllIncomes({ ...params, page }));
-                },
-              }}
+             pagination={{
+                             current: currentPage,
+                             total: totalRecords,
+                             pageSize: computedPageSize,
+                             showSizeChanger: true, 
+                             pageSizeOptions: ["5", "10", "20", "50"], 
+                             size: "small",
+                             showTotal: (total, range) =>
+                               `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                             onChange: (page, pageSize) => {
+                               dispatch(setCurrentPage(page)); 
+                               setComputedPageSize(pageSize); 
+                               dispatch(fetchAllIncomes({
+                                limit:  pageSize,
+                                categoryName: "Student-Based Revenue",
+                                includeDetails: true,
+                                classId: "",
+                                sectionId: "",
+                                subCategory: "",
+                                page:page
+                              }));
+                             },
+                             onShowSizeChange: (current, size) => {
+                               setComputedPageSize(size); 
+                               dispatch(setCurrentPage(1));
+                             },
+                           }}
               rowKey="_id"
               size="small"
             />

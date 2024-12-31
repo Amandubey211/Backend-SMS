@@ -97,8 +97,9 @@ export const fetchAllIncomes = createAsyncThunk(
   "earnings/fetchAllIncomes",
   async (params, { rejectWithValue, dispatch }) => {
     try {
+      const say=getAY();
       dispatch(setShowError(false));
-      const response = await getData("/finance/revenue/get-income", params);
+      const response = await getData(`/finance/revenue/get-income?academicYear=${say}`, params);
 
       if (response?.success) {
         return response;

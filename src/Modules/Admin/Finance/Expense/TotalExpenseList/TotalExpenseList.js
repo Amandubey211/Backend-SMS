@@ -1,7 +1,16 @@
 // src/Modules/Admin/Finance/Components/TotalExpenseList.jsx
 
 import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Table, Input, Button, Spin, Alert, Tooltip, Tag } from "antd";
+import {
+  Table,
+  Input,
+  Button,
+  Spin,
+  Alert,
+  Tooltip,
+  Tag,
+  Checkbox,
+} from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
@@ -12,6 +21,9 @@ import {
   SyncOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
+  DollarCircleOutlined,
+  CloudOutlined,
+  CreditCardOutlined,
 } from "@ant-design/icons";
 import { AiFillAccountBook } from "react-icons/ai";
 import { BiDonateHeart } from "react-icons/bi";
@@ -21,7 +33,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-// import DeleteModal from "./Components/DeleteModal";
 import debounce from "lodash.debounce";
 import { fetchAllExpenses } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import {
@@ -34,6 +45,8 @@ import {
 import toast from "react-hot-toast";
 import Card from "../components/Card";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import ExportModal from "../../Earnings/Components/ExportModal";
+import DeleteModal from "../../Earnings/Components/DeleteModal";
 
 const TotalExpenseList = () => {
   useNavHeading("Finance", "Expense List");
@@ -43,9 +56,13 @@ const TotalExpenseList = () => {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-
+  const [isBulkEntriesModalVisible, setIsBulkEntriesModalVisible] =
+    useState(false);
   const [selectedExpenseForDeletion, setSelectedExpenseForDeletion] =
     useState(null);
+
+  // State for selected row key (single selection)
+  const [selectedRowKey, setSelectedRowKey] = useState(null);
 
   // Navigation and dispatch
   const navigate = useNavigate();
@@ -70,6 +87,7 @@ const TotalExpenseList = () => {
   // Initialize local state for computedPageSize
   const [computedPageSize, setComputedPageSize] = useState(pageSize || 10);
 
+  // Custom header cell for table
   const CustomHeaderCell = (props) => (
     <th {...props} className="bg-pink-100 py-1 px-2 text-xs" />
   );
@@ -159,10 +177,10 @@ const TotalExpenseList = () => {
     </div>
   );
 
-  // Formatting functions
-  const formatCurrency = (value) =>
+  // Formatting functions with optional currency parameter
+  const formatCurrency = (value, currency = "QR") =>
     value !== undefined && value !== null
-      ? `${value.toLocaleString()} QR`
+      ? `${value.toLocaleString()} ${currency}`
       : "N/A";
 
   const formatPercentage = (value) =>
@@ -171,9 +189,47 @@ const TotalExpenseList = () => {
   const formatDate = (date) =>
     date ? new Date(date).toLocaleDateString() : "N/A";
 
-  // Define table columns without the selection column
+  // Define table columns with a separate selection column using Checkboxes
   const columns = useMemo(
     () => [
+      // Selection Column
+      {
+        title: "",
+        key: "selection",
+        width: 60,
+        render: (_, record) => {
+          const isSelected = selectedRowKey === record.key;
+          if (record.paymentStatus === "unpaid") {
+            return (
+              <div className="flex items-center justify-center">
+                <Tooltip title="Selectable">
+                  <Checkbox
+                    checked={isSelected}
+                    onChange={(e) => {
+                      e.stopPropagation();
+                      if (e.target.checked) {
+                        setSelectedRowKey(record.key);
+                      } else {
+                        setSelectedRowKey(null);
+                      }
+                    }}
+                    aria-label={isSelected ? "Unselect" : "Select"}
+                  />
+                </Tooltip>
+              </div>
+            );
+          } else {
+            return (
+              <div className="flex items-center justify-center">
+                <Tooltip title="Not selectable">
+                  <Checkbox disabled />
+                </Tooltip>
+                {/* <BlockOutlined className="ml-1 text-red-500" /> */}
+              </div>
+            );
+          }
+        },
+      },
       {
         title: "Category",
         dataIndex: "categoryName",
@@ -250,6 +306,35 @@ const TotalExpenseList = () => {
         width: 120,
         ellipsis: true,
       },
+      // Status Column
+      {
+        title: "Status",
+        dataIndex: "paymentStatus",
+        key: "paymentStatus",
+        render: (status) => {
+          let color = "default";
+          switch (status) {
+            case "paid":
+              color = "green";
+              break;
+            case "partial":
+              color = "yellow";
+              break;
+            case "unpaid":
+              color = "red";
+              break;
+            default:
+              color = "default";
+          }
+          return (
+            <Tag color={color} className="text-xs capitalize">
+              {status || "N/A"}
+            </Tag>
+          );
+        },
+        width: 80,
+        ellipsis: true,
+      },
       // Action Column
       {
         title: "Action",
@@ -259,8 +344,26 @@ const TotalExpenseList = () => {
         width: 120,
       },
     ],
-    [expenseIdMap]
+    [selectedRowKey, expenseIdMap]
   );
+
+  // Transform expense data for export
+  const transformExpenseData = (expenses) =>
+    expenses?.map(({ _id, category, ...expense }, index) => ({
+      sNo: index + 1,
+      category: category?.[0]?.categoryName || "N/A",
+      description: expense.description || "N/A",
+      paymentType: expense.paymentType || "N/A",
+      discount: expense.discount || 0,
+      discountType: expense.discountType || "percentage",
+      finalAmount: expense.finalAmount || 0,
+      paidAmount: expense.paidAmount || 0,
+      remainingAmount: expense.remainingAmount || 0,
+      penalty: expense.penalty || 0,
+      earnedDate: expense.paidDate || expense.generateDate || "N/A",
+      totalAmount: expense.totalAmount || 0,
+      academicYearDetails: expense.academicYearDetails?.[0]?.year || "N/A",
+    })) || [];
 
   // Map expenses to data source with camelCase fields
   const dataSource = useMemo(
@@ -269,7 +372,7 @@ const TotalExpenseList = () => {
         key: expense._id,
         categoryName: expense.category?.[0]?.categoryName || "N/A",
         description: expense.description || (
-          <span className="text-yellow-600">No Description </span>
+          <span className="text-yellow-600">No Description</span>
         ),
         paymentType: expense.paymentType || "N/A",
         discount: expense.discount || 0,
@@ -278,6 +381,7 @@ const TotalExpenseList = () => {
         paidAmount: expense.paidAmount || 0,
         remainingAmount: expense.remainingAmount || 0,
         penalty: expense.penalty || 0,
+        paymentStatus: expense.paymentStatus || "N/A",
         earnedDate: expense.paidDate || expense.generateDate || null,
         totalAmount: expense.totalAmount || 0,
         academicYearDetails: expense.academicYearDetails?.[0]?.year || "N/A",
@@ -310,57 +414,53 @@ const TotalExpenseList = () => {
 
     return (
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={3}>
+        <Table.Summary.Cell index={0} colSpan={4}>
           <strong>Totals:</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={3}>
+        <Table.Summary.Cell index={4}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={4}>
+        <Table.Summary.Cell index={5}>
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5}>
+        <Table.Summary.Cell index={6}>
           <strong>{formatCurrency(totalPaidAmountSum)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={6}>
+        <Table.Summary.Cell index={7}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={7} />
+        <Table.Summary.Cell index={8}></Table.Summary.Cell>
+        <Table.Summary.Cell index={9} />
       </Table.Summary.Row>
     );
   };
 
-  // Define card data directly without importing from cardsData
-  // Define card data directly without importing from cardsData
-
-  // Define card data directly without importing from cardsData
+  // Retrieve statistics from Redux store and map to color classes
   const cardDataWithValues = useMemo(() => {
     const cards = [
       {
         title: "Total Paid Amount",
-        value: formatCurrency(totalPaidAmount),
+        value: formatCurrency(totalPaidAmount, "QAR"),
         icon: <FaRegMoneyBillAlt />,
-        // Add other card properties
+        color: "green",
       },
-
       {
         title: "Remaining Partial Paid",
-        value: formatCurrency(remainingPartialPaidExpense),
+        value: formatCurrency(remainingPartialPaidExpense, "QAR"),
         icon: <BiDonateHeart />,
-        // Add other card properties
+        color: "yellow",
       },
-
       {
         title: "Unpaid Amount",
-        value: formatCurrency(unpaidExpense),
+        value: formatCurrency(unpaidExpense, "QAR"),
         icon: <MdOutlineMoneyOff />,
-        // Add other card properties
+        color: "red",
       },
       {
         title: "Total Expense",
-        value: formatCurrency(totalExpenseAmount),
+        value: formatCurrency(totalExpenseAmount, "QAR"),
         icon: <AiFillAccountBook />,
-        // Add other card properties like comparison, percentage, trend if needed
+        color: "purple",
       },
       // Add more cards if necessary
     ];
@@ -368,8 +468,8 @@ const TotalExpenseList = () => {
     return cards;
   }, [
     totalExpenseAmount,
-    remainingPartialPaidExpense,
     totalPaidAmount,
+    remainingPartialPaidExpense,
     unpaidExpense,
   ]);
 
@@ -394,7 +494,7 @@ const TotalExpenseList = () => {
           <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
             <div className="flex items-center gap-4 ms-4">
               <Input
-                placeholder="Search by Subcategory"
+                placeholder="Search by Description"
                 prefix={<SearchOutlined />}
                 className="w-full md:w-64 text-xs"
                 value={searchText}
@@ -403,40 +503,58 @@ const TotalExpenseList = () => {
                 style={{
                   borderRadius: "0.375rem",
                   height: "35px",
-                  borderColor: "#ff6bcb",
-                  boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
+                  // borderColor: "#ff6bcb",
+                  // boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
                 }}
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {/* Create Invoice button removed */}
-              <Button
-                className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
-                icon={<FilterOutlined />}
-                disabled
-                // onClick={() => setIsFilterModalVisible(true)}
-              >
-                Filter
-              </Button>
+              {selectedRowKey && (
+                <Tooltip title="Create an invoice for the selected unpaid record">
+                  <Button
+                    type="primary"
+                    icon={<DollarCircleOutlined />}
+                    onClick={() => {
+                      const selectedExpense = expenseIdMap[selectedRowKey];
+                      if (selectedExpense) {
+                        // Navigate to the invoice creation page with selectedRow data
+                        navigate("/finance/invoices/add-new-invoice", {
+                          state: { expense: selectedExpense },
+                        });
+                      } else {
+                        toast.error("Selected expense not found.");
+                      }
+                    }}
+                    className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                  >
+                    Create Invoice
+                  </Button>
+                </Tooltip>
+              )}
               <Button
                 type="primary"
                 icon={<ExportOutlined />}
-                // onClick={() => setIsExportModalVisible(true)}
-                disabled
+                onClick={() => setIsExportModalVisible(true)}
                 className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-3 rounded-md shadow-md"
               >
                 Export
               </Button>
-              {/* Uncomment if Bulk Entries is needed
               <Button
-                className="flex items-center px-3 py-1 bg-gradient-to-r from-pink-500 to-pink-400 text-white font-bold rounded-md hover:opacity-90 transition text-xs shadow-md"
-                icon={<UploadOutlined />}
+                className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
+                icon={<FilterOutlined />}
+                disabled
+                onClick={() => setIsFilterModalVisible(true)}
+              >
+                Filter
+              </Button>
+
+              {/* <Button
+                className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none shadow-md hover:from-pink-600 hover:to-pink-500 transition duration-200"
+                icon={<SyncOutlined />}
                 onClick={() => setIsBulkEntriesModalVisible(true)}
-                size="small"
               >
                 Bulk Entries
-              </Button>
-              */}
+              </Button> */}
             </div>
           </div>
 
@@ -471,7 +589,6 @@ const TotalExpenseList = () => {
                   dispatch(setCurrentPage(1)); // Optionally reset to first page
                 },
               }}
-              // Removed the conflicting onChange prop from the Table
               className="rounded-lg shadow text-xs"
               bordered
               size="small"
@@ -483,31 +600,42 @@ const TotalExpenseList = () => {
                 tip: "Loading...",
               }}
               summary={summary}
-              // Removed rowSelection and rowClassName
-              // Removed onRow handler
+              onRow={(record) => ({
+                onClick: () => {
+                  if (record.paymentStatus !== "unpaid") {
+                    return;
+                  }
+                  setSelectedRowKey(record.key);
+                },
+              })}
             />
           </div>
 
           {/* Modals */}
-          {/* <DeleteModal
+          <DeleteModal
             visible={isDeleteModalVisible}
+            type="Expense"
             onClose={() => {
               setIsDeleteModalVisible(false);
               setSelectedExpenseForDeletion(null);
             }}
             expense={selectedExpenseForDeletion}
-          /> */}
-          {/* <ExportModal
+          />
+          <ExportModal
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}
             dataToExport={transformExpenseData(expenses)}
             title="ExpensesData"
             sheet="expenses_report"
           />
-          <FilterExpenseModal
+          {/* <FilterExpenseModal
             visible={isFilterModalVisible}
             onClose={() => setIsFilterModalVisible(false)}
             onFilterApply={handleFilterApply}
+          /> */}
+          {/* <BulkEntriesModal
+            visible={isBulkEntriesModalVisible}
+            onClose={() => setIsBulkEntriesModalVisible(false)}
           /> */}
         </div>
       </DashLayout>

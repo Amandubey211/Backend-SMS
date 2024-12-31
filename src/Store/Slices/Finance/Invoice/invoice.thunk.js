@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
-import { getData, postData } from "../../../../services/apiEndpoints";
+import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
@@ -21,8 +21,29 @@ export const addInvoice = createAsyncThunk(
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
+
   }
 );
+
+  export const cancelInvoice = createAsyncThunk(
+    "earnings/cancelInvoice",
+    async (id, { dispatch, rejectWithValue }) => {
+      const say = getAY();
+      dispatch(setShowError(false));
+      try {
+        const response = await putData(`/finance/invoice/cancel/${id}?say=${say}`);
+        if(response.success){
+           toast.success("Invoice cancel successfully!");     
+        }else{
+          toast.error("Something is wrong!");  
+        }
+        return response.data
+      } catch (error) {
+        return handleError(error, dispatch, rejectWithValue);
+      }
+    }
+  );
+
 export const fetchInvoice = createAsyncThunk(
   "earnings/fetchInvoice",
   async (params, { dispatch, rejectWithValue }) => {

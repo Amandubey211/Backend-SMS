@@ -5,17 +5,19 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import QuotationReceipts from "./Components/RecentQuotation.table";
+import { useDispatch } from "react-redux";
+import { clearSelectedQuotation, setReadOnly } from "../../../../Store/Slices/Finance/Quotations/quotationSlice";
 
 const QuotationMain = () => {
     useNavHeading("Finance", "Quotation");
     const navigate = useNavigate();
-
+    const dispatch = useDispatch();
     return (
         <AdminDashLayout>
             <div className="p-6 space-y-6">
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
-                    
+
                     <div className="flex gap-4 justify-start items-center">
                         {/* Filters */}
                         {/* <div className="relative rounded-[0.625rem] p-[2px] bg-gradient-to-r from-[#C83B62] to-[#46138A]">
@@ -42,9 +44,13 @@ const QuotationMain = () => {
                         </div> */}
                     </div>
 
-                    {/* Add New Receipt Button */}
+                    {/* Add New Quotation Button */}
                     <button
-                        onClick={() => navigate("/finance/quotations/add-new-quotations")}
+                        onClick={() => {
+                            dispatch(clearSelectedQuotation())
+                            dispatch(setReadOnly(false))
+                            navigate("/finance/quotations/add-new-quotations")
+                        }}
                         className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                     >
                         <span className="text-gray-800 font-medium">Add New Quotation</span>

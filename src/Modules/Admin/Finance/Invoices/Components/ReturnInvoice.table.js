@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchOutlined, MoreOutlined } from "@ant-design/icons";
-import { Table, Input, Button, Tooltip, Spin, Alert } from "antd";
+import { Table, Input, Button, Tooltip, Spin, Alert, Tag } from "antd";
 import { useSelector } from "react-redux";
 import moment from "moment";
-import { fetchInvoice } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 
 const ReturnInvoice = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -25,26 +24,13 @@ const ReturnInvoice = () => {
       title: "Invoice No.",
       dataIndex: "invoiceNumber",
       key: "invoiceNumber",
-      render: (invoiceNumber) => `-${invoiceNumber.slice(-5)}`,
+      render: (invoiceNumber) => invoiceNumber,
     },
     {
       title: "Recipient Name",
       dataIndex: "receiver",
       key: "receiver",
       render: (receiver) => receiver?.name || "N/A",
-    },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      render: (dueDate) => (dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A"),
-    },
-    {
-      title: "Final Amount",
-      dataIndex: "finalAmount",
-      key: "finalAmount",
-      render: (finalAmount) => finalAmount?.toFixed(2)+  ' QR',
-      sorter: (a, b) => a.finalAmount - b.finalAmount,
     },
     {
       title: "Category",
@@ -61,27 +47,30 @@ const ReturnInvoice = () => {
         ),
     },
     {
+      title: "Due Date",
+      dataIndex: "dueDate",
+      key: "dueDate",
+      render: (dueDate) => (dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A"),
+    },
+    {
+      title: "Final Amount",
+      dataIndex: "finalAmount",
+      key: "finalAmount",
+      render: (finalAmount) => finalAmount?.toFixed(2)+  ' QR',
+      sorter: (a, b) => a.finalAmount - b.finalAmount,
+    },
+    
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (_, record) => {
-        let style = {};
-        let text = "Active";
-        if (record.isReturn) {
-          style = { backgroundColor: "#F3EAFF", color: "#3F2FF2" };
-          text = "Return";
-        } else if (record.isCancel) {
-          style = { backgroundColor: "#FFE6E5", color: "#E70F00" };
-          text = "Cancel";
-        } else {
-          style = { backgroundColor: "#cfe3d3", color: "#297538" };
-        }
         return (
-          <span className="px-4 py-2 rounded-md text-sm font-semibold" style={style}>
-            {text}
-          </span>
+          <Tag color="yellow" className="text-xs capitalize">
+            Return
+          </Tag>
         );
-      },
+      }
     },
     
   ];
@@ -94,7 +83,7 @@ const ReturnInvoice = () => {
         <div className="flex gap-4">
           <Button
               className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-            onClick={() => navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment")}
+            onClick={() => navigate("/finance/penaltyAdjustment-list")}
           >
             View More ({filteredData?.filter((item)=>item.isReturn)?.length})
           </Button>

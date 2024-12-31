@@ -23,26 +23,13 @@ const RecentInvoice = () => {
       title: "Invoice No.",
       dataIndex: "invoiceNumber",
       key: "invoiceNumber",
-      render: (invoiceNumber) => `-${invoiceNumber.slice(-5)}`,
+      render: (invoiceNumber) => invoiceNumber,
     },
     {
       title: "Recipient Name",
       dataIndex: "receiver",
       key: "receiver",
       render: (receiver) => receiver?.name || "N/A",
-    },
-    {
-      title: "Due Date",
-      dataIndex: "dueDate",
-      key: "dueDate",
-      render: (dueDate) => (dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A"),
-    },
-    {
-      title: "Final Amount",
-      dataIndex: "finalAmount",
-      key: "finalAmount",
-      render: (finalAmount) => finalAmount?.toFixed(2)+  ' QR',
-      sorter: (a, b) => a.finalAmount - b.finalAmount,
     },
     {
       title: "Category",
@@ -58,6 +45,20 @@ const RecentInvoice = () => {
           "N/A"
         ),
     },
+    {
+      title: "Due Date",
+      dataIndex: "dueDate",
+      key: "dueDate",
+      render: (dueDate) => (dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A"),
+    },
+    {
+      title: "Final Amount",
+      dataIndex: "finalAmount",
+      key: "finalAmount",
+      render: (finalAmount) => finalAmount?.toFixed(2)+  ' QR',
+      sorter: (a, b) => a.finalAmount - b.finalAmount,
+    },
+    
     {
       title: "Status",
       dataIndex: "status",
@@ -98,7 +99,7 @@ const RecentInvoice = () => {
         <Spin tip="Loading..." />
       )  : (
         <Table
-          dataSource={filteredData}
+          dataSource={filteredData?.slice(0,5)}
           columns={columns}
           rowKey="invoiceNumber"
           size="small"

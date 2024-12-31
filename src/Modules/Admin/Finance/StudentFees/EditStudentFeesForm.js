@@ -7,6 +7,7 @@ import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { updateStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import toast from "react-hot-toast";
 
 export default function EditStudentFeesForm({ data }) {
     const [initialValues, setInitialValues] = useState({
@@ -38,15 +39,14 @@ export default function EditStudentFeesForm({ data }) {
 
     useEffect(() => {
         if (data) {
-            console.log(data);
-
             setInitialValues({
                 feeId: data._id || "",
                 subCategory: data.subCategory || "",
                 feeCycle: data.feeCycle?.type || "",
-                startDate: data.feeCycle?.startDate || "",
-                endDate: data.feeCycle?.endDate || "",
-                dueDate: data.dueDate || "",
+                startDate: data.feeCycle?.startDate?.slice(0,10) || "",
+                endDate: data.feeCycle?.endDate?.slice(0,10) || "",
+                dueDate: data.dueDate?.slice(0,10) || "",
+                paidDate: data.paidDate?.slice(0,10) || "",
                 examType: data.examType || "",
                 paymentType: data.paymentType || "",
                 chequeNumber: data.chequeNumber || "",
@@ -59,6 +59,7 @@ export default function EditStudentFeesForm({ data }) {
                 advance_amount: data.advance_amount || 0,
                 penalty: data.penalty || 0,
                 paid_amount: data.paid_amount || 0,
+                final_amount:data.final_amount ||0,
                 paymentStatus: data.paymentStatus || "",
                 studentId: data.studentId,
                 classId: data.classId,
@@ -140,6 +141,7 @@ export default function EditStudentFeesForm({ data }) {
                     };
                     console.log("Submitted Data:", updatedValues);
                     dispatch(updateStudentFee(updatedValues)).then(() => {
+                        toast.success('Fees update successfully!')
                         dispatch(
                             fetchAllIncomes({
                                 page: 1,
@@ -231,6 +233,16 @@ export default function EditStudentFeesForm({ data }) {
                                 label="Penalty"
                                 name="penalty"
                                 type="number"
+                            />
+                              <TextInput
+                                label="Final Amount"
+                                name="final_amount"
+                                type="number"
+                            />
+                             <TextInput
+                                label="Paid Date"
+                                name="paidDate"
+                                type="date"
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-6 w-full">
