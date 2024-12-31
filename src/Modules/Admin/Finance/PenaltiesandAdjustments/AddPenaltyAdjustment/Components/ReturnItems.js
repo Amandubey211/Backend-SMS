@@ -43,13 +43,13 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                   onChange={(value) =>
                     setFieldValue(`items.${index}.revenueType`, value)
                   }
-                  required
+                  
                 />
-                <ErrorMessage
+                {/* <ErrorMessage
                   name={`items.${index}.revenueType`}
                   component="div"
                   className="text-sm text-red-500"
-                />
+                /> */}
               </div>
 
               {/* Revenue Reference */}
@@ -61,11 +61,11 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                   required
                   type="text"
                 />
-                <ErrorMessage
+                {/* <ErrorMessage
                   name={`items.${index}.revenueReference`}
                   component="div"
                   className="text-sm text-red-500"
-                />
+                /> */}
               </div>
 
               {/* Quantity */}
@@ -78,11 +78,11 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                   type="number"
                   min={1}
                 />
-                <ErrorMessage
+                {/* <ErrorMessage
                   name={`items.${index}.quantity`}
                   component="div"
                   className="text-sm text-red-500"
-                />
+                /> */}
               </div>
 
               {/* Amount */}
@@ -90,16 +90,16 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                 <TextInput
                   name={`items.${index}.amount`}
                   label=""
-                  placeholder="Enter Amount (e.g., 100.00)"
+                  placeholder="Enter Amount"
                   required
                   type="number"
                   min={0}
                 />
-                <ErrorMessage
+                {/* <ErrorMessage
                   name={`items.${index}.amount`}
                   component="div"
                   className="text-sm text-red-500"
-                />
+                /> */}
               </div>
 
               {/* Remove Button */}

@@ -49,15 +49,15 @@ const CreatePenaltyAdjustment = () => {
       {
         revenueType: "",
         revenueReference: "",
-        quantity: 1,
-        amount: 0,
+        quantity: null,
+        amount: null,
       },
     ],
     reason: "",
     discountType: "amount",
-    discount: 0,
-    adjustmentPenalty: 0,
-    tax: 0,
+    discount: null,
+    adjustmentPenalty: null,
+    tax: null,
     document: null, // Optional
   };
 
@@ -267,7 +267,7 @@ const CreatePenaltyAdjustment = () => {
                 <TextInput
                   name="tax"
                   label="Tax *"
-                  placeholder="Enter tax percentage"
+                  placeholder="Enter tax value"
                   required
                   type="number"
                 />
