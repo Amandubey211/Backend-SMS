@@ -49,10 +49,7 @@ const SummaryRevenueList = () => {
 
   const [selectedRowIds, setSelectedRowIds] = useState([]); // To store selected rows
 
-  useEffect(() => {
-    dispatch(fetchAllClasses())
-    dispatch(fetchAllIncomes(params));
-  }, [dispatch,]);
+  
 
   const filterOnchange = (e) => {
     const { name, value } = e.target;
@@ -74,7 +71,10 @@ const SummaryRevenueList = () => {
       [name]: value,
     }));
   };
-
+  useEffect(() => {
+    dispatch(fetchAllClasses())
+    dispatch(fetchAllIncomes(params));
+  }, [dispatch,params]);
   const handleDeleteSelected = () => {
     if (selectedRowIds.length > 0) {
       dispatch(deleteStudentFees({ids:selectedRowIds})).then(()=>dispatch(fetchAllIncomes(params)));
