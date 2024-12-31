@@ -1,5 +1,3 @@
-// src/Components/Admin/Finance/Earnings/Component/Header.jsx
-
 import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
 import { categories, subCategories } from "../constants/categories";
@@ -21,6 +19,10 @@ const Header = ({
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
 
+  const filteredCategories = categories.filter(
+    (cat) => cat !== "Student-Based Revenue"
+  );
+
   useEffect(() => {
     // Sync initial state if props change
     setCategory(initialCategory);
@@ -34,7 +36,7 @@ const Header = ({
     setIsCategoryOpen(false);
 
     // Automatically select the first subcategory
-    const firstSubCategory = subCategories[selectedCategory][0];
+    const firstSubCategory = subCategories[selectedCategory]?.[0];
     setSubCategory(firstSubCategory);
     onSubCategoryChange(firstSubCategory);
   };
@@ -55,6 +57,16 @@ const Header = ({
         </h1>
         {!readOnly && ( // Hide buttons if readOnly is true
           <div className="flex gap-4">
+            {/* Reset Button */}
+            {!isUpdate && ( // Show Reset button only when not in update mode
+              <button
+                type="button" // Prevent form submission
+                onClick={onReset}
+                className="border border-pink-500 text-black bg-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-pink-50 hover:text-black transition"
+              >
+                Reset
+              </button>
+            )}
             {/* Submit Button (Save or Update) */}
             <button
               type="submit" // Formik will handle the submit
@@ -73,7 +85,7 @@ const Header = ({
           name="category"
           id="category-dropdown" // Unique ID
           value={category}
-          options={categories}
+          options={filteredCategories}
           isOpen={isCategoryOpen}
           onToggle={() => setIsCategoryOpen(!isCategoryOpen)}
           onSelect={handleCategorySelect}
@@ -81,13 +93,12 @@ const Header = ({
           borderColor="border-red-300"
           disabled={readOnly} // Disable dropdown if readOnly
         />
-
         <DropdownCard
           label="Sub-category"
           name="subCategory"
           id="subcategory-dropdown" // Unique ID
           value={subCategory}
-          options={subCategories[category]}
+          options={subCategories[category] || []}
           isOpen={isSubCategoryOpen}
           onToggle={() => setIsSubCategoryOpen(!isSubCategoryOpen)}
           onSelect={handleSubCategorySelect}
@@ -95,7 +106,6 @@ const Header = ({
           borderColor="border-purple-300"
           disabled={readOnly} // Disable dropdown if readOnly
         />
-
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
           <label
@@ -108,15 +118,23 @@ const Header = ({
             id="description"
             name="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={100}
+            onChange={(e) => {
+              const words = e.target.value
+                .split(/\s+/)
+                .filter((word) => word.length > 0);
+              if (words.length <= 100) setDescription(e.target.value); // Limit to 100 words
+            }}
             className="bg-gray-50 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
             placeholder="Write a short description"
             readOnly={readOnly} // Make textarea read-only if readOnly is true
           ></textarea>
           <div className="flex justify-end items-center my-3">
             <span className="text-xs text-gray-500 italic">
-              You can write up to 100 characters
+              {`You can write up to 100 words (${
+                100 -
+                description.split(/\s+/).filter((word) => word.length > 0)
+                  .length
+              } words left)`}
             </span>
           </div>
         </div>

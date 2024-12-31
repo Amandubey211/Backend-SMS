@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import { FaPlusCircle } from "react-icons/fa";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -54,7 +55,7 @@ useEffect(() => {
   };
 
   return (
-    <div className="p-4 md:p-6 space-y-6 scroll-smooth overflow-y-auto h-full w-full ">
+    <div className="p-2 md:p-6 space-y-6 scroll-smooth overflow-y-auto h-full w-full ">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 md:gap-0">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -66,9 +67,9 @@ useEffect(() => {
           onClick={() => navigate("/finance/studentfees/add/form")}
           className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
-          <span className="text-gray-800 font-medium">Add New Fee</span>
+          <span className="text-gray-800 font-medium">Add New Fees</span>
           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-            <FiUserPlus size={16} />
+             <FaPlusCircle size={16} />
           </div>
         </button>
       </div>

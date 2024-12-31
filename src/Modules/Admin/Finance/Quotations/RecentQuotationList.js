@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { CheckCircleOutlined, CloseCircleOutlined, FilePdfOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
+import { CheckCircleOutlined, CloseCircleOutlined, EyeOutlined, FilePdfOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { RiErrorWarningFill } from "react-icons/ri";
 import { FcDeleteDatabase } from "react-icons/fc";
@@ -11,9 +11,10 @@ import Spinner from "../../../../Components/Common/Spinner";
 import EmailModal from "../../../../Components/Common/EmailModal";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import debounce from "lodash.debounce";
-import { setCurrentPage } from "../../../../Store/Slices/Finance/Quotations/quotationSlice";
+import { clearSelectedQuotation, setCurrentPage, setReadOnly, setSelectedQuotation } from "../../../../Store/Slices/Finance/Quotations/quotationSlice";
 import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
 import Layout from "../../../../Components/Common/Layout";
+import toast from "react-hot-toast";
 
 const RecentQuotationList = () => {
     useNavHeading("Finance", "Quotation List");
@@ -35,6 +36,13 @@ const RecentQuotationList = () => {
     const paze_size = totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
     const [computedPageSize, setComputedPageSize] = useState(paze_size)
 
+    const quotationIdMap = useMemo(() => {
+        const map = {};
+        quotations.forEach((quotation) => {
+            map[quotation._id] = quotation;
+        });
+        return map;
+    }, [quotations]);
 
     // Debounced function to fetch adjustments with a fixed limit of 5
     const debouncedFetch = useCallback(
@@ -106,6 +114,16 @@ const RecentQuotationList = () => {
             ellipsis: true,
         },
         {
+            title: "Total Amount(QR)",
+            dataIndex: "total_amount",
+            key: "total_amount",
+            render: (value) => (
+                <span className="text-xs">{value || "0"} QR</span>
+            ),
+            width: 120,
+            ellipsis: true,
+        },
+        {
             title: "Final Amount(QR)",
             dataIndex: "final_amount",
             key: "final_amount",
@@ -119,8 +137,28 @@ const RecentQuotationList = () => {
             title: "Status",
             dataIndex: "status",
             key: "status",
-            render: (text) => <span className="text-xs">{text}</span>,
-            width: 120,
+            render: (status) => {
+                let color = "default";
+                switch (status) {
+                    case "accept":
+                        color = "green";
+                        break;
+                    case "pending":
+                        color = "yellow";
+                        break;
+                    case "reject":
+                        color = "red";
+                        break;
+                    default:
+                        color = "default";
+                }
+                return (
+                    <Tag color={color} className="text-xs capitalize">
+                        {status || "N/A"}
+                    </Tag>
+                );
+            },
+            width: 80,
             ellipsis: true,
         },
         {
@@ -130,13 +168,25 @@ const RecentQuotationList = () => {
             render: (_, record) => {
                 const menu = (
                     <Menu>
-                        <Menu.Item key="1" onClick={() => console.log("Edit", record)}>
-                            <FilePdfOutlined style={{ marginRight: 8 }} /> preview
+                        <Menu.Item key="1" onClick={() => { console.log('preview') }}>
+                            <FilePdfOutlined style={{ marginRight: 8 }} /> Preview
                         </Menu.Item>
-                        <Menu.Item key="2" onClick={() => handleStatusChange(record.key, "accept")}>
+                        <Menu.Item key="2" onClick={() => {
+                            const quotationToView = quotationIdMap[record.key];
+                            if (quotationToView) {
+                                dispatch(setReadOnly(true)); // Set readOnly to true for viewing
+                                dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected income to Redux
+                                navigate("/finance/quotations/add-new-quotations"); // Navigate to view page
+                            } else {
+                                toast.error("Selected income not found.");
+                            }
+                        }}>
+                            <EyeOutlined style={{ marginRight: 8 }} /> View(Read-only)
+                        </Menu.Item>
+                        <Menu.Item key="3" onClick={() => handleStatusChange(record.key, "accept")}>
                             <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
                         </Menu.Item>
-                        <Menu.Item key="3" onClick={() => handleStatusChange(record.key, "reject")}>
+                        <Menu.Item key="4" onClick={() => handleStatusChange(record.key, "reject")}>
                             <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
                         </Menu.Item>
                     </Menu>
@@ -168,6 +218,7 @@ const RecentQuotationList = () => {
         discount: quotation.discount || 0,
         discountType: quotation.discountType || "percentage",
         final_amount: quotation.final_amount || 0,
+        total_amount: quotation.total_amount || 0,
         status: quotation.status || "pending"
     }));
 
@@ -179,6 +230,7 @@ const RecentQuotationList = () => {
             purpose: quotation.purpose || "N/A",
             discount: quotation.discount || 0,
             discountType: quotation.discountType || "percentage",
+            total_amount: quotation.total_amount || 0,
             final_amount: quotation.final_amount || 0,
         })) || [];
 
@@ -204,8 +256,8 @@ const RecentQuotationList = () => {
                             style={{
                                 borderRadius: "0.375rem",
                                 height: "35px",
-                                borderColor: "#ff6bcb",
-                                boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
+                                //borderColor: "#ff6bcb",
+                                //boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
                             }}
                         />
                         <div className="flex justify-end items-center gap-2">
@@ -218,10 +270,14 @@ const RecentQuotationList = () => {
                                 Export
                             </Button> */}
                             <button
-                                onClick={() =>
+                                onClick={() => {
+                                    dispatch(clearSelectedQuotation())
+                                    dispatch(setReadOnly(false))
                                     navigate(
-                                        "/finance/penaltyAdjustment/add-new-penalty-adjustment"
+                                        "/finance/quotations/add-new-quotations"
                                     )
+                                }
+
                                 }
                                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                             >

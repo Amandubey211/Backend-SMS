@@ -89,8 +89,9 @@ export const fetchAllExpenses = createAsyncThunk(
   "expenses/fetchAllExpenses",
   async (params, { dispatch, rejectWithValue }) => {
     try {
+      const say=getAY();
       dispatch(setShowError(false));
-      const response = await getData("/finance/expense/getAll", params);
+      const response = await getData(`/finance/expense/getAll?academicYear=${say}`, params);
 
       if (response?.success) {
         return response;
@@ -190,6 +191,7 @@ export const fetchExpenseById = createAsyncThunk(
   "expenses/fetchExpenseById",
   async ({ category, id }, { dispatch, rejectWithValue }) => {
     try {
+      const say=getAY();
       dispatch(setShowError(false));
       const endpoint = `/finance/expense/get/${category}/${id}`;
       const response = await getData(endpoint);

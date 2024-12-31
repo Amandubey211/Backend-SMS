@@ -43,7 +43,7 @@ const SelectInput = ({ label, name, options, autoComplete = "off" }) => {
         name={name}
         disabled={readOnly} // Disable select if readOnly
         autoComplete={autoComplete}
-        className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${
+        className={`bg-white border border-gray-300 rounded-sm px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${
           readOnly ? "cursor-not-allowed" : ""
         }`}
       >

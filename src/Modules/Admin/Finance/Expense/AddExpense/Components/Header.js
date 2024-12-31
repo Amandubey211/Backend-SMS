@@ -81,7 +81,6 @@ const Header = ({
           borderColor="border-red-300"
           disabled={readOnly} // Disable dropdown if readOnly
         />
-
         {/* SubCategory Selector */}
         <DropdownCard
           label="Sub-category"
@@ -96,7 +95,6 @@ const Header = ({
           borderColor="border-purple-300"
           disabled={readOnly} // Disable dropdown if readOnly
         />
-
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
           <label
@@ -109,15 +107,23 @@ const Header = ({
             id="description"
             name="description"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            maxLength={100}
-            className="bg-gray-50 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
+            onChange={(e) => {
+              const words = e.target.value
+                .split(/\s+/)
+                .filter((word) => word.length > 0);
+              if (words.length <= 100) setDescription(e.target.value); // Limit to 100 words
+            }}
+            className="bg-gray-50 z-40 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
             placeholder="Write a short description"
             readOnly={readOnly} // Make textarea read-only if readOnly is true
           ></textarea>
           <div className="flex justify-end items-center my-3">
             <span className="text-xs text-gray-500 italic">
-              You can write up to 100 characters
+              {`You can write up to 100 words (${
+                100 -
+                description.split(/\s+/).filter((word) => word.length > 0)
+                  .length
+              } words left)`}
             </span>
           </div>
         </div>

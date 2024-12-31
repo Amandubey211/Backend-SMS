@@ -15,7 +15,8 @@ const initialState = {
   totalQuotations: 0,
   acceptedQuotations: 0,
   rejectedQuotations: 0,
-  pendingQuotations: 0
+  pendingQuotations: 0,
+  readOnly: false
 };
 
 const quotationSlice = createSlice({
@@ -47,6 +48,9 @@ const quotationSlice = createSlice({
     clearFilters(state) {
       state.filters = {};
       state.currentPage = 1;
+    },
+    setReadOnly: (state, action) => {
+      state.readOnly = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -152,6 +156,7 @@ export const {
   setCurrentPage,
   setFilters,
   clearFilters,
+  setReadOnly
 } = quotationSlice.actions;
 
 export default quotationSlice.reducer;
