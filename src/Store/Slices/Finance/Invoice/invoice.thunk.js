@@ -82,6 +82,7 @@ export const fetchInvoiceByNumber = createAsyncThunk(
       }
       const response = await getData(`/finance/invoice/getInvoiceByNumber?say=${say}&invoiceNumber=${invoiceNumber}`);
       if (response?.success) {
+        toast.success("Invoice fetched successfully!");
         return response.data;
       } else {
         toast.error(response?.message || "Invoice not found.");

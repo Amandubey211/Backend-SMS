@@ -1,7 +1,5 @@
-// src/Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Components/ReturnItems.js
-
 import React from "react";
-import { FieldArray } from "formik";
+import { FieldArray, ErrorMessage } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
@@ -41,7 +39,16 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                     { value: "Other", label: "Other" },
                   ]}
                   placeholder="Select Revenue Type"
-                  
+                  value={item.revenueType || undefined}
+                  onChange={(value) =>
+                    setFieldValue(`items.${index}.revenueType`, value)
+                  }
+                  required
+                />
+                <ErrorMessage
+                  name={`items.${index}.revenueType`}
+                  component="div"
+                  className="text-sm text-red-500"
                 />
               </div>
 
@@ -50,9 +57,14 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                 <TextInput
                   name={`items.${index}.revenueReference`}
                   label=""
-                  placeholder="Enter Revenue Reference"
+                  placeholder="Enter Revenue Reference (e.g., ID or code)"
                   required
                   type="text"
+                />
+                <ErrorMessage
+                  name={`items.${index}.revenueReference`}
+                  component="div"
+                  className="text-sm text-red-500"
                 />
               </div>
 
@@ -66,6 +78,11 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                   type="number"
                   min={1}
                 />
+                <ErrorMessage
+                  name={`items.${index}.quantity`}
+                  component="div"
+                  className="text-sm text-red-500"
+                />
               </div>
 
               {/* Amount */}
@@ -73,19 +90,26 @@ const ReturnItems = ({ values, setFieldValue, required }) => (
                 <TextInput
                   name={`items.${index}.amount`}
                   label=""
-                  placeholder="Enter Amount"
+                  placeholder="Enter Amount (e.g., 100.00)"
                   required
                   type="number"
                   min={0}
+                />
+                <ErrorMessage
+                  name={`items.${index}.amount`}
+                  component="div"
+                  className="text-sm text-red-500"
                 />
               </div>
 
               {/* Remove Button */}
               <div className="col-span-2 flex justify-center">
-                <MinusCircleOutlined
-                  onClick={() => arrayHelpers.remove(index)}
-                  className="text-red-500 text-lg cursor-pointer"
-                />
+                {values.items.length > 1 && (
+                  <MinusCircleOutlined
+                    onClick={() => arrayHelpers.remove(index)}
+                    className="text-red-500 text-lg cursor-pointer"
+                  />
+                )}
               </div>
             </div>
           ))}

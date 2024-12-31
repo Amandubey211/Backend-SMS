@@ -1,27 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Table, Spin, Input, Tooltip, Button, Modal, Tag, Pagination, Select } from "antd";
-import { ExportOutlined, MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import { FiPlus, FiUserPlus } from "react-icons/fi";
+import {
+  Menu,
+  Dropdown,
+  Table,
+  Spin,
+  Input,
+  Button,
+  Modal,
+  Tag,
+} from "antd";
+import {
+  ExportOutlined,
+  MoreOutlined,
+  SearchOutlined,
+  EyeOutlined,
+  RedoOutlined,
+  CloseCircleOutlined,
+} from "@ant-design/icons";
+import { FiPlus } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import Invoice from "./Components/Invoice";
-import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
-import { cancelInvoice, fetchInvoice } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
-import { isCancel } from "axios";
-import { FaPlusCircle } from "react-icons/fa";
-import { EyeOutlined, RedoOutlined, CloseCircleOutlined } from "@ant-design/icons"; // Import icons
-import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import {
+  cancelInvoice,
+  fetchInvoice,
+} from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+import {
+  setInvoiceData,
+  setSelectedInvoiceNumber,
+} from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useNavHeading("Finance", "Recent Invoice List");
 
   const [searchQuery, setSearchQuery] = useState("");
-  const { loading, error, invoices, pagination } = useSelector((store) => store.admin.invoices);
+  const { loading, error, invoices, pagination } = useSelector(
+    (store) => store.admin.invoices
+  );
   const [pageSize, setPageSize] = useState(10);
+
   // Filtered data based on search query
   const filteredData = invoices?.filter(
     (item) =>
@@ -32,12 +56,13 @@ const RecentInvoiceList = () => {
 
   useEffect(() => {
     const filters = {
-      page:1,
+      page: 1,
       limit: pageSize,
     };
 
     dispatch(fetchInvoice(filters));
-  }, []);
+  }, [dispatch, pageSize]);
+
   // Define Ant Design columns
   const columns = [
     {
@@ -69,13 +94,14 @@ const RecentInvoiceList = () => {
       title: "Due Date",
       dataIndex: "dueDate",
       key: "dueDate",
-      render: (dueDate) => (dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A"),
+      render: (dueDate) =>
+        dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A",
     },
     {
       title: "Final Amount",
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (finalAmount) => finalAmount?.toFixed(2) + ' QAR',
+      render: (finalAmount) => finalAmount?.toFixed(2) + " QAR",
       sorter: (a, b) => a.finalAmount - b.finalAmount,
     },
     {
@@ -85,15 +111,19 @@ const RecentInvoiceList = () => {
       render: (_, record) => {
         let color = "green";
         let text = "Active";
-        if (record.isCancel) { color = "red"; text = "Cancel" } else if (record.isReturn) {
-          color = "yellow"; text = "Return"
+        if (record.isCancel) {
+          color = "red";
+          text = "Cancel";
+        } else if (record.isReturn) {
+          color = "yellow";
+          text = "Return";
         }
         return (
           <Tag color={color} className="text-xs capitalize">
             {text}
           </Tag>
         );
-      }
+      },
     },
     {
       title: "Action",
@@ -110,22 +140,36 @@ const RecentInvoiceList = () => {
               </Menu.Item>
               <Menu.Item
                 icon={<RedoOutlined />} // Icon for Return
-                onClick={() => navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment")}
+                onClick={() => {
+                  dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Set selected invoice number
+                  navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Navigate to form
+                }}
               >
                 Return
               </Menu.Item>
-              {!record.isCancel && <Menu.Item
-                icon={<CloseCircleOutlined />}
-                onClick={() => {dispatch(cancelInvoice(record._id)).then(()=>dispatch(fetchInvoice({
-                  page:1,
-                  limit: pageSize,
-                })))}}
-              >
-                Cancel
-              </Menu.Item>}
+              {!record.isCancel && (
+                <Menu.Item
+                  icon={<CloseCircleOutlined />}
+                  onClick={() => {
+                    dispatch(cancelInvoice(record._id)).then(() =>
+                      dispatch(
+                        fetchInvoice({
+                          page: 1,
+                          limit: pageSize,
+                        })
+                      )
+                    );
+                  }}
+                >
+                  Cancel
+                </Menu.Item>
+              )}
               <Menu.Item
-                icon={<EyeOutlined />} // Icon for Preview
-                onClick={() => {dispatch(setInvoiceData(record));navigate('/finance/invoices/add-new-invoice')}}
+                icon={<EyeOutlined />} // Icon for View (Read Only)
+                onClick={() => {
+                  dispatch(setInvoiceData(record));
+                  navigate("/finance/invoices/add-new-invoice");
+                }}
               >
                 View (Read Only)
               </Menu.Item>
@@ -135,8 +179,8 @@ const RecentInvoiceList = () => {
         >
           <Button shape="circle" icon={<MoreOutlined />} />
         </Dropdown>
-      )
-    }
+      ),
+    },
   ];
 
   const closeInvoice = (e) => {
@@ -144,26 +188,24 @@ const RecentInvoiceList = () => {
       setInvoiceVisible(false); // Close popup when clicking outside
     }
   };
-  const dispatch = useDispatch()
-  const filterOnchange = (e) => {
-    const { name, value } = e.target;
-    if (value == "isCancel") {
-      dispatch(fetchInvoice({ isCancel: true }))
-    } else if (value == "isReturn") {
-      dispatch(fetchInvoice({ isReturn: true }))
-    } else {
-      dispatch(fetchInvoice({}))
-    }
 
-  }
+  const filterOnchange = (e) => {
+    const { value } = e.target;
+    if (value === "isCancel") {
+      dispatch(fetchInvoice({ isCancel: true }));
+    } else if (value === "isReturn") {
+      dispatch(fetchInvoice({ isReturn: true }));
+    } else {
+      dispatch(fetchInvoice({}));
+    }
+  };
 
   return (
     <AdminLayout>
       <div className="p-4 bg-white rounded-lg ">
-        <div className="p-1 bg-white  rounded-lg">
+        <div className="p-1 bg-white rounded-lg">
           {/* Filters and Buttons Section */}
           <div className="flex justify-between items-start">
-
             <div className="flex flex-col space-y-4">
               <div className="flex gap-4">
                 <Input
@@ -215,17 +257,20 @@ const RecentInvoiceList = () => {
                 className="flex items-center px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-medium rounded-lg hover:opacity-90"
                 onClick={() => console.log("Exporting data...")}
               >
-                <ExportOutlined className="pr-2" />  Export
+                <ExportOutlined className="pr-2" /> Export
               </button>
 
               {/* Add New Fee Button */}
               <button
-               onClick={() => {dispatch(setInvoiceData());navigate('/finance/invoices/add-new-invoice')}}
+                onClick={() => {
+                  dispatch(setInvoiceData(null)); // Clear any existing invoice data
+                  navigate("/finance/invoices/add-new-invoice");
+                }}
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
               >
                 <span className="text-gray-800 font-medium">Add New Invoice</span>
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiPlus size={16} />
+                  <FiPlus size={16} />
                 </div>
               </button>
             </div>
@@ -237,7 +282,7 @@ const RecentInvoiceList = () => {
           {/* Table Section */}
           {loading ? (
             <Spin tip="Loading..." />
-          ) : (<>
+          ) : (
             <Table
               dataSource={filteredData}
               columns={columns}
@@ -265,10 +310,11 @@ const RecentInvoiceList = () => {
               }}
               size="small"
               onRow={(record) => ({
-                onClick: () => { setSelectedInvoice(record) }
+                onClick: () => {
+                  setSelectedInvoice(record);
+                },
               })}
             />
-          </>
           )}
         </div>
         {isInvoiceVisible && selectedInvoice && (
@@ -295,7 +341,7 @@ const RecentInvoiceList = () => {
               <h2 className="text-center text-xl font-bold text-white bg-pink-600 py-2 my-4 rounded-md">INVOICE</h2>
 
               {/* Invoice Details */}
-              <div className="flex  justify-between ">
+              <div className="flex justify-between">
                 <div>
                   <strong>Bill To:</strong>
                   <p>{selectedInvoice.receiver.name}</p>
@@ -350,7 +396,9 @@ const RecentInvoiceList = () => {
                   </tr>
                   <tr>
                     <td className="text-left font-bold text-pink-700">Total:</td>
-                    <td className="text-right font-bold text-pink-700">{selectedInvoice.finalAmount?.toFixed(2)} QAR</td>
+                    <td className="text-right font-bold text-pink-700">
+                      {selectedInvoice.finalAmount?.toFixed(2)} QAR
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -361,7 +409,6 @@ const RecentInvoiceList = () => {
               </div>
             </div>
           </Modal>
-
         )}
       </div>
     </AdminLayout>
