@@ -313,7 +313,7 @@ const RecentReceipts = () => {
             onClick={() => navigate("/finance/receipts/receipt-list")}
             className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
           >
-            View More ({pagination.totalRecords - 5 || 0})
+            View More ({pagination.totalRecords || 0})
           </button>
         </div>
       </div>
@@ -354,14 +354,7 @@ const RecentReceipts = () => {
           }}
           size="small"
           pagination={false} // Disable Ant Design pagination
-          locale={{
-            emptyText: (
-              <div className="flex flex-col items-center text-gray-500 text-xs py-4">
-                <ExclamationCircleOutlined style={{ fontSize: "48px", marginBottom: "8px" }} />
-                <span>No receipts available.</span>
-              </div>
-            ),
-          }}
+          
         />
       )}
 
