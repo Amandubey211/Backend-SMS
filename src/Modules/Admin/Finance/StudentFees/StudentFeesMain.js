@@ -4,7 +4,7 @@ import StudentCardSection from "./Components/StudentCardSection"; // Reused Card
 import StudentFeesGraph from "./Components/StudentFeesGraph";
 import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
 import AddNewFeeSidebar from "./Components/AddNewFeeSidebar";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -69,7 +69,7 @@ useEffect(() => {
         >
           <span className="text-gray-800 font-medium">Add New Fees</span>
           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-             <FaPlusCircle size={16} />
+          <FiPlus size={16} />
           </div>
         </button>
       </div>

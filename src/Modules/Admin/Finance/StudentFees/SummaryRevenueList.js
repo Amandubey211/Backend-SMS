@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { EditOutlined, DeleteOutlined, EyeOutlined, ExportOutlined, DollarCircleOutlined } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FiUserPlus } from "react-icons/fi";
+import { FiPlus, FiUserPlus } from "react-icons/fi";
 import moment from "moment"; // Replaced dayjs with moment
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
@@ -243,6 +243,7 @@ const SummaryRevenueList = () => {
   };
 
   return (
+  
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
@@ -366,7 +367,7 @@ const SummaryRevenueList = () => {
             >
               <span className="text-gray-800 font-medium">Add New Fees</span>
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FaPlusCircle size={16} />
+              <FiPlus size={16} />
               </div>
             </button>
            </div>

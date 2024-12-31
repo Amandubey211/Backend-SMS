@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-import { Formik, Form, FieldArray } from "formik";
+import React, { useEffect, useState } from "react";
+import { Formik, Form, FieldArray, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { addInvoice } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
-import toast from "react-hot-toast";
 import AdminDashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import Layout from "../../../../../Components/Common/Layout";
 import TextInput from "./Components/TextInput";
@@ -14,7 +13,7 @@ const CreateNewInvoice = () => {
   const { invoiceData } = useSelector((store) => store.admin.invoices); // Redux data
   const dispatch = useDispatch();
 
-  const initialValues = invoiceData || {
+  let initialValues = invoiceData || {
     dueDate: "",
     receiver: {
       name: "",
@@ -56,19 +55,12 @@ const CreateNewInvoice = () => {
 
   const handleSubmit = async (values) => {
     setLoading(true);
-    dispatch(addInvoice(values))
-      .then(() => {
-        setLoading(false);
-        toast.success("Invoice saved successfully!");
-      })
-      .catch(() => {
-        setLoading(false);
-        toast.error("Failed to save invoice!");
-      });
+    dispatch(addInvoice(values)).then(()=>setLoading(false))
   };
+  
 
   const isReadonly = !!invoiceData;
-
+  
   return (
     <Layout title="Finance | Invoice">
       <AdminDashLayout>
@@ -93,7 +85,7 @@ const CreateNewInvoice = () => {
                         Reset
                       </button>
                       <button
-                        type="submit"
+                        onClick={()=>handleSubmit(values)}
                         disabled={loading}
                         className="px-4 py-2 mx-2 rounded-md text-white"
                         style={{
@@ -146,7 +138,7 @@ const CreateNewInvoice = () => {
                   />
                 </div>
 
-                <div className="p-6 rounded-md mx-20" style={{ backgroundColor: "#ECECEC" }}>
+                <div className="p-6 rounded-md mx-20 mb-2" style={{ backgroundColor: "#ECECEC" }}>
                   <h2 className="text-lg font-semibold mb-4">Items</h2>
                   <FieldArray name="lineItems">
                     {({ remove, push }) => (
@@ -249,7 +241,15 @@ const CreateNewInvoice = () => {
                     name="finalAmount"
                     label="Final Amount"
                     placeholder="Calculated automatically"
-                    disabled
+                    disabled={true}
+                    
+                  />
+                  <TextInput
+                    name="totalAmount"
+                    label="Total Amount"
+                    placeholder="Calculated automatically"
+                    disabled={true}
+                    
                   />
                   <SelectInput
                     name="paymentType"
