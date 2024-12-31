@@ -138,7 +138,7 @@ const CreateNewInvoice = () => {
                   />
                 </div>
 
-                <div className="p-6 rounded-md mx-20 mb-2" style={{ backgroundColor: "#ECECEC" }}>
+                <div className="p-6 rounded-md mx-20 mb-8" style={{ backgroundColor: "#ECECEC" }}>
                   <h2 className="text-lg font-semibold mb-4">Items</h2>
                   <FieldArray name="lineItems">
                     {({ remove, push }) => (
@@ -237,7 +237,7 @@ const CreateNewInvoice = () => {
                     placeholder="Enter Tax"
                     disabled={isReadonly}
                   />
-                  <TextInput
+                  {/* <TextInput
                     name="finalAmount"
                     label="Final Amount"
                     placeholder="Calculated automatically"
@@ -250,7 +250,7 @@ const CreateNewInvoice = () => {
                     placeholder="Calculated automatically"
                     disabled={true}
                     
-                  />
+                  /> */}
                   <SelectInput
                     name="paymentType"
                     label="Payment Type"

@@ -99,7 +99,7 @@ const RecentInvoice = () => {
         <Spin tip="Loading..." />
       )  : (
         <Table
-          dataSource={filteredData}
+          dataSource={filteredData?.slice(0,5)}
           columns={columns}
           rowKey="invoiceNumber"
           size="small"

@@ -65,14 +65,9 @@ const ReturnInvoice = () => {
       dataIndex: "status",
       key: "status",
       render: (_, record) => {
-        let color = "green";
-        let text = "Active";
-        if (record.isCancel) { color = "red"; text = "Cancel" } else if(record.isReturn){
-          color = "yellow"; text = "Return"
-        }
         return (
-          <Tag color={color} className="text-xs capitalize">
-            {text}
+          <Tag color="yellow" className="text-xs capitalize">
+            Return
           </Tag>
         );
       }
