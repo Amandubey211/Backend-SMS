@@ -76,6 +76,7 @@ const CreateReceipt = () => {
   const validationSchema = Yup.object().shape({
     tax: Yup.number()
       .typeError("Tax must be a number")
+      .integer("Tax must be an integer")
       .min(0, "Tax must be positive")
       .required("Tax is required"),
     discountType: Yup.string()
@@ -83,31 +84,44 @@ const CreateReceipt = () => {
       .required("Discount type is required"),
     discount: Yup.number()
       .typeError("Discount must be a number")
+      .integer("Discount must be an integer")
       .min(0, "Discount must be positive")
       .required("Discount is required"),
     penalty: Yup.number()
       .typeError("Penalty must be a number")
+      .integer("Penalty must be an integer")
       .min(0, "Penalty must be positive")
       .required("Penalty is required"),
-
-    contactNumber: Yup.string().required("Contact number is required"),
-    mailId: Yup.string().email("Invalid email address").required("Email is required"),
-    address: Yup.string().required("Address is required"),
-    receiverName: Yup.string().required("Name is required"),
+  
+    contactNumber: Yup.string()
+      .required("Contact number is required"),
+    mailId: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    address: Yup.string()
+      .required("Address is required"),
+    receiverName: Yup.string()
+      .required("Name is required"),
     items: Yup.array()
       .of(
         Yup.object().shape({
-          category: Yup.string().required("Category is required"),
-          quantity: Yup.string() // Change to string to match backend
+          category: Yup.string()
+            .required("Category is required"),
+          quantity: Yup.number()
+            .typeError("Quantity must be a number")
+            .integer("Quantity must be an integer")
+            .min(1, "Quantity must be at least 1")
             .required("Quantity is required"),
           totalAmount: Yup.number()
             .typeError("Total Amount must be a number")
+            .integer("Total Amount must be an integer")
             .min(0, "Total Amount cannot be negative")
             .required("Total Amount is required"),
         })
       )
       .min(1, "At least one line item is required"),
   });
+  
 
   // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
@@ -115,11 +129,12 @@ const CreateReceipt = () => {
       setSubmitting(false);
       return;
     }
-
+  
+    // Ensure numerical fields are integers
     const formValues = {
-      tax: parseFloat(values.tax) || 0,
-      discount: parseFloat(values.discount) || 0,
-      penalty: parseFloat(values.penalty) || 0,
+      tax: parseInt(values.tax, 10) || 0, // Convert to integer
+      discount: parseInt(values.discount, 10) || 0, // Convert to integer
+      penalty: parseInt(values.penalty, 10) || 0, // Convert to integer
       discountType: values.discountType || "",
       govtRefNumber: values.govtRefNumber || "",
       remark: values.remark || "",
@@ -132,15 +147,14 @@ const CreateReceipt = () => {
       },
       lineItems: values.items.map((item) => ({
         revenueType: item.category,
-        quantity: item.quantity, // Keep as string
-        total: parseFloat(item.totalAmount) || 0,
+        quantity: parseInt(item.quantity, 10) || 0, // Convert to integer
+        total: parseInt(item.totalAmount, 10) || 0, // Convert to integer
       })),
-      
     };
-
+  
     // Debugging: Log formValues
     console.log("Submitting Form Values:", formValues);
-
+  
     dispatch(createReceipt(formValues))
       .unwrap()
       .then((response) => {
@@ -160,6 +174,7 @@ const CreateReceipt = () => {
         setSubmitting(false);
       });
   };
+  
 
   return (
     <DashLayout>

@@ -449,13 +449,6 @@ const RecentReceiptsList = () => {
             <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
             <p>Unable to fetch the receipts.</p>
           </div>
-        ) : filteredData.length === 0 ? (
-          <div
-            style={{ textAlign: "center", color: "#999", marginTop: "16px" }}
-          >
-            <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-            <p>No receipts available.</p>
-          </div>
         ) : (
           // Render Table and Custom Pagination
           <>

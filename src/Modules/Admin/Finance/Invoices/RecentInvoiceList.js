@@ -45,16 +45,6 @@ import {
   setSelectedInvoiceNumber,
 } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 
-
-
-import { isCancel } from "axios";
-import { FaPlusCircle } from "react-icons/fa";
-import {
-  EyeOutlined,
-  RedoOutlined,
-  CloseCircleOutlined,
-} from "@ant-design/icons"; // Import icons
-import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
@@ -227,33 +217,7 @@ const RecentInvoiceList = () => {
     
               {/* View (Read Only) */}
               <Menu.Item
-                icon={<RedoOutlined />} // Icon for Return
-                onClick={() => {
-                  dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Set selected invoice number
-                  navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Navigate to form
-                }}
-              >
-                Return
-              </Menu.Item>
-              {!record.isCancel && (
-                <Menu.Item
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => {
-                    dispatch(cancelInvoice(record._id)).then(() =>
-                      dispatch(
-                        fetchInvoice({
-                          page: 1,
-                          limit: pageSize,
-                        })
-                      )
-                    );
-                  }}
-                >
-                  Cancel
-                </Menu.Item>
-              )}
-              <Menu.Item
-                icon={<EyeOutlined />} // Icon for View (Read Only)
+                icon={<EyeOutlined />}
                 onClick={() => {
                   dispatch(setInvoiceData(record));
                   navigate("/finance/invoices/add-new-invoice");
@@ -277,7 +241,7 @@ const RecentInvoiceList = () => {
     }
   };
 
-  const dispatch = useDispatch();
+ 
   const filterOnchange = (e) => {
     const { name, value } = e.target;
     if (value == "isCancel") {
