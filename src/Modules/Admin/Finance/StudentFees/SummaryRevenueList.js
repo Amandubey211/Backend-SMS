@@ -24,6 +24,9 @@ import { FaPlusCircle } from "react-icons/fa";
 import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import { flattenObject } from "../../../../Utils/xl";
 import ExportModal from "../Earnings/Components/ExportModal";
+import Layout from "../../../../Components/Common/Layout";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { GiTakeMyMoney } from "react-icons/gi";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -130,7 +133,23 @@ const SummaryRevenueList = () => {
       sorter: (a, b) => a.total_amount - b.total_amount,
       render: (amount) => <span>{`${amount.toFixed(2)} QAR`}</span>,
     },
-
+    {
+      title: "Discount",
+      dataIndex: "discount",
+      key: "discount",
+      render: (value, record) =>
+        record.discountType === "percentage" ? (
+          <Tag color="purple" className="text-xs">
+            {value || 0}%
+          </Tag>
+        ) : (
+          <Tag color="orange" className="text-xs">
+            {value || 0} QAR
+          </Tag>
+        ),
+      width: 100,
+      ellipsis: true,
+    },
     {
       title: "Final Amount",
       dataIndex: "final_amount",
@@ -173,23 +192,7 @@ const SummaryRevenueList = () => {
       sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
-    {
-      title: "Discount",
-      dataIndex: "discount",
-      key: "discount",
-      render: (value, record) =>
-        record.discountType === "percentage" ? (
-          <Tag color="purple" className="text-xs">
-            {value || 0}%
-          </Tag>
-        ) : (
-          <Tag color="orange" className="text-xs">
-            {value || 0} QAR
-          </Tag>
-        ),
-      width: 100,
-      ellipsis: true,
-    },
+  
     {
       title: "Action",
       key: "action",
@@ -270,9 +273,9 @@ const SummaryRevenueList = () => {
           flattenedIncome["academicYearDetails.year"] || "N/A",
       };
     }) || [];
-
+    useNavHeading("Finance","Student Fees List")
   return (
-  
+    <Layout title="Finance | Student Fees">
     <AdminLayout>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
@@ -386,21 +389,19 @@ const SummaryRevenueList = () => {
               </div>
             </div>
           </div>
-          <div className="flex items-center space-y-4 flex-col">
-
-            
-           <div>
+          <div className="flex space-y-4  flex-col">
+           <div className="flex ml-auto">
            <button
               onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
             >
               <span className="text-gray-800 font-medium">Add New Fees</span>
               <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-              <FiPlus size={16} />
+                <GiTakeMyMoney size={20} />
               </div>
             </button>
            </div>
-           <div className="flex items-center space-x-4 flex-row">
+           <div className="flex gap-2 justify-between flex-row">
            {selectedRowIds?.length == 1 && (
 
                 <Tooltip title="Create an invoice for the selected unpaid record">
@@ -409,7 +410,7 @@ const SummaryRevenueList = () => {
                     onClick={() => {
                       navigate("/finance/invoices/add-new-invoice");
                     }}
-                    className="flex items-center  px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
+                    className="flex items-center   bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
                   >
                     Create Invoice
                   </Button>
@@ -419,7 +420,7 @@ const SummaryRevenueList = () => {
                 type="primary"
                 icon={<ExportOutlined />}
                 onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                className="flex items-center ml-auto flex-end bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
               >
                 Export
               </Button>
@@ -430,9 +431,7 @@ const SummaryRevenueList = () => {
         <div className="mt-6">
           {loading ? (
             <Spinner />
-          ) : error ? (
-            <NoDataFound />
-          ) : (
+          )  : (
             <Table
               rowSelection={rowSelection}
               dataSource={incomes}
@@ -493,6 +492,7 @@ const SummaryRevenueList = () => {
         sheet="student_fees_report"
       />
     </AdminLayout>
+    </Layout>
   );
 };
 

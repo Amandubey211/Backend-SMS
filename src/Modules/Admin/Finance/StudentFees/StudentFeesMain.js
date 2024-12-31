@@ -4,13 +4,14 @@ import StudentCardSection from "./Components/StudentCardSection"; // Reused Card
 import StudentFeesGraph from "./Components/StudentFeesGraph";
 import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
 import AddNewFeeSidebar from "./Components/AddNewFeeSidebar";
-import { FiPlus, FiUserPlus } from "react-icons/fi";
+import { GiTakeMyMoney } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { FaPlusCircle } from "react-icons/fa";
+import { MdAttachMoney } from "react-icons/md";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -65,7 +66,7 @@ useEffect(() => {
         >
           <span className="text-gray-800 font-medium">Add New Fees</span>
           <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-          <FiPlus size={16} />
+          <GiTakeMyMoney size={20} />
           </div>
         </button>
       </div>

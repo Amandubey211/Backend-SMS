@@ -42,6 +42,8 @@ import {
 } from "@ant-design/icons"; // Import icons
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import ExportModal from "../Earnings/Components/ExportModal";
+import Layout from "../../../../Components/Common/Layout";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -108,10 +110,17 @@ const RecentInvoiceList = () => {
         dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A",
     },
     {
+      title: "Total Amount",
+      dataIndex: "totalAmount",
+      key: "totalAmount",
+      render: (totalAmount) => totalAmount?.toFixed(2) + " QR",
+      sorter: (a, b) => a.totalAmount - b.totalAmount,
+    },
+    {
       title: "Final Amount",
       dataIndex: "finalAmount",
       key: "finalAmount",
-      render: (finalAmount) => finalAmount?.toFixed(2) + " QAR",
+      render: (finalAmount) => finalAmount?.toFixed(2) + " QR",
       sorter: (a, b) => a.finalAmount - b.finalAmount,
     },
     {
@@ -123,7 +132,7 @@ const RecentInvoiceList = () => {
         let text = "Active";
         if (record.isCancel) {
           color = "red";
-          text = "Cancel";
+          text = "Canceled";
         } else if (record.isReturn) {
           color = "yellow";
           text = "Return";
@@ -142,23 +151,39 @@ const RecentInvoiceList = () => {
         <Dropdown
           overlay={
             <Menu>
+              {/* Preview */}
               <Menu.Item
-                icon={<EyeOutlined />} // Icon for Preview
+                icon={<EyeOutlined />}
                 onClick={() => setInvoiceVisible(true)}
               >
                 Preview
               </Menu.Item>
-              <Menu.Item
-                icon={<RedoOutlined />} // Icon for Return
-                onClick={() =>
-                  navigate(
-                    "/finance/penaltyAdjustment/add-new-penalty-adjustment"
-                  )
-                }
-              >
-                Return
-              </Menu.Item>
-              {!record.isCancel && (
+    
+              {/* Return */}
+              {!record.isCancel && !record.isReturn && (
+                <Menu.Item
+                  icon={<RedoOutlined />}
+                  onClick={() =>
+                    navigate(
+                      "/finance/penaltyAdjustment/add-new-penalty-adjustment"
+                    )
+                  }
+                >
+                  Return
+                </Menu.Item>
+              )}
+              {record.isReturn && (
+                <Menu.Item icon={<RedoOutlined />} disabled>
+                  Return 
+                </Menu.Item>
+              )}
+    
+              {/* Canceled */}
+              {record.isCancel || record.isReturn ? (
+                <Menu.Item icon={<CloseCircleOutlined />} disabled>
+                  Canceled
+                </Menu.Item>
+              ) : (
                 <Menu.Item
                   icon={<CloseCircleOutlined />}
                   onClick={() => {
@@ -175,8 +200,10 @@ const RecentInvoiceList = () => {
                   Cancel
                 </Menu.Item>
               )}
+    
+              {/* View (Read Only) */}
               <Menu.Item
-                icon={<EyeOutlined />} // Icon for Preview
+                icon={<EyeOutlined />}
                 onClick={() => {
                   dispatch(setInvoiceData(record));
                   navigate("/finance/invoices/add-new-invoice");
@@ -191,7 +218,8 @@ const RecentInvoiceList = () => {
           <Button shape="circle" icon={<MoreOutlined />} />
         </Dropdown>
       ),
-    },
+    }
+    
   ];
 
   const closeInvoice = (e) => {
@@ -235,8 +263,9 @@ const RecentInvoiceList = () => {
       date: invoice?.issueDate || "N/A",
       academicYear: invoice?.academicYear?.year || "N/A",
     })) || [];
-
+    useNavHeading("Finance", "Invoices List");
   return (
+    <Layout title="Finance | Invoice">
     <AdminLayout>
       <div className="p-4 bg-white rounded-lg ">
         <div className="p-1 bg-white  rounded-lg">
@@ -485,6 +514,7 @@ const RecentInvoiceList = () => {
         />
       </div>
     </AdminLayout>
+    </Layout>
   );
 };
 
