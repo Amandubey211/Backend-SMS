@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 
 import {
@@ -14,25 +14,39 @@ import {
   Pagination,
   Select,
   Descriptions,
+
 } from "antd";
 import {
   ExportOutlined,
   MoreOutlined,
   SearchOutlined,
+
+  EyeOutlined,
+  RedoOutlined,
+  CloseCircleOutlined,
 } from "@ant-design/icons";
+
+
 
 
 import { FiPlus, FiUserPlus } from "react-icons/fi";
 
+
 import { useNavigate } from "react-router-dom";
-import Invoice from "./Components/Invoice";
-import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import {
   cancelInvoice,
   fetchInvoice,
 } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+
+import {
+  setInvoiceData,
+  setSelectedInvoiceNumber,
+} from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+
+
+
 import { isCancel } from "axios";
 import { FaPlusCircle } from "react-icons/fa";
 import {
@@ -44,18 +58,24 @@ import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoice
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const popupRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useNavHeading("Finance", "Recent Invoice List");
 
   const [searchQuery, setSearchQuery] = useState("");
   const { loading, error, invoices, pagination } = useSelector(
     (store) => store.admin.invoices
   );
   const [pageSize, setPageSize] = useState(10);
+
+
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+
 
   // Filtered data based on search query
   const filteredData = invoices?.filter(
@@ -74,7 +94,8 @@ const RecentInvoiceList = () => {
     };
 
     dispatch(fetchInvoice(filters));
-  }, []);
+  }, [dispatch, pageSize]);
+
   // Define Ant Design columns
   const columns = [
     {
@@ -108,6 +129,8 @@ const RecentInvoiceList = () => {
       key: "dueDate",
       render: (dueDate) =>
         dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A",
+
+
     },
     {
       title: "Total Amount",
@@ -115,6 +138,7 @@ const RecentInvoiceList = () => {
       key: "totalAmount",
       render: (totalAmount) => totalAmount?.toFixed(2) + " QR",
       sorter: (a, b) => a.totalAmount - b.totalAmount,
+
     },
     {
       title: "Final Amount",
@@ -132,7 +156,7 @@ const RecentInvoiceList = () => {
         let text = "Active";
         if (record.isCancel) {
           color = "red";
-          text = "Canceled";
+          text = "Cancelled";
         } else if (record.isReturn) {
           color = "yellow";
           text = "Return";
@@ -203,7 +227,33 @@ const RecentInvoiceList = () => {
     
               {/* View (Read Only) */}
               <Menu.Item
-                icon={<EyeOutlined />}
+                icon={<RedoOutlined />} // Icon for Return
+                onClick={() => {
+                  dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Set selected invoice number
+                  navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Navigate to form
+                }}
+              >
+                Return
+              </Menu.Item>
+              {!record.isCancel && (
+                <Menu.Item
+                  icon={<CloseCircleOutlined />}
+                  onClick={() => {
+                    dispatch(cancelInvoice(record._id)).then(() =>
+                      dispatch(
+                        fetchInvoice({
+                          page: 1,
+                          limit: pageSize,
+                        })
+                      )
+                    );
+                  }}
+                >
+                  Cancel
+                </Menu.Item>
+              )}
+              <Menu.Item
+                icon={<EyeOutlined />} // Icon for View (Read Only)
                 onClick={() => {
                   dispatch(setInvoiceData(record));
                   navigate("/finance/invoices/add-new-invoice");
@@ -219,7 +269,6 @@ const RecentInvoiceList = () => {
         </Dropdown>
       ),
     }
-    
   ];
 
   const closeInvoice = (e) => {
@@ -227,6 +276,7 @@ const RecentInvoiceList = () => {
       setInvoiceVisible(false); // Close popup when clicking outside
     }
   };
+
   const dispatch = useDispatch();
   const filterOnchange = (e) => {
     const { name, value } = e.target;
@@ -238,6 +288,8 @@ const RecentInvoiceList = () => {
       dispatch(fetchInvoice({}));
     }
   };
+
+
 
   const transformQuotationData = (invoices) =>
     invoices?.map(({ _id, ...invoice }, index) => ({
@@ -264,11 +316,12 @@ const RecentInvoiceList = () => {
       academicYear: invoice?.academicYear?.year || "N/A",
     })) || [];
     useNavHeading("Finance", "Invoices List");
+
   return (
     <Layout title="Finance | Invoice">
     <AdminLayout>
       <div className="p-4 bg-white rounded-lg ">
-        <div className="p-1 bg-white  rounded-lg">
+        <div className="p-1 bg-white rounded-lg">
           {/* Filters and Buttons Section */}
           <div className="flex justify-between items-start">
             <div className="flex flex-col space-y-4">
@@ -323,14 +376,15 @@ const RecentInvoiceList = () => {
                 icon={<ExportOutlined />}
                 onClick={() => setIsExportModalVisible(true)}
                 className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-              >
-                Export
-              </Button>
+              >Export</Button>
+
 
               {/* Add New Fee Button */}
               <button
                 onClick={() => {
+
                   dispatch(setInvoiceData());
+
                   navigate("/finance/invoices/add-new-invoice");
                 }}
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -339,7 +393,7 @@ const RecentInvoiceList = () => {
                   Add New Invoice
                 </span>
                 <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiPlus size={16} />
+                  <FiPlus size={16} />
                 </div>
               </button>
             </div>
@@ -386,6 +440,7 @@ const RecentInvoiceList = () => {
                 })}
               />
             </>
+
           )}
         </div>
         {isInvoiceVisible && selectedInvoice && (
@@ -418,7 +473,7 @@ const RecentInvoiceList = () => {
               </h2>
 
               {/* Invoice Details */}
-              <div className="flex  justify-between ">
+              <div className="flex justify-between">
                 <div>
                   <strong>Bill To:</strong>
                   <p>{selectedInvoice.receiver.name}</p>
@@ -488,9 +543,9 @@ const RecentInvoiceList = () => {
                     </td>
                   </tr>
                   <tr>
-                    <td className="text-left font-bold text-pink-700">
-                      Total:
-                    </td>
+
+                    <td className="text-left font-bold text-pink-700">Total:</td>
+
                     <td className="text-right font-bold text-pink-700">
                       {selectedInvoice.finalAmount?.toFixed(2)} QAR
                     </td>

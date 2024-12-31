@@ -1,7 +1,5 @@
-// src/Modules/Admin/Finance/Receipts/AddReceipt/CreateReceipt.js
-
-import React, { useState, useEffect, useCallback } from "react";
-import { Formik, Form, ErrorMessage } from "formik";
+import React from "react";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -10,12 +8,8 @@ import TextInput from "./Components/TextInput";
 import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import { toast } from "react-hot-toast";
 import SelectInput from "../../PenaltiesandAdjustments/AddPenaltyAdjustment/Components/SelectInput";
-import debounce from "lodash.debounce";
-import { Spin, Tooltip } from "antd";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
@@ -25,10 +19,6 @@ const CreateReceipt = () => {
   // Check if we came from "View (Read-Only)"
   const readOnly = location.state?.readOnly === true;
   const receiptData = location.state?.receiptData || null;
-
-  // --- Local State for Invoice Number Handling ---
-  const [invoiceStatus, setInvoiceStatus] = useState("idle"); // 'idle' | 'loading' | 'success' | 'error'
-  const [invoiceErrorMsg, setInvoiceErrorMsg] = useState("");
 
   // --- Utility to parse existing receipt data ---
   const parseReceiptData = (data) => {
@@ -119,73 +109,6 @@ const CreateReceipt = () => {
       .min(1, "At least one line item is required"),
   });
 
-  // --- Format Invoice Number with Dashes ---
-  const formatInvoiceNumber = (value) => {
-    // Remove all non-alphanumeric characters
-    const raw = value.replace(/[^a-zA-Z0-9]/g, "");
-
-    // Assuming the format is SCHOOLCODE-YYYYMM-SSSS
-    // Example: ABCD-202401-0001
-
-    // Define lengths
-    const schoolCodeLength = 4;
-    const yearMonthLength = 6;
-    const sequenceLength = 4;
-
-    let formatted = "";
-
-    if (raw.length > 0) {
-      formatted += raw.substring(0, Math.min(schoolCodeLength, raw.length));
-    }
-    if (raw.length > schoolCodeLength) {
-      formatted += "-" + raw.substring(schoolCodeLength, Math.min(schoolCodeLength + yearMonthLength, raw.length));
-    }
-    if (raw.length > schoolCodeLength + yearMonthLength) {
-      formatted += "-" + raw.substring(schoolCodeLength + yearMonthLength, Math.min(schoolCodeLength + yearMonthLength + sequenceLength, raw.length));
-    }
-
-    return formatted.toUpperCase();
-  };
-
-  // --- Debounced Function to Fetch Invoice Data ---
-  const debouncedFetchInvoice = useCallback(
-    debounce((invoiceNumber, setFieldValue) => {
-      if (!invoiceNumber) {
-        setInvoiceStatus("idle");
-        setInvoiceErrorMsg("");
-        return;
-      }
-
-      setInvoiceStatus("loading");
-      setInvoiceErrorMsg("");
-
-      dispatch(fetchInvoiceByNumber(invoiceNumber))
-        .unwrap()
-        .then((data) => {
-          setInvoiceStatus("success");
-          setInvoiceErrorMsg("");
-
-          // Preload invoice data into form fields
-          const parsedData = parseReceiptData(data);
-          Object.keys(parsedData).forEach((key) => {
-            if (key !== "items" && key !== "invoiceNumber") {
-              setFieldValue(key, parsedData[key]);
-            }
-          });
-
-          // Handle line items separately
-          if (parsedData.items && parsedData.items.length > 0) {
-            setFieldValue("items", parsedData.items);
-          }
-        })
-        .catch((error) => {
-          setInvoiceStatus("error");
-          setInvoiceErrorMsg(error || "Invoice not found.");
-        });
-    }, 500),
-    [dispatch]
-  );
-
   // --- Handle Submit (disabled if readOnly) ---
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
     if (readOnly) {
@@ -212,6 +135,7 @@ const CreateReceipt = () => {
         quantity: item.quantity, // Keep as string
         total: parseFloat(item.totalAmount) || 0,
       })),
+      
     };
 
     // Debugging: Log formValues
@@ -258,7 +182,7 @@ const CreateReceipt = () => {
               {/* Header */}
               <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-semibold">
-                  {readOnly ? "View Receipt" : "Create Receipt"}
+                  {readOnly ? "View Receipt" : "Create Receipts"}
                 </h1>
                 {!readOnly && (
                   <div className="flex gap-4">
@@ -310,48 +234,6 @@ const CreateReceipt = () => {
                   placeholder="Enter email"
                   disabled={readOnly}
                 />
-
-                {/* --- Enhanced Invoice Number Field --- */}
-                <div className="relative col-span-1 md:col-span-3">
-                  <TextInput
-                    name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
-                    label="Invoice Reference Number" // You can update the label if needed
-                    placeholder="Enter invoice reference number"
-                    disabled={readOnly}
-                    onChange={(e) => {
-                      const rawValue = e.target.value;
-                      const formattedValue = formatInvoiceNumber(rawValue); // Format invoice number with dashes
-                      setFieldValue("invoiceNumber", formattedValue); // Update Formik field value
-
-                      // Reset invoice status and error message
-                      setInvoiceStatus("idle");
-                      setInvoiceErrorMsg("");
-
-                      debouncedFetchInvoice(formattedValue, setFieldValue); // Fetch invoice data
-                    }}
-                  />
-                  {/* Feedback Icons */}
-                  {!readOnly && (
-                    <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                      {invoiceStatus === "loading" && <Spin size="small" />}
-                      {invoiceStatus === "success" && (
-                        <Tooltip title="Invoice loaded successfully">
-                          <CheckCircleOutlined style={{ color: "green", fontSize: "16px" }} />
-                        </Tooltip>
-                      )}
-                      {invoiceStatus === "error" && (
-                        <Tooltip title={invoiceErrorMsg || "Invoice not found"}>
-                          <CloseCircleOutlined style={{ color: "red", fontSize: "16px" }} />
-                        </Tooltip>
-                      )}
-                    </div>
-                  )}
-                  {/* Validation Error */}
-                  <ErrorMessage name="invoiceNumber">
-                    {(msg) => <div className="text-red-500 text-sm mt-1">{msg}</div>}
-                  </ErrorMessage>
-                </div>
-                {/* --- End Enhanced Invoice Number Field --- */}
               </div>
 
               {/* Return Items */}
@@ -403,14 +285,18 @@ const CreateReceipt = () => {
                   disabled={readOnly}
                 />
                 <TextInput
+                  name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
+                  label="Invoice Reference ID" // You can update the label if needed
+                  placeholder="Enter invoice reference number"
+                  disabled={readOnly}
+                />
+                <TextInput
                   name="remark"
                   label="Remarks"
                   placeholder="Any remarks here"
                   disabled={readOnly}
                 />
-                {/* Uncomment and use FileInput if needed */}
-                {/* 
-                <FileInput
+                {/* <FileInput
                   name="document"
                   label="Add Document (if any)"
                   placeholder="Upload file"
@@ -420,8 +306,7 @@ const CreateReceipt = () => {
                     }
                   }}
                   disabled={readOnly}
-                /> 
-                */}
+                /> */}
               </div>
             </Form>
           )}
@@ -432,3 +317,4 @@ const CreateReceipt = () => {
 };
 
 export default CreateReceipt;
+

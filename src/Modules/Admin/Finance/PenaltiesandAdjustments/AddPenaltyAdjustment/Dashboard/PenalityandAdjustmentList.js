@@ -34,7 +34,7 @@ import { setCurrentPage } from "../../../../../../Store/Slices/Finance/Penalitya
 import ReturnInvoice from "../../../../../../Utils/FinanceTemplate/ReturnInvoice";
 
 const PenalityandAdjustmentList = () => {
-  useNavHeading("Finance", "Penality & Adjustment List");
+  useNavHeading("Finance", "Return Invoice List");
   const {
     adjustmentData,
     loading,
@@ -139,47 +139,61 @@ const PenalityandAdjustmentList = () => {
       title: "Final Amount(QR)",
       dataIndex: "adjustmentTotal",
       key: "adjustmentTotal",
-      render: (value) => (
-        <span className="text-xs text-green-600">{value || "0"} QR</span>
-      ),
+      render: (value) => {
+        const formattedValue = value
+          ? Number.isInteger(value)
+            ? value // Keep whole numbers as they are
+            : value.toFixed(2) // Format decimals to two places
+          : "0";
+        return <span className="text-xs text-green-600">{formattedValue} QR</span>;
+      },
       width: 120,
       ellipsis: true,
       sorter: (a, b) => (a.adjustmentTotal || 0) - (b.adjustmentTotal || 0),
-    },
+    },    
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (text) => (
-        <Tag color={text == "Cancelled" ? "red" : "purple"} className="text-xs">
-          <span className="text-xs">{text}</span>
+        <Tag color={text === "Cancelled" ? "red" : "purple"} className="text-xs">
+          <span className="text-xs">{text || "Active"}</span>
         </Tag>
       ),
       width: 100,
       ellipsis: true,
-      sorter: (a, b) => a.status.localeCompare(b.status),
+      sorter: (a, b) => (a.status || "").localeCompare(b.status || ""),
     },
     {
       title: "Date",
       dataIndex: "adjustedAt",
       key: "adjustedAt",
       render: (value) => {
-        const date = value ? new Date(value) : null;
-        const formattedDate = date
-          ? new Intl.DateTimeFormat("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            }).format(date)
-          : "N/A";
-
-        return <span className="text-xs">{formattedDate}</span>;
+        if (!value) {
+          return <span className="text-xs">N/A</span>; // Handle undefined/null date
+        }
+        try {
+          const date = new Date(value);
+          const formattedDate = new Intl.DateTimeFormat("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }).format(date);
+          return <span className="text-xs">{formattedDate}</span>;
+        } catch (error) {
+          console.error("Invalid date value:", value, error);
+          return <span className="text-xs">N/A</span>; // Fallback for invalid dates
+        }
       },
       width: 120,
       ellipsis: {
         showTitle: true,
       },
-      sorter: (a, b) => new Date(a.adjustedAt) - new Date(b.adjustedAt),
+      sorter: (a, b) => {
+        const dateA = new Date(a.adjustedAt || 0);
+        const dateB = new Date(b.adjustedAt || 0);
+        return dateA - dateB;
+      },
     },
     {
       title: "Action",
@@ -249,16 +263,14 @@ const PenalityandAdjustmentList = () => {
     return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
     invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
     receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
-    // discount: adjustment.discount || 0,
-    // discountType: adjustment.discountType || "percentage",
-    // penalty: adjustment.adjustmentPenalty || "N/A",
-    // tax: adjustment.tax,
-    adjustmentAmount: adjustment?.adjustmentTotal || 0,
-    adjustmentTotal: adjustment?.adjustmentAmount || 0,
-    status: adjustment.isCancel ? "Cancelled" : "-",
+    adjustmentAmount: adjustment?.adjustmentAmount || 0,
+    adjustmentTotal: adjustment?.adjustmentTotal || 0,
+    status: adjustment?.isCancel ? "Cancelled" : "Active", // Use optional chaining
     adjustedAt: adjustment?.adjustedAt || "N/A",
-    ...adjustment,
+    ...adjustment, // Spread other properties safely
+
   }));
+
 
   const transformAdjustmentData = (adjustmentData) =>
     adjustmentData?.map(({ _id, ...adjustment }, index) => ({
@@ -282,6 +294,7 @@ const PenalityandAdjustmentList = () => {
       Date: adjustment?.adjustedAt || "N/A",
       academicYearDetails: adjustment?.academicYear?.year || "N/A",
     })) || [];
+
 
   return (
     <Layout title={"Penality & Adjustment List | Student Diwan"}>

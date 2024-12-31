@@ -1,24 +1,46 @@
-// src/Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js
-
-import React from "react";
-import { Formik, Form } from "formik";
+import React, { useEffect } from "react";
+import { Formik, Form, useFormikContext } from "formik";
 import * as Yup from "yup";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
 import ReturnItems from "./Components/ReturnItems";
-import FileInput from "./Components/FileInput";
 import { useDispatch, useSelector } from "react-redux";
 import { createAdjustment } from "../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
-import { toast } from "react-hot-toast";
+import {clearSelectedInvoiceNumber} from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import {fetchInvoiceByNumber} from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import { useNavigate } from "react-router-dom";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce"; // Adjust the import path as necessary
 
 const CreatePenaltyAdjustment = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  useNavHeading("Finance", "Create Penalty & Adjustment");
 
-  // Corrected useSelector path
-  const { loading, error, successMessage } = useSelector((state) => state.admin.penaltyAdjustment);
+  // Extract necessary state from Redux
+  const {
+    loading,
+    error,
+    successMessage,
+    selectedInvoiceNumber,
+    invoiceDetails,
+    invoiceFetchSuccess,
+  } = useSelector((state) => state.admin.invoices);
+
+
+  useEffect(() => {
+    if (selectedInvoiceNumber) {
+      const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
+      if (invoiceNumberPattern.test(selectedInvoiceNumber)) {
+        dispatch(fetchInvoiceByNumber(selectedInvoiceNumber));
+      }
+    }
+  }, [selectedInvoiceNumber, dispatch]);
+  
+  // Debounce the invoice number input by 500ms
+  const [invoiceNumberInput, setInvoiceNumberInput] = React.useState("");
+  const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
 
   // Define initial values based on backend requirements
   const initialValues = {
@@ -27,18 +49,18 @@ const CreatePenaltyAdjustment = () => {
       {
         revenueType: "",
         revenueReference: "",
-        quantity: "",
-        amount: "",
+        quantity: null,
+        amount: null,
       },
     ],
     reason: "",
-    discountType: "",
-    discount: "",
-    adjustmentPenalty: "",
-    tax: "",
+    discountType: "amount",
+    discount: null,
+    adjustmentPenalty: null,
+    tax: null,
     document: null, // Optional
   };
-  
+
   // Define validation schema
   const validationSchema = Yup.object().shape({
     invoiceNumber: Yup.string().required("Invoice Number is required"),
@@ -78,13 +100,17 @@ const CreatePenaltyAdjustment = () => {
     // Prepare the payload as per the backend requirements
     const payload = {
       invoiceNumber: values.invoiceNumber,
-      items: values.items,
+      items: values.items.map((item) => ({
+        revenueType: item.revenueType,
+        revenueReference: item.revenueReference,
+        quantity: item.quantity,
+        amount: item.amount,
+      })),
       reason: values.reason,
       discountType: values.discountType,
-      discount: values.discount,
-      adjustmentPenalty: values.adjustmentPenalty,
-      tax: values.tax,
-      document: values.document, // Optional
+      discount: Number(values.discount),
+      adjustmentPenalty: Number(values.adjustmentPenalty),
+      tax: Number(values.tax),
     };
 
     // Dispatch the thunk
@@ -92,8 +118,7 @@ const CreatePenaltyAdjustment = () => {
       .unwrap()
       .then(() => {
         resetForm();
-        toast.success("Adjustment created successfully!");
-        navigate("/finance/penaltyAdjustment-list"); // Navigate to adjustments list page
+        navigate("/finance/penaltyAdjustment-list"); // Redirect after successful submission
       })
       .catch((err) => {
         // Errors are handled in the slice and toast
@@ -103,6 +128,44 @@ const CreatePenaltyAdjustment = () => {
         setSubmitting(false);
       });
   };
+
+  // Fetch invoice details when debounced invoice number changes and is valid
+  useEffect(() => {
+    const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
+    if (debouncedInvoiceNumber && invoiceNumberPattern.test(debouncedInvoiceNumber)) {
+      dispatch(fetchInvoiceByNumber(debouncedInvoiceNumber));
+    }
+  }, [debouncedInvoiceNumber, dispatch]);
+
+  // Reference to Formik to set field values outside Formik's render props
+  const formikRef = React.useRef();
+
+  // Prefill form fields when invoice details are fetched successfully
+  useEffect(() => {
+    if (invoiceFetchSuccess && invoiceDetails) {
+      // Prefill the form fields with invoiceDetails
+      formikRef.current.setFieldValue("invoiceNumber", invoiceDetails.invoiceNumber);
+      formikRef.current.setFieldValue("reason", ""); // You can set a default reason or fetch from invoiceDetails if available
+      formikRef.current.setFieldValue("discountType", invoiceDetails.discountType || "amount"); // Default discount type; adjust as needed
+      formikRef.current.setFieldValue("discount", invoiceDetails.discount || 0);
+      formikRef.current.setFieldValue("adjustmentPenalty", invoiceDetails.penalty || 0);
+      formikRef.current.setFieldValue("tax", invoiceDetails.tax || 0);
+      formikRef.current.setFieldValue(
+        "items",
+        invoiceDetails.lineItems.map((item) => ({
+          revenueType: item.revenueType,
+          revenueReference: item._id, // Assuming revenueReference is the line item ID
+          quantity: item.quantity,
+          amount: item.amount,
+        }))
+      );
+      // Show success message
+      // toast.success("Invoice data fetched successfully!"); // Already handled in thunk
+      // Clear selectedInvoiceNumber to allow manual entries in future
+      dispatch(clearSelectedInvoiceNumber());
+    }
+  }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
+  console.log('this is invoice number: ' + selectedInvoiceNumber);
 
   return (
     <DashLayout>
@@ -114,11 +177,12 @@ const CreatePenaltyAdjustment = () => {
 
         {/* Form Section */}
         <Formik
+          innerRef={formikRef}
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, setFieldValue, isSubmitting, resetForm }) => (
+          {(formik) => (
             <Form id="create-adjustment-form">
               {/* Header Buttons */}
               <div className="flex justify-end items-center mb-6">
@@ -126,8 +190,8 @@ const CreatePenaltyAdjustment = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      resetForm();
-                      toast.success("Form has been reset.");
+                      formik.resetForm();
+                      // toast.success("Form has been reset."); // Already handled in thunk
                     }}
                     className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
                   >
@@ -139,7 +203,7 @@ const CreatePenaltyAdjustment = () => {
                     style={{
                       background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
                     }}
-                    disabled={isSubmitting || loading}
+                    disabled={formik.isSubmitting || loading}
                   >
                     Save Adjustment
                   </button>
@@ -153,9 +217,11 @@ const CreatePenaltyAdjustment = () => {
                 <TextInput
                   name="invoiceNumber"
                   label="Invoice Number *"
-                  placeholder="Enter invoice number"
+                  placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
                   required
                   type="text"
+                  value={invoiceNumberInput}
+                  onChange={(e) => setInvoiceNumberInput(e.target.value)}
                 />
 
                 {/* Reason */}
@@ -201,7 +267,7 @@ const CreatePenaltyAdjustment = () => {
                 <TextInput
                   name="tax"
                   label="Tax *"
-                  placeholder="Enter tax percentage"
+                  placeholder="Enter tax value"
                   required
                   type="number"
                 />
@@ -210,31 +276,16 @@ const CreatePenaltyAdjustment = () => {
               {/* Items Section */}
               <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
               <ReturnItems
-                values={values}
-                setFieldValue={setFieldValue}
+                values={formik.values}
+                setFieldValue={formik.setFieldValue}
                 required
               />
-
-              {/* Document Upload (Optional) */}
-              {/* <div className="mb-6">
-                <FileInput
-                  name="document"
-                  label="Add Document (if any)"
-                  placeholder="Upload file"
-                  onChange={(e) => {
-                    setFieldValue("document", e.currentTarget.files[0]);
-                  }}
-                  disabled={isSubmitting || loading}
-                />
-              </div> */}
 
               {/* Display Success and Error Messages */}
               {successMessage && (
                 <div className="text-green-500 mb-4">{successMessage}</div>
               )}
-              {error && (
-                <div className="text-red-500 mb-4">{error}</div>
-              )}
+              {error && <div className="text-red-500 mb-4">{error}</div>}
             </Form>
           )}
         </Formik>

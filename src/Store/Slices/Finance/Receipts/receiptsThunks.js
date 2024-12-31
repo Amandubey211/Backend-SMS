@@ -5,57 +5,12 @@ import { getAY } from "../../../../Utils/academivYear";
 
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
-  async ({ page = 1, limit = 10, fetchLatest = false }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
     try {
-
-      if (fetchLatest) {
-        // Step 1: Fetch pagination details to calculate the last page
-        const initialResponse = await getData(`/finance/revenue/all/receipt?page=1&limit=${limit}`);
-        const { pagination } = initialResponse;
-
-        if (!pagination || !pagination.totalRecords) {
-          return rejectWithValue("Unable to fetch pagination details.");
-        }
-
-        // Step 2: Calculate the last page
-        const lastPage = Math.ceil(pagination.totalRecords / limit);
-
-        // Step 3: Fetch the last page
-        let accumulatedReceipts = [];
-        let currentPage = lastPage;
-
-        while (accumulatedReceipts.length < limit && currentPage > 0) {
-          const response = await getData(
-            `/finance/revenue/all/receipt?page=${currentPage}&limit=${limit}`
-          );
-
-          if (response?.data) {
-            accumulatedReceipts = [...response.data, ...accumulatedReceipts];
-          }
-
-          currentPage--; // Move to the previous page if needed
-        }
-
-        // Trim the accumulated receipts to the requested limit
-        accumulatedReceipts = accumulatedReceipts.slice(0, limit);
-
-        return {
-          receipts: accumulatedReceipts,
-          pagination: {
-            currentPage: lastPage,
-            totalRecords: pagination.totalRecords,
-            limit,
-          },
-        };
-      }
-
-
-      const say=getAY();
-      const response = await getData(`/finance/revenue/all/receipt?say=${say}&page=${page}&limit=${limit}`); // Backend API with pagination
-
+      const response = await getData(`/finance/revenue/all/receipt?page=${page}&limit=${limit}`); // Backend API with pagination
       if (response?.data) {
         const { data, pagination } = response;
-        return { receipts: data, pagination };
+        return { receipts: data, pagination }; // Include pagination metadata
       } else {
         return rejectWithValue(response?.message || "Failed to fetch receipts.");
       }
@@ -64,8 +19,6 @@ export const fetchAllReceipts = createAsyncThunk(
     }
   }
 );
-
-
 
 
 // Create a receipt
@@ -78,12 +31,13 @@ export const createReceipt = createAsyncThunk(
       const schoolId = storedSchoolId || "";
 
       // 2) Fetch academicYear
-      const say = getAY();
+      const academicYearId = getAY();
 
       // 3) Merge formValues with schoolId, academicYear
       const payload = {
         ...formValues,
-        schoolId
+        schoolId,
+        academicYear: academicYearId,
       };
 
       // 4) Create FormData
@@ -118,7 +72,7 @@ export const createReceipt = createAsyncThunk(
       // }
 
       // 5) POST
-      const response = await postData(`/finance/revenue/create/receipt?say=${say}`, formData, {
+      const response = await postData("/finance/revenue/create/receipt", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -170,6 +124,7 @@ export const updateReceipt = createAsyncThunk(
       formData.append("tax", payload.tax);
       formData.append("discount", payload.discount);
       formData.append("penalty", payload.penalty);
+      formData.append("totalPaidAmount", payload.totalPaidAmount);
       formData.append("govtRefNumber", payload.govtRefNumber);
       formData.append("remark", payload.remark);
       formData.append("schoolId", payload.schoolId);
