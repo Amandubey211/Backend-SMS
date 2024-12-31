@@ -14,7 +14,7 @@ const Card = ({ title, count, color, textColor,icon }) => {
         </div>
         <h3 className="text-sm font-medium text-gray-800 truncate">{title} Amount</h3>
       </div>
-      <p className={`text-xl font-bold  text-purple-800 `}>{count?.toFixed(2)} QAR</p>
+      <p className={`text-xl font-bold  text-purple-800 px-2 `}>{count?.toFixed(2)} QAR</p>
     </div>
   );
 };
