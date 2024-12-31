@@ -59,15 +59,27 @@ const CreateReceipt = () => {
   }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
 
   // Handle API request for invoice details
-  const fetchInvoiceDetails = async (invoiceNumber) => {
+  // Updated fetchInvoiceDetails function
+  const fetchInvoiceDetails = async (invoiceNumber, resetForm) => {
     if (invoiceNumber.trim() === "") return;
     setInvoiceStatus("loading");
     try {
-      await dispatch(fetchInvoiceByNumber(invoiceNumber)).unwrap();
-    } catch {
+      const result = await dispatch(fetchInvoiceByNumber(invoiceNumber)).unwrap();
+      if (!result) {
+        throw new Error("No data found");
+      }
+    } catch (error) {
       setInvoiceStatus("error");
+      resetForm({
+        values: {
+          ...blankInitialValues,
+          invoiceNumber: invoiceNumber, // Preserve the invoice number
+        },
+      });
     }
   };
+  
+
 
   const blankInitialValues = {
     receiverName: "",
@@ -200,13 +212,15 @@ const CreateReceipt = () => {
                   name="invoiceNumber"
                   label="Invoice Number *"
                   placeholder="Enter invoice number"
-                  onBlur={() => fetchInvoiceDetails(invoiceNumberInput)} // Fetch details on blur
+                  onBlur={() => fetchInvoiceDetails(invoiceNumberInput, resetForm)} // Place it here
                   onChange={(e) => {
-                    setInvoiceNumberInput(e.target.value);
-                    setFieldValue("invoiceNumber", e.target.value); // Update Formik's value
+                    const value = e.target.value;
+                    setInvoiceNumberInput(value);
+                    setFieldValue("invoiceNumber", value); // Update Formik's value
                   }}
                   className="w-full md:w-1/3" // Adjust width
                 />
+
                 {/* Status Icon */}
                 <div className="absolute top-[2.3rem] right-4">
                   {invoiceStatus === "loading" && <Spin size="small" />}
