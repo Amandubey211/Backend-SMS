@@ -304,9 +304,9 @@ const MainSection = () => {
 
       setQuizStarted(true);
       dispatch(
-        setTimeLeft(response?.remainingTime * 60 || itemDetails.timeLimit * 60)
+        setTimeLeft(response?.remainingTime * 60 || itemDetails?.timeLimit * 60)
       );
-      dispatch(setTotalTime(itemDetails.timeLimit * 60));
+      dispatch(setTotalTime(itemDetails?.timeLimit * 60));
       setQuizSubmitted(false);
       setShowInstructions(false);
       setIsModalOpen(true);
@@ -329,7 +329,7 @@ const MainSection = () => {
   }, [
     dispatch,
     quizId,
-    itemDetails.timeLimit,
+    itemDetails?.timeLimit,
     handleSubmit,
     addSecurityEventListeners,
   ]);

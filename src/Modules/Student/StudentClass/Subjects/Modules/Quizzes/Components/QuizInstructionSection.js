@@ -7,6 +7,8 @@ import { stdGetSingleQuiz } from "../../../../../../../Store/Slices/Student/MyCl
 const QuizInstructionSection = () => {
 
   const { itemDetails } = useSelector((store) => store?.student?.studentQuiz);
+
+  console.log("itemDetails", itemDetails)
   const { content, thumbnail } = itemDetails;
 
   return (
