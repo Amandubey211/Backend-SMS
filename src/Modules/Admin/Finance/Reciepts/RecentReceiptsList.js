@@ -30,7 +30,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
 
-import Receipt from "./Components/Receipt"; // Adjust path if needed
+import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 
 const RecentReceiptsList = () => {

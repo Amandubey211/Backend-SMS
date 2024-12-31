@@ -1,6 +1,6 @@
 import React from "react";
-import StudentDiwanLogo from "../../../../../Assets/RBAC/StudentDiwan.svg";
-import IconLogo from "../../../../../Assets/RBAC/Icon.svg";
+import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
+import IconLogo from "../../Assets/RBAC/Icon.svg";
 
 const Receipt = ({ receiptData }) => {
   if (!receiptData) return null;
