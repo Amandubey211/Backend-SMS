@@ -9,7 +9,7 @@ const ExportModal = ({ visible, onClose, dataToExport, title, sheet }) => {
   if (!visible) return null;
 
   const handleExport = (
-    dataToExport = [{ name: "Akash" }],
+    dataToExport = [{ name: "N/A" }],
     title = "ExportedData",
     sheet = "sheet1"
   ) => {

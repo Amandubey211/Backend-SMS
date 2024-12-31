@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentFeesDashboard = () => {
-  useNavHeading("Finance","Student Fess")
+  useNavHeading("Finance","Student Fees")
   return (
     <Layout title="Finance | Student Fees">
       <AdminDashLayout>

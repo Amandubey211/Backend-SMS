@@ -10,6 +10,7 @@ import {
   Tooltip,
   Tag,
   Checkbox,
+  Descriptions,
 } from "antd";
 import {
   SearchOutlined,
@@ -52,6 +53,7 @@ import toast from "react-hot-toast";
 import Layout from "../../../../Components/Common/Layout";
 import Card from "../Expense/components/Card";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import { flattenObject } from "../../../../Utils/xl";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -512,22 +514,28 @@ const TotalRevenueList = () => {
   ]);
 
   const transformIncomeData = (incomes) =>
-    incomes?.map(({ _id, category, ...income }, index) => ({
-      sNo: index + 1,
-      category: category?.[0]?.categoryName || "N/A",
-      ...income,
-      subCategory: income.subCategory || "N/A",
-      paymentType: income.paymentType || "N/A",
-      discount: income.discount || 0,
-      discountType: income.discountType || "percentage",
-      finalAmount: income.final_amount || 0,
-      paidAmount: income.paid_amount || 0,
-      remainingAmount: income.remaining_amount || 0,
-      penalty: income.penalty || 0,
-      // earnedDate: income.paidDate || income.generateDate || "N/A",
-      totalAmount: income.total_amount || 0,
-      academicYearDetails: income.academicYearDetails?.[0]?.year || "N/A",
-    })) || [];
+    incomes?.map(({ _id, category, collectBy, document, ...income }, index) => {
+      const flattenedIncome = flattenObject(income);
+      return {
+        sNo: index + 1,
+        category: category?.categoryName || "N/A",
+        ...flattenedIncome,
+        subCategory: flattenedIncome["subCategory"] || "N/A",
+        description: flattenedIncome["description"] || "N/A",
+        paymentType: flattenedIncome["paymentType"] || "N/A",
+        paymentStatus: flattenedIncome["paymentStatus"] || "N/A",
+        tax: flattenedIncome["tax"] || "N/A",
+        penalty: flattenedIncome["penalty"] || 0,
+        discount: flattenedIncome["discount"] || 0,
+        discountType: flattenedIncome["discountType"] || "N/A",
+        paidAmount: flattenedIncome["paid_amount"] || 0,
+        remainingAmount: flattenedIncome["remaining_amount"] || 0,
+        totalAmount: flattenedIncome["total_amount"] || 0,
+        finalAmount: flattenedIncome["final_amount"] || 0,
+        academicYearDetails:
+          flattenedIncome["academicYearDetails.year"] || "N/A",
+      };
+    }) || [];
 
   return (
     <Layout title="Earning List | Student Diwan">
