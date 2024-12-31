@@ -12,11 +12,14 @@ import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoic
 import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import { Spin } from "antd";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons"; // Import Ant Design Icons
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  useNavHeading("Finance", "Create Receipt");
 
   const [invoiceNumberInput, setInvoiceNumberInput] = useState(""); // Track invoice input
   const [invoiceStatus, setInvoiceStatus] = useState("idle"); // idle, loading, success, error
@@ -142,10 +145,57 @@ const CreateReceipt = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting, values, setFieldValue }) => (
+          {({ isSubmitting, values, setFieldValue, resetForm }) => (
             <Form>
+              {/* Header with Buttons */}
+              <div className="flex justify-end mb-2 space-x-4">
+                <button
+                  type="reset"
+                  onClick={resetForm}
+                  className="px-4 py-2 rounded-md text-white transition duration-300"
+                  style={{
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                  }}
+                  onMouseEnter={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #a855f7, #ec4899)")
+                  }
+                  onMouseLeave={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #ec4899, #a855f7)")
+                  }
+                  disabled={isSubmitting}
+                >
+                  Reset
+                </button>
+
+                <button
+                  type="submit"
+                  className="px-4 py-2 rounded-md text-white transition duration-300"
+                  style={{
+                    background: "linear-gradient(to right, #ec4899, #a855f7)",
+                  }}
+                  onMouseEnter={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #a855f7, #ec4899)")
+                  }
+                  onMouseLeave={(e) =>
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #ec4899, #a855f7)")
+                  }
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Submitting..." : "Create Receipt"}
+                </button>
+              </div>
+
+
+
+
+              {/* Receiver Details */}
+              <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
               {/* Invoice Number */}
-              <div className="relative">
+              <div className="relative mb-6">
                 <InvoiceTextInput
                   name="invoiceNumber"
                   label="Invoice Number *"
@@ -155,22 +205,19 @@ const CreateReceipt = () => {
                     setInvoiceNumberInput(e.target.value);
                     setFieldValue("invoiceNumber", e.target.value); // Update Formik's value
                   }}
-
+                  className="w-full md:w-1/3" // Adjust width
                 />
                 {/* Status Icon */}
-                <div className="absolute top-8 right-4">
+                <div className="absolute top-[2.3rem] right-4">
                   {invoiceStatus === "loading" && <Spin size="small" />}
                   {invoiceStatus === "success" && (
-                    <span className="text-green-500 font-bold">&#10003;</span>
+                    <CheckCircleOutlined style={{ color: "green", fontSize: "20px" }} />
                   )}
                   {invoiceStatus === "error" && (
-                    <span className="text-red-500 font-bold">&#10007;</span>
+                    <CloseCircleOutlined style={{ color: "red", fontSize: "20px" }} />
                   )}
                 </div>
               </div>
-
-              {/* Receiver Details */}
-              <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <TextInput
                   name="receiverName"
@@ -232,7 +279,7 @@ const CreateReceipt = () => {
               <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
               <ReturnItems values={values} setFieldValue={setFieldValue} />
 
-              {/* Submit Button */}
+              {/* Optionally, you can keep the buttons here as well if needed
               <div className="flex justify-end mt-6">
                 <button
                   type="submit"
@@ -245,6 +292,7 @@ const CreateReceipt = () => {
                   {isSubmitting ? "Submitting..." : "Create Receipt"}
                 </button>
               </div>
+              */}
             </Form>
           )}
         </Formik>
