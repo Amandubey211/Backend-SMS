@@ -1,4 +1,4 @@
-// src/Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js
+// src/Modules/Admin/Finance/Receipts/AddReceipt/CreateReceipt.js
 
 import React, { useState, useEffect, useCallback } from "react";
 import { Formik, Form, ErrorMessage } from "formik";
@@ -183,7 +183,7 @@ const CreateReceipt = () => {
           setInvoiceErrorMsg(error || "Invoice not found.");
         });
     }, 500),
-    [dispatch, parseReceiptData]
+    [dispatch]
   );
 
   // --- Handle Submit (disabled if readOnly) ---
@@ -253,182 +253,182 @@ const CreateReceipt = () => {
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ isSubmitting, resetForm, values, setFieldValue }) => {
-            // Handle changes to invoiceNumber to reset status
-            useEffect(() => {
-              setInvoiceStatus("idle");
-              setInvoiceErrorMsg("");
-            }, [values.invoiceNumber]);
-
-            return (
-              <Form id="create-receipt-form">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                  <h1 className="text-2xl font-semibold">
-                    {readOnly ? "View Receipt" : "Create Receipt"}
-                  </h1>
-                  {!readOnly && (
-                    <div className="flex gap-4">
-                      <button
-                        type="button"
-                        onClick={() => resetForm()}
-                        className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                      >
-                        Reset
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-4 py-2 rounded-md text-white"
-                        style={{
-                          background: "linear-gradient(to right, #ec4899, #a855f7)",
-                        }}
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Creating..." : "Create Receipt"}
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Receiver Info */}
-                <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <TextInput
-                    name="receiverName"
-                    label="Student Name *"
-                    placeholder="Enter name"
-                    disabled={readOnly}
-                  />
-                  <TextInput
-                    name="address"
-                    label="Address *"
-                    placeholder="Enter address"
-                    disabled={readOnly}
-                  />
-                  <TextInput
-                    name="contactNumber"
-                    label="Contact Number *"
-                    placeholder="Enter contact number"
-                    disabled={readOnly}
-                  />
-                  <TextInput
-                    name="mailId"
-                    label="Email *"
-                    placeholder="Enter email"
-                    disabled={readOnly}
-                  />
-
-                  {/* --- Enhanced Invoice Number Field --- */}
-                  <div className="relative">
-                    <TextInput
-                      name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
-                      label="Invoice Reference Number" // You can update the label if needed
-                      placeholder="Enter invoice reference number"
-                      disabled={readOnly}
-                      onChange={(e) => {
-                        const rawValue = e.target.value;
-                        const formattedValue = formatInvoiceNumber(rawValue); // Format invoice number with dashes
-                        setFieldValue("invoiceNumber", formattedValue); // Update Formik field value
-                        debouncedFetchInvoice(formattedValue, setFieldValue); // Fetch invoice data
+          {({ isSubmitting, resetForm, values, setFieldValue }) => (
+            <Form id="create-receipt-form">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl font-semibold">
+                  {readOnly ? "View Receipt" : "Create Receipt"}
+                </h1>
+                {!readOnly && (
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => resetForm()}
+                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded-md text-white"
+                      style={{
+                        background: "linear-gradient(to right, #ec4899, #a855f7)",
                       }}
-                    />
-                    {/* Feedback Icons */}
-                    {!readOnly && (
-                      <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
-                        {invoiceStatus === "loading" && <Spin size="small" />}
-                        {invoiceStatus === "success" && (
-                          <Tooltip title="Invoice loaded successfully">
-                            <CheckCircleOutlined style={{ color: "green", fontSize: "16px" }} />
-                          </Tooltip>
-                        )}
-                        {invoiceStatus === "error" && (
-                          <Tooltip title={invoiceErrorMsg || "Invoice not found"}>
-                            <CloseCircleOutlined style={{ color: "red", fontSize: "16px" }} />
-                          </Tooltip>
-                        )}
-                      </div>
-                    )}
-                    {/* Validation Error */}
-                    <ErrorMessage name="invoiceNumber">
-                      {(msg) => <div className="text-red-500 text-sm mt-1">{msg}</div>}
-                    </ErrorMessage>
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Creating..." : "Create Receipt"}
+                    </button>
                   </div>
-                  {/* --- End Enhanced Invoice Number Field --- */}
-                </div>
+                )}
+              </div>
 
-                {/* Return Items */}
-                {/* Pass readOnly so we can disable those fields in ReturnItems */}
-                <ReturnItems
-                  values={values}
-                  setFieldValue={setFieldValue}
-                  readOnly={readOnly}
+              {/* Receiver Info */}
+              <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <TextInput
+                  name="receiverName"
+                  label="Student Name *"
+                  placeholder="Enter name"
+                  disabled={readOnly}
+                />
+                <TextInput
+                  name="address"
+                  label="Address *"
+                  placeholder="Enter address"
+                  disabled={readOnly}
+                />
+                <TextInput
+                  name="contactNumber"
+                  label="Contact Number *"
+                  placeholder="Enter contact number"
+                  disabled={readOnly}
+                />
+                <TextInput
+                  name="mailId"
+                  label="Email *"
+                  placeholder="Enter email"
+                  disabled={readOnly}
                 />
 
-                {/* Payment Info */}
-                <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                {/* --- Enhanced Invoice Number Field --- */}
+                <div className="relative col-span-1 md:col-span-3">
                   <TextInput
-                    name="tax"
-                    label="Tax *"
-                    placeholder="Enter tax amount"
+                    name="invoiceNumber" // Renamed from invoiceRefId to invoiceNumber
+                    label="Invoice Reference Number" // You can update the label if needed
+                    placeholder="Enter invoice reference number"
                     disabled={readOnly}
-                  />
-                  <TextInput
-                    name="discount"
-                    label="Discount *"
-                    placeholder="Enter discount"
-                    disabled={readOnly}
-                  />
-                  <SelectInput
-                    name="discountType"
-                    label="Discount Type *"
-                    options={[
-                      { value: "percentage", label: "Percentage" },
-                      { value: "amount", label: "Fixed Amount" }, // Changed to "amount"
-                    ]}
-                    placeholder="Select discount type"
-                    disabled={readOnly}
-                  />
-
-                  <TextInput
-                    name="penalty"
-                    label="Penalty *"
-                    placeholder="Enter penalty"
-                    disabled={readOnly}
-                  />
-
-                  {/* Optional fields */}
-                  <TextInput
-                    name="govtRefNumber"
-                    label="Government Reference Number"
-                    placeholder="Enter reference number"
-                    disabled={readOnly}
-                  />
-                  <TextInput
-                    name="remark"
-                    label="Remarks"
-                    placeholder="Any remarks here"
-                    disabled={readOnly}
-                  />
-                  {/* <FileInput
-                    name="document"
-                    label="Add Document (if any)"
-                    placeholder="Upload file"
                     onChange={(e) => {
-                      if (!readOnly) {
-                        setFieldValue("document", e.currentTarget.files[0]);
-                      }
+                      const rawValue = e.target.value;
+                      const formattedValue = formatInvoiceNumber(rawValue); // Format invoice number with dashes
+                      setFieldValue("invoiceNumber", formattedValue); // Update Formik field value
+
+                      // Reset invoice status and error message
+                      setInvoiceStatus("idle");
+                      setInvoiceErrorMsg("");
+
+                      debouncedFetchInvoice(formattedValue, setFieldValue); // Fetch invoice data
                     }}
-                    disabled={readOnly}
-                  /> */}
+                  />
+                  {/* Feedback Icons */}
+                  {!readOnly && (
+                    <div className="absolute inset-y-0 right-4 flex items-center pointer-events-none">
+                      {invoiceStatus === "loading" && <Spin size="small" />}
+                      {invoiceStatus === "success" && (
+                        <Tooltip title="Invoice loaded successfully">
+                          <CheckCircleOutlined style={{ color: "green", fontSize: "16px" }} />
+                        </Tooltip>
+                      )}
+                      {invoiceStatus === "error" && (
+                        <Tooltip title={invoiceErrorMsg || "Invoice not found"}>
+                          <CloseCircleOutlined style={{ color: "red", fontSize: "16px" }} />
+                        </Tooltip>
+                      )}
+                    </div>
+                  )}
+                  {/* Validation Error */}
+                  <ErrorMessage name="invoiceNumber">
+                    {(msg) => <div className="text-red-500 text-sm mt-1">{msg}</div>}
+                  </ErrorMessage>
                 </div>
-              </Form>
-            )}
-          }
-          </Formik>
-        </div>
-      </DashLayout>
-    );
+                {/* --- End Enhanced Invoice Number Field --- */}
+              </div>
+
+              {/* Return Items */}
+              {/* Pass readOnly so we can disable those fields in ReturnItems */}
+              <ReturnItems
+                values={values}
+                setFieldValue={setFieldValue}
+                readOnly={readOnly}
+              />
+
+              {/* Payment Info */}
+              <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <TextInput
+                  name="tax"
+                  label="Tax *"
+                  placeholder="Enter tax amount"
+                  disabled={readOnly}
+                />
+                <TextInput
+                  name="discount"
+                  label="Discount *"
+                  placeholder="Enter discount"
+                  disabled={readOnly}
+                />
+                <SelectInput
+                  name="discountType"
+                  label="Discount Type *"
+                  options={[
+                    { value: "percentage", label: "Percentage" },
+                    { value: "amount", label: "Fixed Amount" }, // Changed to "amount"
+                  ]}
+                  placeholder="Select discount type"
+                  disabled={readOnly}
+                />
+
+                <TextInput
+                  name="penalty"
+                  label="Penalty *"
+                  placeholder="Enter penalty"
+                  disabled={readOnly}
+                />
+
+                {/* Optional fields */}
+                <TextInput
+                  name="govtRefNumber"
+                  label="Government Reference Number"
+                  placeholder="Enter reference number"
+                  disabled={readOnly}
+                />
+                <TextInput
+                  name="remark"
+                  label="Remarks"
+                  placeholder="Any remarks here"
+                  disabled={readOnly}
+                />
+                {/* Uncomment and use FileInput if needed */}
+                {/* 
+                <FileInput
+                  name="document"
+                  label="Add Document (if any)"
+                  placeholder="Upload file"
+                  onChange={(e) => {
+                    if (!readOnly) {
+                      setFieldValue("document", e.currentTarget.files[0]);
+                    }
+                  }}
+                  disabled={readOnly}
+                /> 
+                */}
+              </div>
+            </Form>
+          )}
+        </Formik>
+      </div>
+    </DashLayout>
+  );
 };
 
 export default CreateReceipt;
