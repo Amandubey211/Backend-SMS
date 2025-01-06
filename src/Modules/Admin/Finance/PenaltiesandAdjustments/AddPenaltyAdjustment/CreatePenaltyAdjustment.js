@@ -33,12 +33,10 @@ const CreatePenaltyAdjustment = () => {
     if (selectedInvoiceNumber) {
       const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
       if (invoiceNumberPattern.test(selectedInvoiceNumber)) {
-        formikRef.current.setFieldValue("invoiceNumber", selectedInvoiceNumber); // Prefill the form field
-        dispatch(fetchInvoiceByNumber(selectedInvoiceNumber)); // Fetch invoice details
+        dispatch(fetchInvoiceByNumber(selectedInvoiceNumber));
       }
     }
   }, [selectedInvoiceNumber, dispatch]);
-  
   
   // Debounce the invoice number input by 500ms
   const [invoiceNumberInput, setInvoiceNumberInput] = React.useState("");
