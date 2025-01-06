@@ -2,7 +2,7 @@ import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 
-const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) => {
+const SelectInput = ({ label, name, options, disabled, required = false, autoComplete = "off" }) => {
   // Animation variants for the container
   const containerVariants = {
     hidden: { opacity: 0, x: -10 },
@@ -29,7 +29,7 @@ const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) =
         variants={fieldVariants}
         transition={{ delay: 0.1 }}
       >
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </motion.label>
       <Field
         as="select"
@@ -43,14 +43,9 @@ const SelectInput = ({ label, name, options, disabled, autoComplete = "off" }) =
       >
         <option value="" label={`Select ${label}`} />
         {options.map((option, index) => (
-          <motion.option
-            key={index}
-            value={option}
-            variants={fieldVariants}
-            transition={{ delay: 0.2 }}
-          >
-            {option}
-          </motion.option>
+          <option key={index} value={option.value}>
+            {option.label}
+          </option>
         ))}
       </Field>
       <motion.div

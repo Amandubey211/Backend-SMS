@@ -32,35 +32,61 @@ const CreateNewInvoice = () => {
     paymentType: "",
     paymentStatus: "",
   };
-
   const validationSchema = Yup.object().shape({
+    // Required fields
     dueDate: Yup.string().required("Due Date is required"),
     "receiver.name": Yup.string().required("Receiver name is required"),
     "receiver.address": Yup.string().required("Receiver address is required"),
-    "receiver.contact": Yup.string(),
-    "receiver.email": Yup.string().email("Invalid email format"),
+  
+    // Optional fields
+    "receiver.contact": Yup.string(), // No validation as it's optional
+    "receiver.email": Yup.string().email("Invalid email format"), // Validates only if provided
+  
+    // Line items
     lineItems: Yup.array().of(
       Yup.object().shape({
-        revenueType: Yup.string().required("Revenue type is required"),
-        quantity: Yup.number().min(1, "Quantity must be at least 1").required(),
-        amount: Yup.number().min(0, "Amount must be positive").required(),
+        revenueType: Yup.string().required("Revenue type is required"), // Required
+        quantity: Yup.number()
+          .min(1, "Quantity must be at least 1") // Optional, defaults to 1 if not provided
+          .nullable(),
+        amount: Yup.number()
+          .min(0, "Amount must be positive") // Required
+          .required("Amount is required"),
       })
     ),
-    discountType: Yup.string().oneOf(["percentage", "amount"], "Invalid discount type"),
-    totalAmount: Yup.number().min(0, "Total amount must be positive"),
-    finalAmount: Yup.number().min(0, "Final amount must be positive"),
-    paymentType: Yup.string().oneOf(["cash", "card", "online", "cheque", "other"]),
-    paymentStatus: Yup.string().oneOf(["paid", "unpaid", "partial", "advance"]),
+  
+    // Discount-related fields
+    discountType: Yup.string()
+      .oneOf(["percentage", "amount"], "Invalid discount type")
+      .nullable(), // Optional field
+  
+    discount: Yup.number().min(0, "Discount must be non-negative").nullable(), // Optional
+  
+    // Penalty and tax
+    penalty: Yup.number().min(0, "Penalty must be non-negative").nullable(), // Optional
+    tax: Yup.number().min(0, "Tax must be non-negative").nullable(), // Optional
+  
+    // Amount fields
+    totalAmount: Yup.number().min(0, "Total amount must be positive").required("Total amount is required"),
+    finalAmount: Yup.number().min(0, "Final amount must be positive").nullable(), // Optional
+  
+    // Payment fields
+    paymentType: Yup.string()
+      .oneOf(["cash", "card", "online", "cheque", "other"], "Invalid payment type")
+      .required("Payment type is required"),
+    paymentStatus: Yup.string()
+      .oneOf(["paid", "unpaid", "partial", "advance"], "Invalid payment status")
+      .required("Payment status is required"),
   });
-
+  
   const handleSubmit = async (values) => {
     setLoading(true);
-    dispatch(addInvoice(values)).then(()=>setLoading(false))
+    dispatch(addInvoice(values)).then(() => setLoading(false))
   };
-  
+
 
   const isReadonly = !!invoiceData;
-  
+
   return (
     <Layout title="Finance | Invoice">
       <AdminDashLayout>
@@ -85,7 +111,7 @@ const CreateNewInvoice = () => {
                         Reset
                       </button>
                       <button
-                        onClick={()=>handleSubmit(values)}
+                        onClick={() => handleSubmit(values)}
                         disabled={loading}
                         className="px-4 py-2 mx-2 rounded-md text-white"
                         style={{
@@ -105,37 +131,46 @@ const CreateNewInvoice = () => {
                     placeholder="Enter due date"
                     type="datetime-local"
                     disabled={isReadonly}
+                    required // Required field
                   />
+
                   <TextInput
                     name="receiver.name"
                     label="Receiver Name"
                     placeholder="Enter Receiver Name"
                     disabled={isReadonly}
+                    required // Required field
                   />
+
                   <TextInput
                     name="receiver.address"
                     label="Receiver Address"
                     placeholder="Enter Receiver Address"
                     disabled={isReadonly}
+                    required // Required field
                   />
+
                   <TextInput
                     name="receiver.contact"
                     label="Contact"
                     placeholder="Enter Contact"
                     disabled={isReadonly}
-                  />
+                  /> {/* Optional field */}
+
                   <TextInput
                     name="receiver.email"
                     label="Email"
                     placeholder="Enter Email"
                     disabled={isReadonly}
-                  />
+                  /> {/* Optional field */}
+
                   <TextInput
                     name="description"
                     label="Note"
                     placeholder="Enter Short Description"
                     disabled={isReadonly}
-                  />
+                  /> {/* Optional field */}
+
                 </div>
 
                 <div className="p-6 rounded-md mx-20 mb-8" style={{ backgroundColor: "#ECECEC" }}>
@@ -150,16 +185,18 @@ const CreateNewInvoice = () => {
                                 name={`lineItems.${index}.revenueType`}
                                 label="Revenue Type"
                                 options={[
-                                  "studentFee",
-                                  "FacilityRevenue",
-                                  "service_based_revenue",
-                                  "community_externalaffair_revenue",
-                                  "financial_investment_revenue",
-                                  "Penalties",
-                                  "Other",
+                                  { label: "Student Fee", value: "studentFee" },
+                                  { label: "Facility Revenue", value: "FacilityRevenue" },
+                                  { label: "Service-Based Revenue", value: "service_based_revenue" },
+                                  { label: "Community & External Affairs Revenue", value: "community_externalaffair_revenue" },
+                                  { label: "Financial Investment Revenue", value: "financial_investment_revenue" },
+                                  { label: "Penalties", value: "Penalties" },
+                                  { label: "Other", value: "Other" },
                                 ]}
                                 disabled={isReadonly}
+                                required
                               />
+
                             </div>
                             <div className="col-span-3">
                               <TextInput
@@ -168,8 +205,9 @@ const CreateNewInvoice = () => {
                                 type="number"
                                 placeholder="Enter Quantity"
                                 disabled={isReadonly}
-                              />
+                              /> {/* Optional field */}
                             </div>
+
                             <div className="col-span-3">
                               <TextInput
                                 name={`lineItems.${index}.amount`}
@@ -177,8 +215,10 @@ const CreateNewInvoice = () => {
                                 type="number"
                                 placeholder="Enter Amount"
                                 disabled={isReadonly}
+                                required // Required field
                               />
                             </div>
+
                             {!isReadonly && (
                               <div className="col-span-2 flex items-center justify-center">
                                 <button
@@ -216,9 +256,13 @@ const CreateNewInvoice = () => {
                   <SelectInput
                     name="discountType"
                     label="Discount Type"
-                    options={["percentage", "amount"]}
+                    options={[
+                      { label: "Percentage", value: "percentage" },
+                      { label: "Amount", value: "amount" },
+                    ]}
                     disabled={isReadonly}
                   />
+
                   <TextInput
                     name="discount"
                     label="Discount"
@@ -254,15 +298,28 @@ const CreateNewInvoice = () => {
                   <SelectInput
                     name="paymentType"
                     label="Payment Type"
-                    options={["cash", "card", "online", "cheque", "other"]}
+                    options={[
+                      { label: "Cash", value: "cash" },
+                      { label: "Card", value: "card" },
+                      { label: "Online", value: "online" },
+                      { label: "Cheque", value: "cheque" },
+                      { label: "Other", value: "other" },
+                    ]}
                     disabled={isReadonly}
                   />
+
                   <SelectInput
                     name="paymentStatus"
                     label="Payment Status"
-                    options={["paid", "unpaid", "partial", "advance"]}
+                    options={[
+                      { label: "Paid", value: "paid" },
+                      { label: "Unpaid", value: "unpaid" },
+                      { label: "Partial", value: "partial" },
+                      { label: "Advance", value: "advance" },
+                    ]}
                     disabled={isReadonly}
                   />
+
                 </div>
               </Form>
             )}

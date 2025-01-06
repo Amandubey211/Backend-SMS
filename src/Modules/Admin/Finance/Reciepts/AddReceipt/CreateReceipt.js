@@ -36,21 +36,37 @@ const CreateReceipt = () => {
       const prefilledValues = {
         receiverName: invoiceDetails?.receiver?.name || "",
         mailId: invoiceDetails?.receiver?.email || "",
-        contactNumber: invoiceDetails?.receiver?.phone || "",
+        contactNumber: invoiceDetails?.receiver?.contact || "",
         address: invoiceDetails?.receiver?.address || "",
         discountType: invoiceDetails?.discountType || "",
-        discount: invoiceDetails?.discount || "",
-        penalty: invoiceDetails?.penalty || "",
-        tax: invoiceDetails?.tax || "",
-        govtRefNumber: "",
-        remark: "",
+        discount: invoiceDetails?.discount || 0,
+        penalty: invoiceDetails?.penalty || 0,
+        tax: invoiceDetails?.tax || 0,
+        govtRefNumber: "", // Set to empty as no reference in the provided data
+        remark: "", // Set to empty as no reference in the provided data
         invoiceNumber: invoiceDetails?.invoiceNumber || "",
-        items: invoiceDetails?.lineItems?.map((item) => ({
-          category: item?.revenueType || "",
-          quantity: item?.quantity || "",
-          totalAmount: item?.amount || "",
-        })) || [{ category: "", quantity: "", totalAmount: "" }],
+        items:
+          invoiceDetails?.lineItems?.map((item) => ({
+            category: item?.revenueType || "",
+            quantity: item?.quantity || 0,
+            totalAmount: item?.amount || 0,
+            subCategory: item?.revenueReference?.subCategory || "", // Nested mapping example
+            stationeries: item?.revenueReference?.stationeryItems?.map((stationery) => ({
+              itemName: stationery?.itemName || "",
+              quantity: stationery?.quantity || 0,
+              unitCost: stationery?.unitCost || 0,
+            })) || [], // Ensure an array is always returned
+          })) || [
+            {
+              category: "",
+              quantity: 0,
+              totalAmount: 0,
+              subCategory: "",
+              stationeries: [],
+            },
+          ],
       };
+      
 
       formikRef.current.setValues(prefilledValues);
       setInvoiceStatus("success");
