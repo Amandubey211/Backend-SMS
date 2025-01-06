@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Formik, Form, useFormikContext } from "formik";
+import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
@@ -7,11 +7,12 @@ import SelectInput from "./Components/SelectInput";
 import ReturnItems from "./Components/ReturnItems";
 import { useDispatch, useSelector } from "react-redux";
 import { createAdjustment } from "../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
-import {clearSelectedInvoiceNumber} from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
-import {fetchInvoiceByNumber} from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import { useNavigate } from "react-router-dom";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce"; // Adjust the import path as necessary
+import InvoiceTextInput from "./Components/InvoiceTextInput"; // Import the new component
 
 const CreatePenaltyAdjustment = () => {
   const dispatch = useDispatch();
@@ -28,16 +29,6 @@ const CreatePenaltyAdjustment = () => {
     invoiceFetchSuccess,
   } = useSelector((state) => state.admin.invoices);
 
-
-  useEffect(() => {
-    if (selectedInvoiceNumber) {
-      const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
-      if (invoiceNumberPattern.test(selectedInvoiceNumber)) {
-        dispatch(fetchInvoiceByNumber(selectedInvoiceNumber));
-      }
-    }
-  }, [selectedInvoiceNumber, dispatch]);
-  
   // Debounce the invoice number input by 500ms
   const [invoiceNumberInput, setInvoiceNumberInput] = React.useState("");
   const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
@@ -159,12 +150,30 @@ const CreatePenaltyAdjustment = () => {
           amount: item.amount,
         }))
       );
-      // Show success message
-      // toast.success("Invoice data fetched successfully!"); // Already handled in thunk
       // Clear selectedInvoiceNumber to allow manual entries in future
       dispatch(clearSelectedInvoiceNumber());
     }
   }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
+
+  // Reset form fields when there's an error fetching invoice
+  useEffect(() => {
+    if (error) {
+      formikRef.current.setFieldValue("reason", "");
+      formikRef.current.setFieldValue("discountType", "amount");
+      formikRef.current.setFieldValue("discount", null);
+      formikRef.current.setFieldValue("adjustmentPenalty", null);
+      formikRef.current.setFieldValue("tax", null);
+      formikRef.current.setFieldValue("items", [
+        {
+          revenueType: "",
+          revenueReference: "",
+          quantity: null,
+          amount: null,
+        },
+      ]);
+    }
+  }, [error]);
+
   console.log('this is invoice number: ' + selectedInvoiceNumber);
 
   return (
@@ -214,14 +223,39 @@ const CreatePenaltyAdjustment = () => {
               <h2 className="text-lg font-semibold mb-4">Adjustment Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {/* Invoice Number */}
-                <TextInput
+                <InvoiceTextInput
                   name="invoiceNumber"
                   label="Invoice Number *"
                   placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
                   required
                   type="text"
                   value={invoiceNumberInput}
-                  onChange={(e) => setInvoiceNumberInput(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setInvoiceNumberInput(value);
+                    formik.setFieldValue("invoiceNumber", value);
+
+                    // Reset form fields if invoice number changes
+                    if (value !== selectedInvoiceNumber) {
+                      formik.setFieldValue("reason", "");
+                      formik.setFieldValue("discountType", "amount");
+                      formik.setFieldValue("discount", null);
+                      formik.setFieldValue("adjustmentPenalty", null);
+                      formik.setFieldValue("tax", null);
+                      formik.setFieldValue("items", [
+                        {
+                          revenueType: "",
+                          revenueReference: "",
+                          quantity: null,
+                          amount: null,
+                        },
+                      ]);
+                    }
+                  }}
+                  onBlur={() => {
+                    // Dispatch fetchInvoiceByNumber on blur
+                    dispatch(fetchInvoiceByNumber(invoiceNumberInput));
+                  }}
                 />
 
                 {/* Reason */}

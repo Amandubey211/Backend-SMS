@@ -276,27 +276,45 @@ const PenalityandAdjustmentList = () => {
   }));
 
   const transformAdjustmentData = (adjustmentData) =>
-    adjustmentData?.map(({ _id, ...adjustment }, index) => ({
-      sNo: index + 1,
-      returnInvoiceNumber: adjustment?.returnInvoiceNumber || "N/A",
-      refInvoiceNumber: adjustment?.invoiceId?.invoiceNumber || "N/A",
-      receiver: adjustment?.invoiceId?.name || "N/A",
-      receiverEmail: adjustment?.invoiceId?.email || "N/A",
-      receiverPhone: adjustment?.invoiceId?.phone || "N/A",
-      receiverAddress: adjustment?.invoiceId?.address || "N/A",
-      tax: `${parseFloat(adjustment?.tax)} %` || 0,
-      discount:
-        (adjustment?.discountType === "percentage"
-          ? `${parseFloat(adjustment?.discount)} %`
-          : `${parseFloat(adjustment?.discount)} QR`) || 0,
-      discountType: parseFloat(adjustment?.discountType) || "percentage",
-      penalty: `${parseFloat(adjustment?.adjustmentPenalty)} QR` || 0,
-      totalAmount: `${parseFloat(adjustment?.adjustmentTotal)} QR` || 0,
-      finalAmount: `${parseFloat(adjustment?.adjustmentAmount)} QR` || 0,
-      createdBy: adjustment?.adjustedBy?.adminName || "N/A",
-      Date: adjustment?.adjustedAt || "N/A",
-      academicYearDetails: adjustment?.academicYear?.year || "N/A",
-    })) || [];
+    adjustmentData?.map((adjustment, index) => {
+      const {
+        _id,
+        returnInvoiceNumber = "N/A",
+        invoiceId = {},
+        tax = 0,
+        discount = 0,
+        discountType = "percentage",
+        adjustmentPenalty = 0,
+        adjustmentTotal = 0,
+        adjustmentAmount = 0,
+        adjustedBy = {},
+        adjustedAt = "N/A",
+        academicYear = {},
+      } = adjustment || {};
+  
+      return {
+        sNo: index + 1,
+        returnInvoiceNumber,
+        refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
+        receiver: invoiceId.name || "N/A",
+        receiverEmail: invoiceId.email || "N/A",
+        receiverPhone: invoiceId.phone || "N/A",
+        receiverAddress: invoiceId.address || "N/A",
+        tax: `${parseFloat(tax)} %`,
+        discount:
+          discountType === "percentage"
+            ? `${parseFloat(discount)} %`
+            : `${parseFloat(discount)} QR`,
+        discountType,
+        penalty: `${parseFloat(adjustmentPenalty)} QR`,
+        totalAmount: `${parseFloat(adjustmentTotal)} QR`,
+        finalAmount: `${parseFloat(adjustmentAmount)} QR`,
+        createdBy: adjustedBy.adminName || "N/A",
+        Date: adjustedAt,
+        academicYearDetails: academicYear.year || "N/A",
+      };
+    }) || [];
+  
 
   return (
     <Layout title={"Penality & Adjustment List | Student Diwan"}>

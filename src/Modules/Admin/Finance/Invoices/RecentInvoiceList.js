@@ -176,15 +176,16 @@ const RecentInvoiceList = () => {
               {/* Return */}
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
-                  icon={<RedoOutlined />}
-                  onClick={() =>
-                    navigate(
-                      "/finance/penaltyAdjustment/add-new-penalty-adjustment"
-                    )
-                  }
-                >
-                  Return
-                </Menu.Item>
+                icon={<RedoOutlined />}
+                onClick={() => {
+                  // Store the invoice number instead of the _id
+                  dispatch(setSelectedInvoiceNumber(record.invoiceNumber));
+                  // Navigate to the Create Penalty Adjustment form
+                  navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
+                }}
+              >
+                Return
+              </Menu.Item>
               )}
               {record.isReturn && (
                 <Menu.Item icon={<RedoOutlined />} disabled>
