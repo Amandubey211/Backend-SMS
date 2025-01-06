@@ -1,36 +1,73 @@
-import React from "react";
-import { Field, ErrorMessage } from "formik";
-import { motion } from "framer-motion";
+import React from 'react';
+import { Field, ErrorMessage } from 'formik';
+import { motion } from 'framer-motion';
+import { Spin, Tooltip } from 'antd';
+import { CheckCircleOutlined, CloseCircleOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 
-const TextInput = ({ label, name, type = "text", placeholder, disabled, autoComplete = "off", onBlur, onChange }) => {
-  const variants = {
-    hidden: { opacity: 0, y: -10 },
-    visible: { opacity: 1, y: 0 },
-  };
+const InvoiceTextInput = ({
+  label,
+  name,
+  type = 'text',
+  placeholder,
+  disabled,
+  autoComplete = 'off',
+  onBlur,
+  onChange,
+  required = false,
+}) => {
+  // Extract relevant state from Redux
+  const { loading, error, invoiceFetchSuccess } = useSelector(
+    (state) => state.admin.invoices
+  );
+
+  // Determine which icon to display, only if a value is present in the field
+  let icon = null;
+  if (loading) {
+    icon = <Spin indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />;
+  } else if (error) {
+    icon = (
+      <Tooltip title="Failed to fetch invoice data">
+        <CloseCircleOutlined style={{ color: 'red', fontSize: 18 }} />
+      </Tooltip>
+    );
+  } else if (invoiceFetchSuccess) {
+    icon = (
+      <Tooltip title="Invoice data fetched successfully">
+        <CheckCircleOutlined style={{ color: 'green', fontSize: 18 }} />
+      </Tooltip>
+    );
+  }
 
   return (
     <motion.div
       className="relative w-full mb-4"
-      variants={variants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.3 }}
     >
       <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
-      <Field
-        id={name}
-        name={name}
-        type={type}
-        placeholder={placeholder}
-        disabled={disabled || false}
-        className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
-        autoComplete={autoComplete}
-        onBlur={onBlur} // Pass onBlur to Field
-        onChange={onChange} // Pass onChange to Field
-      />
+      <div className="relative">
+        <Field
+          id={name}
+          name={name}
+          type={type}
+          placeholder={placeholder}
+          disabled={disabled || false}
+          className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-purple-300"
+          autoComplete={autoComplete}
+          onBlur={onBlur}
+          onChange={onChange}
+        />
+        {icon && (
+          <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            {icon}
+          </div>
+        )}
+      </div>
       <ErrorMessage
         name={name}
         component="div"
@@ -40,4 +77,4 @@ const TextInput = ({ label, name, type = "text", placeholder, disabled, autoComp
   );
 };
 
-export default TextInput;
+export default InvoiceTextInput;
