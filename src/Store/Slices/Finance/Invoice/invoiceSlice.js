@@ -6,11 +6,11 @@ const initialState = {
   invoiceDetails: null,
   cardData: {},
   invoiceData: {},
-  selectedInvoiceNumber: null, // Stores the selected invoice number
+  selectedInvoiceNumber: null, 
   loading: false,
-  error: null, // Stores error messages
-  invoiceFetchSuccess: false, // Indicates if invoice fetch was successful
-  pagination: {}, // Pagination details
+  error: null, 
+  invoiceFetchSuccess: false, 
+  pagination: {},
 };
 
 const invoiceSlice = createSlice({

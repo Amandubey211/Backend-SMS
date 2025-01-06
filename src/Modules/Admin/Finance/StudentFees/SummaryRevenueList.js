@@ -82,6 +82,7 @@ const SummaryRevenueList = () => {
     dispatch(fetchAllClasses())
     dispatch(fetchAllIncomes(params));
   }, [dispatch,params]);
+
   const handleDeleteSelected = () => {
     if (selectedRowIds.length > 0) {
       dispatch(deleteStudentFees({ ids: selectedRowIds })).then(() =>
@@ -93,11 +94,22 @@ const SummaryRevenueList = () => {
     }
   };
 
+  const [selectedRecords, setSelectedRecords] = useState([]); 
+
   const rowSelection = {
-    onChange: (selectedRowKeys) => {
+    onChange: (selectedRowKeys, selectedRows) => {
       setSelectedRowIds(selectedRowKeys);
+      console.log(selectedRows); 
+      if(selectedRows){
+        const record = selectedRows?.filter((i)=>i.paymentStatus == "unpaid");
+        console.log(record);
+        
+        setSelectedRecords(record);
+      }
+
     },
     selectedRowKeys: selectedRowIds,
+
   };
 
   const columns = [
@@ -241,13 +253,13 @@ const SummaryRevenueList = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   const handleEditClick = (record) => {
-    setSelectedRecord(record); // Set the selected record
-    setIsEditModalVisible(true); // Show the modal
+    setSelectedRecord(record); 
+    setIsEditModalVisible(true); 
   };
 
   const handleModalClose = () => {
-    setIsEditModalVisible(false); // Close the modal
-    setSelectedRecord(null); // Clear selected record
+    setIsEditModalVisible(false);
+    setSelectedRecord(null);
   };
 
   const transformStdFeeData = (incomes) =>
@@ -377,7 +389,7 @@ const SummaryRevenueList = () => {
                 <span className="text-gray-700">Unpaid</span>
               </label>
               <div className="flex items-center space-x-4 ">
-                {selectedRowIds.length > 0 && (
+                {selectedRowIds?.length > 0 && (
                   <Button
                     type="danger"
                     onClick={handleDeleteSelected}
@@ -402,13 +414,15 @@ const SummaryRevenueList = () => {
             </button>
            </div>
            <div className="flex gap-2 justify-between flex-row">
-           {selectedRowIds?.length == 1 && (
+           {selectedRowIds?.length ==1 && selectedRecords?.length == 1 && (
 
                 <Tooltip title="Create an invoice for the selected unpaid record">
                   <Button
                     icon={<DollarCircleOutlined />}
                     onClick={() => {
-                      navigate("/finance/invoices/add-new-invoice");
+                      navigate("/finance/invoices/add-new-invoice", {
+                        state: { income: selectedRecords[0] || {} },
+                      });
                     }}
                     className="flex items-center   bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
                   >
