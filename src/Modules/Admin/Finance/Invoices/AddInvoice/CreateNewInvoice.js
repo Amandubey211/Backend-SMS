@@ -36,8 +36,8 @@ const CreateNewInvoice = () => {
   const validationSchema = Yup.object().shape({
     dueDate: Yup.string().required("Due Date is required"),
     "receiver.name": Yup.string().required("Receiver name is required"),
-    "receiver.address": Yup.string().required("Receiver address is required"),
-    "receiver.contact": Yup.string(),
+    "receiver.address": Yup.string().optional().required("Receiver address is required"),
+    "receiver.contact": Yup.string().optional(),
     "receiver.email": Yup.string().email("Invalid email format"),
     lineItems: Yup.array().of(
       Yup.object().shape({
@@ -59,7 +59,7 @@ const CreateNewInvoice = () => {
   };
   
 
-  const isReadonly = !!invoiceData;
+  const isReadonly = invoiceData?.mode == 'view' ?true:false ;
   
   return (
     <Layout title="Finance | Invoice">
@@ -150,11 +150,11 @@ const CreateNewInvoice = () => {
                                 name={`lineItems.${index}.revenueType`}
                                 label="Revenue Type"
                                 options={[
-                                  "studentFee",
-                                  "FacilityRevenue",
-                                  "service_based_revenue",
-                                  "community_externalaffair_revenue",
-                                  "financial_investment_revenue",
+                                  "Student-Based Revenue",
+                                  "Facility-Based Revenue",
+                                  "Service-Based Revenue",
+                                  "Community and External Revenue",
+                                  "Financial Investments",
                                   "Penalties",
                                   "Other",
                                 ]}

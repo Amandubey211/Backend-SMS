@@ -54,6 +54,7 @@ import Layout from "../../../../Components/Common/Layout";
 import Card from "../Expense/components/Card";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { flattenObject } from "../../../../Utils/xl";
+import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -668,6 +669,27 @@ const TotalRevenueList = () => {
                     return;
                   }
                   setSelectedRowKey(record.key);
+                    const invoiceData = {
+                            dueDate: record?.dueDate?.slice(0,10),
+                            receiver: {
+                              name: record?.rentIncome?.nameOfRenter || record?.examCentreFees?.examName || '',
+                              address: "",
+                              contact: "",
+                              email: record?.email,
+                            },
+                            description: record?.description || '',
+                            lineItems: [{ revenueType: record?.category?.categoryName, quantity: 1, amount: record?.total_amount }],
+                            discountType: record?.discountType,
+                            discount: record?.discount,
+                            penalty: record?.penalty,
+                            tax: record?.tax,
+                            totalAmount: 0,
+                            finalAmount: record?.final_amount,
+                            paymentType: record?.paymentType,
+                            paymentStatus:record?.paymentStatus,
+                            mode:'create'
+                          };
+                             dispatch(setInvoiceData(invoiceData));
                 },
               })}
             />

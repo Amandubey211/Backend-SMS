@@ -219,7 +219,7 @@ const RecentInvoiceList = () => {
               <Menu.Item
                 icon={<EyeOutlined />}
                 onClick={() => {
-                  dispatch(setInvoiceData(record));
+                  dispatch(setInvoiceData({...record,mode:'view'}));
                   navigate("/finance/invoices/add-new-invoice");
                 }}
               >
