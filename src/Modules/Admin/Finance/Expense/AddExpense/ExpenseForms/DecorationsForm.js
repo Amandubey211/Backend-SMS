@@ -15,59 +15,48 @@ const DecorationsForm = () => {
     },
     {
       type: "text",
-      label: "Decorative Items",
-      name: "decorativeItems",
-      placeholder: "Enter items (separate by comma)",
+      label: "vendor",
+      name: "vendor",
+      placeholder: "Enter vendor name",
     },
+
     { type: "date", label: "Start Date", name: "startDate" },
 
     { type: "date", label: "End Date", name: "endDate" },
-
-    {
-      type: "number",
-      label: "Total Banners",
-      name: "totalBanners",
-      placeholder: "Enter number of banners",
-    },
-    {
-      type: "number",
-      label: "Total Posters",
-      name: "totalPosters",
-      placeholder: "Enter number of posters",
-    },
-    {
-      type: "text",
-      label: "vendor",
-      name: "vendor",
-      placeholder: "Enter vendor",
-    },
-    {
-      type: "text",
-      label: "Service Provider",
-      name: "serviceProvider",
-      placeholder: "Enter service provider",
-    },
   ];
-
   const billingDetailsFields = [
     {
       type: "select",
       label: "Billing Period",
       name: "billingPeriod",
-      options: ["Monthly", "Quarterly", "Annually"],
-    },
-    { type: "datetime-local", label: "Date & Time", name: "dateTime" },
-    {
-      type: "number",
-      label: "Total Amount",
-      name: "totalAmount",
-      placeholder: "Enter total amount",
+      options: ["Monthly", "Quarterly", "Yearly"],
     },
     {
-      type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"],
+    },
+    // { type: "datetime-local", label: "Date & Time", name: "dateTime" },
+    {
+      name: "payment_type", // Changed to snake_case
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+
+    // {
+    //   name: "paid_by", // Changed to snake_case
+    //   label: "Paid By",
+    //   type: "select",
+    //   options: ["Manual", "Auto"],
+    // },
+
+    {
+      type: "select",
+      label: "Discount Type",
+      name: "discountType",
+      options: ["amount", "percentage"],
     },
     {
       type: "number",
@@ -81,13 +70,47 @@ const DecorationsForm = () => {
       name: "penalty",
       placeholder: "Enter penalty amount",
     },
-    { type: "file", label: "Add Receipt/Document", name: "receipt" },
     {
       type: "number",
-      label: "Final Amount (After tax/discount/penalty)",
-      name: "finalAmount",
-      placeholder: "Enter net amount",
+      label: "Tax (Inc/Exc)",
+      name: "tax",
+      placeholder: "Enter tax percentage",
     },
+    {
+      type: "number",
+      label: "Total Amount",
+      name: "total_amount",
+      placeholder: "Enter total amount",
+    },
+    {
+      type: "number",
+      label: "Final Amount",
+      name: "final_amount",
+      placeholder: "Enter final amount",
+    },
+    {
+      name: "paid_amount", // Changed to snake_case
+      label: "Paid Amount (QR)",
+      type: "number",
+      placeholder: "Enter paid amount",
+      min: 0,
+    },
+    {
+      name: "advance_amount",
+      label: "Advance Amount (QR)",
+      type: "number",
+      placeholder: "Enter advance amount",
+      min: 0,
+    },
+    {
+      name: "remaining_amount",
+      label: "Remaining Amount (QR)",
+      type: "number",
+      placeholder: "Enter remaining amount",
+      min: 0,
+      readOnly: true, // Make it read-only as it's calculated
+    },
+    { type: "file", label: "Add Receipt/Document", name: "receipt" },
   ];
 
   return (
@@ -104,7 +127,7 @@ const DecorationsForm = () => {
         setFieldValue={setFieldValue}
         values={values}
       />
-      <PaymentStatus />
+      {/* <PaymentStatus /> */}
     </>
   );
 };

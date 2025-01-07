@@ -89,9 +89,12 @@ export const fetchAllExpenses = createAsyncThunk(
   "expenses/fetchAllExpenses",
   async (params, { dispatch, rejectWithValue }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(`/finance/expense/getAll?academicYear=${say}`, params);
+      const response = await getData(
+        `/finance/expense/getAll?academicYear=${say}`,
+        params
+      );
 
       if (response?.success) {
         return response;
@@ -183,15 +186,11 @@ export const deleteExpense = createAsyncThunk(
   }
 );
 
-/**
- * Thunk to fetch a single expense by ID and category.
- * Optional: Implement if you need to fetch individual expense details.
- */
 export const fetchExpenseById = createAsyncThunk(
   "expenses/fetchExpenseById",
   async ({ category, id }, { dispatch, rejectWithValue }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
       const endpoint = `/finance/expense/get/${category}/${id}`;
       const response = await getData(endpoint);
