@@ -1,5 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
-import { Formik, Form } from "formik";
+// src/Modules/Admin/Finance/Receipts/AddReceipt/CreateReceipt.js
+
+import React, { useEffect, useRef, useState } from "react";
+import { Formik, Form, Field, ErrorMessage, useFormikContext } from "formik"; // Import Field and ErrorMessage
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -14,6 +16,85 @@ import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/rece
 import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
+// Define calculateFinalAmounts function
+const calculateFinalAmounts = (data) => {
+  const { total_amount, discountType, discount, tax, penalty, paid_amount, advance_amount } = data;
+
+  // Calculate discount
+  let discountValue = 0;
+  if (discountType === 'percentage') {
+    discountValue = (total_amount * discount) / 100;
+  } else if (discountType === 'amount') {
+    discountValue = discount;
+  }
+
+  // Ensure discount does not exceed the total amount
+  discountValue = Math.min(discountValue, total_amount);
+
+  // Round discount value to 2 decimal places
+  discountValue = parseFloat(discountValue.toFixed(2));
+
+  // Calculate total with tax
+  const totalWithTax = parseFloat((total_amount + (total_amount * tax) / 100).toFixed(2));
+
+  // Calculate the final amount
+  const finalAmount = parseFloat((totalWithTax - discountValue + penalty).toFixed(2));
+
+  // Combine paid_amount and advance_amount
+  let totalPaid = paid_amount + (advance_amount || 0);
+
+  let remainingAmount = 0;
+  let advanceAmount = advance_amount || 0;
+
+  if (totalPaid >= finalAmount) {
+    // If total paid exceeds finalAmount
+    advanceAmount = parseFloat((totalPaid - finalAmount).toFixed(2));
+    totalPaid = finalAmount; // Cap paid_amount to finalAmount
+    remainingAmount = 0;
+  } else {
+    // Calculate remaining amount
+    remainingAmount = parseFloat((finalAmount - totalPaid).toFixed(2));
+    advanceAmount = 0; // No surplus in advance
+  }
+
+  return {
+    discountValue,
+    finalAmount,
+    remainingAmount,
+    advanceAmount,
+    totalPaid,
+  };
+};
+
+// Define CalculateAmounts component
+const CalculateAmounts = () => {
+  const { values, setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    // Calculate total_amount from items
+    const total_amount = values.items.reduce(
+      (acc, item) => acc + Number(item.totalAmount || 0),
+      0
+    );
+
+    const calculated = calculateFinalAmounts({
+      total_amount,
+      discountType: values.discountType,
+      discount: Number(values.discount),
+      tax: Number(values.tax),
+      penalty: Number(values.penalty),
+      paid_amount: 0, // Assuming no paid amount
+      advance_amount: 0, // Assuming no advance amount
+    });
+
+    // Update Formik's subAmount and finalAmount
+    setFieldValue("subAmount", calculated.discountValue, false);
+    setFieldValue("finalAmount", calculated.finalAmount, false);
+  }, [values.items, values.discountType, values.discount, values.tax, values.penalty, setFieldValue]);
+
+  return null; // This component doesn't render anything
+};
+
 const CreateReceipt = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,7 +104,7 @@ const CreateReceipt = () => {
   const [invoiceNumberInput, setInvoiceNumberInput] = useState(""); // Track invoice input
   const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
 
-  // Add selectedInvoiceNumber to the destructured state
+  // Destructure the necessary state
   const { invoiceDetails, invoiceFetchSuccess, error, selectedInvoiceNumber } = useSelector(
     (state) => state.admin.invoices
   );
@@ -71,6 +152,8 @@ const CreateReceipt = () => {
               ],
             },
           ],
+        subAmount: 0, // Initialize subAmount
+        finalAmount: 0, // Initialize finalAmount
       };
 
       formikRef.current.setValues(prefilledValues);
@@ -78,42 +161,21 @@ const CreateReceipt = () => {
     }
   }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
 
-  // Remove fetchInvoiceDetails function and its usages
-  // Removed below code:
-  /*
-  const fetchInvoiceDetails = async (invoiceNumber, resetForm) => {
-    if (invoiceNumber.trim() === "") return;
-    setInvoiceStatus("loading");
-    try {
-      const result = await dispatch(fetchInvoiceByNumber(invoiceNumber)).unwrap();
-      if (!result) {
-        throw new Error("No data found");
-      }
-    } catch (error) {
-      setInvoiceStatus("error");
-      resetForm({
-        values: {
-          ...blankInitialValues,
-          invoiceNumber: invoiceNumber, // Preserve the invoice number
-        },
-      });
-    }
-  };
-  */
-
   const blankInitialValues = {
     receiverName: "",
     mailId: "",
     contactNumber: "",
     address: "",
-    discountType: "",
-    tax: "",
-    discount: "",
-    penalty: "",
+    discountType: "amount",
+    tax: 0,
+    discount: 0,
+    penalty: 0,
     govtRefNumber: "",
     remark: "",
     invoiceNumber: "",
     items: [{ category: "", quantity: "", totalAmount: "" }],
+    subAmount: 0, // Initialize subAmount
+    finalAmount: 0, // Initialize finalAmount
   };
 
   const validationSchema = Yup.object().shape({
@@ -132,7 +194,8 @@ const CreateReceipt = () => {
       .min(0, "Penalty cannot be negative")
       .required("Penalty is required"),
     tax: Yup.number()
-      .min(0, "Tax cannot be negative")
+      .min(0, "Tax cannot be less than 0")
+      .max(100, "Tax cannot exceed 100")
       .required("Tax is required"),
     items: Yup.array()
       .of(
@@ -147,6 +210,8 @@ const CreateReceipt = () => {
         })
       )
       .min(1, "At least one line item is required"),
+    subAmount: Yup.number().min(0).notRequired(),
+    finalAmount: Yup.number().min(0).notRequired(),
   });
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
@@ -169,6 +234,7 @@ const CreateReceipt = () => {
         quantity: Number(item.quantity),
         total: Number(item.totalAmount),
       })),
+      finalAmount: values.finalAmount, // Include finalAmount in the payload
     };
 
     dispatch(createReceipt(formValues))
@@ -187,19 +253,23 @@ const CreateReceipt = () => {
       dispatch(fetchInvoiceByNumber(debouncedInvoiceNumber));
     } else if (debouncedInvoiceNumber === "") {
       // Optionally handle empty input by resetting the form
-      formikRef.current.setValues(blankInitialValues);
+      if (formikRef.current) {
+        formikRef.current.setValues(blankInitialValues);
+      }
     }
   }, [debouncedInvoiceNumber, dispatch]);
 
   // Reset form fields when there's an error fetching invoice
   useEffect(() => {
     if (error) {
-      formikRef.current.resetForm({
-        values: {
-          ...blankInitialValues,
-          invoiceNumber: invoiceNumberInput, // Preserve the invoice number
-        },
-      });
+      if (formikRef.current) {
+        formikRef.current.resetForm({
+          values: {
+            ...blankInitialValues,
+            invoiceNumber: invoiceNumberInput, // Preserve the invoice number
+          },
+        });
+      }
     }
   }, [error, blankInitialValues, invoiceNumberInput]);
 
@@ -214,6 +284,9 @@ const CreateReceipt = () => {
         >
           {({ isSubmitting, values, setFieldValue, resetForm }) => (
             <Form>
+              {/* Calculate and update subAmount and finalAmount */}
+              <CalculateAmounts />
+
               {/* Header with Buttons */}
               <div className="flex justify-end mb-2 space-x-4">
                 <button
@@ -288,17 +361,19 @@ const CreateReceipt = () => {
                         {
                           category: "",
                           revenueReference: "",
-                          quantity: null,
-                          amount: null,
+                          quantity: "",
+                          totalAmount: "",
                         },
                       ]);
+                      setFieldValue("subAmount", 0, false);
+                      setFieldValue("finalAmount", 0, false);
                     }
                   }}
-                  // Remove the onBlur prop
+                  // Removed the onBlur prop
                 />
                 {/* Removed the separate Status Icon div */}
               </div>
-              
+
               {/* Receiver Details Fields */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <TextInput
@@ -331,16 +406,35 @@ const CreateReceipt = () => {
               <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
               <ReturnItems values={values} setFieldValue={setFieldValue} />
 
-{/* Payment Info */}
-<h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
+              {/* Payment Info */}
+              <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput name="tax" label="Tax *" placeholder="Enter tax" />
-                <TextInput
-                  name="discount"
-                  label="Discount"
-                  placeholder="Enter discount"
-                  required
-                />
+                {/* Tax Field with Percent Icon */}
+                <div className="relative">
+                  <label htmlFor="tax" className="text-sm text-gray-500 block mb-1">
+                    Tax <span className="text-red-500">*</span>
+                  </label>
+                  <Field
+                    id="tax"
+                    name="tax"
+                    type="number"
+                    placeholder="Enter tax"
+                    className="bg-white border border-gray-300 rounded-md px-4 py-3 pr-10 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
+                    autoComplete="off"
+                    aria-required="true"
+                    min="0"
+                    max="100"
+                  />
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+                  <ErrorMessage
+                    name="tax"
+                    component="div"
+                    className="text-sm text-red-500 mt-1"
+                  />
+                </div>
+
+                <TextInput name="discount" label="Discount" placeholder="Enter discount" required />
+
                 <SelectInput
                   name="discountType"
                   label="Discount Type"
@@ -348,26 +442,37 @@ const CreateReceipt = () => {
                     { value: "percentage", label: "Percentage" },
                     { value: "amount", label: "Fixed Amount" },
                   ]}
-                  
                 />
+
+                {/* Sub Amount (Read-only) */}
                 <TextInput
-                  name="penalty"
-                  label="Penalty"
-                  placeholder="Enter penalty"
-                  required
+                  name="subAmount"
+                  label="Sub Amount"
+                  placeholder="Sub Amount"
+                  type="number"
+                  disabled
                 />
+
+                <TextInput name="penalty" label="Penalty" placeholder="Enter penalty" required />
+
                 <TextInput
                   name="govtRefNumber"
                   label="Government Reference Number"
                   placeholder="Enter reference number"
                 />
+
+                <TextInput name="remark" label="Remarks" placeholder="Add remarks" />
+
+                {/* Final Amount (Read-only) */}
                 <TextInput
-                  name="remark"
-                  label="Remarks"
-                  placeholder="Add remarks"
+                  name="finalAmount"
+                  label="Final Amount"
+                  placeholder="Final Amount"
+                  type="number"
+                  disabled
                 />
               </div>
-              
+
               {/* Display Error Messages */}
               {error && <div className="text-red-500 mb-4">{error}</div>}
               {/* Optionally, add success messages if needed */}
