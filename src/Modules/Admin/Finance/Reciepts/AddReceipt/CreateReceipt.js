@@ -36,7 +36,7 @@ const CreateReceipt = () => {
       const prefilledValues = {
         receiverName: invoiceDetails?.receiver?.name || "",
         mailId: invoiceDetails?.receiver?.email || "",
-        contactNumber: invoiceDetails?.receiver?.phone || "",
+        contactNumber: invoiceDetails?.receiver?.contact || "",
         address: invoiceDetails?.receiver?.address || "",
         discountType: invoiceDetails?.discountType || "amount",
         discount: invoiceDetails?.discount || 0,
@@ -49,7 +49,7 @@ const CreateReceipt = () => {
           invoiceDetails?.lineItems?.map((item) => ({
             category: item?.revenueType || "",
             quantity: item?.quantity || 0,
-            totalAmount: item?.total || 0,
+            totalAmount: item?.revenueReference?.stationeryItems?.[0]?.unitCost || 0,
             subCategory: item?.revenueReference?.subCategory || "",
             stationeries: item?.revenueReference?.stationeryItems?.map((stationery) => ({
               itemName: stationery?.itemName || "",
