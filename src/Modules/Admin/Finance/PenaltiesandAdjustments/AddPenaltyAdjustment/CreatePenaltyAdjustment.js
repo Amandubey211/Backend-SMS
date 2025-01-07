@@ -13,9 +13,10 @@ import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/
 import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import { useNavigate } from "react-router-dom";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
-import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce"; // Adjust the import path as necessary
+import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import InvoiceTextInput from "./Components/InvoiceTextInput"; // Import the new component
-import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts"; // Import the calculateFinalAmounts function
+import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts"; // Adjust the import path as necessary
+import TextInputWithSuffix from "./Components/TextInputWithSuffix";
 
 // Define CalculateAmounts component
 const CalculateAmounts = () => {
@@ -73,15 +74,15 @@ const CreatePenaltyAdjustment = () => {
   const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
 
   // Reference to Formik to set field values outside Formik's render props
-  const formikRef = React.useRef();
+  const formikRef = useRef();
 
   // Prefill form fields when invoice details are fetched successfully
   useEffect(() => {
     if (invoiceFetchSuccess && invoiceDetails) {
       // Prefill the form fields with invoiceDetails
       formikRef.current.setFieldValue("invoiceNumber", invoiceDetails.invoiceNumber);
-      formikRef.current.setFieldValue("reason", ""); // You can set a default reason or fetch from invoiceDetails if available
-      formikRef.current.setFieldValue("discountType", invoiceDetails.discountType || "amount"); // Default discount type; adjust as needed
+      formikRef.current.setFieldValue("reason", ""); // Set default reason or fetch from invoiceDetails if available
+      formikRef.current.setFieldValue("discountType", invoiceDetails.discountType || "amount");
       formikRef.current.setFieldValue("discount", invoiceDetails.discount || 0);
       formikRef.current.setFieldValue("adjustmentPenalty", invoiceDetails.penalty || 0);
       formikRef.current.setFieldValue("tax", invoiceDetails.tax || 0);
@@ -99,6 +100,7 @@ const CreatePenaltyAdjustment = () => {
     }
   }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
 
+  // Define initial values based on backend requirements
   const initialValues = {
     invoiceNumber: "",
     items: [
@@ -114,9 +116,9 @@ const CreatePenaltyAdjustment = () => {
     discount: null,
     adjustmentPenalty: null,
     tax: null,
-    document: null, // Optional
     subAmount: 0, // Initialize subAmount
     finalAmount: 0, // Initialize finalAmount
+    document: null, // Optional
   };
 
   // Define validation schema
@@ -149,12 +151,11 @@ const CreatePenaltyAdjustment = () => {
       .min(0, "Penalty cannot be negative")
       .required("Adjustment Penalty is required"),
     tax: Yup.number()
-      .min(0, "Tax cannot be negative")
+      .min(0, "Tax cannot be less than 0")
       .max(100, "Tax cannot exceed 100")
       .required("Tax is required"),
     subAmount: Yup.number().min(0).notRequired(),
     finalAmount: Yup.number().min(0).notRequired(),
-    // You can add validation for 'document' if needed
   });
 
   // Handle form submission
@@ -174,7 +175,6 @@ const CreatePenaltyAdjustment = () => {
       adjustmentPenalty: Number(values.adjustmentPenalty),
       tax: Number(values.tax),
       finalAmount: Number(values.finalAmount), // Include finalAmount in the payload
-      // Include 'document' if it's handled (e.g., file upload)
     };
 
     // Dispatch the thunk
@@ -204,18 +204,23 @@ const CreatePenaltyAdjustment = () => {
   // Reset form fields when there's an error fetching invoice
   useEffect(() => {
     if (error) {
-      if (formikRef.current) {
-        formikRef.current.resetForm({
-          values: {
-            ...initialValues,
-            invoiceNumber: invoiceNumberInput, // Preserve the invoice number
-          },
-        });
-      }
+      formikRef.current.setFieldValue("reason", "");
+      formikRef.current.setFieldValue("discountType", "amount");
+      formikRef.current.setFieldValue("discount", null);
+      formikRef.current.setFieldValue("adjustmentPenalty", null);
+      formikRef.current.setFieldValue("tax", null);
+      formikRef.current.setFieldValue("subAmount", 0, false);
+      formikRef.current.setFieldValue("finalAmount", 0, false);
+      formikRef.current.setFieldValue("items", [
+        {
+          revenueType: "",
+          revenueReference: "",
+          quantity: null,
+          amount: null,
+        },
+      ]);
     }
-  }, [error, invoiceNumberInput]);
-
-  console.log('This is invoice number: ' + selectedInvoiceNumber);
+  }, [error]);
 
   return (
     <DashLayout>
@@ -242,10 +247,7 @@ const CreatePenaltyAdjustment = () => {
                 <div className="flex gap-4">
                   <button
                     type="button"
-                    onClick={() => {
-                      formik.resetForm();
-                      // toast.success("Form has been reset."); // Already handled in thunk
-                    }}
+                    onClick={() => formik.resetForm()}
                     className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
                   >
                     Reset
@@ -269,9 +271,8 @@ const CreatePenaltyAdjustment = () => {
                 {/* Invoice Number */}
                 <InvoiceTextInput
                   name="invoiceNumber"
-                  label="Invoice Number *"
+                  label="Invoice Number"
                   placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
-                  required
                   type="text"
                   value={invoiceNumberInput}
                   onChange={(e) => {
@@ -286,6 +287,8 @@ const CreatePenaltyAdjustment = () => {
                       formik.setFieldValue("discount", null);
                       formik.setFieldValue("adjustmentPenalty", null);
                       formik.setFieldValue("tax", null);
+                      formik.setFieldValue("subAmount", 0, false);
+                      formik.setFieldValue("finalAmount", 0, false);
                       formik.setFieldValue("items", [
                         {
                           revenueType: "",
@@ -294,29 +297,46 @@ const CreatePenaltyAdjustment = () => {
                           amount: null,
                         },
                       ]);
-                      formik.setFieldValue("subAmount", 0, false);
-                      formik.setFieldValue("finalAmount", 0, false);
                     }
                   }}
                   onBlur={() => {
+                    // Ensure tax is within 0-100 on blur
+                    const taxValue = formik.values.tax;
+                    if (taxValue > 100) {
+                      formik.setFieldValue("tax", 100);
+                    } else if (taxValue < 0) {
+                      formik.setFieldValue("tax", 0);
+                    }
+
                     // Dispatch fetchInvoiceByNumber on blur
                     dispatch(fetchInvoiceByNumber(invoiceNumberInput));
                   }}
+                  required
                 />
 
                 {/* Reason */}
                 <TextInput
                   name="reason"
-                  label="Reason *"
+                  label="Reason"
                   placeholder="Enter reason for adjustment"
                   required
                   type="text"
                 />
 
+
+              </div>
+
+              {/* Items Section */}
+              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
+              <ReturnItems values={formik.values} setFieldValue={formik.setFieldValue} required />
+
+              {/* Sub Amount and Final Amount */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
                 {/* Discount Type */}
                 <SelectInput
                   name="discountType"
-                  label="Discount Type *"
+                  label="Discount Type"
                   options={[
                     { value: "percentage", label: "Percentage" },
                     { value: "amount", label: "Amount" },
@@ -328,7 +348,7 @@ const CreatePenaltyAdjustment = () => {
                 {/* Discount */}
                 <TextInput
                   name="discount"
-                  label="Discount *"
+                  label="Discount"
                   placeholder="Enter discount value"
                   required
                   type="number"
@@ -337,47 +357,22 @@ const CreatePenaltyAdjustment = () => {
                 {/* Adjustment Penalty */}
                 <TextInput
                   name="adjustmentPenalty"
-                  label="Adjustment Penalty *"
+                  label="Adjustment Penalty"
                   placeholder="Enter penalty amount"
                   required
                   type="number"
                 />
 
                 {/* Tax */}
-                <div className="relative">
-                  <label htmlFor="tax" className="text-sm text-gray-500 block mb-1">
-                    Tax <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    id="tax"
-                    name="tax"
-                    type="number"
-                    placeholder="Enter tax value"
-                    className="bg-white border border-gray-300 rounded-md px-4 py-3 pr-10 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
-                    autoComplete="off"
-                    aria-required="true"
-                    min="0"
-                    max="100"
-                  />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
-                  <ErrorMessage
-                    name="tax"
-                    component="div"
-                    className="text-sm text-red-500 mt-1"
-                  />
-                </div>
-              </div>
+                <TextInputWithSuffix
+                  name="tax"
+                  label="Tax"
+                  placeholder="Enter tax value"
+                  required
+                  type="number"
+                  suffix="%"
+                />
 
-              {/* Adjustment Items Section */}
-              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
-              <ReturnItems
-                values={formik.values}
-                setFieldValue={formik.setFieldValue}
-                required
-              />
-
-              {/* Sub Amount and Final Amount */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 mb-6">
                 {/* Sub Amount (Read-only) */}
                 <TextInput
                   name="subAmount"

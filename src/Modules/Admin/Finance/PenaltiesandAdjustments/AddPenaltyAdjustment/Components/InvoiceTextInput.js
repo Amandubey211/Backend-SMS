@@ -14,6 +14,7 @@ const InvoiceTextInput = ({
   autoComplete = 'off',
   onBlur,
   onChange,
+  required = false, // Added required prop
 }) => {
   // Extract relevant state from Redux
   const { loading, error, invoiceFetchSuccess } = useSelector(
@@ -47,7 +48,7 @@ const InvoiceTextInput = ({
       transition={{ duration: 0.3 }}
     >
       <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative">
         <Field
@@ -56,7 +57,9 @@ const InvoiceTextInput = ({
           type={type}
           placeholder={placeholder}
           disabled={disabled || false}
-          className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-purple-300"
+          className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none ${
+            required ? 'focus:ring-red-300' : 'focus:ring-purple-300'
+          }`}
           autoComplete={autoComplete}
           onBlur={onBlur} // Pass onBlur to Field
           onChange={onChange} // Pass onChange to Field
