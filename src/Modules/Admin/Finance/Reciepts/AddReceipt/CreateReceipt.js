@@ -40,7 +40,7 @@ const CreateReceipt = () => {
         address: invoiceDetails?.receiver?.address || "",
         discountType: invoiceDetails?.discountType || "amount",
         discount: invoiceDetails?.discount || 0,
-        penalty: invoiceDetails?.adjustmentPenalty || 0,
+        penalty: invoiceDetails?.penalty || 0,
         tax: invoiceDetails?.tax || 0,
         govtRefNumber: "",
         remark: "",
@@ -49,7 +49,7 @@ const CreateReceipt = () => {
           invoiceDetails?.lineItems?.map((item) => ({
             category: item?.revenueType || "",
             quantity: item?.quantity || 0,
-            totalAmount: item?.revenueReference?.stationeryItems?.[0]?.unitCost || 0,
+            totalAmount: item?.amount || 0,
             subCategory: item?.revenueReference?.subCategory || "",
             stationeries: item?.revenueReference?.stationeryItems?.map((stationery) => ({
               itemName: stationery?.itemName || "",
