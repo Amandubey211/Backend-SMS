@@ -327,8 +327,12 @@ const CreateReceipt = () => {
                 />
               </div>
 
-              {/* Payment Info */}
-              <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
+              {/* Items */}
+              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
+              <ReturnItems values={values} setFieldValue={setFieldValue} />
+
+{/* Payment Info */}
+<h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <TextInput name="tax" label="Tax *" placeholder="Enter tax" />
                 <TextInput
@@ -363,11 +367,7 @@ const CreateReceipt = () => {
                   placeholder="Add remarks"
                 />
               </div>
-
-              {/* Items */}
-              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
-              <ReturnItems values={values} setFieldValue={setFieldValue} />
-
+              
               {/* Display Error Messages */}
               {error && <div className="text-red-500 mb-4">{error}</div>}
               {/* Optionally, add success messages if needed */}
