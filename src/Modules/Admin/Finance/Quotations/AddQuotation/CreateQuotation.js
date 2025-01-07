@@ -4,7 +4,6 @@ import * as Yup from "yup";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
-import ReturnItems from "./Components/ReturnItems";
 import FileInput from "./Components/FileInput";
 import { useDispatch, useSelector } from "react-redux";
 import { addQuotation } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
@@ -43,6 +42,7 @@ const CreateQuotation = () => {
     date: Yup.string().required("Quotation Date is required"),
     final_amount: Yup.number().min(0, "Final amount must be positive"),
     remainingAmount: Yup.number().min(0, "Remaining amount must be positive"),
+    document: Yup.string().nullable(),
   });
 
   const dispatch = useDispatch()
@@ -74,7 +74,7 @@ const CreateQuotation = () => {
       selectedQuotation?.lineItems || [{ revenueType: "", quantity: 1, amount: 0 }],
     date: selectedQuotation?.date
       ? formatDate(selectedQuotation.date)
-      : formatDate(new Date()), 
+      : formatDate(new Date()),
     dueDate: selectedQuotation?.dueDate
       ? formatDate(selectedQuotation.dueDate)
       : formatDate(new Date()),
@@ -92,7 +92,7 @@ const CreateQuotation = () => {
     remark: selectedQuotation?.remark || "",
     govtRefNumber: selectedQuotation?.govtRefNumber || "",
   };
-  
+
   console.log("Initial Values:", formattedQuotation);
 
   return (
@@ -321,6 +321,11 @@ const CreateQuotation = () => {
                     name="document"
                     label="Add Document (if any)"
                     placeholder="Upload file"
+                    onChange={(e) => {
+                      const fileUrl = e.target.value; // Cloudinary URL after upload
+                      setFieldValue("document", fileUrl); // Update Formik's value
+                    }}
+                    value={values.document} // Bind Formik's value
                     readOnly={readOnly}
                     disabled={readOnly}
                   />
