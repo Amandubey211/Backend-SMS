@@ -17,6 +17,7 @@ import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import InvoiceTextInput from "./Components/InvoiceTextInput"; // Import the new component
 import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts"; // Adjust the import path as necessary
 import TextInputWithSuffix from "./Components/TextInputWithSuffix";
+import FileInput from "./Components/FileInput";
 
 // Define CalculateAmounts component
 const CalculateAmounts = () => {
@@ -156,6 +157,7 @@ const CreatePenaltyAdjustment = () => {
       .required("Tax is required"),
     subAmount: Yup.number().min(0).notRequired(),
     finalAmount: Yup.number().min(0).notRequired(),
+    document: Yup.string().nullable()
   });
 
   // Handle form submission
@@ -371,6 +373,17 @@ const CreatePenaltyAdjustment = () => {
                   required
                   type="number"
                   suffix="%"
+                />
+
+                {/* Document Upload Field */}
+                <FileInput
+                  name="document"
+                  label="Upload Document (Optional)"
+                  onChange={(e) => {
+                    const fileUrl = e.target.value; // Cloudinary URL after upload
+                    formik.setFieldValue("document", fileUrl); // Update Formik's value
+                  }}
+                  value={formik.values.document} // Bind Formik's value
                 />
 
                 {/* Sub Amount (Read-only) */}

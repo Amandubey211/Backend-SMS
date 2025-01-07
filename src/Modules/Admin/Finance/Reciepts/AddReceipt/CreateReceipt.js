@@ -15,7 +15,7 @@ import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
-
+import FileInput from "./Components/FileInput";
 // Define calculateFinalAmounts function
 const calculateFinalAmounts = (data) => {
   const { total_amount, discountType, discount, tax, penalty, paid_amount, advance_amount } = data;
@@ -176,6 +176,7 @@ const CreateReceipt = () => {
     items: [{ category: "", quantity: "", totalAmount: "" }],
     subAmount: 0, // Initialize subAmount
     finalAmount: 0, // Initialize finalAmount
+    document: null
   };
 
   const validationSchema = Yup.object().shape({
@@ -212,6 +213,7 @@ const CreateReceipt = () => {
       .min(1, "At least one line item is required"),
     subAmount: Yup.number().min(0).notRequired(),
     finalAmount: Yup.number().min(0).notRequired(),
+    document: Yup.string().nullable()
   });
 
   const handleSubmit = (values, { setSubmitting, resetForm }) => {
@@ -297,12 +299,12 @@ const CreateReceipt = () => {
                     background: "linear-gradient(to right, #ec4899, #a855f7)",
                   }}
                   onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "linear-gradient(to right, #a855f7, #ec4899)")
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #a855f7, #ec4899)")
                   }
                   onMouseLeave={(e) =>
-                    (e.currentTarget.style.background =
-                      "linear-gradient(to right, #ec4899, #a855f7)")
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #ec4899, #a855f7)")
                   }
                   disabled={isSubmitting}
                 >
@@ -316,12 +318,12 @@ const CreateReceipt = () => {
                     background: "linear-gradient(to right, #ec4899, #a855f7)",
                   }}
                   onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "linear-gradient(to right, #a855f7, #ec4899)")
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #a855f7, #ec4899)")
                   }
                   onMouseLeave={(e) =>
-                    (e.currentTarget.style.background =
-                      "linear-gradient(to right, #ec4899, #a855f7)")
+                  (e.currentTarget.style.background =
+                    "linear-gradient(to right, #ec4899, #a855f7)")
                   }
                   disabled={isSubmitting}
                 >
@@ -369,7 +371,7 @@ const CreateReceipt = () => {
                       setFieldValue("finalAmount", 0, false);
                     }
                   }}
-                  // Removed the onBlur prop
+                // Removed the onBlur prop
                 />
                 {/* Removed the separate Status Icon div */}
               </div>
@@ -470,6 +472,17 @@ const CreateReceipt = () => {
                   placeholder="Final Amount"
                   type="number"
                   disabled
+                />
+
+                {/* Document Upload Field */}
+                <FileInput
+                  label="Upload Document (Optional)"
+                  name="document"
+                  onChange={(e) => {
+                    const fileUrl = e.target.value;
+                    setFieldValue("document", fileUrl);
+                  }}
+                  value={values.document}
                 />
               </div>
 
