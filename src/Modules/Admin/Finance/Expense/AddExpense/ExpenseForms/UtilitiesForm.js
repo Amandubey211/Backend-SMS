@@ -1,7 +1,7 @@
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
-import PaymentStatus from "../../../Earnings/AddEarnings/Component/PaymentStatus";
+// import PaymentStatus from "../../../Earnings/AddEarnings/Component/PaymentStatus";
 
 const UtilitiesForm = () => {
   const { setFieldValue, values } = useFormikContext();
@@ -34,18 +34,18 @@ const UtilitiesForm = () => {
     },
 
     // { type: "date", label: "Due Date", name: "dueDate" },
-    {
-      type: "number",
-      label: "Unit Consumption",
-      name: "unitConsumption",
-      placeholder: "Enter unit consumption",
-    },
-    {
-      type: "number",
-      label: "Unit Per Cost",
-      name: "unitCost",
-      placeholder: "Enter unit per cost",
-    },
+    // {
+    //   type: "number",
+    //   label: "Unit Consumption",
+    //   name: "unitConsumption",
+    //   placeholder: "Enter unit consumption",
+    // },
+    // {
+    //   type: "number",
+    //   label: "Unit Per Cost",
+    //   name: "unitCost",
+    //   placeholder: "Enter unit per cost",
+    // },
   ];
 
   // Billing Details
@@ -56,18 +56,32 @@ const UtilitiesForm = () => {
       name: "billingPeriod",
       options: ["Monthly", "Quarterly", "Yearly"],
     },
-    { type: "datetime-local", label: "Date & Time", name: "dateTime" },
     {
-      type: "number",
-      label: "Total Amount",
-      name: "total_amount",
-      placeholder: "Enter total amount",
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"],
     },
+    // { type: "datetime-local", label: "Date & Time", name: "dateTime" },
     {
-      type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
+      name: "payment_type", // Changed to snake_case
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+
+    // {
+    //   name: "paid_by", // Changed to snake_case
+    //   label: "Paid By",
+    //   type: "select",
+    //   options: ["Manual", "Auto"],
+    // },
+
+    {
+      type: "select",
+      label: "Discount Type",
+      name: "discountType",
+      options: ["amount", "percentage"],
     },
     {
       type: "number",
@@ -83,9 +97,43 @@ const UtilitiesForm = () => {
     },
     {
       type: "number",
+      label: "Tax (Inc/Exc)",
+      name: "tax",
+      placeholder: "Enter tax percentage",
+    },
+    {
+      type: "number",
+      label: "Total Amount",
+      name: "total_amount",
+      placeholder: "Enter total amount",
+    },
+    {
+      type: "number",
       label: "Final Amount",
       name: "final_amount",
       placeholder: "Enter final amount",
+    },
+    {
+      name: "paid_amount", // Changed to snake_case
+      label: "Paid Amount (QR)",
+      type: "number",
+      placeholder: "Enter paid amount",
+      min: 0,
+    },
+    {
+      name: "advance_amount",
+      label: "Advance Amount (QR)",
+      type: "number",
+      placeholder: "Enter advance amount",
+      min: 0,
+    },
+    {
+      name: "remaining_amount",
+      label: "Remaining Amount (QR)",
+      type: "number",
+      placeholder: "Enter remaining amount",
+      min: 0,
+      readOnly: true, // Make it read-only as it's calculated
     },
     { type: "file", label: "Add Receipt/Document", name: "receipt" },
   ];
@@ -104,7 +152,7 @@ const UtilitiesForm = () => {
         setFieldValue={setFieldValue}
         values={values}
       />
-      <PaymentStatus />
+      {/* <PaymentStatus /> */}
     </>
   );
 };

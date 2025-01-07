@@ -29,7 +29,7 @@ export const subCategories = {
   ],
   Supplies: [
     "Classroom & Office Purpose", // Updated from "Stationery Supplies" for clarity
-    "Canteen Supplies",
+    // "Canteen Supplies",
     //"Others",
   ],
   "Event and Activity Costs": [
@@ -51,7 +51,7 @@ export const subCategories = {
   ],
   "Examination and Affiliation": [
     "Printing Exam Papers",
-    "Examination Invigilator Payments", // Updated from "Invigilation Fees" for consistency
+    // "Examination Invigilator Payments", // Updated from "Invigilation Fees" for consistency
     "Affiliation Fees",
     //"Others",
   ],

@@ -234,7 +234,6 @@ const AddExpenses = () => {
                 </div>
               )}
 
-              {/* Error Message */}
               {error && showError && (
                 <div className="bg-red-100 text-red-700 p-2 rounded-md text-sm">
                   {Array.isArray(error)
@@ -245,7 +244,6 @@ const AddExpenses = () => {
                 </div>
               )}
 
-              {/* Header with Dropdowns and Description */}
               <Header
                 onCategoryChange={(category) => {
                   if (readOnly) return;
@@ -289,14 +287,11 @@ const AddExpenses = () => {
                 isUpdate={!!selectedExpense}
               />
 
-              {/* Render the selected form component */}
               {formComponent || (
                 <div className="text-center text-gray-500 text-xs py-4">
                   Select a sub-category to proceed.
                 </div>
               )}
-
-              {/* Submit Button is handled within Header.jsx */}
             </Form>
           )}
         </Formik>

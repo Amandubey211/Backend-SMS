@@ -20,66 +20,87 @@ const LMSERPSubscriptionForm = () => {
       placeholder: "Enter  vendor",
     },
     { type: "date", label: "Date", name: "Date" },
-
-    // {
-    //   name: "platformName",
-    //   label: "Platform Name",
-    //   type: "text",
-    //   placeholder: "Enter platform name",
-    // },
-    // {
-    //   name: "numberOfUsers",
-    //   label: "Number Of Users",
-    //   type: "number",
-    //   placeholder: "Enter number of users",
-    // },
-    // {
-    //   name: "costPerUser",
-    //   label: "Cost Per User",
-    //   type: "number",
-    //   placeholder: "Enter cost per user",
-    // },
   ];
 
   const billingDetailsFields = [
     {
-      name: "subscriptionPeriod",
-      label: "Subscription Period",
       type: "select",
-      options: ["Monthly", "Yearly"],
+      label: "Billing Period",
+      name: "billingPeriod",
+      options: ["Monthly", "Quarterly", "Yearly"],
     },
-    { name: "dateTime", label: "Date & Time", type: "datetime-local" },
     {
-      name: "totalAmount",
-      label: "Total Amount",
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"],
+    },
+    {
+      name: "payment_type", // Changed to snake_case
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+
+    {
+      type: "select",
+      label: "Discount Type",
+      name: "discountType",
+      options: ["amount", "percentage"],
+    },
+    {
       type: "number",
-      placeholder: "Enter total amount",
-    },
-    {
-      name: "tax",
-      label: "Tax (Inc/Exc)",
-      type: "number",
-      placeholder: "Enter tax percentage",
-    },
-    {
-      name: "discount",
       label: "Discount",
-      type: "number",
+      name: "discount",
       placeholder: "Enter discount",
     },
     {
-      name: "penalty",
-      label: "Penalty",
       type: "number",
+      label: "Penalty",
+      name: "penalty",
       placeholder: "Enter penalty amount",
     },
     {
-      name: "final_amount",
-      label: "Final Amount (After tax/discount/penalty)",
       type: "number",
+      label: "Tax (Inc/Exc)",
+      name: "tax",
+      placeholder: "Enter tax percentage",
+    },
+    {
+      type: "number",
+      label: "Total Amount",
+      name: "total_amount",
+      placeholder: "Enter total amount",
+    },
+    {
+      type: "number",
+      label: "Final Amount",
+      name: "final_amount",
       placeholder: "Enter final amount",
     },
-    { name: "receipt", label: "Add Receipt/Document", type: "file" },
+    {
+      name: "paid_amount", // Changed to snake_case
+      label: "Paid Amount (QR)",
+      type: "number",
+      placeholder: "Enter paid amount",
+      min: 0,
+    },
+    {
+      name: "advance_amount",
+      label: "Advance Amount (QR)",
+      type: "number",
+      placeholder: "Enter advance amount",
+      min: 0,
+    },
+    {
+      name: "remaining_amount",
+      label: "Remaining Amount (QR)",
+      type: "number",
+      placeholder: "Enter remaining amount",
+      min: 0,
+      readOnly: true, // Make it read-only as it's calculated
+    },
+    { type: "file", label: "Add Receipt/Document", name: "receipt" },
   ];
 
   return (
@@ -96,7 +117,6 @@ const LMSERPSubscriptionForm = () => {
         setFieldValue={setFieldValue}
         values={values}
       />
-      <PaymentStatus />
     </>
   );
 };
