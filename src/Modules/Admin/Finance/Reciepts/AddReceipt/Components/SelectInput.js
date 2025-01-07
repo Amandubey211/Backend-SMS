@@ -1,5 +1,3 @@
-// src/Components/Admin/Finance/Earnings/Component/SelectInput.jsx
-
 import React from "react";
 import { useField } from "formik";
 import { motion } from "framer-motion";
@@ -11,6 +9,7 @@ const SelectInput = ({
   disabled,
   autoComplete = "off",
   onChange, // Accept onChange as a prop
+  required = false, // Add required prop with default value false
 }) => {
   const [field, meta] = useField(name);
 
@@ -35,7 +34,7 @@ const SelectInput = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </motion.label>
       <select
         {...field}
