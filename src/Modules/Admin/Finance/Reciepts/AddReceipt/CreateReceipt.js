@@ -446,15 +446,6 @@ const CreateReceipt = () => {
                   ]}
                 />
 
-                {/* Sub Amount (Read-only) */}
-                <TextInput
-                  name="subAmount"
-                  label="Sub Amount"
-                  placeholder="Sub Amount"
-                  type="number"
-                  disabled
-                />
-
                 <TextInput name="penalty" label="Penalty" placeholder="Enter penalty" required />
 
                 <TextInput
@@ -464,15 +455,6 @@ const CreateReceipt = () => {
                 />
 
                 <TextInput name="remark" label="Remarks" placeholder="Add remarks" />
-
-                {/* Final Amount (Read-only) */}
-                <TextInput
-                  name="finalAmount"
-                  label="Final Amount"
-                  placeholder="Final Amount"
-                  type="number"
-                  disabled
-                />
 
                 {/* Document Upload Field */}
                 <FileInput
@@ -484,6 +466,27 @@ const CreateReceipt = () => {
                   }}
                   value={values.document}
                 />
+
+
+
+                {/* Sub Amount (Read-only) */}
+                <TextInput
+                  name="subAmount"
+                  label="Sub Amount"
+                  placeholder="Sub Amount"
+                  type="number"
+                  disabled
+                />
+                {/* Final Amount (Read-only) */}
+                <TextInput
+                  name="finalAmount"
+                  label="Final Amount"
+                  placeholder="Final Amount"
+                  type="number"
+                  disabled
+                />
+
+
               </div>
 
               {/* Display Error Messages */}
