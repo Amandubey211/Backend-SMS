@@ -29,63 +29,32 @@ import CanteenEquipmentMaintenanceForm from "../AddExpense/ExpenseForms/CanteenE
 // Initial values for each subCategory with flat fields
 export const initialValuesMap = {
   "Teaching Staffs": {
-    employeeName: "Jane Doe", // Full name of the employee
     staffType: "teaching",
-    // staffId: "TS2024-001", // Unique staff identifier
-    salaryAmount: "7500", // Gross salary amount (as a string if needed)
-    paymentDate: "2024-12-25", // Date of payment (YYYY-MM-DD format)
-    jobTitle: "Senior Mathematics Teacher", // Job title of the employee
-    department: "Mathematics", // Department the employee belongs to
-    phoneNumber: "555-1234-567", // Contact phone number
+    staffId: "",
     email: "jane.doe@example.com", // Contact email address
-    address: "123 Elm Street, Springfield", // Residential address
-    accountNumber: "9876543210", // Bank account number for salary deposit
-    accountHolderName: "Jane Doe", // Name of the account holder
-    ifsc: "IFSC0001234", // IFSC code of the bank branch
-    bankName: "Springfield Bank", // Name of the bank
-    branchName: "Downtown Branch", // Specific branch name
-    total_amount: 7500, // Base salary amount (number)
-    tax: 750, // Tax deducted (number)
-    deduction: 150, // Other deductions (number)
-    penalty: 0, // Penalties, if any (number)
-    bonus: 500, // Bonus amount, if any (number)
-    final_amount: 7500 - 750 - 150 + 500, // Calculated net salary (number)
-    paymentStatus: "paid", // Status of the payment (e.g., Paid, Pending)
-    paymentType: "cash", // Method of payment (e.g., Direct Deposit, Cheque)
-    paid_amount: 5100, // Amount actually paid (number)
-    advance_amount: 0, // Any advance amount given (number)
-    remaining_amount: 0, // Any remaining amount to be paid (number)
-    receipt: "receipts/jane_doe_2024-12-25.pdf", // Path or URL to the payment receipt
+
+    // base fields
+    totalAmount: 750,
+    tax: 75,
+    discount: 25,
+    penalty: 0,
+    final_amount: 800,
+    total_amount: 800,
+    receipt: "receipt12345.pdf",
   },
 
   "Non-Teaching Staffs": {
-    employeeName: "",
-
     staffType: "nonteaching",
-    salaryAmount: "",
-    paymentDate: "",
-    jobTitle: "",
-    department: "",
-    phoneNumber: "",
-    email: "",
-    address: "",
-    accountNumber: "",
-    accountHolderName: "",
-    ifsc: "",
-    bankName: "",
-    branchName: "",
-    baseSalary: 0,
-    tax: 0,
-    deduction: 0,
+    staffId: "",
+    // email: "jane.doe@example.com", // Contact email address
+    // base fields
+    totalAmount: 750,
+    tax: 75,
+    discount: 25,
     penalty: 0,
-    bonus: 0,
-    netSalary: 0,
-    paymentStatus: "",
-    paymentType: "",
-    paidAmount: 0,
-    advanceAmount: 0,
-    remainingAmount: 0,
-    receipt: null,
+    final_amount: 800,
+    total_amount: 800,
+    receipt: "receipt12345.pdf",
   },
   Utilities: {
     // utilities fields
