@@ -14,12 +14,7 @@ const UtilitiesForm = () => {
       name: "utilityType",
       options: ["electricity", "water", "internet", "gas", "other"],
     },
-    // {
-    //   type: "text",
-    //   label: "Bill Number/Invoice ID",
-    //   name: "billNumber",
-    //   placeholder: "Enter number",
-    // },
+
     {
       type: "text",
       label: "Name",
@@ -32,20 +27,6 @@ const UtilitiesForm = () => {
       name: "vendor",
       placeholder: "Enter vendor name",
     },
-
-    // { type: "date", label: "Due Date", name: "dueDate" },
-    // {
-    //   type: "number",
-    //   label: "Unit Consumption",
-    //   name: "unitConsumption",
-    //   placeholder: "Enter unit consumption",
-    // },
-    // {
-    //   type: "number",
-    //   label: "Unit Per Cost",
-    //   name: "unitCost",
-    //   placeholder: "Enter unit per cost",
-    // },
   ];
 
   // Billing Details
@@ -62,20 +43,12 @@ const UtilitiesForm = () => {
       type: "select",
       options: ["paid", "unpaid", "partial", "advance"],
     },
-    // { type: "datetime-local", label: "Date & Time", name: "dateTime" },
     {
       name: "payment_type", // Changed to snake_case
       label: "Payment Type",
       type: "select",
       options: ["cash", "card", "online", "cheque", "other"],
     },
-
-    // {
-    //   name: "paid_by", // Changed to snake_case
-    //   label: "Paid By",
-    //   type: "select",
-    //   options: ["Manual", "Auto"],
-    // },
 
     {
       type: "select",
