@@ -95,39 +95,39 @@ const PenalityandAdjustmentList = () => {
         toast.error("No receipt selected for download.");
         return;
       }
-  
+
       if (!popupRef.current) {
         toast.error("Receipt content is not available.");
         return;
       }
-  
+
       const pdfTitle = selectedReceipt.returnInvoiceNumber
         ? `${selectedReceipt.returnInvoiceNumber}.pdf`
         : "penalty_adjustment.pdf";
-  
+
       const canvas = await html2canvas(popupRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
-  
+
       const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-  
+
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
       const newWidth = imgWidth * ratio;
       const newHeight = imgHeight * ratio;
-  
+
       pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
       pdf.save(pdfTitle);
-  
+
       toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error("Error generating PDF: ", error);
       toast.error("Failed to generate PDF.");
     }
   };
-  
+
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -489,28 +489,25 @@ const PenalityandAdjustmentList = () => {
           />
           {/* Receipt Preview Overlay */}
           {isReceiptVisible && (
-            <div className="fixed inset-0 z-50">
+            <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
               {/* Dim / Blur background */}
               <div
-                className="absolute inset-[-5rem] bg-black bg-opacity-60"
+                className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
               />
-              {/* Centered content */}
-              <div className="relative flex items-center justify-center w-full h-full">
-                <div
-                  className="relative bg-white rounded-md shadow-md p-6 w-full max-w-[53rem] max-h-[90vh] overflow-auto"
-                  ref={popupRef}
-                >
-                  {/* The actual penalty adjustment content */}
-                  <PenaltyAdjustmentTemplate data={selectedReceipt} />
-                </div>
-
-                {/* Close + Download PDF buttons */}
-                <div className="absolute mt-[-29rem] ml-[66rem] flex flex-col items-center space-y-2">
+              {/* Centered content with buttons positioned at the top-right */}
+              <div
+                className="relative bg-white rounded-md shadow-md p-6 w-full max-w-[53rem] max-h-[90vh] overflow-auto"
+                ref={popupRef}
+                onClick={(e) => e.stopPropagation()} // Prevents click events from bubbling to the overlay
+              >
+                {/* Buttons Container */}
+                <div className="absolute top-4 right-4 flex flex-col space-y-2">
                   {/* Close button */}
                   <button
                     onClick={() => setReceiptVisible(false)}
-                    className="bg-gray-200 hover:bg-gray-300 mr-32 rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold shadow-md"
+                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold shadow-md"
+                    aria-label="Close Receipt Preview"
                   >
                     ✕
                   </button>
@@ -525,9 +522,13 @@ const PenalityandAdjustmentList = () => {
                     Download PDF
                   </button>
                 </div>
+
+                {/* The actual penalty adjustment content */}
+                <PenaltyAdjustmentTemplate data={selectedReceipt} />
               </div>
             </div>
           )}
+
         </div>
       </AdminDashLayout>
     </Layout>
