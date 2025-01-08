@@ -108,7 +108,7 @@ const SummaryRevenueList = () => {
           receiver: {
             name: record[0]?.studentDetails?.firstName+' '+record[0]?.studentDetails?.lastName,
             address: "",
-            contact: "",
+            contact: record[0]?.studentDetails?.contactNumber,
             email: record[0]?.studentDetails?.email,
           },
           description: record[0]?.description || '',

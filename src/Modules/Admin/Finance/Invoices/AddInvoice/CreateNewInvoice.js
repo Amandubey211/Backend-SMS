@@ -7,6 +7,7 @@ import AdminDashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import Layout from "../../../../../Components/Common/Layout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
+import { TotalInputs } from "./TotalInputs";
 
 const CreateNewInvoice = () => {
   const [loading, setLoading] = useState(false);
@@ -36,8 +37,8 @@ const CreateNewInvoice = () => {
   const validationSchema = Yup.object().shape({
     dueDate: Yup.string().required("Due Date is required"),
     "receiver.name": Yup.string().required("Receiver name is required"),
-    "receiver.address": Yup.string().optional().required("Receiver address is required"),
-    "receiver.contact": Yup.string().optional(),
+    "receiver.address": Yup.string().required("Receiver address is required"),
+    "receiver.contact": Yup.string(),
     "receiver.email": Yup.string().email("Invalid email format"),
     lineItems: Yup.array().of(
       Yup.object().shape({
@@ -103,7 +104,7 @@ const CreateNewInvoice = () => {
                     name="dueDate"
                     label="Due Date"
                     placeholder="Enter due date"
-                    type="datetime-local"
+                    type="date"
                     disabled={isReadonly}
                   />
                   <TextInput
@@ -192,6 +193,7 @@ const CreateNewInvoice = () => {
                             )}
                           </div>
                         ))}
+                        
                         {!isReadonly && (
                           <div className="flex justify-center items-center flex-col mt-4">
                             <button
@@ -206,6 +208,7 @@ const CreateNewInvoice = () => {
                             </button>
                             <span className="text-gray-600 text-sm mt-2">Add Item</span>
                           </div>
+
                         )}
                       </>
                     )}
@@ -237,20 +240,7 @@ const CreateNewInvoice = () => {
                     placeholder="Enter Tax"
                     disabled={isReadonly}
                   />
-                  {/* <TextInput
-                    name="finalAmount"
-                    label="Final Amount"
-                    placeholder="Calculated automatically"
-                    disabled={true}
-                    
-                  />
-                  <TextInput
-                    name="totalAmount"
-                    label="Total Amount"
-                    placeholder="Calculated automatically"
-                    disabled={true}
-                    
-                  /> */}
+                 
                   <SelectInput
                     name="paymentType"
                     label="Payment Type"
@@ -264,6 +254,7 @@ const CreateNewInvoice = () => {
                     disabled={isReadonly}
                   />
                 </div>
+                <TotalInputs/>
               </Form>
             )}
           </Formik>

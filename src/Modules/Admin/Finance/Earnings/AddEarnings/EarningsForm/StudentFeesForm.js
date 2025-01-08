@@ -67,7 +67,9 @@ const handleCustomSubmit = () => {
     });
   }
 };
-
+const getNestedValue = (values, path) => {
+  return path.split(".").reduce((acc, part) => acc && acc[part], values);
+};
   return (
     <Formik
       innerRef={formikRef}
@@ -114,11 +116,15 @@ const handleCustomSubmit = () => {
               label="Online Transaction-ID (*If payment type is online)"
               name="onlineTransactionId"
             />
-            <FileInput
-              label="Add receipt/document"
-              name="receipt"
-              onChange={(event) => setFieldValue("receipt", event.target.files[0])}
-            />
+           <FileInput
+            label="Add receipt/document"
+              name="document"
+            
+            onChange={
+              (e) => setFieldValue("document", e.target.value || null) // Set to URL string
+            }
+            
+          />
 
           </div>
           {/* Custom Submit Button */}
