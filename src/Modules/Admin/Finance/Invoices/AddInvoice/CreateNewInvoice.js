@@ -173,7 +173,7 @@ const CreateNewInvoice = () => {
 
                 </div>
 
-                <div className="p-6 rounded-md mx-20 mb-8" style={{ backgroundColor: "#ECECEC" }}>
+                <div className="p-6 rounded-md mb-8" style={{ backgroundColor: "#ECECEC" }}>
                   <h2 className="text-lg font-semibold mb-4">Items</h2>
                   <FieldArray name="lineItems">
                     {({ remove, push }) => (
