@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Formik, Form, useFormikContext } from "formik";
 
 import StudentDetails from "../Component/StudentDetails";
@@ -67,7 +67,10 @@ const handleCustomSubmit = () => {
     });
   }
 };
-
+const getNestedValue = (values, path) => {
+  return path.split(".").reduce((acc, part) => acc && acc[part], values);
+};
+const [imageUrl,setImageUrl] = useState('')
   return (
     <Formik
       innerRef={formikRef}
@@ -114,11 +117,15 @@ const handleCustomSubmit = () => {
               label="Online Transaction-ID (*If payment type is online)"
               name="onlineTransactionId"
             />
-            <FileInput
-              label="Add receipt/document"
-              name="receipt"
-              onChange={(event) => setFieldValue("receipt", event.target.files[0])}
-            />
+           <FileInput
+            label="Add receipt/document"
+              name="document"
+            
+            onChange={
+              (e) => {setFieldValue("document", e.target.value || null);setImageUrl(e.target.value)} // Set to URL string
+            }
+            value={imageUrl}
+          />
 
           </div>
           {/* Custom Submit Button */}

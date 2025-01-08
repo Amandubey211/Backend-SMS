@@ -89,9 +89,12 @@ export const fetchAllExpenses = createAsyncThunk(
   "expenses/fetchAllExpenses",
   async (params, { dispatch, rejectWithValue }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(`/finance/expense/getAll?academicYear=${say}`, params);
+      const response = await getData(
+        `/finance/expense/getAll?academicYear=${say}`,
+        params
+      );
 
       if (response?.success) {
         return response;
@@ -183,15 +186,11 @@ export const deleteExpense = createAsyncThunk(
   }
 );
 
-/**
- * Thunk to fetch a single expense by ID and category.
- * Optional: Implement if you need to fetch individual expense details.
- */
 export const fetchExpenseById = createAsyncThunk(
   "expenses/fetchExpenseById",
   async ({ category, id }, { dispatch, rejectWithValue }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
       const endpoint = `/finance/expense/get/${category}/${id}`;
       const response = await getData(endpoint);
@@ -252,6 +251,50 @@ export const fetchCardDataExpense = createAsyncThunk(
         );
         return rejectWithValue(
           response?.message || "Failed to fetch card data for expenses."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+export const fetchTeachingStaff = createAsyncThunk(
+  "expenses/fetchTeachingStaff",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData("/admin/teachingStaff");
+
+      if (response?.success) {
+        return response.data; // Assuming data is the array of teaching staff
+      } else {
+        toast.error(response?.msg || "Failed to fetch teaching staff.");
+        return rejectWithValue(
+          response?.msg || "Failed to fetch teaching staff."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/**
+ * Thunk to fetch Non-Teaching Staff
+ */
+export const fetchNonTeachingStaff = createAsyncThunk(
+  "expenses/fetchNonTeachingStaff",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData("/admin/nonTeachingStaff");
+
+      if (response?.success) {
+        return response.data; // Assuming data is the array of non-teaching staff
+      } else {
+        toast.error(response?.msg || "Failed to fetch non-teaching staff.");
+        return rejectWithValue(
+          response?.msg || "Failed to fetch non-teaching staff."
         );
       }
     } catch (error) {

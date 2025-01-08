@@ -31,9 +31,7 @@ const ExpenseMain = () => {
       <DashLayout>
         <div className="p-2 space-y-2 scroll-smooth overflow-y-auto h-full w-full mx-auto">
           <CardSection />
-
           <ExpenseChart />
-
           <ExpenseTable />
         </div>
       </DashLayout>

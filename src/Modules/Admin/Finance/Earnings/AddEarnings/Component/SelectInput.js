@@ -70,5 +70,4 @@ const SelectInput = ({ label, name, options, autoComplete = "off" }) => {
   );
 };
 
-
 export default SelectInput;
