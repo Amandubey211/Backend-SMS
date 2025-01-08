@@ -509,26 +509,26 @@ const RecentReceiptsList = () => {
                   totalPenalty += record.penalty || 0;
                 });
 
-                return (
-                  <Table.Summary.Row>
-                    <Table.Summary.Cell index={0} colSpan={3}>
-                      <strong>Totals:</strong>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={1}>
-                      <strong>{totalPaidAmount.toLocaleString()} QR</strong>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={2}>
-                      <strong>{totalTax.toLocaleString()} QR</strong>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={3}>
-                      <strong>{totalDiscount.toLocaleString()}%</strong>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={4}>
-                      <strong>{totalPenalty.toLocaleString()} QR</strong>
-                    </Table.Summary.Cell>
-                    <Table.Summary.Cell index={5} />
-                  </Table.Summary.Row>
-                );
+                // return (
+                //   <Table.Summary.Row>
+                //     <Table.Summary.Cell index={0} colSpan={3}>
+                //       <strong>Totals:</strong>
+                //     </Table.Summary.Cell>
+                //     <Table.Summary.Cell index={1}>
+                //       <strong>{totalDiscount.toLocaleString()} %</strong>
+                //     </Table.Summary.Cell>
+                //     <Table.Summary.Cell index={2}>
+                //       <strong>{totalTax.toLocaleString()} QR</strong>
+                //     </Table.Summary.Cell>
+                //     <Table.Summary.Cell index={3}>
+                //       <strong>{totalPaidAmount.toLocaleString()} QR</strong>
+                //     </Table.Summary.Cell>
+                //     <Table.Summary.Cell index={4}>
+                //       <strong>{totalPenalty.toLocaleString()} QR</strong>
+                //     </Table.Summary.Cell>
+                //     <Table.Summary.Cell index={5} />
+                //   </Table.Summary.Row>
+                // );
               }}
               size="small"
               bordered

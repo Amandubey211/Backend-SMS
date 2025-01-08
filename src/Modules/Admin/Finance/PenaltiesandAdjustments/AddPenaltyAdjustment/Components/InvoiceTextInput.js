@@ -14,27 +14,27 @@ const InvoiceTextInput = ({
   autoComplete = 'off',
   onBlur,
   onChange,
-  required = false,
+  required = false, // Added required prop
 }) => {
   // Extract relevant state from Redux
   const { loading, error, invoiceFetchSuccess } = useSelector(
     (state) => state.admin.invoices
   );
 
-  // Determine which icon to display, only if a value is present in the field
+  // Determine which icon to display
   let icon = null;
   if (loading) {
     icon = <Spin indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />;
   } else if (error) {
     icon = (
       <Tooltip title="Failed to fetch invoice data">
-        <CloseCircleOutlined style={{ color: 'red', fontSize: 18 }} />
+        <CloseCircleOutlined style={{ color: 'red' }} />
       </Tooltip>
     );
   } else if (invoiceFetchSuccess) {
     icon = (
       <Tooltip title="Invoice data fetched successfully">
-        <CheckCircleOutlined style={{ color: 'green', fontSize: 18 }} />
+        <CheckCircleOutlined style={{ color: 'green' }} />
       </Tooltip>
     );
   }
@@ -57,10 +57,12 @@ const InvoiceTextInput = ({
           type={type}
           placeholder={placeholder}
           disabled={disabled || false}
-          className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-purple-300"
+          className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none ${
+            required ? 'focus:ring-red-300' : 'focus:ring-purple-300'
+          }`}
           autoComplete={autoComplete}
-          onBlur={onBlur}
-          onChange={onChange}
+          onBlur={onBlur} // Pass onBlur to Field
+          onChange={onChange} // Pass onChange to Field
         />
         {icon && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

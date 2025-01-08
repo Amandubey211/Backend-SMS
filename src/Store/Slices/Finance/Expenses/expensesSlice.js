@@ -9,6 +9,8 @@ import {
   deleteExpense,
   fetchExpenseGraph,
   fetchCardDataExpense,
+  fetchTeachingStaff, // Import the new thunks
+  fetchNonTeachingStaff, // Import the new thunks
 } from "./expensesThunks"; // Ensure the path is correct
 
 const initialState = {
@@ -28,6 +30,12 @@ const initialState = {
   unpaidExpense: 0,
   expenseGraph: [], // New state for graph data
   cardDataExpense: {}, // New state for card data
+  teachingStaff: [],
+  nonTeachingStaff: [],
+  teachingStaffLoading: false,
+  teachingStaffError: null,
+  nonTeachingStaffLoading: false,
+  nonTeachingStaffError: null,
 };
 
 const expensesSlice = createSlice({
@@ -103,13 +111,6 @@ const expensesSlice = createSlice({
       })
       .addCase(addExpense.fulfilled, (state, action) => {
         state.loading = false;
-        // state.expenses.unshift(action.payload); // Add new expense to the start
-        // state.totalRecords += 1;
-
-        // // Update statistics
-        // state.totalExpenseAmount += action.payload.finalAmount || 0;
-        // state.totalPaidAmount += action.payload.paidAmount || 0;
-        // state.unpaidExpense += action.payload.remainingAmount || 0;
       })
       .addCase(addExpense.rejected, (state, action) => {
         state.loading = false;
@@ -123,28 +124,6 @@ const expensesSlice = createSlice({
       })
       .addCase(updateExpense.fulfilled, (state, action) => {
         state.loading = false;
-        // const index = state.expenses.findIndex(
-        //   (expense) => expense._id === action.payload._id
-        // );
-        // if (index !== -1) {
-        //   // Update the expense
-        //   state.expenses[index] = action.payload;
-
-        //   // Optionally, update statistics
-        //   // Recalculate totals for accuracy
-        //   state.totalExpenseAmount = state.expenses.reduce(
-        //     (acc, expense) => acc + (expense.finalAmount || 0),
-        //     0
-        //   );
-        //   state.totalPaidAmount = state.expenses.reduce(
-        //     (acc, expense) => acc + (expense.paidAmount || 0),
-        //     0
-        //   );
-        //   state.unpaidExpense = state.expenses.reduce(
-        //     (acc, expense) => acc + (expense.remainingAmount || 0),
-        //     0
-        //   );
-        // }
       })
       .addCase(updateExpense.rejected, (state, action) => {
         state.loading = false;
@@ -158,24 +137,6 @@ const expensesSlice = createSlice({
       })
       .addCase(deleteExpense.fulfilled, (state, action) => {
         state.loading = false;
-        // const { id, category } = action.payload;
-        // state.expenses = state.expenses.filter((expense) => expense._id !== id);
-        // state.totalRecords -= 1;
-
-        // // Optionally, update statistics
-        // // Recalculate totals for accuracy
-        // state.totalExpenseAmount = state.expenses.reduce(
-        //   (acc, expense) => acc + (expense.finalAmount || 0),
-        //   0
-        // );
-        // state.totalPaidAmount = state.expenses.reduce(
-        //   (acc, expense) => acc + (expense.paidAmount || 0),
-        //   0
-        // );
-        // state.unpaidExpense = state.expenses.reduce(
-        //   (acc, expense) => acc + (expense.remainingAmount || 0),
-        //   0
-        // );
       })
       .addCase(deleteExpense.rejected, (state, action) => {
         state.loading = false;
@@ -227,6 +188,34 @@ const expensesSlice = createSlice({
         state.error =
           action.payload ||
           "An error occurred while fetching expense card data.";
+      })
+      .addCase(fetchTeachingStaff.pending, (state) => {
+        state.teachingStaffLoading = true;
+        state.teachingStaffError = null;
+      })
+      .addCase(fetchTeachingStaff.fulfilled, (state, action) => {
+        state.teachingStaffLoading = false;
+        state.teachingStaff = action.payload;
+      })
+      .addCase(fetchTeachingStaff.rejected, (state, action) => {
+        state.teachingStaffLoading = false;
+        state.teachingStaffError =
+          action.payload || "Failed to fetch teaching staff.";
+      })
+
+      // Fetch Non-Teaching Staff
+      .addCase(fetchNonTeachingStaff.pending, (state) => {
+        state.nonTeachingStaffLoading = true;
+        state.nonTeachingStaffError = null;
+      })
+      .addCase(fetchNonTeachingStaff.fulfilled, (state, action) => {
+        state.nonTeachingStaffLoading = false;
+        state.nonTeachingStaff = action.payload;
+      })
+      .addCase(fetchNonTeachingStaff.rejected, (state, action) => {
+        state.nonTeachingStaffLoading = false;
+        state.nonTeachingStaffError =
+          action.payload || "Failed to fetch non-teaching staff.";
       });
   },
 });

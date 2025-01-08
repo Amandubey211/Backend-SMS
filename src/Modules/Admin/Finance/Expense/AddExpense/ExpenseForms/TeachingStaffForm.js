@@ -1,7 +1,9 @@
-import React from "react";
+// src/components/TeachingStaffForm.js
+
+import React, { useEffect } from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
-import PaymentStatus from "../../../Earnings/AddEarnings/Component/PaymentStatus";
+import StaffSelect from "../Components/StaffSelect";
 
 const TeachingStaffForm = () => {
   const { setFieldValue, values } = useFormikContext();
@@ -10,113 +12,44 @@ const TeachingStaffForm = () => {
   const staffDetailsFields = [
     {
       type: "text",
-      label: "Staff Name",
-      name: "staffName",
-      placeholder: "Enter staff name",
-    },
-    // {
-    //   type: "text",
-    //   label: "Staff ID",
-    //   name: "staffId",
-    //   placeholder: "Enter staff ID",
-    // },
-    {
-      type: "text",
-      label: "Job Title",
-      name: "jobTitle",
-      placeholder: "Enter job title",
-    },
-    {
-      type: "select",
-      label: "Department",
-      name: "department",
-      options: ["Mathematics", "Science", "Humanities", "IT", "Others"],
-    },
-    {
-      type: "text",
-      label: "Phone Number",
-      name: "phoneNumber",
-      placeholder: "Enter phone number",
-    },
-    {
-      type: "text",
       label: "Mail ID",
       name: "email",
       placeholder: "Enter mail ID",
     },
-    {
-      type: "text",
-      label: "Address",
-      name: "address",
-      placeholder: "Enter address",
-    },
-  ];
-
-  // Configuration for Bank Details
-  const bankDetailsFields = [
-    {
-      type: "text",
-      label: "Account Number",
-      name: "accountNumber",
-      placeholder: "Enter account number",
-    },
-    {
-      type: "text",
-      label: "Account Holder Name",
-      name: "accountHolderName",
-      placeholder: "Enter account holder name",
-    },
-    {
-      type: "text",
-      label: "IFSC/SWIFT Code",
-      name: "ifsc",
-      placeholder: "Enter IFSC/SWIFT code",
-    },
-    {
-      type: "text",
-      label: "Bank Name",
-      name: "bankName",
-      placeholder: "Enter Bank name",
-    },
-    {
-      type: "text",
-      label: "Branch Name",
-      name: "branchName",
-      placeholder: "Enter branch name",
-    },
+    // Add more staff detail fields as needed
   ];
 
   // Configuration for Salary Details
   const salaryDetailsFields = [
     {
-      type: "text",
-      label: "Recurring Expenses",
-      name: "recurringExpenses",
-      placeholder: "Enter recurring expenses",
+      type: "select",
+      label: "Billing Period",
+      name: "billingPeriod",
+      options: ["Monthly", "Quarterly", "Yearly"],
     },
     {
-      type: "text",
-      label: "Date & Time",
-      name: "dateAndTime",
-      placeholder: "Enter date and time",
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"],
+    },
+    {
+      name: "payment_type",
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+    {
+      type: "select",
+      label: "Discount Type",
+      name: "discountType",
+      options: ["amount", "percentage"],
     },
     {
       type: "number",
-      label: "Base Salary",
-      name: "baseSalary",
-      placeholder: "Enter base salary",
-    },
-    {
-      type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
-    },
-    {
-      type: "number",
-      label: "Deduction",
-      name: "deduction",
-      placeholder: "Enter deduction",
+      label: "Discount",
+      name: "discount",
+      placeholder: "Enter discount",
     },
     {
       type: "number",
@@ -126,35 +59,69 @@ const TeachingStaffForm = () => {
     },
     {
       type: "number",
-      label: "Bonus & Incentives",
-      name: "bonus",
-      placeholder: "Enter bonus amount",
+      label: "Tax (Inc/Exc)",
+      name: "tax",
+      placeholder: "Enter tax percentage",
     },
     {
       type: "number",
-      label: "Net Salary (After tax/discount/penalty/bonus)",
-      name: "netSalary",
-      placeholder: "Enter net salary",
+      label: "Total Amount",
+      name: "total_amount",
+      placeholder: "Enter total amount",
+    },
+    {
+      type: "number",
+      label: "Final Amount",
+      name: "final_amount",
+      placeholder: "Enter final amount",
+    },
+    {
+      name: "paid_amount",
+      label: "Paid Amount (QR)",
+      type: "number",
+      placeholder: "Enter paid amount",
+      min: 0,
+    },
+    {
+      name: "advance_amount",
+      label: "Advance Amount (QR)",
+      type: "number",
+      placeholder: "Enter advance amount",
+      min: 0,
+    },
+    {
+      name: "remaining_amount",
+      label: "Remaining Amount (QR)",
+      type: "number",
+      placeholder: "Enter remaining amount",
+      min: 0,
+      readOnly: true,
+    },
+    {
+      type: "file",
+      label: "Add Receipt/Document",
+      name: "receipt",
     },
   ];
 
   return (
     <>
-      {/* Staff Details Section */}
+      {/* Staff Selection Section */}
+      <StaffSelect
+        name="staffId"
+        label="Select Teaching Staff"
+        setFieldValue={setFieldValue}
+        value={values.staffId}
+        staffType="teaching"
+      />
+
+      {/* Staff Details Section
       <FormSection
         title="Staff Details"
         fields={staffDetailsFields}
         setFieldValue={setFieldValue}
         values={values}
-      />
-
-      {/* Bank Details Section */}
-      <FormSection
-        title="Staff Bank Details"
-        fields={bankDetailsFields}
-        setFieldValue={setFieldValue}
-        values={values}
-      />
+      /> */}
 
       {/* Salary Details Section */}
       <FormSection
@@ -164,8 +131,7 @@ const TeachingStaffForm = () => {
         values={values}
       />
 
-      {/* Static Payment Status Section */}
-      <PaymentStatus />
+      {/* Additional Sections as Needed */}
     </>
   );
 };

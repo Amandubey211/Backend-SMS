@@ -9,6 +9,12 @@ const BuildingMaintenanceForm = () => {
   const expenseDetailsFields = [
     {
       type: "select",
+      label: "Utility Type",
+      name: "utilityType",
+      options: ["electricity", "water", "internet", "gas", "other"],
+    },
+    {
+      type: "select",
       label: "Maintenance Type",
       name: "maintenanceCategory",
       options: [
@@ -20,24 +26,32 @@ const BuildingMaintenanceForm = () => {
         "other",
       ],
     },
+
     {
       type: "text",
-      label: "Building/Block Name",
-      name: "buildingName",
-      placeholder: "Enter building/block name",
-    },
-    {
-      type: "select",
-      label: "Services",
-      name: "services",
-      options: ["Plumbing", "Electrical", "Carpentry"],
+      label: "Name",
+      name: "name",
+      placeholder: "Enter service provider name",
     },
     {
       type: "text",
-      label: "Vendor Name",
-      name: "vendorName",
+      label: "vendor",
+      name: "vendor",
       placeholder: "Enter vendor name",
     },
+
+    // {
+    //   type: "text",
+    //   label: "Building/Block Name",
+    //   name: "buildingName",
+    //   placeholder: "Enter building/block name",
+    // },
+    // {
+    //   type: "select",
+    //   label: "Services",
+    //   name: "services",
+    //   options: ["Plumbing", "Electrical", "Carpentry"],
+    // },
   ];
 
   const billingDetailsFields = [
@@ -47,18 +61,32 @@ const BuildingMaintenanceForm = () => {
       name: "billingPeriod",
       options: ["Monthly", "Quarterly", "Yearly"],
     },
-    { type: "datetime-local", label: "Date & Time", name: "dateTime" },
     {
-      type: "number",
-      label: "Total Amount",
-      name: "totalAmount",
-      placeholder: "Enter total amount",
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"],
     },
+    // { type: "datetime-local", label: "Date & Time", name: "dateTime" },
     {
-      type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
+      name: "payment_type", // Changed to snake_case
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+
+    // {
+    //   name: "paid_by", // Changed to snake_case
+    //   label: "Paid By",
+    //   type: "select",
+    //   options: ["Manual", "Auto"],
+    // },
+
+    {
+      type: "select",
+      label: "Discount Type",
+      name: "discountType",
+      options: ["amount", "percentage"],
     },
     {
       type: "number",
@@ -74,9 +102,43 @@ const BuildingMaintenanceForm = () => {
     },
     {
       type: "number",
+      label: "Tax (Inc/Exc)",
+      name: "tax",
+      placeholder: "Enter tax percentage",
+    },
+    {
+      type: "number",
+      label: "Total Amount",
+      name: "total_amount",
+      placeholder: "Enter total amount",
+    },
+    {
+      type: "number",
       label: "Final Amount",
-      name: "finalAmount",
+      name: "final_amount",
       placeholder: "Enter final amount",
+    },
+    {
+      name: "paid_amount", // Changed to snake_case
+      label: "Paid Amount (QR)",
+      type: "number",
+      placeholder: "Enter paid amount",
+      min: 0,
+    },
+    {
+      name: "advance_amount",
+      label: "Advance Amount (QR)",
+      type: "number",
+      placeholder: "Enter advance amount",
+      min: 0,
+    },
+    {
+      name: "remaining_amount",
+      label: "Remaining Amount (QR)",
+      type: "number",
+      placeholder: "Enter remaining amount",
+      min: 0,
+      readOnly: true, // Make it read-only as it's calculated
     },
     { type: "file", label: "Add Receipt/Document", name: "receipt" },
   ];
@@ -95,7 +157,7 @@ const BuildingMaintenanceForm = () => {
         setFieldValue={setFieldValue}
         values={values}
       />
-      <PaymentStatus />
+      {/* <PaymentStatus /> */}
     </>
   );
 };

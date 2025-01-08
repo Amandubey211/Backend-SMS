@@ -2,7 +2,7 @@ import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 
-const TextInput = ({ label, name, type = "text", placeholder, disabled, autoComplete = "off" }) => {
+const TextInput = ({ label, name, type = "text", placeholder, disabled, required = false, autoComplete = "off" }) => {
   const variants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
@@ -18,7 +18,7 @@ const TextInput = ({ label, name, type = "text", placeholder, disabled, autoComp
       transition={{ duration: 0.3 }}
     >
       <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
       <Field
         id={name}
@@ -26,7 +26,9 @@ const TextInput = ({ label, name, type = "text", placeholder, disabled, autoComp
         type={type}
         placeholder={placeholder}
         disabled={disabled || false}
-        className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
+        className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 ${
+          required ? 'focus:ring-red-300' : 'focus:ring-purple-300'
+        }`}
         autoComplete={autoComplete}
       />
       <ErrorMessage

@@ -1,110 +1,42 @@
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
-import PaymentStatus from "../../../Earnings/AddEarnings/Component/PaymentStatus";
+import StaffSelect from "../Components/StaffSelect";
 
 const NonTeachingStaffForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Staff Details
-  const staffDetailsFields = [
-    {
-      type: "text",
-      label: "Staff Name",
-      name: "staffName",
-      placeholder: "Enter staff name",
-    },
-    {
-      type: "text",
-      label: "Staff ID",
-      name: "staffID",
-      placeholder: "Enter staff ID",
-    },
-    {
-      type: "text",
-      label: "Job Title",
-      name: "jobTitle",
-      placeholder: "Enter job title",
-    },
-    {
-      type: "select",
-      label: "Department",
-      name: "department",
-      options: ["HR", "Maintenance", "Administration", "Others"],
-    },
-    {
-      type: "text",
-      label: "Phone Number",
-      name: "phoneNumber",
-      placeholder: "Enter phone number",
-    },
-    {
-      type: "text",
-      label: "Mail ID",
-      name: "email",
-      placeholder: "Enter mail ID",
-    },
-    {
-      type: "text",
-      label: "Address",
-      name: "address",
-      placeholder: "Enter address",
-    },
-  ];
-
-  // Configuration for Bank Details
-  const bankDetailsFields = [
-    {
-      type: "text",
-      label: "Account Number",
-      name: "accountNumber",
-      placeholder: "Enter account number",
-    },
-    {
-      type: "text",
-      label: "Account Holder Name",
-      name: "accountHolderName",
-      placeholder: "Enter Account holder name",
-    },
-    {
-      type: "text",
-      label: "IFSC/SWIFT Code",
-      name: "ifsc",
-      placeholder: "Enter code here",
-    },
-    {
-      type: "text",
-      label: "Bank Name",
-      name: "bankName",
-      placeholder: "Enter Bank name",
-    },
-    {
-      type: "text",
-      label: "Branch Name",
-      name: "branchName",
-      placeholder: "Enter branch name",
-    },
-  ];
-
   // Configuration for Salary Details
   const salaryDetailsFields = [
     {
-      type: "number",
-      label: "Base Salary",
-      name: "baseSalary",
-      placeholder: "Enter base salary",
+      type: "select",
+      label: "Billing Period",
+      name: "billingPeriod",
+      options: ["Monthly", "Quarterly", "Yearly"],
+    },
+    {
+      name: "paymentStatus",
+      label: "Payment Status",
+      type: "select",
+      options: ["paid", "unpaid", "partial", "advance"],
+    },
+    {
+      name: "payment_type",
+      label: "Payment Type",
+      type: "select",
+      options: ["cash", "card", "online", "cheque", "other"],
+    },
+    {
+      type: "select",
+      label: "Discount Type",
+      name: "discountType",
+      options: ["amount", "percentage"],
     },
     {
       type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
-    },
-    {
-      type: "number",
-      label: "Deduction",
-      name: "deduction",
-      placeholder: "Enter deduction",
+      label: "Discount",
+      name: "discount",
+      placeholder: "Enter discount",
     },
     {
       type: "number",
@@ -114,58 +46,66 @@ const NonTeachingStaffForm = () => {
     },
     {
       type: "number",
-      label: "Bonus & Incentives",
-      name: "bonus",
-      placeholder: "Enter amount",
+      label: "Tax (Inc/Exc)",
+      name: "tax",
+      placeholder: "Enter tax percentage",
     },
     {
       type: "number",
-      label: "Net salary (After tax/discount/penalty/bonus)",
-      name: "netSalary",
-      placeholder: "Enter net salary",
+      label: "Total Amount",
+      name: "total_amount",
+      placeholder: "Enter total amount",
     },
     {
-      type: "text",
-      label: "Recurring Expenses",
-      name: "recurringExpenses",
-      placeholder: "Enter recurring expenses",
+      type: "number",
+      label: "Final Amount",
+      name: "final_amount",
+      placeholder: "Enter final amount",
     },
     {
-      type: "date",
-      label: "Date & Time",
-      name: "dateTime",
-      placeholder: "Enter date and time",
+      name: "paid_amount",
+      label: "Paid Amount (QR)",
+      type: "number",
+      placeholder: "Enter paid amount",
+      min: 0,
+    },
+    {
+      name: "advance_amount",
+      label: "Advance Amount (QR)",
+      type: "number",
+      placeholder: "Enter advance amount",
+      min: 0,
+    },
+    {
+      name: "remaining_amount",
+      label: "Remaining Amount (QR)",
+      type: "number",
+      placeholder: "Enter remaining amount",
+      min: 0,
+      readOnly: true,
+    },
+    {
+      type: "file",
+      label: "Add Receipt/Document",
+      name: "receipt",
     },
   ];
 
   return (
     <>
-      {/* Staff Details Section */}
-      <FormSection
-        title="Staff Details"
-        fields={staffDetailsFields}
+      <StaffSelect
+        name="staffId"
+        label="Select Non-Teaching Staff"
         setFieldValue={setFieldValue}
-        values={values}
+        value={values.staffId}
+        staffType="non-teaching" // Specify the staff type
       />
-
-      {/* Staff Bank Details Section */}
-      <FormSection
-        title="Staff Bank Details"
-        fields={bankDetailsFields}
-        setFieldValue={setFieldValue}
-        values={values}
-      />
-
-      {/* Salary Details Section */}
       <FormSection
         title="Salary Details"
         fields={salaryDetailsFields}
         setFieldValue={setFieldValue}
         values={values}
       />
-
-      {/* Static Payment Status Section */}
-      <PaymentStatus />
     </>
   );
 };
