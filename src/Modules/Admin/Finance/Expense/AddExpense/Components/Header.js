@@ -1,9 +1,10 @@
-// src/Components/Admin/Finance/Expenses/Components/Header.jsx
+// src/Components/Admin/Finance/Expenses/Config/Header.jsx
 
 import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
 import { useSelector } from "react-redux";
 import { subCategories, categories } from "../../Config/categories";
+import { Button } from "antd";
 
 const Header = ({
   onCategoryChange,
@@ -32,10 +33,16 @@ const Header = ({
     onCategoryChange(selectedCategory);
     setIsCategoryOpen(false);
 
-    // Automatically select the first subcategory
-    const firstSubCategory = subCategories[selectedCategory][0];
-    setSubCategory(firstSubCategory);
-    onSubCategoryChange(firstSubCategory);
+    // Automatically select the first subcategory if available
+    const subCategoryList = subCategories[selectedCategory];
+    if (subCategoryList && subCategoryList.length > 0) {
+      const firstSubCategory = subCategoryList[0];
+      setSubCategory(firstSubCategory);
+      onSubCategoryChange(firstSubCategory);
+    } else {
+      setSubCategory(""); // Reset subCategory if none available
+      onSubCategoryChange("");
+    }
   };
 
   const handleSubCategorySelect = (selectedSubCategory) => {
@@ -44,6 +51,9 @@ const Header = ({
     onSubCategoryChange(selectedSubCategory);
     setIsSubCategoryOpen(false);
   };
+
+  // Determine if subcategory dropdown should be displayed
+  const shouldShowSubCategory = subCategories[category]?.length > 1;
 
   return (
     <div className="bg-white py-3 px-5">
@@ -54,13 +64,13 @@ const Header = ({
         </h1>
         {!readOnly && (
           <div className="flex gap-4">
-            {/* Submit Button (Save or Update) */}
-            <button
-              type="submit" // Formik will handle the submit
+            <Button
+              type="primary"
+              htmlType="submit"
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
             >
               {isUpdate ? "Update Expense" : "Save Expense"}
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -71,7 +81,7 @@ const Header = ({
         <DropdownCard
           label="Category"
           name="category"
-          id="category-dropdown" // Unique ID
+          id="category-dropdown"
           value={category}
           options={categories}
           isOpen={isCategoryOpen}
@@ -79,22 +89,26 @@ const Header = ({
           onSelect={handleCategorySelect}
           bgColor="bg-red-50"
           borderColor="border-red-300"
-          disabled={readOnly} // Disable dropdown if readOnly
+          disabled={readOnly}
         />
-        {/* SubCategory Selector */}
-        <DropdownCard
-          label="Sub-category"
-          name="subCategory"
-          id="subcategory-dropdown" // Unique ID
-          value={subCategory}
-          options={subCategories[category]}
-          isOpen={isSubCategoryOpen}
-          onToggle={() => setIsSubCategoryOpen(!isSubCategoryOpen)}
-          onSelect={handleSubCategorySelect}
-          bgColor="bg-purple-50"
-          borderColor="border-purple-300"
-          disabled={readOnly} // Disable dropdown if readOnly
-        />
+
+        {/* SubCategory Selector (Conditional) */}
+        {shouldShowSubCategory && (
+          <DropdownCard
+            label="Sub-category"
+            name="subCategory"
+            id="subcategory-dropdown"
+            value={subCategory}
+            options={subCategories[category]}
+            isOpen={isSubCategoryOpen}
+            onToggle={() => setIsSubCategoryOpen(!isSubCategoryOpen)}
+            onSelect={handleSubCategorySelect}
+            bgColor="bg-purple-50"
+            borderColor="border-purple-300"
+            disabled={readOnly}
+          />
+        )}
+
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
           <label
@@ -111,11 +125,11 @@ const Header = ({
               const words = e.target.value
                 .split(/\s+/)
                 .filter((word) => word.length > 0);
-              if (words.length <= 100) setDescription(e.target.value); // Limit to 100 words
+              if (words.length <= 100) setDescription(e.target.value);
             }}
             className="bg-gray-50 z-40 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
             placeholder="Write a short description"
-            readOnly={readOnly} // Make textarea read-only if readOnly is true
+            readOnly={readOnly}
           ></textarea>
           <div className="flex justify-end items-center my-3">
             <span className="text-xs text-gray-500 italic">

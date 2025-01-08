@@ -1,9 +1,8 @@
-// ClassroomOfficePurposeForm.jsx
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
-// import PaymentStatus from "../../../Earnings/AddEarnings/Component/PaymentStatus";
 import ItemsSection from "../Components/ItemsSection";
+import TransactionDetails from "../Components/TransactionDetails";
 
 const ClassroomOfficePurposeForm = () => {
   const { setFieldValue, values } = useFormikContext();
@@ -14,136 +13,29 @@ const ClassroomOfficePurposeForm = () => {
       label: "Name",
       name: "name",
       placeholder: "Enter name",
-      // component: Input, // Removed since not using antd here
     },
     {
       type: "text",
       label: "Vendor",
       name: "vendor",
       placeholder: "Enter vendor name",
-      // component: Input, // Removed since not using antd here
     },
     {
       type: "date",
       label: "Purchased Date",
       name: "purchasedDate",
-      // component: DatePicker, // Removed since not using antd here
     },
-  ];
-
-  const billingDetailsFields = [
-    {
-      type: "select",
-      label: "Billing Period",
-      name: "billingPeriod",
-      options: ["Monthly", "Quarterly", "Yearly"],
-    },
-    {
-      name: "paymentStatus",
-      label: "Payment Status",
-      type: "select",
-      options: ["paid", "unpaid", "partial", "advance"],
-    },
-    // { type: "datetime-local", label: "Date & Time", name: "dateTime" },
-    {
-      name: "payment_type", // Changed to snake_case
-      label: "Payment Type",
-      type: "select",
-      options: ["cash", "card", "online", "cheque", "other"],
-    },
-
-    // {
-    //   name: "paid_by", // Changed to snake_case
-    //   label: "Paid By",
-    //   type: "select",
-    //   options: ["Manual", "Auto"],
-    // },
-
-    {
-      type: "select",
-      label: "Discount Type",
-      name: "discountType",
-      options: ["amount", "percentage"],
-    },
-    {
-      type: "number",
-      label: "Discount",
-      name: "discount",
-      placeholder: "Enter discount",
-    },
-    {
-      type: "number",
-      label: "Penalty",
-      name: "penalty",
-      placeholder: "Enter penalty amount",
-    },
-    {
-      type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
-    },
-    {
-      type: "number",
-      label: "Total Amount",
-      name: "total_amount",
-      placeholder: "Enter total amount",
-    },
-    {
-      type: "number",
-      label: "Final Amount",
-      name: "final_amount",
-      placeholder: "Enter final amount",
-    },
-    {
-      name: "paid_amount", // Changed to snake_case
-      label: "Paid Amount (QR)",
-      type: "number",
-      placeholder: "Enter paid amount",
-      min: 0,
-    },
-    {
-      name: "advance_amount",
-      label: "Advance Amount (QR)",
-      type: "number",
-      placeholder: "Enter advance amount",
-      min: 0,
-    },
-    {
-      name: "remaining_amount",
-      label: "Remaining Amount (QR)",
-      type: "number",
-      placeholder: "Enter remaining amount",
-      min: 0,
-      readOnly: true, // Make it read-only as it's calculated
-    },
-    { type: "file", label: "Add Receipt/Document", name: "receipt" },
   ];
 
   return (
     <>
-      {/* Expense Details Section */}
-
       <FormSection
         fields={expenseDetailsFields}
         setFieldValue={setFieldValue}
         values={values}
       />
-
-      {/* Items Section */}
       <ItemsSection type="classroom" />
-
-      {/* Billing Details Section */}
-
-      <FormSection
-        title="Billing Details"
-        fields={billingDetailsFields}
-        setFieldValue={setFieldValue}
-        values={values}
-      />
-
-      {/* Uncomment if PaymentStatus is needed */}
-      {/* <PaymentStatus /> */}
+      <TransactionDetails setFieldValue={setFieldValue} values={values} />
     </>
   );
 };

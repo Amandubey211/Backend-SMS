@@ -6,10 +6,10 @@ import {
   Input,
   Button,
   Spin,
-  Alert,
   Tooltip,
   Tag,
   Checkbox,
+  Modal,
 } from "antd";
 import {
   SearchOutlined,
@@ -17,13 +17,8 @@ import {
   FilterOutlined,
   EditOutlined,
   DeleteOutlined,
-  DollarOutlined,
-  SyncOutlined,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
+  EyeOutlined,
   DollarCircleOutlined,
-  CloudOutlined,
-  CreditCardOutlined,
 } from "@ant-design/icons";
 import { AiFillAccountBook } from "react-icons/ai";
 import { BiDonateHeart } from "react-icons/bi";
@@ -44,9 +39,9 @@ import {
 } from "../../../../../Store/Slices/Finance/Expenses/expensesSlice";
 import toast from "react-hot-toast";
 import Card from "../components/Card";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import ExportModal from "../../Earnings/Components/ExportModal";
 import DeleteModal from "../../Earnings/Components/DeleteModal";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const TotalExpenseList = () => {
   useNavHeading("Finance", "Expense List");
@@ -55,9 +50,6 @@ const TotalExpenseList = () => {
   const [searchText, setSearchText] = useState("");
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
-  const [isFilterModalVisible, setIsFilterModalVisible] = useState(false);
-  const [isBulkEntriesModalVisible, setIsBulkEntriesModalVisible] =
-    useState(false);
   const [selectedExpenseForDeletion, setSelectedExpenseForDeletion] =
     useState(null);
 
@@ -86,11 +78,6 @@ const TotalExpenseList = () => {
 
   // Initialize local state for computedPageSize
   const [computedPageSize, setComputedPageSize] = useState(pageSize || 10);
-
-  // Custom header cell for table
-  const CustomHeaderCell = (props) => (
-    <th {...props} className="bg-pink-100 py-1 px-2 text-xs" />
-  );
 
   // Memoize a mapping from _id to expense object for faster lookup
   const expenseIdMap = useMemo(() => {
@@ -136,24 +123,59 @@ const TotalExpenseList = () => {
     }
   };
 
-  // Render action buttons (Edit, Delete) for each row
+  // Handle View Action
+  const handleView = (record) => {
+    const expenseToView = expenseIdMap[record.key];
+    if (expenseToView) {
+      dispatch(setSelectedExpense(expenseToView));
+      dispatch(setReadOnly(true));
+      navigate("/finance/expenses/add"); // Adjust the route if necessary
+    } else {
+      toast.error("Selected expense not found.");
+    }
+  };
+
+  // Handle Edit Action
+  const handleEdit = (record) => {
+    const expenseToEdit = expenseIdMap[record.key];
+    if (expenseToEdit) {
+      dispatch(setSelectedExpense(expenseToEdit));
+      dispatch(setReadOnly(false));
+      navigate("/finance/expenses/add"); // Adjust the route if necessary
+    } else {
+      toast.error("Selected expense not found.");
+    }
+  };
+
+  // Show delete confirmation modal
+  const showDeleteModal = (record) => {
+    const expenseToDelete = expenseIdMap[record.key];
+    if (expenseToDelete) {
+      setSelectedExpenseForDeletion(expenseToDelete);
+      setIsDeleteModalVisible(true);
+    } else {
+      toast.error("Selected expense not found.");
+    }
+  };
+
+  // Render action buttons (View, Edit, Delete) for each row
   const renderActionIcons = (record) => (
     <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+      <Tooltip title="View">
+        <Button
+          type="link"
+          icon={<EyeOutlined />}
+          onClick={() => handleView(record)}
+          className="text-blue-600 hover:text-blue-800 p-0"
+          aria-label="View"
+        />
+      </Tooltip>
       <Tooltip title="Edit">
         <Button
           type="link"
           icon={<EditOutlined />}
-          onClick={() => {
-            const expenseToEdit = expenseIdMap[record.key];
-            if (expenseToEdit) {
-              dispatch(setReadOnly(false)); // Set readOnly to false for editing
-              dispatch(setSelectedExpense(expenseToEdit)); // Dispatch the selected expense to Redux
-              navigate("/finance/expenses/add"); // Navigate to edit page
-            } else {
-              toast.error("Selected expense not found.");
-            }
-          }}
-          className="text-blue-600 hover:text-blue-800 p-0"
+          onClick={() => handleEdit(record)}
+          className="text-green-600 hover:text-green-800 p-0"
           aria-label="Edit"
         />
       </Tooltip>
@@ -161,15 +183,7 @@ const TotalExpenseList = () => {
         <Button
           type="link"
           icon={<DeleteOutlined />}
-          onClick={() => {
-            const expenseToDelete = expenseIdMap[record.key];
-            if (expenseToDelete) {
-              setSelectedExpenseForDeletion(expenseToDelete); // Set expense for deletion
-              setIsDeleteModalVisible(true);
-            } else {
-              toast.error("Selected expense not found.");
-            }
-          }}
+          onClick={() => showDeleteModal(record)}
           className="text-red-600 hover:text-red-800 p-0"
           aria-label="Delete"
         />
@@ -224,7 +238,6 @@ const TotalExpenseList = () => {
                 <Tooltip title="Not selectable">
                   <Checkbox disabled />
                 </Tooltip>
-                {/* <BlockOutlined className="ml-1 text-red-500" /> */}
               </div>
             );
           }
@@ -239,11 +252,11 @@ const TotalExpenseList = () => {
         ellipsis: true,
       },
       {
-        title: "Description",
-        dataIndex: "description",
-        key: "description",
+        title: "Sub-Category",
+        dataIndex: "subCategoryName",
+        key: "subCategoryName",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 200,
+        width: 150,
         ellipsis: true,
       },
       // Discount Column
@@ -362,7 +375,7 @@ const TotalExpenseList = () => {
       penalty: expense.penalty || 0,
       earnedDate: expense.paidDate || expense.generateDate || "N/A",
       totalAmount: expense.totalAmount || 0,
-      academicYearDetails: expense.academicYearDetails?.[0]?.year || "N/A",
+      academicYearDetails: expense.academicYearDetails?.year || "N/A",
     })) || [];
 
   // Map expenses to data source with camelCase fields
@@ -370,30 +383,31 @@ const TotalExpenseList = () => {
     () =>
       expenses?.map((expense) => ({
         key: expense._id,
-        categoryName: expense.category?.[0]?.categoryName || "N/A",
+        categoryName: expense.category?.categoryName || "N/A",
+        subCategoryName: expense?.subcategory || "N/A",
         description: expense.description || (
           <span className="text-yellow-600">No Description</span>
         ),
-        paymentType: expense.paymentType || "N/A",
+        paymentType: expense.payment_type || "N/A",
         discount: expense.discount || 0,
         discountType: expense.discountType || "percentage",
-        finalAmount: expense.finalAmount || 0,
-        paidAmount: expense.paidAmount || 0,
-        remainingAmount: expense.remainingAmount || 0,
+        finalAmount: expense.final_amount || 0,
+        paidAmount: expense.paid_amount || 0,
+        remainingAmount: expense.remaining_amount || 0,
         penalty: expense.penalty || 0,
         paymentStatus: expense.paymentStatus || "N/A",
         earnedDate: expense.paidDate || expense.generateDate || null,
-        totalAmount: expense.totalAmount || 0,
-        academicYearDetails: expense.academicYearDetails?.[0]?.year || "N/A",
+        totalAmount: expense.total_amount || 0,
+        academicYearDetails: expense.academicYearDetails?.year || "N/A",
       })),
     [expenses]
   );
 
   // Custom components for table headers
   const components = {
-    header: {
-      cell: CustomHeaderCell,
-    },
+    // header: {
+    //   cell: CustomHeaderCell,
+    // },
   };
 
   // Table summary (totals row)
@@ -440,25 +454,25 @@ const TotalExpenseList = () => {
     const cards = [
       {
         title: "Total Paid Amount",
-        value: formatCurrency(totalPaidAmount, "QAR"),
+        value: formatCurrency(totalPaidAmount, "QR"),
         icon: <FaRegMoneyBillAlt />,
         color: "green",
       },
       {
         title: "Remaining Partial Paid",
-        value: formatCurrency(remainingPartialPaidExpense, "QAR"),
+        value: formatCurrency(remainingPartialPaidExpense, "QR"),
         icon: <BiDonateHeart />,
         color: "yellow",
       },
       {
         title: "Unpaid Amount",
-        value: formatCurrency(unpaidExpense, "QAR"),
+        value: formatCurrency(unpaidExpense, "QR"),
         icon: <MdOutlineMoneyOff />,
         color: "red",
       },
       {
         title: "Total Expense",
-        value: formatCurrency(totalExpenseAmount, "QAR"),
+        value: formatCurrency(totalExpenseAmount, "QR"),
         icon: <AiFillAccountBook />,
         color: "purple",
       },
@@ -503,8 +517,6 @@ const TotalExpenseList = () => {
                 style={{
                   borderRadius: "0.375rem",
                   height: "35px",
-                  // borderColor: "#ff6bcb",
-                  // boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
                 }}
               />
             </div>
@@ -543,18 +555,10 @@ const TotalExpenseList = () => {
                 className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
                 icon={<FilterOutlined />}
                 disabled
-                onClick={() => setIsFilterModalVisible(true)}
+                // onClick={() => setIsFilterModalVisible(true)}
               >
                 Filter
               </Button>
-
-              {/* <Button
-                className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none shadow-md hover:from-pink-600 hover:to-pink-500 transition duration-200"
-                icon={<SyncOutlined />}
-                onClick={() => setIsBulkEntriesModalVisible(true)}
-              >
-                Bulk Entries
-              </Button> */}
             </div>
           </div>
 
@@ -628,15 +632,7 @@ const TotalExpenseList = () => {
             title="ExpensesData"
             sheet="expenses_report"
           />
-          {/* <FilterExpenseModal
-            visible={isFilterModalVisible}
-            onClose={() => setIsFilterModalVisible(false)}
-            onFilterApply={handleFilterApply}
-          /> */}
-          {/* <BulkEntriesModal
-            visible={isBulkEntriesModalVisible}
-            onClose={() => setIsBulkEntriesModalVisible(false)}
-          /> */}
+          {/* Add other modals like FilterExpenseModal or BulkEntriesModal if needed */}
         </div>
       </DashLayout>
     </Layout>

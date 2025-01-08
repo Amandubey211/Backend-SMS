@@ -9,9 +9,9 @@ import { IoMdAdd, IoMdRemove } from "react-icons/io";
 
 const FormSection = ({ title, fields, setFieldValue, values }) => {
   return (
-    <div className="mb-6">
+    <div className="mb-6 px-3">
       {title && (
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">{title}</h2>
+        <h2 className="text-md font-bold text-gray-800 mb-4">{title}</h2>
       )}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {fields?.map((field, index) => {
@@ -26,6 +26,9 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
             ...rest
           } = field;
 
+          // All fields are required
+          const isRequired = true;
+
           switch (type) {
             case "text":
             case "number":
@@ -39,6 +42,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                   label={label}
                   placeholder={placeholder}
                   type={type}
+                  required={isRequired}
                   value={getNestedValue(values, name)}
                   onChange={(e) => {
                     const value =
@@ -59,6 +63,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                   name={name}
                   label={label}
                   options={options || []}
+                  required={isRequired}
                   value={getNestedValue(values, name)}
                   onChange={(value) => setFieldValue(name, value)}
                   {...rest}
@@ -70,6 +75,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                   key={index}
                   name={name}
                   label={label}
+                  required={isRequired}
                   value={getNestedValue(values, name)}
                   onChange={
                     (e) => setFieldValue(name, e.target.value || null) // Set to URL string
@@ -81,7 +87,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
               return (
                 <div key={index} className="col-span-1 md:col-span-3">
                   <label className="text-sm text-gray-500 block mb-1">
-                    {label}
+                    {label} <span className="text-red-500">*</span>
                   </label>
                   <FieldArray
                     name={name}
@@ -114,6 +120,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                                         name={`${name}.${idx}.${subField.name}`}
                                         label={subField.label}
                                         options={subField.options || []}
+                                        required={isRequired}
                                         value={getNestedValue(
                                           values,
                                           `${name}.${idx}.${subField.name}`
@@ -131,6 +138,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                                         label={subField.label}
                                         placeholder={subField.placeholder}
                                         type={subField.type}
+                                        required={isRequired}
                                         value={getNestedValue(
                                           values,
                                           `${name}.${idx}.${subField.name}`

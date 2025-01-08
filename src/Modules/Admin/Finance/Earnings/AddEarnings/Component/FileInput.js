@@ -1,7 +1,8 @@
 // src/Components/Admin/Finance/Earnings/Component/FileInput.jsx
 
 import React, { useState, useRef, useEffect } from "react";
-import { ErrorMessage } from "formik";
+import { useField } from "formik";
+import { motion } from "framer-motion";
 import { IoIosCloudUpload, IoMdClose } from "react-icons/io";
 import { Modal, Spin, Button, Tooltip, Badge, Progress } from "antd";
 import {
@@ -13,9 +14,12 @@ import { useSelector } from "react-redux";
 import useCloudinaryUpload from "../../../../../../Hooks/CommonHooks/useCloudinaryUpload";
 import toast from "react-hot-toast";
 
-const FileInput = ({ label, name, onChange, value }) => {
+const FileInput = ({ label, name, onChange, value, required = false }) => {
   // Subscribe to Redux state
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
+
+  // Use Formik's useField to get meta
+  const [field, meta] = useField(name);
 
   // Cloudinary Configuration
   const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
@@ -137,8 +141,24 @@ const FileInput = ({ label, name, onChange, value }) => {
     }
   };
 
+  // Framer Motion variants for error animation
+  const variants = {
+    hidden: { opacity: 0, y: -10 },
+    visible: { opacity: 1, y: 0 },
+    error: {
+      x: [0, -10, 10, -10, 10, 0],
+      transition: { duration: 0.4 },
+    },
+  };
+
   return (
-    <div className="relative w-full mb-4">
+    <motion.div
+      className="relative w-full mb-4"
+      variants={variants}
+      initial="hidden"
+      animate={meta.touched && meta.error ? "error" : "visible"}
+      transition={{ duration: 0.3 }}
+    >
       {/* Loading Bar */}
       {uploading && (
         <Progress
@@ -153,11 +173,13 @@ const FileInput = ({ label, name, onChange, value }) => {
       )}
 
       <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
-        {label}
+        {label} {required && <span className="text-red-500">*</span>}
       </label>
 
       <div
-        className={`relative bg-white border border-gray-700 rounded-sm px-4 py-3 flex items-center justify-between shadow-sm ${
+        className={`relative bg-white border ${
+          meta.touched && meta.error ? "border-red-500" : "border-gray-700"
+        } rounded-sm px-4 py-3 flex items-center justify-between shadow-sm ${
           readOnly ? "cursor-not-allowed opacity-60" : "cursor-pointer"
         }`}
       >
@@ -268,20 +290,13 @@ const FileInput = ({ label, name, onChange, value }) => {
       )}
 
       {/* Error Message */}
-      {error && (
+      {meta.touched && meta.error && (
         <div className="text-sm text-red-500 mt-1">
-          {error === "Network Error"
+          {meta.error === "Network Error"
             ? "Network error. Please check your connection and try again."
-            : error}
+            : meta.error}
         </div>
       )}
-
-      {/* Formik Error Message */}
-      <ErrorMessage
-        name={name}
-        component="div"
-        className="text-sm text-red-500 mt-1"
-      />
 
       {/* Preview Modal */}
       <Modal
@@ -318,7 +333,7 @@ const FileInput = ({ label, name, onChange, value }) => {
           ></iframe>
         )}
       </Modal>
-    </div>
+    </motion.div>
   );
 };
 

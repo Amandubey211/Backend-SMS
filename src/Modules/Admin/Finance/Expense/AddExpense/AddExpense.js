@@ -4,11 +4,12 @@ import React, { useEffect, useState, useMemo } from "react";
 import { Formik, Form } from "formik";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import * as Yup from "yup";
+import { Button } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
-import { categories, subCategories } from "../Config/categories";
+import { subCategories } from "../Config/categories";
+import * as Yup from "yup";
 import {
   setReadOnly,
   clearSelectedExpense,
@@ -17,17 +18,15 @@ import {
   addExpense,
   updateExpense,
 } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
-import { Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "../Config/formConfig";
 import { validationSchemas } from "../Config/validationSchemas";
 import toast from "react-hot-toast";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AddExpenses = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   useNavHeading("Expenses", "Manage");
+
   // Redux state
   const { readOnly, error, selectedExpense } = useSelector(
     (state) => state.admin.expenses
@@ -58,18 +57,18 @@ const AddExpenses = () => {
     if (selectedExpense) {
       const expenseData = selectedExpense;
 
-      // Extract 'subCategory' correctly
-      const subCategory = expenseData.subCategory || expenseData.sub_category;
+      // Extract 'subcategory' correctly
+      const subCategory = expenseData.subcategory || expenseData.sub_category;
 
       const categoryName =
-        expenseData.category?.[0]?.categoryName || "Salaries and Wages";
+        expenseData.category?.categoryName || "Salaries and Wages";
 
       // Construct initial values with subcategory-specific fields
       const initialValues = {
         _id: expenseData._id || "",
         categoryName: categoryName,
         sub_category: subCategory || selectedSubCategory,
-        paymentMethod: expenseData.paymentMethod || "cash",
+        payment_type: expenseData.payment_type || "cash",
         receipt: expenseData.receipt || null,
         description: expenseData.description || "",
         ...initialValuesMap[subCategory],
@@ -85,7 +84,7 @@ const AddExpenses = () => {
       _id: "",
       categoryName: selectedCategory,
       sub_category: selectedSubCategory,
-      paymentMethod: "cash",
+      payment_type: "cash",
       receipt: null,
       description: "",
       ...initialValuesMap[selectedSubCategory],
@@ -98,7 +97,8 @@ const AddExpenses = () => {
     setDescription("");
     if (selectedExpense) {
       dispatch(clearSelectedExpense());
-      navigate("/finance/total-expense-list");
+      // Optionally navigate to the expenses list
+      // navigate("/finance/expenses/total-expense-list");
     } else {
       setSelectedCategory("Salaries and Wages");
       setSelectedSubCategory("Teaching Staffs");
@@ -117,7 +117,7 @@ const AddExpenses = () => {
         subCategory: sub_category,
         description,
         receipt,
-        paymentMethod: values.paymentMethod,
+        payment_type: values.payment_type,
         ...rest,
       };
 
@@ -141,6 +141,7 @@ const AddExpenses = () => {
           payload[field] = Number(payload[field]);
         }
       });
+
       let category = selectedCategory;
       if (selectedExpense) {
         // Update existing record
@@ -150,12 +151,14 @@ const AddExpenses = () => {
         ).unwrap();
         toast.success("Expense updated successfully!");
         dispatch(clearSelectedExpense());
-        navigate("/finance/expenses/total-expense-list");
+        // Optionally navigate to the expenses list
+        // navigate("/finance/expenses/total-expense-list");
       } else {
         // Add new record
         await dispatch(addExpense({ values: payload, category })).unwrap();
         toast.success("Expense added successfully!");
-        navigate("/finance/expenses/total-expense-list");
+        // Optionally navigate to the expenses list
+        // navigate("/finance/expenses/total-expense-list");
       }
     } catch (err) {
       toast.error(
@@ -168,12 +171,12 @@ const AddExpenses = () => {
     }
   };
 
-  // Populate selectedExpense when editing
+  // Populate selectedExpense when editing or viewing
   useEffect(() => {
     if (selectedExpense) {
       const categoryName =
-        selectedExpense.category?.[0]?.categoryName || "Salaries and Wages";
-      const subCategory = selectedExpense.subCategory || "Teaching Staffs";
+        selectedExpense.category?.categoryName || "Salaries and Wages";
+      const subCategory = selectedExpense.subcategory || "Teaching Staffs";
       setSelectedCategory(categoryName);
       setSelectedSubCategory(subCategory);
       setDescription(selectedExpense.description || "");
@@ -185,7 +188,9 @@ const AddExpenses = () => {
 
   // Validation schema
   const getValidationSchema = () => {
-    return validationSchemas[selectedSubCategory] || Yup.object({});
+    return readOnly
+      ? null
+      : validationSchemas[selectedSubCategory] || Yup.object({});
   };
 
   // Auto-hide error message
@@ -215,7 +220,7 @@ const AddExpenses = () => {
           // validationSchema={getValidationSchema()}
           onSubmit={handleSaveOrUpdate}
         >
-          {({ resetForm }) => (
+          {({ resetForm, isSubmitting }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
               {readOnly && (
@@ -234,6 +239,7 @@ const AddExpenses = () => {
                 </div>
               )}
 
+              {/* Error Message */}
               {error && showError && (
                 <div className="bg-red-100 text-red-700 p-2 rounded-md text-sm">
                   {Array.isArray(error)
@@ -244,6 +250,7 @@ const AddExpenses = () => {
                 </div>
               )}
 
+              {/* Header Component */}
               <Header
                 onCategoryChange={(category) => {
                   if (readOnly) return;
@@ -255,7 +262,7 @@ const AddExpenses = () => {
                       _id: "", // Reset _id for new entries
                       categoryName: category,
                       sub_category: firstSubCategory, // Use 'sub_category'
-                      paymentMethod: "cash",
+                      payment_type: "cash",
                       receipt: null,
                       description: "",
                       ...initialValuesMap[firstSubCategory],
@@ -271,7 +278,7 @@ const AddExpenses = () => {
                       _id: "", // Reset _id for new entries
                       categoryName: selectedCategory,
                       sub_category: subCategory, // Use 'sub_category'
-                      paymentMethod: "cash",
+                      payment_type: "cash",
                       receipt: null,
                       description: "",
                       ...initialValuesMap[subCategory],
@@ -287,9 +294,25 @@ const AddExpenses = () => {
                 isUpdate={!!selectedExpense}
               />
 
+              {/* Form Section */}
               {formComponent || (
                 <div className="text-center text-gray-500 text-xs py-4">
                   Select a sub-category to proceed.
+                </div>
+              )}
+
+              {/* Submit Button */}
+              {!readOnly && (
+                <div className="flex justify-end mt-6">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
+                    className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+                  >
+                    {selectedExpense ? "Update Expense" : "Save Expense"}
+                  </Button>
                 </div>
               )}
             </Form>
