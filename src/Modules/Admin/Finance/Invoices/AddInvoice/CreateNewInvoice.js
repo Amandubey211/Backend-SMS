@@ -7,6 +7,7 @@ import AdminDashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import Layout from "../../../../../Components/Common/Layout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
+import { TotalInputs } from "./TotalInputs";
 
 const CreateNewInvoice = () => {
   const [loading, setLoading] = useState(false);
@@ -84,8 +85,8 @@ const CreateNewInvoice = () => {
     dispatch(addInvoice(values)).then(() => setLoading(false))
   };
 
-
-  const isReadonly = !!invoiceData;
+  const isReadonly = invoiceData?.mode == 'view' ?true:false ;
+  
 
   return (
     <Layout title="Finance | Invoice">
@@ -129,7 +130,7 @@ const CreateNewInvoice = () => {
                     name="dueDate"
                     label="Due Date"
                     placeholder="Enter due date"
-                    type="datetime-local"
+                    type="date"
                     disabled={isReadonly}
                     required // Required field
                   />
@@ -185,13 +186,13 @@ const CreateNewInvoice = () => {
                                 name={`lineItems.${index}.revenueType`}
                                 label="Revenue Type"
                                 options={[
-                                  { label: "Student Fee", value: "studentFee" },
-                                  { label: "Facility Revenue", value: "FacilityRevenue" },
-                                  { label: "Service-Based Revenue", value: "service_based_revenue" },
-                                  { label: "Community & External Affairs Revenue", value: "community_externalaffair_revenue" },
-                                  { label: "Financial Investment Revenue", value: "financial_investment_revenue" },
-                                  { label: "Penalties", value: "Penalties" },
-                                  { label: "Other", value: "Other" },
+                                  "Student-Based Revenue",
+                                  "Facility-Based Revenue",
+                                  "Service-Based Revenue",
+                                  "Community and External Revenue",
+                                  "Financial Investments",
+                                  "Penalties",
+                                  "Other",
                                 ]}
                                 disabled={isReadonly}
                                 required
@@ -232,6 +233,7 @@ const CreateNewInvoice = () => {
                             )}
                           </div>
                         ))}
+                        
                         {!isReadonly && (
                           <div className="flex justify-center items-center flex-col mt-4">
                             <button
@@ -246,6 +248,7 @@ const CreateNewInvoice = () => {
                             </button>
                             <span className="text-gray-600 text-sm mt-2">Add Item</span>
                           </div>
+
                         )}
                       </>
                     )}
@@ -281,20 +284,7 @@ const CreateNewInvoice = () => {
                     placeholder="Enter Tax"
                     disabled={isReadonly}
                   />
-                  {/* <TextInput
-                    name="finalAmount"
-                    label="Final Amount"
-                    placeholder="Calculated automatically"
-                    disabled={true}
-                    
-                  />
-                  <TextInput
-                    name="totalAmount"
-                    label="Total Amount"
-                    placeholder="Calculated automatically"
-                    disabled={true}
-                    
-                  /> */}
+                 
                   <SelectInput
                     name="paymentType"
                     label="Payment Type"
@@ -321,6 +311,7 @@ const CreateNewInvoice = () => {
                   />
 
                 </div>
+                <TotalInputs/>
               </Form>
             )}
           </Formik>

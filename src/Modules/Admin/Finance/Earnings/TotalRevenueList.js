@@ -54,6 +54,7 @@ import Layout from "../../../../Components/Common/Layout";
 import Card from "../Expense/components/Card";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { flattenObject } from "../../../../Utils/xl";
+import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -271,6 +272,7 @@ const TotalRevenueList = () => {
                     onChange={(e) => {
                       e.stopPropagation();
                       if (e.target.checked) {
+                        
                         setSelectedRowKey(record.key);
                       } else {
                         setSelectedRowKey(null);
@@ -422,6 +424,7 @@ const TotalRevenueList = () => {
         paymentStatus: income.paymentStatus || "N/A",
         earnedDate: income.paidDate || income.generateDate || null,
         totalAmount: income.total_amount || 0,
+        email:income?.email
       })),
     [incomes]
   );
@@ -579,10 +582,8 @@ const TotalRevenueList = () => {
                     onClick={() => {
                       const selectedIncome = incomeIdMap[selectedRowKey];
                       if (selectedIncome) {
-                        // Navigate to the invoice creation page with selectedRow data
-                        navigate("/finance/invoices/add-new-invoice", {
-                          state: { income: selectedIncome },
-                        });
+                       
+                        navigate("/finance/invoices/add-new-invoice");
                       } else {
                         toast.error("Selected income not found.");
                       }
@@ -667,7 +668,33 @@ const TotalRevenueList = () => {
                   if (record.paymentStatus !== "unpaid") {
                     return;
                   }
+                  console.log(record);
+                  
+                  const invoiceData = {
+                    dueDate: record?.dueDate?.slice(0,10),
+                    receiver: {
+                      name: record?.rentIncome?.nameOfRenter || record?.examCentreFees?.examName || '',
+                      address: "",
+                      contact: "",
+                      email: record?.email,
+                    },
+                    description: record?.description || '',
+                    lineItems: [{ revenueType: record?.categoryName, quantity: 1, amount: record?.totalAmount }],
+                    discountType: record?.discountType,
+                    discount: record?.discount,
+                    penalty: record?.penalty,
+                    tax: record?.tax,
+                    totalAmount: 0,
+                    finalAmount: record?.finalAmount,
+                    paymentType: record?.paymentType,
+                    paymentStatus:record?.paymentStatus,
+                    mode:'create'
+                  };
+                  console.log(invoiceData,'id');
+                  
+                     dispatch(setInvoiceData(invoiceData));
                   setSelectedRowKey(record.key);
+                    
                 },
               })}
             />
