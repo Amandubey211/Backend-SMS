@@ -1,7 +1,6 @@
 import React from "react";
 import { useFormikContext } from "formik";
 import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
-import PaymentStatus from "../../../Earnings/AddEarnings/Component/PaymentStatus";
 import ItemsSection from "../Components/ItemsSection";
 
 const BookPurchasesForm = () => {
@@ -112,7 +111,7 @@ const BookPurchasesForm = () => {
         setFieldValue={setFieldValue}
         values={values}
       />
-      <ItemsSection />
+      <ItemsSection type="classroom" />
       <FormSection
         title="Billing Details"
         fields={billingDetailsFields}

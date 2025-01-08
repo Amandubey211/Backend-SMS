@@ -31,7 +31,7 @@ export const initialValuesMap = {
   "Teaching Staffs": {
     staffType: "teaching",
     staffId: "",
-    email: "jane.doe@example.com", // Contact email address
+    // email: "jane.doe@example.com", // Contact email address
 
     // base fields
     totalAmount: 750,
@@ -288,7 +288,6 @@ export const initialValuesMap = {
     vendor: "",
     description: "",
     vendorName: "",
-
     examRelatedCosts: [
       {
         itemName: "",
