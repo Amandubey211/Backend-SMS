@@ -273,13 +273,15 @@ export default function EditStudentFeesForm({ data }) {
                             />}
                         </div>
                         <div className="grid grid-cols-3 gap-6 w-full">
-                            <FileInput
-                                label="Upload Receipt"
-                                name="document"
-                                onChange={(event) =>
-                                    setFieldValue("document", event.target.files[0])
-                                }
-                            />
+                        <FileInput
+            label="Add receipt/document"
+              name="document"
+            
+            onChange={
+              (e) => {setFieldValue("document", e.target.value || null)} 
+            }
+            value={values.document || ''}
+          />
                         </div>
                         <button
                             type="submit"
