@@ -185,8 +185,10 @@ const CreateQuotation = () => {
 
                 </div>
 
-                {/* Quotation Details Section */}
-                <div className="p-6 rounded-md flex items-center flex-col justify-center mx-20" style={{ backgroundColor: "#ECECEC" }}>
+                <div
+                  className="p-6 rounded-md flex flex-col items-center justify-center mb-7"
+                  style={{ backgroundColor: "#ECECEC" }}
+                >
                   <h2 className="text-lg font-semibold mb-4">Items</h2>
                   <FieldArray name="lineItems">
                     {({ remove, push }) => (
@@ -194,19 +196,21 @@ const CreateQuotation = () => {
                         {values.lineItems.map((item, index) => (
                           <div
                             key={index}
-                            className="grid grid-cols-12 gap-4 items-center mb-4"
+                            className="grid grid-cols-12 gap-8 items-center mb-6"
                           >
-                            <div className="col-span-4">
+                            <div className="col-span-3">
                               <SelectInput
                                 name={`lineItems.${index}.revenueType`}
                                 label="Revenue Type"
-                                options={["studentFee",
+                                options={[
+                                  "studentFee",
                                   "FacilityRevenue",
                                   "service_based_revenue",
                                   "community_externalaffair_revenue",
                                   "financial_investment_revenue",
                                   "Penalties",
-                                  "Other",]}
+                                  "Other",
+                                ]}
                                 readOnly={readOnly}
                                 disabled={readOnly}
                               />
@@ -222,6 +226,7 @@ const CreateQuotation = () => {
                                 disabled={readOnly}
                               />
                             </div>
+
                             <div className="col-span-3">
                               <TextInput
                                 name={`lineItems.${index}.amount`}
@@ -232,37 +237,43 @@ const CreateQuotation = () => {
                                 disabled={readOnly}
                               />
                             </div>
-                            <div className="col-span-2 flex items-center justify-center">
-                              {!readOnly &&
-                                (<button
+
+                            <div className="col-span-3 flex items-center justify-center">
+                              {!readOnly && (
+                                <button
                                   type="button"
                                   onClick={() => remove(index)}
-                                  className="text-red-500 hover:text-red-700"
+                                  className="text-red-500 hover:text-red-700 text-xl"
                                 >
                                   ✖
-                                </button>)}
+                                </button>
+                              )}
                             </div>
                           </div>
                         ))}
-                        {!readOnly && (<div className="flex justify-center items-center flex-col mt-4">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              push({ revenueType: "", quantity: 1, amount: 0 })
-                            }
-                            className="rounded-full w-12 h-12 flex items-center justify-center"
-                            style={{
-                              background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
-                            }}
-                          >
-                            <span className="text-white text-lg">+</span>
-                          </button>
-                          <span className="text-gray-600 text-sm mt-2">Add Item</span>
-                        </div>)}
+
+                        {!readOnly && (
+                          <div className="flex flex-col justify-center items-center mt-6">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                push({ revenueType: "", quantity: 1, amount: 0 })
+                              }
+                              className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
+                              style={{
+                                background: "linear-gradient(to right, #ec4899, #a855f7)",
+                              }}
+                            >
+                              <span className="text-white text-2xl">+</span>
+                            </button>
+                            <span className="text-gray-600 text-sm mt-2">Add Item</span>
+                          </div>
+                        )}
                       </>
                     )}
                   </FieldArray>
                 </div>
+
 
                 {/* Additional Details Section */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">

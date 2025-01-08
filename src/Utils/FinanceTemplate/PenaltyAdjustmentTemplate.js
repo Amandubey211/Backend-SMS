@@ -66,7 +66,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          PENALTY ADJUSTMENT INVOICE
+          RETURN INVOICE
         </div>
       </div>
 

@@ -91,32 +91,43 @@ const PenalityandAdjustmentList = () => {
   // Handle downloading the PDF
   const handleDownloadPDF = async () => {
     try {
-      if (!selectedReceipt) return;
-
+      if (!selectedReceipt) {
+        toast.error("No receipt selected for download.");
+        return;
+      }
+  
+      if (!popupRef.current) {
+        toast.error("Receipt content is not available.");
+        return;
+      }
+  
       const pdfTitle = selectedReceipt.returnInvoiceNumber
         ? `${selectedReceipt.returnInvoiceNumber}.pdf`
         : "penalty_adjustment.pdf";
-
+  
       const canvas = await html2canvas(popupRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
-
+  
       const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
+  
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
       const newWidth = imgWidth * ratio;
       const newHeight = imgHeight * ratio;
-
+  
       pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
       pdf.save(pdfTitle);
+  
+      toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error("Error generating PDF: ", error);
       toast.error("Failed to generate PDF.");
     }
   };
+  
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -495,7 +506,7 @@ const PenalityandAdjustmentList = () => {
                 </div>
 
                 {/* Close + Download PDF buttons */}
-                <div className="absolute top-6 right-[10rem] flex flex-col items-center space-y-2">
+                <div className="absolute mt-[-29rem] ml-[66rem] flex flex-col items-center space-y-2">
                   {/* Close button */}
                   <button
                     onClick={() => setReceiptVisible(false)}
@@ -517,8 +528,6 @@ const PenalityandAdjustmentList = () => {
               </div>
             </div>
           )}
-
-
         </div>
       </AdminDashLayout>
     </Layout>
