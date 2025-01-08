@@ -186,14 +186,15 @@ const CreateNewInvoice = () => {
                                 name={`lineItems.${index}.revenueType`}
                                 label="Revenue Type"
                                 options={[
-                                  "Student-Based Revenue",
-                                  "Facility-Based Revenue",
-                                  "Service-Based Revenue",
-                                  "Community and External Revenue",
-                                  "Financial Investments",
-                                  "Penalties",
-                                  "Other",
-                                ]}
+                                  { label: "Student-Based Revenue", value: "Student-Based Revenue" },
+                                  { label: "Facility-Based Revenue", value: "Facility-Based Revenue" },
+                                  { label: "Service-Based Revenue", value: "Service-Based Revenue" },
+                                  { label: "Community and External Revenue", value: "Community and External Revenue" },
+                                  { label: "Financial Investments", value: "Financial Investments" },
+                                  { label: "Penalties", value: "Penalties" },
+                                  { label: "Other", value: "Other" }
+                                ]
+                              }
                                 disabled={isReadonly}
                                 required
                               />

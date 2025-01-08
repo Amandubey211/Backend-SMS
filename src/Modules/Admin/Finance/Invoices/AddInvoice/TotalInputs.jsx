@@ -7,7 +7,7 @@ export const TotalInputs = () => {
 
   useEffect(() => {
     // Calculate totalAmount from lineItems
-    const total = values.lineItems.reduce((sum, item) => {
+    const total = values?.lineItems?.reduce((sum, item) => {
       return sum + (Number(item.quantity) || 0) * (Number(item.amount) || 0);
     }, 0);
     setFieldValue("totalAmount", total);
