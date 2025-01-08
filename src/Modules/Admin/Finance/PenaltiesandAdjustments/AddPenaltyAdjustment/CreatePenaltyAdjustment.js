@@ -77,6 +77,18 @@ const CreatePenaltyAdjustment = () => {
   // Reference to Formik to set field values outside Formik's render props
   const formikRef = useRef();
 
+  useEffect(() => {
+    if (selectedInvoiceNumber) {
+      setInvoiceNumberInput(selectedInvoiceNumber);
+      if (formikRef.current) {
+        formikRef.current.setFieldValue("invoiceNumber", selectedInvoiceNumber);
+      }
+      // Fetch the invoice details based on selectedInvoiceNumber
+      dispatch(fetchInvoiceByNumber(selectedInvoiceNumber));
+    }
+  }, [selectedInvoiceNumber, dispatch]);
+
+  
   // Prefill form fields when invoice details are fetched successfully
   useEffect(() => {
     if (invoiceFetchSuccess && invoiceDetails) {
