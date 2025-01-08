@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
@@ -7,8 +7,6 @@ import {
   Button,
   Dropdown,
   Input,
-  Menu,
-  Modal,
   Spin,
   Table,
   Tag,
@@ -31,10 +29,15 @@ import {
 } from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
-import ReturnInvoiceTemplate from "../../../../../../Utils/FinanceTemplate/ReturnInvoice";
+import PenaltyAdjustmentTemplate from "../../../../../../Utils/FinanceTemplate/PenaltyAdjustmentTemplate";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { toast } from "react-hot-toast";
 
 const PenalityandAdjustmentList = () => {
-  useNavHeading("Finance", "Return Invoice List");
+  useNavHeading("Finance", "Penalty & Adjustment List");
+
+  // Redux state
   const {
     adjustmentData,
     loading,
@@ -44,12 +47,18 @@ const PenalityandAdjustmentList = () => {
     currentPage,
     pageSize,
   } = useSelector((state) => state.admin.penaltyAdjustment);
+
+  // Local state
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [isReceiptVisible, setReceiptVisible] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isPreviewVisible, setPreviewVisible] = useState(false);
-  const [selectedReturnInvoice, setSelectedReturnInvoice] = useState();
+
+  // Reference for the popup/modal
+  const popupRef = useRef(null);
 
   const paze_size =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
@@ -61,23 +70,55 @@ const PenalityandAdjustmentList = () => {
     dispatch(setCurrentPage(1));
   };
 
+  // Handle canceling a return invoice
   const handleCancleReturnInvoice = (id) => {
     const params = {
       search: searchText,
       page: 1, // Always fetch the first page
-      limit: 10, // Limit to 5 records
+      limit: 10, // Limit to 10 records
       sortBy: "createdAt",
       sortOrder: "desc",
     };
     dispatch(cancleReturnInvoiceData({ params, id }));
   };
 
+  // Handle previewing a return invoice
   const handleReturnPreview = (record) => {
-    setSelectedReturnInvoice(record);
-    setPreviewVisible(true);
+    setSelectedReceipt(record);
+    setReceiptVisible(true);
   };
 
-  // Debounced function to fetch adjustments with a fixed limit of 5
+  // Handle downloading the PDF
+  const handleDownloadPDF = async () => {
+    try {
+      if (!selectedReceipt) return;
+
+      const pdfTitle = selectedReceipt.returnInvoiceNumber
+        ? `${selectedReceipt.returnInvoiceNumber}.pdf`
+        : "penalty_adjustment.pdf";
+
+      const canvas = await html2canvas(popupRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+      const newWidth = imgWidth * ratio;
+      const newHeight = imgHeight * ratio;
+
+      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
+      pdf.save(pdfTitle);
+    } catch (error) {
+      console.error("Error generating PDF: ", error);
+      toast.error("Failed to generate PDF.");
+    }
+  };
+
+  // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchReturnInvoice(params));
@@ -85,17 +126,34 @@ const PenalityandAdjustmentList = () => {
     [dispatch]
   );
 
-  // Fetch data on component mount with limit set to 5
+  // Fetch data on component mount and when dependencies change
   useEffect(() => {
     const params = {
       search: searchText,
-      page: 1,
-      limit: 10,
+      page: currentPage,
+      limit: computedPageSize,
       sortBy: "createdAt",
       sortOrder: "desc",
     };
     debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage, pageSize, computedPageSize]);
+  }, [debouncedFetch, searchText, currentPage, computedPageSize]);
+
+  // Close receipt preview modal on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target) &&
+        isReceiptVisible
+      ) {
+        setReceiptVisible(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isReceiptVisible]);
 
   // Define table columns with fixed widths and ellipsis
   const columns = [
@@ -106,7 +164,8 @@ const PenalityandAdjustmentList = () => {
       render: (text) => <span className="text-xs">{text}</span>,
       width: 150,
       ellipsis: true,
-      sorter: (a, b) => a.return_invoice_no.localeCompare(b.return_invoice_no),
+      sorter: (a, b) =>
+        a.return_invoice_no.localeCompare(b.return_invoice_no),
     },
     {
       title: "Invoice No. Ref",
@@ -133,7 +192,8 @@ const PenalityandAdjustmentList = () => {
       render: (value) => <span className="text-xs">{value || "0"} QR</span>,
       width: 120,
       ellipsis: true,
-      sorter: (a, b) => (a.adjustmentAmount || 0) - (b.adjustmentAmount || 0),
+      sorter: (a, b) =>
+        (a.adjustmentAmount || 0) - (b.adjustmentAmount || 0),
     },
     {
       title: "Final Amount(QR)",
@@ -142,16 +202,19 @@ const PenalityandAdjustmentList = () => {
       render: (value) => {
         const formattedValue = value
           ? Number.isInteger(value)
-            ? value // Keep whole numbers as they are
-            : value.toFixed(2) // Format decimals to two places
+            ? value
+            : value.toFixed(2)
           : "0";
         return (
-          <span className="text-xs text-green-600">{formattedValue} QR</span>
+          <span className="text-xs text-green-600">
+            {formattedValue} QR
+          </span>
         );
       },
       width: 120,
       ellipsis: true,
-      sorter: (a, b) => (a.adjustmentTotal || 0) - (b.adjustmentTotal || 0),
+      sorter: (a, b) =>
+        (a.adjustmentTotal || 0) - (b.adjustmentTotal || 0),
     },
     {
       title: "Status",
@@ -167,7 +230,8 @@ const PenalityandAdjustmentList = () => {
       ),
       width: 100,
       ellipsis: true,
-      sorter: (a, b) => (a.status || "").localeCompare(b.status || ""),
+      sorter: (a, b) =>
+        (a.status || "").localeCompare(b.status || ""),
     },
     {
       title: "Date",
@@ -175,7 +239,7 @@ const PenalityandAdjustmentList = () => {
       key: "adjustedAt",
       render: (value) => {
         if (!value) {
-          return <span className="text-xs">N/A</span>; // Handle undefined/null date
+          return <span className="text-xs">N/A</span>;
         }
         try {
           const date = new Date(value);
@@ -187,7 +251,7 @@ const PenalityandAdjustmentList = () => {
           return <span className="text-xs">{formattedDate}</span>;
         } catch (error) {
           console.error("Invalid date value:", value, error);
-          return <span className="text-xs">N/A</span>; // Fallback for invalid dates
+          return <span className="text-xs">N/A</span>;
         }
       },
       width: 120,
@@ -205,7 +269,6 @@ const PenalityandAdjustmentList = () => {
       dataIndex: "action",
       key: "action",
       render: (_, record) => {
-        console.log(record);
         const menuItems = [
           {
             key: "1",
@@ -241,7 +304,7 @@ const PenalityandAdjustmentList = () => {
                 Send Mail
               </span>
             ),
-            // onClick: () => console.log("Send Mail", record),
+            // Implement Send Mail functionality if needed
           },
         ];
 
@@ -262,7 +325,7 @@ const PenalityandAdjustmentList = () => {
     },
   ];
 
-  // Transform adjustments data to table dataSource and limit to 10 records
+  // Transform adjustments data to table dataSource
   const dataSource = adjustmentData?.map((adjustment) => ({
     key: adjustment?._id,
     return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
@@ -270,11 +333,12 @@ const PenalityandAdjustmentList = () => {
     receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
     adjustmentAmount: adjustment?.adjustmentAmount || 0,
     adjustmentTotal: adjustment?.adjustmentTotal || 0,
-    status: adjustment?.isCancel ? "Cancelled" : "Active", // Use optional chaining
+    status: adjustment?.isCancel ? "Cancelled" : "Active",
     adjustedAt: adjustment?.adjustedAt || "N/A",
     ...adjustment, // Spread other properties safely
   }));
 
+  // Transform adjustment data for export (if needed)
   const transformAdjustmentData = (adjustmentData) =>
     adjustmentData?.map((adjustment, index) => {
       const {
@@ -291,15 +355,15 @@ const PenalityandAdjustmentList = () => {
         adjustedAt = "N/A",
         academicYear = {},
       } = adjustment || {};
-  
+
       return {
         sNo: index + 1,
         returnInvoiceNumber,
         refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
-        receiver: invoiceId.name || "N/A",
-        receiverEmail: invoiceId.email || "N/A",
-        receiverPhone: invoiceId.phone || "N/A",
-        receiverAddress: invoiceId.address || "N/A",
+        receiver: invoiceId.receiver?.name || "N/A",
+        receiverEmail: invoiceId.receiver?.email || "N/A",
+        receiverPhone: invoiceId.receiver?.contact || "N/A",
+        receiverAddress: invoiceId.receiver?.address || "N/A",
         tax: `${parseFloat(tax)} %`,
         discount:
           discountType === "percentage"
@@ -314,12 +378,11 @@ const PenalityandAdjustmentList = () => {
         academicYearDetails: academicYear.year || "N/A",
       };
     }) || [];
-  
 
   return (
-    <Layout title={"Penality & Adjustment List | Student Diwan"}>
+    <Layout title={"Penalty & Adjustment List | Student Diwan"}>
       <AdminDashLayout>
-        <div className="bg-white p-4 rounded-lg  space-y-4 mt-3">
+        <div className="bg-white p-4 rounded-lg space-y-4 mt-3">
           {/* Header */}
           <div className="flex justify-between items-center">
             <Input
@@ -339,7 +402,7 @@ const PenalityandAdjustmentList = () => {
                 type="primary"
                 icon={<ExportOutlined />}
                 onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
               >
                 Export
               </Button>
@@ -359,13 +422,6 @@ const PenalityandAdjustmentList = () => {
                 </div>
               </button>
             </div>
-            {/* <Button
-            onClick={handleViewMore}
-            className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-            size="small"
-          >
-            View More ({totalRecords})
-          </Button> */}
           </div>
 
           {/* Loading Indicator */}
@@ -384,12 +440,6 @@ const PenalityandAdjustmentList = () => {
               closable
             />
           )}
-          {/* No Data Placeholder */}
-          {/* {!loading &&  !error && (
-          <div className="text-center text-gray-500 text-xs py-4">
-            No records found.
-          </div>
-        )} */}
           {/* Table */}
           {!loading && !error && (
             <Table
@@ -400,64 +450,75 @@ const PenalityandAdjustmentList = () => {
                 total: totalRecords,
                 pageSize: computedPageSize,
                 showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "10", "20", "50"],
+                pageSizeOptions: ["5", "10", "20", "50"],
                 size: "small",
                 showTotal: () =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
                 onChange: (page, pageSize) => {
-                  setCurrentPage(page); // Update the current page
-                  setComputedPageSize(pageSize); // Update the page size
+                  dispatch(setCurrentPage(page));
+                  setComputedPageSize(pageSize);
                 },
                 onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size); // Handle page size change
+                  setComputedPageSize(size);
                 },
-              }}
-              onChange={(pagination) => {
-                const newPage = pagination.current;
-                dispatch(setCurrentPage(newPage));
               }}
               className="rounded-lg shadow text-xs"
               bordered
               size="small"
-              tableLayout="fixed" // Fixed table layout
+              tableLayout="fixed"
             />
           )}
+          {/* Export Modal */}
           <ExportModal
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}
             dataToExport={transformAdjustmentData(adjustmentData)}
-            title="Return Receipt Data"
-            sheet="return_receipt_report"
+            title="Penalty Adjustment Data"
+            sheet="penalty_adjustment_report"
           />
-          <Modal
-            visible={isPreviewVisible}
-            title="Return Invoice Preview"
-            footer={null} // Remove footer buttons so we can customize
-            onCancel={() => setPreviewVisible(false)}
-            width={800}
-            style={{ position: "relative" }} // Allow absolute positioning of the button
-          >
-            <div id="return-invoice-preview" style={{ position: "relative" }}>
-              <ReturnInvoiceTemplate data={selectedReturnInvoice} />
+          {/* Receipt Preview Overlay */}
+          {isReceiptVisible && (
+            <div className="fixed inset-0 z-50">
+              {/* Dim / Blur background */}
+              <div
+                className="absolute inset-[-5rem] bg-black bg-opacity-60"
+                style={{ backdropFilter: "blur(8px)" }}
+              />
+              {/* Centered content */}
+              <div className="relative flex items-center justify-center w-full h-full">
+                <div
+                  className="relative bg-white rounded-md shadow-md p-6 w-full max-w-[53rem] max-h-[90vh] overflow-auto"
+                  ref={popupRef}
+                >
+                  {/* The actual penalty adjustment content */}
+                  <PenaltyAdjustmentTemplate data={selectedReceipt} />
+                </div>
 
-              {/* Button inside the transparent part of the modal */}
-              <Button
-                key="download"
-                type="primary"
-                onClick={""}
-                style={{
-                  position: "absolute",
-                  right: "20px", // Position it on the right side
-                  top: "20px", // Position it on the top
-                  zIndex: 1000, // Ensure it's on top
-                  background:
-                    "linear-gradient(115deg,rgb(84, 123, 77),rgb(245, 28, 107))", // Gradient background
-                }}
-              >
-                Download PDF
-              </Button>
+                {/* Close + Download PDF buttons */}
+                <div className="absolute top-6 right-[10rem] flex flex-col items-center space-y-2">
+                  {/* Close button */}
+                  <button
+                    onClick={() => setReceiptVisible(false)}
+                    className="bg-gray-200 hover:bg-gray-300 mr-32 rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold shadow-md"
+                  >
+                    ✕
+                  </button>
+                  {/* Download PDF button */}
+                  <button
+                    className="w-40 py-2 text-white font-semibold rounded-md shadow-md"
+                    style={{
+                      background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                    }}
+                    onClick={handleDownloadPDF}
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </div>
             </div>
-          </Modal>
+          )}
+
+
         </div>
       </AdminDashLayout>
     </Layout>
