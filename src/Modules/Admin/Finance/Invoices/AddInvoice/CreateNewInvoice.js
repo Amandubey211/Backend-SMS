@@ -11,7 +11,7 @@ import { TotalInputs } from "./TotalInputs";
 
 const CreateNewInvoice = () => {
   const [loading, setLoading] = useState(false);
-  const { invoiceData } = useSelector((store) => store.admin.invoices); // Redux data
+  const { invoiceData } = useSelector((store) => store.admin.invoices); 
   const dispatch = useDispatch();
 
   let initialValues = invoiceData || {
@@ -23,7 +23,7 @@ const CreateNewInvoice = () => {
       email: "",
     },
     description: "",
-    lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
+    lineItems: [{ revenueType: "",revenueReference:"", quantity: 1, amount: 0 }],
     discountType: "",
     discount: 0,
     penalty: 0,
@@ -47,8 +47,8 @@ const CreateNewInvoice = () => {
     lineItems: Yup.array().of(
       Yup.object().shape({
         revenueType: Yup.string().required("Revenue type is required"), // Required
-        quantity: Yup.number()
-          .min(1, "Quantity must be at least 1") // Optional, defaults to 1 if not provided
+        quantity: Yup.number().required()
+          .min(1, "Quantity must be at least 1") 
           .nullable(),
         amount: Yup.number()
           .min(0, "Amount must be positive") // Required
@@ -174,7 +174,7 @@ const CreateNewInvoice = () => {
 
                 </div>
 
-                <div className="p-6 rounded-md mx-20 mb-8" style={{ backgroundColor: "#ECECEC" }}>
+                <div className="p-6 rounded-md  mb-8" style={{ backgroundColor: "#ECECEC" }}>
                   <h2 className="text-lg font-semibold mb-4">Items</h2>
                   <FieldArray name="lineItems">
                     {({ remove, push }) => (
@@ -188,7 +188,7 @@ const CreateNewInvoice = () => {
                                 options={[
                                   { label: "Student-Based Revenue", value: "Student-Based Revenue" },
                                   { label: "Facility-Based Revenue", value: "Facility-Based Revenue" },
-                                  { label: "Service-Based Revenue", value: "Service-Based Revenue" },
+                                  { label: "Service-Based Revenue", value: "Service-Based Revenue"},
                                   { label: "Community and External Revenue", value: "Community and External Revenue" },
                                   { label: "Financial Investments", value: "Financial Investments" },
                                   { label: "Penalties", value: "Penalties" },
@@ -207,10 +207,11 @@ const CreateNewInvoice = () => {
                                 type="number"
                                 placeholder="Enter Quantity"
                                 disabled={isReadonly}
-                              /> {/* Optional field */}
+                                required
+                              /> 
                             </div>
 
-                            <div className="col-span-3">
+                            <div className="col-span-4">
                               <TextInput
                                 name={`lineItems.${index}.amount`}
                                 label="Amount"
@@ -221,8 +222,8 @@ const CreateNewInvoice = () => {
                               />
                             </div>
 
-                            {!isReadonly && (
-                              <div className="col-span-2 flex items-center justify-center">
+                            {!invoiceData  && (
+                              <div className="col-span-1 flex items-center justify-center">
                                 <button
                                   type="button"
                                   onClick={() => remove(index)}
@@ -235,7 +236,7 @@ const CreateNewInvoice = () => {
                           </div>
                         ))}
                         
-                        {!isReadonly && (
+                        {!invoiceData && (
                           <div className="flex justify-center items-center flex-col mt-4">
                             <button
                               type="button"

@@ -679,7 +679,7 @@ const TotalRevenueList = () => {
                       email: record?.email,
                     },
                     description: record?.description || '',
-                    lineItems: [{ revenueType: record?.categoryName, quantity: 1, amount: record?.totalAmount }],
+                    lineItems: [{ revenueType: record?.categoryName,revenueReference:record?.key, quantity: 1, amount: record?.totalAmount }],
                     discountType: record?.discountType,
                     discount: record?.discount,
                     penalty: record?.penalty,

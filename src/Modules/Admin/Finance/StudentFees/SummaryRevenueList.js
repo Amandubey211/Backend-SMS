@@ -112,7 +112,7 @@ const SummaryRevenueList = () => {
             email: record[0]?.studentDetails?.email,
           },
           description: record[0]?.description || '',
-          lineItems: [{ revenueType: record[0]?.category?.categoryName, quantity: 1, amount: record[0]?.total_amount }],
+          lineItems: [{ revenueType: record[0]?.category?.categoryName, revenueReference:record[0]?._id, quantity: 1, amount: record[0]?.total_amount }],
           discountType: record[0]?.discountType,
           discount: record[0]?.discount,
           penalty: record[0]?.penalty,
