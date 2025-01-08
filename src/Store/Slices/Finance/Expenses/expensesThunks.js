@@ -258,3 +258,47 @@ export const fetchCardDataExpense = createAsyncThunk(
     }
   }
 );
+export const fetchTeachingStaff = createAsyncThunk(
+  "expenses/fetchTeachingStaff",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData("/admin/teachingStaff");
+
+      if (response?.success) {
+        return response.data; // Assuming data is the array of teaching staff
+      } else {
+        toast.error(response?.msg || "Failed to fetch teaching staff.");
+        return rejectWithValue(
+          response?.msg || "Failed to fetch teaching staff."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/**
+ * Thunk to fetch Non-Teaching Staff
+ */
+export const fetchNonTeachingStaff = createAsyncThunk(
+  "expenses/fetchNonTeachingStaff",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData("/admin/nonTeachingStaff");
+
+      if (response?.success) {
+        return response.data; // Assuming data is the array of non-teaching staff
+      } else {
+        toast.error(response?.msg || "Failed to fetch non-teaching staff.");
+        return rejectWithValue(
+          response?.msg || "Failed to fetch non-teaching staff."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
