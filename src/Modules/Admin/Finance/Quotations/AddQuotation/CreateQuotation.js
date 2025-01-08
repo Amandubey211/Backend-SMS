@@ -10,6 +10,7 @@ import { addQuotation } from "../../../../../Store/Slices/Finance/Quotations/quo
 import toast from "react-hot-toast";
 import Layout from "../../../../../Components/Common/Layout";
 import { useNavigate } from "react-router-dom";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const CreateQuotation = () => {
   const formatDate = (date) => {
@@ -19,6 +20,7 @@ const CreateQuotation = () => {
   const [loading, setLoading] = useState(false);
   const { readOnly, selectedQuotation } = useSelector((state) => state.admin.quotations);
   const navigate = useNavigate();
+  useNavHeading("Finance", "Create Quotations");
 
   const validationSchema = Yup.object().shape({
     receiver: Yup.object().shape({
@@ -115,7 +117,7 @@ const CreateQuotation = () => {
               <Form>
                 <div className="flex justify-between gap-4 mb-6">
                   <h1 className="text-2xl font-semibold">
-                    {readOnly ? "View Quotation" : "Create Quotation"}
+                    {readOnly ? "View Quotation" : ""}
                   </h1>
                   {!readOnly && (<div className="gap-4">
                     <button
