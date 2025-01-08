@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Formik, Form, useFormikContext } from "formik";
 
 import StudentDetails from "../Component/StudentDetails";
@@ -70,6 +70,7 @@ const handleCustomSubmit = () => {
 const getNestedValue = (values, path) => {
   return path.split(".").reduce((acc, part) => acc && acc[part], values);
 };
+const [imageUrl,setImageUrl] = useState('')
   return (
     <Formik
       innerRef={formikRef}
@@ -121,10 +122,9 @@ const getNestedValue = (values, path) => {
               name="document"
             
             onChange={
-              (e) => setFieldValue("document", e.target.value || null) // Set to URL string
+              (e) => {setFieldValue("document", e.target.value || null);setImageUrl(e.target.value)} // Set to URL string
             }
-            
-            
+            value={imageUrl}
           />
 
           </div>
