@@ -17,7 +17,6 @@ import {
   clearInvoiceFetchSuccess,
 } from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import FileInput from "./Components/FileInput";
 import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts";
@@ -26,6 +25,12 @@ const CalculationHandler = () => {
   const { values, setFieldValue } = useFormikContext();
 
   useEffect(() => {
+    if (!Array.isArray(values.items)) {
+      setFieldValue("subAmount", 0, false);
+      setFieldValue("finalAmount", 0, false);
+      return;
+    }
+
     const total_amount = values.items.reduce(
       (acc, item) => acc + Number(item.totalAmount || 0),
       0
@@ -70,13 +75,16 @@ const CreateReceipt = () => {
 
   // Manage local read-only and edit modes
   const [isReadOnlyState, setIsReadOnlyState] = useState(isReadOnly);
-  const [isEditMode, setIsEditMode] = useState(false); // New flag for edit mode
+  const [isEditMode, setIsEditMode] = useState(false); // Flag for edit mode
 
   // Initialize fetchedInvoiceNumber to prevent infinite API requests
   const [fetchedInvoiceNumber, setFetchedInvoiceNumber] = useState("");
 
   // State to handle form resetting
   const [isFormResetting, setIsFormResetting] = useState(false);
+
+  // Local state to track API errors
+  const [invoiceError, setInvoiceError] = useState(false);
 
   // Define initialValues based on read-only mode
   const prefilledValues =
@@ -158,11 +166,15 @@ const CreateReceipt = () => {
     document: null,
   };
 
-  const initialValues = isReadOnlyState && prefilledValues ? prefilledValues : blankInitialValues;
+  const initialValues =
+    isReadOnlyState && prefilledValues ? prefilledValues : blankInitialValues;
 
   // Track invoice input
-  const [invoiceNumberInput, setInvoiceNumberInput] = useState(initialValues.invoiceNumber || "");
-  const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
+  const [invoiceNumberInput, setInvoiceNumberInput] = useState(
+    initialValues.invoiceNumber || ""
+  );
+
+  // Removed useDebounce as per user request
 
   const {
     invoiceDetails,
@@ -256,28 +268,29 @@ const CreateReceipt = () => {
       .finally(() => setSubmitting(false));
   };
 
-  // Fetch invoice details when debounced invoice number changes and is valid (only in create mode)
+  // Fetch invoice details when invoice number changes and is valid (only in create mode)
   useEffect(() => {
     if (isReadOnlyState || isEditMode) return; // Do not fetch if in read-only or edit mode
     if (isFormResetting) return; // Do not fetch if form is resetting
 
     const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
-    if (debouncedInvoiceNumber && invoiceNumberPattern.test(debouncedInvoiceNumber)) {
-      if (debouncedInvoiceNumber !== fetchedInvoiceNumber) {
-        dispatch(fetchInvoiceByNumber(debouncedInvoiceNumber));
-        setFetchedInvoiceNumber(debouncedInvoiceNumber); // Update fetchedInvoiceNumber
+    if (invoiceNumberInput && invoiceNumberPattern.test(invoiceNumberInput)) {
+      if (invoiceNumberInput !== fetchedInvoiceNumber) {
+        dispatch(fetchInvoiceByNumber(invoiceNumberInput));
+        setFetchedInvoiceNumber(invoiceNumberInput); // Update fetchedInvoiceNumber
       }
-    } else if (debouncedInvoiceNumber === "" && fetchedInvoiceNumber !== "") {
+    } else if (invoiceNumberInput === "" && fetchedInvoiceNumber !== "") {
       // Only reset if previously fetchedInvoiceNumber was not ""
       if (formikRef.current) {
         setIsFormResetting(true); // Indicate that form is resetting
         formikRef.current.setValues(blankInitialValues);
         setFetchedInvoiceNumber("");
+        setInvoiceError(false); // Reset error state
         setIsFormResetting(false); // Reset the flag after form reset
       }
     }
   }, [
-    debouncedInvoiceNumber,
+    invoiceNumberInput,
     dispatch,
     isReadOnlyState,
     isEditMode, // Added to dependencies
@@ -348,8 +361,76 @@ const CreateReceipt = () => {
       setInvoiceNumberInput(prefilledValues.invoiceNumber); // Synchronize invoiceNumberInput
       dispatch(clearSelectedInvoiceNumber());
       dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
+      setInvoiceError(false); // Reset error state on successful fetch
     }
   }, [invoiceFetchSuccess, invoiceDetails, dispatch, isReadOnlyState, isEditMode]);
+
+  // Handle API errors (e.g., invoice not found)
+  useEffect(() => {
+    if (error && !isReadOnlyState && !isEditMode) {
+      // If there's an error and not in read-only or edit mode
+      setInvoiceError(true);
+
+      if (formikRef.current) {
+        // Clear all fields except invoiceNumber
+        const currentValues = formikRef.current.values;
+        formikRef.current.setValues({
+          ...currentValues,
+          receiverName: "",
+          mailId: "",
+          contactNumber: "",
+          address: "",
+          discountType: "amount",
+          discount: 0,
+          penalty: 0,
+          tax: 0,
+          govtRefNumber: "",
+          remark: "",
+          items: [
+            {
+              category: "",
+              quantity: "",
+              totalAmount: "",
+              subCategory: "",
+              stationeries: [],
+            },
+          ],
+          subAmount: 0,
+          finalAmount: 0,
+          document: null,
+        });
+      }
+    } else {
+      // If there's no error, ensure error state is false
+      setInvoiceError(false);
+    }
+  }, [error, isReadOnlyState, isEditMode]);
+
+  // Prefill subAmount and finalAmount in read-only mode
+  useEffect(() => {
+    if (isReadOnlyState && receiptData) {
+      const lineItems = receiptData.lineItems || [];
+      const total_amount = lineItems.reduce(
+        (acc, item) => acc + Number(item.totalAmount || 0),
+        0
+      );
+
+      const calculated = calculateFinalAmounts({
+        total_amount,
+        discountType: receiptData.discountType,
+        discount: Number(receiptData.discount),
+        tax: Number(receiptData.tax),
+        penalty: Number(receiptData.penalty),
+        paid_amount: 0, // Assuming no paid amount
+        advance_amount: 0, // Assuming no advance amount
+      });
+
+      if (formikRef.current) {
+        formikRef.current.setFieldValue("subAmount", calculated.discountValue, false);
+        formikRef.current.setFieldValue("finalAmount", calculated.finalAmount, false);
+      }
+    }
+  }, [isReadOnlyState, receiptData]);
 
   // Synchronize invoiceNumberInput when initialValues change (especially in read-only mode)
   useEffect(() => {
@@ -364,6 +445,7 @@ const CreateReceipt = () => {
     setIsEditMode(true); // Set edit mode
     dispatch(clearSelectedInvoiceNumber()); // Clear selectedInvoiceNumber to prevent API calls
     dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
+    setInvoiceError(false); // Reset error state
   };
 
   return (
@@ -410,6 +492,7 @@ const CreateReceipt = () => {
                         setFetchedInvoiceNumber("");
                         dispatch(clearSelectedInvoiceNumber());
                         dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
+                        setInvoiceError(false); // Reset error state
                         setIsFormResetting(false); // Reset the flag after form reset
                       }}
                       className="px-4 py-2 rounded-md text-white transition duration-300"
@@ -478,6 +561,8 @@ const CreateReceipt = () => {
                         }
                       }}
                       disabled={isReadOnlyState} // Disable input in read-only mode
+                      errorState={invoiceError} // Pass error state to handle icon
+                      isEditMode={isEditMode} // Pass edit mode to handle icon
                     />
                   )}
                 </Field>
@@ -622,11 +707,7 @@ const CreateReceipt = () => {
                 />
               </div>
 
-              {/* Display Error Messages */}
-              {!isReadOnlyState && error && (
-                <div className="text-red-500 mb-4">{error}</div>
-              )}
-              {/* Optionally, add success messages if needed */}
+              {/* Removed the red error text at the bottom */}
             </Form>
           )}
         </Formik>

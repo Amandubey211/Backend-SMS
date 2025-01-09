@@ -18,23 +18,25 @@ const InvoiceTextInput = ({
   onBlur,
   onChange,
   required = false, // Added required prop
+  errorState = false, // New prop to indicate error state
+  isEditMode = false, // New prop to indicate edit mode
 }) => {
   // Extract relevant state from Redux
-  const { loading, error, invoiceFetchSuccess } = useSelector(
-    (state) => state.admin.invoices // Adjusted to the correct slice
+  const { loading, invoiceFetchSuccess } = useSelector(
+    (state) => state.admin.invoices || {}
   );
 
   // Determine which icon to display
   let icon = null;
   if (loading) {
     icon = <Spin indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />;
-  } else if (error) {
+  } else if (errorState && !isEditMode) {
     icon = (
-      <Tooltip title="Failed to fetch invoice data">
+      <Tooltip title="Invoice not found">
         <CloseCircleOutlined style={{ color: 'red' }} />
       </Tooltip>
     );
-  } else if (invoiceFetchSuccess) {
+  } else if (invoiceFetchSuccess && !errorState && !isEditMode) {
     icon = (
       <Tooltip title="Invoice data fetched successfully">
         <CheckCircleOutlined style={{ color: 'green' }} />
