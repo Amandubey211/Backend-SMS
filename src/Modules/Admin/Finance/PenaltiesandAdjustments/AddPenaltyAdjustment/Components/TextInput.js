@@ -2,11 +2,31 @@ import React from "react";
 import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 
-const TextInput = ({ label, name, type = "text", placeholder, disabled, required = false, autoComplete = "off" }) => {
+const TextInput = ({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  disabled,
+  required = false,
+  autoComplete = "off",
+  hide = false, // New prop to hide the input
+}) => {
   const variants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
   };
+
+  // If hide is true, render a hidden input
+  if (hide) {
+    return (
+      <Field
+        id={name}
+        name={name}
+        type="hidden"
+      />
+    );
+  }
 
   return (
     <motion.div

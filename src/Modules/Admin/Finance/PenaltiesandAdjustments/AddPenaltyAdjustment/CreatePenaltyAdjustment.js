@@ -521,15 +521,16 @@ const CreatePenaltyAdjustment = () => {
                             </div>
 
                             {/* Revenue Reference */}
-                            <div className="col-span-3">
+                            <div className="" style={{ display: "none" }}>
                               <TextInput
                                 name={`items.${index}.revenueReference`}
                                 label="Revenue Reference"
                                 placeholder="Enter Revenue Reference"
                                 required
-                                type="text"
+                                type="hidden"
                                 readOnly={readOnly}
                                 disabled={readOnly}
+                                
                               />
                             </div>
 

@@ -58,7 +58,7 @@ const ReturnItems = ({ values, setFieldValue, readOnly }) => (
                 </div>
 
                 {/* Revenue Reference */}
-                <div className="col-span-3" style={{ display: "none" }}>
+                <div class="col-span-3" style="display: none;">
                   <TextInput
                     name={`items.${index}.revenueReference`}
                     label="Revenue Reference"
@@ -68,6 +68,7 @@ const ReturnItems = ({ values, setFieldValue, readOnly }) => (
                     disabled={readOnly}
                   />
                 </div>
+                
 
                 {/* Quantity */}
                 <div className="col-span-3">
