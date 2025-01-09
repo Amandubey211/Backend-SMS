@@ -1,7 +1,7 @@
 // src/Modules/Admin/Finance/Receipts/AddReceipt/CreateReceipt.js
 
 import React, { useEffect, useRef, useState } from "react";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -11,12 +11,50 @@ import InvoiceTextInput from "./Components/InvoiceTextInput";
 import ReturnItems from "./Components/ReturnItems";
 import SelectInput from "../../PenaltiesandAdjustments/AddPenaltyAdjustment/Components/SelectInput";
 import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
-import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import {
+  clearSelectedInvoiceNumber,
+  setSelectedInvoiceNumber,
+  clearInvoiceFetchSuccess,
+} from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import FileInput from "./Components/FileInput";
 import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts";
+
+const CalculationHandler = () => {
+  const { values, setFieldValue } = useFormikContext();
+
+  useEffect(() => {
+    const total_amount = values.items.reduce(
+      (acc, item) => acc + Number(item.totalAmount || 0),
+      0
+    );
+
+    const calculated = calculateFinalAmounts({
+      total_amount,
+      discountType: values.discountType,
+      discount: Number(values.discount),
+      tax: Number(values.tax),
+      penalty: Number(values.penalty),
+      paid_amount: 0, // Assuming no paid amount
+      advance_amount: 0, // Assuming no advance amount
+    });
+
+    // Update Formik's subAmount and finalAmount
+    setFieldValue("subAmount", calculated.discountValue, false);
+    setFieldValue("finalAmount", calculated.finalAmount, false);
+  }, [
+    values.items,
+    values.discountType,
+    values.discount,
+    values.tax,
+    values.penalty,
+    setFieldValue,
+  ]);
+
+  return null;
+};
 
 const CreateReceipt = () => {
   const dispatch = useDispatch();
@@ -36,6 +74,9 @@ const CreateReceipt = () => {
   // Initialize fetchedInvoiceNumber to prevent infinite API requests
   const [fetchedInvoiceNumber, setFetchedInvoiceNumber] = useState("");
 
+  // State to handle form resetting
+  const [isFormResetting, setIsFormResetting] = useState(false);
+
   // Define initialValues based on read-only mode
   const prefilledValues =
     isReadOnly && receiptData
@@ -50,10 +91,18 @@ const CreateReceipt = () => {
           tax: receiptData.tax || 0,
           govtRefNumber: receiptData.govtRefNumber || "",
           remark: receiptData.remark || "",
+          // Ensure invoiceNumber is a string
           invoiceNumber:
             typeof receiptData.invoiceNumber === "string"
               ? receiptData.invoiceNumber
+              : receiptData.invoiceNumber
+              ? String(
+                  receiptData.invoiceNumber.number ||
+                    receiptData.invoiceNumber.invoiceNumber ||
+                    receiptData.invoiceNumber
+                )
               : "",
+
           items:
             receiptData.lineItems?.map((item) => ({
               category: item.revenueType || "",
@@ -110,6 +159,7 @@ const CreateReceipt = () => {
 
   const initialValues = isReadOnlyState && prefilledValues ? prefilledValues : blankInitialValues;
 
+  // Track invoice input
   const [invoiceNumberInput, setInvoiceNumberInput] = useState(initialValues.invoiceNumber || "");
   const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
 
@@ -205,9 +255,10 @@ const CreateReceipt = () => {
       .finally(() => setSubmitting(false));
   };
 
-  // Fetch invoice details when debounced invoice number changes and is valid (only in create mode)
+  // Fetch invoice details when debounced invoice number changes and is valid (only in create/edit mode)
   useEffect(() => {
     if (isReadOnlyState) return; // Do not fetch if in read-only mode
+    if (isFormResetting) return; // Do not fetch if form is resetting
 
     const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
     if (debouncedInvoiceNumber && invoiceNumberPattern.test(debouncedInvoiceNumber)) {
@@ -215,16 +266,25 @@ const CreateReceipt = () => {
         dispatch(fetchInvoiceByNumber(debouncedInvoiceNumber));
         setFetchedInvoiceNumber(debouncedInvoiceNumber); // Update fetchedInvoiceNumber
       }
-    } else if (debouncedInvoiceNumber === "") {
-      // Optionally handle empty input by resetting the form
+    } else if (debouncedInvoiceNumber === "" && fetchedInvoiceNumber !== "") {
+      // Only reset if previously fetchedInvoiceNumber was not ""
       if (formikRef.current) {
+        setIsFormResetting(true); // Indicate that form is resetting
         formikRef.current.setValues(blankInitialValues);
         setFetchedInvoiceNumber("");
+        setIsFormResetting(false); // Reset the flag after form reset
       }
     }
-  }, [debouncedInvoiceNumber, dispatch, isReadOnlyState, fetchedInvoiceNumber, blankInitialValues]);
+  }, [
+    debouncedInvoiceNumber,
+    dispatch,
+    isReadOnlyState,
+    fetchedInvoiceNumber,
+    blankInitialValues,
+    isFormResetting, // Added to dependencies
+  ]);
 
-  // Prefill form when invoice details are fetched successfully (only in create mode)
+  // Prefill form when invoice details are fetched successfully (only in create/edit mode)
   useEffect(() => {
     if (invoiceFetchSuccess && invoiceDetails && !isReadOnlyState) {
       const prefilledValues = {
@@ -238,7 +298,13 @@ const CreateReceipt = () => {
         tax: invoiceDetails?.tax || 0,
         govtRefNumber: "",
         remark: "",
-        invoiceNumber: invoiceDetails?.invoiceNumber || "",
+        invoiceNumber: invoiceDetails?.invoiceNumber
+          ? typeof invoiceDetails.invoiceNumber === "string"
+            ? invoiceDetails.invoiceNumber
+            : invoiceDetails.invoiceNumber.number
+            ? String(invoiceDetails.invoiceNumber.number)
+            : String(invoiceDetails.invoiceNumber)
+          : "",
         items:
           invoiceDetails?.lineItems?.map((item) => ({
             category: item?.revenueType || "",
@@ -271,39 +337,24 @@ const CreateReceipt = () => {
         document: null, // Initialize document
       };
 
+      // Debugging: Log the prefilled invoice number
+      console.log("Prefilled Invoice Number:", prefilledValues.invoiceNumber);
+      console.log("Invoice Details:", invoiceDetails);
+
       formikRef.current.setValues(prefilledValues);
       setFetchedInvoiceNumber(prefilledValues.invoiceNumber);
+      setInvoiceNumberInput(prefilledValues.invoiceNumber); // Synchronize invoiceNumberInput
       dispatch(clearSelectedInvoiceNumber());
+      dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
     }
   }, [invoiceFetchSuccess, invoiceDetails, dispatch, isReadOnlyState]);
 
-  // Perform calculations whenever relevant fields change (only in create mode)
+  // Synchronize invoiceNumberInput when initialValues change (especially in read-only mode)
   useEffect(() => {
-    if (isReadOnlyState) return; // Do not perform calculations in read-only mode
-
-    if (formikRef.current) {
-      const { values, setFieldValue } = formikRef.current;
-
-      const total_amount = values.items.reduce(
-        (acc, item) => acc + Number(item.totalAmount || 0),
-        0
-      );
-
-      const calculated = calculateFinalAmounts({
-        total_amount,
-        discountType: values.discountType,
-        discount: Number(values.discount),
-        tax: Number(values.tax),
-        penalty: Number(values.penalty),
-        paid_amount: 0, // Assuming no paid amount
-        advance_amount: 0, // Assuming no advance amount
-      });
-
-      // Update Formik's subAmount and finalAmount
-      setFieldValue("subAmount", calculated.discountValue, false);
-      setFieldValue("finalAmount", calculated.finalAmount, false);
-    }
-  }, [invoiceDetails, isReadOnlyState]);
+    setInvoiceNumberInput(initialValues.invoiceNumber || "");
+    // Debugging: Log the initial invoice number
+    console.log("Initial Invoice Number:", initialValues.invoiceNumber);
+  }, [initialValues.invoiceNumber]);
 
   return (
     <DashLayout>
@@ -317,6 +368,9 @@ const CreateReceipt = () => {
         >
           {({ isSubmitting, values, setFieldValue, resetForm }) => (
             <Form>
+              {/* Calculation Handler */}
+              {!isReadOnlyState && <CalculationHandler />}
+
               {/* Read-Only Mode Message */}
               {isReadOnlyState && (
                 <div className="flex justify-between items-center bg-yellow-100 text-yellow-700 p-2 rounded-md text-sm mb-4">
@@ -325,7 +379,10 @@ const CreateReceipt = () => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => setIsReadOnlyState(false)}
+                    onClick={() => {
+                      setIsReadOnlyState(false);
+                      dispatch(clearInvoiceFetchSuccess()); // Clear the fetch success flag
+                    }}
                     className="flex items-center px-2 py-1 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-transform duration-200"
                   >
                     Edit
@@ -338,10 +395,15 @@ const CreateReceipt = () => {
                 {!isReadOnlyState && (
                   <>
                     <button
-                      type="reset"
+                      type="button" // Changed from "reset" to "button"
                       onClick={() => {
+                        setIsFormResetting(true); // Indicate that form is resetting
                         resetForm();
+                        setInvoiceNumberInput("");
                         setFetchedInvoiceNumber("");
+                        dispatch(clearSelectedInvoiceNumber());
+                        dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
+                        setIsFormResetting(false); // Reset the flag after form reset
                       }}
                       className="px-4 py-2 rounded-md text-white transition duration-300"
                       style={{
@@ -399,6 +461,10 @@ const CreateReceipt = () => {
                         form.handleChange(e);
                         const value = e.target.value;
                         setInvoiceNumberInput(value);
+
+                        // Debugging: Log the input value
+                        console.log("Invoice Number Input Changed:", value);
+
                         if (value !== fetchedInvoiceNumber) {
                           form.setFieldValue("receiverName", "");
                           form.setFieldValue("mailId", "");
@@ -423,6 +489,11 @@ const CreateReceipt = () => {
                           form.setFieldValue("subAmount", 0, false);
                           form.setFieldValue("finalAmount", 0, false);
                           setFetchedInvoiceNumber("");
+
+                          // If in create/edit mode, set the selectedInvoiceNumber in Redux
+                          if (!isReadOnlyState) {
+                            dispatch(setSelectedInvoiceNumber(value));
+                          }
                         }
                       }}
                       disabled={isReadOnlyState} // Disable input in read-only mode

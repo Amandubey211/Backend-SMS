@@ -28,7 +28,7 @@ import {
   MailOutlined,
   MoreOutlined,
   SearchOutlined,
-  EyeOutlined, // Ensure EyeOutlined is imported
+  EyeOutlined,
 } from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
 import PenaltyAdjustmentTemplate from "../../../../../../Utils/FinanceTemplate/PenaltyAdjustmentTemplate";
@@ -36,6 +36,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "react-hot-toast";
 import { setCurrentPage, setReadOnly, setSelectedAdjustment } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
+import SelectInput from "../Components/SelectInput"; // Ensure correct import path
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -383,7 +384,7 @@ const PenalityandAdjustmentList = () => {
         tax = 0,
         discount = 0,
         discountType = "percentage",
-        adjustmentPenalty = 0,
+        penalty = 0,
         adjustmentTotal = 0,
         adjustmentAmount = 0,
         adjustedBy = {},
@@ -405,7 +406,7 @@ const PenalityandAdjustmentList = () => {
             ? `${parseFloat(discount)} %`
             : `${parseFloat(discount)} QR`,
         discountType,
-        penalty: `${parseFloat(adjustmentPenalty)} QR`,
+        penalty: `${parseFloat(penalty)} QR`,
         totalAmount: `${parseFloat(adjustmentTotal)} QR`,
         finalAmount: `${parseFloat(adjustmentAmount)} QR`,
         createdBy: adjustedBy.adminName || "N/A",
