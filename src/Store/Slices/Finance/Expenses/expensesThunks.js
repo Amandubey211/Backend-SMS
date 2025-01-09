@@ -17,7 +17,7 @@ import { getAY } from "../../../../Utils/academivYear";
  */
 const getEndpointForCategory = (category, action, expenseId) => {
   const baseUrl = "/finance/expense";
-
+  console.log(category, "kk");
   switch (category) {
     case "Salaries and Wages":
       if (action === "create") return `${baseUrl}/add/salaryWages`;
@@ -171,23 +171,28 @@ export const updateExpense = createAsyncThunk(
   }
 );
 
-/**
- * Thunk to delete an existing expense.
- */
 export const deleteExpense = createAsyncThunk(
   "expenses/deleteExpense",
-  async ({ category, id }, { dispatch, rejectWithValue }) => {
+  async ({ category, id }, { dispatch, rejectWithValue, getState }) => {
     try {
       const endpoint = getEndpointForCategory(category, "delete", id);
       const response = await deleteData(endpoint);
 
       if (response?.success) {
-        // toast.success("Expense deleted successfully!");
-        // Refetch expenses after deletion
-        dispatch(fetchAllExpenses({})); // You can pass relevant filters if needed
+        const state = getState();
+        const { currentPage, computedPageSize, filters } = state.admin.expenses;
+
+        const params = {
+          page: currentPage,
+          limit: computedPageSize,
+          includeDetails: true,
+          ...filters,
+        };
+
+        await dispatch(fetchAllExpenses(params)); // Refetch the expenses list
+        toast.success("Expense deleted successfully!");
         return { id, category };
       } else {
-        dispatch(setShowError(true));
         toast.error(response?.message || "Failed to delete expense.");
         return rejectWithValue(
           response?.message || "Failed to delete expense."
