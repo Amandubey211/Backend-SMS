@@ -1,25 +1,25 @@
 // src/Modules/Admin/Finance/Receipts/AddReceipt/CreatePenaltyAdjustment.js
 
-import React, { useEffect, useRef } from "react";
-import { Formik, Form, Field, ErrorMessage, useFormikContext } from "formik"; // Import Field and ErrorMessage
+import React, { useState, useEffect, useRef } from "react";
+import { Formik, Form, FieldArray, useFormikContext } from "formik"; // Import FieldArray if needed
 import * as Yup from "yup";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
-import ReturnItems from "./Components/ReturnItems";
+import FileInput from "./Components/FileInput";
 import { useDispatch, useSelector } from "react-redux";
 import { createAdjustment } from "../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
-import { clearSelectedInvoiceNumber } from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
-import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
+import { clearSelectedAdjustment, setReadOnly } from "../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
+import toast from "react-hot-toast";
+import Layout from "../../../../../Components/Common/Layout";
 import { useNavigate } from "react-router-dom";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
 import InvoiceTextInput from "./Components/InvoiceTextInput"; // Import the new component
 import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts"; // Adjust the import path as necessary
 import TextInputWithSuffix from "./Components/TextInputWithSuffix";
-import FileInput from "./Components/FileInput";
+import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 
-// Define CalculateAmounts component
 const CalculateAmounts = () => {
   const { values, setFieldValue } = useFormikContext();
 
@@ -65,73 +65,57 @@ const CreatePenaltyAdjustment = () => {
     loading,
     error,
     successMessage,
-    selectedInvoiceNumber,
-    invoiceDetails,
-    invoiceFetchSuccess,
-  } = useSelector((state) => state.admin.invoices);
-
-  // Debounce the invoice number input by 500ms
-  const [invoiceNumberInput, setInvoiceNumberInput] = React.useState("");
-  const debouncedInvoiceNumber = useDebounce(invoiceNumberInput, 500);
+    readOnly,
+    selectedAdjustment,
+  } = useSelector((state) => state.admin.penaltyAdjustment);
 
   // Reference to Formik to set field values outside Formik's render props
   const formikRef = useRef();
 
+  // Clear selected adjustment on component unmount
   useEffect(() => {
-    if (selectedInvoiceNumber) {
-      setInvoiceNumberInput(selectedInvoiceNumber);
-      if (formikRef.current) {
-        formikRef.current.setFieldValue("invoiceNumber", selectedInvoiceNumber);
-      }
-      // Fetch the invoice details based on selectedInvoiceNumber
-      dispatch(fetchInvoiceByNumber(selectedInvoiceNumber));
-    }
-  }, [selectedInvoiceNumber, dispatch]);
+    return () => {
+      dispatch(clearSelectedAdjustment());
+    };
+  }, [dispatch]);
 
-  
-  // Prefill form fields when invoice details are fetched successfully
-  useEffect(() => {
-    if (invoiceFetchSuccess && invoiceDetails) {
-      // Prefill the form fields with invoiceDetails
-      formikRef.current.setFieldValue("invoiceNumber", invoiceDetails.invoiceNumber);
-      formikRef.current.setFieldValue("reason", ""); // Set default reason or fetch from invoiceDetails if available
-      formikRef.current.setFieldValue("discountType", invoiceDetails.discountType || "amount");
-      formikRef.current.setFieldValue("discount", invoiceDetails.discount || 0);
-      formikRef.current.setFieldValue("adjustmentPenalty", invoiceDetails.penalty || 0);
-      formikRef.current.setFieldValue("tax", invoiceDetails.tax || 0);
-      formikRef.current.setFieldValue(
-        "items",
-        invoiceDetails.lineItems.map((item) => ({
-          revenueType: item.revenueType,
-          revenueReference: item._id, // Assuming revenueReference is the line item ID
-          quantity: item.quantity,
-          amount: item.amount,
-        }))
-      );
-      // Clear selectedInvoiceNumber to allow manual entries in future
-      dispatch(clearSelectedInvoiceNumber());
-    }
-  }, [invoiceFetchSuccess, invoiceDetails, dispatch]);
-
-  // Define initial values based on backend requirements
-  const initialValues = {
+  // Define initial values based on whether in read-only mode or creating new
+  const initialValues = readOnly && selectedAdjustment ? {
+    invoiceNumber: selectedAdjustment.invoiceId?.invoiceNumber || "",
+    items: selectedAdjustment.items || [
+      {
+        revenueType: "",
+        revenueReference: "",
+        quantity: 1,
+        amount: 0,
+      },
+    ],
+    reason: selectedAdjustment.reason || "",
+    discountType: selectedAdjustment.discountType || "amount",
+    discount: selectedAdjustment.discount || 0,
+    adjustmentPenalty: selectedAdjustment.adjustmentPenalty || 0,
+    tax: selectedAdjustment.tax || 0,
+    subAmount: selectedAdjustment.subAmount || 0,
+    finalAmount: selectedAdjustment.finalAmount || 0,
+    document: selectedAdjustment.document || null,
+  } : {
     invoiceNumber: "",
     items: [
       {
         revenueType: "",
         revenueReference: "",
-        quantity: null,
-        amount: null,
+        quantity: 1,
+        amount: 0,
       },
     ],
     reason: "",
     discountType: "amount",
-    discount: null,
-    adjustmentPenalty: null,
-    tax: null,
-    subAmount: 0, // Initialize subAmount
-    finalAmount: 0, // Initialize finalAmount
-    document: null, // Optional
+    discount: 0,
+    adjustmentPenalty: 0,
+    tax: 0,
+    subAmount: 0,
+    finalAmount: 0,
+    document: null,
   };
 
   // Define validation schema
@@ -169,264 +153,314 @@ const CreatePenaltyAdjustment = () => {
       .required("Tax is required"),
     subAmount: Yup.number().min(0).notRequired(),
     finalAmount: Yup.number().min(0).notRequired(),
-    document: Yup.string().nullable()
+    document: Yup.string().nullable(),
   });
 
   // Handle form submission
-  const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    // Prepare the payload as per the backend requirements
-    const payload = {
-      invoiceNumber: values.invoiceNumber,
-      items: values.items.map((item) => ({
-        revenueType: item.revenueType,
-        revenueReference: item.revenueReference,
-        quantity: Number(item.quantity),
-        amount: Number(item.amount),
-      })),
-      reason: values.reason,
-      discountType: values.discountType,
-      discount: Number(values.discount),
-      adjustmentPenalty: Number(values.adjustmentPenalty),
-      tax: Number(values.tax),
-      finalAmount: Number(values.finalAmount), // Include finalAmount in the payload
-    };
-
-    // Dispatch the thunk
-    dispatch(createAdjustment(payload))
-      .unwrap()
-      .then(() => {
-        resetForm();
-        navigate("/finance/penaltyAdjustment-list"); // Redirect after successful submission
-      })
-      .catch((err) => {
-        // Errors are handled in the slice and toast
-        console.error("Error creating adjustment:", err);
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
+  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    if (readOnly) return; // Prevent submission in read-only mode
+    dispatch(setReadOnly(false)); // Reset readOnly if needed
+    setSubmitting(true);
+    try {
+      await dispatch(createAdjustment(values)).unwrap(); // Unwraps the promise to catch errors more effectively
+      toast.success("Penalty & Adjustment created successfully!");
+      resetForm(); // Resets the form to initial values
+      navigate("/finance/penaltyAdjustment-list"); // Redirect after successful submission
+    } catch (error) {
+      toast.error(error || "Failed to create penalty & adjustment.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  // Fetch invoice details when debounced invoice number changes and is valid
-  useEffect(() => {
-    const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
-    if (debouncedInvoiceNumber && invoiceNumberPattern.test(debouncedInvoiceNumber)) {
-      dispatch(fetchInvoiceByNumber(debouncedInvoiceNumber));
-    }
-  }, [debouncedInvoiceNumber, dispatch]);
-
-  // Reset form fields when there's an error fetching invoice
-  useEffect(() => {
-    if (error) {
-      formikRef.current.setFieldValue("reason", "");
-      formikRef.current.setFieldValue("discountType", "amount");
-      formikRef.current.setFieldValue("discount", null);
-      formikRef.current.setFieldValue("adjustmentPenalty", null);
-      formikRef.current.setFieldValue("tax", null);
-      formikRef.current.setFieldValue("subAmount", 0, false);
-      formikRef.current.setFieldValue("finalAmount", 0, false);
-      formikRef.current.setFieldValue("items", [
-        {
-          revenueType: "",
-          revenueReference: "",
-          quantity: null,
-          amount: null,
-        },
-      ]);
-    }
-  }, [error]);
-
   return (
-    <DashLayout>
-      <div className="p-6 min-h-screen">
-        {/* Header Section */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold">Create Penalty Adjustment</h1>
-        </div>
+    <Layout>
+      <DashLayout>
+        <div className="p-6 min-h-screen">
+          {/* Header Section */}
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold">
+              {readOnly ? "View Penalty & Adjustment" : "Create Penalty & Adjustment"}
+            </h1>
+            {readOnly && (
+              <button
+                type="button"
+                onClick={() => dispatch(setReadOnly(false))}
+                className="bg-blue-500 text-white px-4 py-2 rounded-md"
+              >
+                Edit
+              </button>
+            )}
+          </div>
 
-        {/* Form Section */}
-        <Formik
-          innerRef={formikRef}
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={handleSubmit}
-        >
-          {(formik) => (
-            <Form id="create-adjustment-form">
-              {/* Calculate and update subAmount and finalAmount */}
-              <CalculateAmounts />
-
-              {/* Header Buttons */}
-              <div className="flex justify-end items-center mb-6">
-                <div className="flex gap-4">
-                  <button
-                    type="button"
-                    onClick={() => formik.resetForm()}
-                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
-                  >
-                    Reset
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-md text-white"
-                    style={{
-                      background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
-                    }}
-                    disabled={formik.isSubmitting || loading}
-                  >
-                    Save Adjustment
-                  </button>
-                </div>
-              </div>
-
-              {/* Adjustment Details */}
-              <h2 className="text-lg font-semibold mb-4">Adjustment Details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* Invoice Number */}
-                <InvoiceTextInput
-                  name="invoiceNumber"
-                  label="Invoice Number"
-                  placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
-                  type="text"
-                  value={invoiceNumberInput}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setInvoiceNumberInput(value);
-                    formik.setFieldValue("invoiceNumber", value);
-
-                    // Reset form fields if invoice number changes
-                    if (value !== selectedInvoiceNumber) {
-                      formik.setFieldValue("reason", "");
-                      formik.setFieldValue("discountType", "amount");
-                      formik.setFieldValue("discount", null);
-                      formik.setFieldValue("adjustmentPenalty", null);
-                      formik.setFieldValue("tax", null);
-                      formik.setFieldValue("subAmount", 0, false);
-                      formik.setFieldValue("finalAmount", 0, false);
-                      formik.setFieldValue("items", [
-                        {
-                          revenueType: "",
-                          revenueReference: "",
-                          quantity: null,
-                          amount: null,
-                        },
-                      ]);
-                    }
-                  }}
-                  onBlur={() => {
-                    // Ensure tax is within 0-100 on blur
-                    const taxValue = formik.values.tax;
-                    if (taxValue > 100) {
-                      formik.setFieldValue("tax", 100);
-                    } else if (taxValue < 0) {
-                      formik.setFieldValue("tax", 0);
-                    }
-
-                    // Dispatch fetchInvoiceByNumber on blur
-                    dispatch(fetchInvoiceByNumber(invoiceNumberInput));
-                  }}
-                  required
-                />
-
-                {/* Reason */}
-                <TextInput
-                  name="reason"
-                  label="Reason"
-                  placeholder="Enter reason for adjustment"
-                  required
-                  type="text"
-                />
-
-
-              </div>
-
-              {/* Items Section */}
-              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
-              <ReturnItems values={formik.values} setFieldValue={formik.setFieldValue} required />
-
-              {/* Sub Amount and Final Amount */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-                {/* Discount Type */}
-                <SelectInput
-                  name="discountType"
-                  label="Discount Type"
-                  options={[
-                    { value: "percentage", label: "Percentage" },
-                    { value: "amount", label: "Amount" },
-                  ]}
-                  placeholder="Select Discount Type"
-                  required
-                />
-
-                {/* Discount */}
-                <TextInput
-                  name="discount"
-                  label="Discount"
-                  placeholder="Enter discount value"
-                  required
-                  type="number"
-                />
-
-                {/* Adjustment Penalty */}
-                <TextInput
-                  name="adjustmentPenalty"
-                  label="Adjustment Penalty"
-                  placeholder="Enter penalty amount"
-                  required
-                  type="number"
-                />
-
-                {/* Tax */}
-                <TextInputWithSuffix
-                  name="tax"
-                  label="Tax"
-                  placeholder="Enter tax value"
-                  required
-                  type="number"
-                  suffix="%"
-                />
-
-                {/* Document Upload Field */}
-                <FileInput
-                  name="document"
-                  label="Upload Document (Optional)"
-                  onChange={(e) => {
-                    const fileUrl = e.target.value; // Cloudinary URL after upload
-                    formik.setFieldValue("document", fileUrl); // Update Formik's value
-                  }}
-                  value={formik.values.document} // Bind Formik's value
-                />
-
-                {/* Sub Amount (Read-only) */}
-                <TextInput
-                  name="subAmount"
-                  label="Sub Amount"
-                  placeholder="Sub Amount"
-                  type="number"
-                  disabled
-                />
-
-                {/* Final Amount (Read-only) */}
-                <TextInput
-                  name="finalAmount"
-                  label="Final Amount"
-                  placeholder="Final Amount"
-                  type="number"
-                  disabled
-                />
-              </div>
-
-              {/* Display Success and Error Messages */}
-              {successMessage && (
-                <div className="text-green-500 mb-4">{successMessage}</div>
-              )}
-              {error && <div className="text-red-500 mb-4">{error}</div>}
-            </Form>
+          {/* Read-Only Mode Alert */}
+          {readOnly && selectedAdjustment && (
+            <div className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded-md mb-4">
+              Currently in read-only mode. You cannot edit these fields.
+            </div>
           )}
-        </Formik>
-      </div>
-    </DashLayout>
+
+          {/* Form Section */}
+          <Formik
+            innerRef={formikRef}
+            initialValues={initialValues}
+            validationSchema={readOnly ? null : validationSchema} // Disable validation in read-only
+            onSubmit={handleSubmit}
+            enableReinitialize
+          >
+            {({ values, setFieldValue, resetForm, isSubmitting }) => (
+              <Form id="create-adjustment-form">
+                {/* Calculate and update subAmount and finalAmount */}
+                <CalculateAmounts />
+
+                {/* Header Buttons */}
+                {!readOnly && (
+                  <div className="flex justify-end items-center mb-6 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => resetForm()}
+                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-100"
+                    >
+                      Reset
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || loading}
+                      className="px-4 py-2 rounded-md text-white"
+                      style={{
+                        background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
+                      }}
+                    >
+                      {isSubmitting || loading ? 'Loading..' : 'Save Adjustment'}
+                    </button>
+                  </div>
+                )}
+
+                {/* Adjustment Details */}
+                <h2 className="text-lg font-semibold mb-4">Adjustment Details</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  {/* Invoice Number */}
+                  <InvoiceTextInput
+                    name="invoiceNumber"
+                    label="Invoice Number"
+                    placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
+                    type="text"
+                    value={values.invoiceNumber}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setFieldValue("invoiceNumber", value);
+
+                      // Dispatch fetchInvoiceByNumber
+                      if (value.trim() !== "") {
+                        dispatch(fetchInvoiceByNumber(value.trim()));
+                      }
+                    }}
+                    required
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
+                  {/* Reason */}
+                  <TextInput
+                    name="reason"
+                    label="Reason"
+                    placeholder="Enter reason for adjustment"
+                    required
+                    type="text"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+                </div>
+
+                {/* Adjustment Items Section */}
+                <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
+                <FieldArray name="items">
+                  {({ remove, push }) => (
+                    <>
+                      {values.items.map((item, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-12 gap-8 items-center mb-6"
+                        >
+                          <div className="col-span-3">
+                            <SelectInput
+                              name={`items.${index}.revenueType`}
+                              label="Revenue Type"
+                              options={[
+                                "studentFee",
+                                "FacilityRevenue",
+                                "service_based_revenue",
+                                "community_externalaffair_revenue",
+                                "financial_investment_revenue",
+                                "Penalties",
+                                "Other",
+                              ]}
+                              readOnly={readOnly}
+                              disabled={readOnly}
+                            />
+                          </div>
+
+                          <div className="col-span-3">
+                            <TextInput
+                              name={`items.${index}.quantity`}
+                              label="Quantity"
+                              type="number"
+                              placeholder="Enter Quantity"
+                              readOnly={readOnly}
+                              disabled={readOnly}
+                            />
+                          </div>
+
+                          <div className="col-span-3">
+                            <TextInput
+                              name={`items.${index}.amount`}
+                              label="Amount *"
+                              type="number"
+                              placeholder="Enter Amount"
+                              readOnly={readOnly}
+                              disabled={readOnly}
+                            />
+                          </div>
+
+                          <div className="col-span-3 flex items-center justify-center">
+                            {!readOnly && (
+                              <button
+                                type="button"
+                                onClick={() => remove(index)}
+                                className="text-red-500 hover:text-red-700 text-xl"
+                              >
+                                ✖
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {!readOnly && (
+                        <div className="flex flex-col justify-center items-center mt-6">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              push({ revenueType: "", revenueReference: "", quantity: 1, amount: 0 })
+                            }
+                            className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
+                            style={{
+                              background: "linear-gradient(to right, #ec4899, #a855f7)",
+                            }}
+                          >
+                            <span className="text-white text-2xl">+</span>
+                          </button>
+                          <span className="text-gray-600 text-sm mt-2">Add Item</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </FieldArray>
+
+                {/* Additional Details Section */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  {/* Due Date */}
+                  <TextInput
+                    name="dueDate"
+                    label="Due Date"
+                    placeholder="Enter Due Date"
+                    type="date"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
+                  {/* Sub Amount */}
+                  <TextInput
+                    name="subAmount"
+                    label="Sub Amount"
+                    placeholder="Sub Amount"
+                    type="number"
+                    readOnly
+                    disabled
+                  />
+
+                  {/* Tax */}
+                  <TextInputWithSuffix
+                    name="tax"
+                    label="Tax"
+                    placeholder="Enter tax value"
+                    required
+                    type="number"
+                    suffix="%"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
+                  {/* Discount Type */}
+                  <SelectInput
+                    name="discountType"
+                    label="Discount Type"
+                    options={[
+                      { value: "percentage", label: "Percentage" },
+                      { value: "amount", label: "Amount" },
+                    ]}
+                    placeholder="Select Discount Type"
+                    required
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
+                  {/* Discount */}
+                  <TextInput
+                    name="discount"
+                    label={`Discount (${values.discountType === "percentage" ? "%" : "Amount"})`}
+                    placeholder={`Enter discount ${values.discountType}`}
+                    type="number"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
+                  {/* Adjustment Penalty */}
+                  <TextInput
+                    name="adjustmentPenalty"
+                    label="Adjustment Penalty"
+                    placeholder="Enter penalty amount"
+                    required
+                    type="number"
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+
+                  {/* Final Amount */}
+                  <TextInput
+                    name="finalAmount"
+                    label="Final Amount (After tax/discount)"
+                    placeholder="Final Amount"
+                    type="number"
+                    readOnly
+                    disabled
+                  />
+
+                  {/* Document Upload Field */}
+                  <FileInput
+                    name="document"
+                    label="Upload Document (Optional)"
+                    onChange={(e) => {
+                      const fileUrl = e.target.value; // Cloudinary URL after upload
+                      setFieldValue("document", fileUrl); // Update Formik's value
+                    }}
+                    value={values.document} // Bind Formik's value
+                    readOnly={readOnly}
+                    disabled={readOnly}
+                  />
+                </div>
+
+                {/* Display Success and Error Messages */}
+                {successMessage && (
+                  <div className="text-green-500 mb-4">{successMessage}</div>
+                )}
+                {error && <div className="text-red-500 mb-4">{error}</div>}
+              </Form>
+            )}
+          </Formik>
+        </div>
+      </DashLayout>
+    </Layout>
   );
 };
 

@@ -1,9 +1,10 @@
+// src/Modules/Admin/Finance/Receipts/RecentReceiptsList.js
+
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { Menu, Dropdown, Input, Table, Tag, Tooltip } from "antd";
 import {
-
   MoreOutlined,
   ExclamationCircleOutlined,
   SearchOutlined,
@@ -12,7 +13,6 @@ import {
   MailOutlined,
   EyeOutlined,
   ExportOutlined,
-
 } from "@ant-design/icons";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
 import { toast } from "react-hot-toast";
@@ -29,65 +29,62 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 
 const RecentReceiptsList = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useNavHeading("Finance", "Receipts List");
+  const { receipts = [], loading, error, pagination = {} } = useSelector(
+    (state) => state.admin.receipts || {}
+  );
 
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    useNavHeading("Finance", "Receipts List");
-    const { receipts = [], loading, error, pagination = {} } = useSelector(
-        (state) => state.admin.receipts || {}
-    );
+  // Basic states
+  const [searchQuery, setSearchQuery] = useState("");
 
-    // Basic states
-    const [searchQuery, setSearchQuery] = useState("");
+  // Cancel receipt states
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedReceiptId, setSelectedReceiptId] = useState(null);
+  const [cancelLoading, setCancelLoading] = useState(false);
 
-    // Cancel receipt states
-    const [modalVisible, setModalVisible] = useState(false);
-    const [selectedReceiptId, setSelectedReceiptId] = useState(null);
-    const [cancelLoading, setCancelLoading] = useState(false);
+  // Email modal states
+  const [isEmailModalOpen, setEmailModalOpen] = useState(false);
 
-    // Email modal states
-    const [isEmailModalOpen, setEmailModalOpen] = useState(false);
+  // Receipt preview states
+  const [isReceiptVisible, setReceiptVisible] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
 
-    // Receipt preview states
-    const [isReceiptVisible, setReceiptVisible] = useState(false);
-    const [selectedReceipt, setSelectedReceipt] = useState(null);
+  // Export modal states
+  const [isExportModalOpen, setExportModalOpen] = useState(false);
 
-    // Export modal states
-    const [isExportModalOpen, setExportModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageLimit, setPageLimit] = useState(10);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageLimit, setPageLimit] = useState(10);
+  // Ref for outside-click detection & PDF generation
+  const popupRef = useRef(null);
 
-    // Ref for outside-click detection & PDF generation
-    const popupRef = useRef(null);
+  // --- 1) Fetch receipts when component mounts or pagination changes ---
+  useEffect(() => {
+    dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
+  }, [dispatch, currentPage, pageLimit]);
 
-    // --- 1) Fetch receipts when component mounts or pagination changes ---
-    useEffect(() => {
-        dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
-    }, [dispatch, currentPage, pageLimit]);
-
-    // --- 2) Close receipt preview modal on outside click ---
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (
-                popupRef.current &&
-                !popupRef.current.contains(event.target) &&
-                isReceiptVisible
-            ) {
-                setReceiptVisible(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, [isReceiptVisible]);
-
+  // --- 2) Close receipt preview modal on outside click ---
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        popupRef.current &&
+        !popupRef.current.contains(event.target) &&
+        isReceiptVisible
+      ) {
+        setReceiptVisible(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isReceiptVisible]);
 
   // --- Cancel Receipt ---
   const handleConfirmCancelReceipt = async () => {
@@ -95,7 +92,7 @@ const RecentReceiptsList = () => {
     const result = await dispatch(cancelReceipt(selectedReceiptId));
     if (result.payload === "Receipt cancel successfully") {
       toast.success("Receipt canceled successfully!");
-      // Pass the currentPage and pageLimit when fetching receipts
+      // Fetch receipts again to update the list
       dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
     } else {
       toast.error("Failed to cancel receipt.");
@@ -110,7 +107,7 @@ const RecentReceiptsList = () => {
     setReceiptVisible(true);
   };
 
-  // --- View in read-only mode (navigates to CreateReceipt but with record data) ---
+  // --- View in read-only mode (navigates to CreateReceipt with record data) ---
   const handleViewReadOnlyReceipt = (record) => {
     // Navigate with state
     navigate("/finance/receipts/add-new-receipt", {
@@ -120,7 +117,6 @@ const RecentReceiptsList = () => {
       },
     });
   };
-
 
   // --- Delete receipt ---
   const handleDeleteReceipt = async (record) => {
@@ -133,7 +129,7 @@ const RecentReceiptsList = () => {
       const result = await dispatch(deleteReceipt(record._id));
       if (result.payload === "Receipt Deleted successfully") {
         toast.success("Receipt deleted successfully!");
-        // Pass the currentPage and pageLimit when fetching receipts
+        // Fetch receipts again to update the list
         dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
       } else {
         toast.error("Failed to delete receipt.");
@@ -219,14 +215,13 @@ const RecentReceiptsList = () => {
           ? `${parseFloat(receipt?.discount)} %`
           : `${parseFloat(receipt?.discount)} QR`) || 0,
       discountType: parseFloat(receipt?.discountType) || "percentage",
-      penalty: `${parseFloat(receipt?.receiptPenalty)} QR` || 0,
+      penalty: `${parseFloat(receipt?.penalty)} QR` || 0,
       totalPaidAmount: `${parseFloat(receipt?.totalPaidAmount)} QR` || 0,
       cancelReceipt: receipt?.isCancel ? "Yes" : "No",
       Date: receipt?.date || "N/A",
       academicYearDetails: receipt?.academicYear?.year || "N/A",
     })) || [];
 
-  // --- 3-Dots Action Menu ---
   // --- 3-Dots Action Menu ---
   const actionMenu = (record) => (
     <Menu>
@@ -289,7 +284,6 @@ const RecentReceiptsList = () => {
       receiverName.includes(q) ||
       paidAmount.includes(q) ||
       dateString.includes(q)
-
     );
   });
 
@@ -354,10 +348,8 @@ const RecentReceiptsList = () => {
       dataIndex: "invoiceNumber",
       key: "invoiceNumber",
       sorter: (a, b) =>
-        (a.invoiceNumber?.invoiceNumber || "").localeCompare(
-          b.invoiceNumber?.invoiceNumber || ""
-        ),
-      render: (invoiceNumber) => invoiceNumber?.invoiceNumber || "N/A",
+        (a.invoiceNumber || "").localeCompare(b.invoiceNumber || ""),
+      render: (invoiceNumber) => invoiceNumber || "N/A",
     },
     {
       title: "Status",
@@ -416,7 +408,6 @@ const RecentReceiptsList = () => {
               style={{ width: "250px" }}
             />
           </div>
-
 
           <div className="flex items-center space-x-4">
             <button
@@ -503,12 +494,13 @@ const RecentReceiptsList = () => {
 
                 // Calculate totals from filteredData
                 filteredData.forEach((record) => {
-                  totalPaidAmount += record.totalPaidAmount || 0;
-                  totalTax += record.tax || 0;
-                  totalDiscount += record.discount || 0;
-                  totalPenalty += record.penalty || 0;
+                  totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
+                  totalTax += parseFloat(record.tax) || 0;
+                  totalDiscount += parseFloat(record.discount) || 0;
+                  totalPenalty += parseFloat(record.penalty) || 0;
                 });
 
+                // Uncomment if you want to display totals
                 // return (
                 //   <Table.Summary.Row>
                 //     <Table.Summary.Cell index={0} colSpan={3}>
@@ -567,49 +559,46 @@ const RecentReceiptsList = () => {
 
       {/* Receipt Preview Overlay */}
       {isReceiptVisible && (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* Dim / Blur background */}
           <div
             className="absolute inset-0 bg-black bg-opacity-60"
             style={{ backdropFilter: "blur(8px)" }}
           />
           {/* Centered content */}
-          <div className="relative flex items-center justify-center w-full h-full">
-            <div
-              ref={popupRef}
-              className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md"
-            >
-              {/* Close + Download PDF buttons */}
-              <div className="absolute -top-4 -right-44 mt-4 flex flex-col items-start space-y-2">
-                {/* Close button */}
-                <button
-                  onClick={() => setReceiptVisible(false)}
-                  className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-                >
-                  ✕
-                </button>
-                {/* Download PDF button */}
-                <button
-                  className="w-40 py-2 text-white font-semibold rounded-md"
-                  style={{
-                    background:
-                      "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
-                  }}
-                  onClick={handleDownloadPDF}
-                >
-                  Download PDF
-                </button>
-              </div>
-
-              {/* The actual receipt content */}
-              <Receipt receiptData={selectedReceipt} />
+          <div
+            ref={popupRef}
+            className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+          >
+            {/* Close + Download PDF buttons */}
+            <div className="flex justify-end space-x-2 mb-4">
+              {/* Close button */}
+              <button
+                onClick={() => setReceiptVisible(false)}
+                className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+              >
+                ✕
+              </button>
+              {/* Download PDF button */}
+              <button
+                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                onClick={handleDownloadPDF}
+              >
+                Download PDF
+              </button>
             </div>
+
+            {/* The actual receipt content */}
+            {selectedReceipt ? (
+              <Receipt receiptData={selectedReceipt} />
+            ) : (
+              <p>No receipt data available.</p>
+            )}
           </div>
         </div>
       )}
     </AdminLayout>
   );
-
 };
 
 export default RecentReceiptsList;

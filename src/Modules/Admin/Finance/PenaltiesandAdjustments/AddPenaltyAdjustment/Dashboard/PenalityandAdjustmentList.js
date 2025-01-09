@@ -1,3 +1,5 @@
+// src/Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/PenalityandAdjustmentList.js
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
@@ -26,13 +28,14 @@ import {
   MailOutlined,
   MoreOutlined,
   SearchOutlined,
+  EyeOutlined, // Ensure EyeOutlined is imported
 } from "@ant-design/icons";
 import ExportModal from "../../../Earnings/Components/ExportModal";
-import { setCurrentPage } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 import PenaltyAdjustmentTemplate from "../../../../../../Utils/FinanceTemplate/PenaltyAdjustmentTemplate";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "react-hot-toast";
+import { setCurrentPage, setReadOnly, setSelectedAdjustment } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -46,7 +49,7 @@ const PenalityandAdjustmentList = () => {
     totalPages,
     currentPage,
     pageSize,
-  } = useSelector((state) => state.admin.penaltyAdjustment);
+  } = useSelector((state) => state.admin.penaltyAdjustment); // Ensure correct slice name
 
   // Local state
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
@@ -127,7 +130,6 @@ const PenalityandAdjustmentList = () => {
       toast.error("Failed to generate PDF.");
     }
   };
-
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -317,6 +319,28 @@ const PenalityandAdjustmentList = () => {
             ),
             // Implement Send Mail functionality if needed
           },
+          {
+            key: "4",
+            label: (
+              <span>
+                <EyeOutlined style={{ marginRight: 8 }} />
+                View (Read-only)
+              </span>
+            ),
+            onClick: () => {
+              // Find the selected adjustment based on the record's key
+              const selectedAdjustment = adjustmentData.find(
+                (adjustment) => adjustment._id === record.key
+              );
+              if (selectedAdjustment) {
+                dispatch(setSelectedAdjustment(selectedAdjustment));
+                dispatch(setReadOnly(true));
+                navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Corrected route
+              } else {
+                toast.error("Selected adjustment not found.");
+              }
+            },
+          },
         ];
 
         return (
@@ -420,7 +444,7 @@ const PenalityandAdjustmentList = () => {
               <button
                 onClick={() =>
                   navigate(
-                    "/finance/penaltyAdjustment/add-new-penalty-adjustment"
+                    "/finance/penaltyAdjustment/create" // Corrected route
                   )
                 }
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -489,7 +513,7 @@ const PenalityandAdjustmentList = () => {
           />
           {/* Receipt Preview Overlay */}
           {isReceiptVisible && (
-            <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
               {/* Dim / Blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"

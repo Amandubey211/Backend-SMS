@@ -1,8 +1,10 @@
+// src/Modules/Admin/Finance/Receipts/AddReceipt/Components/ReturnItems.js
+
 import React from "react";
 import { FieldArray } from "formik";
 import TextInput from "./TextInput";
 
-const ReturnItems = ({ values, setFieldValue, readOnly }) => (
+const ReturnItems = ({ values, setFieldValue, disabled }) => (
   <div className="mb-6 p-6 rounded-md" style={{ backgroundColor: "#ECECEC" }}>
     <FieldArray
       name="items"
@@ -16,59 +18,63 @@ const ReturnItems = ({ values, setFieldValue, readOnly }) => (
             <div className="col-span-1"></div>
           </div>
 
-          {values.items.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-12 gap-4 items-center mb-4"
-            >
-              {/* Category */}
-              <div className="col-span-4">
-                <TextInput
-                  name={`items.${index}.category`}
-                  label=""
-                  placeholder="Enter category"
-                  disabled={readOnly} // Disable input if readOnly is true
-                />
-              </div>
-
-              {/* Quantity */}
-              <div className="col-span-3">
-                <TextInput
-                  name={`items.${index}.quantity`}
-                  type="number"
-                  placeholder="Enter quantity"
-                  disabled={readOnly} // Disable input if readOnly is true
-                />
-              </div>
-
-              {/* Total Amount */}
-              <div className="col-span-4">
-                <TextInput
-                  name={`items.${index}.totalAmount`}
-                  label=""
-                  type="number"
-                  placeholder="Enter total amount"
-                  disabled={readOnly} // Disable input if readOnly is true
-                />
-              </div>
-
-              {/* Remove Button */}
-              {!readOnly && (
-                <div className="col-span-1 flex justify-center">
-                  <button
-                    type="button"
-                    onClick={() => arrayHelpers.remove(index)}
-                    className="text-purple-500 hover:text-red-500 text-lg font-bold"
-                  >
-                    ✖
-                  </button>
+          {values.items && values.items.length > 0 ? (
+            values.items.map((item, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-12 gap-4 items-center mb-4"
+              >
+                {/* Category */}
+                <div className="col-span-4">
+                  <TextInput
+                    name={`items.${index}.category`}
+                    label=""
+                    placeholder="Enter category"
+                    disabled={disabled} // Updated to use 'disabled'
+                  />
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* Quantity */}
+                <div className="col-span-3">
+                  <TextInput
+                    name={`items.${index}.quantity`}
+                    type="number"
+                    placeholder="Enter quantity"
+                    disabled={disabled} // Updated to use 'disabled'
+                  />
+                </div>
+
+                {/* Total Amount */}
+                <div className="col-span-4">
+                  <TextInput
+                    name={`items.${index}.totalAmount`}
+                    label=""
+                    type="number"
+                    placeholder="Enter total amount"
+                    disabled={disabled} // Updated to use 'disabled'
+                  />
+                </div>
+
+                {/* Remove Button */}
+                {!disabled && (
+                  <div className="col-span-1 flex justify-center">
+                    <button
+                      type="button"
+                      onClick={() => arrayHelpers.remove(index)}
+                      className="text-purple-500 hover:text-red-500 text-lg font-bold"
+                    >
+                      ✖
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No items added.</p>
+          )}
 
           {/* Add Item Button */}
-          {!readOnly && (
+          {!disabled && (
             <div className="flex justify-center items-center flex-col mt-4">
               <button
                 type="button"

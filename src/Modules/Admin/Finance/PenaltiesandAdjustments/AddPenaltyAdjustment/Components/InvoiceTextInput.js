@@ -1,3 +1,5 @@
+// src/Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Components/InvoiceTextInput.js
+
 import React from 'react';
 import { Field, ErrorMessage } from 'formik';
 import { motion } from 'framer-motion';
@@ -10,13 +12,14 @@ const InvoiceTextInput = ({
   name,
   type = 'text',
   placeholder,
-  disabled,
+  disabled = false,
+  readOnly = false,
   autoComplete = 'off',
   onBlur,
   onChange,
-  required = false, // Added required prop
+  required = false,
 }) => {
-  // Extract relevant state from Redux
+  // Corrected selector to invoice slice
   const { loading, error, invoiceFetchSuccess } = useSelector(
     (state) => state.admin.invoices
   );
@@ -39,6 +42,14 @@ const InvoiceTextInput = ({
     );
   }
 
+  // Combined onChange handler
+  const handleChange = (e) => {
+    if (onChange) {
+      onChange(e);
+    }
+    // Formik's onChange is handled automatically by Field
+  };
+
   return (
     <motion.div
       className="relative w-full mb-4"
@@ -56,13 +67,14 @@ const InvoiceTextInput = ({
           name={name}
           type={type}
           placeholder={placeholder}
-          disabled={disabled || false}
+          disabled={disabled}
+          readOnly={readOnly}
           className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none ${
             required ? 'focus:ring-red-300' : 'focus:ring-purple-300'
           }`}
           autoComplete={autoComplete}
-          onBlur={onBlur} // Pass onBlur to Field
-          onChange={onChange} // Pass onChange to Field
+          onBlur={onBlur}
+          onChange={handleChange}
         />
         {icon && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">

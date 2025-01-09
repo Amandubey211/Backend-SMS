@@ -1,3 +1,5 @@
+// src/Modules/Admin/Finance/Receipts/AddReceipt/Components/InvoiceTextInput.js
+
 import React from 'react';
 import { Field, ErrorMessage } from 'formik';
 import { motion } from 'framer-motion';
@@ -10,34 +12,43 @@ const InvoiceTextInput = ({
   name,
   type = 'text',
   placeholder,
-  disabled,
+  disabled = false,
+  readOnly = false, // Added readOnly prop
   autoComplete = 'off',
   onBlur,
   onChange,
-  required = false,
+  required = false, // Added required prop
 }) => {
   // Extract relevant state from Redux
   const { loading, error, invoiceFetchSuccess } = useSelector(
-    (state) => state.admin.invoices
+    (state) => state.admin.invoices // Adjusted to the correct slice
   );
 
-  // Determine which icon to display, only if a value is present in the field
+  // Determine which icon to display
   let icon = null;
   if (loading) {
     icon = <Spin indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />;
   } else if (error) {
     icon = (
       <Tooltip title="Failed to fetch invoice data">
-        <CloseCircleOutlined style={{ color: 'red', fontSize: 18 }} />
+        <CloseCircleOutlined style={{ color: 'red' }} />
       </Tooltip>
     );
   } else if (invoiceFetchSuccess) {
     icon = (
       <Tooltip title="Invoice data fetched successfully">
-        <CheckCircleOutlined style={{ color: 'green', fontSize: 18 }} />
+        <CheckCircleOutlined style={{ color: 'green' }} />
       </Tooltip>
     );
   }
+
+  // Combined onChange handler
+  const handleChange = (e) => {
+    if (onChange) {
+      onChange(e); // Execute any additional onChange logic
+    }
+    // Formik's onChange is handled automatically by Field
+  };
 
   return (
     <motion.div
@@ -56,11 +67,14 @@ const InvoiceTextInput = ({
           name={name}
           type={type}
           placeholder={placeholder}
-          disabled={disabled || false}
-          className="bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-purple-300"
+          disabled={disabled}
+          readOnly={readOnly} // Pass readOnly to Field
+          className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none ${
+            required ? 'focus:ring-red-300' : 'focus:ring-purple-300'
+          }`}
           autoComplete={autoComplete}
-          onBlur={onBlur}
-          onChange={onChange}
+          onBlur={onBlur} // Pass onBlur to Field
+          onChange={handleChange} // Wrap onChange
         />
         {icon && (
           <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
