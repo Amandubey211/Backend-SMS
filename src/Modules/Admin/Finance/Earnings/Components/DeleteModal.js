@@ -1,53 +1,126 @@
-import React from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
+import { Input, Button, Typography, Spin } from "antd";
+import { ExclamationCircleOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteExpense } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { deleteEarnings } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
+import { motion } from "framer-motion";
 
-const DeleteModal = ({ visible, onClose, type, income }) => {
+const { Text } = Typography;
+
+const DeleteModal = ({ visible, onClose, type, expense }) => {
+  const { loading } = useSelector((state) => state.admin.expenses);
   const dispatch = useDispatch();
-  if (!visible) return null;
+  const [inputValue, setInputValue] = useState("");
 
   const handleConfirm = async () => {
+    if (!expense) {
+      toast.error("No expense selected for deletion.");
+      return;
+    }
+
     try {
-      // await onConfirm(); // Execute the passed delete function
+      const { _id, category } = expense;
+      const categoryName = category?.categoryName || category;
+
+      await dispatch(
+        deleteExpense({ category: categoryName, id: _id })
+      ).unwrap();
       toast.success(`${type} deleted successfully!`);
-      onClose(); // Close the modal after successful deletion
     } catch (error) {
-      toast.error(error.message || `Failed to delete ${type}.`);
+      toast.error(`Failed to delete ${type}. Please try again.`);
+    } finally {
+      setInputValue(""); // Clear input after deletion
+      onClose();
     }
   };
 
-  return (
-    <div className="fixed -top-6 bottom-0 left-0 right-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-md text-center space-y-4">
-        <h2 className="text-lg font-medium">
-          Are you sure you want to delete this {type}?
-        </h2>
-        <div className="flex justify-center gap-4">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 border border-pink-500 text-pink-500 rounded-md hover:bg-pink-100"
-          >
-            No
-          </button>
-          <button
-            onClick={handleConfirm}
-            className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600"
-          >
-            Yes
-          </button>
+  const handleClose = () => {
+    setInputValue(""); // Clear input when modal is closed
+    onClose();
+  };
+
+  const categoryName =
+    expense?.category?.categoryName || expense?.category || "";
+
+  // Prevent clicks inside the modal from closing it
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      handleClose();
+    }
+  };
+
+  return visible ? (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black bg-opacity-30"
+      onClick={handleBackdropClick}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white p-6 rounded-lg shadow-lg w-96"
+        onClick={(e) => e.stopPropagation()} // Prevent modal click from closing
+      >
+        <div className="flex flex-col">
+          <div className="mb-4 flex items-center">
+            <ExclamationCircleOutlined
+              style={{ fontSize: "2rem", color: "#FF4D4F", marginRight: 12 }}
+            />
+            <h2 className="text-xl font-bold text-gray-700">
+              Confirm Deletion
+            </h2>
+          </div>
+          <Text type="secondary" className="block text-left">
+            To confirm, type the category name{" "}
+            <strong className="text-red-500 font-semibold">
+              {categoryName}
+            </strong>{" "}
+            below.
+          </Text>
+
+          <Input
+            placeholder="Type category name here"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className="mt-4"
+            size="large"
+          />
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              onClick={handleClose}
+              size="large"
+              className="hover:bg-gray-200"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              danger
+              size="large"
+              onClick={handleConfirm}
+              disabled={
+                loading ||
+                inputValue.trim().toLowerCase() !== categoryName.toLowerCase()
+              }
+              className="bg-gradient-to-r from-red-500 to-red-600 text-white border-none hover:from-red-600 hover:to-red-700 transition-all flex items-center"
+            >
+              {loading ? <Spin size="small" className="mr-2" /> : "Delete"}
+            </Button>
+          </div>
         </div>
-      </div>
+      </motion.div>
     </div>
-  );
+  ) : null;
 };
 
 DeleteModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired, // New prop for delete confirmation
   type: PropTypes.string.isRequired,
+  expense: PropTypes.object, // Expense to delete
 };
 
 export default DeleteModal;

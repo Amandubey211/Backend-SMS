@@ -182,7 +182,7 @@ const TotalExpenseList = () => {
           aria-label="Edit"
         />
       </Tooltip>
-      {/* <Tooltip title="Delete">
+      <Tooltip title="Delete">
         <Button
           type="link"
           icon={<DeleteOutlined />}
@@ -190,7 +190,7 @@ const TotalExpenseList = () => {
           className="text-red-600 hover:text-red-800 p-0"
           aria-label="Delete"
         />
-      </Tooltip> */}
+      </Tooltip>
     </div>
   );
 
@@ -338,27 +338,27 @@ const TotalExpenseList = () => {
         ellipsis: true,
       },
       // Paid Amount Column
-      // {
-      //   title: "Paid Amount (QR)",
-      //   dataIndex: "paidAmount",
-      //   key: "paidAmount",
-      //   render: (value) => (
-      //     <span className="text-xs text-green-600">{value || "0"} QR</span>
-      //   ),
-      //   width: 120,
-      //   ellipsis: true,
-      // },
+      {
+        title: "Paid Amount (QR)",
+        dataIndex: "paidAmount",
+        key: "paidAmount",
+        render: (value) => (
+          <span className="text-xs text-green-600">{value || "0"} QR</span>
+        ),
+        width: 120,
+        ellipsis: true,
+      },
       // Remaining Amount Column
-      // {
-      //   title: "Remaining Amount (QR)",
-      //   dataIndex: "remainingAmount",
-      //   key: "remainingAmount",
-      //   render: (value) => (
-      //     <span className="text-xs text-red-600">{value || "0"} QR</span>
-      //   ),
-      //   width: 120,
-      //   ellipsis: true,
-      // },
+      {
+        title: "Remaining Amount (QR)",
+        dataIndex: "remainingAmount",
+        key: "remainingAmount",
+        render: (value) => (
+          <span className="text-xs text-red-600">{value || "0"} QR</span>
+        ),
+        width: 120,
+        ellipsis: true,
+      },
 
       // Action Column
       {
@@ -635,16 +635,8 @@ const TotalExpenseList = () => {
               setIsDeleteModalVisible(false);
               setSelectedExpenseForDeletion(null);
             }}
-            onConfirm={() => {
-              if (selectedExpenseForDeletion) {
-                const { _id, category } = selectedExpenseForDeletion;
-                const categoryName = category?.categoryName || category;
-                dispatch(deleteExpense({ category: categoryName, id: _id }));
-              } else {
-                toast.error("No expense selected for deletion.");
-              }
-            }}
             type="Expense"
+            expense={selectedExpenseForDeletion}
           />
 
           <ExportModal
