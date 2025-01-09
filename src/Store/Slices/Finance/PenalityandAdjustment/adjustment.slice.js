@@ -18,6 +18,8 @@ const initialState = {
   error: null, // Changed from boolean to store error messages
   returnCardData: {},
   successMessage: null, // To store success messages
+  readOnly: false, // New state for read-only mode
+  selectedAdjustment: null, // New state for selected adjustment
 };
 
 const penaltyAdjustmentSlice = createSlice({
@@ -38,12 +40,25 @@ const penaltyAdjustmentSlice = createSlice({
       state.loading = false;
       state.error = null;
       state.successMessage = null;
+      state.readOnly = false;
+      state.selectedAdjustment = null;
     },
     clearError: (state) => {
       state.error = null;
     },
     clearSuccessMessage: (state) => {
       state.successMessage = null;
+    },
+    // New reducers
+    setReadOnly: (state, action) => {
+      state.readOnly = action.payload;
+    },
+    setSelectedAdjustment: (state, action) => {
+      state.selectedAdjustment = action.payload;
+    },
+    clearSelectedAdjustment: (state) => {
+      state.selectedAdjustment = null;
+      state.readOnly = false;
     },
   },
   extraReducers: (builder) => {
@@ -121,6 +136,9 @@ export const {
   resetAdjustmentData,
   clearError,
   clearSuccessMessage,
+  setReadOnly,
+  setSelectedAdjustment,
+  clearSelectedAdjustment,
 } = penaltyAdjustmentSlice.actions;
 
 export default penaltyAdjustmentSlice.reducer;
