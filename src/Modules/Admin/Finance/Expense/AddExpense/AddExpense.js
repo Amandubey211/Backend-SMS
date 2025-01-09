@@ -26,6 +26,7 @@ import {
   frontendToBackendSubCategoryMap,
 } from "../Config/subCategoryMapping";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import { mapBackendToFrontend } from "../Config/fieldMapping";
 
 const AddExpenses = () => {
   const dispatch = useDispatch();
@@ -85,52 +86,14 @@ const AddExpenses = () => {
   // Initial form values
   const getInitialValues = () => {
     if (selectedExpense) {
+      const mappedData = mapBackendToFrontend(selectedExpense);
+      const categoryName = mappedData.categoryName;
+      const actualSubCategory = mappedData.sub_category;
       const expenseData = selectedExpense;
-
-      // Extract 'subcategory' correctly
-      let subCategory = expenseData.subcategory || expenseData.sub_category;
-
-      // Handle special mappings for 'staffType' and 'expenseSubCategory'
-      if (expenseData.staffType) {
-        subCategory =
-          expenseData.staffType === "nonteaching"
-            ? "Non-Teaching Staffs"
-            : "Teaching Staffs";
-      } else if (expenseData.expenseSubCategory) {
-        subCategory =
-          expenseData.expenseSubCategory === "maintenance"
-            ? "Maintenance"
-            : "Utilities";
-      }
-
-      const categoryName =
-        expenseData.category?.categoryName || "Salaries and Wages";
-
-      // Determine if the category has multiple subcategories
-      const hasMultipleSubCategories = subCategories[categoryName]?.length > 1;
-
-      // For categories with single subcategory, set subCategory to the only subcategory
-      const actualSubCategory = hasMultipleSubCategories
-        ? subCategory
-        : subCategories[categoryName]?.[0] || subCategory;
-
-      // Construct initial values with subcategory-specific fields
+      // Merge mapped data with initialValuesMap
       const initialValues = {
-        _id: expenseData._id || "",
-        categoryName: categoryName,
-        sub_category: actualSubCategory || "", // Ensure sub_category is set
-        paymentType: expenseData.paymentType || "cash",
-        receipt: expenseData.receipt || "",
-        description: expenseData.description || "",
-        paid_amount: expenseData.paidAmount || 0,
-        total_amount: expenseData.totalAmount || 0,
-        finalAmount: expenseData.finalAmount || 0,
-        remaining_amount: expenseData.remainingAmount || 0,
-        // advanceAmount: expenseData.paidAmount || 0,
-
-        // paid_amount: expenseData.paidAmount || 0,
         ...initialValuesMap[actualSubCategory],
-        // Spread expenseData after initialValuesMap to override if necessary
+        ...mappedData,
         ...expenseData,
       };
 
@@ -410,21 +373,6 @@ const AddExpenses = () => {
               {formComponent || (
                 <div className="text-center text-gray-500 text-xs py-4">
                   Select a sub-category to proceed.
-                </div>
-              )}
-
-              {/* Submit Button */}
-              {!readOnly && (
-                <div className="flex justify-end mt-6">
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    loading={isSubmitting}
-                    disabled={isSubmitting}
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-                  >
-                    {selectedExpense ? "Update Expense" : "Save Expense"}
-                  </Button>
                 </div>
               )}
             </Form>
