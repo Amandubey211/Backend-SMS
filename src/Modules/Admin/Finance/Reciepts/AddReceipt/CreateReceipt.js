@@ -472,35 +472,9 @@ const CreateReceipt = () => {
                         // Debugging: Log the input value
                         console.log("Invoice Number Input Changed:", value);
 
-                        if (value !== fetchedInvoiceNumber) {
-                          form.setFieldValue("receiverName", "");
-                          form.setFieldValue("mailId", "");
-                          form.setFieldValue("contactNumber", "");
-                          form.setFieldValue("address", "");
-                          form.setFieldValue("discountType", "amount");
-                          form.setFieldValue("discount", 0);
-                          form.setFieldValue("penalty", 0);
-                          form.setFieldValue("tax", 0);
-                          form.setFieldValue("govtRefNumber", "");
-                          form.setFieldValue("remark", "");
-                          form.setFieldValue("items", [
-                            {
-                              category: "",
-                              revenueReference: "",
-                              quantity: "",
-                              totalAmount: "",
-                              subCategory: "",
-                              stationeries: [],
-                            },
-                          ]);
-                          form.setFieldValue("subAmount", 0, false);
-                          form.setFieldValue("finalAmount", 0, false);
-                          setFetchedInvoiceNumber("");
-
-                          // If in create mode, set the selectedInvoiceNumber in Redux
-                          if (!isEditMode) {
-                            dispatch(setSelectedInvoiceNumber(value));
-                          }
+                        // Only dispatch setSelectedInvoiceNumber in Create Mode
+                        if (!isEditMode) {
+                          dispatch(setSelectedInvoiceNumber(value));
                         }
                       }}
                       disabled={isReadOnlyState} // Disable input in read-only mode
