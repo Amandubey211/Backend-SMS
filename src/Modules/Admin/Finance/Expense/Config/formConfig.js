@@ -79,7 +79,7 @@ export const initialValuesMap = {
   },
 
   // Utilities
-  Utilities: {
+  utilities: {
     // Category-specific fields
     utilityType: "electricity",
     name: "",
@@ -102,7 +102,7 @@ export const initialValuesMap = {
   },
 
   // Maintenance
-  Maintenance: {
+  maintenance: {
     // Category-specific fields
     name: "Aman Sharma",
     vendor: "aman",
@@ -288,8 +288,8 @@ export const formComponentsMap = {
     "Non-Teaching Staffs": NonTeachingStaffForm,
   },
   "Utilities and Maintenance": {
-    Utilities: UtilitiesForm,
-    Maintenance: BuildingMaintenanceForm,
+    utilities: UtilitiesForm,
+    maintenance: BuildingMaintenanceForm,
   },
   Supplies: {
     "Classroom & Office Purpose": ClassroomOfficePurposeForm,

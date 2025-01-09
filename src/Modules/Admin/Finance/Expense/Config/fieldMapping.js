@@ -4,7 +4,7 @@ export const mapBackendToFrontend = (expenseData) => {
   return {
     _id: expenseData._id || "",
     categoryName: expenseData.category?.categoryName || "Salaries and Wages",
-    sub_category: expenseData.subcategory || expenseData.sub_category || "",
+    sub_category: expenseData.subcategory || "",
     payment_type: expenseData.paymentType || "cash",
     receipt: expenseData.receipt || "",
     description: expenseData.description || "",

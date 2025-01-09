@@ -16,13 +16,14 @@ import {
 import {
   addExpense,
   updateExpense,
+  deleteExpense,
 } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import { formComponentsMap, initialValuesMap } from "../Config/formConfig";
 import { validationSchemas } from "../Config/validationSchemas";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
 import {
-  backendToFrontendSubCategoryMap,
+  // backendToFrontendSubCategoryMap,
   frontendToBackendSubCategoryMap,
 } from "../Config/subCategoryMapping";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
@@ -87,9 +88,9 @@ const AddExpenses = () => {
   const getInitialValues = () => {
     if (selectedExpense) {
       const mappedData = mapBackendToFrontend(selectedExpense);
-      const categoryName = mappedData.categoryName;
       const actualSubCategory = mappedData.sub_category;
       const expenseData = selectedExpense;
+
       // Merge mapped data with initialValuesMap
       const initialValues = {
         ...initialValuesMap[actualSubCategory],
@@ -230,6 +231,7 @@ const AddExpenses = () => {
       if (selectedExpense) {
         // Update existing record
         const id = selectedExpense._id;
+        console.log(payload, "payload");
         await dispatch(
           updateExpense({ values: payload, category, id })
         ).unwrap();
