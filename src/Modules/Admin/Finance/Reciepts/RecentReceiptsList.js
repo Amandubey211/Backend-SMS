@@ -572,13 +572,7 @@ const RecentReceiptsList = () => {
           >
             {/* Close + Download PDF buttons */}
             <div className="flex justify-end space-x-2 mb-4">
-              {/* Close button */}
-              <button
-                onClick={() => setReceiptVisible(false)}
-                className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-              >
-                ✕
-              </button>
+              
               {/* Download PDF button */}
               <button
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
@@ -586,11 +580,18 @@ const RecentReceiptsList = () => {
               >
                 Download PDF
               </button>
+              {/* Close button */}
+              <button
+                onClick={() => setReceiptVisible(false)}
+                className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+              >
+                ✕
+              </button>
             </div>
 
             {/* The actual receipt content */}
             {selectedReceipt ? (
-              <Receipt receiptData={selectedReceipt} />
+              <Receipt data={selectedReceipt} />
             ) : (
               <p>No receipt data available.</p>
             )}

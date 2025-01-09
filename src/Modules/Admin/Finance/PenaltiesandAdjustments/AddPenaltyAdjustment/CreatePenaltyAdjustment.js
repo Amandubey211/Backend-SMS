@@ -1,7 +1,14 @@
 // src/Modules/Admin/Finance/Receipts/AddReceipt/CreatePenaltyAdjustment.js
 
 import React, { useState, useEffect, useRef } from "react";
-import { Formik, Form, FieldArray, Field, ErrorMessage, useFormikContext } from "formik";
+import {
+  Formik,
+  Form,
+  FieldArray,
+  Field,
+  ErrorMessage,
+  useFormikContext,
+} from "formik";
 import * as Yup from "yup";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import TextInput from "./Components/TextInput";
@@ -17,7 +24,6 @@ import {
 import toast from "react-hot-toast";
 import Layout from "../../../../../Components/Common/Layout";
 import { useNavigate } from "react-router-dom";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import InvoiceTextInput from "./Components/InvoiceTextInput";
 import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts";
 import TextInputWithSuffix from "./Components/TextInputWithSuffix";
@@ -91,8 +97,14 @@ const CreatePenaltyAdjustment = () => {
       ? {
         invoiceNumber: selectedAdjustment.invoiceId?.invoiceNumber || "",
         items:
-          Array.isArray(selectedAdjustment.items) && selectedAdjustment.items.length > 0
-            ? selectedAdjustment.items
+          Array.isArray(selectedAdjustment.items) &&
+            selectedAdjustment.items.length > 0
+            ? selectedAdjustment.items.map((item) => ({
+              revenueType: item.revenueType || "",
+              revenueReference: item._id || "", // **Set to `_id` from lineItems**
+              quantity: item.quantity || 1,
+              amount: item.amount || 0,
+            }))
             : [
               {
                 revenueType: "",
@@ -108,7 +120,7 @@ const CreatePenaltyAdjustment = () => {
         tax: selectedAdjustment.tax || 0,
         subAmount: selectedAdjustment.subAmount || 0,
         finalAmount: selectedAdjustment.finalAmount || 0,
-        document: selectedAdjustment.document || null,
+        document: selectedAdjustment.document || null, // **Retain document in read-only mode**
       }
       : {
         invoiceNumber: "",
@@ -127,7 +139,7 @@ const CreatePenaltyAdjustment = () => {
         tax: 0,
         subAmount: 0,
         finalAmount: 0,
-        document: null,
+        document: null, // **Initial value for create mode**
       };
 
   const initialValues = prefilledValues;
@@ -181,12 +193,36 @@ const CreatePenaltyAdjustment = () => {
     }
     setSubmitting(true);
     try {
-      await dispatch(createAdjustment(values)).unwrap();
-      toast.success("Penalty & Adjustment created successfully!");
+      // Prepare the payload
+      const payload = {
+        invoiceNumber: values.invoiceNumber,
+        items: values.items.map((item) => ({
+          revenueType: item.revenueType,
+          revenueReference: item.revenueReference, // **This is the `_id` from lineItems**
+          quantity: item.quantity,
+          amount: item.amount,
+        })),
+        reason: values.reason,
+        discountType: values.discountType,
+        discount: values.discount,
+        adjustmentPenalty: values.adjustmentPenalty,
+        tax: values.tax,
+        subAmount: values.subAmount,
+        finalAmount: values.finalAmount,
+      };
+
+      // Include 'document' only if it exists
+      if (values.document) {
+        payload.document = values.document;
+      }
+
+      await dispatch(createAdjustment(payload)).unwrap();
+      // toast.success("Penalty & Adjustment created successfully!");
       resetForm();
-      navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Ensure this path is correct
+      navigate("/finance/penaltyAdjustment-list"); // **Ensure this path is correct**
     } catch (err) {
-      toast.error(err || "Failed to create penalty & adjustment.");
+      // toast.error(err || "Failed to create penalty & adjustment.");
+      console.log(err || "Failed to create penalty & adjustment.");
     } finally {
       setSubmitting(false);
     }
@@ -242,13 +278,13 @@ const CreatePenaltyAdjustment = () => {
   useEffect(() => {
     if (invoiceFetchSuccess && invoiceDetails && !readOnly) {
       // Prefill form fields based on fetched invoice details
-      formikRef.current.setFieldValue("reason", invoiceDetails.reason || "", false);
+      formikRef.current.setFieldValue("reason", invoiceDetails.description || "", false);
 
       // Map lineItems from API to items in the form
       if (Array.isArray(invoiceDetails.lineItems)) {
         const mappedItems = invoiceDetails.lineItems.map((item) => ({
           revenueType: item.revenueType || "",
-          revenueReference: "", // Assuming this field isn't provided by the API
+          revenueReference: item._id || "", // **Set to `_id` from lineItems**
           quantity: item.quantity || 1,
           amount: item.amount || 0,
         }));
@@ -262,7 +298,8 @@ const CreatePenaltyAdjustment = () => {
       formikRef.current.setFieldValue("tax", invoiceDetails.tax || 0, false);
       formikRef.current.setFieldValue("subAmount", invoiceDetails.subAmount || 0, false);
       formikRef.current.setFieldValue("finalAmount", invoiceDetails.finalAmount || 0, false);
-      formikRef.current.setFieldValue("document", invoiceDetails.qrCode || null, false);
+      // **Removed:** Prevent pre-filling 'document'
+      // formikRef.current.setFieldValue("document", invoiceDetails.qrCode || null, false);
 
       setInvoiceError(false); // Reset error state on successful fetch
       dispatch(clearSelectedInvoiceNumber());
@@ -282,7 +319,7 @@ const CreatePenaltyAdjustment = () => {
           items: [
             {
               revenueType: "",
-              revenueReference: "",
+              revenueReference: "", // **Set to empty since we don't have valid IDs**
               quantity: 1,
               amount: 0,
             },
@@ -294,7 +331,7 @@ const CreatePenaltyAdjustment = () => {
           tax: 0,
           subAmount: 0,
           finalAmount: 0,
-          document: null,
+          // **Removed:** Do not reset 'document'
         });
       }
       dispatch(clearSelectedAdjustment());
@@ -455,6 +492,7 @@ const CreatePenaltyAdjustment = () => {
                             key={index}
                             className="grid grid-cols-12 gap-8 items-center mb-6"
                           >
+                            {/* Revenue Type */}
                             <div className="col-span-3">
                               <SelectInput
                                 name={`items.${index}.revenueType`}
@@ -482,6 +520,7 @@ const CreatePenaltyAdjustment = () => {
                               />
                             </div>
 
+                            {/* Revenue Reference */}
                             <div className="col-span-3">
                               <TextInput
                                 name={`items.${index}.revenueReference`}
@@ -494,6 +533,7 @@ const CreatePenaltyAdjustment = () => {
                               />
                             </div>
 
+                            {/* Quantity */}
                             <div className="col-span-3">
                               <TextInput
                                 name={`items.${index}.quantity`}
@@ -507,6 +547,7 @@ const CreatePenaltyAdjustment = () => {
                               />
                             </div>
 
+                            {/* Amount */}
                             <div className="col-span-3">
                               <TextInput
                                 name={`items.${index}.amount`}
@@ -544,7 +585,7 @@ const CreatePenaltyAdjustment = () => {
                             onClick={() =>
                               push({
                                 revenueType: "",
-                                revenueReference: "",
+                                revenueReference: "", // **Initialize as empty; user can fill or auto-filled later**
                                 quantity: 1,
                                 amount: 0,
                               })
@@ -562,7 +603,6 @@ const CreatePenaltyAdjustment = () => {
                     </div>
                   )}
                 </FieldArray>
-
 
                 {/* Additional Details Section */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
