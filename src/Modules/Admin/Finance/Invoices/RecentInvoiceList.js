@@ -178,10 +178,8 @@ const RecentInvoiceList = () => {
                 <Menu.Item
                   icon={<RedoOutlined />}
                   onClick={() => {
-                    // Store the invoice number instead of the _id
-                    dispatch(setSelectedInvoiceNumber(record.invoiceNumber));
-                    // Navigate to the Create Penalty Adjustment form
-                    navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
+                    dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
+                    navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
                   }}
                 >
                   Return

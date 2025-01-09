@@ -79,6 +79,12 @@ const CreatePenaltyAdjustment = () => {
   const navigate = useNavigate();
   const formikRef = useRef();
 
+
+  const selectedInvoiceNumber = useSelector(
+    (state) => state.admin.invoices.selectedInvoiceNumber
+  );
+
+
   // Extract necessary state from Redux
   const {
     loading,
@@ -87,6 +93,8 @@ const CreatePenaltyAdjustment = () => {
     readOnly,
     selectedAdjustment,
   } = useSelector((state) => state.admin.penaltyAdjustment);
+
+
 
   // Local state to track API errors
   const [invoiceError, setInvoiceError] = useState(false);
@@ -143,6 +151,26 @@ const CreatePenaltyAdjustment = () => {
       };
 
   const initialValues = prefilledValues;
+
+
+  useEffect(() => {
+    const fetchAndPrefill = async () => {
+      if (selectedInvoiceNumber) {
+        try {
+          await dispatch(fetchInvoiceByNumber(selectedInvoiceNumber)).unwrap();
+          formikRef.current.setFieldValue("invoiceNumber", selectedInvoiceNumber);
+          dispatch(clearSelectedInvoiceNumber());
+        } catch (error) {
+          console.error("Failed to fetch invoice:", error);
+        }
+      }
+    };
+
+    fetchAndPrefill();
+  }, [selectedInvoiceNumber, dispatch]);
+
+
+
 
   // Define validation schema
   const validationSchema = Yup.object().shape({
@@ -233,10 +261,6 @@ const CreatePenaltyAdjustment = () => {
     (state) => state.admin.invoices || {}
   );
 
-  // Watch selectedInvoiceNumber for changes
-  const selectedInvoiceNumber = useSelector(
-    (state) => state.admin.invoices.selectedInvoiceNumber
-  );
 
   // Implementing Debounce to prevent excessive API calls
   const debounceRef = useRef(null);
@@ -499,25 +523,18 @@ const CreatePenaltyAdjustment = () => {
                                 label="Revenue Type"
                                 options={[
                                   { value: "studentFee", label: "Student Fee" },
-                                  { value: "facilityRevenue", label: "Facility Revenue" },
-                                  {
-                                    value: "serviceBasedRevenue",
-                                    label: "Service-Based Revenue",
-                                  },
-                                  {
-                                    value: "communityExternalAffairRevenue",
-                                    label: "Community External Affair Revenue",
-                                  },
-                                  {
-                                    value: "financialInvestmentRevenue",
-                                    label: "Financial Investment Revenue",
-                                  },
-                                  { value: "penalties", label: "Penalties" },
-                                  { value: "other", label: "Other" },
+                                  { value: "FacilityRevenue", label: "Facility Revenue" },
+                                  { value: "service_based_revenue", label: "Service-Based Revenue" },
+                                  { value: "community_externalaffair_revenue", label: "Community External Affair Revenue" },
+                                  { value: "financial_investment_revenue", label: "Financial Investment Revenue" },
+                                  { value: "Penalties", label: "Penalties" },
+                                  { value: "Other", label: "Other" },
                                 ]}
-                                readOnly={readOnly}
+                                placeholder="Select Revenue Type"
                                 disabled={readOnly}
+                                required
                               />
+
                             </div>
 
                             {/* Revenue Reference */}
@@ -530,7 +547,7 @@ const CreatePenaltyAdjustment = () => {
                                 type="hidden"
                                 readOnly={readOnly}
                                 disabled={readOnly}
-                                
+
                               />
                             </div>
 
