@@ -165,10 +165,10 @@ const CreatePenaltyAdjustment = () => {
         }
       }
     };
-  
+
     fetchAndPrefill();
   }, [selectedInvoiceNumber, dispatch]);
-  
+
 
 
 
@@ -523,25 +523,18 @@ const CreatePenaltyAdjustment = () => {
                                 label="Revenue Type"
                                 options={[
                                   { value: "studentFee", label: "Student Fee" },
-                                  { value: "facilityRevenue", label: "Facility Revenue" },
-                                  {
-                                    value: "serviceBasedRevenue",
-                                    label: "Service-Based Revenue",
-                                  },
-                                  {
-                                    value: "communityExternalAffairRevenue",
-                                    label: "Community External Affair Revenue",
-                                  },
-                                  {
-                                    value: "financialInvestmentRevenue",
-                                    label: "Financial Investment Revenue",
-                                  },
-                                  { value: "penalties", label: "Penalties" },
-                                  { value: "other", label: "Other" },
+                                  { value: "FacilityRevenue", label: "Facility Revenue" },
+                                  { value: "service_based_revenue", label: "Service-Based Revenue" },
+                                  { value: "community_externalaffair_revenue", label: "Community External Affair Revenue" },
+                                  { value: "financial_investment_revenue", label: "Financial Investment Revenue" },
+                                  { value: "Penalties", label: "Penalties" },
+                                  { value: "Other", label: "Other" },
                                 ]}
-                                readOnly={readOnly}
+                                placeholder="Select Revenue Type"
                                 disabled={readOnly}
+                                required
                               />
+
                             </div>
 
                             {/* Revenue Reference */}
