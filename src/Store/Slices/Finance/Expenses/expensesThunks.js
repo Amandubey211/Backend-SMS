@@ -21,7 +21,7 @@ const getEndpointForCategory = (category, action, id) => {
   switch (category) {
     case "Salaries and Wages":
       if (action === "create") return `${baseUrl}/add/salaryWages`;
-      if (action === "update") return `${baseUrl}/update/salaryWages/${id}`;
+      if (action === "update") return `${baseUrl}/edit/salaryWages`;
       if (action === "delete") return `${baseUrl}/delete/salaryWages/${id}`;
       break;
 

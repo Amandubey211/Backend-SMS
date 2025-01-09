@@ -14,9 +14,9 @@ import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoic
 import { useNavigate } from "react-router-dom";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import useDebounce from "../../../../../Hooks/CommonHooks/useDebounce";
-import InvoiceTextInput from "./Components/InvoiceTextInput"; // Import the new component
+// import InvoiceTextInput from "./Components/InvoiceTextInput"; // Import the new component
 import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts"; // Adjust the import path as necessary
-import TextInputWithSuffix from "./Components/TextInputWithSuffix";
+// import TextInputWithSuffix from "./Components/TextInputWithSuffix";
 import FileInput from "./Components/FileInput";
 
 // Define CalculateAmounts component
@@ -88,16 +88,24 @@ const CreatePenaltyAdjustment = () => {
     }
   }, [selectedInvoiceNumber, dispatch]);
 
-  
   // Prefill form fields when invoice details are fetched successfully
   useEffect(() => {
     if (invoiceFetchSuccess && invoiceDetails) {
       // Prefill the form fields with invoiceDetails
-      formikRef.current.setFieldValue("invoiceNumber", invoiceDetails.invoiceNumber);
+      formikRef.current.setFieldValue(
+        "invoiceNumber",
+        invoiceDetails.invoiceNumber
+      );
       formikRef.current.setFieldValue("reason", ""); // Set default reason or fetch from invoiceDetails if available
-      formikRef.current.setFieldValue("discountType", invoiceDetails.discountType || "amount");
+      formikRef.current.setFieldValue(
+        "discountType",
+        invoiceDetails.discountType || "amount"
+      );
       formikRef.current.setFieldValue("discount", invoiceDetails.discount || 0);
-      formikRef.current.setFieldValue("adjustmentPenalty", invoiceDetails.penalty || 0);
+      formikRef.current.setFieldValue(
+        "adjustmentPenalty",
+        invoiceDetails.penalty || 0
+      );
       formikRef.current.setFieldValue("tax", invoiceDetails.tax || 0);
       formikRef.current.setFieldValue(
         "items",
@@ -141,7 +149,9 @@ const CreatePenaltyAdjustment = () => {
       .of(
         Yup.object().shape({
           revenueType: Yup.string().required("Revenue Type is required"),
-          revenueReference: Yup.string().required("Revenue Reference is required"),
+          revenueReference: Yup.string().required(
+            "Revenue Reference is required"
+          ),
           quantity: Yup.number()
             .min(1, "Quantity must be at least 1")
             .required("Quantity is required"),
@@ -169,7 +179,7 @@ const CreatePenaltyAdjustment = () => {
       .required("Tax is required"),
     subAmount: Yup.number().min(0).notRequired(),
     finalAmount: Yup.number().min(0).notRequired(),
-    document: Yup.string().nullable()
+    document: Yup.string().nullable(),
   });
 
   // Handle form submission
@@ -210,7 +220,10 @@ const CreatePenaltyAdjustment = () => {
   // Fetch invoice details when debounced invoice number changes and is valid
   useEffect(() => {
     const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
-    if (debouncedInvoiceNumber && invoiceNumberPattern.test(debouncedInvoiceNumber)) {
+    if (
+      debouncedInvoiceNumber &&
+      invoiceNumberPattern.test(debouncedInvoiceNumber)
+    ) {
       dispatch(fetchInvoiceByNumber(debouncedInvoiceNumber));
     }
   }, [debouncedInvoiceNumber, dispatch]);
@@ -283,7 +296,7 @@ const CreatePenaltyAdjustment = () => {
               <h2 className="text-lg font-semibold mb-4">Adjustment Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 {/* Invoice Number */}
-                <InvoiceTextInput
+                {/* <InvoiceTextInput
                   name="invoiceNumber"
                   label="Invoice Number"
                   placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
@@ -326,7 +339,7 @@ const CreatePenaltyAdjustment = () => {
                     dispatch(fetchInvoiceByNumber(invoiceNumberInput));
                   }}
                   required
-                />
+                /> */}
 
                 {/* Reason */}
                 <TextInput
@@ -336,17 +349,18 @@ const CreatePenaltyAdjustment = () => {
                   required
                   type="text"
                 />
-
-
               </div>
 
               {/* Items Section */}
               <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
-              <ReturnItems values={formik.values} setFieldValue={formik.setFieldValue} required />
+              <ReturnItems
+                values={formik.values}
+                setFieldValue={formik.setFieldValue}
+                required
+              />
 
               {/* Sub Amount and Final Amount */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
                 {/* Discount Type */}
                 <SelectInput
                   name="discountType"
@@ -378,14 +392,14 @@ const CreatePenaltyAdjustment = () => {
                 />
 
                 {/* Tax */}
-                <TextInputWithSuffix
+                {/* <TextInputWithSuffix
                   name="tax"
                   label="Tax"
                   placeholder="Enter tax value"
                   required
                   type="number"
                   suffix="%"
-                />
+                /> */}
 
                 {/* Document Upload Field */}
                 <FileInput
