@@ -35,7 +35,7 @@ import PenaltyAdjustmentTemplate from "../../../../../../Utils/FinanceTemplate/P
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "react-hot-toast";
-import { setCurrentPage, setReadOnly, setSelectedAdjustment } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
+import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSuccess, clearSelectedInvoiceNumber } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
 
 const PenalityandAdjustmentList = () => {
@@ -50,7 +50,7 @@ const PenalityandAdjustmentList = () => {
     totalPages,
     currentPage,
     pageSize,
-  } = useSelector((state) => state.admin.penaltyAdjustment); // Ensure correct slice name
+  } = useSelector((state) => state.admin.penaltyAdjustment || {});
 
   // Local state
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
@@ -64,9 +64,8 @@ const PenalityandAdjustmentList = () => {
   // Reference for the popup/modal
   const popupRef = useRef(null);
 
-  const paze_size =
+  const computedPageSize =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
-  const [computedPageSize, setComputedPageSize] = useState(paze_size);
 
   // Handle search input changes
   const handleSearch = (e) => {
@@ -105,8 +104,8 @@ const PenalityandAdjustmentList = () => {
         return;
       }
 
-      const pdfTitle = selectedReceipt.returnInvoiceNumber
-        ? `${selectedReceipt.returnInvoiceNumber}.pdf`
+      const pdfTitle = selectedReceipt.return_invoice_no
+        ? `${selectedReceipt.return_invoice_no}.pdf`
         : "penalty_adjustment.pdf";
 
       const canvas = await html2canvas(popupRef.current, { scale: 2 });
@@ -362,58 +361,62 @@ const PenalityandAdjustmentList = () => {
   ];
 
   // Transform adjustments data to table dataSource
-  const dataSource = adjustmentData?.map((adjustment) => ({
-    key: adjustment?._id,
-    return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
-    invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
-    receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
-    adjustmentAmount: adjustment?.adjustmentAmount || 0,
-    adjustmentTotal: adjustment?.adjustmentTotal || 0,
-    status: adjustment?.isCancel ? "Cancelled" : "Active",
-    adjustedAt: adjustment?.adjustedAt || "N/A",
-    ...adjustment, // Spread other properties safely
-  }));
+  const dataSource = Array.isArray(adjustmentData)
+    ? adjustmentData.map((adjustment) => ({
+        key: adjustment?._id,
+        return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
+        invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
+        receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
+        adjustmentAmount: adjustment?.adjustmentAmount || 0,
+        adjustmentTotal: adjustment?.adjustmentTotal || 0,
+        status: adjustment?.isCancel ? "Cancelled" : "Active",
+        adjustedAt: adjustment?.adjustedAt || "N/A",
+        ...adjustment, // Spread other properties safely
+      }))
+    : [];
 
   // Transform adjustment data for export (if needed)
   const transformAdjustmentData = (adjustmentData) =>
-    adjustmentData?.map((adjustment, index) => {
-      const {
-        _id,
-        returnInvoiceNumber = "N/A",
-        invoiceId = {},
-        tax = 0,
-        discount = 0,
-        discountType = "percentage",
-        penalty = 0,
-        adjustmentTotal = 0,
-        adjustmentAmount = 0,
-        adjustedBy = {},
-        adjustedAt = "N/A",
-        academicYear = {},
-      } = adjustment || {};
+    Array.isArray(adjustmentData)
+      ? adjustmentData.map((adjustment, index) => {
+          const {
+            _id,
+            returnInvoiceNumber = "N/A",
+            invoiceId = {},
+            tax = 0,
+            discount = 0,
+            discountType = "percentage",
+            penalty = 0,
+            adjustmentTotal = 0,
+            adjustmentAmount = 0,
+            adjustedBy = {},
+            adjustedAt = "N/A",
+            academicYear = {},
+          } = adjustment || {};
 
-      return {
-        sNo: index + 1,
-        returnInvoiceNumber,
-        refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
-        receiver: invoiceId.receiver?.name || "N/A",
-        receiverEmail: invoiceId.receiver?.email || "N/A",
-        receiverPhone: invoiceId.receiver?.contact || "N/A",
-        receiverAddress: invoiceId.receiver?.address || "N/A",
-        tax: `${parseFloat(tax)} %`,
-        discount:
-          discountType === "percentage"
-            ? `${parseFloat(discount)} %`
-            : `${parseFloat(discount)} QR`,
-        discountType,
-        penalty: `${parseFloat(penalty)} QR`,
-        totalAmount: `${parseFloat(adjustmentTotal)} QR`,
-        finalAmount: `${parseFloat(adjustmentAmount)} QR`,
-        createdBy: adjustedBy.adminName || "N/A",
-        Date: adjustedAt,
-        academicYearDetails: academicYear.year || "N/A",
-      };
-    }) || [];
+          return {
+            sNo: index + 1,
+            returnInvoiceNumber,
+            refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
+            receiver: invoiceId.receiver?.name || "N/A",
+            receiverEmail: invoiceId.receiver?.email || "N/A",
+            receiverPhone: invoiceId.receiver?.contact || "N/A",
+            receiverAddress: invoiceId.receiver?.address || "N/A",
+            tax: `${parseFloat(tax)} %`,
+            discount:
+              discountType === "percentage"
+                ? `${parseFloat(discount)} %`
+                : `${parseFloat(discount)} QR`,
+            discountType,
+            penalty: `${parseFloat(penalty)} QR`,
+            totalAmount: `${parseFloat(adjustmentTotal)} QR`,
+            finalAmount: `${parseFloat(adjustmentAmount)} QR`,
+            createdBy: adjustedBy.adminName || "N/A",
+            Date: adjustedAt,
+            academicYearDetails: academicYear.year || "N/A",
+          };
+        })
+      : [];
 
   return (
     <Layout title={"Penalty & Adjustment List | Student Diwan"}>
@@ -445,7 +448,7 @@ const PenalityandAdjustmentList = () => {
               <button
                 onClick={() =>
                   navigate(
-                    "/finance/penaltyAdjustment/create" // Corrected route
+                    "/finance/penaltyAdjustment/add-new-penalty-adjustment"
                   )
                 }
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -492,10 +495,9 @@ const PenalityandAdjustmentList = () => {
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
                 onChange: (page, pageSize) => {
                   dispatch(setCurrentPage(page));
-                  setComputedPageSize(pageSize);
                 },
                 onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size);
+                  dispatch(setCurrentPage(1)); // Reset to first page on size change
                 },
               }}
               className="rounded-lg shadow text-xs"
@@ -540,7 +542,7 @@ const PenalityandAdjustmentList = () => {
                   <button
                     className="w-40 py-2 text-white font-semibold rounded-md shadow-md"
                     style={{
-                      background: "linear-gradient(90deg, #C83B62 0%, #7F35CD 100%)",
+                      background: "linear-gradient(to right, #C83B62, #7F35CD)",
                     }}
                     onClick={handleDownloadPDF}
                   >
@@ -553,7 +555,6 @@ const PenalityandAdjustmentList = () => {
               </div>
             </div>
           )}
-
         </div>
       </AdminDashLayout>
     </Layout>
