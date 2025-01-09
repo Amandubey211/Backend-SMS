@@ -3,38 +3,46 @@ import { saveAs } from "file-saver";
 import { jsPDF } from "jspdf";
 import toast from "react-hot-toast";
 
+export const ExportExcel = (
+  data = [],
+  fileName = "ExportedData.xlsx",
+  sheet = "sheet1"
+) => {
+  if (!data.length) {
+    return toast.error("No data available to export");
+  }
 
-export const ExportExcel = (data = [], fileName = "ExportedData.xlsx", sheet = "sheet1") => {
-    if (!data.length) {
-      return toast.error("No data available to export");
-    }
-  
-    // Step 1: Dynamically extract fields from the first object
-    const fields = Object.keys(data[0] || {});
-  
-    // Step 2: Format the data to ensure field order
-    const formattedData = data.map((row) =>
-      fields.reduce((acc, field) => {
-        acc[field] = row[field] || "N/A"; // Enforce field order and default value
-        return acc;
-      }, {})
-    );
-  
-    // Step 3: Create a worksheet
-    const worksheet = XLSX.utils.json_to_sheet(formattedData);
-  
-    // Step 4: Create a workbook
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheet);
-  
-    // Step 5: Write the workbook directly to file
-    XLSX.writeFile(workbook, fileName); // Automatically triggers the file download
-  };
+  // Step 1: Dynamically extract fields from the first object
+  const fields = Object.keys(data[0] || {});
+
+  // Step 2: Format the data to ensure field order
+  const formattedData = data.map((row) =>
+    fields.reduce((acc, field) => {
+      acc[field] = row[field] || "N/A"; // Enforce field order and default value
+      return acc;
+    }, {})
+  );
+
+  // Step 3: Create a worksheet
+  const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+  // Step 4: Create a workbook
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheet);
+
+  // Step 5: Write the workbook directly to file
+  XLSX.writeFile(workbook, fileName); // Automatically triggers the file download
+};
 
 // ........................... pdf ................................. //
-const generatePDFContent = (pdf, data, schoolName = "Student Diwan", fields = null) => {
+const generatePDFContent = (
+  pdf,
+  data,
+  schoolName = "Student Diwan",
+  fields = null
+) => {
   if (!data || data.length === 0) {
-      throw new Error("Data is required to generate the table.");
+    throw new Error("Data is required to generate the table.");
   }
 
   // Add title to the PDF
@@ -53,32 +61,36 @@ const generatePDFContent = (pdf, data, schoolName = "Student Diwan", fields = nu
   let currentY = 25;
 
   data.forEach((item, index) => {
-      // Check if adding this row exceeds the page height
-      if (currentY + rowHeight * (Object.keys(item).length + 2) > maxPageHeight) {
-          pdf.addPage(); // Add a new page if data exceeds current page
-          currentY = 25; // Reset Y position
-          pdf.setFontSize(18);
-          pdf.text(`Exported Data (page : ${index+1})`, 10, 10); // Add continued title
-          pdf.setDrawColor(0);
-          pdf.setLineWidth(0.5);
-          pdf.line(10, 15, 200, 15); // Horizontal line below the title
-      }
+    // Check if adding this row exceeds the page height
+    if (currentY + rowHeight * (Object.keys(item).length + 2) > maxPageHeight) {
+      pdf.addPage(); // Add a new page if data exceeds current page
+      currentY = 25; // Reset Y position
+      pdf.setFontSize(18);
+      pdf.text(`Exported Data (page : ${index + 1})`, 10, 10); // Add continued title
+      pdf.setDrawColor(0);
+      pdf.setLineWidth(0.5);
+      pdf.line(10, 15, 200, 15); // Horizontal line below the title
+    }
 
-      // Add S.No in a badge-like style
-      pdf.setFontSize(12);
-      pdf.setTextColor("#FFFFFF"); // White text
-      pdf.setFillColor("#4A90E2"); // Blue background
-      pdf.rect(10, currentY, 40, rowHeight, "F"); // Draw filled rectangle
-      pdf.text(`Document: ${index + 1}`, 12, currentY + 7); // Centered text within the badge
+    // Add S.No in a badge-like style
+    pdf.setFontSize(12);
+    pdf.setTextColor("#FFFFFF"); // White text
+    pdf.setFillColor("#4A90E2"); // Blue background
+    pdf.rect(10, currentY, 40, rowHeight, "F"); // Draw filled rectangle
+    pdf.text(`Document: ${index + 1}`, 12, currentY + 7); // Centered text within the badge
 
-      let contentY = currentY + rowHeight + 5;
-      pdf.setTextColor("#000000"); // Reset text color to black
-      Object.entries(item).forEach(([key, value]) => {
-          pdf.text(`${key}: ${value !== null && value !== undefined ? value : "N/A"}`, 10, contentY);
-          contentY += rowHeight; // Move to the next line
-      });
+    let contentY = currentY + rowHeight + 5;
+    pdf.setTextColor("#000000"); // Reset text color to black
+    Object.entries(item).forEach(([key, value]) => {
+      pdf.text(
+        `${key}: ${value !== null && value !== undefined ? value : "N/A"}`,
+        10,
+        contentY
+      );
+      contentY += rowHeight; // Move to the next line
+    });
 
-      currentY = contentY + rowHeight / 2; // Space between rows
+    currentY = contentY + rowHeight / 2; // Space between rows
   });
 
   // Add footer
@@ -87,28 +99,36 @@ const generatePDFContent = (pdf, data, schoolName = "Student Diwan", fields = nu
   pdf.text(`Generated by ${schoolName}`, 10, 290);
 };
 
+export const ExportPDF = (
+  data = [],
+  fileName = "ExportedData.pdf",
+  schoolName
+) => {
+  if (!data.length) {
+    return toast.error("No data available to export");
+  }
 
+  const pdf = new jsPDF();
+  generatePDFContent(pdf, data, schoolName);
+  pdf.save(fileName);
+};
 
-  export const ExportPDF = (data = [], fileName = "ExportedData.pdf",schoolName) => {
-    if (!data.length) {
-      return toast.error("No data available to export");
+export const flattenObject = (obj, prefix = "") =>
+  Object.entries(obj || {}).reduce((acc, [key, value]) => {
+    const newKey = prefix ? `${prefix}.${key}` : key;
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      Object.assign(acc, flattenObject(value, newKey));
+    } else {
+      acc[newKey] = value;
     }
-  
-    const pdf = new jsPDF();
-    generatePDFContent(pdf, data, schoolName);
-    pdf.save(fileName);
-  };
-  
+    return acc;
+  }, {});
 
-  export const flattenObject = (obj, prefix = "") => 
-    Object.entries(obj || {}).reduce((acc, [key, value]) => {
-      const newKey = prefix ? `${prefix}.${key}` : key;
-      if (value && typeof value === "object" && !Array.isArray(value)) {
-        Object.assign(acc, flattenObject(value, newKey));
-      } else {
-        acc[newKey] = value;
-      }
-      return acc;
-    }, {});
-
-
+export const formatDateForInput = (isoString) => {
+  if (!isoString) return "";
+  const date = new Date(isoString);
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};

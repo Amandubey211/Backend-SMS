@@ -71,6 +71,7 @@ const AddEarnings = () => {
         case "Rent Income":
           specificFields = {
             name: incomeData.rentIncome.name || "",
+
             startDate: incomeData.rentIncome.startDate?.slice(0,10) || "",
             endDate: incomeData.rentIncome.endDate?.slice(0,10) || "",
             nameOfRenter: incomeData.rentIncome.nameOfRenter || "",

@@ -77,9 +77,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                   label={label}
                   required={isRequired}
                   value={getNestedValue(values, name)}
-                  onChange={
-                    (e) => setFieldValue(name, e.target.value || null) // Set to URL string
-                  }
+                  onChange={(e) => setFieldValue(name, e.target.value)}
                   {...rest}
                 />
               );
@@ -129,6 +127,22 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                                           setFieldValue(
                                             `${name}.${idx}.${subField.name}`,
                                             value
+                                          )
+                                        }
+                                      />
+                                    ) : subField.type === "file" ? (
+                                      <FileInput
+                                        name={`${name}.${idx}`} // Important: name corresponds to 'document.0', 'document.1', etc.
+                                        label={subField.label}
+                                        required={isRequired}
+                                        value={getNestedValue(
+                                          values,
+                                          `${name}.${idx}`
+                                        )}
+                                        onChange={(e) =>
+                                          setFieldValue(
+                                            `${name}.${idx}`,
+                                            e.target.value
                                           )
                                         }
                                       />

@@ -14,7 +14,7 @@ export const categories = [
 
 export const subCategories = {
   "Salaries and Wages": ["Teaching Staffs", "Non-Teaching Staffs"],
-  "Utilities and Maintenance": ["utilities", "maintenance"],
+  "Utilities and Maintenance": ["utility", "maintenance"],
   Supplies: ["Classroom & Office Purpose"],
   "Event and Activity Costs": ["Decorations"],
   "Library and Academic Resources": ["Book Purchases"],

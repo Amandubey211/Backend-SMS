@@ -15,64 +15,75 @@ import { getAY } from "../../../../Utils/academivYear";
 /**
  * Helper function to determine the correct API endpoints based on expense category.
  */
-const getEndpointForCategory = (category, action, id) => {
+const getEndpointForCategory = (category, action, expenseId) => {
   const baseUrl = "/finance/expense";
 
   switch (category) {
     case "Salaries and Wages":
       if (action === "create") return `${baseUrl}/add/salaryWages`;
-      if (action === "update") return `${baseUrl}/edit/salaryWages`;
-      if (action === "delete") return `${baseUrl}/delete/salaryWages/${id}`;
+      if (action === "update")
+        return `${baseUrl}/edit/salaryWages/${expenseId}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/salaryWages/${expenseId}`;
       break;
 
     case "Utilities and Maintenance":
       if (action === "create") return `${baseUrl}/add/utilityMaintenance`;
       if (action === "update")
-        return `${baseUrl}/update/utilityMaintenance/${id}`;
+        return `${baseUrl}/edit/utilityMaintenance/${expenseId}`;
       if (action === "delete")
-        return `${baseUrl}/delete/utilityMaintenance/${id}`;
+        return `${baseUrl}/delete/utilityMaintenance/${expenseId}`;
       break;
 
     case "Supplies":
       if (action === "create") return `${baseUrl}/add/supplies`;
-      if (action === "update") return `${baseUrl}/update/supplies/${id}`;
-      if (action === "delete") return `${baseUrl}/delete/supplies/${id}`;
+      if (action === "update") return `${baseUrl}/edit/supplies/${expenseId}`;
+      if (action === "delete") return `${baseUrl}/delete/supplies/${expenseId}`;
       break;
 
     case "Event and Activity Costs":
       if (action === "create") return `${baseUrl}/add/eventActivity`;
-      if (action === "update") return `${baseUrl}/update/eventActivity/${id}`;
-      if (action === "delete") return `${baseUrl}/delete/eventActivity/${id}`;
+      if (action === "update")
+        return `${baseUrl}/edit/eventActivity/${expenseId}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/eventActivity/${expenseId}`;
       break;
 
     case "Library and Academic Resources":
       if (action === "create") return `${baseUrl}/add/libraryAcademic`;
-      if (action === "update") return `${baseUrl}/edit/libraryAcademic/${id}`;
-      if (action === "delete") return `${baseUrl}/delete/libraryAcademic/${id}`;
+      if (action === "update")
+        return `${baseUrl}/edit/libraryAcademic/${expenseId}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/libraryAcademic/${expenseId}`;
       break;
 
     case "Marketing and Advertising":
       if (action === "create") return `${baseUrl}/add/marketingAd`;
-      if (action === "update") return `${baseUrl}/edit/marketingAd/${id}`;
-      if (action === "delete") return `${baseUrl}/delete/marketingAd/${id}`;
+      if (action === "update")
+        return `${baseUrl}/edit/marketingAd/${expenseId}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/marketingAd/${expenseId}`;
       break;
 
     case "Miscellaneous":
       if (action === "create") return `${baseUrl}/add/miscellaneous`;
-      if (action === "update") return `${baseUrl}/edit/miscellaneous/${id}`;
-      if (action === "delete") return `${baseUrl}/delete/miscellaneous/${id}`;
+      if (action === "update")
+        return `${baseUrl}/edit/miscellaneous/${expenseId}`;
+      if (action === "delete")
+        return `${baseUrl}/delete/miscellaneous/${expenseId}`;
       break;
 
     case "IT and Software":
       if (action === "create") return `${baseUrl}/add/software`;
-      if (action === "update") return `${baseUrl}/edit/software/${id}`;
-      if (action === "delete") return `${baseUrl}/delete/software/${id}`;
+      if (action === "update") return `${baseUrl}/edit/software/${expenseId}`;
+      if (action === "delete") return `${baseUrl}/delete/software/${expenseId}`;
 
     case "Examination and Affiliation": // New Category Added
       if (action === "create") return `${baseUrl}/add/examAffiliatione`;
-      if (action === "update") return `${baseUrl}/edit/examAffiliatione/${id}`;
+      if (action === "update")
+        return `${baseUrl}/edit/examAffiliatione/${expenseId}`;
       if (action === "delete")
-        return `${baseUrl}/delete/examAffiliatione/${id}`;
+        return `${baseUrl}/delete/examAffiliatione/${expenseId}`;
       break;
 
     // Add more categories as needed
@@ -139,9 +150,9 @@ export const addExpense = createAsyncThunk(
  */
 export const updateExpense = createAsyncThunk(
   "expenses/updateExpense",
-  async ({ values, category, id }, { dispatch, rejectWithValue }) => {
+  async ({ values, category, expenseId }, { dispatch, rejectWithValue }) => {
     try {
-      const endpoint = getEndpointForCategory(category, "update", id);
+      const endpoint = getEndpointForCategory(category, "update", expenseId);
       const response = await putData(endpoint, values);
 
       if (response?.success) {
@@ -171,7 +182,9 @@ export const deleteExpense = createAsyncThunk(
       const response = await deleteData(endpoint);
 
       if (response?.success) {
-        toast.success("Expense deleted successfully!");
+        // toast.success("Expense deleted successfully!");
+        // Refetch expenses after deletion
+        dispatch(fetchAllExpenses({})); // You can pass relevant filters if needed
         return { id, category };
       } else {
         dispatch(setShowError(true));

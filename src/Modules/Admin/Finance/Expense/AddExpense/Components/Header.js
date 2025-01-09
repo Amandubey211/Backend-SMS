@@ -11,7 +11,7 @@ const Header = ({
   onSubCategoryChange,
   onReset,
   description,
-  setDescription,
+  setDescription, // Now uses Formik's setFieldValue
   initialCategory = "Salaries and Wages",
   initialSubCategory = "Teaching Staffs",
   isUpdate = false,
@@ -54,6 +54,14 @@ const Header = ({
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
             >
               {isUpdate ? "Update Expense" : "Save Expense"}
+            </Button>
+            <Button
+              type="default"
+              onClick={onReset}
+              className="text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-gray-200 transition"
+              disabled={readOnly}
+            >
+              Reset
             </Button>
           </div>
         )}
@@ -112,10 +120,9 @@ const Header = ({
             name="description"
             value={description}
             onChange={(e) => {
-              const words = e.target.value
-                .split(/\s+/)
-                .filter((word) => word.length > 0);
-              if (words.length <= 100) setDescription(e.target.value);
+              const desc = e.target.value;
+              const words = desc.split(/\s+/).filter((word) => word.length > 0);
+              if (words.length <= 100) setDescription(desc);
             }}
             className="bg-gray-50 z-40 rounded-lg p-2 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 shadow-sm"
             placeholder="Write a short description"

@@ -288,7 +288,7 @@ export const formComponentsMap = {
     "Non-Teaching Staffs": NonTeachingStaffForm,
   },
   "Utilities and Maintenance": {
-    utilities: UtilitiesForm,
+    utility: UtilitiesForm,
     maintenance: BuildingMaintenanceForm,
   },
   Supplies: {

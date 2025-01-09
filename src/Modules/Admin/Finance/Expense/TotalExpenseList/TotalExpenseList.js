@@ -29,7 +29,10 @@ import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import debounce from "lodash.debounce";
-import { fetchAllExpenses } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
+import {
+  fetchAllExpenses,
+  deleteExpense,
+} from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import {
   setCurrentPage,
   setFilters,
@@ -628,13 +631,22 @@ const TotalExpenseList = () => {
           {/* Modals */}
           <DeleteModal
             visible={isDeleteModalVisible}
-            type="Expense"
             onClose={() => {
               setIsDeleteModalVisible(false);
               setSelectedExpenseForDeletion(null);
             }}
-            expense={selectedExpenseForDeletion}
+            onConfirm={() => {
+              if (selectedExpenseForDeletion) {
+                const { _id, category } = selectedExpenseForDeletion;
+                const categoryName = category?.categoryName || category;
+                dispatch(deleteExpense({ category: categoryName, id: _id }));
+              } else {
+                toast.error("No expense selected for deletion.");
+              }
+            }}
+            type="Expense"
           />
+
           <ExportModal
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}
