@@ -86,20 +86,22 @@ const RecentInvoice = () => {
         <h2 className="text-xl font-semibold">Recent Invoice List</h2>
         <div className="flex gap-4">
           <Button
-              className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+            className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
             onClick={() => navigate("/finance/invoices/dashboard/recent-invoices")}
           >
             View More ({invoices?.length || 0})
           </Button>
         </div>
       </div>
-
+  
       {/* Table Section */}
       {loading ? (
-        <Spin tip="Loading..." />
-      )  : (
+        <div className="flex justify-center items-center py-20">
+          <Spin tip="Loading..." />
+        </div>
+      ) : (
         <Table
-          dataSource={filteredData?.slice(0,5)}
+          dataSource={filteredData?.slice(0, 5)}
           columns={columns}
           rowKey="invoiceNumber"
           size="small"
@@ -108,6 +110,7 @@ const RecentInvoice = () => {
       )}
     </div>
   );
+  
 };
 
 export default RecentInvoice;

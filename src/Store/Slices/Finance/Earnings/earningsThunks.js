@@ -3,7 +3,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
-import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 
@@ -18,6 +18,7 @@ const getEndpointForCategory = (category, action, id) => {
     case "Facility-Based Revenue":
       if (action === "create") return `${facilityBase}/income`;
       if (action === "update") return `${facilityBase}/update-income/${id}`;
+      
       break;
 
     case "Financial Investments":
@@ -93,6 +94,7 @@ export const updateEarnings = createAsyncThunk(
   }
 );
 
+
 export const fetchAllIncomes = createAsyncThunk(
   "earnings/fetchAllIncomes",
   async (params, { rejectWithValue, dispatch }) => {
@@ -157,6 +159,57 @@ export const fetchCardDataRevenue = createAsyncThunk(
         toast.error(response?.message || "Failed to fetch card data revenue.");
         return rejectWithValue(
           response?.message || "Failed to fetch card data revenue."
+        );
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const deleteEarnings = createAsyncThunk(
+  "earnings/deleteEarnings",
+  async ({ id, category }, { dispatch, rejectWithValue }) => {
+    try {
+      const baseUrl = "/finance/revenue";
+      let endpoint;
+
+      // Determine the endpoint for deletion
+      switch (category) {
+        case "Facility-Based Revenue":
+          endpoint = `${baseUrl}/facility/delete-income/${id}`;
+          break;
+        case "Financial Investments":
+          endpoint = `${baseUrl}/delete/financialInvestment/${id}`;
+          break;
+        case "Community and External Revenue":
+          endpoint = `${baseUrl}/delete/communityExternalAffairs/${id}`;
+          break;
+        case "Service-Based Revenue":
+          endpoint = `${baseUrl}/delete/serviceBased/${id}`;
+          break;
+        case "Penalties":
+          endpoint = `/finance/penaltyAdjustment/cancel/${id}`;
+          break;
+        default:
+          throw new Error(`Category ${category} not supported for deletion.`);
+      }
+
+      const response = await deleteData(endpoint); 
+
+      if (response?.success) {
+        toast.success("Earnings deleted successfully!");
+        const params = {
+          page: 1,
+          limit: 20,
+          includeDetails: true,
+        }
+        dispatch(fetchAllIncomes(params))
+        return id; 
+      } else {
+        toast.error(response?.message || "Failed to delete earnings.");
+        return rejectWithValue(
+          response?.message || "Failed to delete earnings."
         );
       }
     } catch (error) {

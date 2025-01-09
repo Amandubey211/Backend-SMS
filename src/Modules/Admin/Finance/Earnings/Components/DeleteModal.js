@@ -1,8 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { deleteEarnings } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
-const DeleteModal = ({ visible, onClose, onConfirm, type }) => {
+
+const DeleteModal = ({ visible, onClose, type,income }) => {
+  const dispatch = useDispatch()
   if (!visible) return null;
 
   const handleConfirm = async () => {
@@ -29,7 +33,9 @@ const DeleteModal = ({ visible, onClose, onConfirm, type }) => {
             No
           </button>
           <button
-            onClick={handleConfirm}
+
+            onClick={()=>{dispatch(deleteEarnings({id:income._id,category:income.category.categoryName
+            }));onClose()}}
             className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600"
           >
             Yes

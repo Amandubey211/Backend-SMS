@@ -71,26 +71,27 @@ const AddEarnings = () => {
         case "Rent Income":
           specificFields = {
             name: incomeData.rentIncome.name || "",
-            startDate: incomeData.startDate || "",
-            endDate: incomeData.endDate || "",
-            nameOfRenter: incomeData.nameOfRenter || "",
+
+            startDate: incomeData.rentIncome.startDate?.slice(0,10) || "",
+            endDate: incomeData.rentIncome.endDate?.slice(0,10) || "",
+            nameOfRenter: incomeData.rentIncome.nameOfRenter || "",
           };
           break;
         case "Exam Center Fees":
           specificFields = {
-            examName: incomeData.examName || "",
-            startDate: incomeData.startDate || "",
-            endDate: incomeData.endDate || "",
-            mobileNumber: incomeData.mobileNumber || "",
+            examName: incomeData.examCentreFees.examName || "",
+            startDate: incomeData.examCentreFees.startDate?.slice(0,10) || "",
+            endDate: incomeData.examCentreFees.endDate?.slice(0,10) || "",
+            mobileNumber: incomeData.examCentreFees.mobileNumber?.slice(0,10) || "",
           };
           break;
         case "Parking Fees":
           specificFields = {
-            vehicleType: incomeData.vehicleType || "",
-            name: incomeData.name || "",
-            userType: incomeData.userType || "",
-            otherVehicleDetails: incomeData.otherVehicleDetails || "",
-            otherUserDetails: incomeData.otherUserDetails || "",
+            vehicleType: incomeData.parkingFees.vehicleType || "",
+            name: incomeData.parkingFees.name || "",
+            userType: incomeData.parkingFees.userType || "",
+            otherVehicleDetails: incomeData.parkingFees.otherVehicleDetails || "",
+            otherUserDetails: incomeData.parkingFees.otherUserDetails || "",
           };
           break;
         case "Stationery Fees":
