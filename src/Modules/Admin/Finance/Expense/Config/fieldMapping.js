@@ -1,5 +1,7 @@
 // src/Modules/Admin/Finance/Expense/AddExpense/Config/fieldMapping.js
 
+import { formatDateForInput } from "../../../../../Utils/xl";
+
 export const mapBackendToFrontend = (expenseData) => {
   return {
     _id: expenseData._id || "",
@@ -18,6 +20,10 @@ export const mapBackendToFrontend = (expenseData) => {
     discount: expenseData.discount || 0,
     penalty: expenseData.penalty || 0,
     document: expenseData.document || [],
+    startDate: expenseData.startDate
+      ? formatDateForInput(expenseData.startDate)
+      : "",
+    endDate: expenseData.endDate ? formatDateForInput(expenseData.endDate) : "",
     // Add more mappings as needed
     // For example, map nested fields or other specific cases
   };

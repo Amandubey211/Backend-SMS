@@ -15,15 +15,17 @@ import useCloudinaryUpload from "../../../../../../Hooks/CommonHooks/useCloudina
 import toast from "react-hot-toast";
 
 const FileInput = ({ label, name, onChange, value, required = false }) => {
-  // Subscribe to Redux state
-  const readOnly = useSelector((state) => state.admin.earnings.readOnly);
+  console.log(value, "FileInput Value");
+
+  // Corrected the readOnly selector to reference expenses instead of earnings
+  const readOnly = useSelector((state) => state.admin.expenses.readOnly);
 
   // Use Formik's useField to get meta
   const [field, meta] = useField(name);
 
   // Cloudinary Configuration
   const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
-  const CLOUDINARY_FOLDER = "earnings"; // Optional: specify your folder
+  const CLOUDINARY_FOLDER = "expenses"; // Updated folder name for clarity
 
   // Utilize the custom hook
   const {
@@ -208,7 +210,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
                   } truncate`}
                   style={{ maxWidth: "120px" }}
                 >
-                  {fileName.length > 10
+                  {fileName.length > 20
                     ? `${fileName.substring(0, 20)}...`
                     : fileName || "No file selected"}
                 </span>

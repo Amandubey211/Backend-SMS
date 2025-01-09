@@ -70,7 +70,7 @@ const AddEarnings = () => {
       switch (subCategory) {
         case "Rent Income":
           specificFields = {
-            name: incomeData.name || "",
+            name: incomeData.rentIncome.name || "",
             startDate: incomeData.startDate || "",
             endDate: incomeData.endDate || "",
             nameOfRenter: incomeData.nameOfRenter || "",

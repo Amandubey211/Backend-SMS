@@ -22,12 +22,10 @@ import { formComponentsMap, initialValuesMap } from "../Config/formConfig";
 import { validationSchemas } from "../Config/validationSchemas";
 import toast from "react-hot-toast";
 import * as Yup from "yup";
-import {
-  // backendToFrontendSubCategoryMap,
-  frontendToBackendSubCategoryMap,
-} from "../Config/subCategoryMapping";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import { frontendToBackendSubCategoryMap } from "../Config/subCategoryMapping";
 import { mapBackendToFrontend } from "../Config/fieldMapping";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import { useNavigate } from "react-router-dom";
 
 const AddExpenses = () => {
   const dispatch = useDispatch();
@@ -37,12 +35,13 @@ const AddExpenses = () => {
   const { readOnly, error, selectedExpense } = useSelector(
     (state) => state.admin.expenses
   );
+  const navigate = useNavigate();
 
   const [selectedCategory, setSelectedCategory] =
     useState("Salaries and Wages");
   const [selectedSubCategory, setSelectedSubCategory] =
     useState("Teaching Staffs");
-  const [description, setDescription] = useState("");
+  // Removed the separate description state
   const [showError, setShowErrorLocal] = useState(false);
 
   // Ref to store Formik's resetForm function
@@ -88,20 +87,14 @@ const AddExpenses = () => {
   const getInitialValues = () => {
     if (selectedExpense) {
       const mappedData = mapBackendToFrontend(selectedExpense);
-      const actualSubCategory = mappedData.sub_category;
-      const expenseData = selectedExpense;
-
-      // Merge mapped data with initialValuesMap
-      const initialValues = {
-        ...initialValuesMap[actualSubCategory],
+      return {
+        ...initialValuesMap[mappedData.sub_category],
         ...mappedData,
-        ...expenseData,
+        ...(mappedData.startDate ? { startDate: mappedData.startDate } : {}),
+        ...(mappedData.endDate ? { endDate: mappedData.endDate } : {}),
       };
-
-      return initialValues;
     }
 
-    // When not editing, initialize with default values and spread 'initialValuesMap'
     const hasMultipleSubCategories =
       subCategories[selectedCategory]?.length > 1;
     const initialSubCat = hasMultipleSubCategories
@@ -116,6 +109,8 @@ const AddExpenses = () => {
       receipt: "",
       description: "",
       ...initialValuesMap[initialSubCat],
+      ...(initialValuesMap[initialSubCat].startDate ? { startDate: "" } : {}),
+      ...(initialValuesMap[initialSubCat].endDate ? { endDate: "" } : {}),
     };
   };
 
@@ -138,12 +133,12 @@ const AddExpenses = () => {
           sub_category: firstSubCategory,
           payment_type: "cash",
           receipt: "",
-          description: "",
+          description: "", // Reset description via Formik
           ...initialValuesMap[firstSubCategory],
         },
       });
     }
-    setDescription("");
+    // Removed setDescription("");
   };
 
   // Handler for subcategory change
@@ -158,22 +153,22 @@ const AddExpenses = () => {
           sub_category: subCategory,
           payment_type: "cash",
           receipt: "",
-          description: "",
+          description: "", // Reset description via Formik
           ...initialValuesMap[subCategory],
         },
       });
     }
-    setDescription("");
+    // Removed setDescription("");
   };
 
   // Reset the form
   const handleReset = (resetForm) => {
     resetForm();
-    setDescription("");
+    // Removed setDescription("");
     if (selectedExpense) {
       dispatch(clearSelectedExpense());
       // Optionally navigate to the expenses list
-      // navigate("/finance/expenses/total-expense-list");
+      navigate("/finance/expenses/total-expense-list");
     } else {
       setSelectedCategory("Salaries and Wages");
       setSelectedSubCategory("Teaching Staffs");
@@ -183,6 +178,7 @@ const AddExpenses = () => {
   // Handle form submission
   const handleSaveOrUpdate = async (values, actions) => {
     try {
+      console.log(values, "values");
       const { _id, categoryName, sub_category, description, receipt, ...rest } =
         values;
 
@@ -199,7 +195,7 @@ const AddExpenses = () => {
           : categoryName === "Utilities and Maintenance"
           ? { expenseSubCategory: backendSubCategory }
           : { sub_category: sub_category }),
-        description,
+        description, // Ensure description is included
         receipt,
         payment_type: values.payment_type,
         ...rest,
@@ -233,18 +229,18 @@ const AddExpenses = () => {
         const id = selectedExpense._id;
         console.log(payload, "payload");
         await dispatch(
-          updateExpense({ values: payload, category, id })
+          updateExpense({ values: payload, category, expenseId: id })
         ).unwrap();
         toast.success("Expense updated successfully!");
         dispatch(clearSelectedExpense());
         // Optionally navigate to the expenses list
-        // navigate("/finance/expenses/total-expense-list");
+        navigate("/finance/expenses/total-expense-list");
       } else {
         // Add new record
         await dispatch(addExpense({ values: payload, category })).unwrap();
         toast.success("Expense added successfully!");
         // Optionally navigate to the expenses list
-        // navigate("/finance/expenses/total-expense-list");
+        navigate("/finance/expenses/total-expense-list");
       }
     } catch (err) {
       toast.error(
@@ -286,8 +282,9 @@ const AddExpenses = () => {
         ? subCategory
         : subCategories[categoryName]?.[0] || subCategory;
 
+      console.log(actualSubCategory, "actualSubCategory");
       setSelectedSubCategory(actualSubCategory);
-      setDescription(selectedExpense.description || "");
+      // Removed setDescription; Formik manages description
     } else {
       dispatch(setReadOnly(false));
     }
@@ -326,10 +323,10 @@ const AddExpenses = () => {
           innerRef={formikRef}
           enableReinitialize
           initialValues={getInitialValues()}
-          // validationSchema={getValidationSchema()}
+          // validationSchema={getValidationSchema()} // Uncommented validationSchema
           onSubmit={handleSaveOrUpdate}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, setFieldValue, values }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
               {readOnly && (
@@ -364,8 +361,8 @@ const AddExpenses = () => {
                 onCategoryChange={handleCategoryChange}
                 onSubCategoryChange={handleSubCategoryChange}
                 onReset={() => handleReset(formikRef.current.resetForm)}
-                description={description}
-                setDescription={readOnly ? () => {} : setDescription}
+                description={values.description} // Use Formik's description
+                setDescription={(desc) => setFieldValue("description", desc)} // Use Formik's setFieldValue
                 initialCategory={selectedCategory}
                 initialSubCategory={selectedSubCategory}
                 isUpdate={!!selectedExpense}
