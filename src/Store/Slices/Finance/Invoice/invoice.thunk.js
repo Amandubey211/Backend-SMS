@@ -19,6 +19,7 @@ export const addInvoice = createAsyncThunk(
       }
       return response.data
     } catch (error) {
+      toast.error("Something is wrong!");
       return handleError(error, dispatch, rejectWithValue);
     }
 

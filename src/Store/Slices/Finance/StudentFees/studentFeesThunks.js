@@ -47,6 +47,7 @@ export const createStudentFee = createAsyncThunk(
       }
       return response;
     } catch (error) {
+      toast.error('Something is wrong!')
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -69,6 +70,7 @@ export const updateStudentFee = createAsyncThunk(
       }
       return response;
     } catch (error) {
+      toast.error('Something is wrong')
       return handleError(error, dispatch, rejectWithValue);
     }
   }

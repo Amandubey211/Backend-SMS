@@ -10,6 +10,7 @@ import TextInput from "../Component/TextInput";
 import { useDispatch } from "react-redux";
 import { createStudentFee } from "../../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import StudentPaymentDetails from "../Component/StudentPaymentDetails";
+import toast from "react-hot-toast";
 
 const StudentFeesForm = ({ selectCategories, allData, setStudentDetail,setFormData,formData,studentDetail }) => {
   const formikRef = useRef(null);
@@ -58,11 +59,15 @@ const handleCustomSubmit = () => {
         // Set the updated data in state
         setFormData(updatedFormData);
         console.log("Final formData after updates:", updatedFormData);
+        if(updatedFormData?.length==0){
+           toast.error('Please fill all required fields')
+        }else{
+ dispatch(createStudentFee(updatedFormData));
+        }
 
-        // Dispatch action with the updated formData
-        dispatch(createStudentFee(updatedFormData));
+       
       } else {
-        console.error("Validation errors:", errors);
+        toast.error('Please fill all required fields')
       }
     });
   }
