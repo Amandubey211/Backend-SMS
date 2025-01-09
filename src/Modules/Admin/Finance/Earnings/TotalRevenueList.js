@@ -227,7 +227,7 @@ const TotalRevenueList = () => {
             onClick={() => {
               const incomeToDelete = incomeIdMap[record.key];
               if (incomeToDelete) {
-                setSelectedIncomeForDeletion(incomeToDelete); // Set income for deletion
+                setSelectedIncomeForDeletion(incomeToDelete); 
                 setIsDeleteModalVisible(true);
               } else {
                 toast.error("Selected income not found.");
@@ -283,15 +283,7 @@ const TotalRevenueList = () => {
                 </Tooltip>
               </div>
             );
-          } else {
-            return (
-              <div className="flex items-center justify-center">
-                <Tooltip title="Not selectable">
-                  <Checkbox disabled />
-                </Tooltip>
-              </div>
-            );
-          }
+          } 
         },
       },
       {
