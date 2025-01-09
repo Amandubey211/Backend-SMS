@@ -1,98 +1,37 @@
 import React from "react";
 import { useFormikContext } from "formik";
-import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
 import StaffSelect from "../Components/StaffSelect";
+import TransactionDetails from "../Components/TransactionDetails"; // Import reusable component
+import FormSection from "../../../Earnings/AddEarnings/Component/FormSection";
 
 const NonTeachingStaffForm = () => {
   const { setFieldValue, values } = useFormikContext();
 
-  // Configuration for Salary Details
-  const salaryDetailsFields = [
+  // Recurring Expense Fields
+  const recurringFields = [
     {
-      type: "select",
-      label: "Billing Period",
-      name: "billingPeriod",
-      options: ["Monthly", "Quarterly", "Yearly"],
-    },
-    {
-      name: "paymentStatus",
-      label: "Payment Status",
-      type: "select",
-      options: ["paid", "unpaid", "partial", "advance"],
-    },
-    {
-      name: "payment_type",
-      label: "Payment Type",
-      type: "select",
-      options: ["cash", "card", "online", "cheque", "other"],
+      type: "checkbox",
+      label: "Is Recurring?",
+      name: "recurringExpense.isRecurring",
     },
     {
       type: "select",
-      label: "Discount Type",
-      name: "discountType",
-      options: ["amount", "percentage"],
+      label: "Frequency",
+      name: "recurringExpense.frequency",
+      options: ["monthly", "weekly", "yearly"],
+      disabled: !values.recurringExpense?.isRecurring,
     },
     {
-      type: "number",
-      label: "Discount",
-      name: "discount",
-      placeholder: "Enter discount",
-    },
-    {
-      type: "number",
-      label: "Penalty",
-      name: "penalty",
-      placeholder: "Enter penalty amount",
-    },
-    {
-      type: "number",
-      label: "Tax (Inc/Exc)",
-      name: "tax",
-      placeholder: "Enter tax percentage",
-    },
-    {
-      type: "number",
-      label: "Total Amount",
-      name: "total_amount",
-      placeholder: "Enter total amount",
-    },
-    {
-      type: "number",
-      label: "Final Amount",
-      name: "final_amount",
-      placeholder: "Enter final amount",
-    },
-    {
-      name: "paid_amount",
-      label: "Paid Amount (QR)",
-      type: "number",
-      placeholder: "Enter paid amount",
-      min: 0,
-    },
-    {
-      name: "advance_amount",
-      label: "Advance Amount (QR)",
-      type: "number",
-      placeholder: "Enter advance amount",
-      min: 0,
-    },
-    {
-      name: "remaining_amount",
-      label: "Remaining Amount (QR)",
-      type: "number",
-      placeholder: "Enter remaining amount",
-      min: 0,
-      readOnly: true,
-    },
-    {
-      type: "file",
-      label: "Add Receipt/Document",
-      name: "receipt",
+      type: "date",
+      label: "Next Due Date",
+      name: "recurringExpense.nextDueDate",
+      disabled: !values.recurringExpense?.isRecurring,
     },
   ];
 
   return (
     <>
+      {/* Staff Selection Section */}
       <StaffSelect
         name="staffId"
         label="Select Non-Teaching Staff"
@@ -100,9 +39,14 @@ const NonTeachingStaffForm = () => {
         value={values.staffId}
         staffType="non-teaching" // Specify the staff type
       />
+
+      {/* Reusable Transaction Details Section */}
+      <TransactionDetails setFieldValue={setFieldValue} values={values} />
+
+      {/* Recurring Expense Section */}
       <FormSection
-        title="Salary Details"
-        fields={salaryDetailsFields}
+        title="Recurring Expense"
+        fields={recurringFields}
         setFieldValue={setFieldValue}
         values={values}
       />

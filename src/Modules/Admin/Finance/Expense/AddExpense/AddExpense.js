@@ -1,14 +1,14 @@
-// src/Components/Admin/Finance/Expenses/AddExpenses.jsx
+// src/Modules/Admin/Finance/Expense/AddExpense/AddExpenses.jsx
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Formik, Form } from "formik";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import * as Yup from "yup";
+import { Button } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import Header from "./Components/Header";
-import { categories, subCategories } from "../Config/categories";
+import { subCategories, categories } from "../Config/categories";
 import {
   setReadOnly,
   clearSelectedExpense,
@@ -17,17 +17,20 @@ import {
   addExpense,
   updateExpense,
 } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
-import { Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "../Config/formConfig";
 import { validationSchemas } from "../Config/validationSchemas";
 import toast from "react-hot-toast";
+import * as Yup from "yup";
+import {
+  backendToFrontendSubCategoryMap,
+  frontendToBackendSubCategoryMap,
+} from "../Config/subCategoryMapping";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AddExpenses = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   useNavHeading("Expenses", "Manage");
+
   // Redux state
   const { readOnly, error, selectedExpense } = useSelector(
     (state) => state.admin.expenses
@@ -40,17 +43,43 @@ const AddExpenses = () => {
   const [description, setDescription] = useState("");
   const [showError, setShowErrorLocal] = useState(false);
 
+  // Ref to store Formik's resetForm function
+  const formikRef = useRef();
+
   // Memoized form component
   const formComponent = useMemo(() => {
-    const SubCategoryComponent =
-      formComponentsMap[selectedCategory]?.[selectedSubCategory];
-    return SubCategoryComponent ? (
-      <SubCategoryComponent readOnly={readOnly} />
-    ) : (
-      <div className="text-center text-gray-500 text-sm py-4">
-        Form for this sub-category is under development.
-      </div>
-    );
+    const formMap = formComponentsMap[selectedCategory];
+    if (!formMap) {
+      return (
+        <div className="text-center text-gray-500 text-sm py-4">
+          Form for this category is under development.
+        </div>
+      );
+    }
+
+    // Check if formMap is an object (multiple subcategories) or a single component (single subcategory)
+    if (typeof formMap === "object") {
+      const SubCategoryComponent = formMap[selectedSubCategory];
+      if (SubCategoryComponent) {
+        return <SubCategoryComponent readOnly={readOnly} />;
+      } else {
+        return (
+          <div className="text-center text-gray-500 text-sm py-4">
+            Form for this sub-category is under development.
+          </div>
+        );
+      }
+    } else if (typeof formMap === "function") {
+      // In your current setup, all categories have at least one subcategory,
+      // so this block might not be necessary. Keeping it for future scalability.
+      return <formMap readOnly={readOnly} />;
+    } else {
+      return (
+        <div className="text-center text-gray-500 text-sm py-4">
+          Form for this category is under development.
+        </div>
+      );
+    }
   }, [selectedCategory, selectedSubCategory, readOnly]);
 
   // Initial form values
@@ -58,21 +87,49 @@ const AddExpenses = () => {
     if (selectedExpense) {
       const expenseData = selectedExpense;
 
-      // Extract 'subCategory' correctly
-      const subCategory = expenseData.subCategory || expenseData.sub_category;
+      // Extract 'subcategory' correctly
+      let subCategory = expenseData.subcategory || expenseData.sub_category;
+
+      // Handle special mappings for 'staffType' and 'expenseSubCategory'
+      if (expenseData.staffType) {
+        subCategory =
+          expenseData.staffType === "nonteaching"
+            ? "Non-Teaching Staffs"
+            : "Teaching Staffs";
+      } else if (expenseData.expenseSubCategory) {
+        subCategory =
+          expenseData.expenseSubCategory === "maintenance"
+            ? "Maintenance"
+            : "Utilities";
+      }
 
       const categoryName =
-        expenseData.category?.[0]?.categoryName || "Salaries and Wages";
+        expenseData.category?.categoryName || "Salaries and Wages";
+
+      // Determine if the category has multiple subcategories
+      const hasMultipleSubCategories = subCategories[categoryName]?.length > 1;
+
+      // For categories with single subcategory, set subCategory to the only subcategory
+      const actualSubCategory = hasMultipleSubCategories
+        ? subCategory
+        : subCategories[categoryName]?.[0] || subCategory;
 
       // Construct initial values with subcategory-specific fields
       const initialValues = {
         _id: expenseData._id || "",
         categoryName: categoryName,
-        sub_category: subCategory || selectedSubCategory,
-        paymentMethod: expenseData.paymentMethod || "cash",
-        receipt: expenseData.receipt || null,
+        sub_category: actualSubCategory || "", // Ensure sub_category is set
+        paymentType: expenseData.paymentType || "cash",
+        receipt: expenseData.receipt || "",
         description: expenseData.description || "",
-        ...initialValuesMap[subCategory],
+        paid_amount: expenseData.paidAmount || 0,
+        total_amount: expenseData.totalAmount || 0,
+        finalAmount: expenseData.finalAmount || 0,
+        remaining_amount: expenseData.remainingAmount || 0,
+        // advanceAmount: expenseData.paidAmount || 0,
+
+        // paid_amount: expenseData.paidAmount || 0,
+        ...initialValuesMap[actualSubCategory],
         // Spread expenseData after initialValuesMap to override if necessary
         ...expenseData,
       };
@@ -81,15 +138,68 @@ const AddExpenses = () => {
     }
 
     // When not editing, initialize with default values and spread 'initialValuesMap'
+    const hasMultipleSubCategories =
+      subCategories[selectedCategory]?.length > 1;
+    const initialSubCat = hasMultipleSubCategories
+      ? selectedSubCategory
+      : subCategories[selectedCategory]?.[0] || selectedCategory;
+
     return {
       _id: "",
       categoryName: selectedCategory,
-      sub_category: selectedSubCategory,
-      paymentMethod: "cash",
-      receipt: null,
+      sub_category: initialSubCat || "",
+      payment_type: "cash",
+      receipt: "",
       description: "",
-      ...initialValuesMap[selectedSubCategory],
+      ...initialValuesMap[initialSubCat],
     };
+  };
+
+  // Handler for category change
+  const handleCategoryChange = (category) => {
+    if (readOnly) return;
+    setSelectedCategory(category);
+    const hasMultipleSubCategories = subCategories[category]?.length > 1;
+    const firstSubCategory = hasMultipleSubCategories
+      ? subCategories[category][0]
+      : subCategories[category][0]; // Only one subcategory
+    setSelectedSubCategory(firstSubCategory);
+    handleSubCategoryChange(firstSubCategory); // Call the subcategory handler
+
+    if (formikRef.current) {
+      formikRef.current.resetForm({
+        values: {
+          _id: "", // Reset _id for new entries
+          categoryName: category,
+          sub_category: firstSubCategory,
+          payment_type: "cash",
+          receipt: "",
+          description: "",
+          ...initialValuesMap[firstSubCategory],
+        },
+      });
+    }
+    setDescription("");
+  };
+
+  // Handler for subcategory change
+  const handleSubCategoryChange = (subCategory) => {
+    if (readOnly) return;
+    setSelectedSubCategory(subCategory);
+    if (formikRef.current) {
+      formikRef.current.resetForm({
+        values: {
+          _id: "", // Reset _id for new entries
+          categoryName: selectedCategory,
+          sub_category: subCategory,
+          payment_type: "cash",
+          receipt: "",
+          description: "",
+          ...initialValuesMap[subCategory],
+        },
+      });
+    }
+    setDescription("");
   };
 
   // Reset the form
@@ -98,7 +208,8 @@ const AddExpenses = () => {
     setDescription("");
     if (selectedExpense) {
       dispatch(clearSelectedExpense());
-      navigate("/finance/total-expense-list");
+      // Optionally navigate to the expenses list
+      // navigate("/finance/expenses/total-expense-list");
     } else {
       setSelectedCategory("Salaries and Wages");
       setSelectedSubCategory("Teaching Staffs");
@@ -111,13 +222,22 @@ const AddExpenses = () => {
       const { _id, categoryName, sub_category, description, receipt, ...rest } =
         values;
 
+      // Convert frontend sub_category to backend value
+      const backendSubCategory =
+        frontendToBackendSubCategoryMap[sub_category] || sub_category;
+
       // Construct payload
       const payload = {
         categoryName,
-        subCategory: sub_category,
+        // Use the appropriate backend field based on category
+        ...(categoryName === "Salaries and Wages"
+          ? { staffType: backendSubCategory }
+          : categoryName === "Utilities and Maintenance"
+          ? { expenseSubCategory: backendSubCategory }
+          : { sub_category: sub_category }),
         description,
         receipt,
-        paymentMethod: values.paymentMethod,
+        payment_type: values.payment_type,
         ...rest,
       };
 
@@ -129,8 +249,9 @@ const AddExpenses = () => {
         "discount",
         "penalty",
         "total_amount",
-        "final_amount",
+        "finalAmount",
         "return_amount",
+        "advanceAmount",
         // Add other numeric fields as necessary
       ];
 
@@ -141,7 +262,8 @@ const AddExpenses = () => {
           payload[field] = Number(payload[field]);
         }
       });
-      let category = selectedCategory;
+
+      let category = categoryName;
       if (selectedExpense) {
         // Update existing record
         const id = selectedExpense._id;
@@ -150,12 +272,14 @@ const AddExpenses = () => {
         ).unwrap();
         toast.success("Expense updated successfully!");
         dispatch(clearSelectedExpense());
-        navigate("/finance/expenses/total-expense-list");
+        // Optionally navigate to the expenses list
+        // navigate("/finance/expenses/total-expense-list");
       } else {
         // Add new record
         await dispatch(addExpense({ values: payload, category })).unwrap();
         toast.success("Expense added successfully!");
-        navigate("/finance/expenses/total-expense-list");
+        // Optionally navigate to the expenses list
+        // navigate("/finance/expenses/total-expense-list");
       }
     } catch (err) {
       toast.error(
@@ -168,14 +292,36 @@ const AddExpenses = () => {
     }
   };
 
-  // Populate selectedExpense when editing
+  // Populate selectedExpense when editing or viewing
   useEffect(() => {
     if (selectedExpense) {
       const categoryName =
-        selectedExpense.category?.[0]?.categoryName || "Salaries and Wages";
-      const subCategory = selectedExpense.subCategory || "Teaching Staffs";
+        selectedExpense.category?.categoryName || "Salaries and Wages";
+      let subCategory =
+        selectedExpense.subcategory || selectedExpense.sub_category;
+
+      // Handle special mappings for 'staffType' and 'expenseSubCategory'
+      if (selectedExpense.staffType) {
+        subCategory =
+          selectedExpense.staffType === "nonteaching"
+            ? "Non-Teaching Staffs"
+            : "Teaching Staffs";
+      } else if (selectedExpense.expenseSubCategory) {
+        subCategory =
+          selectedExpense.expenseSubCategory === "maintenance"
+            ? "Maintenance"
+            : "Utilities";
+      }
+
       setSelectedCategory(categoryName);
-      setSelectedSubCategory(subCategory);
+
+      const hasMultipleSubCategories = subCategories[categoryName]?.length > 1;
+
+      const actualSubCategory = hasMultipleSubCategories
+        ? subCategory
+        : subCategories[categoryName]?.[0] || subCategory;
+
+      setSelectedSubCategory(actualSubCategory);
       setDescription(selectedExpense.description || "");
     } else {
       dispatch(setReadOnly(false));
@@ -185,7 +331,9 @@ const AddExpenses = () => {
 
   // Validation schema
   const getValidationSchema = () => {
-    return validationSchemas[selectedSubCategory] || Yup.object({});
+    if (readOnly) return null; // No validation in read-only mode
+    const schema = validationSchemas[selectedSubCategory];
+    return schema || Yup.object({});
   };
 
   // Auto-hide error message
@@ -210,12 +358,13 @@ const AddExpenses = () => {
     >
       <DashLayout>
         <Formik
+          innerRef={formikRef}
           enableReinitialize
           initialValues={getInitialValues()}
           // validationSchema={getValidationSchema()}
           onSubmit={handleSaveOrUpdate}
         >
-          {({ resetForm }) => (
+          {({ isSubmitting }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
               {readOnly && (
@@ -234,6 +383,7 @@ const AddExpenses = () => {
                 </div>
               )}
 
+              {/* Error Message */}
               {error && showError && (
                 <div className="bg-red-100 text-red-700 p-2 rounded-md text-sm">
                   {Array.isArray(error)
@@ -244,42 +394,11 @@ const AddExpenses = () => {
                 </div>
               )}
 
+              {/* Header Component */}
               <Header
-                onCategoryChange={(category) => {
-                  if (readOnly) return;
-                  setSelectedCategory(category);
-                  const firstSubCategory = subCategories[category][0];
-                  setSelectedSubCategory(firstSubCategory);
-                  resetForm({
-                    values: {
-                      _id: "", // Reset _id for new entries
-                      categoryName: category,
-                      sub_category: firstSubCategory, // Use 'sub_category'
-                      paymentMethod: "cash",
-                      receipt: null,
-                      description: "",
-                      ...initialValuesMap[firstSubCategory],
-                    },
-                  });
-                  setDescription("");
-                }}
-                onSubCategoryChange={(subCategory) => {
-                  if (readOnly) return;
-                  setSelectedSubCategory(subCategory);
-                  resetForm({
-                    values: {
-                      _id: "", // Reset _id for new entries
-                      categoryName: selectedCategory,
-                      sub_category: subCategory, // Use 'sub_category'
-                      paymentMethod: "cash",
-                      receipt: null,
-                      description: "",
-                      ...initialValuesMap[subCategory],
-                    },
-                  });
-                  setDescription("");
-                }}
-                onReset={() => handleReset(resetForm)}
+                onCategoryChange={handleCategoryChange}
+                onSubCategoryChange={handleSubCategoryChange}
+                onReset={() => handleReset(formikRef.current.resetForm)}
                 description={description}
                 setDescription={readOnly ? () => {} : setDescription}
                 initialCategory={selectedCategory}
@@ -287,9 +406,25 @@ const AddExpenses = () => {
                 isUpdate={!!selectedExpense}
               />
 
+              {/* Form Section */}
               {formComponent || (
                 <div className="text-center text-gray-500 text-xs py-4">
                   Select a sub-category to proceed.
+                </div>
+              )}
+
+              {/* Submit Button */}
+              {!readOnly && (
+                <div className="flex justify-end mt-6">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    loading={isSubmitting}
+                    disabled={isSubmitting}
+                    className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+                  >
+                    {selectedExpense ? "Update Expense" : "Save Expense"}
+                  </Button>
                 </div>
               )}
             </Form>
