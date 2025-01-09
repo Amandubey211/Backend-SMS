@@ -4,14 +4,13 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { deleteEarnings } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
-
-const DeleteModal = ({ visible, onClose, type,income }) => {
-  const dispatch = useDispatch()
+const DeleteModal = ({ visible, onClose, type, income }) => {
+  const dispatch = useDispatch();
   if (!visible) return null;
 
   const handleConfirm = async () => {
     try {
-      await onConfirm(); // Execute the passed delete function
+      // await onConfirm(); // Execute the passed delete function
       toast.success(`${type} deleted successfully!`);
       onClose(); // Close the modal after successful deletion
     } catch (error) {
@@ -33,9 +32,7 @@ const DeleteModal = ({ visible, onClose, type,income }) => {
             No
           </button>
           <button
-
-            onClick={()=>{dispatch(deleteEarnings({id:income._id,category:income.category.categoryName
-            }));onClose()}}
+            onClick={handleConfirm}
             className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600"
           >
             Yes
