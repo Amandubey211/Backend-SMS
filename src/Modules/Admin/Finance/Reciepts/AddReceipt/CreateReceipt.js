@@ -68,8 +68,9 @@ const CreateReceipt = () => {
   const { readOnly, receiptData } = location.state || {};
   const isReadOnly = readOnly === true;
 
-  // Manage local read-only state
+  // Manage local read-only and edit modes
   const [isReadOnlyState, setIsReadOnlyState] = useState(isReadOnly);
+  const [isEditMode, setIsEditMode] = useState(false); // New flag for edit mode
 
   // Initialize fetchedInvoiceNumber to prevent infinite API requests
   const [fetchedInvoiceNumber, setFetchedInvoiceNumber] = useState("");
@@ -255,9 +256,9 @@ const CreateReceipt = () => {
       .finally(() => setSubmitting(false));
   };
 
-  // Fetch invoice details when debounced invoice number changes and is valid (only in create/edit mode)
+  // Fetch invoice details when debounced invoice number changes and is valid (only in create mode)
   useEffect(() => {
-    if (isReadOnlyState) return; // Do not fetch if in read-only mode
+    if (isReadOnlyState || isEditMode) return; // Do not fetch if in read-only or edit mode
     if (isFormResetting) return; // Do not fetch if form is resetting
 
     const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
@@ -279,14 +280,15 @@ const CreateReceipt = () => {
     debouncedInvoiceNumber,
     dispatch,
     isReadOnlyState,
+    isEditMode, // Added to dependencies
     fetchedInvoiceNumber,
     blankInitialValues,
     isFormResetting, // Added to dependencies
   ]);
 
-  // Prefill form when invoice details are fetched successfully (only in create/edit mode)
+  // Prefill form when invoice details are fetched successfully (only in create mode)
   useEffect(() => {
-    if (invoiceFetchSuccess && invoiceDetails && !isReadOnlyState) {
+    if (invoiceFetchSuccess && invoiceDetails && !isReadOnlyState && !isEditMode) {
       const prefilledValues = {
         receiverName: invoiceDetails?.receiver?.name || "",
         mailId: invoiceDetails?.receiver?.email || "",
@@ -347,7 +349,7 @@ const CreateReceipt = () => {
       dispatch(clearSelectedInvoiceNumber());
       dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
     }
-  }, [invoiceFetchSuccess, invoiceDetails, dispatch, isReadOnlyState]);
+  }, [invoiceFetchSuccess, invoiceDetails, dispatch, isReadOnlyState, isEditMode]);
 
   // Synchronize invoiceNumberInput when initialValues change (especially in read-only mode)
   useEffect(() => {
@@ -355,6 +357,14 @@ const CreateReceipt = () => {
     // Debugging: Log the initial invoice number
     console.log("Initial Invoice Number:", initialValues.invoiceNumber);
   }, [initialValues.invoiceNumber]);
+
+  // Handle Edit Mode Transition
+  const handleEditMode = () => {
+    setIsReadOnlyState(false);
+    setIsEditMode(true); // Set edit mode
+    dispatch(clearSelectedInvoiceNumber()); // Clear selectedInvoiceNumber to prevent API calls
+    dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
+  };
 
   return (
     <DashLayout>
@@ -379,10 +389,7 @@ const CreateReceipt = () => {
                   </span>
                   <button
                     type="button"
-                    onClick={() => {
-                      setIsReadOnlyState(false);
-                      dispatch(clearInvoiceFetchSuccess()); // Clear the fetch success flag
-                    }}
+                    onClick={handleEditMode}
                     className="flex items-center px-2 py-1 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-transform duration-200"
                   >
                     Edit
@@ -490,8 +497,8 @@ const CreateReceipt = () => {
                           form.setFieldValue("finalAmount", 0, false);
                           setFetchedInvoiceNumber("");
 
-                          // If in create/edit mode, set the selectedInvoiceNumber in Redux
-                          if (!isReadOnlyState) {
+                          // If in create mode, set the selectedInvoiceNumber in Redux
+                          if (!isEditMode) {
                             dispatch(setSelectedInvoiceNumber(value));
                           }
                         }

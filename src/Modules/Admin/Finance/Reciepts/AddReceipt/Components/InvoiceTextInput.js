@@ -20,7 +20,7 @@ const InvoiceTextInput = ({
   required = false, // Added required prop
 }) => {
   // Extract relevant state from Redux
-  const { loading, error, invoiceFetchSuccess, selectedInvoiceNumber } = useSelector(
+  const { loading, error, invoiceFetchSuccess } = useSelector(
     (state) => state.admin.invoices // Adjusted to the correct slice
   );
 
