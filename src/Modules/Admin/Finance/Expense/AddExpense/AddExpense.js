@@ -84,17 +84,59 @@ const AddExpenses = () => {
   }, [selectedCategory, selectedSubCategory, readOnly]);
 
   // Initial form values
+  // const getInitialValues = () => {
+  //   if (selectedExpense) {
+  //     const mappedData = mapBackendToFrontend(selectedExpense);
+  //     const actualSubCategory = mappedData.sub_category;
+  //     const expenseData = selectedExpense;
+
+  //     // Merge mapped data with initialValuesMap
+  //     const initialValues = {
+  //       ...initialValuesMap[actualSubCategory],
+  //       ...mappedData,
+  //       ...expenseData,
+  //     };
+
+  //     return initialValues;
+  //   }
+
+  //   // When not editing, initialize with default values and spread 'initialValuesMap'
+  //   const hasMultipleSubCategories =
+  //     subCategories[selectedCategory]?.length > 1;
+  //   const initialSubCat = hasMultipleSubCategories
+  //     ? selectedSubCategory
+  //     : subCategories[selectedCategory]?.[0] || selectedCategory;
+
+  //   return {
+  //     _id: "",
+  //     categoryName: selectedCategory,
+  //     sub_category: initialSubCat || "",
+  //     payment_type: "cash",
+  //     description: "", // Ensure description is initialized
+  //     ...initialValuesMap[initialSubCat],
+  //   };
+  // };
+
   const getInitialValues = () => {
     if (selectedExpense) {
       const mappedData = mapBackendToFrontend(selectedExpense);
-      return {
-        ...initialValuesMap[mappedData.sub_category],
+      const actualSubCategory = mappedData.sub_category;
+      const expenseData = selectedExpense;
+
+      // Merge mapped data with initialValuesMap
+      const initialValues = {
+        ...initialValuesMap[actualSubCategory],
         ...mappedData,
-        ...(mappedData.startDate ? { startDate: mappedData.startDate } : {}),
-        ...(mappedData.endDate ? { endDate: mappedData.endDate } : {}),
+        ...expenseData,
+        // Ensure startDate and endDate are included for relevant forms
+        startDate: mappedData.startDate || "",
+        endDate: mappedData.endDate || "",
       };
+
+      return initialValues;
     }
 
+    // When not editing, initialize with default values and spread 'initialValuesMap'
     const hasMultipleSubCategories =
       subCategories[selectedCategory]?.length > 1;
     const initialSubCat = hasMultipleSubCategories
@@ -106,11 +148,10 @@ const AddExpenses = () => {
       categoryName: selectedCategory,
       sub_category: initialSubCat || "",
       payment_type: "cash",
-      receipt: "",
-      description: "",
+      description: "", // Ensure description is initialized
+      startDate: "", // Default startDate
+      endDate: "", // Default endDate
       ...initialValuesMap[initialSubCat],
-      ...(initialValuesMap[initialSubCat].startDate ? { startDate: "" } : {}),
-      ...(initialValuesMap[initialSubCat].endDate ? { endDate: "" } : {}),
     };
   };
 

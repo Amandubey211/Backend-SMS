@@ -182,7 +182,9 @@ export const deleteExpense = createAsyncThunk(
       const response = await deleteData(endpoint);
 
       if (response?.success) {
-        toast.success("Expense deleted successfully!");
+        // toast.success("Expense deleted successfully!");
+        // Refetch expenses after deletion
+        dispatch(fetchAllExpenses({})); // You can pass relevant filters if needed
         return { id, category };
       } else {
         dispatch(setShowError(true));

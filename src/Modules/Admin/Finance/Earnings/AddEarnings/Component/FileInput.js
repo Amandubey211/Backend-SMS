@@ -58,7 +58,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
   // Helper function to extract file name from URL
   const getFileNameFromUrl = (url) => {
     if (!url) return "";
-    const urlSegments = url.split("/");
+    const urlSegments = url?.split("/");
     const nameWithParams = urlSegments[urlSegments.length - 1];
     const name = nameWithParams.split("?")[0];
     return name;
@@ -201,32 +201,19 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
 
           {/* File Name and Size */}
           <div className="flex flex-col">
-            {/* Truncate file name to 10 characters if PDF */}
-            {getFileType(value) === "pdf" ? (
-              <Tooltip title={fileName}>
-                <span
-                  className={`${
-                    fileName ? "text-gray-800 font-medium" : "text-gray-400"
-                  } truncate`}
-                  style={{ maxWidth: "120px" }}
-                >
-                  {fileName.length > 20
-                    ? `${fileName.substring(0, 20)}...`
-                    : fileName || "No file selected"}
-                </span>
-              </Tooltip>
-            ) : (
-              <Tooltip title={fileName}>
-                <span
-                  className={`${
-                    fileName ? "text-gray-800 font-medium" : "text-gray-400"
-                  } truncate`}
-                  style={{ maxWidth: "150px" }}
-                >
-                  {fileName || "No file selected"}
-                </span>
-              </Tooltip>
-            )}
+            {/* Truncate file name to 20 characters */}
+            <Tooltip title={fileName}>
+              <span
+                className={`${
+                  fileName ? "text-gray-800 font-medium" : "text-gray-400"
+                } truncate`}
+                style={{ maxWidth: "150px" }}
+              >
+                {fileName.length > 20
+                  ? `${fileName.substring(0, 20)}...`
+                  : fileName || "No file selected"}
+              </span>
+            </Tooltip>
             {/* File Size Badge */}
             {fileSize > 0 && !uploading && (
               <Badge
