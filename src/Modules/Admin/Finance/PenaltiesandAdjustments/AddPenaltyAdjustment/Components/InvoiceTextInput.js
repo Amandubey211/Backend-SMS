@@ -13,28 +13,30 @@ const InvoiceTextInput = ({
   type = 'text',
   placeholder,
   disabled = false,
-  readOnly = false,
+  readOnly = false, // Added readOnly prop
   autoComplete = 'off',
   onBlur,
   onChange,
-  required = false,
+  required = false, // Added required prop
+  errorState = false, // New prop to indicate error state
+  isEditMode = false, // New prop to indicate edit mode
 }) => {
-  // Corrected selector to invoice slice
-  const { loading, error, invoiceFetchSuccess } = useSelector(
-    (state) => state.admin.invoices
+  // Extract relevant state from Redux
+  const { loading, invoiceFetchSuccess } = useSelector(
+    (state) => state.admin.invoices || {}
   );
 
   // Determine which icon to display
   let icon = null;
   if (loading) {
     icon = <Spin indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />;
-  } else if (error) {
+  } else if (errorState && !isEditMode) {
     icon = (
-      <Tooltip title="Failed to fetch invoice data">
+      <Tooltip title="Invoice not found">
         <CloseCircleOutlined style={{ color: 'red' }} />
       </Tooltip>
     );
-  } else if (invoiceFetchSuccess) {
+  } else if (invoiceFetchSuccess && !errorState && !isEditMode) {
     icon = (
       <Tooltip title="Invoice data fetched successfully">
         <CheckCircleOutlined style={{ color: 'green' }} />
@@ -45,7 +47,7 @@ const InvoiceTextInput = ({
   // Combined onChange handler
   const handleChange = (e) => {
     if (onChange) {
-      onChange(e);
+      onChange(e); // Execute any additional onChange logic
     }
     // Formik's onChange is handled automatically by Field
   };
@@ -67,7 +69,7 @@ const InvoiceTextInput = ({
           name={name}
           type={type}
           placeholder={placeholder}
-          disabled={disabled}
+          disabled={disabled || readOnly}
           readOnly={readOnly}
           className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full pr-10 focus:outline-none ${
             required ? 'focus:ring-red-300' : 'focus:ring-purple-300'
