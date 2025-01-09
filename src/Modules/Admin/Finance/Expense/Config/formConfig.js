@@ -25,12 +25,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
 
     // Additional fields
     recurringExpense: {
@@ -56,12 +57,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
 
     // Additional fields
     recurringExpense: {
@@ -90,12 +92,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // Maintenance
@@ -112,12 +115,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // Classroom & Office Purpose
@@ -142,12 +146,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // Decorations
@@ -166,12 +171,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
-    paid_amount: 0,
+    finalAmount: 0,
+    paidAmount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // Book Purchases
@@ -195,12 +201,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // Printing Exam Papers
@@ -222,12 +229,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // LMS/ERP Subscription
@@ -243,12 +251,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 
   // Legal and Audit Fees
@@ -262,12 +271,13 @@ export const initialValuesMap = {
     tax: 0,
     discount: 0,
     penalty: 0,
-    final_amount: 0,
+    finalAmount: 0,
     paid_amount: 0,
     remaining_amount: 0,
+    advanceAmount: 0,
     receipt: "",
     paymentStatus: "unpaid",
-    payment_type: "cash",
+    paymentType: "cash",
   },
 };
 

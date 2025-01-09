@@ -252,11 +252,48 @@ const TotalExpenseList = () => {
         ellipsis: true,
       },
       {
-        title: "Sub-Category",
+        title: "Sub-Category/Name",
         dataIndex: "subCategoryName",
         key: "subCategoryName",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 150,
+        width: 120,
+        ellipsis: true,
+      },
+      // Status Column
+      {
+        title: "Status",
+        dataIndex: "paymentStatus",
+        key: "paymentStatus",
+        render: (status) => {
+          let color = "default";
+          switch (status) {
+            case "paid":
+              color = "green";
+              break;
+            case "partial":
+              color = "yellow";
+              break;
+            case "unpaid":
+              color = "red";
+              break;
+            default:
+              color = "default";
+          }
+          return (
+            <Tag color={color} className="text-xs capitalize">
+              {status || "N/A"}
+            </Tag>
+          );
+        },
+        width: 80,
+        ellipsis: true,
+      },
+      {
+        title: "Total Amount (QR)",
+        dataIndex: "totalAmount",
+        key: "totalAmount",
+        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+        width: 100,
         ellipsis: true,
       },
       // Discount Column
@@ -319,35 +356,7 @@ const TotalExpenseList = () => {
         width: 120,
         ellipsis: true,
       },
-      // Status Column
-      {
-        title: "Status",
-        dataIndex: "paymentStatus",
-        key: "paymentStatus",
-        render: (status) => {
-          let color = "default";
-          switch (status) {
-            case "paid":
-              color = "green";
-              break;
-            case "partial":
-              color = "yellow";
-              break;
-            case "unpaid":
-              color = "red";
-              break;
-            default:
-              color = "default";
-          }
-          return (
-            <Tag color={color} className="text-xs capitalize">
-              {status || "N/A"}
-            </Tag>
-          );
-        },
-        width: 80,
-        ellipsis: true,
-      },
+
       // Action Column
       {
         title: "Action",
@@ -388,16 +397,17 @@ const TotalExpenseList = () => {
         description: expense.description || (
           <span className="text-yellow-600">No Description</span>
         ),
-        paymentType: expense.payment_type || "N/A",
+        paymentType: expense.paymentType || "N/A",
+        totalAmount: expense.totalAmount || 0,
         discount: expense.discount || 0,
         discountType: expense.discountType || "percentage",
-        finalAmount: expense.final_amount || 0,
-        paidAmount: expense.paid_amount || 0,
-        remainingAmount: expense.remaining_amount || 0,
+        finalAmount: expense.finalAmount || 0,
+        paidAmount: expense.paidAmount || 0,
+        remainingAmount: expense.remainingAmount || 0,
         penalty: expense.penalty || 0,
         paymentStatus: expense.paymentStatus || "N/A",
         earnedDate: expense.paidDate || expense.generateDate || null,
-        totalAmount: expense.total_amount || 0,
+        totalAmount: expense.totalAmount || 0,
         academicYearDetails: expense.academicYearDetails?.year || "N/A",
       })),
     [expenses]
@@ -428,7 +438,7 @@ const TotalExpenseList = () => {
 
     return (
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={4}>
+        <Table.Summary.Cell index={0} colSpan={6}>
           <strong>Totals:</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell index={4}>

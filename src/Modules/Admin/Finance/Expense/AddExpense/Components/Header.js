@@ -1,59 +1,43 @@
-// src/Components/Admin/Finance/Expenses/Config/Header.jsx
+// src/Modules/Admin/Finance/Expense/AddExpense/Components/Header.jsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { Button } from "antd";
 import DropdownCard from "./DropdownCard";
 import { useSelector } from "react-redux";
 import { subCategories, categories } from "../../Config/categories";
-import { Button } from "antd";
 
 const Header = ({
   onCategoryChange,
   onSubCategoryChange,
+  onReset,
   description,
   setDescription,
   initialCategory = "Salaries and Wages",
   initialSubCategory = "Teaching Staffs",
   isUpdate = false,
 }) => {
-  const [category, setCategory] = useState(initialCategory);
-  const [subCategory, setSubCategory] = useState(initialSubCategory);
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-  const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
   const readOnly = useSelector((state) => state.admin.expenses.readOnly);
 
-  useEffect(() => {
-    // Sync initial state if props change
-    setCategory(initialCategory);
-    setSubCategory(initialSubCategory);
-  }, [initialCategory, initialSubCategory]);
+  // Determine if subcategory dropdown should be displayed
+  const shouldShowSubCategory =
+    subCategories[initialCategory] && subCategories[initialCategory].length > 1;
 
-  const handleCategorySelect = (selectedCategory) => {
-    if (readOnly) return;
-    setCategory(selectedCategory);
-    onCategoryChange(selectedCategory);
-    setIsCategoryOpen(false);
+  // Manage dropdown open states
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const [isSubCategoryDropdownOpen, setIsSubCategoryDropdownOpen] =
+    useState(false);
 
-    // Automatically select the first subcategory if available
-    const subCategoryList = subCategories[selectedCategory];
-    if (subCategoryList && subCategoryList.length > 0) {
-      const firstSubCategory = subCategoryList[0];
-      setSubCategory(firstSubCategory);
-      onSubCategoryChange(firstSubCategory);
-    } else {
-      setSubCategory(""); // Reset subCategory if none available
-      onSubCategoryChange("");
+  // Toggle functions
+  const toggleCategoryDropdown = () => {
+    setIsCategoryDropdownOpen((prev) => !prev);
+    if (shouldShowSubCategory) {
+      setIsSubCategoryDropdownOpen(false); // Close subcategory dropdown when category is toggled
     }
   };
 
-  const handleSubCategorySelect = (selectedSubCategory) => {
-    if (readOnly) return;
-    setSubCategory(selectedSubCategory);
-    onSubCategoryChange(selectedSubCategory);
-    setIsSubCategoryOpen(false);
+  const toggleSubCategoryDropdown = () => {
+    setIsSubCategoryDropdownOpen((prev) => !prev);
   };
-
-  // Determine if subcategory dropdown should be displayed
-  const shouldShowSubCategory = subCategories[category]?.length > 1;
 
   return (
     <div className="bg-white py-3 px-5">
@@ -82,11 +66,14 @@ const Header = ({
           label="Category"
           name="category"
           id="category-dropdown"
-          value={category}
+          value={initialCategory}
           options={categories}
-          isOpen={isCategoryOpen}
-          onToggle={() => setIsCategoryOpen(!isCategoryOpen)}
-          onSelect={handleCategorySelect}
+          isOpen={isCategoryDropdownOpen}
+          onToggle={toggleCategoryDropdown}
+          onSelect={(selectedCategory) => {
+            onCategoryChange(selectedCategory);
+            setIsCategoryDropdownOpen(false); // Close dropdown after selection
+          }}
           bgColor="bg-red-50"
           borderColor="border-red-300"
           disabled={readOnly}
@@ -98,11 +85,14 @@ const Header = ({
             label="Sub-category"
             name="subCategory"
             id="subcategory-dropdown"
-            value={subCategory}
-            options={subCategories[category]}
-            isOpen={isSubCategoryOpen}
-            onToggle={() => setIsSubCategoryOpen(!isSubCategoryOpen)}
-            onSelect={handleSubCategorySelect}
+            value={initialSubCategory}
+            options={subCategories[initialCategory]}
+            isOpen={isSubCategoryDropdownOpen}
+            onToggle={toggleSubCategoryDropdown}
+            onSelect={(selectedSubCategory) => {
+              onSubCategoryChange(selectedSubCategory);
+              setIsSubCategoryDropdownOpen(false); // Close dropdown after selection
+            }}
             bgColor="bg-purple-50"
             borderColor="border-purple-300"
             disabled={readOnly}

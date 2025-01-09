@@ -1,7 +1,7 @@
 // src/Components/Admin/Finance/Expenses/Components/DropdownCard.jsx
 
 import React, { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowForward } from "react-icons/io";
 
 const DropdownCard = ({
@@ -54,14 +54,17 @@ const DropdownCard = ({
         onClick={() => {
           if (!disabled) onToggle();
         }}
-        onMouseEnter={() => {
-          if (!disabled && !isOpen) onToggle();
-        }}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
         aria-labelledby={`label-${id}`}
         role="combobox"
         tabIndex={disabled ? -1 : 0} // Make focusable if not disabled
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (!disabled) onToggle();
+          }
+        }}
       >
         <span className="text-gray-800 font-medium">
           {value || `Select ${label}`}
@@ -76,36 +79,39 @@ const DropdownCard = ({
       </div>
 
       {/* Dropdown Options */}
-      {isOpen && (
-        <motion.ul
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -10 }}
-          className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10"
-          role="listbox"
-          aria-labelledby={`label-${id}`}
-        >
-          {options?.map((item, index) => (
-            <li
-              key={index}
-              className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
-                item === value ? "bg-pink-200 font-bold text-gray-900" : ""
-              }`}
-              onClick={() => onSelect(item)}
-              role="option"
-              aria-selected={item === value}
-              tabIndex={0} // Make focusable
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  onSelect(item);
-                }
-              }}
-            >
-              {item}
-            </li>
-          ))}
-        </motion.ul>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.ul
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute left-0 top-full mt-1 w-full bg-white border border-gray-300 rounded-lg shadow-lg z-10"
+            role="listbox"
+            aria-labelledby={`label-${id}`}
+          >
+            {options?.map((item, index) => (
+              <li
+                key={index}
+                className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+                  item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+                }`}
+                onClick={() => onSelect(item)}
+                role="option"
+                aria-selected={item === value}
+                tabIndex={0} // Make focusable
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onSelect(item);
+                  }
+                }}
+              >
+                {item}
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

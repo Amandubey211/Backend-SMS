@@ -53,7 +53,7 @@ const TransactionDetails = ({ setFieldValue, values }) => {
       options: ["paid", "unpaid", "partial", "advance"],
     },
     {
-      name: "payment_type",
+      name: "paymentType",
       label: "Payment Type",
       type: "select",
       options: ["cash", "card", "online", "cheque", "other"],
@@ -95,7 +95,7 @@ const TransactionDetails = ({ setFieldValue, values }) => {
     {
       type: "number",
       label: "Final Amount",
-      name: "final_amount",
+      name: "finalAmount",
       placeholder: "Auto-calculated",
       readOnly: true,
     },
