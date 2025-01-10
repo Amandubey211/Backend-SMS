@@ -221,27 +221,15 @@ const ExpenseChart = () => {
   }
 
   // Handle error state
-  if (error) {
-    return (
-      <div className="w-full bg-white p-4 rounded-lg shadow flex justify-center items-center">
-        <Alert message="Error loading graph." type="error" showIcon />
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="w-full bg-white p-4 rounded-lg shadow flex justify-center items-center">
+  //       <Alert message="Error loading graph." type="error" showIcon />
+  //     </div>
+  //   );
+  // }
 
   // Handle case when there's no data
-  if (expenseGraph.length === 0) {
-    return (
-      <div className="w-full bg-white p-4 rounded-lg shadow flex justify-center items-center">
-        <Alert
-          message="No expense data available."
-          type="info"
-          showIcon
-          description="Please add some expenses to view the graph."
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="flex justify-center items-center">

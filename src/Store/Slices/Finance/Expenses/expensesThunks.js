@@ -110,7 +110,6 @@ export const fetchAllExpenses = createAsyncThunk(
       if (response?.success) {
         return response;
       } else {
-        toast.error(response?.message || "Failed to fetch expenses.");
         return rejectWithValue(
           response?.message || "Failed to fetch expenses."
         );
@@ -145,9 +144,6 @@ export const addExpense = createAsyncThunk(
   }
 );
 
-/**
- * Thunk to update an existing expense.
- */
 export const updateExpense = createAsyncThunk(
   "expenses/updateExpense",
   async ({ values, category, expenseId }, { dispatch, rejectWithValue }) => {
@@ -264,9 +260,6 @@ export const fetchCardDataExpense = createAsyncThunk(
       if (response?.success) {
         return response.data;
       } else {
-        toast.error(
-          response?.message || "Failed to fetch card data for expenses."
-        );
         return rejectWithValue(
           response?.message || "Failed to fetch card data for expenses."
         );
@@ -297,9 +290,6 @@ export const fetchTeachingStaff = createAsyncThunk(
   }
 );
 
-/**
- * Thunk to fetch Non-Teaching Staff
- */
 export const fetchNonTeachingStaff = createAsyncThunk(
   "expenses/fetchNonTeachingStaff",
   async (_, { dispatch, rejectWithValue }) => {

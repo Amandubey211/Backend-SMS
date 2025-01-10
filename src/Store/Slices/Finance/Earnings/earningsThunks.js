@@ -3,7 +3,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
-import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
+import {
+  deleteData,
+  getData,
+  postData,
+  putData,
+} from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 
@@ -18,7 +23,7 @@ const getEndpointForCategory = (category, action, id) => {
     case "Facility-Based Revenue":
       if (action === "create") return `${facilityBase}/income`;
       if (action === "update") return `${facilityBase}/update-income/${id}`;
-      
+
       break;
 
     case "Financial Investments":
@@ -94,19 +99,20 @@ export const updateEarnings = createAsyncThunk(
   }
 );
 
-
 export const fetchAllIncomes = createAsyncThunk(
   "earnings/fetchAllIncomes",
   async (params, { rejectWithValue, dispatch }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(`/finance/revenue/get-income?academicYear=${say}`, params);
+      const response = await getData(
+        `/finance/revenue/get-income?academicYear=${say}`,
+        params
+      );
 
       if (response?.success) {
         return response;
       } else {
-        //toast.error(response?.message || "Failed to fetch incomes.");
         return rejectWithValue(response?.message || "Failed to fetch incomes.");
       }
     } catch (error) {
@@ -156,7 +162,6 @@ export const fetchCardDataRevenue = createAsyncThunk(
         // const transformedData = transformCardData(response.data);
         // return transformedData;
       } else {
-        toast.error(response?.message || "Failed to fetch card data revenue.");
         return rejectWithValue(
           response?.message || "Failed to fetch card data revenue."
         );
@@ -169,7 +174,7 @@ export const fetchCardDataRevenue = createAsyncThunk(
 
 export const deleteEarnings = createAsyncThunk(
   "earnings/deleteEarnings",
-  async ({ id, category }, { dispatch, rejectWithValue }) => {
+  async ({ category, id }, { dispatch, rejectWithValue }) => {
     try {
       const baseUrl = "/finance/revenue";
       let endpoint;
@@ -195,17 +200,16 @@ export const deleteEarnings = createAsyncThunk(
           throw new Error(`Category ${category} not supported for deletion.`);
       }
 
-      const response = await deleteData(endpoint); 
+      const response = await deleteData(endpoint);
 
       if (response?.success) {
-        toast.success("Earnings deleted successfully!");
         const params = {
           page: 1,
           limit: 20,
           includeDetails: true,
-        }
-        dispatch(fetchAllIncomes(params))
-        return id; 
+        };
+        dispatch(fetchAllIncomes(params));
+        return id;
       } else {
         toast.error(response?.message || "Failed to delete earnings.");
         return rejectWithValue(

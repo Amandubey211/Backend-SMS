@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { Table, Spin, Alert, Button, Tag, Tooltip } from "antd";
+import { Table, Spin, Button, Tooltip, Tag } from "antd";
 import {
   DollarOutlined,
   CloudOutlined,
@@ -170,34 +170,21 @@ const SummaryTotalRevenue = () => {
           <Spin tip="Loading..." />
         </div>
       )}
-      {/* Error Message */}
-      {error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          closable
-        />
-      )}
-      {/* No Data Placeholder */}
-      {!loading && incomes.length === 0 && !error && (
-        <div className="text-center text-gray-500 text-xs py-4">
-          No records found.
-        </div>
-      )}
+
       {/* Table */}
-      {!loading && !error && incomes.length > 0 && (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false} // Removed pagination controls
-          className="rounded-lg shadow text-xs"
-          bordered
-          size="small"
-          tableLayout="fixed" // Fixed table layout
-        />
-      )}
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        pagination={false} // Removed pagination controls
+        className="rounded-lg shadow text-xs"
+        bordered
+        size="small"
+        tableLayout="fixed" // Fixed table layout
+        loading={loading} // Show spinner on loading
+        locale={{
+          emptyText: "No Data Found", // Default message for empty table
+        }}
+      />
     </div>
   );
 };
