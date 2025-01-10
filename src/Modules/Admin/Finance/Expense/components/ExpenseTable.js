@@ -157,11 +157,7 @@ const ExpenseTable = () => {
       </div>
 
       {/* Loading Indicator */}
-      {/* {loading && (
-        <div className="flex justify-center">
-          <Spin tip="Loading..." />
-        </div>
-      )} */}
+
       {!loading && expenses.length === 0 && !error && (
         <div className="text-center text-gray-500 text-xs py-4">
           No records found.
