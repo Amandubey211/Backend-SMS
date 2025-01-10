@@ -54,7 +54,8 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const popupRef = useRef(null);
+  const popupRef = useRef(null); // Define popupRef to prevent errors
+  const pdfRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useNavHeading("Finance", "Recent Invoice List");
@@ -69,27 +70,31 @@ const RecentInvoiceList = () => {
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
   const downloadPDF = async () => {
-    if (!popupRef.current) return;
-
+    if (!pdfRef.current) return;
+  
     try {
-      const canvas = await html2canvas(popupRef.current, {
-        scale: 2, // Higher scale for better quality
-        useCORS: true, // Allow cross-origin images
+      // Capture the pdfRef element as a canvas
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2, // Increase scale for higher resolution
+        useCORS: true, // Enable cross-origin
+        windowWidth: pdfRef.current.scrollWidth, // Match the element's width
+        windowHeight: pdfRef.current.scrollHeight, // Match the element's height
       });
-
+  
       const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4");
-
-      // Calculate dimensions for A4 page
+      const pdf = new jsPDF("p", "mm", "a4"); // A4 size PDF
+  
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintain aspect ratio
+  
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`);
+      pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`); // Save the PDF
     } catch (error) {
       console.error("Failed to generate PDF", error);
     }
   };
+  
+
 
   // Filtered data based on search query
   const filteredData = invoices?.filter(
@@ -435,45 +440,47 @@ const RecentInvoiceList = () => {
 
 
 
+          {/* PDF Preview Modal */}
           {isInvoiceVisible && selectedInvoice && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Full-screen blur background */}
-            <div
-              className="absolute inset-0 bg-black bg-opacity-60"
-              style={{
-                backdropFilter: "blur(8px)",
-                height: "100vh",
-                width: "100vw",
-              }}
-              onClick={() => setInvoiceVisible(false)}
-            />
-            {/* Centered content */}
-            <div
-              ref={popupRef}
-              className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Close and Download Buttons */}
-              <div className="flex justify-end space-x-2 mb-4">
-                <button
-                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                  onClick={downloadPDF} // Trigger PDF download
-                >
-                  Download PDF
-                </button>
-                <button
-                  onClick={() => setInvoiceVisible(false)}
-                  className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
+              {/* Full-screen blur background */}
+              <div
+                className="absolute inset-0 bg-black bg-opacity-60"
+                style={{ backdropFilter: "blur(8px)" }}
+                onClick={() => setInvoiceVisible(false)}
+              />
+              {/* Centered content */}
+              <div
+                ref={popupRef}
+                className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <div className="flex justify-end space-x-2 mb-4">
+                  <button
+                    onClick={downloadPDF}
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                  >
+                    Download PDF
+                  </button>
+                  <button
+                    onClick={() => setInvoiceVisible(false)}
+                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                  >
+                    ✕
+                  </button>
+                </div>
 
-              {/* Render RecentInvoiceTemplate */}
-              <RecentInvoiceTemplate data={selectedInvoice} />
+                {/* Hidden container for PDF generation */}
+                <div ref={pdfRef} className="hidden">
+                  <RecentInvoiceTemplate data={selectedInvoice} />
+                </div>
+
+                {/* Visible content */}
+                <RecentInvoiceTemplate data={selectedInvoice} />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
 
           <ExportModal
