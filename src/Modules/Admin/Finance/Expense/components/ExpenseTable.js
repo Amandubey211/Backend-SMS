@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { Table, Spin, Alert, Button, Tag, Tooltip } from "antd";
+import { Table, Spin, Button, Tooltip } from "antd";
 import {
   DollarOutlined,
   CloudOutlined,
@@ -9,7 +9,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllExpenses } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import debounce from "lodash.debounce";
-import { setCurrentPage } from "../../../../../Store/Slices/Finance/Expenses/expensesSlice";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -163,34 +162,21 @@ const ExpenseTable = () => {
           <Spin tip="Loading..." />
         </div>
       )}
-      {/* Error Message */}
-      {error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          closable
-        />
-      )}
-      {/* No Data Placeholder */}
-      {!loading && expenses.length === 0 && !error && (
-        <div className="text-center text-gray-500 text-xs py-4">
-          No records found.
-        </div>
-      )}
+
       {/* Table */}
-      {!loading && !error && expenses.length > 0 && (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false} // Removed pagination controls
-          className="rounded-lg shadow text-xs"
-          bordered
-          size="small"
-          tableLayout="fixed" // Fixed table layout
-        />
-      )}
+      <Table
+        dataSource={dataSource}
+        columns={columns}
+        pagination={false} // Removed pagination controls
+        className="rounded-lg shadow text-xs"
+        bordered
+        size="small"
+        tableLayout="fixed" // Fixed table layout
+        loading={loading} // Show spinner on loading
+        locale={{
+          emptyText: "No Data Found", // Default message for empty table
+        }}
+      />
     </div>
   );
 };

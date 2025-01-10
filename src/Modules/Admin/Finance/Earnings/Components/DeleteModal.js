@@ -1,32 +1,64 @@
+// src/Components/Admin/Finance/Earnings/Components/DeleteModal.jsx
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { Input, Button, Typography, Spin } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteExpense } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
+// ↓ IMPORTANT: import the deleteIncome thunk for Earnings
+import { deleteEarnings } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
+import { deleteExpense } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 
 const { Text } = Typography;
 
-const DeleteModal = ({ visible, onClose, type, expense }) => {
-  const { loading } = useSelector((state) => state.admin.expenses);
+/**
+ * @param {boolean} visible - Whether the modal is shown
+ * @param {function} onClose - Function to close the modal
+ * @param {string} type - "Expense" or "Earnings"
+ * @param {object} expense - Expense item to delete (if type="Expense")
+ * @param {object} income - Income item to delete (if type="Earnings")
+ */
+const DeleteModal = ({ visible, onClose, type, expense, income }) => {
+  // Use loading flags from both slices to handle spinner correctly
+  const { loading: loadingExpenses } = useSelector(
+    (state) => state.admin.expenses
+  );
+  const { loading: loadingEarnings } = useSelector(
+    (state) => state.admin.earnings
+  );
+
+  // Decide which loading flag to use based on `type`
+  const isLoading = type === "Expense" ? loadingExpenses : loadingEarnings;
+
   const dispatch = useDispatch();
   const [inputValue, setInputValue] = useState("");
 
+  // Determine the item to delete based on the type
+  const itemToDelete = type === "Expense" ? expense : income;
+
   const handleConfirm = async () => {
-    if (!expense) {
-      toast.error("No expense selected for deletion.");
+    if (!itemToDelete) {
+      toast.error(`No ${type.toLowerCase()} selected for deletion.`);
       return;
     }
 
     try {
-      const { _id, category } = expense;
+      const { _id, category } = itemToDelete;
       const categoryName = category?.categoryName || category;
 
-      await dispatch(
-        deleteExpense({ category: categoryName, id: _id })
-      ).unwrap();
+      if (type === "Expense") {
+        // Dispatch deleteExpense thunk
+        await dispatch(
+          deleteExpense({ category: categoryName, id: _id })
+        ).unwrap();
+      } else if (type === "Earnings") {
+        // Dispatch deleteIncome thunk
+        await dispatch(
+          deleteEarnings({ category: categoryName, id: _id })
+        ).unwrap();
+      }
+
       toast.success(`${type} deleted successfully!`);
     } catch (error) {
       toast.error(`Failed to delete ${type}. Please try again.`);
@@ -42,7 +74,7 @@ const DeleteModal = ({ visible, onClose, type, expense }) => {
   };
 
   const categoryName =
-    expense?.category?.categoryName || expense?.category || "";
+    itemToDelete?.category?.categoryName || itemToDelete?.category || "";
 
   // Prevent clicks inside the modal from closing it
   const handleBackdropClick = (e) => {
@@ -102,12 +134,12 @@ const DeleteModal = ({ visible, onClose, type, expense }) => {
               size="large"
               onClick={handleConfirm}
               disabled={
-                loading ||
+                isLoading ||
                 inputValue.trim().toLowerCase() !== categoryName.toLowerCase()
               }
               className="bg-gradient-to-r from-red-500 to-red-600 text-white border-none hover:from-red-600 hover:to-red-700 transition-all flex items-center"
             >
-              {loading ? <Spin size="small" className="mr-2" /> : "Delete"}
+              {isLoading ? <Spin size="small" className="mr-2" /> : "Delete"}
             </Button>
           </div>
         </div>
@@ -120,7 +152,8 @@ DeleteModal.propTypes = {
   visible: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   type: PropTypes.string.isRequired,
-  expense: PropTypes.object, // Expense to delete
+  expense: PropTypes.object, // Expense to delete if type = "Expense"
+  income: PropTypes.object, // Income to delete if type = "Earnings"
 };
 
 export default DeleteModal;

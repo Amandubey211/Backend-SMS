@@ -100,6 +100,7 @@ const expensesSlice = createSlice({
       })
       .addCase(fetchAllExpenses.rejected, (state, action) => {
         state.loading = false;
+        state.expenses = [];
         state.error =
           action.payload || "An error occurred while fetching expenses.";
       })
