@@ -86,7 +86,7 @@ const sidebarData = [
         //requiredPermission: PERMISSIONS.VIEW_TEACHERS, // Added permission reference
       },
       {
-        title: "Accountant",
+        title: "Finance",
         icon: <MdManageAccounts />,
         path: "/users/accountants",
         roles: [ROLES.ADMIN],

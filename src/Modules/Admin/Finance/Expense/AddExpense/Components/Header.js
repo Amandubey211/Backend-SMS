@@ -16,7 +16,7 @@ const Header = ({
   initialSubCategory = "Teaching Staffs",
   isUpdate = false,
 }) => {
-  const readOnly = useSelector((state) => state.admin.expenses.readOnly);
+  const { readOnly, loading } = useSelector((state) => state.admin.expenses);
 
   // Determine if subcategory dropdown should be displayed
   const shouldShowSubCategory =
@@ -51,7 +51,7 @@ const Header = ({
             <Button
               type="default"
               onClick={onReset}
-              className="text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-gray-200 transition"
+              className="border border-pink-500 text-black bg-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-pink-50 hover:text-black transition"
               disabled={readOnly}
             >
               Reset
