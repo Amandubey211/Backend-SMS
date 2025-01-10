@@ -3,7 +3,6 @@ import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { FiCalendar } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEarningsData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Make sure the path is correct
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 

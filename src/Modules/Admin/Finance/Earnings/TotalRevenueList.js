@@ -218,27 +218,26 @@ const TotalRevenueList = () => {
                 aria-label="Edit"
               />
             </Tooltip>
-          
-        
-        <Tooltip title="Delete">
-          <Button
-            type="link"
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              const incomeToDelete = incomeIdMap[record.key];
-              if (incomeToDelete) {
-                setSelectedIncomeForDeletion(incomeToDelete); 
-                setIsDeleteModalVisible(true);
-              } else {
-                toast.error("Selected income not found.");
-              }
-            }}
-            className="text-red-600 hover:text-red-800 p-0"
-            aria-label="Delete"
-          />
-        </Tooltip>
-        </>
-      )}
+
+            <Tooltip title="Delete">
+              <Button
+                type="link"
+                icon={<DeleteOutlined />}
+                onClick={() => {
+                  const incomeToDelete = incomeIdMap[record.key];
+                  if (incomeToDelete) {
+                    setSelectedIncomeForDeletion(incomeToDelete);
+                    setIsDeleteModalVisible(true);
+                  } else {
+                    toast.error("Selected income not found.");
+                  }
+                }}
+                className="text-red-600 hover:text-red-800 p-0"
+                aria-label="Delete"
+              />
+            </Tooltip>
+          </>
+        )}
       </div>
     );
   };
@@ -265,7 +264,10 @@ const TotalRevenueList = () => {
         width: 60,
         render: (_, record) => {
           const isSelected = selectedRowKey === record.key;
-          if (record.paymentStatus === "unpaid" && record.categoryName !== "Student-Based Revenue") {
+          if (
+            record.paymentStatus === "unpaid" &&
+            record.categoryName !== "Student-Based Revenue"
+          ) {
             return (
               <div className="flex items-center justify-center">
                 <Tooltip title="Selectable">
@@ -274,7 +276,6 @@ const TotalRevenueList = () => {
                     onChange={(e) => {
                       e.stopPropagation();
                       if (e.target.checked) {
-                        
                         setSelectedRowKey(record.key);
                       } else {
                         setSelectedRowKey(null);
@@ -285,7 +286,7 @@ const TotalRevenueList = () => {
                 </Tooltip>
               </div>
             );
-          } 
+          }
         },
       },
       {
@@ -418,8 +419,8 @@ const TotalRevenueList = () => {
         paymentStatus: income.paymentStatus || "N/A",
         earnedDate: income.paidDate || income.generateDate || null,
         totalAmount: income.total_amount || 0,
-        email:income?.email,
-        ...income
+        email: income?.email,
+        ...income,
       })),
     [incomes]
   );
@@ -577,7 +578,6 @@ const TotalRevenueList = () => {
                     onClick={() => {
                       const selectedIncome = incomeIdMap[selectedRowKey];
                       if (selectedIncome) {
-                       
                         navigate("/finance/invoices/add-new-invoice");
                       } else {
                         toast.error("Selected income not found.");
@@ -663,20 +663,31 @@ const TotalRevenueList = () => {
                   if (record.paymentStatus !== "unpaid") {
                     return;
                   }
-                  console.log('kk',record);
-                  
+                  console.log("kk", record);
+
                   const invoiceData = {
-                    dueDate: record?.dueDate?.slice(0,10),
+                    dueDate: record?.dueDate?.slice(0, 10),
                     receiver: {
-                      name: record?.rentIncome?.nameOfRenter || record?.examCentreFees?.examName || record?.companyName 
-                       ||'',
+                      name:
+                        record?.rentIncome?.nameOfRenter ||
+                        record?.examCentreFees?.examName ||
+                        record?.companyName ||
+                        "",
                       address: record?.address || "",
-                      contact: record?.examCentreFees?.
-                      mobileNumber || record?.phoneNumber,
+                      contact:
+                        record?.examCentreFees?.mobileNumber ||
+                        record?.phoneNumber,
                       email: record?.email,
                     },
-                    description: record?.description || '',
-                    lineItems: [{ revenueType: record?.categoryName,revenueReference:record?.key, quantity: 1, amount: record?.totalAmount }],
+                    description: record?.description || "",
+                    lineItems: [
+                      {
+                        revenueType: record?.categoryName,
+                        revenueReference: record?.key,
+                        quantity: 1,
+                        amount: record?.totalAmount,
+                      },
+                    ],
                     discountType: record?.discountType,
                     discount: record?.discount,
                     penalty: record?.penalty,
@@ -684,14 +695,13 @@ const TotalRevenueList = () => {
                     totalAmount: 0,
                     finalAmount: record?.finalAmount,
                     paymentType: record?.paymentType,
-                    paymentStatus:record?.paymentStatus,
-                    mode:'create'
+                    paymentStatus: record?.paymentStatus,
+                    mode: "create",
                   };
-                  console.log(invoiceData,'id');
-                  
-                     dispatch(setInvoiceData(invoiceData));
+                  console.log(invoiceData, "id");
+
+                  dispatch(setInvoiceData(invoiceData));
                   setSelectedRowKey(record.key);
-                    
                 },
               })}
             />
