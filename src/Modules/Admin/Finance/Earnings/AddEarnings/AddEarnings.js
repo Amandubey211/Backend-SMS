@@ -72,17 +72,18 @@ const AddEarnings = () => {
           specificFields = {
             name: incomeData.rentIncome.name || "",
 
-            startDate: incomeData.rentIncome.startDate?.slice(0,10) || "",
-            endDate: incomeData.rentIncome.endDate?.slice(0,10) || "",
+            startDate: incomeData.rentIncome.startDate?.slice(0, 10) || "",
+            endDate: incomeData.rentIncome.endDate?.slice(0, 10) || "",
             nameOfRenter: incomeData.rentIncome.nameOfRenter || "",
           };
           break;
         case "Exam Center Fees":
           specificFields = {
             examName: incomeData.examCentreFees.examName || "",
-            startDate: incomeData.examCentreFees.startDate?.slice(0,10) || "",
-            endDate: incomeData.examCentreFees.endDate?.slice(0,10) || "",
-            mobileNumber: incomeData.examCentreFees.mobileNumber?.slice(0,10) || "",
+            startDate: incomeData.examCentreFees.startDate?.slice(0, 10) || "",
+            endDate: incomeData.examCentreFees.endDate?.slice(0, 10) || "",
+            mobileNumber:
+              incomeData.examCentreFees.mobileNumber?.slice(0, 10) || "",
           };
           break;
         case "Parking Fees":
@@ -90,7 +91,8 @@ const AddEarnings = () => {
             vehicleType: incomeData.parkingFees.vehicleType || "",
             name: incomeData.parkingFees.name || "",
             userType: incomeData.parkingFees.userType || "",
-            otherVehicleDetails: incomeData.parkingFees.otherVehicleDetails || "",
+            otherVehicleDetails:
+              incomeData.parkingFees.otherVehicleDetails || "",
             otherUserDetails: incomeData.parkingFees.otherUserDetails || "",
           };
           break;
@@ -489,7 +491,7 @@ const AddEarnings = () => {
               )}
 
               {/* Error Message */}
-              {error && showError && (
+              {/* {error && showError && (
                 <div className="bg-red-100 text-red-700 p-2 rounded-md text-sm">
                   {Array.isArray(error)
                     ? error.map((err, idx) => (
@@ -497,7 +499,7 @@ const AddEarnings = () => {
                       ))
                     : error}
                 </div>
-              )}
+              )} */}
 
               {/* Header with Dropdowns and Description */}
               <Header
