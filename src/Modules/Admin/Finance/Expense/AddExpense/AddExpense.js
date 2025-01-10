@@ -131,6 +131,7 @@ const AddExpenses = () => {
         // Ensure startDate and endDate are included for relevant forms
         startDate: mappedData.startDate || "",
         endDate: mappedData.endDate || "",
+        // purchasedDate: mappedData.purchasedDate || "",
       };
 
       return initialValues;
