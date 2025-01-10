@@ -13,7 +13,9 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
     invoiceId,
     tax,
     discount,
+    discountType,
     adjustmentPenalty,
+    penaltyType,
     adjustmentTotal,
     adjustmentAmount,
     items = [],
@@ -23,7 +25,6 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
     adjustedBy,
     adjustedAt,
     academicYear,
-    // Add more fields if necessary
   } = data;
 
   // Extract receiver details
@@ -36,11 +37,29 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
 
   // Calculate subtotal from line items
   const subtotal = items.reduce((acc, item) => acc + (item.amount || 0), 0);
-  const totalAfterAdjustments =
-    subtotal + (tax || 0) + (adjustmentPenalty || 0) - (discount || 0);
 
-  // Assume schoolName is available; replace "School Name" with actual data if available
-  const schoolName = "Student Diwan School";
+  // Calculate tax amount
+  const taxAmount = (subtotal * (tax || 0)) / 100;
+
+  // Calculate penalty amount based on penalty type
+  const penaltyAmount =
+    penaltyType === "percentage"
+      ? (subtotal * (adjustmentPenalty || 0)) / 100
+      : adjustmentPenalty || 0;
+
+  // Calculate discount amount based on discount type
+  const discountAmount =
+    discountType === "percentage"
+      ? (subtotal * (discount || 0)) / 100
+      : discount || 0;
+
+  // Calculate final amount after all adjustments
+  const finalAmount = (subtotal + taxAmount + penaltyAmount - discountAmount).toFixed(2);
+
+  // Calculate net paid amount
+  const netPaidAmount = (adjustmentTotal - (adjustmentAmount || 0)).toFixed(2);
+
+  const schoolName = "Student Diwan School"; // Replace with dynamic school name if available
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -111,8 +130,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           <strong>Payment Status:</strong> {paymentStatus || "N/A"}
         </p>
         <p>
-          <strong>Academic Year:</strong>{" "}
-          {academicYear?.year || "N/A"}
+          <strong>Academic Year:</strong> {academicYear?.year || "N/A"}
         </p>
         <p>
           <strong>Adjusted By:</strong> {adjustedBy?.adminName || "N/A"}
@@ -141,16 +159,18 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
                   {index + 1}
                 </td>
                 <td className="p-2 border border-gray-300">
-                  {item.revenueType || "N/A"}
+                  {item.revenueType
+                    ? item.revenueType
+                      .replace(/_/g, ' ') // Replace underscores with spaces
+                      .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
+                    : "N/A"}
                 </td>
+
                 <td className="p-2 border border-gray-300 text-center">
                   {item.quantity || 1}
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
-                  {item.quantity
-                    ? (item.amount / item.quantity).toFixed(2)
-                    : item.amount.toFixed(2)}{" "}
-                  QAR
+                  {(item.amount / item.quantity).toFixed(2)} QAR
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
                   {item.amount.toLocaleString()} QAR
@@ -179,29 +199,32 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax
+              Tax ({tax || 0}%)
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {tax.toLocaleString()} QAR
+              {taxAmount.toFixed(2)} QAR
             </td>
           </tr>
           {/* Penalty Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Penalty
+              Penalty ({penaltyType === "percentage" ? `${adjustmentPenalty}%` : `${adjustmentPenalty} QAR`})
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {adjustmentPenalty.toLocaleString()} QAR
+              {penaltyAmount.toFixed(2)} QAR
             </td>
           </tr>
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount
+              Discount ({discountType === "percentage" ? `${discount}%` : `${discount} QAR`})
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              -{discount.toLocaleString()} QAR
+              {discountType === "percentage"
+                ? `${discountAmount.toFixed(2)}%`
+                : `${discountAmount.toFixed(2)} QAR`}
             </td>
+
           </tr>
           {/* Final Total Row */}
           <tr className="font-bold text-pink-600">
@@ -209,16 +232,16 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
               Final Amount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {adjustmentTotal.toLocaleString()} QAR
+              {finalAmount} QAR
             </td>
           </tr>
         </tbody>
       </table>
 
       {/* Remarks and Summary */}
-      <div className="w-full flex justify-between items-start gap-x-2">
+      <div className="w-full flex flex-col gap-y-4">
         {/* Remarks on the left */}
-        <div className="text-sm text-gray-700 w-2/3">
+        <div className="text-sm text-gray-700">
           <p>
             <strong>Reason for Adjustment:</strong>
           </p>
@@ -226,7 +249,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           <p>
             <strong>Remarks:</strong>
           </p>
-          <ul className="list-disc px-5">
+          <ul className="list-disc px-5 w-full break-words">
             {[
               "Thank you for your attention to this adjustment.",
               "Please retain this document for your records.",
@@ -239,7 +262,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
         </div>
 
         {/* Summary Table aligned to the right */}
-        <table className="text-sm border border-gray-300 rounded-md w-1/2">
+        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
           <tbody>
             <tr className="bg-white">
               <td className="p-2 border border-gray-300" colSpan="4">
@@ -262,11 +285,11 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
                 Net Paid Amount
               </td>
               <td className="p-2 border border-gray-300 text-right text-pink-600">
-                {(adjustmentTotal - (adjustmentAmount || 0)).toLocaleString()} QAR
+                {netPaidAmount} QAR
               </td>
             </tr>
           </tbody>
-        </table>
+        </table> */}
       </div>
     </div>
   );

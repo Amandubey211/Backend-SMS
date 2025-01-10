@@ -13,21 +13,35 @@ const ReceiptTemplate = ({ data }) => {
     reciever,
     tax,
     discount,
+    discountType,
     penalty,
-    totalPaidAmount,
     lineItems = [],
     remark,
     govtRefNumber,
     paymentMethod,
     paymentStatus,
-    createdBy,
+    totalPaidAmount,
   } = data;
 
   const finalReceiver = reciever?.name ? reciever : receiver;
   const formattedDate = date ? new Date(date).toLocaleDateString() : "N/A";
+
+  // Calculate subtotal
   const subtotal = lineItems.reduce((acc, item) => acc + (item.total || 0), 0);
-  const totalAfterAdjustments =
-    subtotal + (tax || 0) + (penalty || 0) - (discount || 0);
+
+  // Calculate tax as a percentage of subtotal
+  const taxAmount = (subtotal * (tax || 0)) / 100;
+
+  // Calculate discount based on type
+  const discountAmount =
+    discountType === "percentage"
+      ? (subtotal * (discount || 0)) / 100
+      : discount || 0;
+
+  // Calculate final total after adjustments
+  const finalAmount = (
+    subtotal + taxAmount + (penalty || 0) - discountAmount
+  ).toFixed(2);
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -63,10 +77,10 @@ const ReceiptTemplate = ({ data }) => {
           <p>
             <strong>Bill To:</strong>
           </p>
-          <p>Name: {finalReceiver?.name || "Akash"}</p>
-          <p>Email: {finalReceiver?.email || "ak@gmail.com"}</p>
-          <p>Address: {finalReceiver?.address || "India"}</p>
-          <p>Phone no: {finalReceiver?.phone || "8965896589"}</p>
+          <p>Name: {finalReceiver?.name || "N/A"}</p>
+          <p>Email: {finalReceiver?.email || "N/A"}</p>
+          <p>Address: {finalReceiver?.address || "N/A"}</p>
+          <p>Phone no: {finalReceiver?.phone || "N/A"}</p>
         </div>
         <div>
           <p>
@@ -77,12 +91,11 @@ const ReceiptTemplate = ({ data }) => {
             <strong>Ref Invoice No:</strong> {"INV0001-202412-0001"}
           </p>
           <p>
-            <strong>Date:</strong> {formattedDate || "MM-DD-YYYY"}
+            <strong>Date:</strong> {formattedDate}
           </p>
           {govtRefNumber && (
             <p>
-              <strong>Govt Ref (if any):</strong>{" "}
-              {govtRefNumber || "GINV0001-202412-0001"}
+              <strong>Govt Ref (if any):</strong> {govtRefNumber}
             </p>
           )}
         </div>
@@ -98,7 +111,6 @@ const ReceiptTemplate = ({ data }) => {
         </p>
       </div>
 
-      {/* Items Table */}
       {/* Items Table */}
       <table className="w-full text-sm mb-6 border border-gray-300">
         <thead>
@@ -127,23 +139,16 @@ const ReceiptTemplate = ({ data }) => {
                   {item.quantity || 1}
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
-                  {(item.quantity
-                    ? (item.total / item.quantity).toFixed(2)
-                    : item.total || 0
-                  ).toLocaleString()}{" "}
-                  QAR
+                  {(item.total / (item.quantity || 1)).toFixed(2)} QAR
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
-                  {(item.total || 0).toLocaleString()} QAR
+                  {item.total.toLocaleString()} QAR
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td
-                className="p-2 border border-gray-300 text-center"
-                colSpan="5"
-              >
+              <td className="p-2 border border-gray-300 text-center" colSpan="5">
                 No items found.
               </td>
             </tr>
@@ -154,16 +159,16 @@ const ReceiptTemplate = ({ data }) => {
               Subtotal
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {subtotal.toLocaleString()} QAR
+              {subtotal.toFixed(2)} QAR
             </td>
           </tr>
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax
+              Tax ({tax || 0}%)
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {(tax || 0).toLocaleString()} QAR
+              {taxAmount.toFixed(2)} %
             </td>
           </tr>
           {/* Penalty Row */}
@@ -172,16 +177,20 @@ const ReceiptTemplate = ({ data }) => {
               Penalty
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {(penalty || 0).toLocaleString()} QAR
+              {(penalty || 0).toFixed(2)} QAR
             </td>
           </tr>
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount
+              Discount (
+              {discountType === "percentage" ? `${discount}%` : `${discount} QAR`}
+              )
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              -{(discount || 0).toLocaleString()} QAR
+              {discountType === "percentage"
+                ? `${discount}%`
+                : `${discountAmount.toFixed(2)} QAR`}
             </td>
           </tr>
           {/* Final Total Row */}
@@ -190,20 +199,19 @@ const ReceiptTemplate = ({ data }) => {
               Final Amount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {"200" || totalAfterAdjustments.toLocaleString()} QAR
+              {finalAmount} QAR
             </td>
           </tr>
         </tbody>
       </table>
 
-      {/* Added ml-auto for right alignment */}
-      <div className="w-full flex justify-between items-start gap-x-2">
-        {/* Remark on the left */}
-        <div className="text-sm text-gray-700 w-2/3">
+      {/* Remarks and Summary */}
+      <div className="w-full flex flex-col gap-y-4">
+        <div className="text-sm text-gray-700">
           <p>
             <strong>Remarks:</strong>
           </p>
-          <ul className="list-disc px-5">
+          <ul className="list-disc px-5 w-full break-words">
             {[
               "Thank you for doing business with us. If you have any questions, please contact us.",
               "Ensure to retain this document for future reference.",
@@ -211,40 +219,35 @@ const ReceiptTemplate = ({ data }) => {
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}
-            {remark && <li>{remark || "rrr"}</li>}
+            {remark && <li>{remark}</li>}
           </ul>
         </div>
 
-        {/* Table aligned to the right */}
-        <table className="text-sm  border border-gray-300 rounded-md w-1/2">
+
+        {/* Summary Table */}
+        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
           <tbody>
             <tr className="bg-white">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Total Invoice Amount
-              </td>
+              <td className="p-2 border border-gray-300">Total Invoice Amount</td>
               <td className="p-2 border border-gray-300 text-right">
-                1,000 QAR
+                {subtotal.toFixed(2)} QAR
               </td>
             </tr>
             <tr className="bg-gray-50">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Return Amount
+              <td className="p-2 border border-gray-300">Return Amount</td>
+              <td className="p-2 border border-gray-300 text-right">
+                {finalAmount} QAR
               </td>
-              <td className="p-2 border border-gray-300 text-right">200 QAR</td>
             </tr>
             <tr className="font-bold text-gray-900 bg-gray-50">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Net Paid Amount
-              </td>
+              <td className="p-2 border border-gray-300">Net Paid Amount</td>
               <td className="p-2 border border-gray-300 text-right text-pink-600">
-                800 QAR
+                {totalPaidAmount.toFixed(2)} QAR
               </td>
             </tr>
           </tbody>
-        </table>
+        </table> */}
       </div>
-
-      {/* Remark */}
     </div>
   );
 };

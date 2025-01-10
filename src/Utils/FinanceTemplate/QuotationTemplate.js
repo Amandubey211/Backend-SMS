@@ -1,5 +1,3 @@
-// src/Utils/FinanceTemplate/QuotationTemplate.js
-
 import React from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
@@ -35,8 +33,18 @@ const QuotationTemplate = ({ data }) => {
 
   // Calculate subtotal from line items
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
-  const totalAfterAdjustments =
-    subtotal + (tax || 0) - (discount || 0);
+
+  // Calculate tax amount
+  const taxAmount = (subtotal * (tax || 0)) / 100;
+
+  // Calculate discount amount based on discount type
+  const discountAmount =
+    discountType === "percentage"
+      ? (subtotal * (discount || 0)) / 100
+      : discount || 0;
+
+  // Calculate final amount
+  const finalAmount = (subtotal + taxAmount - discountAmount).toFixed(2);
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -97,9 +105,9 @@ const QuotationTemplate = ({ data }) => {
 
       {/* Purpose and Status */}
       <div className="mb-4">
-        <p>
+        {/* <p>
           <strong>Purpose:</strong> {purpose || "N/A"}
-        </p>
+        </p> */}
         <p>
           <strong>Status:</strong> {status || "N/A"}
         </p>
@@ -139,8 +147,8 @@ const QuotationTemplate = ({ data }) => {
                   {item.amount && item.quantity
                     ? (item.amount / item.quantity).toFixed(2)
                     : item.amount
-                    ? item.amount.toFixed(2)
-                    : "0.00"}{" "}
+                      ? item.amount.toFixed(2)
+                      : "0.00"}{" "}
                   QAR
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
@@ -175,7 +183,7 @@ const QuotationTemplate = ({ data }) => {
               Tax ({tax || 0}%)
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {tax ? `${tax.toLocaleString()} QAR` : "0 QAR"}
+              {taxAmount.toFixed(2)} QAR
             </td>
           </tr>
           {/* Discount Row */}
@@ -188,10 +196,9 @@ const QuotationTemplate = ({ data }) => {
               )
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {discountType === "percentage"
-                ? `-${discount.toLocaleString()}%`
-                : `-${discount.toLocaleString()} QAR`}
+              {discountType === "percentage" ? `${discountAmount.toFixed(2)}%` : `${discountAmount.toFixed(2)} QAR`}
             </td>
+
           </tr>
           {/* Final Total Row */}
           <tr className="font-bold text-pink-600">
@@ -199,24 +206,33 @@ const QuotationTemplate = ({ data }) => {
               Final Amount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {final_amount.toLocaleString()} QAR
+              {finalAmount} QAR
             </td>
           </tr>
         </tbody>
       </table>
 
       {/* Remarks and Summary */}
-      <div className="w-full flex justify-between items-start gap-x-2">
+      <div className="w-full flex flex-col gap-y-4">
         {/* Remarks on the left */}
-        <div className="text-sm text-gray-700 w-2/3">
+        <div className="text-sm text-gray-700">
           <p>
             <strong>Remarks:</strong>
           </p>
-          <p>{remark || "N/A"}</p>
+          <ul className="list-disc px-5 w-full break-words">
+            {[
+              "Thank you for doing business with us. If you have any questions, please contact us.",
+              "Ensure to retain this document for future reference.",
+              "For further details, reach out to our support team.",
+            ].map((defaultRemark, index) => (
+              <li key={index}>{defaultRemark}</li>
+            ))}
+            {remark && <li>{remark}</li>}
+          </ul>
         </div>
 
         {/* Summary Table aligned to the right */}
-        <table className="text-sm border border-gray-300 rounded-md w-1/2">
+        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
           <tbody>
             <tr className="bg-white">
               <td className="p-2 border border-gray-300" colSpan="4">
@@ -231,27 +247,28 @@ const QuotationTemplate = ({ data }) => {
                 Tax
               </td>
               <td className="p-2 border border-gray-300 text-right">
-                {tax.toLocaleString()} QAR
+                {taxAmount.toFixed(2)} %
               </td>
             </tr>
             <tr className="bg-white">
               <td className="p-2 border border-gray-300" colSpan="4">
-                Discount
+                Discount ({discountType === "percentage" ? `${discount}%` : `${discount} QAR`})
               </td>
               <td className="p-2 border border-gray-300 text-right">
-                -{discount.toLocaleString()} {discountType === "percentage" ? "%" : "QAR"}
+                {discountType === "percentage" ? `${discountAmount.toFixed(2)}%` : `${discountAmount.toFixed(2)} QAR`}
               </td>
             </tr>
+
             <tr className="font-bold text-gray-900 bg-gray-50">
               <td className="p-2 border border-gray-300" colSpan="4">
                 Final Amount
               </td>
               <td className="p-2 border border-gray-300 text-right text-pink-600">
-                {final_amount.toLocaleString()} QAR
+                {finalAmount} QAR
               </td>
             </tr>
           </tbody>
-        </table>
+        </table> */}
       </div>
     </div>
   );
