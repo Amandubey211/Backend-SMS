@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 import {
   Menu,
   Dropdown,
@@ -26,6 +27,7 @@ import {
   CloseCircleOutlined,
 } from "@ant-design/icons";
 
+import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 
 
 
@@ -66,6 +68,28 @@ const RecentInvoiceList = () => {
 
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
+  const downloadPDF = async () => {
+    if (!popupRef.current) return;
+
+    try {
+      const canvas = await html2canvas(popupRef.current, {
+        scale: 2, // Higher scale for better quality
+        useCORS: true, // Allow cross-origin images
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      // Calculate dimensions for A4 page
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`);
+    } catch (error) {
+      console.error("Failed to generate PDF", error);
+    }
+  };
 
   // Filtered data based on search query
   const filteredData = invoices?.filter(
@@ -168,7 +192,10 @@ const RecentInvoiceList = () => {
               {/* Preview */}
               <Menu.Item
                 icon={<EyeOutlined />}
-                onClick={() => setInvoiceVisible(true)}
+                onClick={() => {
+                  setSelectedInvoice(record);
+                  setInvoiceVisible(true);
+                }}
               >
                 Preview
               </Menu.Item>
@@ -406,123 +433,49 @@ const RecentInvoiceList = () => {
             )}
           </div>
 
+
+
           {isInvoiceVisible && selectedInvoice && (
-            <Modal
-              visible={isInvoiceVisible}
-              onCancel={() => setInvoiceVisible(false)}
-              footer={null}
-              width={800}
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Full-screen blur background */}
+            <div
+              className="absolute inset-0 bg-black bg-opacity-60"
+              style={{
+                backdropFilter: "blur(8px)",
+                height: "100vh",
+                width: "100vw",
+              }}
+              onClick={() => setInvoiceVisible(false)}
+            />
+            {/* Centered content */}
+            <div
+              ref={popupRef}
+              className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="bg-white shadow-md rounded-lg p-6">
-                {/* Header */}
-                <div className="flex justify-between items-center bg-pink-600 text-white p-4 rounded-md">
-                  <div>
-                    <p className="text-lg font-bold">
-                      ABC Higher Secondary School
-                    </p>
-                    <p className="text-md">
-                      11th Street, Main Road, Pincode: 674258
-                    </p>
-                    <p className="text-md">Maharashtra, India</p>
-                  </div>
-                  <div>
-                    <img src="logo-placeholder.png" alt="Logo" className="h-12" />
-                  </div>
-                </div>
-
-                {/* Invoice Title */}
-                <h2 className="text-center text-xl font-bold text-white bg-pink-600 py-2 my-4 rounded-md">
-                  INVOICE
-                </h2>
-
-                {/* Invoice Details */}
-                <div className="flex justify-between">
-                  <div>
-                    <strong>Bill To:</strong>
-                    <p>{selectedInvoice.receiver.name}</p>
-                    <p>{selectedInvoice.receiver.address}</p>
-                  </div>
-                  <div>
-                    <strong>Invoice Number:</strong>
-                    <p>{selectedInvoice.invoiceNumber}</p>
-                    <strong>Invoice Date:</strong>
-                    <p>
-                      {moment(selectedInvoice.invoiceDate).format("YYYY-MM-DD")}
-                    </p>
-                    <strong>Due Date:</strong>
-                    <p>{moment(selectedInvoice.dueDate).format("YYYY-MM-DD")}</p>
-                  </div>
-                </div>
-
-                {/* Items Table */}
-                <table className="table-auto w-full border-collapse border border-gray-300 text-sm mb-4">
-                  <thead>
-                    <tr className="bg-pink-200">
-                      <th className="border border-gray-300 py-2">S.No</th>
-                      <th className="border border-gray-300 py-2">Category</th>
-                      <th className="border border-gray-300 py-2">Quantity</th>
-                      <th className="border border-gray-300 py-2">
-                        Amount (QAR)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedInvoice.lineItems.map((item, index) => (
-                      <tr key={index} className="text-center">
-                        <td className="border border-gray-300 py-2">
-                          {index + 1}
-                        </td>
-                        <td className="border border-gray-300 py-2">
-                          {item.revenueType}
-                        </td>
-                        <td className="border border-gray-300 py-2">
-                          {item.quantity}
-                        </td>
-                        <td className="border border-gray-300 py-2">
-                          {item.amount}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                {/* Summary */}
-                <table className="w-full text-sm mb-4">
-                  <tbody>
-                    <tr>
-                      <td className="text-left font-bold">Subtotal:</td>
-                      <td className="text-right">
-                        {selectedInvoice.subtotal} QAR
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-left font-bold">Tax (12%):</td>
-                      <td className="text-right">{selectedInvoice.tax} QAR</td>
-                    </tr>
-                    <tr>
-                      <td className="text-left font-bold">Discount:</td>
-                      <td className="text-right">
-                        {selectedInvoice.discount || 0} QAR
-                      </td>
-                    </tr>
-                    <tr>
-
-                      <td className="text-left font-bold text-pink-700">Total:</td>
-
-                      <td className="text-right font-bold text-pink-700">
-                        {selectedInvoice.finalAmount?.toFixed(2)} QAR
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-
-                {/* Footer */}
-                <div className="text-center text-xs text-gray-600 mt-4">
-                  {/* <p>For inquiries, contact: info@studentdiwan.com</p> */}
-                </div>
+              {/* Close and Download Buttons */}
+              <div className="flex justify-end space-x-2 mb-4">
+                <button
+                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                  onClick={downloadPDF} // Trigger PDF download
+                >
+                  Download PDF
+                </button>
+                <button
+                  onClick={() => setInvoiceVisible(false)}
+                  className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                >
+                  ✕
+                </button>
               </div>
-            </Modal>
-          )}
+
+              {/* Render RecentInvoiceTemplate */}
+              <RecentInvoiceTemplate data={selectedInvoice} />
+            </div>
+          </div>
+        )}
+
+
           <ExportModal
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}

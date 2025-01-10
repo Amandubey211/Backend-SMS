@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import {
   CheckCircleOutlined,
@@ -10,8 +10,6 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
-import { RiErrorWarningFill } from "react-icons/ri";
-import { FcDeleteDatabase } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -32,6 +30,7 @@ import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
 import Layout from "../../../../Components/Common/Layout";
 import toast from "react-hot-toast";
 import ExportModal from "../Earnings/Components/ExportModal";
+import QuotationTemplate from "../../../../Utils/FinanceTemplate/QuotationTemplate";
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -48,6 +47,13 @@ const RecentQuotationList = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+
+  const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
+  const [selectedQuotation, setSelectedQuotation] = useState(null);
+  const popupRef = useRef(null);
+
+
 
   const paze_size =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
@@ -186,7 +192,13 @@ const RecentQuotationList = () => {
             <Menu.Item
               key="1"
               onClick={() => {
-                console.log("preview");
+                const quotationToPreview = quotationIdMap[record.key];
+                if (quotationToPreview) {
+                  setSelectedQuotation(quotationToPreview);
+                  setQuotationPreviewVisible(true);
+                } else {
+                  toast.error("Quotation not found.");
+                }
               }}
             >
               <FilePdfOutlined style={{ marginRight: 8 }} /> Preview
@@ -391,6 +403,51 @@ const RecentQuotationList = () => {
               tableLayout="fixed" // Fixed table layout
             />
           )}
+
+          {/* Quotation Preview Overlay */}
+          {isQuotationPreviewVisible && (
+            <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
+              {/* Dim / Blur background */}
+              <div
+                className="absolute inset-0 bg-black bg-opacity-60"
+                style={{ backdropFilter: "blur(8px)" }}
+                onClick={() => setQuotationPreviewVisible(false)} // Close on background click
+              />
+              {/* Centered content */}
+              <div
+                ref={popupRef}
+                className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling
+              >
+                {/* Close + Download PDF buttons */}
+                <div className="flex justify-end space-x-2 mb-4">
+                  {/* Download PDF button */}
+                  <button
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                    onClick={() => {
+                      // Add your PDF download logic here
+                    }}
+                  >
+                    Download PDF
+                  </button>
+                  {/* Close button */}
+                  <button
+                    onClick={() => setQuotationPreviewVisible(false)}
+                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                    aria-label="Close Quotation Preview"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* The actual quotation content */}
+                <div className="mt-4">
+                  <QuotationTemplate data={selectedQuotation} />
+                </div>
+              </div>
+            </div>
+          )}
+
           <ExportModal
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}

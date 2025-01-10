@@ -363,59 +363,59 @@ const PenalityandAdjustmentList = () => {
   // Transform adjustments data to table dataSource
   const dataSource = Array.isArray(adjustmentData)
     ? adjustmentData.map((adjustment) => ({
-        key: adjustment?._id,
-        return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
-        invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
-        receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
-        adjustmentAmount: adjustment?.adjustmentAmount || 0,
-        adjustmentTotal: adjustment?.adjustmentTotal || 0,
-        status: adjustment?.isCancel ? "Cancelled" : "Active",
-        adjustedAt: adjustment?.adjustedAt || "N/A",
-        ...adjustment, // Spread other properties safely
-      }))
+      key: adjustment?._id,
+      return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
+      invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
+      receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
+      adjustmentAmount: adjustment?.adjustmentAmount || 0,
+      adjustmentTotal: adjustment?.adjustmentTotal || 0,
+      status: adjustment?.isCancel ? "Cancelled" : "Active",
+      adjustedAt: adjustment?.adjustedAt || "N/A",
+      ...adjustment, // Spread other properties safely
+    }))
     : [];
 
   // Transform adjustment data for export (if needed)
   const transformAdjustmentData = (adjustmentData) =>
     Array.isArray(adjustmentData)
       ? adjustmentData.map((adjustment, index) => {
-          const {
-            _id,
-            returnInvoiceNumber = "N/A",
-            invoiceId = {},
-            tax = 0,
-            discount = 0,
-            discountType = "percentage",
-            penalty = 0,
-            adjustmentTotal = 0,
-            adjustmentAmount = 0,
-            adjustedBy = {},
-            adjustedAt = "N/A",
-            academicYear = {},
-          } = adjustment || {};
+        const {
+          _id,
+          returnInvoiceNumber = "N/A",
+          invoiceId = {},
+          tax = 0,
+          discount = 0,
+          discountType = "percentage",
+          penalty = 0,
+          adjustmentTotal = 0,
+          adjustmentAmount = 0,
+          adjustedBy = {},
+          adjustedAt = "N/A",
+          academicYear = {},
+        } = adjustment || {};
 
-          return {
-            sNo: index + 1,
-            returnInvoiceNumber,
-            refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
-            receiver: invoiceId.receiver?.name || "N/A",
-            receiverEmail: invoiceId.receiver?.email || "N/A",
-            receiverPhone: invoiceId.receiver?.contact || "N/A",
-            receiverAddress: invoiceId.receiver?.address || "N/A",
-            tax: `${parseFloat(tax)} %`,
-            discount:
-              discountType === "percentage"
-                ? `${parseFloat(discount)} %`
-                : `${parseFloat(discount)} QR`,
-            discountType,
-            penalty: `${parseFloat(penalty)} QR`,
-            totalAmount: `${parseFloat(adjustmentTotal)} QR`,
-            finalAmount: `${parseFloat(adjustmentAmount)} QR`,
-            createdBy: adjustedBy.adminName || "N/A",
-            Date: adjustedAt,
-            academicYearDetails: academicYear.year || "N/A",
-          };
-        })
+        return {
+          sNo: index + 1,
+          returnInvoiceNumber,
+          refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
+          receiver: invoiceId.receiver?.name || "N/A",
+          receiverEmail: invoiceId.receiver?.email || "N/A",
+          receiverPhone: invoiceId.receiver?.contact || "N/A",
+          receiverAddress: invoiceId.receiver?.address || "N/A",
+          tax: `${parseFloat(tax)} %`,
+          discount:
+            discountType === "percentage"
+              ? `${parseFloat(discount)} %`
+              : `${parseFloat(discount)} QR`,
+          discountType,
+          penalty: `${parseFloat(penalty)} QR`,
+          totalAmount: `${parseFloat(adjustmentTotal)} QR`,
+          finalAmount: `${parseFloat(adjustmentAmount)} QR`,
+          createdBy: adjustedBy.adminName || "N/A",
+          Date: adjustedAt,
+          academicYearDetails: academicYear.year || "N/A",
+        };
+      })
       : [];
 
   return (
@@ -516,45 +516,45 @@ const PenalityandAdjustmentList = () => {
           />
           {/* Receipt Preview Overlay */}
           {isReceiptVisible && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
               {/* Dim / Blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
               />
-              {/* Centered content with buttons positioned at the top-right */}
+
+              {/* Centered content */}
               <div
-                className="relative bg-white rounded-md shadow-md p-6 w-full max-w-[53rem] max-h-[90vh] overflow-auto"
                 ref={popupRef}
-                onClick={(e) => e.stopPropagation()} // Prevents click events from bubbling to the overlay
+                className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
               >
-                {/* Buttons Container */}
-                <div className="absolute top-4 right-4 flex flex-col space-y-2">
-                  {/* Close button */}
-                  <button
-                    onClick={() => setReceiptVisible(false)}
-                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-10 h-10 flex items-center justify-center text-lg font-semibold shadow-md"
-                    aria-label="Close Receipt Preview"
-                  >
-                    ✕
-                  </button>
+                {/* Close + Download PDF buttons */}
+                <div className="flex justify-end space-x-2 mb-4">
                   {/* Download PDF button */}
                   <button
-                    className="w-40 py-2 text-white font-semibold rounded-md shadow-md"
-                    style={{
-                      background: "linear-gradient(to right, #C83B62, #7F35CD)",
-                    }}
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                     onClick={handleDownloadPDF}
                   >
                     Download PDF
                   </button>
+                  {/* Close button */}
+                  <button
+                    onClick={() => setReceiptVisible(false)}
+                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                    aria-label="Close Receipt Preview"
+                  >
+                    ✕
+                  </button>
                 </div>
 
-                {/* The actual penalty adjustment content */}
-                <PenaltyAdjustmentTemplate data={selectedReceipt} />
+                {/* The actual receipt content */}
+                <div className="mt-4">
+                  <PenaltyAdjustmentTemplate data={selectedReceipt} />
+                </div>
               </div>
             </div>
           )}
+
         </div>
       </AdminDashLayout>
     </Layout>
