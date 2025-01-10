@@ -218,8 +218,8 @@ const TotalRevenueList = () => {
                 aria-label="Edit"
               />
             </Tooltip>
-          </>
-        )}
+          
+        
         <Tooltip title="Delete">
           <Button
             type="link"
@@ -237,6 +237,8 @@ const TotalRevenueList = () => {
             aria-label="Delete"
           />
         </Tooltip>
+        </>
+      )}
       </div>
     );
   };
@@ -263,7 +265,7 @@ const TotalRevenueList = () => {
         width: 60,
         render: (_, record) => {
           const isSelected = selectedRowKey === record.key;
-          if (record.paymentStatus === "unpaid") {
+          if (record.paymentStatus === "unpaid" && record.categoryName !== "Student-Based Revenue") {
             return (
               <div className="flex items-center justify-center">
                 <Tooltip title="Selectable">
@@ -416,7 +418,8 @@ const TotalRevenueList = () => {
         paymentStatus: income.paymentStatus || "N/A",
         earnedDate: income.paidDate || income.generateDate || null,
         totalAmount: income.total_amount || 0,
-        email:income?.email
+        email:income?.email,
+        ...income
       })),
     [incomes]
   );
@@ -660,14 +663,16 @@ const TotalRevenueList = () => {
                   if (record.paymentStatus !== "unpaid") {
                     return;
                   }
-                  console.log(record);
+                  console.log('kk',record);
                   
                   const invoiceData = {
                     dueDate: record?.dueDate?.slice(0,10),
                     receiver: {
-                      name: record?.rentIncome?.nameOfRenter || record?.examCentreFees?.examName || '',
-                      address: "",
-                      contact: "",
+                      name: record?.rentIncome?.nameOfRenter || record?.examCentreFees?.examName || record?.companyName 
+                       ||'',
+                      address: record?.address || "",
+                      contact: record?.examCentreFees?.
+                      mobileNumber || record?.phoneNumber,
                       email: record?.email,
                     },
                     description: record?.description || '',
