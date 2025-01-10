@@ -5,8 +5,6 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import CardSection from "./components/CardSection";
 import ExpenseChart from "./components/ExpenseChart";
 import ExpenseTable from "./components/ExpenseTable";
-import { useNavigate } from "react-router-dom";
-import { FiPlusCircle } from "react-icons/fi";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { useDispatch } from "react-redux";
@@ -16,7 +14,6 @@ import {
 } from "../../../../Store/Slices/Finance/Expenses/expensesThunks";
 
 const ExpenseMain = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   useNavHeading("Finance", "Expenses");
 

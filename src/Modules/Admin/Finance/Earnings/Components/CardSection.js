@@ -153,13 +153,13 @@ const CardSection = () => {
   }
 
   // Handle error state
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-40">
-        <Alert message="Error loading cards." type="error" showIcon />
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center h-40">
+  //       <Alert message="Error loading cards." type="error" showIcon />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="w-full mb-2">

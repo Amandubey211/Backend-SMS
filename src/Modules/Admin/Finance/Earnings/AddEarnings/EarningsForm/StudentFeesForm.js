@@ -60,7 +60,7 @@ const handleCustomSubmit = () => {
         setFormData(updatedFormData);
         console.log("Final formData after updates:", updatedFormData);
         if(updatedFormData?.length==0){
-           toast.error('Please fill all required fields')
+          toast.error('Please fill the required  Fields !')
         }else{
  dispatch(createStudentFee(updatedFormData));
         }
@@ -103,16 +103,19 @@ const [imageUrl,setImageUrl] = useState('')
           label="Entry Date  & Time"
           name="dateTime"
           type="datetime-local"
+          required
         />
             <SelectInput
               label="Paid By"
               name="paidBy"
               options={["Self", "Parent","Relative","other"]}
+              required
             />
             <SelectInput
               label="Payment Type"
               name="paymentType"
               options={["cash", "card", "online", "cheque", "other"]}
+              required
             />
              <TextInput
               label="Cheque Number (*If payment type is cheque)"

@@ -388,7 +388,7 @@ const AddExpenses = () => {
               )}
 
               {/* Error Message */}
-              {error && showError && (
+              {/* {error && showError && (
                 <div className="bg-red-100 text-red-700 p-2 rounded-md text-sm">
                   {Array.isArray(error)
                     ? error.map((err, idx) => (
@@ -396,7 +396,7 @@ const AddExpenses = () => {
                       ))
                     : error}
                 </div>
-              )}
+              )} */}
 
               {/* Header Component */}
               <Header

@@ -42,7 +42,7 @@ export const SelectDynamicInput = ({ label, name, options, onChange, forWhom, di
         onChange={onChange}
         disabled={disabled}
       >
-        <option value="">Select</option>
+        <option value="" >Select</option>
         {options.map((option, index) => (
           <motion.option
             key={index}
@@ -116,6 +116,7 @@ export const OnePaymentDetail = ({ category }) => {
           name={`totalAmount_${category}`}
           placeholder="Enter total amount"
           type="Number"
+          required
         />
         <TextInput
           label={`Paid Amount (${category})`}

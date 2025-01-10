@@ -1,5 +1,3 @@
-// src/Utils/FinanceTemplate/RecentInvoiceTemplate.js
-
 import React from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
@@ -14,8 +12,6 @@ const RecentInvoiceTemplate = ({ data }) => {
     tax,
     discount,
     discountType,
-    finalAmount,
-    totalAmount,
     lineItems = [],
     dueDate,
     description,
@@ -23,6 +19,7 @@ const RecentInvoiceTemplate = ({ data }) => {
     paymentType,
     penalty,
     qrCode,
+    reason,
     academicYear,
     receiver = {},
     issueDate,
@@ -34,7 +31,16 @@ const RecentInvoiceTemplate = ({ data }) => {
 
   // Calculate subtotal from line items
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
-  const totalAfterAdjustments = subtotal + (tax || 0) + (penalty || 0) - (discount || 0);
+
+  // Calculate tax
+  const taxAmount = tax;
+
+  // Calculate discount based on type
+  const discountAmount =
+    discountType === "percentage" ? (subtotal * (discount || 0)) / 100 : discount || 0;
+
+  // Calculate final amount
+  const finalAmount = (subtotal + taxAmount + (penalty || 0) - discountAmount).toFixed(2);
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -49,18 +55,14 @@ const RecentInvoiceTemplate = ({ data }) => {
           </div>
           <div className="flex items-center space-x-4">
             <img src={IconLogo} alt="Icon Logo" className="w-8 h-8" />
-            <img
-              src={StudentDiwanLogo}
-              alt="Student Diwan"
-              className="w-20 h-20"
-            />
+            <img src={StudentDiwanLogo} alt="Student Diwan" className="w-20 h-20" />
           </div>
         </div>
         <div
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          RECENT INVOICE
+          INVOICE
         </div>
       </div>
 
@@ -90,18 +92,18 @@ const RecentInvoiceTemplate = ({ data }) => {
 
       {/* Description and Payment Status */}
       <div className="mb-4">
-        <p>
+        {/* <p>
           <strong>Description:</strong> {description || "N/A"}
-        </p>
+        </p> */}
         <p>
           <strong>Payment Type:</strong> {paymentType || "N/A"}
         </p>
         <p>
           <strong>Payment Status:</strong> {paymentStatus || "N/A"}
         </p>
-        <p>
+        {/* <p>
           <strong>Academic Year:</strong> {academicYear?.year || "N/A"}
-        </p>
+        </p> */}
       </div>
 
       {/* Line Items Table */}
@@ -122,15 +124,14 @@ const RecentInvoiceTemplate = ({ data }) => {
                 key={item._id || index}
                 className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
               >
-                <td className="p-2 border border-gray-300 text-center">
-                  {index + 1}
+                <td className="p-2 border border-gray-300 text-center">{index + 1}</td>
+                <td className="p-2 border border-gray-300">{item.revenueType
+                  ? item.revenueType
+                    .replace(/_/g, ' ') // Replace underscores with spaces
+                    .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
+                  : "N/A"}
                 </td>
-                <td className="p-2 border border-gray-300">
-                  {item.revenueType || "N/A"}
-                </td>
-                <td className="p-2 border border-gray-300 text-center">
-                  {item.quantity || 1}
-                </td>
+                <td className="p-2 border border-gray-300 text-center">{item.quantity || 1}</td>
                 <td className="p-2 border border-gray-300 text-right">
                   {(item.amount / (item.quantity || 1)).toFixed(2)} QAR
                 </td>
@@ -151,39 +152,29 @@ const RecentInvoiceTemplate = ({ data }) => {
             <td className="p-2 border border-gray-300" colSpan="4">
               Subtotal
             </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {subtotal.toLocaleString()} QAR
-            </td>
+            <td className="p-2 border border-gray-300 text-right">{subtotal.toFixed(2)} QAR</td>
           </tr>
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax ({tax || 0}%)
+              Tax
             </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {tax.toLocaleString()} QAR
-            </td>
+            <td className="p-2 border border-gray-300 text-right">{taxAmount.toFixed(2)} %</td>
           </tr>
           {/* Penalty Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
               Penalty
             </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {penalty.toLocaleString()} QAR
-            </td>
+            <td className="p-2 border border-gray-300 text-right">{penalty.toFixed(2)} QAR</td>
           </tr>
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount (
-              {discountType === "percentage"
-                ? `${discount}%`
-                : `${discount} QAR`}
-              )
+              Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              -{discount.toLocaleString()} QAR
+              {discountAmount.toFixed(2)} {discountType === "percentage" ? "%" : "QAR"}
             </td>
           </tr>
           {/* Final Total Row */}
@@ -191,17 +182,68 @@ const RecentInvoiceTemplate = ({ data }) => {
             <td className="p-2 border border-gray-300" colSpan="4">
               Final Amount
             </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {finalAmount.toLocaleString()} QAR
-            </td>
+            <td className="p-2 border border-gray-300 text-right">{finalAmount} QAR</td>
           </tr>
         </tbody>
       </table>
 
-      {/* QR Code */}
-      <div className="text-center mt-4">
-        <img src={qrCode} alt="QR Code" className="w-32 h-32 mx-auto" />
+      {/* Remarks and Summary */}
+      <div className="w-full flex flex-col gap-y-4">
+        {/* Remarks on the left */}
+        <div className="text-sm text-gray-700">
+          {/* <p>
+            <strong>Reason for Adjustment:</strong>
+          </p>
+          <p>{reason || "N/A"}</p> */}
+          <p>
+            <strong>Remarks:</strong>
+          </p>
+          <ul className="list-disc px-5 w-full break-words">
+            {[
+              "Thank you for your attention to this adjustment.",
+              "Please retain this document for your records.",
+              "Contact support for any queries regarding this adjustment.",
+            ].map((defaultRemark, index) => (
+              <li key={index}>{defaultRemark}</li>
+            ))}
+            {reason && <li>{reason}</li>}
+          </ul>
+        </div>
+
+        {/* Summary Table aligned to the right */}
+        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
+          <tbody>
+            <tr className="bg-white">
+              <td className="p-2 border border-gray-300" colSpan="4">
+                Total Adjustment Amount
+              </td>
+              <td className="p-2 border border-gray-300 text-right">
+                {adjustmentTotal.toLocaleString()} QAR
+              </td>
+            </tr>
+            <tr className="bg-gray-50">
+              <td className="p-2 border border-gray-300" colSpan="4">
+                Return Amount
+              </td>
+              <td className="p-2 border border-gray-300 text-right">
+                {adjustmentAmount ? `${adjustmentAmount.toLocaleString()} QAR` : "0 QAR"}
+              </td>
+            </tr>
+            <tr className="font-bold text-gray-900 bg-gray-50">
+              <td className="p-2 border border-gray-300" colSpan="4">
+                Net Paid Amount
+              </td>
+              <td className="p-2 border border-gray-300 text-right text-pink-600">
+                {netPaidAmount} QAR
+              </td>
+            </tr>
+          </tbody>
+        </table> */}
       </div>
+      {/* QR Code */}
+      {/* <div className="text-center mt-4">
+        <img src={qrCode} alt="QR Code" className="w-32 h-32 mx-auto" />
+      </div> */}
     </div>
   );
 };

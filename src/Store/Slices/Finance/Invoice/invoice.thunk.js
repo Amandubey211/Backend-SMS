@@ -15,11 +15,11 @@ export const addInvoice = createAsyncThunk(
       if (response.success) {
         toast.success("Invoice create successfully!");
       } else {
-        toast.error("Something is wrong!");
+        toast.error('Please fill the required  Fields !')
       }
       return response.data
     } catch (error) {
-      toast.error("Something is wrong!");
+      toast.error('Please fill the required  Fields !')
       return handleError(error, dispatch, rejectWithValue);
     }
 

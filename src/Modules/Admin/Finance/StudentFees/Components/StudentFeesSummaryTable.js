@@ -145,10 +145,9 @@ const StudentFeesSummaryTable = () => {
       {/* Loading Indicator */}
     {loading && <Spinner/>}
     
-    {error && <NoDataFound/>}
 
       {/* Table */}
-      {!loading && !error && (
+      {!loading  && (
         <div className="bg-white p-4 rounded-lg border-2 border-gray-300">
           <Table
             dataSource={filteredData}

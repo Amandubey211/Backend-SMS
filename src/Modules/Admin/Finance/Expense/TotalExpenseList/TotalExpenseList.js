@@ -29,10 +29,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import debounce from "lodash.debounce";
-import {
-  fetchAllExpenses,
-  deleteExpense,
-} from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
+import { fetchAllExpenses } from "../../../../../Store/Slices/Finance/Expenses/expensesThunks";
 import {
   setCurrentPage,
   setFilters,

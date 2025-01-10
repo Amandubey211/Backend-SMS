@@ -139,7 +139,7 @@ const AllAccountants = () => {
     handleSidebarOpen("createRole");
   };
 
-  useNavHeading("User", "Accountants"); // Ensure correct import and usage
+  useNavHeading("User", "Finance"); // Ensure correct import and usage
 
   // Define the renderSidebarContent function
   const renderSidebarContent = () => {
@@ -151,9 +151,7 @@ const AllAccountants = () => {
       case "editAccountant":
         return <AddUser role="accountant" data={accountantData} />;
       case "createRole":
-        return (
-          <CreateRole onClose={handleSidebarClose} department="Accountant" />
-        );
+        return <CreateRole onClose={handleSidebarClose} department="Finance" />;
       default:
         return <div>{t("Select an action")}</div>;
     }
@@ -170,11 +168,11 @@ const AllAccountants = () => {
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
-              title={t("All Accountants")}
+              title={t("All Finance")}
               count={accountant?.length || 0}
               sortOptions={sortOptions}
               filterOptions={filterOptionsList}
-              department="Accountants"
+              department="Finance"
               onSortFilterApply={handleSortFilterApply}
               navigateToManageRoles={navigateToManageRoles}
               handleCreateRole={handleCreateRole}

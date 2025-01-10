@@ -3,7 +3,6 @@ import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
 import { FiCalendar } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchEarningsData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Make sure the path is correct
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 
@@ -37,7 +36,7 @@ const TotalEarningsGraph = () => {
       includeUnpaidExpenses = false;
     }
 
-    // Dispatch fetchEarningsData with necessary parameters
+    // Uncomment and adjust the action below to actually fetch data:
     // dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
   };
 
@@ -64,17 +63,19 @@ const TotalEarningsGraph = () => {
     return <Spinner />;
   }
 
-  if (error || !earningsData) {
+  if (error) {
     return "No Data";
   }
 
+  // No data case: show centered message
   if (
     !earningsData ||
     (earningsData?.earningsData?.length === 0 &&
       earningsData?.expensesData?.length === 0)
   ) {
     return (
-      <div className="p-4 bg-white">
+      <div className="p-4 bg-white flex flex-col min-h-[400px]">
+        {/* Top Bar */}
         <div className="flex justify-between items-center mb-4">
           <div>
             <h2 className="text-xl font-semibold">Earnings</h2>
@@ -90,39 +91,45 @@ const TotalEarningsGraph = () => {
             </select>
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center text-center p-4">
+
+        {/* Centered "No Data" message */}
+        <div className="flex flex-col items-center justify-center text-center flex-1">
           <FiCalendar size={40} className="mb-4 text-gray-400" />
           <p className="text-gray-500">{t("No Earnings/Expense Data Found")}</p>
         </div>
-        <div className="flex justify-around mt-4">
-          <div className="flex flex-col items-start">
-            <div
-              className="w-16 h-1 rounded-full mb-1"
-              style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
-            ></div>
-            <div className="flex items-center">
-              <div className="text-gray-700">Total Collections</div>
-              <div className="ml-2 font-bold mr-1">
-                {earningsData
-                  ? earningsData?.totalEarnings?.toLocaleString()
-                  : 0}
+
+        {/* Stats at bottom */}
+        <div className="mt-auto mb-4">
+          <div className="flex justify-around">
+            <div className="flex flex-col items-start">
+              <div
+                className="w-16 h-1 rounded-full mb-1"
+                style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
+              ></div>
+              <div className="flex items-center">
+                <div className="text-gray-700">Total Collections</div>
+                <div className="ml-2 font-bold mr-1">
+                  {earningsData
+                    ? earningsData?.totalEarnings?.toLocaleString()
+                    : 0}
+                </div>
+                <div className="text-gray-700">QR</div>
               </div>
-              <div className="text-gray-700">QR</div>
             </div>
-          </div>
-          <div className="flex flex-col items-start">
-            <div
-              className="w-16 h-1 rounded-full mb-1"
-              style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
-            ></div>
-            <div className="flex items-center">
-              <div className="text-gray-700">{t("Total Expenses")}</div>
-              <div className="ml-2 font-bold mr-1">
-                {earningsData
-                  ? earningsData.totalExpenses?.toLocaleString()
-                  : 0}
+            <div className="flex flex-col items-start">
+              <div
+                className="w-16 h-1 rounded-full mb-1"
+                style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
+              ></div>
+              <div className="flex items-center">
+                <div className="text-gray-700">{t("Total Expenses")}</div>
+                <div className="ml-2 font-bold mr-1">
+                  {earningsData
+                    ? earningsData.totalExpenses?.toLocaleString()
+                    : 0}
+                </div>
+                <div className="text-gray-700">QR</div>
               </div>
-              <div className="text-gray-700">QR</div>
             </div>
           </div>
         </div>
@@ -130,6 +137,7 @@ const TotalEarningsGraph = () => {
     );
   }
 
+  // Data case: show chart and stats
   const {
     earningsData: earnings,
     expensesData: expenses,
@@ -248,7 +256,8 @@ const TotalEarningsGraph = () => {
   };
 
   return (
-    <div className="p-4 bg-white">
+    <div className="p-4 bg-white flex flex-col min-h-[400px]">
+      {/* Top Bar */}
       <div className="flex justify-between items-center mb-4">
         <div>
           <h2 className="text-xl font-semibold">{t("Earnings")}</h2>
@@ -264,7 +273,9 @@ const TotalEarningsGraph = () => {
           </select>
         </div>
       </div>
-      <div className="relative">
+
+      {/* Chart Container */}
+      <div className="relative flex-1">
         <Line ref={chartRef} data={data} options={options} />
         {tooltipData && (
           <div
@@ -285,7 +296,9 @@ const TotalEarningsGraph = () => {
           </div>
         )}
       </div>
-      <div className="flex justify-around mt-4">
+
+      {/* Bottom Stats with larger margin-top */}
+      <div className="flex justify-around border border-red-300 mt-16 pt-4">
         <div className="flex flex-col items-start">
           <div
             className="w-16 h-1 rounded-full mb-1"
