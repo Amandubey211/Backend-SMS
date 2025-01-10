@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback } from "react";
-import { Table, Spin, Button, Tooltip, Tag } from "antd";
+import React, { useRef, useState, useEffect, useCallback } from "react";
+import { Table, Spin, Button, Tooltip, Tag, Empty } from "antd";
 import {
   DollarOutlined,
   CloudOutlined,
@@ -165,12 +165,16 @@ const SummaryTotalRevenue = () => {
       </div>
 
       {/* Loading Indicator */}
-      {loading && (
+      {/* {loading && (
         <div className="flex justify-center">
           <Spin tip="Loading..." />
         </div>
+      )} */}
+      {!loading && incomes.length === 0 && !error && (
+        <div className="text-center text-gray-500 text-xs py-4">
+          No records found.
+        </div>
       )}
-
       {/* Table */}
       <Table
         dataSource={dataSource}
@@ -181,9 +185,9 @@ const SummaryTotalRevenue = () => {
         size="small"
         tableLayout="fixed" // Fixed table layout
         loading={loading} // Show spinner on loading
-        locale={{
-          emptyText: "No Data Found", // Default message for empty table
-        }}
+        // locale={{
+        //   emptyText: <Empty description="No Data Found" />, // Show default Ant Design empty icon + text
+        // }}
       />
     </div>
   );
