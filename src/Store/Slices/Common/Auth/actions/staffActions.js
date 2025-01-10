@@ -4,8 +4,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   setAcademicYear,
   resetState as resetAuthState,
-  setToken,
   setRole,
+  setUserRoles,
 } from "../reducers/authSlice"; // Updated to handle token
 import { setUserDetails, resetUserState } from "../../User/reducers/userSlice"; // For managing user details and resetting state
 import { requestPermissionAndGetToken } from "../../../../../Hooks/NotificationHooks/NotificationHooks";
@@ -18,21 +18,23 @@ import { setErrorMsg, setShowError } from "../../Alerts/alertsSlice";
 import { ErrorMsg } from "../../Alerts/errorhandling.action";
 import { postData } from "../../../../../services/apiEndpoints";
 import { setLocalCookies } from "../../../../../Utils/academivYear";
-import { decryptData, encryptData } from "../../../../cryptoF";
+import { getMyRolePermissionsThunk } from "../../RBAC/rbacThunks";
 
 // **Staff Login Action**
+
 export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
   async (staffDetails, { rejectWithValue, dispatch, getState }) => {
     try {
-      // Mandatory lines
+      // Hide any previous errors
       dispatch(setShowError(false));
 
-      const deviceToken = await requestPermissionAndGetToken(); // Get notification token
-      const userDetail = { ...staffDetails, deviceToken }; // Include device token
+      // Get device token for notifications
+      const deviceToken = await requestPermissionAndGetToken();
+      const userDetail = { ...staffDetails, deviceToken };
 
+      // Send login request
       const data = await postData("/auth/staff/login", userDetail);
-      // console.log(data);
 
       if (data && data.success) {
         // Dispatch user details to userSlice
@@ -46,29 +48,18 @@ export const staffLogin = createAsyncThunk(
             mobileNumber: data.mobileNumber,
             position: data.position,
             employeeID: data.employeeID,
-            role: data.role,
+            role: data.role, // Primary role
             monthlySalary: data.monthlySalary,
             active: data.active,
             dateOfBirth: data.dateOfBirth,
             schoolName: data.schoolName,
           })
         );
-        decryptData(data.encryptedEmail).then((a)=>console.log(a))
-        //encryptData("ABD");
-        //decryptData()
-        // Dispatch token and role to authSlice
-        dispatch(setToken(data.token));
-        dispatch(setRole(data.role));
 
-        // if (data.role === "admin" && !data.isAcademicYearActive) {
-        //   toast.success("Please create an academic year");
-        //   setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
-        //   return { redirect: "/create_academicYear" }; // Return the redirect path
-        // }
-        if (data.role === "admin") {
-          return { redirect: "/select_branch" };
-        } else {
-          // Format and set the academic year in the state
+        // Reset any existing role
+        dispatch(setRole(null));
+
+        if (data.academicYear) {
           const formattedAcademicYear = formatAcademicYear(
             data.academicYear.year,
             data.academicYear.startDate,
@@ -82,37 +73,77 @@ export const staffLogin = createAsyncThunk(
               },
             ])
           );
-          await dispatch(fetchAcademicYear());
-          const activeAcademicYear =
-            getState().common?.academicYear?.academicYears?.find(
-              (i) => i.isActive === true
-            );
-          if (activeAcademicYear) {
-            setLocalCookies("say", activeAcademicYear._id);
+          // await dispatch(fetchAcademicYear());
+          // const activeAcademicYear =
+          //   getState().common?.academicYear?.academicYears?.find(
+          //     (i) => i.isActive === true
+          //   );
+          if (data.isAcademicYearActive) {
+            // console.log(
+            //   "activeAcademicYear",
+            //   activeAcademicYear,
+            //   activeAcademicYear._id
+            // );
+            setLocalCookies("say", data.academicYear._id);
           }
-
-          // Token and role already set above, no need to set again
-          return { redirect: "/dashboard" }; // Return the redirect path
         }
+
+        // Store grouped roles in the state
+        if (data.groupedRoles && data.groupedRoles.length > 0) {
+          dispatch(setUserRoles(data.groupedRoles));
+        }
+
+        // Handle admin role redirection
+        if (data.role === "admin") {
+          if (!data.isAcademicYearActive) {
+            toast.success("Please create an academic year");
+            setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
+            return { redirect: "/create_academicYear" };
+          }
+          dispatch(setRole(data.role));
+
+          // Fetch permissions after setting role
+          // await dispatch(getMyRolePermissionsThunk());
+
+          return { redirect: "/select_branch" };
+        }
+
+        // Handle staff roles with multiple grouped roles
+        if (data.groupedRoles && data.groupedRoles.length > 1) {
+          return { redirect: "/select_role" };
+        }
+
+        // If the user has exactly one grouped role, set it directly
+        if (data.groupedRoles && data.groupedRoles.length === 1) {
+          const userRole = data.groupedRoles[0].department;
+          dispatch(setRole(userRole));
+
+          // Fetch permissions after setting role
+          await dispatch(getMyRolePermissionsThunk());
+
+          return { redirect: "/dashboard" };
+        }
+
+        // For non-admin users without grouped roles, set academic year and redirect to dashboard
+        if (data.role) {
+          await dispatch(getMyRolePermissionsThunk());
+        }
+
+        return { redirect: "/dashboard" };
       } else {
         const errorMessage = data?.msg || "Incorrect email or password.";
-        // dispatch(setShowError(true));
-        // dispatch(setErrorMsg(errorMessage));
         toast.error(errorMessage);
         return rejectWithValue(errorMessage);
       }
     } catch (error) {
       console.error("Error in staff login:", error);
       const err = ErrorMsg(error);
-      // dispatch(setShowError(true));
-      // dispatch(setErrorMsg(err.message));
       toast.error(err.message || "Login failed.");
       return rejectWithValue(err.message || "Login failed.");
     }
   }
 );
 
-// Staff Logout
 export const staffLogout = createAsyncThunk(
   "auth/staffLogout",
   async (_, { dispatch }) => {
@@ -120,8 +151,8 @@ export const staffLogout = createAsyncThunk(
       Cookies.remove("userToken");
       Cookies.remove("say");
       Cookies.remove("isAcademicYearActive");
-      Cookies.remove('schoolId');
-      Cookies.remove('SelectedschoolId');
+      Cookies.remove("schoolId");
+      Cookies.remove("SelectedschoolId");
       // Mandatory lines
       dispatch(setShowError(false));
 

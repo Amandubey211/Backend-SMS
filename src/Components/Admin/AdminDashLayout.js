@@ -18,7 +18,7 @@ const DashLayout = ({
     <div className="flex w-full min-h-screen overflow-x-hidden  ">
       <SideMenubar />
       <div
-        className={`transition-all duration-500 flex-1 h-full ml-${sidebarWidth}`}
+        className={`transition-all duration-500 flex-1 w-full h-full ml-${sidebarWidth}`}
         style={{
           marginLeft: sidebarWidth,
         }}

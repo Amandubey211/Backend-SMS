@@ -1,13 +1,5 @@
 import React, { useEffect } from "react";
-import TotalAttendanceGraph from "./Graphs/TotalAttendanceGraph";
-import TotalEarningsGraph from "./Graphs/TotalEarningsGraph";
-import TotalStudentsGraphjs from "./Graphs/TotalStudentsGraph";
-import TopRankingStudents from "./Graphs/TopRankingStudents";
-import Library from "./LibraryModule/Library";
-import Events from "./EventModule/Event";
-import BestPerformersChart from "./Graphs/BestPerformancGraph";
-import performanceData from "./DashboardData/PerformanceData";
-import NoticeBoard from "./NoticeModule/NoticeBoard";
+
 import DashCard from "./Dashcard";
 
 // Import role-specific sections
@@ -38,10 +30,9 @@ const MainSection = () => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
-   var { role } = useSelector((state) => ({
+  const { role } = useSelector((state) => ({
     role: state.common.auth.role,
-   }));
- 
+  }));
 
   const { t } = useTranslation();
 

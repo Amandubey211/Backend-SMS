@@ -17,6 +17,22 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(`/admin/student/${classId}?say=${say}`);
+      console.log("API response from thunk:", response); // Debugging
+      return response.data; // Ensure the structure is correct
+    } catch (error) {
+      console.error("Error in thunk:", error); // Debugging
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
+  "students/fetchByClassAndSectionNames",
+  async (classId, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const say = getAY();
+      const response = await getData(`/admin/all/student/${classId}?say=${say}`);
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

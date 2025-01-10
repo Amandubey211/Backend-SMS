@@ -17,6 +17,27 @@ export const fetchAllClasses = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
+      const endpoint = `/admin/all/class?say=${say}`;
+     
+      const response = await getData(endpoint);
+      // console.log(response, "lk");
+      if (response && response.status) {
+        return response.data; // Assuming 'data' contains the list of classes
+      }
+    } catch (error) {
+      // console.log(error);
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const fetchAllClassesDetails = createAsyncThunk(
+  "class/fetchAllClassesDetails",
+  async (_, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+
+    try {
       const endpoint = `/admin/class?say=${say}`;
      
       const response = await getData(endpoint);

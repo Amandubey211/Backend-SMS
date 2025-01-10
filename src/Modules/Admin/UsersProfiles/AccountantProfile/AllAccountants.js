@@ -1,60 +1,159 @@
+// AllAccountants.js
 import React, { useEffect, useState } from "react";
+import { GoPlus } from "react-icons/go";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 import ViewAccountant from "./ViewAccountant";
 import ProfileCard from "../SubComponents/ProfileCard";
-import { useDispatch, useSelector } from "react-redux";
 import AddUser from "../StaffProfile/AddUser";
-import { GoAlertFill } from "react-icons/go";
 import Spinner from "../../../../Components/Common/Spinner";
-import { useTranslation } from "react-i18next";
+import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
+import NoDataFound from "../../../../Components/Common/NoDataFound";
+
 import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
+import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks"; // Ensure this path is correct
+import Header from "../Component/Header";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
+  // State Variables
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarContent, setSidebarContent] = useState(null);
   const [selectedAccountant, setSelectedAccountant] = useState(null);
   const [accountantData, setAccountantData] = useState(null);
-  const { accountant, loading } = useSelector((store) => store.admin.all_staff);
-  const dispatch = useDispatch();
+  const [sortOption, setSortOption] = useState(null); // "by_date" or "by_roles"
+  const [filterRoles, setFilterRoles] = useState([]); // Array of role names
+  const [sortedAccountants, setSortedAccountants] = useState([]);
 
+  // Redux Selectors
+  const { accountant, loading: accountantLoading } = useSelector(
+    (store) => store.admin.all_staff
+  );
+  const role = useSelector((store) => store.common.auth.role);
+  const { roles: AllRoles } = useSelector((state) => state.admin.rbac); // Ensure RBAC is set up correctly
+
+  // Fetch Accountants and Roles on Mount
   useEffect(() => {
     dispatch(fetchAllStaff());
+    dispatch(getAllRolesThunk()); // Fetch roles for filtering
   }, [dispatch]);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+  // Initialize sortedAccountants with accountant data
+  useEffect(() => {
+    setSortedAccountants(accountant);
+  }, [accountant]);
+
+  // Apply Sorting and Filtering
+  useEffect(() => {
+    let filtered = [...accountant];
+
+    // Apply Role Filtering
+    if (filterRoles.length > 0) {
+      filtered = filtered.filter((member) =>
+        member.position.some((pos) => filterRoles.includes(pos))
+      );
+    }
+
+    // Apply Sorting
+    if (sortOption) {
+      switch (sortOption) {
+        case "by_date":
+          filtered.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          break;
+        case "by_roles":
+          filtered.sort((a, b) => a.position.length - b.position.length);
+          break;
+        default:
+          break;
+      }
+    }
+
+    setSortedAccountants(filtered);
+  }, [sortOption, filterRoles, accountant]);
+
+  // Handlers
+  const handleSidebarOpen = (content, data = null) => {
+    setSidebarContent(content);
+    setSelectedAccountant(data);
+    setAccountantData(data);
+    setSidebarOpen(true);
+  };
+
   const handleSidebarClose = () => setSidebarOpen(false);
 
-  const handleAccountantClick = (accountant) => {
-    setSelectedAccountant(accountant);
-    setSidebarContent("viewAccountant");
-    setSidebarOpen(true);
+  const editUser = (event, data) => {
+    event.stopPropagation();
+    handleSidebarOpen("editAccountant", data);
+  };
+
+  const handleAccountantClick = (accountantMember) => {
+    handleSidebarOpen("viewAccountant", accountantMember);
   };
 
   const handleAddAccountantClick = () => {
-    setSidebarContent("addAccountant");
-    setSidebarOpen(true);
+    handleSidebarOpen("addAccountant");
     setAccountantData(null);
   };
 
-  const editUser = (event, accountant) => {
-    event.stopPropagation();
-    setSidebarContent("editAccountant");
-    setSidebarOpen(true);
-    setAccountantData(accountant);
+  // Extract Accountant Roles from AllRoles
+  const accountantRoles =
+    AllRoles?.filter(
+      (dept) => dept.department.toLowerCase() === "accountant"
+    )?.flatMap((dept) => dept.roles) || [];
+
+  // Define Sort and Filter Options
+  const sortOptions = [
+    { label: "By Date", value: "by_date" },
+    { label: "By Roles", value: "by_roles" },
+  ];
+
+  const filterOptionsList = accountantRoles.map((roleItem) => ({
+    label: roleItem.name,
+    value: roleItem.name,
+  }));
+
+  // Handler for applying sort and filter
+  const handleSortFilterApply = ({ sortOption, filterOptions }) => {
+    setSortOption(sortOption);
+    setFilterRoles(filterOptions);
   };
 
+  // Handler for navigating to manage roles
+  const navigateToManageRoles = () => {
+    navigate("/users/manage-roles");
+  };
+
+  // Handler for creating a new role
+  const handleCreateRole = () => {
+    handleSidebarOpen("createRole");
+  };
+
+  useNavHeading("User", "Accountants"); // Ensure correct import and usage
+
+  // Define the renderSidebarContent function
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewAccountant":
         return <ViewAccountant accountant={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role={"accountant"} data={accountantData} />;
+        return <AddUser role="accountant" />;
       case "editAccountant":
-        return <AddUser role={"accountant"} data={accountantData} />;
+        return <AddUser role="accountant" data={accountantData} />;
+      case "createRole":
+        return (
+          <CreateRole onClose={handleSidebarClose} department="Accountant" />
+        );
       default:
         return <div>{t("Select an action")}</div>;
     }
@@ -63,62 +162,86 @@ const AllAccountants = () => {
   return (
     <Layout title={t("All Accountants")}>
       <DashLayout>
-        {loading ? (
+        {accountantLoading ? (
           <div className="flex w-full h-[90vh] flex-col items-center justify-center">
             <Spinner />
           </div>
         ) : (
-          <div className="p-4">
-            <div className="flex justify-between items-center mb-4 border-b-2 h-20">
-              <h2 className="text-xl font-semibold">
-                {t("All Accountants")}{" "}
-                <span className="bg-purple-400 px-2 text-sm py-1 rounded-full">
-                  {accountant?.length}
-                </span>
-              </h2>
-              <button
-                onClick={handleAddAccountantClick}
-                className="bg-purple-500 text-white px-4 py-2 rounded-md flex items-center space-x-2"
-              >
-                <span>{t("Add New Accountant")}</span>
-              </button>
-            </div>
+          <div className="p-4 relative">
+            {/* Reusable Header Component with currentSort and currentFilters */}
+            <Header
+              title={t("All Accountants")}
+              count={accountant?.length || 0}
+              sortOptions={sortOptions}
+              filterOptions={filterOptionsList}
+              department="Accountants"
+              onSortFilterApply={handleSortFilterApply}
+              navigateToManageRoles={navigateToManageRoles}
+              handleCreateRole={handleCreateRole}
+              isAdmin={role === "admin"}
+              currentSort={sortOption} // Pass current sort
+              currentFilters={filterRoles} // Pass current filters
+            />
+
+            {/* Accountant List */}
             <div className="flex flex-wrap -mx-2">
-              {accountant?.length > 0 ? (
-                accountant?.map((accountant, index) => (
+              {sortedAccountants?.length > 0 ? (
+                sortedAccountants.map((acc) => (
                   <ProfileCard
-                    key={index}
-                    profile={accountant}
-                    onClick={handleAccountantClick}
-                    editUser={editUser} // Pass the editUser function as a prop
+                    key={acc._id} // Use a unique identifier
+                    profile={acc}
+                    onClick={() => handleAccountantClick(acc)}
+                    editUser={
+                      role === "admin" ? (event) => editUser(event, acc) : null
+                    }
                   />
                 ))
               ) : (
-                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <GoAlertFill className="text-[5rem]" />
-                  {t("No Accountant Found")}
+                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                  <NoDataFound />
                 </div>
               )}
             </div>
-            <SidebarSlide
-              key={sidebarContent} // Use the key to force re-render
-              isOpen={isSidebarOpen}
-              onClose={handleSidebarClose}
-              title={
-                <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-                  {sidebarContent === "viewAccountant"
-                    ? t("Quick View of Accountant")
-                    : t("Add/Edit Accountant")}
-                </span>
-              }
-              width={sidebarContent === "viewAccountant" ? "30%" : "60%"}
-              height="100%"
-            >
-              {renderSidebarContent()}
-            </SidebarSlide>
+
+            {/* Floating Action Button */}
+            {role === "admin" && (
+              <button
+                onClick={handleAddAccountantClick}
+                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                aria-label="Add New Accountant"
+              >
+                <GoPlus className="text-2xl" />
+              </button>
+            )}
           </div>
         )}
       </DashLayout>
+
+      {/* Sidebar */}
+      <SidebarSlide
+        key={sidebarContent} // Use the key to force re-render
+        isOpen={isSidebarOpen}
+        onClose={handleSidebarClose}
+        title={
+          <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+            {sidebarContent === "viewAccountant"
+              ? t("Quick View of Accountant")
+              : sidebarContent === "createRole"
+              ? t("Create New Role")
+              : t("Add/Edit Accountant")}
+          </span>
+        }
+        width={
+          sidebarContent === "viewAccountant"
+            ? "30%"
+            : sidebarContent === "createRole"
+            ? "60%"
+            : "75%"
+        }
+        height="100%"
+      >
+        {renderSidebarContent()}
+      </SidebarSlide>
     </Layout>
   );
 };

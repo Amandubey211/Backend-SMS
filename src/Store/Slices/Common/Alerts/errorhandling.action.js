@@ -19,21 +19,21 @@ export const ErrorMsg = (error) => {
           message: msg || "You need to log in to access this feature.",
           statusCode,
         };
-      case 403:
-        return {
-          message:
-            msg ||
-            "Access denied. You do not have permission to view this resource.",
-          statusCode,
-        };
+      // case 403:
+      //   return {
+      //     message:
+      //       msg ||
+      //       "Access denied. You do not have permission to view this resource.",
+      //     statusCode,
+      //   };
       case 404:
         return {
           message: msg || "Sorry! We couldn’t find what you’re looking for.",
           statusCode,
         };
-        case 429:
+      case 429:
         return {
-          message:"Too many request try again after 15min.",
+          message: "Too many request try again after 15min.",
           statusCode,
         };
       case 500:
@@ -57,7 +57,7 @@ export const ErrorMsg = (error) => {
         "Network error: Unable to reach the server. Please check your connection.",
       statusCode: null,
     };
-  } else {
+  } else if (error.status > 500) {
     return {
       message:
         "An error occurred while processing your request. Please try again.",

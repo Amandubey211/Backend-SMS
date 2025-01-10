@@ -22,6 +22,24 @@ export const fetchBooksThunk = createAsyncThunk(
     try {
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       dispatch(setShowError(false)); // Reset error visibility
+
+      console.log(say, "ddddddddd");
+      const response = await getData(`/admin/all/bookNames?say=${say}`); // Use getData for API calls
+      return response?.books; // Safely access books using optional chaining
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue); // Centralized error handling
+    }
+  }
+);
+
+export const fetchBooksDetailsThunk = createAsyncThunk(
+  "library/fetchBooksDetails",
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      dispatch(setShowError(false)); // Reset error visibility
+
+      console.log(say, "ddddddddd");
       const response = await getData(`/admin/all/book?say=${say}`); // Use getData for API calls
       return response?.books; // Safely access books using optional chaining
     } catch (error) {

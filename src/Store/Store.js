@@ -32,9 +32,15 @@ import adminAnnouncementReducer from "./Slices/Admin/Class/Announcement/announce
 import allStudentReducer from "./Slices/Admin/Users/Students/studentSlice";
 import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
-import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
-import studentFeesReducer from "./Slices/Admin/Accounting/StudentFees/studentFeesSlice";
-import expensesReducer from "./Slices/Admin/Accounting/Expenses/expensesSlice";
+
+import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
+import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
+import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice"
+// import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
+import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
+import invoiceReducer from "./Slices/Finance/Invoice/invoiceSlice";
+
+import expensesReducer from "./Slices/Finance/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
@@ -43,8 +49,9 @@ import adminQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
 import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSlice";
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
+import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
-
+import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -78,9 +85,6 @@ import parentTimeTableReducer from "../Store/Slices/Parent/TimeTable/parentTimeT
 // teacher
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
 
-
-
-
 // Persist configuration for the Auth slice
 
 const authPersistConfig = {
@@ -92,6 +96,7 @@ const authPersistConfig = {
     "AcademicYear",
     "token",
     "selectedLanguage",
+    "userRoles",
   ], // Fields to persist
 };
 
@@ -153,17 +158,27 @@ const AdminReducer = combineReducers({
   timetable: timetableReducer,
   speedgrades: adminSpeedGradeReducer,
   classIcons: adminClassIconsReducer,
-
+  quotations: quotationReducer,
+  receipts: receiptsReducer,
   graduates: graduateReducer,
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
-  earning: earningReducer,
-  student_fees: studentFeesReducer,
-  expenses: expensesReducer,
+  // student_fees: studentFeesReducer,
+
   subject_grades: subjectGradesReducer,
   // subject_assignment: subjectAssignmentReducer,
   subject_quiz: subjectQuizReducer,
+
+  //RBAC
+  rbac: rbacReducer,
+
+  // Finance
+  earnings: earnignsReducer,
+  expenses: expensesReducer,
+  studentFees: studentFeesReducer,
+  invoices: invoiceReducer,
+  penaltyAdjustment:penaltyAdjustmentReducer,
 });
 
 const studentReducer = combineReducers({
@@ -188,11 +203,8 @@ const studentReducer = combineReducers({
   studentPages: studentPagesReducer,
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
-  studentTimetable: studentTimeTableReducer
+  studentTimetable: studentTimeTableReducer,
 });
-
-
-
 
 const ParentReducer = combineReducers({
   dashboard: dashboardReducer,
@@ -201,7 +213,7 @@ const ParentReducer = combineReducers({
   notice: noticeReducer,
   library: libraryReducer,
   events: eventReducer,
-  parentTimetable: parentTimeTableReducer
+  parentTimetable: parentTimeTableReducer,
 });
 
 // Create the store

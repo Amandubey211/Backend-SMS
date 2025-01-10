@@ -6,6 +6,7 @@ module.exports = {
       backgroundImage: {
         "gradient-to-r-pink-purple":
           "linear-gradient(to right, #fce7f3, #e9d5ff)",
+        'gradient-text': 'linear-gradient(180deg, #C83B62 0%, #46138A 100%)'
       },
       animation: {
         shake: "shake 0.5s ease-in-out",

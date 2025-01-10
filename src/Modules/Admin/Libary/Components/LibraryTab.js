@@ -19,11 +19,11 @@ const LibraryTab = ({ handleSidebarOpen }) => {
     Boolean
   );
 
-  const filteredBooks = books.filter((book) => {
-    const bookClassName = book.classId?.className?.toLowerCase() || "";
-    const bookCategory = book.category?.toLowerCase() || "";
-    const selectedClass = filters.class?.toLowerCase() || "";
-    const selectedCategory = filters.category?.toLowerCase() || "";
+  const filteredBooks = books?.filter((book) => {
+    const bookClassName = book?.classId?.className?.toLowerCase() || "";
+    const bookCategory = book?.category?.toLowerCase() || "";
+    const selectedClass = filters?.class?.toLowerCase() || "";
+    const selectedCategory = filters?.category?.toLowerCase() || "";
 
     if (selectedClass && selectedCategory) {
       return (
@@ -68,7 +68,8 @@ const LibraryTab = ({ handleSidebarOpen }) => {
         {role !== "teacher" && (
           <button
             onClick={handleSidebarOpen}
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600">
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          >
             {t("Add Book")}
           </button>
         )}

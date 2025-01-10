@@ -22,6 +22,8 @@ const initialState = {
   loading: false,
   error: null,
   selectedLanguage: "en",
+  userRoles: [],
+  permissions: [],
 };
 
 const AuthSlice = createSlice({
@@ -34,17 +36,28 @@ const AuthSlice = createSlice({
     setRole: (state, action) => {
       state.role = action.payload;
     },
+    setPermissions: (state, action) => {
+      state.permissions = action.payload;
+    },
+    clearPermissions: (state) => {
+      state.permissions = [];
+    },
+
     setSelectedLanguage: (state, action) => {
       state.selectedLanguage = action.payload;
     },
     setAcademicYear: (state, action) => {
       state.AcademicYear = action.payload;
     },
+    setUserRoles: (state, action) => {
+      state.userRoles = action.payload;
+    },
     resetState: (state) => {
       state.isLoggedIn = false;
       state.role = null;
       state.token = null;
       state.AcademicYear = [];
+      state.permissions = []; // Reset permissio
     },
   },
   extraReducers: (builder) => {
@@ -174,5 +187,8 @@ export const {
   setAcademicYear,
   resetState,
   setSelectedLanguage,
+  setUserRoles,
+  setPermissions,
+  clearPermissions,
 } = AuthSlice.actions;
 export default AuthSlice.reducer;

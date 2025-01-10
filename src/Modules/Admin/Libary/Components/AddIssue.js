@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { issueBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
+import { fetchBooksThunk, issueBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import { useTranslation } from "react-i18next";
 
 const AddIssue = ({ onClose, editIssueData }) => {
+ 
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
+ 
   const { books } = useSelector((state) => state.admin.library);
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList

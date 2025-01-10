@@ -33,7 +33,6 @@ import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
 import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 
-
 // Timetable
 // Admin
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
@@ -45,7 +44,6 @@ import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.actio
 import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
 import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
 
-
 // Teacher
 import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
 import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/TableView.js";
@@ -53,17 +51,56 @@ import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/T
 // Parent
 import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
-
-
-
-
-
-
+import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
+import TotalRevenueList from "../Modules/Admin/Finance/Earnings/TotalRevenueList.js";
+import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
+import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentFeesForm.js";
+import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
+import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
+import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
+import RecentInvoiceList from "../Modules/Admin/Finance/Invoices/RecentInvoiceList.js";
+//import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceList.js";
+import EarningMainSection from "../Modules/Admin/Finance/Earnings/EarningMainSection.js";
+import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
+import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
+import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
+import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
+import AddInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
+import AddReturnInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
+import CreateNewInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/CreateNewInvoice.js";
+import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
+import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
+import CreatePenaltyAdjustment from "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js";
 
 // lazy loaded routes
+const AdjustmentDashboard = lazy(() =>
+  import(
+    "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/AdjustmentDashboard.js"
+  )
+);
+const PenalityandAdjustmentList = lazy(() =>
+  import(
+    "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/PenalityandAdjustmentList.js"
+  )
+);
 
-
-// lazy loaded routes
+const TotalExpenseList = lazy(() =>
+  import(
+    "../Modules/Admin/Finance/Expense/TotalExpenseList/TotalExpenseList.js"
+  )
+);
+const ExpenseMain = lazy(() =>
+  import("../Modules/Admin/Finance/Expense/ExpenseMain.js")
+);
+const AddExpense = lazy(() =>
+  import("../Modules/Admin/Finance/Expense/AddExpense/AddExpense.js")
+);
+const AddEarnings = lazy(() =>
+  import("../Modules/Admin/Finance/Earnings/AddEarnings/AddEarnings.js")
+);
+const RoleSelector = lazy(() =>
+  import("../Components/Common/RBAC/RoleSelector.js")
+);
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
 );
@@ -408,10 +445,29 @@ function App() {
       ),
       errorElement: <Error />,
     },
+
     {
       path: "/select_branch",
       element: (
         <ProtectRoute Component={SelectBranch} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/select_role",
+      element: (
+        <ProtectRoute
+          Component={RoleSelector}
+          allowedRoles={[
+            "admin",
+            "parent",
+            "student",
+            "teacher",
+            "accountant",
+            "librarian",
+            "staff",
+          ]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -829,21 +885,263 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/accounting/earning",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={Earning}
+    //       allowedRoles={["admin", "accountant"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
+    // {
+    //   path: "/accounting/expenses",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={Expenses}
+    //       allowedRoles={["admin", "accountant"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
+
     {
-      path: "/accounting/earning",
+      path: "/finance/earning",
       element: (
         <ProtectRoute
-          Component={Earning}
+          Component={EarningMainSection}
           allowedRoles={["admin", "accountant"]}
         />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/accounting/expenses",
+      path: "/finance/earning/total-revenue-list",
       element: (
         <ProtectRoute
-          Component={Expenses}
+          Component={TotalRevenueList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/expenses",
+      element: (
+        <ProtectRoute
+          Component={ExpenseMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/expenses/total-expense-list",
+      element: (
+        <ProtectRoute
+          Component={TotalExpenseList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+
+    {
+      path: "/finance/studentfees/add/form",
+      element: (
+        <ProtectRoute
+          Component={addStudentFeesForm}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/studentfees",
+      element: (
+        <ProtectRoute
+          Component={StudentFeesDash}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/earning/add",
+      element: (
+        <ProtectRoute
+          Component={AddEarnings}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/expenses/add",
+      element: (
+        <ProtectRoute
+          Component={AddExpense}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/studentfees/total-revenue",
+      element: (
+        <ProtectRoute
+          Component={SummaryRevenueList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/studentfees/total-revenue/addFees",
+      element: (
+        <ProtectRoute
+          Component={AddNewFees}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/dashboard",
+      element: (
+        <ProtectRoute
+          Component={InvoicesMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/add-new-invoice",
+      element: (
+        <ProtectRoute
+          Component={CreateNewInvoice}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/add-return-invoice",
+      element: (
+        <ProtectRoute
+          Component={AddReturnInvoice}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/invoices/dashboard/recent-invoices",
+      element: (
+        <ProtectRoute
+          Component={RecentInvoiceList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    // {
+    //   path: "/finance/invoices/dashboard/return-invoices",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={ReturnInvoiceList}
+    //       allowedRoles={["admin", "accountant"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
+    {
+      path: "/finance/receipts",
+      element: (
+        <ProtectRoute
+          Component={ReceiptsMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/receipts/receipt-list",
+      element: (
+        <ProtectRoute
+          Component={RecentReceiptsList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/receipts/add-new-receipt",
+      element: (
+        <ProtectRoute
+          Component={CreateReceipt}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations",
+      element: (
+        <ProtectRoute
+          Component={QuotationMain}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations/add-new-quotations",
+      element: (
+        <ProtectRoute
+          Component={CreateQuotation}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/quotations/quotations-list",
+      element: (
+        <ProtectRoute
+          Component={RecentQuotationList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penaltyAdjustment/",
+      element: (
+        <ProtectRoute
+          Component={AdjustmentDashboard}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penaltyAdjustment-list",
+      element: (
+        <ProtectRoute
+          Component={PenalityandAdjustmentList}
+          allowedRoles={["admin", "accountant"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penaltyAdjustment/add-new-penalty-adjustment",
+      element: (
+        <ProtectRoute
+          Component={CreatePenaltyAdjustment}
           allowedRoles={["admin", "accountant"]}
         />
       ),
@@ -852,6 +1150,13 @@ function App() {
     {
       path: "/users/students",
       element: <AllStudents />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/manage-roles",
+      element: (
+        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin"]} />
+      ),
       errorElement: <Error />,
     },
     {
@@ -1008,7 +1313,6 @@ function App() {
       errorElement: <Error />,
     },
 
-
     {
       path: "/student_timetable",
       element: (
@@ -1029,7 +1333,6 @@ function App() {
           ),
           errorElement: <Error />,
         },
-        
       ],
     },
 
@@ -1183,11 +1486,8 @@ function App() {
           ),
           errorElement: <Error />,
         },
-        
       ],
     },
-
-
 
     // parent----------------------------------------------------------------
     {
