@@ -24,6 +24,9 @@ export const mapBackendToFrontend = (expenseData) => {
       ? formatDateForInput(expenseData.startDate)
       : "",
     endDate: expenseData.endDate ? formatDateForInput(expenseData.endDate) : "",
+    // purchasedDate: expenseData.purchasedDate
+    //   ? formatDateForInput(expenseData.purchasedDate)
+    //   : "",
     // Add more mappings as needed
     // For example, map nested fields or other specific cases
   };

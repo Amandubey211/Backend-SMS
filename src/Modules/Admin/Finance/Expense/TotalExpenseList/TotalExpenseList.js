@@ -209,43 +209,43 @@ const TotalExpenseList = () => {
   // Define table columns with a separate selection column using Checkboxes
   const columns = useMemo(
     () => [
-      // Selection Column
-      {
-        title: "",
-        key: "selection",
-        width: 60,
-        render: (_, record) => {
-          const isSelected = selectedRowKey === record.key;
-          if (record.paymentStatus === "unpaid") {
-            return (
-              <div className="flex items-center justify-center">
-                <Tooltip title="Selectable">
-                  <Checkbox
-                    checked={isSelected}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                      if (e.target.checked) {
-                        setSelectedRowKey(record.key);
-                      } else {
-                        setSelectedRowKey(null);
-                      }
-                    }}
-                    aria-label={isSelected ? "Unselect" : "Select"}
-                  />
-                </Tooltip>
-              </div>
-            );
-          } else {
-            return (
-              <div className="flex items-center justify-center">
-                <Tooltip title="Not selectable">
-                  <Checkbox disabled />
-                </Tooltip>
-              </div>
-            );
-          }
-        },
-      },
+      // (Uncomment if needed)
+      // {
+      //   title: "",
+      //   key: "selection",
+      //   width: 60,
+      //   render: (_, record) => {
+      //     const isSelected = selectedRowKey === record.key;
+      //     if (record.paymentStatus === "unpaid") {
+      //       return (
+      //         <div className="flex items-center justify-center">
+      //           <Tooltip title="Selectable">
+      //             <Checkbox
+      //               checked={isSelected}
+      //               onChange={(e) => {
+      //                 e.stopPropagation();
+      //                 if (e.target.checked) {
+      //                   setSelectedRowKey(record.key);
+      //                 } else {
+      //                   setSelectedRowKey(null);
+      //                 }
+      //               }}
+      //               aria-label={isSelected ? "Unselect" : "Select"}
+      //             />
+      //           </Tooltip>
+      //         </div>
+      //       );
+      //     } else {
+      //       return (
+      //         <div className="flex items-center justify-center">
+      //           <Tooltip title="Not selectable">
+      //             <Checkbox disabled />
+      //           </Tooltip>
+      //         </div>
+      //       );
+      //     }
+      //   },
+      // },
       {
         title: "Category",
         dataIndex: "categoryName",
@@ -262,11 +262,12 @@ const TotalExpenseList = () => {
         width: 120,
         ellipsis: true,
       },
-      // Status Column
       {
         title: "Status",
         dataIndex: "paymentStatus",
         key: "paymentStatus",
+        width: 50,
+        ellipsis: true,
         render: (status) => {
           let color = "default";
           switch (status) {
@@ -288,22 +289,21 @@ const TotalExpenseList = () => {
             </Tag>
           );
         },
-        width: 80,
-        ellipsis: true,
       },
       {
         title: "Total Amount (QR)",
         dataIndex: "totalAmount",
         key: "totalAmount",
-        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
         width: 100,
         ellipsis: true,
+        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
       },
-      // Discount Column
       {
         title: "Discount",
         dataIndex: "discount",
         key: "discount",
+        width: 100,
+        ellipsis: true,
         render: (value, record) =>
           record.discountType === "percentage" ? (
             <Tag color="purple" className="text-xs">
@@ -314,59 +314,51 @@ const TotalExpenseList = () => {
               {value || 0} QR
             </Tag>
           ),
-        width: 100,
-        ellipsis: true,
       },
-      // Penalty Column
       {
         title: "Penalty",
         dataIndex: "penalty",
         key: "penalty",
+        width: 100,
+        ellipsis: true,
         render: (value) => (
           <span className="text-xs text-red-600">{formatCurrency(value)}</span>
         ),
-        width: 100,
-        ellipsis: true,
       },
-      // Final Amount Column
       {
         title: "Final Amount (QR)",
         dataIndex: "finalAmount",
         key: "finalAmount",
-        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
         width: 150,
         ellipsis: true,
+        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
       },
-      // Paid Amount Column
       {
         title: "Paid Amount (QR)",
         dataIndex: "paidAmount",
         key: "paidAmount",
+        width: 120,
+        ellipsis: true,
         render: (value) => (
           <span className="text-xs text-green-600">{value || "0"} QR</span>
         ),
-        width: 120,
-        ellipsis: true,
       },
-      // Remaining Amount Column
       {
         title: "Remaining Amount (QR)",
         dataIndex: "remainingAmount",
         key: "remainingAmount",
+        width: 100,
+        ellipsis: true,
         render: (value) => (
           <span className="text-xs text-red-600">{value || "0"} QR</span>
         ),
-        width: 120,
-        ellipsis: true,
       },
-
-      // Action Column
       {
         title: "Action",
         key: "action",
-        render: (_, record) => renderActionIcons(record),
-        fixed: "right",
         width: 120,
+        fixed: "right", // ensures the Action column stays visible on scroll
+        render: (_, record) => renderActionIcons(record),
       },
     ],
     [selectedRowKey, expenseIdMap]
@@ -441,7 +433,7 @@ const TotalExpenseList = () => {
 
     return (
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={6}>
+        <Table.Summary.Cell index={0} colSpan={5}>
           <strong>Totals:</strong>
         </Table.Summary.Cell>
         <Table.Summary.Cell index={4}>
@@ -456,8 +448,6 @@ const TotalExpenseList = () => {
         <Table.Summary.Cell index={7}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={8}></Table.Summary.Cell>
-        <Table.Summary.Cell index={9} />
       </Table.Summary.Row>
     );
   };
@@ -582,8 +572,8 @@ const TotalExpenseList = () => {
             </div>
           )}
 
-          {/* Table */}
-          <div className="overflow-x-auto">
+          {/* Table Wrapper (responsive container) */}
+          <div className="w-full overflow-x-auto">
             <Table
               dataSource={dataSource}
               columns={columns}
@@ -595,7 +585,7 @@ const TotalExpenseList = () => {
                 showSizeChanger: true, // Enable size changer
                 pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
                 size: "small",
-                showTotal: (total, range) =>
+                showTotal: (total) =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
                 onChange: (page, pageSize) => {
                   dispatch(setCurrentPage(page)); // Update the current page in Redux
@@ -606,10 +596,11 @@ const TotalExpenseList = () => {
                   dispatch(setCurrentPage(1)); // Optionally reset to first page
                 },
               }}
-              className="rounded-lg shadow text-xs"
+              className="rounded-lg shadow text-xs w-full"
+              style={{ width: "100%" }}
               bordered
               size="small"
-              tableLayout="fixed" // Fixed table layout for compactness
+              tableLayout="auto" // let columns adjust automatically
               components={components}
               loading={{
                 spinning: loading,
@@ -617,6 +608,7 @@ const TotalExpenseList = () => {
                 tip: "Loading...",
               }}
               summary={summary}
+              scroll={{ x: true }} // allow horizontal scroll if needed
               onRow={(record) => ({
                 onClick: () => {
                   if (record.paymentStatus !== "unpaid") {

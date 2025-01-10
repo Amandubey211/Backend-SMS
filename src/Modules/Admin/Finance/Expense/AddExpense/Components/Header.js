@@ -49,19 +49,19 @@ const Header = ({
         {!readOnly && (
           <div className="flex gap-4">
             <Button
-              type="primary"
-              htmlType="submit"
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-            >
-              {isUpdate ? "Update Expense" : "Save Expense"}
-            </Button>
-            <Button
               type="default"
               onClick={onReset}
               className="text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-gray-200 transition"
               disabled={readOnly}
             >
               Reset
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+            >
+              {isUpdate ? "Update Expense" : "Save Expense"}
             </Button>
           </div>
         )}
