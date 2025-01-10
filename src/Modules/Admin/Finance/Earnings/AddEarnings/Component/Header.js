@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
 import { categories, subCategories } from "../constants/categories";
 import { useSelector } from "react-redux";
+import { Spin } from "antd"; // <-- Added import for Spin
 
 const Header = ({
   onReset,
@@ -17,7 +18,7 @@ const Header = ({
   const [subCategory, setSubCategory] = useState(initialSubCategory);
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
-  const readOnly = useSelector((state) => state.admin.earnings.readOnly);
+  const { readOnly, loading } = useSelector((state) => state.admin.earnings);
 
   const filteredCategories = categories.filter(
     (cat) => cat !== "Student-Based Revenue"
@@ -62,6 +63,7 @@ const Header = ({
               <button
                 type="button" // Prevent form submission
                 onClick={onReset}
+                disabled={loading} // Disable when loading
                 className="border border-pink-500 text-black bg-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-pink-50 hover:text-black transition"
               >
                 Reset
@@ -70,8 +72,11 @@ const Header = ({
             {/* Submit Button (Save or Update) */}
             <button
               type="submit" // Formik will handle the submit
+              disabled={loading} // Disable when loading
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
             >
+              {/* Show spinner if loading */}
+              {loading && <Spin size="small" className="mr-2" />}
               {isUpdate ? "Update Earnings" : "Save Earnings"}
             </button>
           </div>

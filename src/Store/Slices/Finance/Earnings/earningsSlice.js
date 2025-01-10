@@ -117,14 +117,6 @@ const earningsSlice = createSlice({
       })
       .addCase(addEarnings.fulfilled, (state, action) => {
         state.loading = false;
-        // // Optionally, you might refresh data or update the store
-        // // For example, prepend the new income to the incomes array
-        // state.incomes.unshift(action.payload);
-        // state.totalRecords += 1;
-        // // Update statistics
-        // state.totalRevenue += action.payload.final_amount || 0;
-        // state.totalPaidAmount += action.payload.paid_amount || 0;
-        // state.unpaidRevenue += action.payload.remaining_amount || 0;
       })
       .addCase(addEarnings.rejected, (state, action) => {
         state.loading = false;
