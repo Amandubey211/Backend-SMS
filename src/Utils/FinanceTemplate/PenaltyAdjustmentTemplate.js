@@ -102,7 +102,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
         </div>
         <div>
           <p>
-            <strong>Penalty Adjustment No:</strong>{" "}
+            <strong>Return Invoice No:</strong>{" "}
             {returnInvoiceNumber || "RTA0001-202412-0001"}
           </p>
           <p>
@@ -129,12 +129,12 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
         <p>
           <strong>Payment Status:</strong> {paymentStatus || "N/A"}
         </p>
-        <p>
+        {/* <p>
           <strong>Academic Year:</strong> {academicYear?.year || "N/A"}
         </p>
         <p>
           <strong>Adjusted By:</strong> {adjustedBy?.adminName || "N/A"}
-        </p>
+        </p> */}
       </div>
 
       {/* Items Table */}
@@ -199,16 +199,16 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax ({tax || 0}%)
+              Tax 
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {taxAmount.toFixed(2)} QAR
+              {taxAmount.toFixed(2)} %
             </td>
           </tr>
           {/* Penalty Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Penalty ({penaltyType === "percentage" ? `${adjustmentPenalty}%` : `${adjustmentPenalty} QAR`})
+              Penalty
             </td>
             <td className="p-2 border border-gray-300 text-right">
               {penaltyAmount.toFixed(2)} QAR
@@ -217,7 +217,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount ({discountType === "percentage" ? `${discount}%` : `${discount} QAR`})
+              Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
               {discountType === "percentage"

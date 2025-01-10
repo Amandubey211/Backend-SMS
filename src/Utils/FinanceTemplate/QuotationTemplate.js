@@ -108,12 +108,12 @@ const QuotationTemplate = ({ data }) => {
         {/* <p>
           <strong>Purpose:</strong> {purpose || "N/A"}
         </p> */}
-        <p>
+        {/* <p>
           <strong>Status:</strong> {status || "N/A"}
         </p>
         <p>
           <strong>Academic Year:</strong> {academicYear?.year || "N/A"}
-        </p>
+        </p> */}
       </div>
 
       {/* Line Items Table */}
@@ -180,20 +180,16 @@ const QuotationTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax ({tax || 0}%)
+              Tax
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {taxAmount.toFixed(2)} QAR
+              {taxAmount.toFixed(2)} %
             </td>
           </tr>
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount (
-              {discountType === "percentage"
-                ? `${discount}%`
-                : `${discount} QAR`}
-              )
+              Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
               {discountType === "percentage" ? `${discountAmount.toFixed(2)}%` : `${discountAmount.toFixed(2)} QAR`}

@@ -67,7 +67,7 @@ const ReceiptTemplate = ({ data }) => {
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          RETURN INVOICE
+          RECEIPT
         </div>
       </div>
 
@@ -84,7 +84,7 @@ const ReceiptTemplate = ({ data }) => {
         </div>
         <div>
           <p>
-            <strong>Return Invoice No:</strong>{" "}
+            <strong>Return Reciept No:</strong>{" "}
             {receiptNumber || "RNT0001-202412-0001"}
           </p>
           <p>
@@ -133,8 +133,13 @@ const ReceiptTemplate = ({ data }) => {
                   {index + 1}
                 </td>
                 <td className="p-2 border border-gray-300">
-                  {item.revenueType || "N/A"}
+                  {item.revenueType
+                    ? item.revenueType
+                      .replace(/_/g, ' ') // Replace underscores with spaces
+                      .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
+                    : "N/A"}
                 </td>
+
                 <td className="p-2 border border-gray-300 text-center">
                   {item.quantity || 1}
                 </td>
@@ -165,7 +170,7 @@ const ReceiptTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax ({tax || 0}%)
+              Tax 
             </td>
             <td className="p-2 border border-gray-300 text-right">
               {taxAmount.toFixed(2)} %
@@ -183,9 +188,7 @@ const ReceiptTemplate = ({ data }) => {
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount (
-              {discountType === "percentage" ? `${discount}%` : `${discount} QAR`}
-              )
+              Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
               {discountType === "percentage"

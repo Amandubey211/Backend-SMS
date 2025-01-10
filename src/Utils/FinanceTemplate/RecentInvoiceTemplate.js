@@ -33,7 +33,7 @@ const RecentInvoiceTemplate = ({ data }) => {
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
 
   // Calculate tax
-  const taxAmount = (subtotal * (tax || 0)) / 100;
+  const taxAmount = tax;
 
   // Calculate discount based on type
   const discountAmount =
@@ -62,7 +62,7 @@ const RecentInvoiceTemplate = ({ data }) => {
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          RECENT INVOICE
+          INVOICE
         </div>
       </div>
 
@@ -101,9 +101,9 @@ const RecentInvoiceTemplate = ({ data }) => {
         <p>
           <strong>Payment Status:</strong> {paymentStatus || "N/A"}
         </p>
-        <p>
+        {/* <p>
           <strong>Academic Year:</strong> {academicYear?.year || "N/A"}
-        </p>
+        </p> */}
       </div>
 
       {/* Line Items Table */}
@@ -125,7 +125,12 @@ const RecentInvoiceTemplate = ({ data }) => {
                 className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
               >
                 <td className="p-2 border border-gray-300 text-center">{index + 1}</td>
-                <td className="p-2 border border-gray-300">{item.revenueType || "N/A"}</td>
+                <td className="p-2 border border-gray-300">{item.revenueType
+                  ? item.revenueType
+                    .replace(/_/g, ' ') // Replace underscores with spaces
+                    .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
+                  : "N/A"}
+                </td>
                 <td className="p-2 border border-gray-300 text-center">{item.quantity || 1}</td>
                 <td className="p-2 border border-gray-300 text-right">
                   {(item.amount / (item.quantity || 1)).toFixed(2)} QAR
@@ -152,7 +157,7 @@ const RecentInvoiceTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax ({tax || 0}%)
+              Tax
             </td>
             <td className="p-2 border border-gray-300 text-right">{taxAmount.toFixed(2)} %</td>
           </tr>
@@ -166,7 +171,7 @@ const RecentInvoiceTemplate = ({ data }) => {
           {/* Discount Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Discount ({discountType === "percentage" ? `${discount}%` : `${discount} QAR`})
+              Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
               {discountAmount.toFixed(2)} {discountType === "percentage" ? "%" : "QAR"}
