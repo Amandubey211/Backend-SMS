@@ -43,11 +43,11 @@ export const createStudentFee = createAsyncThunk(
       if(response.success){
         toast.success('Fees added  successfully!')
       }else{
-        toast.error('Something is wrong!')
+        toast.error('Please fill the required  Fields !')
       }
       return response;
     } catch (error) {
-      toast.error('Something is wrong!')
+      toast.error('Please fill the required  Fields !')
       return handleError(error, dispatch, rejectWithValue);
     }
   }

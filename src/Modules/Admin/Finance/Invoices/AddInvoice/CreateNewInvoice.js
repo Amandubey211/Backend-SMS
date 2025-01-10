@@ -24,7 +24,7 @@ const CreateNewInvoice = () => {
     },
     description: "",
     lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
-    discountType: "",
+    discountType: "percentage",
     discount: 0,
     penalty: 0,
     tax: 0,
@@ -163,6 +163,7 @@ const CreateNewInvoice = () => {
                     label="Email"
                     placeholder="Enter Email"
                     disabled={isReadonly}
+                    required
                   /> {/* Optional field */}
 
                   <TextInput
@@ -265,6 +266,7 @@ const CreateNewInvoice = () => {
                       { label: "Amount", value: "amount" },
                     ]}
                     disabled={isReadonly}
+                    required
                   />
 
                   <TextInput
@@ -297,6 +299,7 @@ const CreateNewInvoice = () => {
                       { label: "Other", value: "other" },
                     ]}
                     disabled={isReadonly}
+                    required
                   />
 
                   <SelectInput
@@ -309,6 +312,7 @@ const CreateNewInvoice = () => {
                       { label: "Advance", value: "advance" },
                     ]}
                     disabled={isReadonly}
+                    required
                   />
 
                 </div>

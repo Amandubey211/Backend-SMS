@@ -14,6 +14,7 @@ const StudentPaymentDetails = ({ category }) => {
             label="Exam Type"
             name={`examType_${category}`}
             placeholder="Enter Exam Type"
+            required
           />
         ) : (<>
           <SelectInput
@@ -26,11 +27,13 @@ const StudentPaymentDetails = ({ category }) => {
               "Yearly",
               "Custom Date",
             ]}
+            required
           />
           <TextInput
             label="Start Date"
             name={`startDate_${category}`}
             type="date"
+           
           />
 
           {/* Conditionally render End Date */}
@@ -53,11 +56,13 @@ const StudentPaymentDetails = ({ category }) => {
           label={`Payment Status (${category})`}
           name={`paymentStatus_${category}`}
           options={["paid", "unpaid", "partial", "advance"]}
+          required
         />
           <SelectInput
           label="Discount Type"
           name={`discountType_${category}`}
           options={["percentage",  "amount"]}
+        
         />
 
         <TextInput

@@ -40,7 +40,7 @@ const StudentDetails = ({setStudentDetail} ) => {
       </h2>
       <div className="grid grid-cols-3 gap-6">
         <SelectDynamicInput
-          label="Class"
+          label="Class*"
           name="classId"
           options={classList}
           forWhom='class'
@@ -55,7 +55,7 @@ const StudentDetails = ({setStudentDetail} ) => {
           onChange={handleInputChange}
         />
             <SelectDynamicInput
-          label="Student"
+          label="Student*"
           name="studentId"
           options={studentsList || []}
           forWhom='student'
