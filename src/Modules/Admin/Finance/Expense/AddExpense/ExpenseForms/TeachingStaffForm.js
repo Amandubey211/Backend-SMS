@@ -9,9 +9,10 @@ const TeachingStaffForm = () => {
   // Recurring Expense Fields
   const recurringFields = [
     {
-      type: "checkbox",
+      type: "select",
       label: "Is Recurring?",
       name: "recurringExpense.isRecurring",
+      options: ["true", "false"],
     },
     {
       type: "select",

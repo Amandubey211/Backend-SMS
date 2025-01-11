@@ -130,26 +130,6 @@ const earningsSlice = createSlice({
       })
       .addCase(updateEarnings.fulfilled, (state, action) => {
         state.loading = false;
-        // Optionally, update the specific income in the incomes array
-        // const index = state.incomes.findIndex(
-        //   (income) => income._id === action.payload._id
-        // );
-        // if (index !== -1) {
-        //   state.incomes[index] = action.payload;
-        //   // Recalculate statistics if necessary
-        //   state.totalRevenue = state.incomes.reduce(
-        //     (acc, income) => acc + (income.final_amount || 0),
-        //     0
-        //   );
-        //   state.totalPaidAmount = state.incomes.reduce(
-        //     (acc, income) => acc + (income.paid_amount || 0),
-        //     0
-        //   );
-        //   state.unpaidRevenue = state.incomes.reduce(
-        //     (acc, income) => acc + (income.remaining_amount || 0),
-        //     0
-        //   );
-        // }
       })
       .addCase(updateEarnings.rejected, (state, action) => {
         state.loading = false;

@@ -75,7 +75,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
                   key={index}
                   name={name}
                   label={label}
-                  required={isRequired}
+                  // required={isRequired}
                   value={getNestedValue(values, name)}
                   onChange={(e) => setFieldValue(name, e.target.value)}
                   {...rest}
@@ -85,7 +85,7 @@ const FormSection = ({ title, fields, setFieldValue, values }) => {
               return (
                 <div key={index} className="col-span-1 md:col-span-3">
                   <label className="text-sm text-gray-500 block mb-1">
-                    {label} <span className="text-red-500">*</span>
+                    {/* {label} <span className="text-red-500">*</span> */}
                   </label>
                   <FieldArray
                     name={name}

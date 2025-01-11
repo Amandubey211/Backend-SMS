@@ -136,7 +136,6 @@ export const addExpense = createAsyncThunk(
       } else {
         dispatch(setShowError(true));
         toast.error(response?.message || "Failed to add expense.");
-        return rejectWithValue(response?.message || "Failed to add expense.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -157,9 +156,6 @@ export const updateExpense = createAsyncThunk(
       } else {
         dispatch(setShowError(true));
         toast.error(response?.message || "Failed to update expense.");
-        return rejectWithValue(
-          response?.message || "Failed to update expense."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -190,9 +186,6 @@ export const deleteExpense = createAsyncThunk(
         return { id, category };
       } else {
         toast.error(response?.message || "Failed to delete expense.");
-        return rejectWithValue(
-          response?.message || "Failed to delete expense."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -211,9 +204,6 @@ export const fetchExpenseById = createAsyncThunk(
 
       if (response?.success) {
         return response;
-      } else {
-        toast.error(response?.message || "Failed to fetch expense.");
-        return rejectWithValue(response?.message || "Failed to fetch expense.");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -234,11 +224,6 @@ export const fetchExpenseGraph = createAsyncThunk(
 
       if (response?.success) {
         return response.data;
-      } else {
-        toast.error(response?.message || "Failed to fetch expense graph data.");
-        return rejectWithValue(
-          response?.message || "Failed to fetch expense graph data."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -259,10 +244,6 @@ export const fetchCardDataExpense = createAsyncThunk(
 
       if (response?.success) {
         return response.data;
-      } else {
-        return rejectWithValue(
-          response?.message || "Failed to fetch card data for expenses."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -278,11 +259,6 @@ export const fetchTeachingStaff = createAsyncThunk(
 
       if (response?.success) {
         return response.data; // Assuming data is the array of teaching staff
-      } else {
-        toast.error(response?.msg || "Failed to fetch teaching staff.");
-        return rejectWithValue(
-          response?.msg || "Failed to fetch teaching staff."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -299,11 +275,6 @@ export const fetchNonTeachingStaff = createAsyncThunk(
 
       if (response?.success) {
         return response.data; // Assuming data is the array of non-teaching staff
-      } else {
-        toast.error(response?.msg || "Failed to fetch non-teaching staff.");
-        return rejectWithValue(
-          response?.msg || "Failed to fetch non-teaching staff."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
