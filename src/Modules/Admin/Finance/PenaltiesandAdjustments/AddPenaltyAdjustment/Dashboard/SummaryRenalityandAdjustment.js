@@ -19,12 +19,12 @@ const paymentTypeIcons = {
   credit: <CreditCardOutlined />,
 };
 
-const SummaryPenalityandAdjustment= () => {
+const SummaryPenalityandAdjustment = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // Extracting necessary state from Redux store
-  const { adjustmentData, loading, error,totalRecords} = useSelector(
+  const { adjustmentData, loading, error, totalRecords } = useSelector(
     (state) => state.admin.penaltyAdjustment
   );
 
@@ -103,12 +103,19 @@ const SummaryPenalityandAdjustment= () => {
     },
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "isCancel", // Use isCancel as the data source
       key: "status",
-      render: (text) => <Tag color={text=="Cancelled"?"red":"purple"} className="text-xs"><span className="text-xs">{text}</span></Tag>,
+      render: (isCancel) => (
+        <Tag
+          color={isCancel ? "red" : "green"} // Red for Cancelled, Green for Active
+          className="text-xs"
+        >
+          <span className="text-xs">{isCancel ? "Cancelled" : "Active"}</span>
+        </Tag>
+      ),
       width: 100,
       ellipsis: true,
-      sorter: (a, b) => a.status.localeCompare(b.status),
+      sorter: (a, b) => (a.isCancel === b.isCancel ? 0 : a.isCancel ? 1 : -1), // Sort based on isCancel
     },
     {
       title: "Date",
@@ -118,12 +125,12 @@ const SummaryPenalityandAdjustment= () => {
         const date = value ? new Date(value) : null;
         const formattedDate = date
           ? new Intl.DateTimeFormat("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "numeric",
-            }).format(date)
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          }).format(date)
           : "N/A";
-  
+
         return <span className="text-xs">{formattedDate}</span>;
       },
       width: 120,
@@ -133,24 +140,24 @@ const SummaryPenalityandAdjustment= () => {
       sorter: (a, b) => new Date(a.adjustedAt) - new Date(b.adjustedAt),
     },
   ];
-  
 
- // Transform adjustments data to table dataSource and limit to 10 records
- const dataSource = adjustmentData?.map((adjustment) => ({
-  key: adjustment?._id,
-  return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
-  invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
-  receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
-  // discount: adjustment.discount || 0,
-  // discountType: adjustment.discountType || "percentage",
-  // penalty: adjustment.adjustmentPenalty || "N/A",
-  // tax: adjustment.tax,
-  adjustmentAmount: adjustment?.adjustmentTotal || 0,
-  adjustmentTotal: adjustment?.adjustmentAmount || 0,
-  status: adjustment.isCancel ? "Cancelled" : "-",
-  adjustedAt: adjustment?.adjustedAt || "N/A",
-  ...adjustment
-}));
+
+  // Transform adjustments data to table dataSource and limit to 10 records
+  const dataSource = adjustmentData?.map((adjustment) => ({
+    key: adjustment?._id,
+    return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
+    invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
+    receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
+    // discount: adjustment.discount || 0,
+    // discountType: adjustment.discountType || "percentage",
+    // penalty: adjustment.adjustmentPenalty || "N/A",
+    // tax: adjustment.tax,
+    adjustmentAmount: adjustment?.adjustmentTotal || 0,
+    adjustmentTotal: adjustment?.adjustmentAmount || 0,
+    status: adjustment.isCancel ? "Cancelled" : "-",
+    adjustedAt: adjustment?.adjustedAt || "N/A",
+    ...adjustment
+  }));
 
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
