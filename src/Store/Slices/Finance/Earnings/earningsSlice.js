@@ -7,10 +7,12 @@ import {
   updateEarnings,
   fetchEarningGraph,
   fetchCardDataRevenue,
+  fetchIncomesGraph,
 } from "./earningsThunks";
 
 const initialState = {
   incomes: [],
+  incomeGraphData: [],
   totalRecords: 0,
   totalPages: 0,
   currentPage: 1,
@@ -121,6 +123,20 @@ const earningsSlice = createSlice({
       .addCase(addEarnings.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to add earnings.";
+      })
+
+      // Add Earnings
+      .addCase(fetchIncomesGraph.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchIncomesGraph.fulfilled, (state, action) => {
+        state.loading = false;
+        state.incomeGraphData = action.payload
+      })
+      .addCase(fetchIncomesGraph.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed";
       })
 
       // Update Earnings
