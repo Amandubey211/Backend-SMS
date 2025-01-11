@@ -6,28 +6,36 @@ export const TotalInputs = () => {
   const { values, setFieldValue } = useFormikContext();
 
   useEffect(() => {
-    // Calculate totalAmount from lineItems
-    const total = values?.lineItems?.reduce((sum, item) => {
+    // Calculate subtotal (total amount from lineItems)
+    const subtotal = values?.lineItems?.reduce((sum, item) => {
       return sum + (Number(item.quantity) || 0) * (Number(item.amount) || 0);
     }, 0);
-    setFieldValue("totalAmount", total);
-  
-    // Calculate discounted amount based on discountType
-    let discountedAmount = total;
+    
+    setFieldValue("totalAmount", subtotal);
+
+    // Calculate discount amount based on discountType
+    let discountAmount = 0;
     if (values.discountType === "percentage" && values.discount) {
-      discountedAmount -= (total * Number(values.discount)) / 100;
+      discountAmount = (subtotal * Number(values.discount)) / 100;
     } else if (values.discountType === "amount" && values.discount) {
-      discountedAmount -= Number(values.discount);
+      discountAmount = Number(values.discount);
     }
-  
-    // Calculate tax amount based on discountedAmount
-    const taxAmount = (discountedAmount * (Number(values.tax) || 0)) / 100;
-  
-    // Add penalty and tax to discounted amount for final amount
+
+    // Ensure discount doesn't exceed subtotal
+    discountAmount = Math.min(discountAmount, subtotal);
+
+    // Subtotal after discount
+    const discountedSubtotal = subtotal - discountAmount;
+
+    // Calculate tax on the discounted subtotal
+    const taxAmount = (discountedSubtotal * (Number(values.tax) || 0)) / 100;
+
+    // Add penalty to calculate the final amount
     const finalAmount =
-      discountedAmount + taxAmount + (Number(values.penalty) || 0);
-  
-    setFieldValue("finalAmount", finalAmount.toFixed(2)); // Ensure 2 decimal precision
+      discountedSubtotal + taxAmount + (Number(values.penalty) || 0);
+
+    // Update the fields in Formik
+    setFieldValue("finalAmount", finalAmount.toFixed(2));
   }, [
     values.lineItems,
     values.discount,
@@ -36,7 +44,7 @@ export const TotalInputs = () => {
     values.penalty,
     setFieldValue,
   ]);
-  
+
   return (
     <div className="mb-6">
       <div className="grid grid-cols-3 gap-6">

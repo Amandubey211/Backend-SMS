@@ -32,15 +32,21 @@ const RecentInvoiceTemplate = ({ data }) => {
   // Calculate subtotal from line items
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
 
-  // Calculate tax
-  const taxAmount = tax;
+  // Calculate tax as a percentage of the subtotal
+  const taxAmount = (subtotal * (tax || 0)) / 100;
 
-  // Calculate discount based on type
+  // Calculate total before discount
+  const totalBeforeDiscount = subtotal + taxAmount + (penalty || 0);
+
+  // Calculate discount based on the type (percentage or fixed)
   const discountAmount =
-    discountType === "percentage" ? (subtotal * (discount || 0)) / 100 : discount || 0;
+    discountType === "percentage"
+      ? (totalBeforeDiscount * (discount || 0)) / 100
+      : discount || 0;
 
   // Calculate final amount
-  const finalAmount = (subtotal + taxAmount + (penalty || 0) - discountAmount).toFixed(2);
+  const finalAmount = (totalBeforeDiscount - discountAmount).toFixed(2);
+
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -159,7 +165,7 @@ const RecentInvoiceTemplate = ({ data }) => {
             <td className="p-2 border border-gray-300" colSpan="4">
               Tax
             </td>
-            <td className="p-2 border border-gray-300 text-right">{taxAmount.toFixed(2)} %</td>
+            <td className="p-2 border border-gray-300 text-right">{tax.toFixed(2)} %</td>
           </tr>
           {/* Penalty Row */}
           <tr>
@@ -174,7 +180,7 @@ const RecentInvoiceTemplate = ({ data }) => {
               Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {discountAmount.toFixed(2)} {discountType === "percentage" ? "%" : "QAR"}
+              {discount.toFixed(2)} {discountType === "percentage" ? "%" : "QAR"}
             </td>
           </tr>
           {/* Final Total Row */}
