@@ -2,6 +2,11 @@ import React from "react";
 import { FieldArray } from "formik";
 import TextInput from "./TextInput";
 
+/**
+ * ReturnItems
+ * A simple FieldArray example for listing items with category, quantity, and totalAmount.
+ * You can mark fields as required by passing `required={true}` to TextInput if desired.
+ */
 const ReturnItems = ({ values, setFieldValue }) => (
   <div className="mb-6 p-6 rounded-md" style={{ backgroundColor: "#ECECEC" }}>
     <FieldArray
@@ -25,8 +30,9 @@ const ReturnItems = ({ values, setFieldValue }) => (
               <div className="col-span-4">
                 <TextInput
                   name={`items.${index}.category`}
-                  label=""
+                  label="Category"
                   placeholder="Enter category"
+                  required={true} // If your schema says it's required
                 />
               </div>
 
@@ -34,8 +40,10 @@ const ReturnItems = ({ values, setFieldValue }) => (
               <div className="col-span-3">
                 <TextInput
                   name={`items.${index}.quantity`}
+                  label="Quantity"
                   type="number"
                   placeholder="Enter quantity"
+                  required={true}
                 />
               </div>
 
@@ -43,9 +51,10 @@ const ReturnItems = ({ values, setFieldValue }) => (
               <div className="col-span-4">
                 <TextInput
                   name={`items.${index}.totalAmount`}
-                  label=""
+                  label="Total Amount"
                   type="number"
                   placeholder="Enter total amount"
+                  required={true}
                 />
               </div>
 
