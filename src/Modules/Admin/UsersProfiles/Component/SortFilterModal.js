@@ -1,15 +1,30 @@
+// SortFilterModal.js
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import PropTypes from "prop-types";
+import {
+  Modal,
+  Button,
+  Radio,
+  Checkbox,
+  Tooltip,
+  message,
+  Row,
+  Col,
+} from "antd";
+import { motion, AnimatePresence } from "framer-motion";
 import { FiRefreshCw } from "react-icons/fi";
 
+/**
+ * SortFilterModal component utilizing Ant Design for better UI,
+ * framer-motion for micro animations, and improved error handling & UX.
+ */
 const SortFilterModal = ({
   isOpen,
   onClose,
   onApply,
   sortOptions,
   filterOptions,
-  department, // Optional: To display department-specific information
+  department,
   initialSort,
   initialFilters,
 }) => {
@@ -19,20 +34,24 @@ const SortFilterModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedSort(initialSort);
-      setSelectedFilters(initialFilters);
+      setSelectedSort(initialSort || null);
+      setSelectedFilters(initialFilters || []);
     }
   }, [isOpen, initialSort, initialFilters]);
 
-  const handleFilterChange = (filterName) => {
+  const handleFilterChange = (value) => {
     setSelectedFilters((prev) =>
-      prev.includes(filterName)
-        ? prev.filter((name) => name !== filterName)
-        : [...prev, filterName]
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
     );
   };
 
   const handleApply = () => {
+    // Basic validation or error handling
+    if (!selectedSort && !selectedFilters.length) {
+      message.info("No sort or filter selected. Applying without changes.");
+    }
     onApply({
       sortOption: selectedSort,
       filterOptions: selectedFilters,
@@ -51,122 +70,122 @@ const SortFilterModal = ({
         filterOptions: [],
       });
       onClose();
-    }, 300); // Simulate a short delay for effect
+    }, 300);
   };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 z-50 flex items-center justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          style={{ background: "rgba(0,0,0,0.5)" }}
         >
           <motion.div
-            className="bg-white rounded-lg shadow-lg w-80 p-6 max-h-[80vh] overflow-y-auto relative"
-            initial={{ scale: 0.8, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
+            exit={{ scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Refresh Button */}
-            <button
-              onClick={handleRefresh}
-              className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-              aria-label="Reset filters"
+            <Modal
+              visible={isOpen}
+              onCancel={onClose}
+              footer={null}
+              centered
+              width={800} // Increased width for a larger modal
+              destroyOnClose
+              bodyStyle={{ padding: "24px 24px" }}
+              title={
+                department
+                  ? `Sort & Filter ${
+                      department.charAt(0).toUpperCase() + department.slice(1)
+                    }`
+                  : "Sort & Filter"
+              }
             >
-              <FiRefreshCw
-                size={24}
-                className={isRefreshing ? "animate-spin" : ""}
-              />
-            </button>
+              {/* Refresh Button with Tooltip */}
+              <div style={{ position: "absolute", top: 16, right: 48 }}>
+                <Tooltip title="Reset filters and sorting">
+                  <Button
+                    type="text"
+                    icon={
+                      <FiRefreshCw
+                        className={isRefreshing ? "animate-spin" : ""}
+                      />
+                    }
+                    onClick={handleRefresh}
+                  />
+                </Tooltip>
+              </div>
 
-            {/* Modal Title */}
-            {department && (
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                {`Sort & Filter ${
-                  department.charAt(0).toUpperCase() + department.slice(1)
-                }`}
-              </h3>
-            )}
-            {!department && (
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                Sort & Filter
-              </h3>
-            )}
-
-            {/* Sort & Filter Sections */}
-            <div className="space-y-6">
-              {/* Sort Section */}
-              {sortOptions && sortOptions.length > 0 && (
-                <div>
-                  <p className="font-medium text-gray-700">Sort By</p>
-                  <div className="ml-4 mt-2 space-y-2">
-                    {sortOptions.map((option) => (
-                      <label
-                        key={option.value}
-                        className="inline-flex items-center ms-2"
-                      >
-                        <input
-                          type="radio"
-                          name="sort"
-                          value={option.value}
-                          checked={selectedSort === option.value}
-                          onChange={() => setSelectedSort(option.value)}
-                          className="form-radio h-4 w-4 text-purple-600"
-                        />
-                        <span className="ml-1 text-gray-700">
+              {/* Sort & Filter Sections arranged side by side */}
+              <Row gutter={[32, 16]}>
+                {/* Sort Section */}
+                {sortOptions && sortOptions.length > 0 && (
+                  <Col xs={24} md={12}>
+                    <h4 style={{ marginBottom: 8 }}>Sort By</h4>
+                    <Radio.Group
+                      onChange={(e) => setSelectedSort(e.target.value)}
+                      value={selectedSort}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                      }}
+                    >
+                      {sortOptions.map((option) => (
+                        <Radio key={option.value} value={option.value}>
                           {option.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
+                        </Radio>
+                      ))}
+                    </Radio.Group>
+                  </Col>
+                )}
 
-              {/* Filter Section */}
-              {filterOptions && filterOptions.length > 0 && (
-                <div>
-                  <p className="font-medium text-gray-700">Filter By</p>
-                  <div className="ml-4 mt-2 space-y-2 max-h-40 overflow-y-auto">
-                    {filterOptions.map((filter) => (
-                      <label
-                        key={filter.value}
-                        className="inline-flex items-center"
-                      >
-                        <input
-                          type="checkbox"
-                          value={filter.value}
+                {/* Filter Section */}
+                {filterOptions && filterOptions.length > 0 && (
+                  <Col xs={24} md={12}>
+                    <h4 style={{ marginBottom: 8 }}>Filter By</h4>
+                    <div
+                      style={{
+                        maxHeight: 200,
+                        overflowY: "auto",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 8,
+                      }}
+                    >
+                      {filterOptions.map((filter) => (
+                        <Checkbox
+                          key={filter.value}
                           checked={selectedFilters.includes(filter.value)}
                           onChange={() => handleFilterChange(filter.value)}
-                          className="form-checkbox h-4 w-4 text-purple-600"
-                        />
-                        <span className="ml-2 text-gray-700">
+                        >
                           {filter.label}
-                        </span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+                        </Checkbox>
+                      ))}
+                    </div>
+                  </Col>
+                )}
+              </Row>
 
-            {/* Modal Actions */}
-            <div className="mt-6 flex justify-end gap-4">
-              <button
-                onClick={onClose}
-                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition"
+              {/* Modal Actions */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  gap: 8,
+                  marginTop: 24,
+                }}
               >
-                Cancel
-              </button>
-              <button
-                onClick={handleApply}
-                className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition"
-              >
-                Apply
-              </button>
-            </div>
+                <Button onClick={onClose}>Cancel</Button>
+                <Button type="primary" onClick={handleApply}>
+                  Apply
+                </Button>
+              </div>
+            </Modal>
           </motion.div>
         </motion.div>
       )}
@@ -174,7 +193,6 @@ const SortFilterModal = ({
   );
 };
 
-// PropTypes
 SortFilterModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
@@ -191,9 +209,9 @@ SortFilterModal.propTypes = {
       value: PropTypes.string.isRequired,
     })
   ),
-  department: PropTypes.string, // Optional
+  department: PropTypes.string,
   initialSort: PropTypes.string,
-  initialFilters: PropTypes.array,
+  initialFilters: PropTypes.arrayOf(PropTypes.string),
 };
 
 SortFilterModal.defaultProps = {

@@ -285,11 +285,7 @@ const AddExpenses = () => {
         navigate("/finance/expenses/total-expense-list");
       }
     } catch (err) {
-      toast.error(
-        err.message || "An unexpected error occurred while saving the data."
-      );
-      console.error("Error while saving data:", err);
-      setShowErrorLocal(true);
+      // setShowErrorLocal(true);
     } finally {
       actions.setSubmitting(false);
     }

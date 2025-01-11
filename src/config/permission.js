@@ -22,8 +22,8 @@ export const PERMISSIONS = {
 
   // Library permissions
   MANAGE_LIBRARY: "manageLibrary",
-  VIEW_LIBRARY: "viewLibrary",
-  ISSUE_BOOK: "issueBook",
+  VIEW_LIBRARY: "Get All Books",
+  ISSUE_BOOK: "Get All Issued Books",
   // Finance permissions
   MANAGE_FINANCE: "manageFinance",
   VIEW_FINANCE: "viewFinance",
