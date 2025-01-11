@@ -15,8 +15,6 @@ import useCloudinaryUpload from "../../../../../../Hooks/CommonHooks/useCloudina
 import toast from "react-hot-toast";
 
 const FileInput = ({ label, name, onChange, value, required = false }) => {
-  console.log(value, "FileInput Value");
-
   // Corrected the readOnly selector to reference expenses instead of earnings
   const readOnly = useSelector((state) => state.admin.expenses.readOnly);
 
@@ -175,7 +173,9 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
       )}
 
       <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
-        {label} {required && <span className="text-red-500">*</span>}
+        {label}
+
+        {/* {required && <span className="text-red-500">*</span>} */}
       </label>
 
       <div

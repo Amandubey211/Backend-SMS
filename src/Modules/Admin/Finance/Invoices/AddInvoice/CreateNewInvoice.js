@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Formik, Form, FieldArray, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
@@ -13,6 +14,7 @@ const CreateNewInvoice = () => {
   const [loading, setLoading] = useState(false);
   const { invoiceData } = useSelector((store) => store.admin.invoices); // Redux data
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   let initialValues = invoiceData || {
     dueDate: "",
@@ -38,11 +40,11 @@ const CreateNewInvoice = () => {
     dueDate: Yup.string().required("Due Date is required"),
     "receiver.name": Yup.string().required("Receiver name is required"),
     "receiver.address": Yup.string().required("Receiver address is required"),
-  
+
     // Optional fields
     "receiver.contact": Yup.string(), // No validation as it's optional
     "receiver.email": Yup.string().email("Invalid email format"), // Validates only if provided
-  
+
     // Line items
     lineItems: Yup.array().of(
       Yup.object().shape({
@@ -55,22 +57,22 @@ const CreateNewInvoice = () => {
           .required("Amount is required"),
       })
     ),
-  
+
     // Discount-related fields
     discountType: Yup.string()
       .oneOf(["percentage", "amount"], "Invalid discount type")
       .nullable(), // Optional field
-  
+
     discount: Yup.number().min(0, "Discount must be non-negative").nullable(), // Optional
-  
+
     // Penalty and tax
     penalty: Yup.number().min(0, "Penalty must be non-negative").nullable(), // Optional
     tax: Yup.number().min(0, "Tax must be non-negative").nullable(), // Optional
-  
+
     // Amount fields
     totalAmount: Yup.number().min(0, "Total amount must be positive").required("Total amount is required"),
     finalAmount: Yup.number().min(0, "Final amount must be positive").nullable(), // Optional
-  
+
     // Payment fields
     paymentType: Yup.string()
       .oneOf(["cash", "card", "online", "cheque", "other"], "Invalid payment type")
@@ -79,14 +81,23 @@ const CreateNewInvoice = () => {
       .oneOf(["paid", "unpaid", "partial", "advance"], "Invalid payment status")
       .required("Payment status is required"),
   });
-  
+
   const handleSubmit = async (values) => {
     setLoading(true);
-    dispatch(addInvoice(values)).then(() => setLoading(false))
+    try {
+      await dispatch(addInvoice(values)).unwrap(); // Ensure proper handling of async actions
+      setLoading(false);
+      navigate("/finance/invoices/dashboard/recent-invoices"); // Redirect after success
+    } catch (error) {
+      setLoading(false);
+      // Handle error if needed
+      console.error("Failed to add invoice:", error);
+    }
   };
 
-  const isReadonly = invoiceData?.mode == 'view' ?true:false ;
-  
+
+  const isReadonly = invoiceData?.mode == 'view' ? true : false;
+
 
   return (
     <Layout title="Finance | Invoice">
@@ -112,6 +123,7 @@ const CreateNewInvoice = () => {
                         Reset
                       </button>
                       <button
+                        type="submit"
                         onClick={() => handleSubmit(values)}
                         disabled={loading}
                         className="px-4 py-2 mx-2 rounded-md text-white"
@@ -195,7 +207,7 @@ const CreateNewInvoice = () => {
                                   { label: "Penalties", value: "Penalties" },
                                   { label: "Other", value: "Other" }
                                 ]
-                              }
+                                }
                                 disabled={isReadonly}
                                 required
                               />
@@ -235,7 +247,7 @@ const CreateNewInvoice = () => {
                             )}
                           </div>
                         ))}
-                        
+
                         {!isReadonly && (
                           <div className="flex justify-center items-center flex-col mt-4">
                             <button
@@ -287,7 +299,7 @@ const CreateNewInvoice = () => {
                     placeholder="Enter Tax"
                     disabled={isReadonly}
                   />
-                 
+
                   <SelectInput
                     name="paymentType"
                     label="Payment Type"
@@ -316,7 +328,7 @@ const CreateNewInvoice = () => {
                   />
 
                 </div>
-                <TotalInputs/>
+                <TotalInputs />
               </Form>
             )}
           </Formik>

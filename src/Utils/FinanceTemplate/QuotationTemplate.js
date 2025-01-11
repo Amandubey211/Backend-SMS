@@ -31,20 +31,28 @@ const QuotationTemplate = ({ data }) => {
     ? new Date(dueDate).toLocaleDateString()
     : "N/A";
 
+
   // Calculate subtotal from line items
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
 
   // Calculate tax amount
   const taxAmount = (subtotal * (tax || 0)) / 100;
 
+  // Calculate total before discount
+  const totalBeforeDiscount = subtotal + taxAmount;
+
   // Calculate discount amount based on discount type
   const discountAmount =
     discountType === "percentage"
-      ? (subtotal * (discount || 0)) / 100
+      ? (totalBeforeDiscount * (discount || 0)) / 100
       : discount || 0;
 
+  // Calculate displayed discount percentage
+  const displayedDiscountPercentage = ((discountAmount / totalBeforeDiscount) * 100).toFixed(2);
+
   // Calculate final amount
-  const finalAmount = (subtotal + taxAmount - discountAmount).toFixed(2);
+  const finalAmount = final_amount
+
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -183,7 +191,7 @@ const QuotationTemplate = ({ data }) => {
               Tax
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {taxAmount.toFixed(2)} %
+              {tax.toFixed(2)} %
             </td>
           </tr>
           {/* Discount Row */}
@@ -192,7 +200,7 @@ const QuotationTemplate = ({ data }) => {
               Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {discountType === "percentage" ? `${discountAmount.toFixed(2)}%` : `${discountAmount.toFixed(2)} QAR`}
+              {discountType === "percentage" ? `${displayedDiscountPercentage}%` : `${discountAmount.toFixed(2)} QAR`}
             </td>
 
           </tr>

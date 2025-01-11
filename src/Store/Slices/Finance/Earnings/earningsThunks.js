@@ -120,6 +120,22 @@ export const fetchAllIncomes = createAsyncThunk(
     }
   }
 );
+export const fetchIncomesGraph = createAsyncThunk(
+  "earnings/fetchIncomesGraph",
+  async (params, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/finance/dashboard/revenue/graph?academicYear=${say}`,
+        params
+      );
+      return response.data
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 export const fetchEarningGraph = createAsyncThunk(
   "earnings/fetchEarningGraph",
   async ({ groupBy = "month" }, { rejectWithValue, dispatch }) => {

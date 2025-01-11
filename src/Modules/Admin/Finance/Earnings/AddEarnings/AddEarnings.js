@@ -12,7 +12,6 @@ import { categories, subCategories } from "./constants/categories";
 import {
   setReadOnly,
   clearSelectedIncome,
-  setSelectedIncome, // Ensure this action exists
 } from "../../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import {
   addEarnings,
@@ -393,9 +392,9 @@ const AddEarnings = () => {
         navigate("/finance/earning/total-revenue-list");
       }
     } catch (err) {
-      toast.error(err || "An unexpected error occurred while saving the data.");
-      console.error("Error while saving data:", err);
-      setShowErrorLocal(true); // Show the error message
+      // toast.error(err || "An unexpected error occurred while saving the data.");
+      // console.error("Error while saving data:", err);
+      // setShowErrorLocal(true); // Show the error message
     } finally {
       actions.setSubmitting(false);
     }

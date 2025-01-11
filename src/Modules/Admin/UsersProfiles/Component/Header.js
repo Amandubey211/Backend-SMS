@@ -8,6 +8,7 @@ import SortFilterModal from "./SortFilterModal"; // Ensure the path is correct b
 import { useSelector } from "react-redux";
 import { CiFilter } from "react-icons/ci";
 import { MdOutlineSort } from "react-icons/md";
+import { Button } from "antd";
 const Header = ({
   title,
   count,
@@ -42,18 +43,7 @@ const Header = ({
               </span>
             </span>
           </h2>
-          {isAdmin && (
-            <div className="flex items-center justify-end">
-              <button
-                onClick={() => setSortModalOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 text-gray-800 bg-white border-2 border-purple-500 rounded-full font-medium hover:shadow-lg hover:bg-purple-50 transition duration-200"
-                aria-label="Open Sort and Filter Modal"
-              >
-                <span>Sort</span>
-                <MdOutlineSort className="text-purple-500 text-xl" />
-              </button>
-            </div>
-          )}
+
           {/* Sort & Filter Modal */}
           {isAdmin && (
             <SortFilterModal
@@ -72,6 +62,31 @@ const Header = ({
         {/* Right Section: Action Buttons */}
         {isAdmin && (
           <div className="flex items-center gap-4">
+            {isAdmin && (
+              <div className="flex items-center justify-end">
+                <Button
+                  size="large"
+                  type="default"
+                  onClick={() => setSortModalOpen(true)}
+                  aria-label="Open Sort and Filter Modal"
+                  style={{
+                    background: "linear-gradient(to right, #ec4899, #9333ea)", // Pink to purple gradient
+                    color: "#ffffff",
+                    border: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                  className="px-4 py-2 hover:opacity-90 transition duration-200"
+                >
+                  <span>Sort</span>
+                  <MdOutlineSort
+                    style={{ fontSize: "1.25rem", color: "#ffffff" }}
+                  />
+                </Button>
+              </div>
+            )}
+
             <button
               onClick={navigateToManageRoles}
               className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md inline-flex items-center gap-2 hover:opacity-90 transition duration-200"

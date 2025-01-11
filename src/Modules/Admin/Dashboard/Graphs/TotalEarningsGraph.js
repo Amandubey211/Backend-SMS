@@ -5,6 +5,7 @@ import { FiCalendar } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
+import { fetchIncomesGraph } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
 ChartJS.register(...registerables);
 
@@ -14,193 +15,41 @@ const TotalEarningsGraph = () => {
   const [selectedOption, setSelectedOption] = useState("currentMonth");
 
   const { t } = useTranslation("dashboard");
-
   const dispatch = useDispatch();
-  const {
-    loadingEarnings: loading,
-    errorEarnings: error,
-    earningsData,
-  } = useSelector((state) => state?.admin?.adminDashboard);
-
-  // Function to dispatch the fetchEarningsData action
-  const fetchDashboardData = (option) => {
-    const date = new Date();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-    let includeUnpaidExpenses = true;
-
-    if (option === "lastMonth") {
-      month = month === 1 ? 12 : month - 1;
-      year = month === 12 ? year - 1 : year;
-    } else if (option === "totalExpensesWithoutPay") {
-      includeUnpaidExpenses = false;
-    }
-
-    // Uncomment and adjust the action below to actually fetch data:
-    // dispatch(fetchEarningsData({ month, year, includeUnpaidExpenses }));
-  };
-
-  // Fetch data whenever selectedOption changes
-  useEffect(() => {
-    fetchDashboardData(selectedOption);
-  }, [selectedOption]);
-
-  // Handle tooltip outside click
-  const handleOutsideClick = (event) => {
-    if (chartRef.current && !chartRef.current.canvas.contains(event.target)) {
-      setTooltipData(null);
-    }
-  };
+  const { incomeGraphData, loading, error } = useSelector(
+    (state) => state.admin.earnings
+  );
 
   useEffect(() => {
-    document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, []);
+    dispatch(fetchIncomesGraph());
+  }, [dispatch]);
 
-  if (loading) {
-    return <Spinner />;
-  }
+  // Group data by time and calculate totals
+  const groupedData = incomeGraphData.reduce(
+    (acc, { time, totalRevenue, category }) => {
+      acc.labels.add(time);
+      acc.datasets[category] = acc.datasets[category] || [];
+      acc.datasets[category].push(totalRevenue);
+      return acc;
+    },
+    { labels: new Set(), datasets: {} }
+  );
 
-  if (error) {
-    return "No Data";
-  }
-
-  // No data case: show centered message
-  if (
-    !earningsData ||
-    (earningsData?.earningsData?.length === 0 &&
-      earningsData?.expensesData?.length === 0)
-  ) {
-    return (
-      <div className="p-4 bg-white flex flex-col min-h-[400px]">
-        {/* Top Bar */}
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h2 className="text-xl font-semibold">Earnings</h2>
-          </div>
-          <div>
-            <select
-              className="border rounded p-2"
-              value={selectedOption}
-              onChange={(e) => setSelectedOption(e.target.value)}
-            >
-              <option value="currentMonth">This month</option>
-              <option value="lastMonth">Last month</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Centered "No Data" message */}
-        <div className="flex flex-col items-center justify-center text-center flex-1">
-          <FiCalendar size={40} className="mb-4 text-gray-400" />
-          <p className="text-gray-500">{t("No Earnings/Expense Data Found")}</p>
-        </div>
-
-        {/* Stats at bottom */}
-        <div className="mt-auto mb-4">
-          <div className="flex justify-around">
-            <div className="flex flex-col items-start">
-              <div
-                className="w-16 h-1 rounded-full mb-1"
-                style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
-              ></div>
-              <div className="flex items-center">
-                <div className="text-gray-700">Total Collections</div>
-                <div className="ml-2 font-bold mr-1">
-                  {earningsData
-                    ? earningsData?.totalEarnings?.toLocaleString()
-                    : 0}
-                </div>
-                <div className="text-gray-700">QR</div>
-              </div>
-            </div>
-            <div className="flex flex-col items-start">
-              <div
-                className="w-16 h-1 rounded-full mb-1"
-                style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
-              ></div>
-              <div className="flex items-center">
-                <div className="text-gray-700">{t("Total Expenses")}</div>
-                <div className="ml-2 font-bold mr-1">
-                  {earningsData
-                    ? earningsData.totalExpenses?.toLocaleString()
-                    : 0}
-                </div>
-                <div className="text-gray-700">QR</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Data case: show chart and stats
-  const {
-    earningsData: earnings,
-    expensesData: expenses,
-    totalEarnings,
-    totalExpenses,
-  } = earningsData;
-
-  // Function to get the ordinal suffix of a number
-  const getOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return "th";
-    switch (day % 10) {
-      case 1:
-        return "st";
-      case 2:
-        return "nd";
-      case 3:
-        return "rd";
-      default:
-        return "th";
-    }
-  };
-
-  const data = {
-    labels: earnings?.map((item) => `${item.day}`),
-    datasets: [
-      {
-        label: "Total Collections",
-        data: earnings?.map((item) => item.amount),
-        borderColor: "#7C3AED",
-        borderWidth: 3,
-        fill: true,
-        backgroundColor: (context) => {
-          const gradient = context.chart.ctx.createLinearGradient(
-            0,
-            0,
-            0,
-            context.chart.height
-          );
-          gradient.addColorStop(0, "rgba(124, 58, 237, 0.1)");
-          gradient.addColorStop(1, "rgba(124, 58, 237, 0)");
-          return gradient;
-        },
-        tension: 0.4,
-        pointBackgroundColor: "#7C3AED",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-      {
-        label: "Total Expenses",
-        data: expenses?.map((item) => item.amount),
-        borderColor: "#EA580C",
-        borderWidth: 3,
-        fill: false,
-        tension: 0.4,
-        pointBackgroundColor: "#EA580C",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 6,
-      },
-    ],
+  const chartData = {
+    labels: [...groupedData.labels],
+    datasets: Object.entries(groupedData.datasets).map(([category, revenues], idx) => ({
+      label: category,
+      data: revenues,
+      borderColor: idx === 0 ? "#7C3AED" : "#EA580C",
+      borderWidth: 3,
+      fill: false,
+      tension: 0.4,
+      pointBackgroundColor: idx === 0 ? "#7C3AED" : "#EA580C",
+      pointBorderColor: "#fff",
+      pointBorderWidth: 2,
+      pointRadius: 4,
+      pointHoverRadius: 6,
+    })),
   };
 
   const options = {
@@ -214,31 +63,19 @@ const TotalEarningsGraph = () => {
             return;
           }
           const value = tooltipModel?.dataPoints[0].raw?.toLocaleString();
-          const day = tooltipModel?.dataPoints[0]?.dataIndex + 1;
-          const date = new Date();
-          date.setDate(day);
-          const formattedDate = `${day}${getOrdinalSuffix(
-            day
-          )} ${date?.toLocaleString("default", { month: "long" })}`;
-          setTooltipData({
-            value,
-            formattedDate,
-            left: tooltipModel.caretX,
-            top: tooltipModel.caretY,
-          });
+          const label = tooltipModel?.dataPoints[0]?.label;
+          setTooltipData({ value, label, left: tooltipModel.caretX, top: tooltipModel.caretY });
         },
       },
       legend: {
-        display: false,
+        display: true,
       },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          callback: function (value) {
-            return value?.toLocaleString() + " QR";
-          },
+          callback: (value) => value?.toLocaleString() + " QR",
         },
         grid: {
           display: false,
@@ -255,14 +92,12 @@ const TotalEarningsGraph = () => {
     },
   };
 
-  return (
-    <div className="p-4 bg-white flex flex-col min-h-[400px]">
-      {/* Top Bar */}
-      <div className="flex justify-between items-center mb-4">
-        <div>
+  if (loading) return <Spinner />;
+  if (error || incomeGraphData.length === 0) {
+    return (
+      <div className="p-4 bg-white flex flex-col min-h-[400px]">
+        <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">{t("Earnings")}</h2>
-        </div>
-        <div>
           <select
             className="border rounded p-2"
             value={selectedOption}
@@ -272,11 +107,32 @@ const TotalEarningsGraph = () => {
             <option value="lastMonth">{t("Last month")}</option>
           </select>
         </div>
+        <div className="flex flex-col items-center justify-center text-center flex-1">
+          <FiCalendar size={40} className="mb-4 text-gray-400" />
+          <p className="text-gray-500">{t("No Earnings/Expense Data Found")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  const totalEarnings = incomeGraphData.reduce((sum, item) => sum + item.totalRevenue, 0);
+
+  return (
+    <div className="p-4 bg-white flex flex-col min-h-[400px]">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">{t("Earnings")}</h2>
+        <select
+          className="border rounded p-2"
+          value={selectedOption}
+          onChange={(e) => setSelectedOption(e.target.value)}
+        >
+          <option value="currentMonth">{t("This month")}</option>
+          <option value="lastMonth">{t("Last month")}</option>
+        </select>
       </div>
 
-      {/* Chart Container */}
       <div className="relative flex-1">
-        <Line ref={chartRef} data={data} options={options} />
+        <Line ref={chartRef} data={chartData} options={options} />
         {tooltipData && (
           <div
             style={{
@@ -292,36 +148,16 @@ const TotalEarningsGraph = () => {
             }}
           >
             <div>{tooltipData.value}</div>
-            <div>{tooltipData.formattedDate}</div>
+            <div>{tooltipData.label}</div>
           </div>
         )}
       </div>
 
-      {/* Bottom Stats with larger margin-top */}
-      <div className="flex justify-around border border-red-300 mt-16 pt-4">
-        <div className="flex flex-col items-start">
-          <div
-            className="w-16 h-1 rounded-full mb-1"
-            style={{ backgroundColor: "#7C3AED", alignSelf: "flex-start" }}
-          ></div>
+      <div className="flex items-center justify-around flex-row mt-16 pt-4 w-full">
+        <div className="flex flex-row items-start justify-center">
           <div className="flex items-center">
             <div className="text-gray-700">{t("Total Collections")}</div>
-            <div className="ml-2 font-bold mr-1">
-              {totalEarnings?.toLocaleString()}
-            </div>
-            <div className="text-gray-700">QR</div>
-          </div>
-        </div>
-        <div className="flex flex-col items-start">
-          <div
-            className="w-16 h-1 rounded-full mb-1"
-            style={{ backgroundColor: "#EA580C", alignSelf: "flex-start" }}
-          ></div>
-          <div className="flex items-center">
-            <div className="text-gray-700">{t("Total Expenses")}</div>
-            <div className="ml-2 font-bold mr-1">
-              {totalExpenses?.toLocaleString()}
-            </div>
+            <div className="ml-2 font-bold mr-1">{totalEarnings?.toLocaleString()}</div>
             <div className="text-gray-700">QR</div>
           </div>
         </div>

@@ -32,16 +32,17 @@ const ReceiptTemplate = ({ data }) => {
   // Calculate tax as a percentage of subtotal
   const taxAmount = (subtotal * (tax || 0)) / 100;
 
-  // Calculate discount based on type
+  // Calculate total before applying penalty and discount
+  const totalBeforeDiscount = subtotal + taxAmount;
+
+  // Correctly apply the discount (only to subtotal + tax)
   const discountAmount =
     discountType === "percentage"
-      ? (subtotal * (discount || 0)) / 100
+      ? (totalBeforeDiscount * (discount || 0)) / 100
       : discount || 0;
 
-  // Calculate final total after adjustments
-  const finalAmount = (
-    subtotal + taxAmount + (penalty || 0) - discountAmount
-  ).toFixed(2);
+  // Add penalty after discount
+  const finalAmount = (totalBeforeDiscount - discountAmount + (penalty || 0)).toFixed(2);
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
@@ -170,10 +171,10 @@ const ReceiptTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax 
+              Tax
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {taxAmount.toFixed(2)} %
+              {tax.toFixed(2)} %
             </td>
           </tr>
           {/* Penalty Row */}
@@ -225,31 +226,6 @@ const ReceiptTemplate = ({ data }) => {
             {remark && <li>{remark}</li>}
           </ul>
         </div>
-
-
-        {/* Summary Table */}
-        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
-          <tbody>
-            <tr className="bg-white">
-              <td className="p-2 border border-gray-300">Total Invoice Amount</td>
-              <td className="p-2 border border-gray-300 text-right">
-                {subtotal.toFixed(2)} QAR
-              </td>
-            </tr>
-            <tr className="bg-gray-50">
-              <td className="p-2 border border-gray-300">Return Amount</td>
-              <td className="p-2 border border-gray-300 text-right">
-                {finalAmount} QAR
-              </td>
-            </tr>
-            <tr className="font-bold text-gray-900 bg-gray-50">
-              <td className="p-2 border border-gray-300">Net Paid Amount</td>
-              <td className="p-2 border border-gray-300 text-right text-pink-600">
-                {totalPaidAmount.toFixed(2)} QAR
-              </td>
-            </tr>
-          </tbody>
-        </table> */}
       </div>
     </div>
   );

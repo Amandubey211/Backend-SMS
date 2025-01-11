@@ -7,10 +7,12 @@ import {
   updateEarnings,
   fetchEarningGraph,
   fetchCardDataRevenue,
+  fetchIncomesGraph,
 } from "./earningsThunks";
 
 const initialState = {
   incomes: [],
+  incomeGraphData: [],
   totalRecords: 0,
   totalPages: 0,
   currentPage: 1,
@@ -123,6 +125,20 @@ const earningsSlice = createSlice({
         state.error = action.payload || "Failed to add earnings.";
       })
 
+      // Add Earnings
+      .addCase(fetchIncomesGraph.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchIncomesGraph.fulfilled, (state, action) => {
+        state.loading = false;
+        state.incomeGraphData = action.payload
+      })
+      .addCase(fetchIncomesGraph.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed";
+      })
+
       // Update Earnings
       .addCase(updateEarnings.pending, (state) => {
         state.loading = true;
@@ -130,26 +146,6 @@ const earningsSlice = createSlice({
       })
       .addCase(updateEarnings.fulfilled, (state, action) => {
         state.loading = false;
-        // Optionally, update the specific income in the incomes array
-        // const index = state.incomes.findIndex(
-        //   (income) => income._id === action.payload._id
-        // );
-        // if (index !== -1) {
-        //   state.incomes[index] = action.payload;
-        //   // Recalculate statistics if necessary
-        //   state.totalRevenue = state.incomes.reduce(
-        //     (acc, income) => acc + (income.final_amount || 0),
-        //     0
-        //   );
-        //   state.totalPaidAmount = state.incomes.reduce(
-        //     (acc, income) => acc + (income.paid_amount || 0),
-        //     0
-        //   );
-        //   state.unpaidRevenue = state.incomes.reduce(
-        //     (acc, income) => acc + (income.remaining_amount || 0),
-        //     0
-        //   );
-        // }
       })
       .addCase(updateEarnings.rejected, (state, action) => {
         state.loading = false;

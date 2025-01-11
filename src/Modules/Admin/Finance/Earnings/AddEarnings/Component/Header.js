@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import DropdownCard from "./DropdownCard";
 import { categories, subCategories } from "../constants/categories";
 import { useSelector } from "react-redux";
-import { Spin } from "antd"; // <-- Added import for Spin
+import { Spin, Modal, Input, Button as AntButton } from "antd"; // <-- Added Modal, Input, and re-aliasing Button
+import { ArrowsAltOutlined } from "@ant-design/icons"; // Maximize icon
 
 const Header = ({
   onReset,
@@ -19,6 +20,10 @@ const Header = ({
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
   const [isSubCategoryOpen, setIsSubCategoryOpen] = useState(false);
   const { readOnly, loading } = useSelector((state) => state.admin.earnings);
+
+  // For the expanded description modal
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalDesc, setModalDesc] = useState(description);
 
   const filteredCategories = categories.filter(
     (cat) => cat !== "Student-Based Revenue"
@@ -49,6 +54,25 @@ const Header = ({
     setIsSubCategoryOpen(false);
   };
 
+  // Open the modal to expand description
+  const handleMaximize = () => {
+    setModalDesc(description); // Load the current description into modal state
+    setIsModalVisible(true);
+  };
+
+  // Handle modal "Ok": save changes if under 100 words
+  const handleModalOk = () => {
+    const words = modalDesc.split(/\s+/).filter((word) => word.length > 0);
+    if (words.length <= 100) {
+      setDescription(modalDesc);
+    }
+    setIsModalVisible(false);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
   return (
     <div className="bg-white py-3 px-5">
       {/* Header Title and Buttons */}
@@ -69,6 +93,7 @@ const Header = ({
                 Reset
               </button>
             )}
+
             {/* Submit Button (Save or Update) */}
             <button
               type="submit" // Formik will handle the submit
@@ -113,12 +138,23 @@ const Header = ({
         />
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
-          <label
-            htmlFor="description"
-            className="text-sm text-gray-900 block mb-2"
-          >
-            Add Description
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="description"
+              className="text-sm text-gray-900 block"
+            >
+              Add Description
+            </label>
+            {!readOnly && (
+              <AntButton
+                type="text"
+                size="small"
+                onClick={handleMaximize}
+                icon={<ArrowsAltOutlined />}
+                className="p-0 text-gray-500 hover:text-gray-800"
+              />
+            )}
+          </div>
           <textarea
             id="description"
             name="description"
@@ -145,6 +181,30 @@ const Header = ({
         </div>
       </div>
       <div className="border-b border-gray-300 mt-6"></div>
+
+      {/* Modal for expanded description */}
+      <Modal
+        title="Add Description"
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Save"
+        cancelText="Cancel"
+        destroyOnClose
+      >
+        <Input.TextArea
+          rows={6}
+          value={modalDesc}
+          onChange={(e) => setModalDesc(e.target.value)}
+          placeholder="Write a detailed description..."
+        />
+        <div className="text-right text-xs text-gray-500 italic mt-1">
+          {`Words left: ${
+            100 -
+            modalDesc.split(/\s+/).filter((word) => word.length > 0).length
+          }`}
+        </div>
+      </Modal>
     </div>
   );
 };

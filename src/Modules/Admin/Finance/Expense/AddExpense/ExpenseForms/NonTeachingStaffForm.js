@@ -10,22 +10,23 @@ const NonTeachingStaffForm = () => {
   // Recurring Expense Fields
   const recurringFields = [
     {
-      type: "checkbox",
+      type: "select",
       label: "Is Recurring?",
       name: "recurringExpense.isRecurring",
+      options: ["true", "false"],
     },
     {
       type: "select",
       label: "Frequency",
       name: "recurringExpense.frequency",
       options: ["monthly", "weekly", "yearly"],
-      disabled: !values.recurringExpense?.isRecurring,
+      // disabled: !values.recurringExpense?.isRecurring,
     },
     {
       type: "date",
       label: "Next Due Date",
       name: "recurringExpense.nextDueDate",
-      disabled: !values.recurringExpense?.isRecurring,
+      // disabled: !values.recurringExpense?.isRecurring,
     },
   ];
 

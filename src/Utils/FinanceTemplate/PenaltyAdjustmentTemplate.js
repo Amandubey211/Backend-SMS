@@ -27,19 +27,19 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
     academicYear,
   } = data;
 
-  // Extract receiver details
+  // Extract receiver details 
   const receiver = invoiceId?.receiver || {};
-
+  console.log("this is data", data);
   // Format the date
   const formattedDate = adjustedAt
     ? new Date(adjustedAt).toLocaleDateString()
     : "N/A";
 
   // Calculate subtotal from line items
-  const subtotal = items.reduce((acc, item) => acc + (item.amount || 0), 0);
+  const subtotal = items[0]?.amount || 0;
 
-  // Calculate tax amount
-  const taxAmount = (subtotal * (tax || 0)) / 100;
+  // Calculate tax multiplier for percentage-based tax
+  const taxMultiplier = 1 + (parseFloat(tax) || 0) / 100;
 
   // Calculate penalty amount based on penalty type
   const penaltyAmount =
@@ -53,11 +53,12 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
       ? (subtotal * (discount || 0)) / 100
       : discount || 0;
 
-  // Calculate final amount after all adjustments
-  const finalAmount = (subtotal + taxAmount + penaltyAmount - discountAmount).toFixed(2);
+  // Calculate final amount using your formula: subtotal * taxMultiplier + penalty - discount
+  const finalAmount = (subtotal * taxMultiplier + penaltyAmount - discountAmount).toFixed(2);
+
 
   // Calculate net paid amount
-  const netPaidAmount = (adjustmentTotal - (adjustmentAmount || 0)).toFixed(2);
+  // const netPaidAmount = (adjustmentTotal - (adjustmentAmount || 0)).toFixed(2);
 
   const schoolName = "Student Diwan School"; // Replace with dynamic school name if available
 
@@ -199,10 +200,10 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           {/* Tax Row */}
           <tr>
             <td className="p-2 border border-gray-300" colSpan="4">
-              Tax 
+              Tax
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {taxAmount.toFixed(2)} %
+              {tax.toFixed(2)} %
             </td>
           </tr>
           {/* Penalty Row */}

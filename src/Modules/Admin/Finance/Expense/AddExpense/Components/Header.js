@@ -1,7 +1,8 @@
 // src/Modules/Admin/Finance/Expense/AddExpense/Components/Header.jsx
 
 import React, { useState } from "react";
-import { Button } from "antd";
+import { Button, Spin, Modal, Input } from "antd"; // Added Modal & Input
+import { ArrowsAltOutlined } from "@ant-design/icons"; // Maximize icon
 import DropdownCard from "./DropdownCard";
 import { useSelector } from "react-redux";
 import { subCategories, categories } from "../../Config/categories";
@@ -27,6 +28,10 @@ const Header = ({
   const [isSubCategoryDropdownOpen, setIsSubCategoryDropdownOpen] =
     useState(false);
 
+  // Modal state for expanded description
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalDesc, setModalDesc] = useState(description);
+
   // Toggle functions
   const toggleCategoryDropdown = () => {
     setIsCategoryDropdownOpen((prev) => !prev);
@@ -39,6 +44,26 @@ const Header = ({
     setIsSubCategoryDropdownOpen((prev) => !prev);
   };
 
+  // Handle opening the modal
+  const handleMaximize = () => {
+    setModalDesc(description); // Initialize modal description with current state
+    setIsModalVisible(true);
+  };
+
+  // Handle closing and saving changes from the modal
+  const handleModalOk = () => {
+    // If word limit is enforced, do it here as well:
+    const words = modalDesc.split(/\s+/).filter((w) => w.length > 0);
+    if (words.length <= 100) {
+      setDescription(modalDesc);
+    }
+    setIsModalVisible(false);
+  };
+
+  const handleModalCancel = () => {
+    setIsModalVisible(false);
+  };
+
   return (
     <div className="bg-white py-3 px-5">
       {/* Header Title and Buttons */}
@@ -48,19 +73,25 @@ const Header = ({
         </h1>
         {!readOnly && (
           <div className="flex gap-4">
+            {/* Reset Button */}
             <Button
               type="default"
               onClick={onReset}
               className="border border-pink-500 text-black bg-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:bg-pink-50 hover:text-black transition"
-              disabled={readOnly}
+              disabled={loading} // Disable Reset when loading
             >
               Reset
             </Button>
+
+            {/* Save/Update Button */}
             <Button
               type="primary"
               htmlType="submit"
               className="bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+              disabled={loading} // Disable Save/Update when loading
             >
+              {/* Show spinner if loading */}
+              {loading && <Spin size="small" className="mr-2" />}
               {isUpdate ? "Update Expense" : "Save Expense"}
             </Button>
           </div>
@@ -109,12 +140,23 @@ const Header = ({
 
         {/* Description Box */}
         <div className="relative w-full bg-gray-100 border border-gray-300 rounded-lg p-4 h-28">
-          <label
-            htmlFor="description"
-            className="text-sm text-gray-900 block mb-2"
-          >
-            Add Description
-          </label>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="description"
+              className="text-sm text-gray-900 block"
+            >
+              Add Description
+            </label>
+            {!readOnly && (
+              <Button
+                type="text"
+                size="small"
+                onClick={handleMaximize}
+                icon={<ArrowsAltOutlined />}
+                className="p-0 text-gray-500 hover:text-gray-800"
+              />
+            )}
+          </div>
           <textarea
             id="description"
             name="description"
@@ -139,7 +181,32 @@ const Header = ({
           </div>
         </div>
       </div>
+
       <div className="border-b border-gray-300 mt-6"></div>
+
+      {/* Modal for expanded description */}
+      <Modal
+        title="Add Description"
+        visible={isModalVisible}
+        onOk={handleModalOk}
+        onCancel={handleModalCancel}
+        okText="Save"
+        cancelText="Cancel"
+        destroyOnClose
+      >
+        <Input.TextArea
+          rows={6}
+          value={modalDesc}
+          onChange={(e) => setModalDesc(e.target.value)}
+          placeholder="Write a detailed description..."
+        />
+        <div className="text-right text-xs text-gray-500 italic mt-1">
+          {`Words left: ${
+            100 -
+            modalDesc.split(/\s+/).filter((word) => word.length > 0).length
+          }`}
+        </div>
+      </Modal>
     </div>
   );
 };
