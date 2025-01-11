@@ -48,7 +48,7 @@ const StudentDetails = ({setStudentDetail} ) => {
           
         />
         <SelectDynamicInput
-          label="Section"
+          label="Section*"
           name="sectionId"
           options={sectionList || []}
           forWhom='section'

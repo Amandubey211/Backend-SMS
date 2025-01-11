@@ -141,7 +141,7 @@ export default function EditStudentFeesForm({ data }) {
                     };
                     console.log("Submitted Data:", updatedValues);
                     dispatch(updateStudentFee(updatedValues)).then(() => {
-                        toast.success('Fees update successfully!')
+                       
                         dispatch(
                             fetchAllIncomes({
                                 page: 1,
