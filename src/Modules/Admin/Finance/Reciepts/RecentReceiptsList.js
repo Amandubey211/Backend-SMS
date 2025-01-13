@@ -63,7 +63,7 @@ const RecentReceiptsList = () => {
 
   // Ref for outside-click detection & PDF generation
   const popupRef = useRef(null);
-
+  const receiptRef = useRef(null);
   // --- 1) Fetch receipts when component mounts or pagination changes ---
   useEffect(() => {
     dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
@@ -143,19 +143,22 @@ const RecentReceiptsList = () => {
   // --- Download PDF from preview ---
   const handleDownloadPDF = async () => {
     try {
-      if (!selectedReceipt) return;
+      if (!selectedReceipt || !receiptRef.current) return;
 
       const pdfTitle = selectedReceipt.receiptNumber
         ? `${selectedReceipt.receiptNumber}.pdf`
         : "receipt.pdf";
 
-      const canvas = await html2canvas(popupRef.current, { scale: 2 });
+      // Capture only the receipt component (not the buttons)
+      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
 
+      // Use jsPDF to create the PDF
       const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
 
+      // Calculate the required dimensions
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
@@ -169,6 +172,7 @@ const RecentReceiptsList = () => {
       toast.error("Failed to generate PDF.");
     }
   };
+
 
   // --- Navigate to Add New Receipt Page (normal create) ---
   const handleNavigate = () => {
@@ -376,10 +380,10 @@ const RecentReceiptsList = () => {
       render: (date) =>
         date
           ? new Date(date).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
           : "N/A",
     },
     {
@@ -573,7 +577,6 @@ const RecentReceiptsList = () => {
           >
             {/* Close + Download PDF buttons */}
             <div className="flex justify-end space-x-2 mb-4">
-              
               {/* Download PDF button */}
               <button
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
@@ -590,15 +593,18 @@ const RecentReceiptsList = () => {
               </button>
             </div>
 
-            {/* The actual receipt content */}
-            {selectedReceipt ? (
-              <Receipt data={selectedReceipt} />
-            ) : (
-              <p>No receipt data available.</p>
-            )}
+            {/* Receipt content container: only this will be captured by html2canvas */}
+            <div ref={receiptRef}>
+              {selectedReceipt ? (
+                <Receipt data={selectedReceipt} />
+              ) : (
+                <p>No receipt data available.</p>
+              )}
+            </div>
           </div>
         </div>
       )}
+
     </AdminLayout>
   );
 };

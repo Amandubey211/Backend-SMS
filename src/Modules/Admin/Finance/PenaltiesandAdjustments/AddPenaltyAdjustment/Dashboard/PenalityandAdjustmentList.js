@@ -60,7 +60,7 @@ const PenalityandAdjustmentList = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const receiptRef = useRef(null);
   // Reference for the popup/modal
   const popupRef = useRef(null);
 
@@ -92,44 +92,40 @@ const PenalityandAdjustmentList = () => {
   };
 
   // Handle downloading the PDF
+
+
   const handleDownloadPDF = async () => {
     try {
-      if (!selectedReceipt) {
-        toast.error("No receipt selected for download.");
-        return;
-      }
-
-      if (!popupRef.current) {
-        toast.error("Receipt content is not available.");
-        return;
-      }
-
+      if (!selectedReceipt || !receiptRef.current) return;
+  
       const pdfTitle = selectedReceipt.return_invoice_no
         ? `${selectedReceipt.return_invoice_no}.pdf`
         : "penalty_adjustment.pdf";
-
-      const canvas = await html2canvas(popupRef.current, { scale: 2 });
+  
+      // Capture only the receipt content
+      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
-
+  
       const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-
+  
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
       const newWidth = imgWidth * ratio;
       const newHeight = imgHeight * ratio;
-
+  
       pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
       pdf.save(pdfTitle);
-
+  
       toast.success("PDF downloaded successfully!");
     } catch (error) {
-      console.error("Error generating PDF: ", error);
+      console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF.");
     }
   };
+  
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -340,7 +336,7 @@ const PenalityandAdjustmentList = () => {
             // Implement Send Mail functionality if needed
           },
         ];
-    
+
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <MoreOutlined
@@ -513,29 +509,28 @@ const PenalityandAdjustmentList = () => {
             sheet="penalty_adjustment_report"
           />
           {/* Receipt Preview Overlay */}
-          {isReceiptVisible && (
+          {isReceiptVisible && selectedReceipt && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
               {/* Dim / Blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
+                onClick={() => setReceiptVisible(false)}
               />
-
               {/* Centered content */}
               <div
                 ref={popupRef}
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                onClick={(e) => e.stopPropagation()}
               >
                 {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
-                  {/* Download PDF button */}
                   <button
-                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                     onClick={handleDownloadPDF}
+                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                   >
                     Download PDF
                   </button>
-                  {/* Close button */}
                   <button
                     onClick={() => setReceiptVisible(false)}
                     className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
@@ -545,13 +540,14 @@ const PenalityandAdjustmentList = () => {
                   </button>
                 </div>
 
-                {/* The actual receipt content */}
-                <div className="mt-4">
+                {/* Receipt content container */}
+                <div ref={receiptRef}>
                   <PenaltyAdjustmentTemplate data={selectedReceipt} />
                 </div>
               </div>
             </div>
           )}
+
 
         </div>
       </AdminDashLayout>
