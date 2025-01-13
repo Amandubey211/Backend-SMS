@@ -206,6 +206,15 @@ const RecentInvoiceList = () => {
               >
                 Preview
               </Menu.Item>
+              <Menu.Item
+                icon={<EyeOutlined />}
+                onClick={() => {
+                  dispatch(setInvoiceData({ ...record, mode: 'view' }));
+                  navigate("/finance/invoices/add-new-invoice");
+                }}
+              >
+                View (Read Only)
+              </Menu.Item>
 
               {/* Return */}
               {!record.isCancel && !record.isReturn && (
@@ -257,15 +266,7 @@ const RecentInvoiceList = () => {
               </Menu.Item>:null
               }
               {/* View (Read Only) */}
-              <Menu.Item
-                icon={<EyeOutlined />}
-                onClick={() => {
-                  dispatch(setInvoiceData({ ...record, mode: 'view' }));
-                  navigate("/finance/invoices/add-new-invoice");
-                }}
-              >
-                View (Read Only)
-              </Menu.Item>
+           
             
             </Menu>
           }

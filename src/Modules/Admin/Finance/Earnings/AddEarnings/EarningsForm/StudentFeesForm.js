@@ -8,7 +8,7 @@ import FileInput from "../Component/FileInput";
 import SelectInput from "../Component/SelectInput";
 import TextInput from "../Component/TextInput";
 import { useDispatch } from "react-redux";
-import { createStudentFee } from "../../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import { createStudentFee, createStudentFeeRecordForClass } from "../../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import StudentPaymentDetails from "../Component/StudentPaymentDetails";
 import toast from "react-hot-toast";
 
@@ -63,7 +63,12 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormD
             toast.dismiss()
             toast.error('Please Select Category')
           } else {
-            dispatch(createStudentFee(updatedFormData));
+            if(updatedFormData[0]?.studentId  == 'ALL' ){
+              dispatch(createStudentFeeRecordForClass(updatedFormData));
+            }else{
+              dispatch(createStudentFee(updatedFormData));
+            }
+       
           }
         } else {
           toast.dismiss()

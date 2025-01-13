@@ -51,6 +51,27 @@ export const createStudentFee = createAsyncThunk(
     }
   }
 );
+export const createStudentFeeRecordForClass = createAsyncThunk(
+  "studentFees/createStudentFeeRecordForClass",
+  async (feeData, { rejectWithValue, dispatch }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+    try {
+      const response = await postData(
+        `/finance/revenue/add/class/student/fee?say=${say}`,
+        { allData: feeData }
+      );
+      if (response.success) {
+        toast.success('Fees added  successfully!')
+      }
+      return response;
+    } catch (error) {
+      toast.dismiss()
+        toast.error('Please fill the required Fields !');
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
 
 export const updateStudentFee = createAsyncThunk(

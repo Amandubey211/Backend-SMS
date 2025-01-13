@@ -127,7 +127,7 @@ export const fetchIncomesGraph = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/finance/dashboard/revenue/graph?academicYear=${say}`,
+        `/finance/dashboard/expenseAndEarningGraph?say=${say}`,
         params
       );
       return response.data
