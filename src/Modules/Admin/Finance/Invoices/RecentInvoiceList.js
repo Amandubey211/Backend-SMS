@@ -21,10 +21,11 @@ import {
   ExportOutlined,
   MoreOutlined,
   SearchOutlined,
-  MailOutlined,
+
   EyeOutlined,
   RedoOutlined,
   CloseCircleOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
@@ -50,7 +51,8 @@ import {
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
+
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -196,7 +198,7 @@ const RecentInvoiceList = () => {
             <Menu>
               {/* Preview */}
               <Menu.Item
-                icon={<EyeOutlined style={{ marginRight: 8 }}/>}
+                icon={<EyeOutlined />}
                 onClick={() => {
                   setSelectedInvoice(record);
                   setInvoiceVisible(true);
@@ -204,10 +206,8 @@ const RecentInvoiceList = () => {
               >
                 Preview
               </Menu.Item>
-
-              {/* View (Read Only) */}
               <Menu.Item
-                icon={<EyeOutlined style={{ marginRight: 8 }}/>}
+                icon={<EyeOutlined />}
                 onClick={() => {
                   dispatch(setInvoiceData({ ...record, mode: 'view' }));
                   navigate("/finance/invoices/add-new-invoice");
@@ -215,10 +215,11 @@ const RecentInvoiceList = () => {
               >
                 View (Read Only)
               </Menu.Item>
+
               {/* Return */}
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
-                  icon={<RedoOutlined style={{ marginRight: 8 }}/>}
+                  icon={<RedoOutlined />}
                   onClick={() => {
                     dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
                     navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
@@ -228,19 +229,19 @@ const RecentInvoiceList = () => {
                 </Menu.Item>
               )}
               {record.isReturn && (
-                <Menu.Item icon={<RedoOutlined style={{ marginRight: 8 }}/>} disabled>
+                <Menu.Item icon={<RedoOutlined />} disabled>
                   Return
                 </Menu.Item>
               )}
 
               {/* Canceled */}
               {record.isCancel || record.isReturn ? (
-                <Menu.Item icon={<CloseCircleOutlined style={{ marginRight: 8 }}/>} disabled>
+                <Menu.Item icon={<CloseCircleOutlined />} disabled>
                   Canceled
                 </Menu.Item>
               ) : (
                 <Menu.Item
-                  icon={<CloseCircleOutlined style={{ marginRight: 8 }}/>}
+                  icon={<CloseCircleOutlined />}
                   onClick={() => {
                     dispatch(cancelInvoice(record._id)).then(() =>
                       dispatch(
@@ -255,11 +256,18 @@ const RecentInvoiceList = () => {
                   Cancel
                 </Menu.Item>
               )}
-              {/* 4) Send Mail */}
-              <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
-                <MailOutlined style={{ marginRight: 8 }}/> Send Mail
-              </Menu.Item>
-
+  {!record.isCancel && !record.isReturn ?
+                <Menu.Item
+                icon={<MailOutlined />}
+                onClick={() => {
+                }}
+              >
+                 Send Mail
+              </Menu.Item>:null
+              }
+              {/* View (Read Only) */}
+           
+            
             </Menu>
           }
           trigger={["click"]}

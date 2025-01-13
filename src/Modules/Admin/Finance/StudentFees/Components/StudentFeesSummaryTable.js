@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { Table, Spin, Alert, Input, Button,Tag } from "antd";
+import { Table, Spin, Alert, Input, Button,Tag, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
@@ -47,25 +47,32 @@ const StudentFeesSummaryTable = () => {
     });
   }, [incomes, searchText]);
 
-  // Table columns definition
+  const capitalizeFirstLetter = (text) =>
+    text ? text.charAt(0).toUpperCase() + text.slice(1) : "N/A";
   const columns = [
     {
       title: "Student",
       dataIndex: "studentDetails",
       key: "studentDetails",
-      render:(studentDetails) => studentDetails?.firstName?.slice(0,10)+'..' || "N/A",
+      render: (studentDetails) => (
+        <Tooltip
+          title={capitalizeFirstLetter(studentDetails?.firstName) + " " + capitalizeFirstLetter(studentDetails?.lastName)}
+        >
+          {capitalizeFirstLetter(studentDetails?.firstName?.slice(0, 10)) + ".." || "N/A"}
+        </Tooltip>
+      ),
     },
     {
-      title: "Class ",
+      title: "Class",
       dataIndex: "classDetails",
       key: "classDetails",
-      render: (classDetails) => classDetails?.className ||"N/A",
+      render: (classDetails) => capitalizeFirstLetter(classDetails?.className),
     },
     {
       title: "Sub-Category",
       dataIndex: "subCategory",
       key: "subCategory",
-      render: (subCategory) => subCategory || "N/A",
+      render: (text) => <span>{capitalizeFirstLetter(text)}</span>,
     },
     {
       title: "Total Amount",

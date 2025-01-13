@@ -55,7 +55,7 @@ const SelectInput = ({ label, name, options, autoComplete = "off" }) => {
             variants={fieldVariants}
             transition={{ delay: 0.2 }}
           >
-            {option}
+            {option?.charAt(0)?.toUpperCase() + option?.slice(1)}
           </motion.option>
         ))}
       </Field>
