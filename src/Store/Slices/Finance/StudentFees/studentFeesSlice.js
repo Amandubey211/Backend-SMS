@@ -8,6 +8,7 @@ import {
   deleteStudentFees,
   studentFeesGraph,
   fetchStudentFeeCardData,
+  createStudentFeeRecordForClass,
 } from "./studentFeesThunks";
 
 const initialState = {
@@ -51,6 +52,20 @@ const studentFeesSlice = createSlice({
         //state.fees.push(action.payload.data);
       })
       .addCase(createStudentFee.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+      //for class
+    builder
+      .addCase(createStudentFeeRecordForClass.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createStudentFeeRecordForClass.fulfilled, (state, action) => {
+        state.loading = false;
+        //state.fees.push(action.payload.data);
+      })
+      .addCase(createStudentFeeRecordForClass.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       });

@@ -132,6 +132,9 @@ const SummaryRevenueList = () => {
 
   };
 
+  const capitalizeFirstLetter = (text) =>
+    text ? text.charAt(0).toUpperCase() + text.slice(1) : "N/A";
+  
   const columns = [
     {
       title: "Student",
@@ -139,9 +142,9 @@ const SummaryRevenueList = () => {
       key: "studentDetails",
       render: (studentDetails) => (
         <Tooltip
-          title={studentDetails?.firstName + " " + studentDetails?.lastName}
+          title={capitalizeFirstLetter(studentDetails?.firstName) + " " + capitalizeFirstLetter(studentDetails?.lastName)}
         >
-          {studentDetails?.firstName?.slice(0, 10) + ".." || "N/A"}
+          {capitalizeFirstLetter(studentDetails?.firstName?.slice(0, 10)) + ".." || "N/A"}
         </Tooltip>
       ),
     },
@@ -149,15 +152,14 @@ const SummaryRevenueList = () => {
       title: "Class",
       dataIndex: "classDetails",
       key: "classDetails",
-      render: (classDetails) => classDetails?.className || "N/A",
+      render: (classDetails) => capitalizeFirstLetter(classDetails?.className),
     },
     {
       title: "Sub-Category",
       dataIndex: "subCategory",
       key: "subCategory",
-      render: (text) => <span>{text || "N/A"}</span>,
+      render: (text) => <span>{capitalizeFirstLetter(text)}</span>,
     },
-
     {
       title: "Total Amount",
       dataIndex: "total_amount",
@@ -172,11 +174,11 @@ const SummaryRevenueList = () => {
       render: (value, record) =>
         record.discountType === "percentage" ? (
           <Tag color="purple" className="text-xs">
-            {value || 0}%
+            {`${value || 0}%`}
           </Tag>
         ) : (
           <Tag color="orange" className="text-xs">
-            {value || 0} QAR
+            {`${value || 0} QAR`}
           </Tag>
         ),
       width: 100,
@@ -210,7 +212,7 @@ const SummaryRevenueList = () => {
         }
         return (
           <Tag color={color} className="text-xs capitalize">
-            {status || "N/A"}
+            {capitalizeFirstLetter(status)}
           </Tag>
         );
       },
@@ -224,7 +226,6 @@ const SummaryRevenueList = () => {
       sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
-  
     {
       title: "Action",
       key: "action",
@@ -238,7 +239,7 @@ const SummaryRevenueList = () => {
                 handleEditClick(record);
               }}
               className="text-blue-600 hover:text-blue-800 p-0"
-              aria-label="Edit"
+              aria-label="View"
             />
           </Tooltip>
           <Tooltip title="Edit">
@@ -256,6 +257,7 @@ const SummaryRevenueList = () => {
       ),
     },
   ];
+  
 
   const subCategoryList = [
     "Tuition Fees",

@@ -12,7 +12,8 @@ const TextInput = ({
   placeholder,
   autoComplete = "off",
   disabled = false, // Added disabled prop with default value
-  required = false, // Added required prop
+  required = false,
+  // Added required prop
 }) => {
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
   const [field, meta] = useField(name);
