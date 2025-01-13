@@ -49,12 +49,10 @@ const RecentQuotationList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-
+  // Local state for preview mode renamed to avoid collision with Redux action
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
-  const [selectedQuotation, setSelectedQuotation] = useState(null);
+  const [previewQuotation, setPreviewQuotation] = useState(null);
   const popupRef = useRef(null);
-
-
 
   const paze_size =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
@@ -76,13 +74,13 @@ const RecentQuotationList = () => {
     [dispatch]
   );
 
-  // Fetch data on component mount with limit set to 5
+  // Fetch data on component mount with limit set to 10
   useEffect(() => {
     console.log("Fetching data...", { searchText, currentPage, pageSize });
     const params = {
       //search: searchText,
       page: 1, // Always fetch the first page
-      limit: 10, // Limit to 5 records
+      limit: 10, // Limit to 10 records
       //sortBy: "createdAt",
       //sortOrder: "desc",
     };
@@ -195,7 +193,8 @@ const RecentQuotationList = () => {
               onClick={() => {
                 const quotationToPreview = quotationIdMap[record.key];
                 if (quotationToPreview) {
-                  setSelectedQuotation(quotationToPreview);
+                  // Use local state for preview mode
+                  setPreviewQuotation(quotationToPreview);
                   setQuotationPreviewVisible(true);
                 } else {
                   toast.error("Quotation not found.");
@@ -208,10 +207,10 @@ const RecentQuotationList = () => {
               key="2"
               onClick={() => {
                 const quotationToView = quotationIdMap[record.key];
-                console.log("THis is Quotation View: ",quotationToView)
+                console.log("THis is Quotation View: ", quotationToView);
                 if (quotationToView) {
                   dispatch(setReadOnly(true)); // Set readOnly to true for viewing
-                  dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected income to Redux
+                  dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected quotation to Redux for view mode
                   navigate("/finance/quotations/add-new-quotations"); // Navigate to view page
                 } else {
                   toast.error("Selected income not found.");
@@ -236,7 +235,6 @@ const RecentQuotationList = () => {
             <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
               <MailOutlined style={{ marginRight: 8 }}/> Send Mail
             </Menu.Item>
-
           </Menu>
         );
 
@@ -257,7 +255,7 @@ const RecentQuotationList = () => {
     },
   ];
 
-  // Transform adjustments data to table dataSource and limit to 10 records
+  // Transform quotations data for table dataSource
   const dataSource = quotations?.map((quotation) => ({
     key: quotation._id,
     quotationNumber: quotation.quotationNumber || "N/A",
@@ -319,8 +317,6 @@ const RecentQuotationList = () => {
               style={{
                 borderRadius: "0.375rem",
                 height: "35px",
-                //borderColor: "#ff6bcb",
-                //boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
               }}
             />
             <div className="flex justify-end items-center gap-2">
@@ -348,13 +344,6 @@ const RecentQuotationList = () => {
                 </div>
               </button>
             </div>
-            {/* <Button
-              onClick={handleViewMore}
-              className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-              size="small"
-            >
-              View More ({totalRecords})
-            </Button> */}
           </div>
 
           {/* Loading Indicator */}
@@ -373,12 +362,6 @@ const RecentQuotationList = () => {
               closable
             />
           )}
-          {/* No Data Placeholder */}
-          {/* {!loading && !error && (
-                        <div className="text-center text-gray-500 text-xs py-4">
-                            No records found.
-                        </div>
-                    )} */}
           {/* Table */}
           {!loading && !error && (
             <Table
@@ -393,11 +376,11 @@ const RecentQuotationList = () => {
                 showTotal: () =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
                 onChange: (page, pageSize) => {
-                  setCurrentPage(page); // Update the current page
-                  setComputedPageSize(pageSize); // Update the page size
+                  setCurrentPage(page);
+                  setComputedPageSize(pageSize);
                 },
                 onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size); // Handle page size change
+                  setComputedPageSize(size);
                 },
               }}
               onChange={(pagination) => {
@@ -407,7 +390,7 @@ const RecentQuotationList = () => {
               className="rounded-lg shadow text-xs"
               bordered
               size="small"
-              tableLayout="fixed" // Fixed table layout
+              tableLayout="fixed"
             />
           )}
 
@@ -418,17 +401,16 @@ const RecentQuotationList = () => {
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
-                onClick={() => setQuotationPreviewVisible(false)} // Close on background click
+                onClick={() => setQuotationPreviewVisible(false)}
               />
               {/* Centered content */}
               <div
                 ref={popupRef}
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
-                onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling
+                onClick={(e) => e.stopPropagation()}
               >
                 {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
-                  {/* Download PDF button */}
                   <button
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                     onClick={() => {
@@ -437,7 +419,6 @@ const RecentQuotationList = () => {
                   >
                     Download PDF
                   </button>
-                  {/* Close button */}
                   <button
                     onClick={() => setQuotationPreviewVisible(false)}
                     className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
@@ -449,7 +430,7 @@ const RecentQuotationList = () => {
 
                 {/* The actual quotation content */}
                 <div className="mt-4">
-                  <QuotationTemplate data={selectedQuotation} />
+                  <QuotationTemplate data={previewQuotation} />
                 </div>
               </div>
             </div>
