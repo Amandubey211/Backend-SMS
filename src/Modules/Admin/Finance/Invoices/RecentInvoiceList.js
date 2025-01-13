@@ -25,6 +25,7 @@ import {
   EyeOutlined,
   RedoOutlined,
   CloseCircleOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
@@ -50,6 +51,7 @@ import {
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import toast from "react-hot-toast";
 
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
@@ -71,7 +73,7 @@ const RecentInvoiceList = () => {
 
   const downloadPDF = async () => {
     if (!pdfRef.current) return;
-  
+
     try {
       // Capture the pdfRef element as a canvas
       const canvas = await html2canvas(pdfRef.current, {
@@ -80,20 +82,20 @@ const RecentInvoiceList = () => {
         windowWidth: pdfRef.current.scrollWidth, // Match the element's width
         windowHeight: pdfRef.current.scrollHeight, // Match the element's height
       });
-  
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4"); // A4 size PDF
-  
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintain aspect ratio
-  
+
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`); // Save the PDF
     } catch (error) {
       console.error("Failed to generate PDF", error);
     }
   };
-  
+
 
 
   // Filtered data based on search query
@@ -256,6 +258,15 @@ const RecentInvoiceList = () => {
               >
                 View (Read Only)
               </Menu.Item>
+              {!record.isCancel && !record.isReturn ?
+                <Menu.Item
+                icon={<MailOutlined />}
+                onClick={() => {
+                }}
+              >
+                 Send Mail
+              </Menu.Item>:null
+              }
             </Menu>
           }
           trigger={["click"]}

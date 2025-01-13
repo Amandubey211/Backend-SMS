@@ -387,6 +387,7 @@ const RecentReceiptsList = () => {
       key: "action",
       render: (_, record) => (
         <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+          
           <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
         </Dropdown>
       ),
