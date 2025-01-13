@@ -21,7 +21,7 @@ import {
   ExportOutlined,
   MoreOutlined,
   SearchOutlined,
-
+  MailOutlined,
   EyeOutlined,
   RedoOutlined,
   CloseCircleOutlined,
@@ -50,7 +50,7 @@ import {
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-
+import { toast } from "react-hot-toast";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -71,7 +71,7 @@ const RecentInvoiceList = () => {
 
   const downloadPDF = async () => {
     if (!pdfRef.current) return;
-  
+
     try {
       // Capture the pdfRef element as a canvas
       const canvas = await html2canvas(pdfRef.current, {
@@ -80,20 +80,20 @@ const RecentInvoiceList = () => {
         windowWidth: pdfRef.current.scrollWidth, // Match the element's width
         windowHeight: pdfRef.current.scrollHeight, // Match the element's height
       });
-  
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", "a4"); // A4 size PDF
-  
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintain aspect ratio
-  
+
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`); // Save the PDF
     } catch (error) {
       console.error("Failed to generate PDF", error);
     }
   };
-  
+
 
 
   // Filtered data based on search query
@@ -196,7 +196,7 @@ const RecentInvoiceList = () => {
             <Menu>
               {/* Preview */}
               <Menu.Item
-                icon={<EyeOutlined />}
+                icon={<EyeOutlined style={{ marginRight: 8 }}/>}
                 onClick={() => {
                   setSelectedInvoice(record);
                   setInvoiceVisible(true);
@@ -205,10 +205,20 @@ const RecentInvoiceList = () => {
                 Preview
               </Menu.Item>
 
+              {/* View (Read Only) */}
+              <Menu.Item
+                icon={<EyeOutlined style={{ marginRight: 8 }}/>}
+                onClick={() => {
+                  dispatch(setInvoiceData({ ...record, mode: 'view' }));
+                  navigate("/finance/invoices/add-new-invoice");
+                }}
+              >
+                View (Read Only)
+              </Menu.Item>
               {/* Return */}
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
-                  icon={<RedoOutlined />}
+                  icon={<RedoOutlined style={{ marginRight: 8 }}/>}
                   onClick={() => {
                     dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
                     navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
@@ -218,19 +228,19 @@ const RecentInvoiceList = () => {
                 </Menu.Item>
               )}
               {record.isReturn && (
-                <Menu.Item icon={<RedoOutlined />} disabled>
+                <Menu.Item icon={<RedoOutlined style={{ marginRight: 8 }}/>} disabled>
                   Return
                 </Menu.Item>
               )}
 
               {/* Canceled */}
               {record.isCancel || record.isReturn ? (
-                <Menu.Item icon={<CloseCircleOutlined />} disabled>
+                <Menu.Item icon={<CloseCircleOutlined style={{ marginRight: 8 }}/>} disabled>
                   Canceled
                 </Menu.Item>
               ) : (
                 <Menu.Item
-                  icon={<CloseCircleOutlined />}
+                  icon={<CloseCircleOutlined style={{ marginRight: 8 }}/>}
                   onClick={() => {
                     dispatch(cancelInvoice(record._id)).then(() =>
                       dispatch(
@@ -245,17 +255,11 @@ const RecentInvoiceList = () => {
                   Cancel
                 </Menu.Item>
               )}
-
-              {/* View (Read Only) */}
-              <Menu.Item
-                icon={<EyeOutlined />}
-                onClick={() => {
-                  dispatch(setInvoiceData({ ...record, mode: 'view' }));
-                  navigate("/finance/invoices/add-new-invoice");
-                }}
-              >
-                View (Read Only)
+              {/* 4) Send Mail */}
+              <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
+                <MailOutlined style={{ marginRight: 8 }}/> Send Mail
               </Menu.Item>
+
             </Menu>
           }
           trigger={["click"]}

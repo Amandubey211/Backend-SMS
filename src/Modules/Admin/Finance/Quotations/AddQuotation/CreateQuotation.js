@@ -143,13 +143,10 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
           {({ remove, push }) => (
             <>
               {values.lineItems.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-12 gap-8 items-center mb-6"
-                >
+                <div key={index} className="grid grid-cols-12 gap-8 items-center mb-6">
                   <div className="col-span-3">
                     <SelectInput
-                      name={`lineItems.${index}.revenueType`}
+                      name={`lineItems?.${index}?.revenueType`}
                       label="Revenue Type"
                       options={[
                         "studentFee",
@@ -208,9 +205,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
                 <div className="flex flex-col justify-center items-center mt-6">
                   <button
                     type="button"
-                    onClick={() =>
-                      push({ revenueType: "", quantity: 1, amount: 0 })
-                    }
+                    onClick={() => push({ revenueType: "", quantity: 1, amount: 0 })}
                     className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
                     style={{
                       background: "linear-gradient(to right, #ec4899, #a855f7)",
@@ -224,6 +219,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
             </>
           )}
         </FieldArray>
+
       </div>
 
       {/* Additional Details Section */}
