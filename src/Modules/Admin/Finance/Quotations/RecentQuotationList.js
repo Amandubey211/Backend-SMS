@@ -7,6 +7,7 @@ import {
   EyeOutlined,
   FilePdfOutlined,
   MoreOutlined,
+  MailOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
@@ -207,6 +208,7 @@ const RecentQuotationList = () => {
               key="2"
               onClick={() => {
                 const quotationToView = quotationIdMap[record.key];
+                console.log("THis is Quotation View: ",quotationToView)
                 if (quotationToView) {
                   dispatch(setReadOnly(true)); // Set readOnly to true for viewing
                   dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected income to Redux
@@ -230,6 +232,11 @@ const RecentQuotationList = () => {
             >
               <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
             </Menu.Item>
+            {/* 4) Send Mail */}
+            <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
+              <MailOutlined style={{ marginRight: 8 }}/> Send Mail
+            </Menu.Item>
+
           </Menu>
         );
 
