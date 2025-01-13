@@ -17,7 +17,7 @@ export const fetchOneStudentFee = createAsyncThunk(
   "studentFees/fetchOneStudentFee",
   async (studentId, { rejectWithValue, dispatch }) => {
     try {
-      const say=getAY();
+      const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
         `/finance/revenue/get/student/fee/${studentId}?say=${say}`
@@ -38,16 +38,15 @@ export const createStudentFee = createAsyncThunk(
     try {
       const response = await postData(
         `/finance/revenue/add/student/fee?say=${say}`,
-        {allData:feeData}
+        { allData: feeData }
       );
-      if(response.success){
+      if (response.success) {
         toast.success('Fees added  successfully!')
-      }else{
-        toast.error('Please fill the required  Fields !')
       }
       return response;
     } catch (error) {
-      toast.error('Please fill the required  Fields !')
+      toast.dismiss()
+        toast.error('Please fill the required Fields !');
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -56,16 +55,16 @@ export const createStudentFee = createAsyncThunk(
 
 export const updateStudentFee = createAsyncThunk(
   "studentFees/updateStudentFee",
-  async (data , { rejectWithValue, dispatch }) => {
+  async (data, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const response = await putData(
         `/finance/revenue/update/student/fee/${data.feeId}`,
         data
       );
-      if(response.success){
+      if (response.success) {
         toast.success('Data update successfully!')
-      }else{
+      } else {
         toast.error('Something is wrong')
       }
       return response;
@@ -83,11 +82,11 @@ export const deleteStudentFees = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       // Since DELETE requests typically don't have a body, use customRequest to send data
-      const response = await customRequest('delete', "/finance/revenue/delete/student/fee", 
+      const response = await customRequest('delete', "/finance/revenue/delete/student/fee",
         data
       );
-      
-      return  response ;
+
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

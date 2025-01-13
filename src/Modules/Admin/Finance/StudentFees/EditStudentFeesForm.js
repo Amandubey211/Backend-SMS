@@ -129,7 +129,7 @@ export default function EditStudentFeesForm({ data }) {
             <Formik
                 enableReinitialize
                 initialValues={initialValues}
-                validationSchema={validationSchema}
+               // validationSchema={validationSchema}
                 onSubmit={(values) => {
                     const { finalAmount, remainingAmount, advanceAmount } =
                         calculateAmounts(values);

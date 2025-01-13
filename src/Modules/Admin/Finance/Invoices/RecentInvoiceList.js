@@ -247,7 +247,15 @@ const RecentInvoiceList = () => {
                   Cancel
                 </Menu.Item>
               )}
-
+  {!record.isCancel && !record.isReturn ?
+                <Menu.Item
+                icon={<MailOutlined />}
+                onClick={() => {
+                }}
+              >
+                 Send Mail
+              </Menu.Item>:null
+              }
               {/* View (Read Only) */}
               <Menu.Item
                 icon={<EyeOutlined />}
@@ -258,15 +266,7 @@ const RecentInvoiceList = () => {
               >
                 View (Read Only)
               </Menu.Item>
-              {!record.isCancel && !record.isReturn ?
-                <Menu.Item
-                icon={<MailOutlined />}
-                onClick={() => {
-                }}
-              >
-                 Send Mail
-              </Menu.Item>:null
-              }
+            
             </Menu>
           }
           trigger={["click"]}
