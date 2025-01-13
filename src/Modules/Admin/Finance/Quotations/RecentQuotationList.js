@@ -32,6 +32,9 @@ import Layout from "../../../../Components/Common/Layout";
 import toast from "react-hot-toast";
 import ExportModal from "../Earnings/Components/ExportModal";
 import QuotationTemplate from "../../../../Utils/FinanceTemplate/QuotationTemplate";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -48,7 +51,7 @@ const RecentQuotationList = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const receiptRef = useRef(null);
   // Local state for preview mode renamed to avoid collision with Redux action
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
   const [previewQuotation, setPreviewQuotation] = useState(null);
@@ -65,6 +68,37 @@ const RecentQuotationList = () => {
     });
     return map;
   }, [quotations]);
+
+
+  const handleDownloadPDF = async () => {
+    try {
+      if (!previewQuotation || !receiptRef.current) return;
+
+      const pdfTitle = previewQuotation.quotationNumber
+        ? `${previewQuotation.quotationNumber}.pdf`
+        : "quotation.pdf";
+
+      // Capture only the quotation content
+      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF("p", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+      const newWidth = imgWidth * ratio;
+      const newHeight = imgHeight * ratio;
+
+      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
+      pdf.save(pdfTitle);
+    } catch (error) {
+      console.error("Error generating PDF: ", error);
+      toast.error("Failed to generate PDF.");
+    }
+  };
 
   // Debounced function to fetch adjustments with a fixed limit of 5
   const debouncedFetch = useCallback(
@@ -233,7 +267,7 @@ const RecentQuotationList = () => {
             </Menu.Item>
             {/* 4) Send Mail */}
             <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
-              <MailOutlined style={{ marginRight: 8 }}/> Send Mail
+              <MailOutlined style={{ marginRight: 8 }} /> Send Mail
             </Menu.Item>
           </Menu>
         );
@@ -405,7 +439,7 @@ const RecentQuotationList = () => {
               />
               {/* Centered content */}
               <div
-                ref={popupRef}
+                ref={popupRef} // Ref for the overall modal (optional)
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -413,9 +447,7 @@ const RecentQuotationList = () => {
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                    onClick={() => {
-                      // Add your PDF download logic here
-                    }}
+                    onClick={handleDownloadPDF}
                   >
                     Download PDF
                   </button>
@@ -428,13 +460,14 @@ const RecentQuotationList = () => {
                   </button>
                 </div>
 
-                {/* The actual quotation content */}
-                <div className="mt-4">
+                {/* Quotation content container */}
+                <div ref={receiptRef}>
                   <QuotationTemplate data={previewQuotation} />
                 </div>
               </div>
             </div>
           )}
+
 
           <ExportModal
             visible={isExportModalVisible}
