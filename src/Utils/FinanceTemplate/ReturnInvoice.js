@@ -7,7 +7,7 @@ const ReturnInvoiceTemplate = ({ data }) => {
 
   const {
     receiptNumber,
-    schoolName,
+    schoolId,
     date,
     receiver,
     reciever,
@@ -20,8 +20,12 @@ const ReturnInvoiceTemplate = ({ data }) => {
     govtRefNumber,
     paymentMethod,
     paymentStatus,
+    isCancel,
     createdBy,
   } = data;
+
+  const { address, branchName, city, code, logo, nameOfSchool } = schoolId;
+
 
   const finalReceiver = reciever?.name ? reciever : receiver;
   const formattedDate = date ? new Date(date).toLocaleDateString() : "N/A";
@@ -31,14 +35,41 @@ const ReturnInvoiceTemplate = ({ data }) => {
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
+      {/* Show "Cancelled" label if isCancel is true */}
+      {isCancel && (
+        <div
+        className="
+          absolute 
+          top-[92%] 
+          left-[51%] 
+          transform 
+          -translate-x-1/2 
+          -translate-y-1/2 
+          rotate-[-15deg] 
+          text-red-500 
+          text-4xl 
+          font-bold 
+          uppercase 
+          border-4 
+          border-red-500 
+          p-5 
+          px-10 
+          rounded-md 
+          bg-white/80 
+          shadow-md 
+          z-10
+        "
+      >
+        Cancelled
+      </div>
+      
+      )}
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
         <div className="w-full bg-pink-100 px-4 py-2 flex justify-between items-center rounded-t-lg">
           <div>
-            <h1 className="font-bold text-lg">{schoolName || "School Name"}</h1>
-            <p className="text-sm text-gray-500">
-              11th Street, Main Road, Pincode: 674258, Maharashtra, India
-            </p>
+            <h1 className="font-bold text-lg">{nameOfSchool || 'N/A'}</h1>
+            <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
           </div>
           <div className="flex items-center space-x-4">
             <img src={IconLogo} alt="Icon Logo" className="w-8 h-8" />

@@ -299,18 +299,38 @@ const PenalityandAdjustmentList = () => {
             key: "2",
             label: (
               <span>
+                <EyeOutlined style={{ marginRight: 8 }} />
+                View (Read-only)
+              </span>
+            ),
+            onClick: () => {
+              const selectedAdjustment = adjustmentData.find(
+                (adjustment) => adjustment._id === record.key
+              );
+              if (selectedAdjustment) {
+                dispatch(setSelectedAdjustment(selectedAdjustment));
+                dispatch(setReadOnly(true));
+                navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
+              } else {
+                toast.error("Selected adjustment not found.");
+              }
+            },
+          },
+          {
+            key: "3",
+            label: (
+              <span>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
                 {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
               </span>
             ),
             onClick: () => {
-              if (record?.status !== "Cancelled")
-                handleCancleReturnInvoice(record?.key);
+              if (record?.status !== "Cancelled") handleCancleReturnInvoice(record?.key);
             },
             disabled: record?.status === "Cancelled",
           },
           {
-            key: "3",
+            key: "4",
             label: (
               <span>
                 <MailOutlined style={{ marginRight: 8 }} />
@@ -319,30 +339,8 @@ const PenalityandAdjustmentList = () => {
             ),
             // Implement Send Mail functionality if needed
           },
-          {
-            key: "4",
-            label: (
-              <span>
-                <EyeOutlined style={{ marginRight: 8 }} />
-                View (Read-only)
-              </span>
-            ),
-            onClick: () => {
-              // Find the selected adjustment based on the record's key
-              const selectedAdjustment = adjustmentData.find(
-                (adjustment) => adjustment._id === record.key
-              );
-              if (selectedAdjustment) {
-                dispatch(setSelectedAdjustment(selectedAdjustment));
-                dispatch(setReadOnly(true));
-                navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Corrected route
-              } else {
-                toast.error("Selected adjustment not found.");
-              }
-            },
-          },
         ];
-
+    
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <MoreOutlined
