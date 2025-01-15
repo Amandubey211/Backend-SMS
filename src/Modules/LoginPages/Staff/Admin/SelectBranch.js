@@ -11,6 +11,7 @@ import { LuLoader } from "react-icons/lu";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { setLocalCookies } from "../../../../Utils/academivYear";
+import { Tooltip } from "antd"; // Importing Ant Design Tooltip
 
 const SelectBranch = () => {
   const dispatch = useDispatch();
@@ -57,10 +58,8 @@ const SelectBranch = () => {
 
   // Filter branches based on the search query
   const filteredBranches = branchs?.filter((branch) => {
-
     const branchName = branch.nameOfSchool?.toLowerCase();
     const branchCity = branch.city?.toLowerCase();
-
     const query = searchQuery?.toLowerCase();
 
     return branchName?.includes(query) || branchCity?.includes(query);
@@ -110,7 +109,7 @@ const SelectBranch = () => {
                     "bg-pink-300",
                   ][colorIndex];
 
-                  const isActive = selectedBranch?.id === branch?._id;
+                  const isActive = selectedBranch?._id === branch?._id;
 
                   return (
                     <motion.div
@@ -125,9 +124,11 @@ const SelectBranch = () => {
                       transition={{ duration: 0.3 }}
                     >
                       <div className="mb-4">
-                        <h3 className="text-xl font-semibold">
-                          {branch?.nameOfSchool}
-                        </h3>
+                        <Tooltip title={branch?.nameOfSchool}>
+                          <h3 className="text-sm font-semibold truncate">
+                            {branch?.nameOfSchool}
+                          </h3>
+                        </Tooltip>
                         <p className="text-sm">{branch?.city}</p>
                       </div>
                       <div className="flex items-center justify-center">

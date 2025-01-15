@@ -17,7 +17,7 @@ import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+// import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 import { fetchAdminDashboardData } from "../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
 
@@ -40,11 +40,11 @@ const MainSection = () => {
     dispatch(fetchAdminDashboardData());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (role == "admin" || role == "accountant") {
-      dispatch(createStaffSalary({ status: "unpaid", action: "pay now" }));
-    }
-  }, [dispatch, createStaffSalary]);
+  // useEffect(() => {
+  //   if (role == "admin" || role == "accountant") {
+  //     dispatch(createStaffSalary({ status: "unpaid", action: "pay now" }));
+  //   }
+  // }, [dispatch, createStaffSalary]);
 
   function capitalizeFirstLetter(string) {
     if (!string) return "";

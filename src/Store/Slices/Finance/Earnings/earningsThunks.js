@@ -133,11 +133,6 @@ export const fetchEarningGraph = createAsyncThunk(
 
       if (response?.success) {
         return response.data;
-      } else {
-        toast.error(response?.message || "Failed to fetch expense graph data.");
-        return rejectWithValue(
-          response?.message || "Failed to fetch expense graph data."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -161,10 +156,6 @@ export const fetchCardDataRevenue = createAsyncThunk(
         return response.data;
         // const transformedData = transformCardData(response.data);
         // return transformedData;
-      } else {
-        return rejectWithValue(
-          response?.message || "Failed to fetch card data revenue."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -210,11 +201,6 @@ export const deleteEarnings = createAsyncThunk(
         };
         dispatch(fetchAllIncomes(params));
         return id;
-      } else {
-        toast.error(response?.message || "Failed to delete earnings.");
-        return rejectWithValue(
-          response?.message || "Failed to delete earnings."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

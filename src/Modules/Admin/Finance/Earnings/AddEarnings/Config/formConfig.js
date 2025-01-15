@@ -83,13 +83,7 @@ export const initialValuesMap = {
     description: "",
   },
   "Stationery Fees": {
-    stationeryItems: [
-      {
-        itemName: "",
-        quantity: 0,
-        unitCost: 0,
-      },
-    ],
+    stationeryItems: [{ itemName: "", quantity: 0, unitCost: 0 }],
     paymentType: "cash",
     paymentStatus: "paid",
     paid_amount: 0,
