@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   showError: false,
-  errorMsg: "",
+  errorMsg: "sdfsdfsdf",
 };
 
 const alertsSlice = createSlice({

@@ -255,7 +255,7 @@ const TotalExpenseList = () => {
         title: "Sub-Category/Name",
         dataIndex: "subCategoryName",
         key: "subCategoryName",
-        render: (text) => <span className="text-xs">{text}</span>,
+        render: (text) => <span className="text-xs capitalize">{text}</span>,
         width: 120,
         ellipsis: true,
       },

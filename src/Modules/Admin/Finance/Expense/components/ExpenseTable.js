@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { Table, Spin, Button, Tooltip } from "antd";
+import { Table, Spin, Button, Tooltip, Tag } from "antd";
 import {
   DollarOutlined,
   CloudOutlined,
@@ -53,10 +53,18 @@ const ExpenseTable = () => {
   // Define table columns with fixed widths and ellipsis
   const columns = [
     {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
       render: (text) => <span className="text-xs">{text}</span>,
+      width: 150,
+      ellipsis: true,
+    },
+    {
+      title: "Sub-Category/Name",
+      dataIndex: "subCategory",
+      key: "subCategory",
+      render: (text) => <span className="text-xs capitalize">{text}</span>,
       width: 150,
       ellipsis: true,
     },
@@ -80,24 +88,32 @@ const ExpenseTable = () => {
       ellipsis: true,
     },
     {
-      title: "Payment Status",
+      title: "Status",
       dataIndex: "paymentStatus",
       key: "paymentStatus",
-      render: (status) => (
-        <span
-          className={
-            status === "paid"
-              ? "text-green-600"
-              : status === "unpaid"
-              ? "text-red-600"
-              : "text-yellow-600"
-          }
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </span>
-      ),
-      width: 120,
+      width: 100,
       ellipsis: true,
+      render: (status) => {
+        let color = "default";
+        switch (status) {
+          case "paid":
+            color = "green";
+            break;
+          case "partial":
+            color = "yellow";
+            break;
+          case "unpaid":
+            color = "red";
+            break;
+          default:
+            color = "default";
+        }
+        return (
+          <Tag color={color} className="text-xs capitalize">
+            {status || "N/A"}
+          </Tag>
+        );
+      },
     },
     {
       title: "Final Amount",
@@ -132,7 +148,8 @@ const ExpenseTable = () => {
   // Transform expenses data to table dataSource and limit to 5 records
   const dataSource = expenses?.slice(0, 5).map((expense) => ({
     key: expense._id,
-    description: expense.description,
+    category: expense.category?.categoryName || "",
+    subCategory: expense.subcategory || "",
     paymentType: expense.paymentType || "N/A",
     paymentStatus: expense.paymentStatus || "N/A",
     finalAmount: expense.finalAmount || 0,
