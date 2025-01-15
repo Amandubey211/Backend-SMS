@@ -21,10 +21,11 @@ import {
   ExportOutlined,
   MoreOutlined,
   SearchOutlined,
-  MailOutlined,
+
   EyeOutlined,
   RedoOutlined,
   CloseCircleOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
@@ -39,6 +40,7 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import {
   cancelInvoice,
+  completeInvoice,
   fetchInvoice,
 } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 
@@ -50,7 +52,9 @@ import {
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
+import { MdOutlineDone } from "react-icons/md";
+
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -58,7 +62,6 @@ const RecentInvoiceList = () => {
   const pdfRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const receiptRef = useRef(null);
   useNavHeading("Finance", "Recent Invoice List");
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -70,39 +73,30 @@ const RecentInvoiceList = () => {
 
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
+  const downloadPDF = async () => {
+    if (!pdfRef.current) return;
 
-
-  const handleDownloadPDF = async () => {
     try {
-      if (!selectedInvoice || !receiptRef.current) return;
+      // Capture the pdfRef element as a canvas
+      const canvas = await html2canvas(pdfRef.current, {
+        scale: 2, // Increase scale for higher resolution
+        useCORS: true, // Enable cross-origin
+        windowWidth: pdfRef.current.scrollWidth, // Match the element's width
+        windowHeight: pdfRef.current.scrollHeight, // Match the element's height
+      });
 
-      const pdfTitle = selectedInvoice.invoiceNumber
-        ? `${selectedInvoice.invoiceNumber}.pdf`
-        : "invoice.pdf";
-
-      // Capture only the invoice content
-      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("p", "mm", "a4"); // A4 size PDF
 
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintain aspect ratio
 
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
-
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`); // Save the PDF
     } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("Failed to generate PDF.");
+      console.error("Failed to generate PDF", error);
     }
   };
-
-
 
 
 
@@ -206,7 +200,7 @@ const RecentInvoiceList = () => {
             <Menu>
               {/* Preview */}
               <Menu.Item
-                icon={<EyeOutlined style={{ marginRight: 8 }} />}
+                icon={<EyeOutlined />}
                 onClick={() => {
                   setSelectedInvoice(record);
                   setInvoiceVisible(true);
@@ -214,10 +208,8 @@ const RecentInvoiceList = () => {
               >
                 Preview
               </Menu.Item>
-
-              {/* View (Read Only) */}
               <Menu.Item
-                icon={<EyeOutlined style={{ marginRight: 8 }} />}
+                icon={<EyeOutlined />}
                 onClick={() => {
                   dispatch(setInvoiceData({ ...record, mode: 'view' }));
                   navigate("/finance/invoices/add-new-invoice");
@@ -225,10 +217,11 @@ const RecentInvoiceList = () => {
               >
                 View (Read Only)
               </Menu.Item>
+
               {/* Return */}
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
-                  icon={<RedoOutlined style={{ marginRight: 8 }} />}
+                  icon={<RedoOutlined />}
                   onClick={() => {
                     dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
                     navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
@@ -238,19 +231,19 @@ const RecentInvoiceList = () => {
                 </Menu.Item>
               )}
               {record.isReturn && (
-                <Menu.Item icon={<RedoOutlined style={{ marginRight: 8 }} />} disabled>
+                <Menu.Item icon={<RedoOutlined />} disabled>
                   Return
                 </Menu.Item>
               )}
 
               {/* Canceled */}
               {record.isCancel || record.isReturn ? (
-                <Menu.Item icon={<CloseCircleOutlined style={{ marginRight: 8 }} />} disabled>
+                <Menu.Item icon={<CloseCircleOutlined />} disabled>
                   Canceled
                 </Menu.Item>
               ) : (
                 <Menu.Item
-                  icon={<CloseCircleOutlined style={{ marginRight: 8 }} />}
+                  icon={<CloseCircleOutlined />}
                   onClick={() => {
                     dispatch(cancelInvoice(record._id)).then(() =>
                       dispatch(
@@ -265,11 +258,34 @@ const RecentInvoiceList = () => {
                   Cancel
                 </Menu.Item>
               )}
-              {/* 4) Send Mail */}
-              <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
-                <MailOutlined style={{ marginRight: 8 }} /> Send Mail
-              </Menu.Item>
-
+               {!record.isCancel && !record.isReturn &&!record.isCompleted  ?
+                <Menu.Item
+                icon={<MdOutlineDone />}
+                onClick={() => dispatch(completeInvoice(record._id))}
+              >
+                 Complete
+              </Menu.Item>:null
+              }
+               {!record.isCancel && !record.isReturn && record.isCompleted  ?
+                <Menu.Item
+                icon={<MdOutlineDone />}
+                disabled
+              >
+                 Completed
+              </Menu.Item>:null
+              }
+  {!record.isCancel && !record.isReturn ?
+                <Menu.Item
+                icon={<MailOutlined />}
+                onClick={() => {
+                }}
+              >
+                 Send Mail
+              </Menu.Item>:null
+              }
+              {/* View (Read Only) */}
+           
+            
             </Menu>
           }
           trigger={["click"]}
@@ -456,7 +472,7 @@ const RecentInvoiceList = () => {
 
           {/* PDF Preview Modal */}
           {isInvoiceVisible && selectedInvoice && (
-            <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
+            <div className="fixed inset-0 z-50 flex items-center justify-center">
               {/* Full-screen blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
@@ -465,14 +481,14 @@ const RecentInvoiceList = () => {
               />
               {/* Centered content */}
               <div
-                ref={popupRef} // Optional: for managing clicks outside the modal
+                ref={popupRef}
                 className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Close + Download PDF buttons */}
+                {/* Close Button */}
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
-                    onClick={handleDownloadPDF} // Updated function name
+                    onClick={downloadPDF}
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                   >
                     Download PDF
@@ -485,14 +501,16 @@ const RecentInvoiceList = () => {
                   </button>
                 </div>
 
-                {/* Invoice content container */}
-                <div ref={receiptRef}>
+                {/* Hidden container for PDF generation */}
+                <div ref={pdfRef} className="hidden">
                   <RecentInvoiceTemplate data={selectedInvoice} />
                 </div>
+
+                {/* Visible content */}
+                <RecentInvoiceTemplate data={selectedInvoice} />
               </div>
             </div>
           )}
-
 
 
           <ExportModal

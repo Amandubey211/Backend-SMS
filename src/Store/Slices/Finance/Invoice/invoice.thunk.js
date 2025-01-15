@@ -44,6 +44,24 @@ export const addInvoice = createAsyncThunk(
       }
     }
   );
+  export const completeInvoice = createAsyncThunk(
+    "earnings/completeInvoice",
+    async (id, { dispatch, rejectWithValue }) => {
+      const say = getAY();
+      dispatch(setShowError(false));
+      try {
+        const response = await putData(`/finance/invoice/handleComplete/${id}?say=${say}`);
+        if(response.success){
+           toast.success("Invoice completed successfully!");     
+        }else{
+          toast.error("Something is wrong!");  
+        }
+        return response.data
+      } catch (error) {
+        return handleError(error, dispatch, rejectWithValue);
+      }
+    }
+  );
 
 export const fetchInvoice = createAsyncThunk(
   "earnings/fetchInvoice",
