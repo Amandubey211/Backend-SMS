@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate, useParams, NavLink } from "react-router-dom";
-import { AiOutlineFileAdd } from "react-icons/ai";
 import { RiAddFill } from "react-icons/ri";
+import { AiOutlineFileAdd } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
@@ -16,7 +16,7 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 
 const MainSection = () => {
   const dispatch = useDispatch();
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const { cid, sid } = useParams();
   const navigate = useNavigate();
 
@@ -65,10 +65,16 @@ const MainSection = () => {
     }
 
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <AiOutlineFileAdd size={64} className="text-gray-500" />
-        <p className="text-gray-500 mt-4">{t("No syllabus has been created yet.")}</p>
-      </div>
+      <NoDataFound
+        title={t("Syllabus")}
+        desc={t(
+          "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus .'"
+        )}
+        icon={AiOutlineFileAdd}
+        iconColor="text-gray-500"
+        textColor="text-gray-500"
+        bgColor="bg-white"
+      />
     );
   };
 
