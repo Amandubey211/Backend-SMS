@@ -13,9 +13,9 @@ import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import { fetchClassDiscussions } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 import { resetDiscussion } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionSlice";
-
+import { FaComments } from "react-icons/fa";
 const MainSection = () => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -26,7 +26,7 @@ const MainSection = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchClassDiscussions({ cid,sid }));
+    dispatch(fetchClassDiscussions({ cid, sid }));
   }, [dispatch, cid]);
 
   const handleSearch = (query) => {
@@ -73,7 +73,7 @@ const MainSection = () => {
             <PinnedDiscussions
               discussions={pinnedDiscussions}
               fetchClassDiscussions={() =>
-                dispatch(fetchClassDiscussions({ cid,sid }))
+                dispatch(fetchClassDiscussions({ cid, sid }))
               }
             />
             <div className="p-3">
@@ -89,13 +89,21 @@ const MainSection = () => {
                       key={index}
                       discussion={discussion}
                       fetchClassDiscussions={() =>
-                        dispatch(fetchClassDiscussions({ cid,sid }))
+                        dispatch(fetchClassDiscussions({ cid, sid }))
                       }
                     />
                   ))}
                 </div>
               ) : (
-                <NoDataFound title={t("Discussions")} />
+                <NoDataFound
+                  title={t("Discussions")}
+                  desc={t(
+                    "No discussions yet! Start a conversation by clicking 'Add New Discussion.'"
+                  )}
+                  icon={FaComments}
+                  iconColor="text-blue-500" // A visually appealing color
+                  textColor="text-gray-600"
+                />
               )}
             </div>
           </>

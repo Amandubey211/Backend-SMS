@@ -17,6 +17,7 @@ import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import AddRubricModal from "./Components/AddRubricModal";
 import { useTranslation } from "react-i18next";
+import { FaClipboardList } from "react-icons/fa";
 
 const MainSection = () => {
   const { t } = useTranslation("admModule");
@@ -66,7 +67,14 @@ const MainSection = () => {
             ))}
           </div>
         ) : (
-          <NoDataFound title={t("Rubrics")} />
+          <NoDataFound
+            title={t("Rubrics")}
+            desc={"Click 'Add New Rubric' to define your evaluation criteria."}
+            icon={FaClipboardList}
+            iconColor="text-blue-500"
+            textColor="text-gray-700"
+            bgColor="bg-gray-100"
+          />
         )}
         {isModalOpen && <AddRubricModal />}
       </div>
