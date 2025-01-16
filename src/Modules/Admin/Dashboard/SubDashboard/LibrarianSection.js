@@ -15,20 +15,20 @@ const LibrarianSection = () => {
 
         {/* Notice Board Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
-          <ProtectedSection requiredPermission={PERMISSIONS.ADD_BOOK}>
-            <div className="w-full h-full">
+          <div className="w-full h-full">
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_NOTICES}>
               <NoticeBoard descriptionLength={140} />
-            </div>
-          </ProtectedSection>
+            </ProtectedSection>
+          </div>
         </div>
 
         {/* Events Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
-          <ProtectedSection requiredPermission={PERMISSIONS.ADD_BOOK}>
-            <div className="w-full h-full">
+          <div className="w-full h-full">
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EVENTS}>
               <Events />
-            </div>
-          </ProtectedSection>
+            </ProtectedSection>
+          </div>
         </div>
       </div>
 
@@ -36,11 +36,11 @@ const LibrarianSection = () => {
       <div className="flex flex-wrap items-start justify-center border-y h-[35rem]">
         {/* Library Section */}
         <div className="w-full p-4 h-full flex items-center justify-center">
-          <ProtectedSection requiredPermission={PERMISSIONS.MANAGE_LIBRARY}>
-            <div className="w-full h-full">
+          <div className="w-full h-full">
+            <ProtectedSection requiredPermission={PERMISSIONS.MANAGE_LIBRARY}>
               <Library />
-            </div>
-          </ProtectedSection>
+            </ProtectedSection>
+          </div>
         </div>
       </div>
     </div>

@@ -7,6 +7,8 @@ import DeleteConfirmationModal from "../../../Components/Common/DeleteConfirmati
 import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action";
 import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice";
 import { toast } from "react-hot-toast"; // Ensure toast library is imported
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../config/permission";
 
 const GraduationMainSection = () => {
   const dispatch = useDispatch();
@@ -105,18 +107,20 @@ const GraduationMainSection = () => {
       <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
 
       {/* Display the filtered students */}
-      <GraduateList
-        students={filteredStudents}
-        selectedStudents={selectedStudents}
-        setSelectedStudents={setSelectedStudents}
-        onViewDetails={handleViewDetails}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-        onDemoteStudents={handleDemoteStudents} // Trigger bulk demote modal
-        loading={loading}
-        error={error}
-      />
+      <ProtectedSection requiredPermission={PERMISSIONS.VIEW_GRADUATES}>
+        <GraduateList
+          students={filteredStudents}
+          selectedStudents={selectedStudents}
+          setSelectedStudents={setSelectedStudents}
+          onViewDetails={handleViewDetails}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          onDemoteStudents={handleDemoteStudents}
+          loading={loading}
+          error={error}
+        />
+      </ProtectedSection>
 
       {/* Sidebar */}
       {isSidebarOpen && selectedGraduate && (
