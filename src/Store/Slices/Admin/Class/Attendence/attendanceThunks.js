@@ -32,7 +32,7 @@ export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
       const formattedDate = formatDate(date); // Format the date before sending
 
       const response = await getData(
-        `/api/teacher/attendance/getStudentList/${classId}?say=${say}`,
+        `/admin/attendance/getStudentList/${classId}?say=${say}`,
         
           { sectionId, groupId, date: formattedDate }, // Send the formatted date and filters
         
@@ -55,7 +55,7 @@ export const markAttendance = createAsyncThunk(
       const formattedDate = formatDate(attendanceData.date); // Format the date
 
       const response = await postData(
-        `${baseUrl}/api/teacher/attendance/mark?say=${say}`,
+        `${baseUrl}/admin/attendance/mark?say=${say}`,
         { ...attendanceData, date: formattedDate }, 
        
       );
@@ -77,7 +77,7 @@ export const fetchAttendanceStats = createAsyncThunk(
       const say = getAY()
 
       const response = await getData(
-        `/api/teacher/attendance/getAttendanceStats/${classId}?say=${say}`,
+        `/admin/attendance/getAttendanceStats/${classId}?say=${say}`,
         
       );
 
@@ -99,7 +99,7 @@ export const fetchStudentsMonthAttendanceList = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY()
       const response = await getData(
-        `/api/teacher/attendance/getStudentMonthList/${classId}?say=${say}`,
+        `/admin/attendance/getStudentMonthList/${classId}?say=${say}`,
        
          { sectionId, groupId, year, month }, 
         
