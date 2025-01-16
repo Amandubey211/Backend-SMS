@@ -1,687 +1,256 @@
-import React, { useEffect, useState, useCallback } from "react";
-import ImageUpload from "../../Addmission/Components/ImageUpload";
-import FormInput from "../../Accounting/subClass/component/FormInput";
-import FormSelect from "../../Accounting/subClass/component/FormSelect";
-import { FiLoader, FiX } from "react-icons/fi";
+import React, { useState, useEffect, useCallback } from "react";
+import toast from "react-hot-toast";
+import { GiImperialCrown } from "react-icons/gi";
+import { FaChevronDown, FaTimes, FaUserSlash } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  addUser,
-  editUser,
-} from "../../../../Store/Slices/Admin/Users/Staff/staff.action";
-import {
-  getAllRolesThunk,
-  assignRoleThunk,
-} from "../../../../Store/Slices/Common/RBAC/rbacThunks";
-import { motion } from "framer-motion";
-import { FaChevronDown, FaUserSlash, FaUsersSlash } from "react-icons/fa";
+  createGroup,
+  updateGroup,
+  fetchUnassignedStudents,
+  fetchGroupsByClass,
+  fetchSectionsByClass,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { useParams } from "react-router-dom";
+import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { useTranslation } from "react-i18next";
 
-// Example permission mapping. Replace with actual permission data as needed.
-const permissionMap = {
-  "674dae980b78c61a56287516": "View Users",
-  "674ee4cc953b41fb89001506": "Edit Users",
-  // Add all permission mappings here
-};
+const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
+  const { t } = useTranslation("admClass");
+  const [groupName, setGroupName] = useState("");
+  const [seatLimit, setSeatLimit] = useState(5);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [leader, setLeader] = useState(null);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [seatLimitError, setSeatLimitError] = useState(""); // Add error state for seat limit
 
-const AddUser = ({ role, data }) => {
   const dispatch = useDispatch();
-  const { roles } = useSelector((store) => store.admin.rbac);
-  const { loading, error } = useSelector((store) => store.admin.all_staff);
-  console.log(roles, "Roles Data");
+  const { cid } = useParams();
 
-  // States for form data
-  const [imagePreview, setImagePreview] = useState(null);
-  const [address, setAddress] = useState({
-    street: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "",
-  });
-  const [teacherData, setTeacherData] = useState({
-    firstName: "",
-    lastName: "",
-    dob: "",
-    religion: "",
-    gender: "",
-    position: "",
-    monthlySalary: "",
-    bloodGroup: "",
-    mobileNumber: "",
-    email: "",
-    profile: null,
-    teacherCV: null,
-    employeeID: "",
-    role: role || "",
-    active: true,
-  });
+  // Get unassigned students and loading/error state from Redux store
+  const { unassignedStudents, loading, error } = useSelector((store) => ({
+    unassignedStudents: store.admin.group_section.unassignedStudentsList,
+    loading: store.admin.group_section.loading,
+    error: store.admin.group_section.error,
+  }));
 
-  // States for role assignment
-  const [selectedRoles, setSelectedRoles] = useState([]);
+  const { studentsList } = useSelector((store) => store.admin.students);
+  // console.log(studentsList, "allStudentsList");
 
-  // State for permissions related to the selected roles
-  const [selectedRolePermissions, setSelectedRolePermissions] = useState([]);
-
-  // Dropdown state for role selection
-  const [isRoleDropdownOpen, setRoleDropdownOpen] = useState(false);
-
-  // Fetch all roles on component mount
+  // Preload data when editing a group
   useEffect(() => {
-    dispatch(getAllRolesThunk());
-  }, [dispatch]);
+    if (isUpdate && group) {
+      setGroupName(group?.groupName || ""); // Set group name
+      setSeatLimit(group?.seatLimit || 5); // Set seat limit
+      setSelectedStudents(group?.students || []); // Set selected students
+      setLeader(group?.leader || null); // Set leader
+    }
+    const classId = cid;
+    dispatch(fetchStudentsByClassAndSection(classId));
+  }, [isUpdate, group]); // Triggered only when editing
 
-  // Populate form data when editing an existing user
   useEffect(() => {
-    if (data) {
-      setTeacherData({
-        firstName: data?.firstName || "",
-        lastName: data?.lastName || "",
-        dob: data?.dob || "",
-        religion: data?.religion || "",
-        gender: data?.gender || "",
-        position: data?.position || "",
-        monthlySalary: data?.monthlySalary || "",
-        bloodGroup: data?.bloodGroup || "",
-        mobileNumber: data?.mobileNumber || "",
-        email: data?.email || "",
-        profile: null,
-        teacherCV: null,
-        employeeID: data?.employeeID || "",
-        role: role || "",
-        active: true,
-      });
-      setAddress(data?.address || {});
+    dispatch(fetchUnassignedStudents(cid));
+  }, [cid, dispatch]);
 
-      // Initialize selectedRoles based on existing data
-      const existingRoles = Array.isArray(data.role)
-        ? data.role
-        : data.role
-        ? [data.role]
-        : [];
-
-      const initialSelectedRoles = roles
-        .flatMap((dept) => dept.roles)
-        .filter((r) => existingRoles.includes(r.id))
-        .map((role) => ({
-          id: role.id,
-          name: role.name,
-        }));
-
-      setSelectedRoles(initialSelectedRoles);
-
-      // Fetch permissions for the existing role(s)
-      const permissions = roles
-        .flatMap((dept) => dept.roles)
-        .filter((r) => existingRoles.includes(r.id))
-        .flatMap((role) => role.permission);
-
-      setSelectedRolePermissions([...new Set(permissions)]);
-    }
-    return () => {
-      resetForm();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, role, roles]);
-
-  // Reset form to initial state
-  const resetForm = () => {
-    setTeacherData({
-      firstName: "",
-      lastName: "",
-      dob: "",
-      religion: "",
-      gender: "",
-      position: "",
-      monthlySalary: "",
-      bloodGroup: "",
-      mobileNumber: "",
-      email: "",
-      profile: null,
-      teacherCV: null,
-      employeeID: "",
-      role: role || "",
-      active: true,
-    });
-    setAddress({
-      street: "",
-      city: "",
-      state: "",
-      postalCode: "",
-      country: "",
-    });
-    setSelectedRoles([]);
-    setSelectedRolePermissions([]);
-    setImagePreview(null);
-  };
-
-  // Options for select fields
-  const genderOptions = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
-    { value: "other", label: "Other" },
-  ];
-  const religionOptions = [
-    { value: "Islam", label: "Islam" },
-    { value: "Christianity", label: "Christianity" },
-    { value: "Hinduism", label: "Hinduism" },
-    { value: "Other", label: "Other" },
-  ];
-  const bloodGroupOptions = [
-    { value: "O+", label: "O+" },
-    { value: "A+", label: "A+" },
-    { value: "B+", label: "B+" },
-    { value: "AB+", label: "AB+" },
-  ];
-
-  // Handle input changes for teacher data
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setTeacherData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Handle input changes for address
-  const handleAddressInputChange = (e) => {
-    const { name, value } = e.target;
-    setAddress((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  // Handle image upload
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-      setTeacherData((prev) => ({
-        ...prev,
-        profile: file,
-      }));
-    }
-  };
-
-  // Handle CV upload
-  const handleCVUpload = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === "application/pdf") {
-      setTeacherData((prev) => ({
-        ...prev,
-        teacherCV: file,
-      }));
-      // Removed validation alerts
-    } else {
-      alert("Please upload a PDF file.");
-    }
-  };
-
-  // Remove uploaded image
-  const handleRemoveImage = () => {
-    setImagePreview(null);
-    setTeacherData((prev) => ({
-      ...prev,
-      profile: null,
-    }));
-  };
-
-  // Handle role selection from dropdown
-  const handleRoleSelect = useCallback(
-    (role) => {
-      // Prevent adding duplicate roles
-      if (!selectedRoles.some((r) => r.id === role.id)) {
-        const updatedRoles = [
-          ...selectedRoles,
-          { id: role.id, name: role.name },
-        ];
-        setSelectedRoles(updatedRoles);
-
-        // Update permissions
-        const newPermissions = role.permission;
-        setSelectedRolePermissions((prev) => [
-          ...new Set([...prev, ...newPermissions]),
-        ]);
+  const handleStudentSelect = useCallback(
+    (studentId) => {
+      const student = studentsList.find((s) => s._id === studentId);
+      if (student && !selectedStudents.some((s) => s._id === studentId)) {
+        setSelectedStudents((prev) => [...prev, student]);
       }
-      setRoleDropdownOpen(false);
+      setDropdownOpen(false);
     },
-    [selectedRoles]
+    [studentsList, selectedStudents]
   );
 
-  // Handle role removal
-  const handleRoleRemove = useCallback(
-    (roleId) => {
-      const updatedRoles = selectedRoles.filter((r) => r.id !== roleId);
-      setSelectedRoles(updatedRoles);
-
-      // Recalculate permissions
-      const remainingPermissions = updatedRoles
-        .flatMap((role) => {
-          const roleData = roles
-            .flatMap((dept) => dept.roles)
-            .find((r) => r.id === role.id);
-          return roleData ? roleData.permission : [];
-        })
-        .filter((perm, index, self) => self.indexOf(perm) === index);
-
-      setSelectedRolePermissions(remainingPermissions);
-    },
-    [selectedRoles, roles]
-  );
-
-  // Toggle role dropdown
-  const toggleRoleDropdown = () => {
-    setRoleDropdownOpen((prev) => !prev);
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      const dropdown = document.getElementById("role-dropdown");
-      if (dropdown && !dropdown.contains(event.target)) {
-        setRoleDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+  const handleLeaderClick = useCallback((student) => {
+    setLeader(student);
   }, []);
 
-  // Handle form submission
+  const handleRemoveStudent = useCallback(
+    (studentId) => {
+      setSelectedStudents((prev) => prev.filter((s) => s._id !== studentId));
+      if (leader && leader._id === studentId) {
+        setLeader(null);
+      }
+    },
+    [leader]
+  );
+
+  const handleRemoveLeader = useCallback(() => {
+    setLeader(null);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation: Ensure at least one role is selected
-    if (selectedRoles.length === 0) {
-      alert("Please select at least one role.");
+    // Validate seat limit
+    if (seatLimit <= 0) {
+      setSeatLimitError(t("Seat limit must be a positive number"));
       return;
-    }
-
-    // Prepare selected role IDs and permissions
-    const selectedRoleIds = selectedRoles.map((role) => role.id);
-    const permissions = selectedRolePermissions;
-
-    // If adding a new user
-    if (!data) {
-      try {
-        // Dispatch addUser
-        const resultAction = await dispatch(
-          addUser({ userData: teacherData, address })
-        );
-
-        if (addUser.fulfilled.match(resultAction)) {
-          const newUser = resultAction.payload; // Assuming the new user data is returned
-
-          // Assign roles to the new user
-          if (selectedRoleIds.length > 0) {
-            await dispatch(
-              assignRoleThunk({
-                staffId: newUser._id, // Adjust according to your API response
-                roleId: selectedRoleIds,
-                permission: permissions,
-              })
-            ).unwrap();
-            alert("User added and roles assigned successfully!");
-            resetForm();
-          } else {
-            alert("User added successfully without role assignment.");
-          }
-        } else {
-          // Handle addUser rejected
-          alert("Failed to add user.");
-        }
-      } catch (error) {
-        console.error("Error adding user:", error);
-        alert("An error occurred while adding the user.");
-      }
     } else {
-      // If editing an existing user
-      try {
-        // Dispatch editUser
-        await dispatch(
-          editUser({ userData: teacherData, address, id: data?._id })
-        ).unwrap();
-
-        // Assign roles to the existing user
-        if (selectedRoleIds.length > 0) {
-          await dispatch(
-            assignRoleThunk({
-              staffId: data._id,
-              roleId: selectedRoleIds,
-              permission: permissions,
-            })
-          ).unwrap();
-          alert("User updated and roles assigned successfully!");
-        } else {
-          alert("User updated successfully without role assignment.");
-        }
-      } catch (error) {
-        console.error("Error updating user:", error);
-        alert("An error occurred while updating the user.");
-      }
+      setSeatLimitError("");
     }
-  };
 
-  // Utility function to get role name by ID
-  const getRoleName = (roleId) => {
-    const role = roles
-      .flatMap((dept) => dept.roles)
-      .find((r) => r.id === roleId);
-    return role ? role.name : "Unknown Role";
+    const formData = {
+      classId: cid,
+      groupName,
+      seatLimit,
+      students: selectedStudents?.map((student) => student._id),
+      leader: leader ? leader._id : null,
+    };
+
+    try {
+      if (isUpdate) {
+        await dispatch(updateGroup({ groupId, formData }));
+      } else {
+        await dispatch(createGroup(formData));
+        setGroupName("");
+        setSeatLimit(5); // Reset seat limit
+        setSelectedStudents([]);
+        setLeader(null);
+      }
+      onClose();
+      dispatch(fetchSectionsByClass(cid)); // Fetch sections again after adding or editing
+      dispatch(fetchGroupsByClass(cid));
+      dispatch(fetchUnassignedStudents(cid));
+    } catch (err) {
+      toast.error(err.message || t("Something went wrong"));
+    }
   };
 
   return (
-    <motion.div
-      className="p-6 bg-white shadow-md rounded-lg overflow-auto"
-      style={{ maxHeight: "90vh" }}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <form className="space-y-8" onSubmit={handleSubmit}>
-        {/* Personal Details Section */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          {/* Image Upload */}
-          <div className="col-span-1">
-            <ImageUpload
-              imagePreview={imagePreview}
-              handleImageChange={handleImageChange}
-              handleRemoveImage={handleRemoveImage}
-            />
-          </div>
-
-          {/* First Column */}
-          <div className="col-span-1 space-y-4">
-            <FormInput
-              id="firstName"
-              label="First Name"
-              name="firstName"
-              value={teacherData.firstName}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormInput
-              id="lastName"
-              label="Last Name"
-              name="lastName"
-              value={teacherData.lastName}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormInput
-              id="dob"
-              label="Date of Birth"
-              type="date"
-              name="dob"
-              value={teacherData.dob}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormSelect
-              id="religion"
-              label="Religion"
-              options={religionOptions}
-              name="religion"
-              value={teacherData.religion}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormSelect
-              id="gender"
-              label="Gender"
-              options={genderOptions}
-              name="gender"
-              value={teacherData.gender}
-              onChange={handleInputChange}
-              required={true}
-            />
-          </div>
-
-          {/* Second Column */}
-          <div className="col-span-1 space-y-4">
-            <FormInput
-              id="monthlySalary"
-              label="Monthly Salary"
-              type="number"
-              name="monthlySalary"
-              value={teacherData.monthlySalary}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormInput
-              id="employeeID"
-              label="Employee ID"
-              name="employeeID"
-              value={teacherData.employeeID}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormSelect
-              id="bloodGroup"
-              label="Blood Group"
-              options={bloodGroupOptions}
-              name="bloodGroup"
-              value={teacherData.bloodGroup}
-              onChange={handleInputChange}
-              required={true}
-            />
-            <FormInput
-              id="position"
-              label="Position"
-              name="position"
-              value={teacherData.position}
-              onChange={handleInputChange}
-              required={true}
-            />
-          </div>
-        </motion.div>
-
-        {/* Address Section */}
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
-        >
-          <h2 className="text-lg font-semibold border-b pb-2">Address</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              id="country"
-              label="Country"
-              name="country"
-              value={address.country}
-              onChange={handleAddressInputChange}
-              required={true}
-            />
-            <FormInput
-              id="state"
-              label="State"
-              name="state"
-              value={address.state}
-              onChange={handleAddressInputChange}
-              required={true}
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              id="city"
-              label="City"
-              name="city"
-              value={address.city}
-              onChange={handleAddressInputChange}
-              required={true}
-            />
-            <FormInput
-              id="postalCode"
-              label="Postal Code"
-              name="postalCode"
-              value={address.postalCode}
-              onChange={handleAddressInputChange}
-              required={true}
-            />
-          </div>
-          <FormInput
-            id="street"
-            label="Street"
-            name="street"
-            value={address.street}
-            onChange={handleAddressInputChange}
-            required={true}
-          />
-          {/* CV Upload */}
-          <div className="flex items-center p-4 bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg">
+    <form className="flex flex-col h-full" onSubmit={handleSubmit}>
+      <div className="bg-white h-[80%] overflow-y-auto rounded-lg p-4 w-full max-w-md">
+        <div className="flex flex-col space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              {t("Group Name")}
+            </label>
             <input
-              type="file"
-              accept=".pdf"
-              onChange={handleCVUpload}
-              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-white file:text-gray-700 hover:file:bg-gray-50"
+              type="text"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              required
             />
           </div>
-        </motion.div>
-
-        {/* Role Assignment Section */}
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <h2 className="text-lg font-semibold border-b pb-2">
-            Role Assignment
-          </h2>
-          {/* Instruction Text */}
-          <p className="text-sm text-gray-600">
-            You can select multiple roles by holding down the{" "}
-            <span className="font-medium">Ctrl</span> (Windows) or{" "}
-            <span className="font-medium">Command</span> (Mac) key while
-            selecting.
-          </p>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              {t("Max. Number Of Students")}
+            </label>
+            <input
+              type="number"
+              value={seatLimit}
+              onChange={(e) => setSeatLimit(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+              required
+            />
+            {seatLimitError && (
+              <p className="text-red-500 text-sm">{seatLimitError}</p>
+            )}
+          </div>
           <div className="relative">
-            <button
-              type="button"
-              onClick={toggleRoleDropdown}
-              className="w-full bg-white border border-gray-300 rounded-md px-4 py-2 text-left flex justify-between items-center hover:bg-gray-50"
-            >
-              <span>Select Roles</span>
-              <FaChevronDown />
-            </button>
-            {isRoleDropdownOpen && (
-              <div
-                id="role-dropdown"
-                className="absolute z-10 mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto"
+            <label className="block text-sm font-medium text-gray-700">
+              {t("Select Students")}
+            </label>
+            <div className="border border-gray-300 rounded-md p-3 flex flex-wrap">
+              {selectedStudents?.map((student) => (
+                <div
+                  key={student._id}
+                  className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md px-2 py-1 m-1 flex items-center space-x-1 truncate"
+                >
+                  <span>
+                    {student.firstName} {student.lastName}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveStudent(student._id)}
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setDropdownOpen(!isDropdownOpen)}
+                className="ml-auto flex items-center"
               >
-                {roles.flatMap((dept) => dept.roles).length === 0 ? (
+                <FaChevronDown />
+              </button>
+            </div>
+            {isDropdownOpen && (
+              <div className="absolute mt-1 w-full bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                {studentsList?.length === 0 ? (
                   <div className="text-center p-4">
-                    <FaUsersSlash className="text-2xl text-gray-400 mx-auto" />
-                    <p className="text-sm text-gray-500">No roles available.</p>
+                    <FaUserSlash className="text-2xl text-gray-400 mx-auto" />
+                    <p className="text-sm text-gray-500">
+                      {t("No students available in this class.")}
+                    </p>
                   </div>
                 ) : (
-                  roles
-                    .flatMap((dept) => dept.roles)
-                    .map((role) => (
-                      <button
-                        key={role.id}
-                        type="button"
-                        onClick={() => handleRoleSelect(role)}
-                        className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                      >
-                        {role.name}
-                      </button>
-                    ))
+                  studentsList?.map((student) => (
+                    <button
+                      key={student._id}
+                      type="button"
+                      onClick={() => handleStudentSelect(student._id)}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                    >
+                      {student.firstName} {student.lastName}
+                    </button>
+                  ))
                 )}
               </div>
             )}
           </div>
-          {/* Display Selected Roles as Badges */}
-          {selectedRoles.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {selectedRoles.map((role) => (
-                <motion.div
-                  key={role.id}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  className="flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              {t("Name Of Team Leader (Optional)")}
+            </label>
+            {leader && (
+              <div className="flex items-center space-x-2 bg-gradient-to-r rounded-lg text-white from-pink-500 to-purple-500">
+                <GiImperialCrown className="text-yellow-400" />
+                <span>
+                  {leader.firstName} {leader.lastName}
+                </span>
+                <button type="button" onClick={handleRemoveLeader}>
+                  <FaTimes />
+                </button>
+              </div>
+            )}
+            <div className="flex flex-wrap mt-2">
+              {selectedStudents?.map((student) => (
+                <div
+                  key={student._id}
+                  className={`px-2 py-1 rounded-lg cursor-pointer ${
+                    leader && leader._id === student._id
+                      ? "border border-pink-500"
+                      : ""
+                  }`}
+                  onClick={() => handleLeaderClick(student)}
                 >
-                  {role.name}
-                  <FiX
-                    className="ml-2 cursor-pointer"
-                    onClick={() => handleRoleRemove(role.id)}
-                  />
-                </motion.div>
+                  {student.firstName} {student.lastName}
+                </div>
               ))}
             </div>
-          )}
-          {/* Display Permissions */}
-          {selectedRolePermissions.length > 0 && (
-            <div className="mt-4">
-              <h3 className="font-medium">Aggregated Permissions:</h3>
-              <ul className="list-disc list-inside">
-                {selectedRolePermissions.map((permId) => (
-                  <li key={permId}>{permissionMap[permId] || permId}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Submit Button */}
-        <motion.div
-          className="flex justify-end"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.5 }}
+          </div>
+        </div>
+      </div>
+      <div className="mt-auto mb-8">
+        <button
+          type="submit"
+          className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
+          disabled={loading}
         >
-          {data ? (
-            <motion.button
-              type="submit"
-              disabled={loading}
-              whileHover={!loading ? { scale: 1.05 } : {}}
-              whileTap={!loading ? { scale: 0.95 } : {}}
-              className={`${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-              } text-white py-2 px-10 rounded-md flex items-center justify-center`}
-            >
-              {loading ? (
-                <FiLoader className="animate-spin w-5 h-5" />
-              ) : (
-                "Update User"
-              )}
-            </motion.button>
-          ) : (
-            <motion.button
-              type="submit"
-              disabled={loading}
-              whileHover={!loading ? { scale: 1.05 } : {}}
-              whileTap={!loading ? { scale: 0.95 } : {}}
-              className={`${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-              } text-white py-2 px-10 rounded-md flex items-center justify-center`}
-            >
-              {loading ? (
-                <FiLoader className="animate-spin w-5 h-5" />
-              ) : (
-                "Add New User"
-              )}
-            </motion.button>
-          )}
-        </motion.div>
-      </form>
-    </motion.div>
+          {loading
+            ? t("Please Wait...")
+            : isUpdate
+            ? t("Update Group")
+            : t("Add Group")}
+        </button>
+      </div>
+    </form>
   );
 };
 
-export default AddUser;
+export default React.memo(AddGroup);
