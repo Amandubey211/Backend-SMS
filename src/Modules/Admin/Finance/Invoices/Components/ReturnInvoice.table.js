@@ -76,7 +76,7 @@ const ReturnInvoice = () => {
   ];
 
   return (
-    <div className="border-2 rounded-lg p-4" style={{ borderColor: "#FFCEDB" }}>
+    <div className="bg-white p-4 rounded-lg shadow-md space-y-4 mt-3">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Return Invoice List</h2>

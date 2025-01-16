@@ -244,10 +244,10 @@ const RecentReceipts = () => {
       render: (date) =>
         date
           ? new Intl.DateTimeFormat("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }).format(new Date(date))
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(new Date(date))
           : "N/A",
     },
     // Action Column (Uncomment and customize if needed)
@@ -287,13 +287,7 @@ const RecentReceipts = () => {
 
   // -------------------- Render --------------------
   return (
-    <div
-      style={{
-        border: "2px solid #FFCEDB",
-        borderRadius: "8px",
-        padding: "16px",
-      }}
-    >
+    <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
       <div
         style={{
           display: "flex",
@@ -354,7 +348,7 @@ const RecentReceipts = () => {
           }}
           size="small"
           pagination={false} // Disable Ant Design pagination
-          
+
         />
       )}
 
