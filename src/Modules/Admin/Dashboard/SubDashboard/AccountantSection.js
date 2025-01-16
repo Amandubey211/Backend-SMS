@@ -3,6 +3,8 @@ import TotalEarningsGraph from "../Graphs/TotalEarningsGraph";
 import TotalStudentsGraphjs from "../Graphs/TotalStudentsGraph";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
 import Events from "../EventModule/Event";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const AccountantSection = () => {
   return (
@@ -13,12 +15,16 @@ const AccountantSection = () => {
         <div className="absolute left-2/3 transform translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-full md:w-2/3 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <TotalEarningsGraph />
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EARNINGS}>
+              <TotalEarningsGraph />
+            </ProtectedSection>
           </div>
         </div>
         <div className="w-full md:w-1/3 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <TotalStudentsGraphjs />
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENTS}>
+              <TotalStudentsGraphjs />
+            </ProtectedSection>
           </div>
         </div>
       </div>
@@ -29,12 +35,16 @@ const AccountantSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-full md:w-1/2 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <NoticeBoard descriptionLength={58} />
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_NOTICES}>
+              <NoticeBoard descriptionLength={58} />
+            </ProtectedSection>
           </div>
         </div>
         <div className="w-full md:w-1/2 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <Events />
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EVENTS}>
+              <Events />
+            </ProtectedSection>
           </div>
         </div>
       </div>

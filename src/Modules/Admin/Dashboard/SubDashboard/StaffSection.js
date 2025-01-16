@@ -1,6 +1,9 @@
 import React from "react";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
 import Events from "../EventModule/Event";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+
 
 const StaffSection = () => {
   return (
@@ -11,12 +14,16 @@ const StaffSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-full md:w-1/2 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <NoticeBoard descriptionLength={58} />
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_NOTICES}>
+              <NoticeBoard descriptionLength={58} />
+            </ProtectedSection>
           </div>
         </div>
         <div className="w-full md:w-1/2 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <Events />
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EVENTS}>
+              <Events />
+            </ProtectedSection>
           </div>
         </div>
       </div>

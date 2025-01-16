@@ -34,4 +34,23 @@ export const PERMISSIONS = {
   VIEW_NOTICES: "viewNotices",
   ADD_BOOK: "addbook",
   GET_NOTICE: "get all notice",
+
+  // Graduation permissions
+  VIEW_GRADUATES: "viewGraduates",
+  DEMOTE_GRADUATES: "demoteGraduates",
+
+  // Timetable Permissions
+  VIEW_TIMETABLE: "viewTimetable",
+  CREATE_TIMETABLE: "createTimetable",
+
+
+  // Admin Dashboard Permissions
+  VIEW_ATTENDANCE: "viewAttendance",
+  VIEW_EARNINGS: "viewEarnings",
+  VIEW_TOP_RANKING: "viewTopRanking",
+  VIEW_STUDENTS: "viewStudents",
+  VIEW_NOTICES: "viewNotices",
+  VIEW_EVENTS: "viewEvents",
+  VIEW_LIBRARY: "viewLibrary",
+
 };
