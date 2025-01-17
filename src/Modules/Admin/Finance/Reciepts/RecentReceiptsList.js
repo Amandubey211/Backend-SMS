@@ -28,7 +28,8 @@ import EmailModal from "../../../../Components/Common/EmailModal";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 
@@ -391,7 +392,7 @@ const RecentReceiptsList = () => {
       key: "action",
       render: (_, record) => (
         <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
-          
+
           <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
         </Dropdown>
       ),
@@ -401,7 +402,7 @@ const RecentReceiptsList = () => {
   // Render
   return (
     <AdminLayout>
-      <div className="p-4 bg-white rounded-lg shadow-lg">
+      <div className="p-4 ">
         {/* Header / Search / Export / Add New */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-4">
@@ -422,16 +423,17 @@ const RecentReceiptsList = () => {
               <ExportOutlined className="text-sm" /> {/* Export Icon */}
               <span>Export</span> {/* Button text */}
             </button>
-
-            <button
-              className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              onClick={handleNavigate}
-            >
-              <span className="text-gray-800 font-medium">Add New Receipt</span>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiUserPlus size={16} />
-              </div>
-            </button>
+            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_RECEIPT}>
+              <button
+                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                onClick={handleNavigate}
+              >
+                <span className="text-gray-800 font-medium">Add New Receipt</span>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                  <FiUserPlus size={16} />
+                </div>
+              </button>
+            </ProtectedSection>
           </div>
         </div>
         {loading ? (
@@ -449,87 +451,89 @@ const RecentReceiptsList = () => {
           // Render Table and Custom Pagination
           <>
             {/* Table */}
-            <Table
-              rowKey={(record) => record._id}
-              columns={columns}
-              dataSource={filteredData}
-              expandable={{
-                expandedRowRender: (record) => (
-                  <div>
-                    <strong>Line Items:</strong>
-                    {record.lineItems && record.lineItems.length > 0 ? (
-                      <ul>
-                        {record.lineItems.map((item, index) => (
-                          <li key={index}>
-                            {item.revenueType || item.name || "Item"}:{" "}
-                            {item.total || 0} QR
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span>No line items available</span>
-                    )}
-                  </div>
-                ),
-              }}
-              pagination={{
-                current: currentPage, // Use state
-                total: pagination.totalRecords, // Total records from API response
-                pageSize: pageLimit, // Use state for limit
-                showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "20", "50"],
-                size: "small",
-                showTotal: (total) =>
-                  `Page ${currentPage} of ${Math.ceil(
-                    pagination.totalRecords / pageLimit
-                  )} | Total ${total} records`,
-                onChange: (page) => {
-                  setCurrentPage(page); // Update currentPage state
-                },
-                onShowSizeChange: (current, size) => {
-                  setPageLimit(size); // Update pageLimit state
-                  setCurrentPage(1); // Reset to the first page
-                },
-              }}
-              summary={() => {
-                let totalPaidAmount = 0;
-                let totalTax = 0;
-                let totalDiscount = 0;
-                let totalPenalty = 0;
+            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_ALL_RECEIPTS}>
+              <Table
+                rowKey={(record) => record._id}
+                columns={columns}
+                dataSource={filteredData}
+                expandable={{
+                  expandedRowRender: (record) => (
+                    <div>
+                      <strong>Line Items:</strong>
+                      {record.lineItems && record.lineItems.length > 0 ? (
+                        <ul>
+                          {record.lineItems.map((item, index) => (
+                            <li key={index}>
+                              {item.revenueType || item.name || "Item"}:{" "}
+                              {item.total || 0} QR
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span>No line items available</span>
+                      )}
+                    </div>
+                  ),
+                }}
+                pagination={{
+                  current: currentPage, // Use state
+                  total: pagination.totalRecords, // Total records from API response
+                  pageSize: pageLimit, // Use state for limit
+                  showSizeChanger: true,
+                  pageSizeOptions: ["5", "10", "20", "50"],
+                  size: "small",
+                  showTotal: (total) =>
+                    `Page ${currentPage} of ${Math.ceil(
+                      pagination.totalRecords / pageLimit
+                    )} | Total ${total} records`,
+                  onChange: (page) => {
+                    setCurrentPage(page); // Update currentPage state
+                  },
+                  onShowSizeChange: (current, size) => {
+                    setPageLimit(size); // Update pageLimit state
+                    setCurrentPage(1); // Reset to the first page
+                  },
+                }}
+                summary={() => {
+                  let totalPaidAmount = 0;
+                  let totalTax = 0;
+                  let totalDiscount = 0;
+                  let totalPenalty = 0;
 
-                // Calculate totals from filteredData
-                filteredData.forEach((record) => {
-                  totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
-                  totalTax += parseFloat(record.tax) || 0;
-                  totalDiscount += parseFloat(record.discount) || 0;
-                  totalPenalty += parseFloat(record.penalty) || 0;
-                });
+                  // Calculate totals from filteredData
+                  filteredData.forEach((record) => {
+                    totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
+                    totalTax += parseFloat(record.tax) || 0;
+                    totalDiscount += parseFloat(record.discount) || 0;
+                    totalPenalty += parseFloat(record.penalty) || 0;
+                  });
 
-                // Uncomment if you want to display totals
-                // return (
-                //   <Table.Summary.Row>
-                //     <Table.Summary.Cell index={0} colSpan={3}>
-                //       <strong>Totals:</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={1}>
-                //       <strong>{totalDiscount.toLocaleString()} %</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={2}>
-                //       <strong>{totalTax.toLocaleString()} QR</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={3}>
-                //       <strong>{totalPaidAmount.toLocaleString()} QR</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={4}>
-                //       <strong>{totalPenalty.toLocaleString()} QR</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={5} />
-                //   </Table.Summary.Row>
-                // );
-              }}
-              size="small"
-              bordered
-            />
+                  // Uncomment if you want to display totals
+                  // return (
+                  //   <Table.Summary.Row>
+                  //     <Table.Summary.Cell index={0} colSpan={3}>
+                  //       <strong>Totals:</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={1}>
+                  //       <strong>{totalDiscount.toLocaleString()} %</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={2}>
+                  //       <strong>{totalTax.toLocaleString()} QR</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={3}>
+                  //       <strong>{totalPaidAmount.toLocaleString()} QR</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={4}>
+                  //       <strong>{totalPenalty.toLocaleString()} QR</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={5} />
+                  //   </Table.Summary.Row>
+                  // );
+                }}
+                size="small"
+                bordered
+              />
+            </ProtectedSection>
           </>
         )}
         {/* Cancel Confirmation Modal */}

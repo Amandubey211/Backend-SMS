@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
-
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 // import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 
 // Mapping payment types to corresponding icons
@@ -199,15 +200,17 @@ const SummaryPenalityandAdjustment = () => {
       )} */}
       {/* Table */}
       {!loading && !error && (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false} // Removed pagination controls
-          className="rounded-lg shadow text-xs"
-          bordered
-          size="small"
-          tableLayout="fixed" // Fixed table layout
-        />
+        <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}>
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={false} // Removed pagination controls
+            className="rounded-lg shadow text-xs"
+            bordered
+            size="small"
+            tableLayout="fixed" // Fixed table layout
+          />
+        </ProtectedSection>
       )}
     </div>
   );

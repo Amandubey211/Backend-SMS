@@ -34,7 +34,8 @@ import ExportModal from "../Earnings/Components/ExportModal";
 import QuotationTemplate from "../../../../Utils/FinanceTemplate/QuotationTemplate";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -362,21 +363,23 @@ const RecentQuotationList = () => {
               >
                 Export
               </Button>
-              <button
-                onClick={() => {
-                  dispatch(clearSelectedQuotation());
-                  dispatch(setReadOnly(false));
-                  navigate("/finance/quotations/add-new-quotations");
-                }}
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              >
-                <span className="text-gray-800 font-medium">
-                  Add New Quotation
-                </span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiPlus size={16} />
-                </div>
-              </button>
+              <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_QUOTATION}>
+                <button
+                  onClick={() => {
+                    dispatch(clearSelectedQuotation());
+                    dispatch(setReadOnly(false));
+                    navigate("/finance/quotations/add-new-quotations");
+                  }}
+                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                >
+                  <span className="text-gray-800 font-medium">
+                    Add New Quotation
+                  </span>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                    <FiPlus size={16} />
+                  </div>
+                </button>
+              </ProtectedSection>
             </div>
           </div>
 
@@ -398,34 +401,36 @@ const RecentQuotationList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              pagination={{
-                current: currentPage,
-                total: totalRecords,
-                pageSize: computedPageSize,
-                showSizeChanger: true,
-                size: "small",
-                showTotal: () =>
-                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                onChange: (page, pageSize) => {
-                  setCurrentPage(page);
-                  setComputedPageSize(pageSize);
-                },
-                onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size);
-                },
-              }}
-              onChange={(pagination) => {
-                const newPage = pagination.current;
-                dispatch(setCurrentPage(newPage));
-              }}
-              className="rounded-lg shadow text-xs"
-              bordered
-              size="small"
-              tableLayout="fixed"
-            />
+            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_LIST_ALL_QUOTATION}>
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={{
+                  current: currentPage,
+                  total: totalRecords,
+                  pageSize: computedPageSize,
+                  showSizeChanger: true,
+                  size: "small",
+                  showTotal: () =>
+                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                  onChange: (page, pageSize) => {
+                    setCurrentPage(page);
+                    setComputedPageSize(pageSize);
+                  },
+                  onShowSizeChange: (current, size) => {
+                    setComputedPageSize(size);
+                  },
+                }}
+                onChange={(pagination) => {
+                  const newPage = pagination.current;
+                  dispatch(setCurrentPage(newPage));
+                }}
+                className="rounded-lg shadow text-xs"
+                bordered
+                size="small"
+                tableLayout="fixed"
+              />
+            </ProtectedSection>
           )}
 
           {/* Quotation Preview Overlay */}
