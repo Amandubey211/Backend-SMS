@@ -7,7 +7,7 @@ import { fetchAnnouncements } from "../../../../../../Store/Slices/Admin/Class/A
 import { useParams } from "react-router-dom";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { AiOutlineBell } from "react-icons/ai";
-// Define an array of colors for random selection.
+
 const colors = [
   "#efc42f",
   "#ee69b6",
