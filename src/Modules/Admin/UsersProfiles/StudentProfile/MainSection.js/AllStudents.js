@@ -19,6 +19,7 @@ import EditStudent from "../../../Students/Components/EditStudent";
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AllStudents = () => {
   const { t } = useTranslation("admAccounts");
@@ -96,6 +97,7 @@ const AllStudents = () => {
             <Spinner />
           </div>
         ) : (
+          <ProtectedSection requiredPermission={"viewStudent"}>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
             {allStudents?.length > 0 ? (
               allStudents?.map((student) => (
@@ -175,7 +177,7 @@ const AllStudents = () => {
                 <NoDataFound />
               </div>
             )}
-          </div>
+          </div></ProtectedSection>
         )}
         <Sidebar
           isOpen={isUpdateSidebarOpen}
