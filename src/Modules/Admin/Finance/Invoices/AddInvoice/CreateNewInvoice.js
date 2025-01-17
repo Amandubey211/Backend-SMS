@@ -9,6 +9,7 @@ import Layout from "../../../../../Components/Common/Layout";
 import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
 import { TotalInputs } from "./TotalInputs";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const CreateNewInvoice = () => {
   const [loading, setLoading] = useState(false);
@@ -102,6 +103,7 @@ const CreateNewInvoice = () => {
   return (
     <Layout title="Finance | Invoice">
       <AdminDashLayout>
+      <ProtectedSection requiredPermission="addInvoice">
         <div className="p-6 min-h-screen">
           <Formik
             initialValues={initialValues}
@@ -333,6 +335,7 @@ const CreateNewInvoice = () => {
             )}
           </Formik>
         </div>
+        </ProtectedSection>
       </AdminDashLayout>
     </Layout>
   );

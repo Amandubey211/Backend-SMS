@@ -2,6 +2,7 @@ import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import React, { useState } from "react";
 import StudentFeesForm from "../Earnings/AddEarnings/EarningsForm/StudentFeesForm";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 export default function AddStudentFeesForm() {
   const subCategories = [
@@ -44,6 +45,7 @@ export default function AddStudentFeesForm() {
   return (
     <Layout title="Finance | Add Student Fees">
       <AdminDashLayout>
+      <ProtectedSection requiredPermission="studentfeegadd">
         <div className="w-full max-w-screen-xl mx-auto overflow-x-hidden p-4 md:p-6">
         <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Add New Fees</h1>
@@ -99,6 +101,7 @@ export default function AddStudentFeesForm() {
             <StudentFeesForm selectCategories={selectCategories}  setStudentDetail={setStudentDetail} formData={formData} setFormData={setFormData} allData={allData} studentDetail={studentDetail} />
           </div>
         </div>
+        </ProtectedSection>
       </AdminDashLayout>
     </Layout>
   );

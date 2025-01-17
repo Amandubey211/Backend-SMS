@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { updateStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import toast from "react-hot-toast";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 export default function EditStudentFeesForm({ data }) {
     const [initialValues, setInitialValues] = useState({
@@ -112,7 +113,7 @@ export default function EditStudentFeesForm({ data }) {
     };
 
     return (
-
+<ProtectedSection requiredPermission="studentedit">
         <div className="flex w-full border flex-col">
             <div className="flex flex-row mx-4 gap-2 font-semibold justify-between my-2">
                 <div className="flex flex-row gap-2">
@@ -293,5 +294,6 @@ export default function EditStudentFeesForm({ data }) {
                 )}
             </Formik>
         </div>
+        </ProtectedSection>
     );
 }

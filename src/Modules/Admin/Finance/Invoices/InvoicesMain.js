@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchInvoice, fetchInvoiceCard } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 import { FaPlusCircle } from "react-icons/fa";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
@@ -23,6 +24,7 @@ const InvoicesMain = () => {
     return (
         <Layout title="Finance | Invoice">
         <AdminDashLayout>
+        <ProtectedSection requiredPermission="invoiceDashboard">
             <div className="p-6 space-y-6">
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
@@ -44,6 +46,7 @@ const InvoicesMain = () => {
                 <RecentInvoice />                
                 <ReturnInvoice />                
             </div>
+            </ProtectedSection>
         </AdminDashLayout>
         </Layout>
     );

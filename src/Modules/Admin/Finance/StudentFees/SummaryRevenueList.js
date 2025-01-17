@@ -28,6 +28,7 @@ import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -311,6 +312,7 @@ const SummaryRevenueList = () => {
   return (
     <Layout title="Finance | Student Fees">
     <AdminLayout>
+    <ProtectedSection requiredPermission="viewStudentFeeList">
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
@@ -525,6 +527,7 @@ const SummaryRevenueList = () => {
         title="Student Fees Data"
         sheet="student_fees_report"
       />
+      </ProtectedSection>
     </AdminLayout>
     </Layout>
   );
