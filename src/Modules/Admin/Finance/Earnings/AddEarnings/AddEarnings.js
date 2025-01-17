@@ -59,8 +59,9 @@ const AddEarnings = () => {
       const subCategory = incomeData.subCategory || incomeData.sub_category;
 
       const categoryName =
-        incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
+        incomeData.category?.categoryName || "Facility-Based Revenue";
 
+      console.log(categoryName, "categoryNamecategoryName");
       // **2. Extract subcategory-specific fields from 'selectedIncome'**
       // Assuming subcategory-specific data is directly present in 'selectedIncome'
       // If they are nested, adjust accordingly (e.g., incomeData.rentIncome.name)
@@ -70,7 +71,6 @@ const AddEarnings = () => {
         case "Rent Income":
           specificFields = {
             name: incomeData.rentIncome.name || "",
-
             startDate: incomeData.rentIncome.startDate?.slice(0, 10) || "",
             endDate: incomeData.rentIncome.endDate?.slice(0, 10) || "",
             nameOfRenter: incomeData.rentIncome.nameOfRenter || "",
@@ -406,7 +406,7 @@ const AddEarnings = () => {
       const incomeData = selectedIncome;
       console.log("Income Data Loaded:", incomeData); // Debugging line
       const categoryName =
-        incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
+        incomeData.category?.categoryName || "Facility-Based Revenue";
       setSelectedCategory(categoryName);
       setSelectedSubCategory(incomeData.subCategory || "Rent Income"); // Use 'subCategory'
       setDescription(incomeData.description || "");
