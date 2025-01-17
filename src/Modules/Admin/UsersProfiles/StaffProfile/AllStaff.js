@@ -19,6 +19,7 @@ import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.
 import Header from "../Component/Header";
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
@@ -165,6 +166,7 @@ const AllStaff = () => {
             <Spinner />
           </div>
         ) : (
+          <ProtectedSection requiredPermission={"viewLibrarian"}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
@@ -213,7 +215,7 @@ const AllStaff = () => {
                 <GoPlus className="text-2xl" />
               </button>
             )}
-          </div>
+          </div></ProtectedSection>
         )}
       </DashLayout>
 

@@ -7,6 +7,7 @@ import { fetchAttendanceData } from "../../../../../../Store/Slices/Admin/Users/
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const StudentOverView = () => {
   const { t } = useTranslation('admAccounts');
@@ -19,6 +20,7 @@ const StudentOverView = () => {
 
   return (
     <>
+    <ProtectedSection requiredPermission={"viewstudentoverview"}>
       <div className="flex flex-col">
         <div className="">
           <AllSubjects />
@@ -38,6 +40,7 @@ const StudentOverView = () => {
           <TaskChart />
         </div>
       </div>
+      </ProtectedSection>
     </>
   );
 };

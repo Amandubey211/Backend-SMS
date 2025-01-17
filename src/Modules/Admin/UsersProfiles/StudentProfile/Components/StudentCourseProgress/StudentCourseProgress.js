@@ -7,6 +7,7 @@ import { GoAlertFill } from 'react-icons/go'
 import { fetchCourseProgress, fetchStudentSubjectProgress } from '../../../../../../Store/Slices/Admin/Users/Students/student.action'
 import MainSection from './Module/MainSection'
 import Spinner from '../../../../../../Components/Common/Spinner'
+import ProtectedSection from '../../../../../../Routes/ProtectedRoutes/ProtectedSection'
 const StudentCourseProgress = ({student}) => {
   const {cid} = useParams()
   const {studentSubjectProgress,loading} = useSelector((store) => store.admin.all_students);
@@ -29,6 +30,7 @@ const StudentCourseProgress = ({student}) => {
   {loading?<div className='w-full h-[90vh] flex items-center justify-center text-gray-600'>
     <Spinner/>
   </div>:
+  <ProtectedSection requiredPermission={"viewstudentprogress"}>
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
@@ -47,7 +49,7 @@ const StudentCourseProgress = ({student}) => {
     <div className='border-t-2'>
        <MainSection /> 
     </div>
-  </div>
+  </div></ProtectedSection>
   }</>
   )
 }

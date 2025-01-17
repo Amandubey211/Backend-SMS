@@ -15,6 +15,7 @@ import { fetchAllStudents } from "../../../../Store/Slices/Admin/Users/Students/
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const uniqueFilterOptions = (data, key) => {
   return [
@@ -82,6 +83,7 @@ const StudentParentProfile = () => {
               <Spinner />
             </div>
           ) : (
+            <ProtectedSection requiredPermission={"viewParent"}>
             <div className="min-h-screen p-4">
               <h2 className="text-xl font-semibold mb-4">
                 {t("All Parents")}{" "}
@@ -254,6 +256,7 @@ const StudentParentProfile = () => {
                 />
               </Sidebar>
             </div>
+            </ProtectedSection>
           )}
         </DashLayout>
       </Layout>

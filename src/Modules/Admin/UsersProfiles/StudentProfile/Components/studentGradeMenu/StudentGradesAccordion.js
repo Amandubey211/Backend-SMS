@@ -3,6 +3,7 @@ import GradeAccordionItem from "./GradeAccordionItem";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const StudentGradesAccordion = ({ student }) => {
   const { t } = useTranslation('admAccounts');
@@ -24,6 +25,7 @@ const StudentGradesAccordion = ({ student }) => {
 
   return (
     <>
+    <ProtectedSection requiredPermission={"viewstudentgrades"}>
       <div className="flex flex-row w-[100%]">
         <div className="w-[75%] ">
           <GradeAccordionItem getData={(subjectId) => getStudentGrades(subjectId)} />
@@ -66,6 +68,7 @@ const StudentGradesAccordion = ({ student }) => {
           </div>
         </div>
       </div>
+      </ProtectedSection>
     </>
   );
 };

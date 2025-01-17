@@ -19,6 +19,7 @@ import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks"; // Ensure this path is correct
 import Header from "../Component/Header";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -165,6 +166,7 @@ const AllAccountants = () => {
             <Spinner />
           </div>
         ) : (
+          <ProtectedSection requiredPermission={"ViewAccountants"}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
@@ -212,6 +214,7 @@ const AllAccountants = () => {
               </button>
             )}
           </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 

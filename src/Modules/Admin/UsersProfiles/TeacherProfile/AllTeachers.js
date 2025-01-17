@@ -20,6 +20,7 @@ import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AllTeachers = () => {
   const { t } = useTranslation("admAccounts");
@@ -163,6 +164,7 @@ const AllTeachers = () => {
             <Spinner />
           </div>
         ) : (
+          <ProtectedSection requiredPermission={"viewTeacher"}>
           <div className="p-4 relative">
             {/* Reusable Header Component */}
             <Header
@@ -208,6 +210,7 @@ const AllTeachers = () => {
               </button>
             )}
           </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 

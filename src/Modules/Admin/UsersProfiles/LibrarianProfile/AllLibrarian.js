@@ -19,6 +19,7 @@ import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AllLibrarian = () => {
   const { t } = useTranslation("admAccounts");
@@ -167,6 +168,7 @@ const AllLibrarian = () => {
             <Spinner />
           </div>
         ) : (
+          <ProtectedSection requiredPermission={"viewLibrarian"}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
@@ -213,7 +215,7 @@ const AllLibrarian = () => {
                 <GoPlus className="text-2xl" />
               </button>
             )}
-          </div>
+          </div></ProtectedSection>
         )}
       </DashLayout>
 

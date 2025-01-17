@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentFinance } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const StudentFinance = ({ student }) => {
   const { t } = useTranslation('admAccounts');
@@ -34,6 +35,7 @@ const StudentFinance = ({ student }) => {
 
   return (
     <>
+    <ProtectedSection requiredPermission={"viewstudentfinance"}>
       <div className="flex flex-col">
         <div className="w-full border p-4">
           <div className="flex flex-row gap-3 p-4">
@@ -70,6 +72,7 @@ const StudentFinance = ({ student }) => {
         </div>
         <FinanceTable />
       </div>
+      </ProtectedSection>
     </>
   );
 };
