@@ -37,7 +37,8 @@ import jsPDF from "jspdf";
 import { toast } from "react-hot-toast";
 import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSuccess, clearSelectedInvoiceNumber } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
-
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
 
@@ -97,35 +98,35 @@ const PenalityandAdjustmentList = () => {
   const handleDownloadPDF = async () => {
     try {
       if (!selectedReceipt || !receiptRef.current) return;
-  
+
       const pdfTitle = selectedReceipt.return_invoice_no
         ? `${selectedReceipt.return_invoice_no}.pdf`
         : "penalty_adjustment.pdf";
-  
+
       // Capture only the receipt content
       const canvas = await html2canvas(receiptRef.current, { scale: 2 });
       const imgData = canvas.toDataURL("image/png");
-  
+
       const pdf = new jsPDF("p", "pt", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-  
+
       const imgWidth = canvas.width;
       const imgHeight = canvas.height;
       const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
       const newWidth = imgWidth * ratio;
       const newHeight = imgHeight * ratio;
-  
+
       pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
       pdf.save(pdfTitle);
-  
+
       toast.success("PDF downloaded successfully!");
     } catch (error) {
       console.error("Error generating PDF:", error);
       toast.error("Failed to generate PDF.");
     }
   };
-  
+
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -439,21 +440,23 @@ const PenalityandAdjustmentList = () => {
               >
                 Export
               </Button>
-              <button
-                onClick={() =>
-                  navigate(
-                    "/finance/penaltyAdjustment/add-new-penalty-adjustment"
-                  )
-                }
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              >
-                <span className="text-gray-800 font-medium">
-                  Add New Adjustment
-                </span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiPlus size={16} />
-                </div>
-              </button>
+              <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_ADJUSTMENT}>
+                <button
+                  onClick={() =>
+                    navigate(
+                      "/finance/penaltyAdjustment/add-new-penalty-adjustment"
+                    )
+                  }
+                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                >
+                  <span className="text-gray-800 font-medium">
+                    Add New Adjustment
+                  </span>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                    <FiPlus size={16} />
+                  </div>
+                </button>
+              </ProtectedSection>
             </div>
           </div>
 
@@ -475,30 +478,32 @@ const PenalityandAdjustmentList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              pagination={{
-                current: currentPage,
-                total: totalRecords,
-                pageSize: computedPageSize,
-                showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "20", "50"],
-                size: "small",
-                showTotal: () =>
-                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                onChange: (page, pageSize) => {
-                  dispatch(setCurrentPage(page));
-                },
-                onShowSizeChange: (current, size) => {
-                  dispatch(setCurrentPage(1)); // Reset to first page on size change
-                },
-              }}
-              className="rounded-lg shadow text-xs"
-              bordered
-              size="small"
-              tableLayout="fixed"
-            />
+            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_LIST_ALL_ADJUSTMENTS}>
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={{
+                  current: currentPage,
+                  total: totalRecords,
+                  pageSize: computedPageSize,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["5", "10", "20", "50"],
+                  size: "small",
+                  showTotal: () =>
+                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                  onChange: (page, pageSize) => {
+                    dispatch(setCurrentPage(page));
+                  },
+                  onShowSizeChange: (current, size) => {
+                    dispatch(setCurrentPage(1)); // Reset to first page on size change
+                  },
+                }}
+                className="rounded-lg shadow text-xs"
+                bordered
+                size="small"
+                tableLayout="fixed"
+              />
+            </ProtectedSection>
           )}
           {/* Export Modal */}
           <ExportModal
