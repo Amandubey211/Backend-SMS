@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import { FaPlusCircle } from "react-icons/fa";
 import { MdAttachMoney } from "react-icons/md";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -76,18 +77,22 @@ useEffect(() => {
         transition={{ duration: 0.3 }}
         className="flex-1 flex flex-col space-y-2"
       >
+        <ProtectedSection requiredPermission="studentfeecard">
         {/* Cards Section */}
         <StudentCardSection />
-       
+        </ProtectedSection>
         {/* Graph Section */}
+        <ProtectedSection requiredPermission="studentfeegrapgh">
         <div className="w-full ">
           <StudentFeesGraph />
         </div>
-
+        </ProtectedSection>
         {/* Summary Table */}
+        <ProtectedSection requiredPermission="StudentFeesSummaryTable">
         <div className="w-full">
           <StudentFeesSummaryTable />
         </div>
+        </ProtectedSection>
       </motion.div>
 
       {/* Sidebar for Adding New Fee */}

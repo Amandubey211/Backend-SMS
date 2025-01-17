@@ -54,6 +54,7 @@ import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import toast from "react-hot-toast";
 import { MdOutlineDone } from "react-icons/md";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
@@ -345,6 +346,7 @@ const RecentInvoiceList = () => {
   return (
     <Layout title="Finance | Invoice">
       <AdminLayout>
+      <ProtectedSection requiredPermission="invoiceList">
         <div className="p-4 bg-white rounded-lg ">
           <div className="p-1 bg-white rounded-lg">
             {/* Filters and Buttons Section */}
@@ -521,6 +523,7 @@ const RecentInvoiceList = () => {
             sheet="invoice_report"
           />
         </div>
+        </ProtectedSection>
       </AdminLayout>
     </Layout>
   );

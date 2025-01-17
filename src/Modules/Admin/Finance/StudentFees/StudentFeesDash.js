@@ -5,15 +5,18 @@ import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentFeesMain from "./StudentFeesMain";
 import { Toaster } from "react-hot-toast";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const StudentFeesDashboard = () => {
   useNavHeading("Finance","Student Fees")
   return (
     <Layout title="Finance | Student Fees">
       <AdminDashLayout>
+      <ProtectedSection requiredPermission="StudentFeedashboard">
         <div className="w-full max-w-screen-xl mx-auto overflow-x-hidden">
           <StudentFeesMain />
         </div>
+   </ProtectedSection>
       </AdminDashLayout>
     </Layout>
   );
