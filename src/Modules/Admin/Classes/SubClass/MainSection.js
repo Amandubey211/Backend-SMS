@@ -13,6 +13,7 @@ import NoDataFound from "../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../Components/Common/Spinner";
 import { fetchClassDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const colors = [
   "bg-yellow-300",
@@ -100,6 +101,7 @@ const MainSection = () => {
 
   return (
     <>
+    <ProtectedSection requiredPermission="viewSubject">
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <Spinner />
@@ -159,6 +161,7 @@ const MainSection = () => {
       >
         <AddNewSubject subject={editSubject} onClose={handleCloseSidebar} />
       </Sidebar>
+      </ProtectedSection>
     </>
   );
 };
