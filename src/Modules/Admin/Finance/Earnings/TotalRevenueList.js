@@ -29,6 +29,8 @@ import {
   CheckCircleOutlined,
   BlockOutlined,
 } from "@ant-design/icons";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";

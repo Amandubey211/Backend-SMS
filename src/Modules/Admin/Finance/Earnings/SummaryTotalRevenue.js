@@ -10,7 +10,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import debounce from "lodash.debounce";
 import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
-
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
   cash: <DollarOutlined />,
@@ -75,9 +76,8 @@ const SummaryTotalRevenue = () => {
       key: "paymentType",
       render: (text) => (
         <Tooltip
-          title={`Payment Type: ${
-            text.charAt(0).toUpperCase() + text.slice(1)
-          }`}
+          title={`Payment Type: ${text.charAt(0).toUpperCase() + text.slice(1)
+            }`}
         >
           <span className="text-xs flex items-center gap-1">
             {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
@@ -176,19 +176,21 @@ const SummaryTotalRevenue = () => {
         </div>
       )}
       {/* Table */}
-      <Table
-        dataSource={dataSource}
-        columns={columns}
-        pagination={false} // Removed pagination controls
-        className="rounded-lg shadow text-xs"
-        bordered
-        size="small"
-        tableLayout="fixed" // Fixed table layout
-        loading={loading} // Show spinner on loading
+      <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_LIST_ALL_REVENUE}>
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          pagination={false} // Removed pagination controls
+          className="rounded-lg shadow text-xs"
+          bordered
+          size="small"
+          tableLayout="fixed" // Fixed table layout
+          loading={loading} // Show spinner on loading
         // locale={{
         //   emptyText: <Empty description="No Data Found" />, // Show default Ant Design empty icon + text
         // }}
-      />
+        />
+      </ProtectedSection>
     </div>
   );
 };
