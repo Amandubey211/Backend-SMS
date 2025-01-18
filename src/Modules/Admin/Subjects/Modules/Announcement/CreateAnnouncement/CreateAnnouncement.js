@@ -13,6 +13,7 @@ import {
   editAnnouncement,
 } from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
 import toast from "react-hot-toast";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const CreateAnnouncement = () => {
   const location = useLocation();
@@ -123,6 +124,7 @@ const CreateAnnouncement = () => {
     <Layout
       title={`${isEditing ? "Update" : "Create"} Announcement | Student Diwan`}
     >
+      <ProtectedSection requiredPermission="addAttendence">
       <div className="flex w-full min-h-screen">
         <SideMenubar />
         <div
@@ -163,6 +165,7 @@ const CreateAnnouncement = () => {
           </div>
         </div>
       </div>
+      </ProtectedSection>
     </Layout>
   );
 };
