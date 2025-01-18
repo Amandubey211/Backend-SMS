@@ -42,6 +42,8 @@ import Card from "../components/Card";
 import ExportModal from "../../Earnings/Components/ExportModal";
 import DeleteModal from "../../Earnings/Components/DeleteModal";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const TotalExpenseList = () => {
   useNavHeading("Finance", "Expense List");
@@ -492,17 +494,19 @@ const TotalExpenseList = () => {
       <DashLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {cardDataWithValues.map((card, index) => (
-              <Card
-                key={index}
-                title={card.title}
-                value={card.value}
-                icon={card.icon}
+          <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_EXPENSE_CARD_DATA}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {cardDataWithValues.map((card, index) => (
+                <Card
+                  key={index}
+                  title={card.title}
+                  value={card.value}
+                  icon={card.icon}
                 // Pass other props like comparison, percentage, icon, trend if needed
-              />
-            ))}
-          </div>
+                />
+              ))}
+            </div>
+          </ProtectedSection>
 
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
@@ -555,7 +559,7 @@ const TotalExpenseList = () => {
                 className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
                 icon={<FilterOutlined />}
                 disabled
-                // onClick={() => setIsFilterModalVisible(true)}
+              // onClick={() => setIsFilterModalVisible(true)}
               >
                 Filter
               </Button>
@@ -571,50 +575,52 @@ const TotalExpenseList = () => {
 
           {/* Table Wrapper (responsive container) */}
           <div className="w-full overflow-x-auto">
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              // Updated pagination configuration
-              pagination={{
-                current: currentPage,
-                total: totalRecords,
-                pageSize: computedPageSize,
-                showSizeChanger: true, // Enable size changer
-                pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
-                size: "small",
-                showTotal: (total) =>
-                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                onChange: (page, pageSize) => {
-                  dispatch(setCurrentPage(page)); // Update the current page in Redux
-                  setComputedPageSize(pageSize); // Update the local page size
-                },
-                onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size); // Handle page size change locally
-                  dispatch(setCurrentPage(1)); // Optionally reset to first page
-                },
-              }}
-              className="rounded-lg shadow text-xs w-full"
-              style={{ width: "100%" }}
-              bordered
-              size="small"
-              tableLayout="auto" // let columns adjust automatically
-              components={components}
-              loading={{
-                spinning: loading,
-                indicator: <Spin size="large" />,
-                tip: "Loading...",
-              }}
-              summary={summary}
-              scroll={{ x: true }} // allow horizontal scroll if needed
-              onRow={(record) => ({
-                onClick: () => {
-                  if (record.paymentStatus !== "unpaid") {
-                    return;
-                  }
-                  setSelectedRowKey(record.key);
-                },
-              })}
-            />
+            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_ALL_EXPENSES}>
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                // Updated pagination configuration
+                pagination={{
+                  current: currentPage,
+                  total: totalRecords,
+                  pageSize: computedPageSize,
+                  showSizeChanger: true, // Enable size changer
+                  pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
+                  size: "small",
+                  showTotal: (total) =>
+                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                  onChange: (page, pageSize) => {
+                    dispatch(setCurrentPage(page)); // Update the current page in Redux
+                    setComputedPageSize(pageSize); // Update the local page size
+                  },
+                  onShowSizeChange: (current, size) => {
+                    setComputedPageSize(size); // Handle page size change locally
+                    dispatch(setCurrentPage(1)); // Optionally reset to first page
+                  },
+                }}
+                className="rounded-lg shadow text-xs w-full"
+                style={{ width: "100%" }}
+                bordered
+                size="small"
+                tableLayout="auto" // let columns adjust automatically
+                components={components}
+                loading={{
+                  spinning: loading,
+                  indicator: <Spin size="large" />,
+                  tip: "Loading...",
+                }}
+                summary={summary}
+                scroll={{ x: true }} // allow horizontal scroll if needed
+                onRow={(record) => ({
+                  onClick: () => {
+                    if (record.paymentStatus !== "unpaid") {
+                      return;
+                    }
+                    setSelectedRowKey(record.key);
+                  },
+                })}
+              />
+            </ProtectedSection>
           </div>
 
           {/* Modals */}
