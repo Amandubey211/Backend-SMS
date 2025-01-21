@@ -10,6 +10,7 @@ import {
   editModule,
 } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { setSelectedModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AddModule = ({ data, onClose }) => {
   const { t } = useTranslation("admModule");
@@ -97,6 +98,7 @@ const AddModule = ({ data, onClose }) => {
   };
 
   return (
+    <ProtectedSection requiredPermission={''}>
     <div className="flex flex-col h-full p-2">
       <div className="bg-white rounded-lg">
         <div className="mb-4">
@@ -220,6 +222,7 @@ const AddModule = ({ data, onClose }) => {
         </button>
       </div>
     </div>
+    </ProtectedSection>
   );
 };
 
