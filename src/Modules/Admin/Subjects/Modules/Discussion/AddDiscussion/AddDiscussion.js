@@ -14,6 +14,7 @@ import {
   updateDiscussion,
 } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 import toast from "react-hot-toast";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AddDiscussion = () => {
   const { cid, sid } = useParams();
@@ -148,6 +149,7 @@ const AddDiscussion = () => {
           : "Add Discussion | Student Diwan"
       }
     >
+       <ProtectedSection requiredPermission={''}>
       <div className="flex w-full min-h-screen">
         <SideMenubar />
         <div
@@ -190,6 +192,7 @@ const AddDiscussion = () => {
           </>
         </div>
       </div>
+      </ProtectedSection>
     </Layout>
   );
 };

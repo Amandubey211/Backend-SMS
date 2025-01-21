@@ -24,6 +24,7 @@ import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "./AddNewCriteriaForm";
 import { fetchFilteredAssignments } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AddRubricModal = ({ readonly = false }) => {
   const { t } = useTranslation("admModule");
@@ -191,6 +192,7 @@ const AddRubricModal = ({ readonly = false }) => {
   };
 
   return (
+    <ProtectedSection requiredPermission={''}>
     <div
       className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-30 transition-opacity duration-300 ${
         isModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -425,6 +427,7 @@ const AddRubricModal = ({ readonly = false }) => {
         )}
       </div>
     </div>
+    </ProtectedSection>
   );
 };
 

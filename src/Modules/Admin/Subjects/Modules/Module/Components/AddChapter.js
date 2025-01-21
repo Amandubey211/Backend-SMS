@@ -8,6 +8,7 @@ import {
   editChapter,
 } from "../../../../../../Store/Slices/Admin/Class/Module/chapterThunk";
 import { useParams } from "react-router-dom";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AddChapter = ({ chapterData, isEditing, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -93,6 +94,7 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
   };
 
   return (
+    <ProtectedSection requiredPermission={''}>
     <form className="flex flex-col h-full p-2" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg">
         {/* Chapter Image Upload */}
@@ -220,6 +222,7 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
         </button>
       </div>
     </form>
+    </ProtectedSection>
   );
 };
 

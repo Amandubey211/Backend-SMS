@@ -11,6 +11,7 @@ import {
   createPage,
   updatePage,
 } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AddPage = () => {
   const { t } = useTranslation('admAccounts');
@@ -104,6 +105,7 @@ const AddPage = () => {
           : t("Add Page | Student Diwan")
       }
     >
+      <ProtectedSection requiredPermission={''}>
       <div className="flex w-full min-h-screen">
         <SideMenubar />
         <div
@@ -164,6 +166,7 @@ const AddPage = () => {
           )}
         </div>
       </div>
+      </ProtectedSection>
     </Layout>
   );
 };
