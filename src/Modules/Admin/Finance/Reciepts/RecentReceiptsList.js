@@ -32,6 +32,7 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
+import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -141,38 +142,44 @@ const RecentReceiptsList = () => {
     }
   };
 
-  // --- Download PDF from preview ---
-  const handleDownloadPDF = async () => {
-    try {
-      if (!selectedReceipt || !receiptRef.current) return;
-
-      const pdfTitle = selectedReceipt.receiptNumber
-        ? `${selectedReceipt.receiptNumber}.pdf`
-        : "receipt.pdf";
-
-      // Capture only the receipt component (not the buttons)
-      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-
-      // Use jsPDF to create the PDF
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      // Calculate the required dimensions
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
-
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
-    } catch (error) {
-      console.error("Error generating PDF: ", error);
-      toast.error("Failed to generate PDF.");
+// --- Download PDF from preview ---
+const handleDownloadPDF = async () => {
+  try {
+    if (!selectedReceipt || !receiptRef.current) {
+      toast.error("Receipt data is unavailable.");
+      return;
     }
-  };
+
+    const pdfTitle = selectedReceipt.receiptNumber
+      ? `${selectedReceipt.receiptNumber}.pdf`
+      : "receipt.pdf";
+
+    // Create a new jsPDF instance
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    // Fetch the HTML content of the receipt
+    const receiptHTML = receiptRef.current.outerHTML;
+
+    // Use jsPDF's HTML rendering method
+    await pdf.html(receiptRef.current, {
+      callback: function (doc) {
+        // Save the generated PDF
+        doc.save(pdfTitle);
+      },
+      x: 10, // Optional: Adjust x margin
+      y: 10, // Optional: Adjust y margin
+      autoPaging: true, // Automatically add new pages if the content overflows
+      width: 190, // Page width in mm
+      windowWidth: 800, // Optional: Set the width for rendering
+    });
+  } catch (error) {
+    console.error("Error generating PDF: ", error);
+    toast.error("Failed to generate PDF.");
+  }
+};
+
+  
+  
 
 
   // --- Navigate to Add New Receipt Page (normal create) ---
@@ -573,11 +580,13 @@ const RecentReceiptsList = () => {
           <div
             className="absolute inset-0 bg-black bg-opacity-60"
             style={{ backdropFilter: "blur(8px)" }}
+            onClick={() => setReceiptVisible(false)}
           />
           {/* Centered content */}
           <div
             ref={popupRef}
-            className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+            className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Close + Download PDF buttons */}
             <div className="flex justify-end space-x-2 mb-4">
@@ -597,17 +606,18 @@ const RecentReceiptsList = () => {
               </button>
             </div>
 
-            {/* Receipt content container: only this will be captured by html2canvas */}
-            <div ref={receiptRef}>
+            {/* Receipt content container */}
+            <div ref={receiptRef} className="receipt-container">
               {selectedReceipt ? (
-                <Receipt data={selectedReceipt} />
+                <ReceiptTemplate data={selectedReceipt} />
               ) : (
-                <p>No receipt data available.</p>
+                <p className="text-center text-gray-500">No receipt data available.</p>
               )}
             </div>
           </div>
         </div>
       )}
+
 
     </AdminLayout>
   );
