@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { fetchAllQuotations } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import Spinner from "../../../../../Components/Common/Spinner";
-
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const RecentQuotation = () => {
     const navigate = useNavigate();
@@ -149,13 +150,16 @@ const RecentQuotation = () => {
                 <h2 className="text-lg font-medium text-gray-700">
                     Summary of Quotation ({dataSource?.length || 5}/{totalRecords})
                 </h2>
-                <Button
-                    onClick={handleViewMore}
-                    className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-                    size="small"
-                >
-                    View More ({totalRecords})
-                </Button>
+                {!PERMISSIONS.FINANCE_SHOWS_SUMMARY_OF_QUOTATION && (
+                    <Button
+                        onClick={handleViewMore}
+                        className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+                        size="small"
+                    >
+                        View More ({totalRecords})
+                    </Button>
+                )}
+
             </div>
 
             {/* Loading Indicator */}
@@ -182,15 +186,18 @@ const RecentQuotation = () => {
             )} */}
             {/* Table */}
             {!loading && !error && (
-                <Table
-                    dataSource={dataSource}
-                    columns={columns}
-                    pagination={false} // Removed pagination controls
-                    className="rounded-lg shadow text-xs"
-                    bordered
-                    size="small"
-                    tableLayout="fixed" // Fixed table layout
-                />
+                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_SUMMARY_OF_QUOTATION}>
+                    <Table
+                        dataSource={dataSource}
+                        columns={columns}
+                        pagination={false} // Removed pagination controls
+                        className="rounded-lg shadow text-xs"
+                        bordered
+                        size="small"
+                        tableLayout="fixed" // Fixed table layout
+                    />
+                </ProtectedSection>
+
             )}
         </div>
     );

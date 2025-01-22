@@ -55,8 +55,8 @@ const ReceiptTemplate = ({ data }) => {
         <div
         className="
           absolute 
-          top-[92%] 
-          left-[51%] 
+          top-[35rem] 
+          left-[28rem] 
           transform 
           -translate-x-1/2 
           -translate-y-1/2 
