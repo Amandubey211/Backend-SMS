@@ -15,7 +15,7 @@ export const fetchAllParent = createAsyncThunk(
     try {
       const say = getAY();
        dispatch(setShowError(false));
-      const response = await getData(`/admin/all/Parents?say=${say}`);
+      const response = await getData(`/all/Parents?say=${say}`);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue); 

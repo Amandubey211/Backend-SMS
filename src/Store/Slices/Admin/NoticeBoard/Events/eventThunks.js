@@ -4,15 +4,19 @@ import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../../Utils/academivYear";
 import { customRequest, deleteData, getData,} from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Fetch events
 export const fetchEventsThunk = createAsyncThunk(
   "events/fetchEvents",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch,getState }) => {
+
     try {
       const say = getAY();
+     
+      const getRole = getUserRole(getState);      
       dispatch(setShowError(false));
-      const response = await getData(`/admin/all/events?say=${say}`);
+      const response = await getData(`/${getRole}/all/events?say=${say}`);
       // console.log("response events--",response);
 
       return response?.events;

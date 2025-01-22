@@ -24,7 +24,7 @@ const SingleStudent = () => {
   const {allStudents,loading} = useSelector((store) => store.admin.all_students);
   const {role} = useSelector((store) => store.common.auth);
   const dispatch = useDispatch();
-  const [activeItem, setActiveItem] = useState(role == "librarian"?"Information":role == "accountant" ?"Information" :"OverView");
+  const [activeItem, setActiveItem] = useState(role == "librarian"?"Information":role == "finance" ?"Information" :"OverView");
   useEffect(() => {
     dispatch(fetchAllStudents());
   }, [dispatch])
@@ -59,7 +59,7 @@ const SingleStudent = () => {
             ]:role == "teacher" ?[
               "OverView", "Course Progress",  "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
-            ]:role == "accountant" ?[
+            ]:role == "finance" ?[
                 "Information", 
               "Parents", "Finance",
             ]:role == "librarian" ?[

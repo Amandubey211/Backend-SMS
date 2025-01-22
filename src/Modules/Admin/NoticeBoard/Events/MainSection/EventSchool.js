@@ -27,6 +27,7 @@ import ViewEvent from "../subComponents/ViewEvent";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -128,7 +129,7 @@ const EventScheduler = () => {
   return (
     <Layout title={`${t("Event")} | ${t("Student Diwan")}`}>
       <DashLayout>
-      <ProtectedSection requiredPermission={"viewsEvents"}>
+      <ProtectedSection requiredPermission={PERMISSIONS.SHOW_EVENTS}>
         <div className="min-h-screen p-4 bg-gray-50 max-w-screen">
           <div className="flex flex-row justify-between">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
