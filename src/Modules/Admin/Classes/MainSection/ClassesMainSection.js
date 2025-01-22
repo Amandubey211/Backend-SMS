@@ -7,6 +7,8 @@ import AddNewClass from "./AddNewClass";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { fetchAllClasses, fetchAllClassesDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 // import { FaSchool } from "react-icons/fa";
 
 const ClassesMainSection = () => {
@@ -42,6 +44,7 @@ const ClassesMainSection = () => {
   }, [dispatch]);
 
   return (
+    <ProtectedSection requiredPermission={PERMISSIONS.TEACHER_GET_ALL_CLASSES}>
     <div className="min-h-screen p-4">
       {/* Conditionally show heading for teachers */}
       {role === "teacher" && (
@@ -102,6 +105,7 @@ const ClassesMainSection = () => {
         </Sidebar>
       )}
     </div>
+    </ProtectedSection>
   );
 };
 

@@ -9,9 +9,9 @@ const Classes = () => {
   useNavHeading("Classes");
   return (
     <Layout title="Classes | Student diwan">
-      <ProtectedSection requiredPermission="viewClasses">
+      
       <DashLayout children={<ClassesMainSection />} hideAvatarList={true} />;
-      </ProtectedSection>
+      
     </Layout>
   );
 };

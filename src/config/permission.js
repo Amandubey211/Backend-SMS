@@ -6,7 +6,7 @@
 export const ROLES = {
   ADMIN: "admin",
   TEACHER: "teacher",
-  ACCOUNTANT: "accountant",
+  FINANCE: "finance",
   LIBRARIAN: "librarian",
   STAFF: "staff",
   STUDENT: "student",
@@ -277,8 +277,9 @@ export const PERMISSIONS = {
   OTHERSTAFF_REMOVE_NOTICE: "Remove Notice",
 
   // Managing Events
-  OTHERSTAFF_SHOW_EVENTS: "Show Events",
-  OTHERSTAFF_ADD_NEW_EVENT: "Add New Event",
+   SHOW_EVENTS: "Show Events",
+  ADD_NEW_EVENT: "Add New Event",
+
   OTHERSTAFF_UPDATE_EVENT: "Update Event",
   OTHERSTAFF_REMOVE_EVENT: "Remove Event",
 
@@ -520,6 +521,6 @@ export const PERMISSIONS = {
   TEACHER_PARENT_GET_ALL_BOOKISSUE: "Get All Book Issues",
 
   // Staff Management
-  TEACHER_PARENT_GET_ALL_STAFF: "Get All Staff",
+  GET_ALL_STAFF: "Get All Staff",
 
 };

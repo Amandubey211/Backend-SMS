@@ -20,6 +20,7 @@ import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunk
 import Header from "../Component/Header";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -36,7 +37,7 @@ const AllAccountants = () => {
   const [sortedAccountants, setSortedAccountants] = useState([]);
 
   // Redux Selectors
-  const { accountant, loading: accountantLoading } = useSelector(
+  const { finance, loading: accountantLoading } = useSelector(
     (store) => store.admin.all_staff
   );
   const role = useSelector((store) => store.common.auth.role);
@@ -48,14 +49,14 @@ const AllAccountants = () => {
     dispatch(getAllRolesThunk()); // Fetch roles for filtering
   }, [dispatch]);
 
-  // Initialize sortedAccountants with accountant data
+  // Initialize sortedAccountants with finance data
   useEffect(() => {
-    setSortedAccountants(accountant);
-  }, [accountant]);
+    setSortedAccountants(finance);
+  }, [finance]);
 
   // Apply Sorting and Filtering
   useEffect(() => {
-    let filtered = [...accountant];
+    let filtered = [...finance];
 
     // Apply Role Filtering
     if (filterRoles.length > 0) {
@@ -81,7 +82,7 @@ const AllAccountants = () => {
     }
 
     setSortedAccountants(filtered);
-  }, [sortOption, filterRoles, accountant]);
+  }, [sortOption, filterRoles, finance]);
 
   // Handlers
   const handleSidebarOpen = (content, data = null) => {
@@ -110,7 +111,7 @@ const AllAccountants = () => {
   // Extract Accountant Roles from AllRoles
   const accountantRoles =
     AllRoles?.filter(
-      (dept) => dept.department.toLowerCase() === "accountant"
+      (dept) => dept.department.toLowerCase() === "finance"
     )?.flatMap((dept) => dept.roles) || [];
 
   // Define Sort and Filter Options
@@ -146,11 +147,11 @@ const AllAccountants = () => {
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewAccountant":
-        return <ViewAccountant accountant={selectedAccountant} />;
+        return <ViewAccountant finance={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role="accountant" />;
+        return <AddUser role="finance" />;
       case "editAccountant":
-        return <AddUser role="accountant" data={accountantData} />;
+        return <AddUser role="finance" data={accountantData} />;
       case "createRole":
         return <CreateRole onClose={handleSidebarClose} department="Finance" />;
       default:
@@ -166,12 +167,12 @@ const AllAccountants = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={"ViewAccountants"}>
+          <ProtectedSection requiredPermission={PERMISSIONS}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header
               title={t("All Finance")}
-              count={accountant?.length || 0}
+              count={finance?.length || 0}
               sortOptions={sortOptions}
               filterOptions={filterOptionsList}
               department="Finance"

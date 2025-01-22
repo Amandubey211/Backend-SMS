@@ -40,7 +40,7 @@ const sidebarData = [
       ROLES.ADMIN,
       ROLES.TEACHER,
       ROLES.LIBRARIAN,
-      ROLES.ACCOUNTANT,
+      ROLES.FINANCE,
       ROLES.STAFF,
     ],
     //requiredPermission: PERMISSIONS.VIEW_DASHBOARD, // Reference permission from config
@@ -65,7 +65,7 @@ const sidebarData = [
     roles: [
       ROLES.ADMIN,
       ROLES.TEACHER,
-      ROLES.ACCOUNTANT,
+      ROLES.FINANCE,
       ROLES.LIBRARIAN,
       ROLES.STAFF,
     ],
@@ -82,7 +82,7 @@ const sidebarData = [
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT, ROLES.LIBRARIAN, ROLES.STAFF],
+        roles: [ROLES.ADMIN, ROLES.FINANCE, ROLES.LIBRARIAN, ROLES.STAFF],
         //requiredPermission: PERMISSIONS.VIEW_TEACHERS, // Added permission reference
       },
       {
@@ -106,7 +106,7 @@ const sidebarData = [
         roles: [
           ROLES.ADMIN,
           ROLES.TEACHER,
-          ROLES.ACCOUNTANT,
+          ROLES.FINANCE,
           ROLES.LIBRARIAN,
           ROLES.STAFF,
         ],
@@ -119,7 +119,7 @@ const sidebarData = [
         roles: [
           ROLES.ADMIN,
           ROLES.TEACHER,
-          ROLES.ACCOUNTANT,
+          ROLES.FINANCE,
           ROLES.LIBRARIAN,
           ROLES.STAFF,
         ],
@@ -132,7 +132,7 @@ const sidebarData = [
         roles: [
           ROLES.ADMIN,
           ROLES.TEACHER,
-          ROLES.ACCOUNTANT,
+          ROLES.FINANCE,
           ROLES.LIBRARIAN,
           ROLES.STAFF,
         ],
@@ -143,69 +143,69 @@ const sidebarData = [
   {
     title: "Finance",
     icon: <HiOutlineCalculator style={{ fontSize: "1.1rem" }} />,
-    roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+    roles: [ROLES.ADMIN, ROLES.FINANCE],
     items: [
       {
         title: "Earning",
         icon: <BsCashCoin />,
         path: "/finance/earning",
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_EARNINGS, // Added permission reference
       },
       {
         title: "Student Fees",
         path: "/finance/studentfees",
         icon: <IoReceiptOutline style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_FEES,
       },
       {
         title: "Expense",
         path: "/finance/expenses",
         icon: <RiHandCoinLine style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_EXPENSES,
       },
       {
         title: "Invoices",
         path: "/finance/invoices/dashboard",
         icon: <TbFileInvoice style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_INVOICES,
       },
       {
         title: "Receipts",
         path: "/finance/receipts",
         icon: <TfiReceipt style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_RECEIPTS,
       },
       {
         title: "Quotations",
         path: "/finance/quotations",
         icon: <FaWpforms style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_QUOTATIONS,
       },
       // {
       //   title: "Payments",
       //   path: "/finance/payments",
       //   icon: <MdPayment style={{ fontSize: '1.1rem' }} />,
-      //   roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+      //   roles: [ROLES.ADMIN, ROLES.FINANCE],
       //   //requiredPermission: PERMISSIONS.VIEW_PAYMENTS,
       // },
       // {
       //   title: "Reports",
       //   path: "/finance/reports",
       //   icon: <TbReport style={{ fontSize: '1.1rem' }} />,
-      //   roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+      //   roles: [ROLES.ADMIN, ROLES.FINANCE],
       //   //requiredPermission: PERMISSIONS.VIEW_REPORTS,
       // },
       {
         title: "Penalties & Adjustment",
         path: "/finance/penaltyAdjustment",
         icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.ACCOUNTANT],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },
     ],
@@ -217,7 +217,7 @@ const sidebarData = [
       ROLES.ADMIN,
       ROLES.TEACHER,
       ROLES.LIBRARIAN,
-      ROLES.ACCOUNTANT,
+      ROLES.FINANCE,
       ROLES.STAFF,
     ],
     items: [
@@ -229,7 +229,7 @@ const sidebarData = [
           ROLES.ADMIN,
           ROLES.TEACHER,
           ROLES.LIBRARIAN,
-          ROLES.ACCOUNTANT,
+          ROLES.FINANCE,
           ROLES.STAFF,
         ],
         //requiredPermission: PERMISSIONS.VIEW_NOTICES, // Added permission reference
@@ -242,7 +242,7 @@ const sidebarData = [
           ROLES.ADMIN,
           ROLES.TEACHER,
           ROLES.LIBRARIAN,
-          ROLES.ACCOUNTANT,
+          ROLES.FINANCE,
           ROLES.STAFF,
         ],
         //requiredPermission: PERMISSIONS.VIEW_EVENTS, // Added permission reference

@@ -41,7 +41,7 @@ const MainSection = () => {
   }, [dispatch]);
 
   // useEffect(() => {
-  //   if (role == "admin" || role == "accountant") {
+  //   if (role == "admin" || role == "finance") {
   //     dispatch(createStaffSalary({ status: "unpaid", action: "pay now" }));
   //   }
   // }, [dispatch, createStaffSalary]);
@@ -128,7 +128,7 @@ const MainSection = () => {
         <>
           {role === "admin" && <AdminSection />}
           {role === "teacher" && <TeacherSection />}
-          {role === "accountant" && <AccountantSection />}
+          {role === "finance" && <AccountantSection />}
           {role === "librarian" && <LibrarianSection />}
           {role === "staff" && <StaffSection />}
         </>

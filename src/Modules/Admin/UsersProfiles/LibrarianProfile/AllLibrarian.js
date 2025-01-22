@@ -20,6 +20,7 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const AllLibrarian = () => {
   const { t } = useTranslation("admAccounts");
@@ -168,7 +169,7 @@ const AllLibrarian = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={"viewLibrarian"}>
+          <ProtectedSection requiredPermission={PERMISSIONS.LI}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header

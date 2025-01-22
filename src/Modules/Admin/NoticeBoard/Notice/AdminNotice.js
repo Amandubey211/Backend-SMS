@@ -90,7 +90,7 @@ const AdminNotice = () => {
             {role === "librarian" && t("Librarian Notice Board")}
             {role === "teacher" && t("Teacher Notice Board")}
             {role === "staff" && t("Staff Notice Board")}
-            {role === "accountant" && t("Accountant Notice Board")}
+            {role === "finance" && t("Accountant Notice Board")}
           </h1>
           {/* Search Bar */}
           <div className="flex p-2 justify-between">
@@ -107,7 +107,7 @@ const AdminNotice = () => {
               </div>
             </div>
             {(role === "admin" ||
-              role === "accountant" ||
+              role === "finance" ||
               role === "teacher" ||
               role === "librarian") && (
               <button

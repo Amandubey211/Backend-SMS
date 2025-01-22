@@ -38,7 +38,6 @@ const RoleSelector = () => {
     if (selectedRole) {
       // Dispatch the selected role to Redux
       dispatch(setRole(selectedRole));
-
       // Fetch permissions for the selected role
       await dispatch(getMyRolePermissionsThunk());
 
