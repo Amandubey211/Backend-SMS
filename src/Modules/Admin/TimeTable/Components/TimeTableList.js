@@ -72,6 +72,97 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
     </Menu>
   );
 
+  // Updated renderSchedule function
+  const renderSchedule = (timetable) => {
+    const { type, days } = timetable;
+
+    if (!days || days.length === 0) {
+      return <p className="text-gray-500">{t("No schedule available.")}</p>;
+    }
+
+    const firstDay = days[0];
+    const firstSlot = firstDay.slots?.[0];
+
+    if (!firstSlot) {
+      return <p className="text-gray-500">{t("No schedule available.")}</p>;
+    }
+
+    // Depending on type, render different schedule details
+    if (type === "event") {
+      return (
+        <div className="mt-2">
+          <p className="text-gray-600">
+            <strong>{t("Date")}:</strong>{" "}
+            {new Date(firstDay.date).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+          <p className="text-sm text-gray-600 flex items-center">
+            <strong className="mr-1">{t("Event")}:</strong>
+            <span className="inline-flex items-center justify-center bg-purple-100 text-purple-700 text-sm font-medium px-2 ml-1 mt-1 rounded-md">
+              {firstSlot.eventName ?? "N/A"}
+            </span>
+          </p>
+          <p className="text-gray-600">
+            <strong>{t("Time")}:</strong> {firstSlot.startTime} – {firstSlot.endTime}
+          </p>
+        </div>
+      );
+    } else if (type === "weekly") {
+      return (
+        <div className="mt-2">
+          <p className="text-gray-600">
+            <strong>{t("Day")}:</strong> {firstDay.day}
+          </p>
+          <p className="text-gray-600">
+            <strong>{t("Subject")}:</strong>{" "}
+            {firstSlot.subjectId?.name ?? "N/A"}
+          </p>
+          <p className="text-gray-600">
+            <strong>{t("Time")}:</strong> {firstSlot.startTime} – {firstSlot.endTime}
+          </p>
+        </div>
+      );
+    } else if (type === "exam") {
+      return (
+        <div className="mt-2">
+          <p className="text-gray-600">
+            <strong>{t("Date")}:</strong>{" "}
+            {new Date(firstDay.date).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
+          </p>
+          <p className="text-gray-600">
+            <strong>{t("Subject")}:</strong>{" "}
+            {firstSlot.subjectId?.name ?? "N/A"}
+          </p>
+          <p className="text-gray-600">
+            <strong>{t("Time")}:</strong> {firstSlot.startTime} – {firstSlot.endTime}
+          </p>
+        </div>
+      );
+    } else if (type === "others") {
+      return (
+        <div className="mt-2">
+          {/* Since 'others' type does not have 'date' or 'day', we display 'startTime' and 'heading' */}
+          <p className="text-gray-600">
+            <strong>{t("Start Time")}:</strong> {firstSlot.startTime}
+          </p>
+          <p className="text-gray-600">
+            <strong>{t("Heading")}:</strong> {firstSlot.heading ?? "N/A"}
+          </p>
+        </div>
+      );
+    } else {
+      // For any other types, do not show schedule
+      return <p className="text-gray-500">{t("No schedule available.")}</p>;
+    }
+  };
+
   return (
     <>
       {/* Heading */}
@@ -99,8 +190,9 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               className="relative p-6 bg-white border border-gray-200 shadow-lg rounded-xl transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
               onClick={() => handleCardClick(timetable)}
             >
-              {/* Dropdown and Status */}
-              <div className="absolute top-4 right-4 flex items-center space-x-2">
+              {/* Active/Draft Tag and Dropdown */}
+              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
+                {/* Active/Draft Tag */}
                 <span
                   className={`text-sm font-normal px-2 rounded ${
                     timetable.status === "active"
@@ -110,18 +202,26 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
                 >
                   {timetable.status === "active" ? t("Active") : t("Draft")}
                 </span>
+                {/* Dropdown with Grey Circle Border */}
                 <Dropdown overlay={actionMenu(timetable)} trigger={["click"]}>
                   <EllipsisOutlined
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent card click
                     }}
-                    style={{ fontSize: "18px", color: "gray", cursor: "pointer" }}
+                    style={{
+                      fontSize: "18px",
+                      color: "gray",
+                      cursor: "pointer",
+                      border: "1px solid gray",
+                      borderRadius: "50%",
+                      padding: "4px",
+                    }}
                   />
                 </Dropdown>
               </div>
 
               {/* Card Header */}
-              <h2 className="text-xl font-bold text-gray-800 mb-4">{timetable.name}</h2>
+              <h2 className="text-xl font-bold text-gray-800 mb-4 mt-8">{timetable.name}</h2>
 
               {/* Details Section */}
               <div className="mb-4">
@@ -159,31 +259,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               {/* Schedule Section */}
               <div className="bg-gray-100 p-4 rounded-lg mb-4 border border-gray-200">
                 <h3 className="text-md font-semibold text-gray-700">{t("Schedule")}</h3>
-                {timetable.days?.[0]?.slots?.[0] ? (
-                  <div className="mt-2">
-                    <p className="text-gray-600">
-                      <strong>{t("Date")}:</strong>{" "}
-                      {new Date(timetable.days[0].date).toLocaleDateString("en-US", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                    <p className="text-sm text-gray-600 flex items-center">
-                      <strong className="mr-1">{t("Event")}:</strong>
-                      <span className="inline-flex items-center justify-center bg-purple-100 text-purple-700 text-sm font-medium px-2 ml-1 mt-1 rounded-md">
-                        {timetable.days[0].slots[0].eventName ?? "N/A"}
-                      </span>
-                    </p>
-
-                    <p className="text-gray-600">
-                      <strong>{t("Time")}:</strong>{" "}
-                      {timetable.days[0].slots[0].startTime} – {timetable.days[0].slots[0].endTime}
-                    </p>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">{t("No schedule available.")}</p>
-                )}
+                {renderSchedule(timetable)}
               </div>
 
               {/* View Button */}
