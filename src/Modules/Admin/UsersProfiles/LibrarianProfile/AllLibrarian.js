@@ -169,7 +169,7 @@ const AllLibrarian = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.LI}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_LIBRARIAN}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header

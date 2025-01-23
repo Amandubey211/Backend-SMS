@@ -20,6 +20,7 @@ import Header from "../Component/Header";
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
@@ -166,7 +167,7 @@ const AllStaff = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={"viewLibrarian"}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STAFF}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header

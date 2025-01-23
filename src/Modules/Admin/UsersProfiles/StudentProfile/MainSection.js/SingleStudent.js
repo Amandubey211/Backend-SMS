@@ -17,6 +17,8 @@ import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action.js";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection.js";
+import { PERMISSIONS } from "../../../../../config/permission.js";
 
 
 const SingleStudent = () => {
@@ -50,6 +52,7 @@ const SingleStudent = () => {
   return (
     <Layout title="Student Details">
       <DashLayout>
+      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_STUDENT_INFO}>
         <div className="flex gap-2   ">
           <div className="flex flex-col  h-auto w-[25%]">
             <StudentProfile student={student} />
@@ -71,6 +74,7 @@ const SingleStudent = () => {
             <div className="w-full">{renderContent()}</div>
           </div>
         </div>
+        </ProtectedSection>
       </DashLayout>
     </Layout>
   );
