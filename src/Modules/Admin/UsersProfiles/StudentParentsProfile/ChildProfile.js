@@ -2,6 +2,8 @@ import React from 'react';
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import ProtectedSection from '../../../../Routes/ProtectedRoutes/ProtectedSection';
+import { PERMISSIONS } from '../../../../config/permission';
 
 const ChildProfile = ({ children }) => {
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ const ChildProfile = ({ children }) => {
   // console.log('Children data:', children);
 
   return (
-    <>
+    <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_PARENT_STUDENT_INFO}>
       <div className="flex flex-col gap-4 mt-2">
         {children?.map((child, index) => (
           <div key={index} className='flex flex-col text-center border border-gray-300 rounded-md items-center justify-around mx-5 py-5 gap-3'>
@@ -47,7 +49,7 @@ const ChildProfile = ({ children }) => {
           </div>
         ))}
       </div>
-    </>
+    </ProtectedSection>
   );
 };
 

@@ -9,6 +9,7 @@ import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.acti
 import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import { customRequest, deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 
 // Fetch All Staff
@@ -18,7 +19,8 @@ export const fetchAllStaff = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(`/admin/get_staffs?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(`/${getRole}/user/get_staffs?say=${say}`);
       dispatch(setAllStaffs(response));
       return response;
     } catch (error) {
