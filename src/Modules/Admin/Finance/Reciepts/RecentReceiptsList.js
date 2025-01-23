@@ -143,43 +143,44 @@ const RecentReceiptsList = () => {
   };
 
 // --- Download PDF from preview ---
-const handleDownloadPDF = async () => {
-  try {
-    if (!selectedReceipt || !receiptRef.current) {
-      toast.error("Receipt data is unavailable.");
-      return;
+
+
+
+
+
+// --- Download PDF from preview ---
+  const handleDownloadPDF = async () => {
+    try {
+      if (!selectedReceipt || !receiptRef.current) return;
+
+      const pdfTitle = selectedReceipt.receiptNumber
+          ? `${selectedReceipt.receiptNumber}.pdf`
+          : "receipt.pdf";
+
+      // Capture only the receipt component (not the buttons)
+      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
+      const imgData = canvas.toDataURL("image/png");
+
+      // Use jsPDF to create the PDF
+      const pdf = new jsPDF("p", "pt", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Calculate the required dimensions
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
+      const newWidth = imgWidth * ratio;
+      const newHeight = imgHeight * ratio;
+
+      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
+      pdf.save(pdfTitle);
+    } catch (error) {
+      console.error("Error generating PDF: ", error);
+      toast.error("Failed to generate PDF.");
     }
+  };
 
-    const pdfTitle = selectedReceipt.receiptNumber
-      ? `${selectedReceipt.receiptNumber}.pdf`
-      : "receipt.pdf";
-
-    // Create a new jsPDF instance
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    // Fetch the HTML content of the receipt
-    const receiptHTML = receiptRef.current.outerHTML;
-
-    // Use jsPDF's HTML rendering method
-    await pdf.html(receiptRef.current, {
-      callback: function (doc) {
-        // Save the generated PDF
-        doc.save(pdfTitle);
-      },
-      x: 10, // Optional: Adjust x margin
-      y: 10, // Optional: Adjust y margin
-      autoPaging: true, // Automatically add new pages if the content overflows
-      width: 190, // Page width in mm
-      windowWidth: 800, // Optional: Set the width for rendering
-    });
-  } catch (error) {
-    console.error("Error generating PDF: ", error);
-    toast.error("Failed to generate PDF.");
-  }
-};
-
-  
-  
 
 
   // --- Navigate to Add New Receipt Page (normal create) ---
