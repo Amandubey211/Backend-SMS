@@ -32,6 +32,7 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
+import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -141,14 +142,20 @@ const RecentReceiptsList = () => {
     }
   };
 
-  // --- Download PDF from preview ---
+// --- Download PDF from preview ---
+
+
+
+
+
+// --- Download PDF from preview ---
   const handleDownloadPDF = async () => {
     try {
       if (!selectedReceipt || !receiptRef.current) return;
 
       const pdfTitle = selectedReceipt.receiptNumber
-        ? `${selectedReceipt.receiptNumber}.pdf`
-        : "receipt.pdf";
+          ? `${selectedReceipt.receiptNumber}.pdf`
+          : "receipt.pdf";
 
       // Capture only the receipt component (not the buttons)
       const canvas = await html2canvas(receiptRef.current, { scale: 2 });
@@ -173,6 +180,7 @@ const RecentReceiptsList = () => {
       toast.error("Failed to generate PDF.");
     }
   };
+
 
 
   // --- Navigate to Add New Receipt Page (normal create) ---
@@ -573,11 +581,13 @@ const RecentReceiptsList = () => {
           <div
             className="absolute inset-0 bg-black bg-opacity-60"
             style={{ backdropFilter: "blur(8px)" }}
+            onClick={() => setReceiptVisible(false)}
           />
           {/* Centered content */}
           <div
             ref={popupRef}
-            className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+            className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Close + Download PDF buttons */}
             <div className="flex justify-end space-x-2 mb-4">
@@ -597,17 +607,18 @@ const RecentReceiptsList = () => {
               </button>
             </div>
 
-            {/* Receipt content container: only this will be captured by html2canvas */}
-            <div ref={receiptRef}>
+            {/* Receipt content container */}
+            <div ref={receiptRef} className="receipt-container">
               {selectedReceipt ? (
-                <Receipt data={selectedReceipt} />
+                <ReceiptTemplate data={selectedReceipt} />
               ) : (
-                <p>No receipt data available.</p>
+                <p className="text-center text-gray-500">No receipt data available.</p>
               )}
             </div>
           </div>
         </div>
       )}
+
 
     </AdminLayout>
   );
