@@ -6,7 +6,7 @@ import { ROLES } from "../../config/permission";
 import Spinner from "../../Components/Common/Spinner";
 
 // **Access Denied Component**
-const AccessDenied = () => (
+const AccessDenied = ({title}) => (
   <motion.div
     className="w-full h-full flex items-center justify-center bg-gray-50"
     initial={{ opacity: 0 }}
@@ -25,8 +25,8 @@ const AccessDenied = () => (
       <h3 className="text-xl font-semibold mb-2 text-gray-800">
         Access Denied
       </h3>
-      <p className="text-sm text-gray-600">
-        You do not have permission to view this section. Please contact your
+      <p className="text-md text-gray-600">
+        You do not have permission to view <strong>{title  || 'This'}</strong> Section. Please contact your
         administrator.
       </p>
     </motion.div>
@@ -34,7 +34,7 @@ const AccessDenied = () => (
 );
 
 // **ProtectedSection Component**
-const ProtectedSection = ({ requiredPermission, children }) => {
+const ProtectedSection = ({ requiredPermission, children, title}) => {
   const { permissions, role, loading, error } = useSelector((state) => ({
     permissions: state.common.auth.permissions,
     role: state.common.auth.role,
@@ -64,7 +64,7 @@ const ProtectedSection = ({ requiredPermission, children }) => {
     <div className="w-full h-full relative">
       {/* Apply the blur effect to the content */}
       <div className="absolute inset-0 " />
-      <AccessDenied />
+      <AccessDenied title={title}/>
     </div>
   );
 };
