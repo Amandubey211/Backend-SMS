@@ -1,10 +1,11 @@
 // src/Utils/FinanceTemplate/PenaltyAdjustmentTemplate.js
 
-import React from "react";
+import React,{forwardRef} from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 
-const PenaltyAdjustmentTemplate = ({ data }) => {
+const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
+  const { data } = props;
   if (!data) return null;
 
   // Destructure necessary fields from the response data
@@ -66,35 +67,9 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
   const schoolName = "Student Diwan School"; // Replace with dynamic school name if available
 
   return (
-    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
+    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
       {/* Show "Cancelled" label if isCancel is true */}
-      {isCancel && (
-        <div
-        className="
-          absolute 
-          top-[92%] 
-          left-[51%] 
-          transform 
-          -translate-x-1/2 
-          -translate-y-1/2 
-          rotate-[-15deg] 
-          text-red-500 
-          text-4xl 
-          font-bold 
-          uppercase 
-          border-4 
-          border-red-500 
-          p-5 
-          px-10 
-          rounded-md 
-          bg-white/80 
-          shadow-md 
-          z-10
-        "
-      >
-        Cancelled
-      </div>
-      )}
+ 
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
         <div className="w-full bg-pink-100 px-4 py-2 flex justify-between items-center rounded-t-lg">
@@ -117,7 +92,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          RETURN INVOICE
+          RETURN INVOICE {isCancel && "CANCELLED"}
         </div>
       </div>
 
@@ -133,6 +108,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           <p>Phone no: {receiver?.contact || "N/A"}</p>
         </div>
         <div>
+       
           <p>
             <strong>Return Invoice No:</strong>{" "}
             {returnInvoiceNumber || "RTA0001-202412-0001"}
@@ -286,6 +262,7 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
               "Thank you for your attention to this adjustment.",
               "Please retain this document for your records.",
               "Contact support for any queries regarding this adjustment.",
+               `${isCancel && "This Return Invoice is cancelled"}`
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}
@@ -293,38 +270,10 @@ const PenaltyAdjustmentTemplate = ({ data }) => {
           </ul>
         </div>
 
-        {/* Summary Table aligned to the right */}
-        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
-          <tbody>
-            <tr className="bg-white">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Total Adjustment Amount
-              </td>
-              <td className="p-2 border border-gray-300 text-right">
-                {adjustmentTotal.toLocaleString()} QAR
-              </td>
-            </tr>
-            <tr className="bg-gray-50">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Return Amount
-              </td>
-              <td className="p-2 border border-gray-300 text-right">
-                {adjustmentAmount ? `${adjustmentAmount.toLocaleString()} QAR` : "0 QAR"}
-              </td>
-            </tr>
-            <tr className="font-bold text-gray-900 bg-gray-50">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Net Paid Amount
-              </td>
-              <td className="p-2 border border-gray-300 text-right text-pink-600">
-                {netPaidAmount} QAR
-              </td>
-            </tr>
-          </tbody>
-        </table> */}
+    
       </div>
     </div>
   );
-};
+});
 
 export default PenaltyAdjustmentTemplate;
