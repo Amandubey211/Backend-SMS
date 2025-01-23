@@ -39,6 +39,7 @@ import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSu
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import { downloadPDF } from "../../../../../../Utils/xl";
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
 
@@ -57,11 +58,11 @@ const PenalityandAdjustmentList = () => {
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isReceiptVisible, setReceiptVisible] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [selectedReturnInvoice, setSelectedReturnInvoice] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const receiptRef = useRef(null);
+  const pdfRef = useRef(null);
   // Reference for the popup/modal
   const popupRef = useRef(null);
 
@@ -88,45 +89,16 @@ const PenalityandAdjustmentList = () => {
 
   // Handle previewing a return invoice
   const handleReturnPreview = (record) => {
-    setSelectedReceipt(record);
+    setSelectedReturnInvoice(record);
     setReceiptVisible(true);
   };
 
   // Handle downloading the PDF
 
-
-  const handleDownloadPDF = async () => {
-    try {
-      if (!selectedReceipt || !receiptRef.current) return;
-
-      const pdfTitle = selectedReceipt.return_invoice_no
-        ? `${selectedReceipt.return_invoice_no}.pdf`
-        : "penalty_adjustment.pdf";
-
-      // Capture only the receipt content
-      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
-
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
-
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      toast.error("Failed to generate PDF.");
-    }
-  };
-
+ const handleDownloadPDF=async (pdfRef,selectedReturnInvoice)=>{
+    await downloadPDF(pdfRef,selectedReturnInvoice,"ReturnInvoice")
+  }
+  
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -514,7 +486,7 @@ const PenalityandAdjustmentList = () => {
             sheet="penalty_adjustment_report"
           />
           {/* Receipt Preview Overlay */}
-          {isReceiptVisible && selectedReceipt && (
+          {isReceiptVisible && selectedReturnInvoice && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
               {/* Dim / Blur background */}
               <div
@@ -531,7 +503,7 @@ const PenalityandAdjustmentList = () => {
                 {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
-                    onClick={handleDownloadPDF}
+                    onClick={()=> handleDownloadPDF(pdfRef,selectedReturnInvoice)}
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                   >
                     Download PDF
@@ -546,8 +518,8 @@ const PenalityandAdjustmentList = () => {
                 </div>
 
                 {/* Receipt content container */}
-                <div ref={receiptRef}>
-                  <PenaltyAdjustmentTemplate data={selectedReceipt} />
+                <div >
+                  <PenaltyAdjustmentTemplate data={selectedReturnInvoice} ref={pdfRef} />
                 </div>
               </div>
             </div>

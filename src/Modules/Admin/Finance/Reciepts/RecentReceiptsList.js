@@ -33,6 +33,7 @@ import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
+import { downloadPDF } from "../../../../Utils/xl";
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -65,7 +66,7 @@ const RecentReceiptsList = () => {
 
   // Ref for outside-click detection & PDF generation
   const popupRef = useRef(null);
-  const receiptRef = useRef(null);
+  const pdfRef = useRef(null);
   // --- 1) Fetch receipts when component mounts or pagination changes ---
   useEffect(() => {
     dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
@@ -149,37 +150,10 @@ const RecentReceiptsList = () => {
 
 
 // --- Download PDF from preview ---
-  const handleDownloadPDF = async () => {
-    try {
-      if (!selectedReceipt || !receiptRef.current) return;
+const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
+  await downloadPDF(pdfRef,selectedReceipt,"Receipt")
+}
 
-      const pdfTitle = selectedReceipt.receiptNumber
-          ? `${selectedReceipt.receiptNumber}.pdf`
-          : "receipt.pdf";
-
-      // Capture only the receipt component (not the buttons)
-      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-
-      // Use jsPDF to create the PDF
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      // Calculate the required dimensions
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
-
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
-    } catch (error) {
-      console.error("Error generating PDF: ", error);
-      toast.error("Failed to generate PDF.");
-    }
-  };
 
 
 
@@ -594,7 +568,7 @@ const RecentReceiptsList = () => {
               {/* Download PDF button */}
               <button
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                onClick={handleDownloadPDF}
+                onClick={()=>handleDownloadPDF(pdfRef,selectedReceipt)}
               >
                 Download PDF
               </button>
@@ -608,9 +582,9 @@ const RecentReceiptsList = () => {
             </div>
 
             {/* Receipt content container */}
-            <div ref={receiptRef} className="receipt-container">
+            <div className="receipt-container">
               {selectedReceipt ? (
-                <ReceiptTemplate data={selectedReceipt} />
+                <ReceiptTemplate data={selectedReceipt} ref={pdfRef} />
               ) : (
                 <p className="text-center text-gray-500">No receipt data available.</p>
               )}
