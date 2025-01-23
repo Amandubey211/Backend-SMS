@@ -3,25 +3,23 @@ import { AiOutlineFileText } from "react-icons/ai";
 import { CiTextAlignJustify } from "react-icons/ci";
 import { FaFileAlt, FaFilePdf } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
-import { RxPerson } from "react-icons/rx";
-import { AiOutlineEye } from "react-icons/ai";
 import { RiFileWord2Line } from "react-icons/ri";
-import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
 import { assignAssignmentGrade } from "../../../../../../Store/Slices/Admin/Class/SpeedGrade/AssignmentSpeedGradeThunks";
 import { assignQuizGrade } from "../../../../../../Store/Slices/Admin/Class/SpeedGrade/QuizSpeedGradeThunks";
 import { useTranslation } from "react-i18next";
+import { MdOutlineAssignmentLate } from "react-icons/md";
 
-const SubmissionDetails = ({ details, student, initialGrade }) => {
+const SubmissionDetails = ({ details = {}, student, initialGrade }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [grade, setGrade] = useState(initialGrade || 0);
   const [attemptDate, setAttemptDate] = useState("");
   const [status, setStatus] = useState("Missing");
   const { type, sgid } = useParams();
   const dispatch = useDispatch();
-  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'submissionDetails'
+  const { t } = useTranslation("admModule");
 
   const loading = useSelector((state) =>
     type === "Assignment"
@@ -31,12 +29,15 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
 
   const { dueDate, points, totalPoints, comments } =
     details?.assignmentId || details?.quizId || {};
-  const { content, media } = details;
+
+  // **Fixed Line: Use Nullish Coalescing Operator to Prevent Destructuring from Null**
+  const { content = "", media = [] } = details ?? {}; // Updated line
+
   const maxPoints = type === "Quiz" ? totalPoints : points;
 
-  const wordCount = content ? content.split(/\s+/)?.length : 0;
+  const wordCount = content ? content?.split(/\s+/)?.length : 0;
   const today = new Date();
-  const due = new Date(dueDate);
+  const due = dueDate ? new Date(dueDate) : today; // Fallback for undefined `dueDate`
   const daysDifference = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
   const daysLeft = daysDifference >= 0;
   const daysLabel = daysLeft
@@ -51,11 +52,11 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
   useEffect(() => {
     setGrade(initialGrade);
     setAttemptDate(
-      details.submittedAt
+      details?.submittedAt
         ? new Date(details.submittedAt).toISOString().split("T")[0]
         : ""
     );
-    setStatus(details.status || t("Missing"));
+    setStatus(details?.status || t("Missing"));
   }, [details, initialGrade, t]);
 
   const handleGradeChange = (e) => {
@@ -69,13 +70,18 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
       if (!isNaN(parsedGrade) && parsedGrade <= maxPoints) {
         setGrade(parsedGrade);
       } else if (parsedGrade > maxPoints) {
-        toast.error(t("Grade cannot exceed", { maxPoints }));
+        toast.error(t("Grade cannot exceed {{maxPoints}}", { maxPoints }));
         setGrade(maxPoints);
       }
     }
   };
 
   const handleSubmitGrade = useCallback(async () => {
+    if (!student) {
+      toast.error(t("No student selected"));
+      return;
+    }
+
     const gradeData = {
       studentId: student._id,
       grade,
@@ -117,7 +123,9 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
         <div className="flex items-center space-x-2 mb-3">
           <RiFileWord2Line className="text-blue-500" />
           <span className="font-medium text-sm">{t("Word Count")}:</span>
-          <span className="text-green-500">{wordCount} {t("Words")}</span>
+          <span className="text-green-500">
+            {wordCount} {t("Words")}
+          </span>
         </div>
       );
     }
@@ -173,9 +181,21 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
     }
   };
 
+  // If no student is selected, display a placeholder
+  if (!student) {
+    return (
+      <div className="flex-grow flex flex-col items-center justify-center text-gray-400 h-full">
+        <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-500" />
+        <p className="text-lg font-semibold">
+          {t("Submission details will appear here")}
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-grow overflow-y-auto no-scrollbar">
+      <div className="flex-grow flex flex-col">
         <div className="flex p-2 justify-between items-center mb-1">
           <h3 className="text-lg font-semibold">{t("Submission")}</h3>
           <span
@@ -189,7 +209,10 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           <div className="flex items-center space-x-2">
             <IoCalendarOutline className="text-green-500 h-4 w-4" />
             <span className="text-sm text-green-500">
-              {t("Due Date")}: <span>{new Date(dueDate).toLocaleDateString()}</span>
+              {t("Due Date")}:{" "}
+              <span>
+                {dueDate ? new Date(dueDate).toLocaleDateString() : t("N/A")}
+              </span>
             </span>
           </div>
 
@@ -289,7 +312,7 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
       </div>
 
       {details?.quizId?.quizType !== "Practice" && (
-        <div className="p-4 mb-10 border-t border-gray-200">
+        <div className="p-4 border-t border-gray-200">
           <button
             className="w-full py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md shadow-md hover:from-purple-500 hover:to-pink-500 focus:outline-none"
             onClick={handleSubmitGrade}
@@ -299,16 +322,6 @@ const SubmissionDetails = ({ details, student, initialGrade }) => {
           </button>
         </div>
       )}
-
-      <AddRubricModal
-        type={type === "Assignment" ? "assignment" : "quiz"}
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        criteriaList={[]}
-        AssignmentId={details?.assignmentId?._id}
-        QuizId={details?.quizId?._id}
-        readonly={true}
-      />
     </div>
   );
 };
