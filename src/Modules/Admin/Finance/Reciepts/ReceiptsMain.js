@@ -43,9 +43,7 @@ const ReceiptsMain = () => {
                 </ProtectedSection>
 
                 {/* Recent Receipts */}
-                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_ALL_RECEIPTS}>
                     <RecentReceipts />
-                </ProtectedSection>
             </div>
         </AdminDashLayout >
     );

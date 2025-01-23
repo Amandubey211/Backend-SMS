@@ -37,9 +37,9 @@ const AdjustmentDashboard = () => {
           </ProtectedSection>
 
           {/* Summary Section */}
-          <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_SUMMARY_OF_RETURN_INVOICE}>
+          {/* <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_SUMMARY_OF_RETURN_INVOICE}> */}
             <SummaryPenalityandAdjustment />
-          </ProtectedSection>
+          {/* </ProtectedSection> */}
 
         </div>
 

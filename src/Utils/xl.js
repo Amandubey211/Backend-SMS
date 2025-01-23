@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
-import { jsPDF } from "jspdf";
 import toast from "react-hot-toast";
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 
 export const ExportExcel = (
   data = [],
@@ -131,4 +131,84 @@ export const formatDateForInput = (isoString) => {
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
   return `${year}-${month}-${day}`;
+};
+
+
+export   const downloadPDF = async (pdfRef,selectedData,title) => {
+  const element = pdfRef.current;
+  const canvas = await html2canvas(element, { scale: 2 }); // Capture the DOM as a canvas
+  const imgData = canvas.toDataURL("image/png"); // Convert canvas to image
+
+  const pdf = new jsPDF("p", "mm", "a4");
+  
+  const pdfWidth = pdf.internal.pageSize.getWidth(); // PDF width in mm
+  const pdfHeight = pdf.internal.pageSize.getHeight(); // PDF height in mm
+
+  const canvasWidth = canvas.width; // Full canvas width
+  const canvasHeight = canvas.height; // Full canvas height
+
+  // Calculate aspect ratio scaling for the canvas to fit in the PDF
+  const scaleFactor = pdfWidth / canvasWidth; // Scale canvas width to PDF width
+  const scaledHeight = canvasHeight * scaleFactor; // Scale canvas height
+
+  const bottomPadding = 15; // Define bottom padding in mm
+  const topPadding = 15; // Define top padding in mm for all pages
+
+  // Calculate the usable height for content on each page (consider both top and bottom padding)
+  const usablePdfHeight = pdfHeight - topPadding - bottomPadding;
+
+  // Calculate the total number of pages needed
+  const totalPages = Math.ceil(scaledHeight / usablePdfHeight);
+
+  // Loop through each page and add to the PDF
+  for (let page = 0; page < totalPages; page++) {
+    const startY = page * (usablePdfHeight / scaleFactor); // Y-position on the original canvas
+
+    const partialCanvas = document.createElement("canvas");
+    partialCanvas.width = canvasWidth; // Same as the original canvas width
+    partialCanvas.height = usablePdfHeight / scaleFactor; // Height of usable content in canvas scale
+
+    const ctx = partialCanvas.getContext("2d");
+    ctx.drawImage(
+      canvas,
+      0,
+      startY,
+      canvasWidth,
+      partialCanvas.height,
+      0,
+      0,
+      canvasWidth,
+      partialCanvas.height
+    );
+
+    const partialImgData = partialCanvas.toDataURL("image/png"); // Convert partial canvas to image
+    const centerY = (pdfHeight - usablePdfHeight) / 2;
+    // Add the first page without top padding
+    if (page === 0) {
+      pdf.addImage(
+        partialImgData,
+        "PNG",
+        0,
+        0, // No top padding for the first page
+        pdfWidth,
+        usablePdfHeight // Restrict content height to usable area (with both padding applied)
+      );
+    } else {
+      // For subsequent pages, add top padding
+      pdf.addPage(); // Add new page for each iteration
+      pdf.addImage(
+        partialImgData,
+        "PNG",
+        0,
+        topPadding , // Apply top padding for all pages after the first
+        pdfWidth,
+        usablePdfHeight // Restrict content height to usable area (with both padding applied)
+      );
+    }
+  }
+
+  // Dynamically generate the filename (for example, based on the current date)
+  const fileName = `${selectedData?.schoolId?.nameOfSchool}_${title}_${new Date().toISOString().split('T')[0]}.pdf`; // Example: Invoice_2025-01-23.pdf
+
+  pdf.save(fileName); // Trigger download with the dynamic filename
 };

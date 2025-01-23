@@ -14,7 +14,8 @@ import {
   fetchAllReceipts,
   cancelReceipt,
 } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 // Import jsPDF and html2canvas
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
@@ -324,32 +325,36 @@ const RecentReceipts = () => {
         </div>
       ) : (
         // The Receipts Table with Custom No Data
-        <Table
-          rowKey={(record) => record._id}
-          columns={columns}
-          dataSource={filteredData}
-          expandable={{
-            expandedRowRender: (record) => (
-              <div>
-                <strong>Line Items:</strong>
-                {record.lineItems && record.lineItems.length > 0 ? (
-                  <ul>
-                    {record.lineItems.map((item, index) => (
-                      <li key={index}>
-                        {item.revenueType}: {item.total} QR (Qty: {item.quantity})
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span>No line items available</span>
-                )}
-              </div>
-            ),
-          }}
-          size="small"
-          pagination={false} // Disable Ant Design pagination
+        <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_ALL_RECEIPTS}>
 
-        />
+          <Table
+            rowKey={(record) => record._id}
+            columns={columns}
+            dataSource={filteredData}
+            expandable={{
+              expandedRowRender: (record) => (
+                <div>
+                  <strong>Line Items:</strong>
+                  {record.lineItems && record.lineItems.length > 0 ? (
+                    <ul>
+                      {record.lineItems.map((item, index) => (
+                        <li key={index}>
+                          {item.revenueType}: {item.total} QR (Qty: {item.quantity})
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span>No line items available</span>
+                  )}
+                </div>
+              ),
+            }}
+            size="small"
+            pagination={false} // Disable Ant Design pagination
+
+          />
+        </ProtectedSection>
+
       )}
 
       {/* Cancel Receipt Confirmation Modal */}

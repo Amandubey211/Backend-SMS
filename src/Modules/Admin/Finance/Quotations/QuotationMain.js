@@ -70,9 +70,7 @@ const QuotationMain = () => {
                 </ProtectedSection>
 
                 {/* Recent Receipts */}
-                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_SUMMARY_OF_QUOTATION}>
-                    <QuotationReceipts />
-                </ProtectedSection>
+                <QuotationReceipts />
             </div>
         </AdminDashLayout>
     );

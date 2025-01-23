@@ -20,6 +20,7 @@ import { useTranslation } from "react-i18next";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const AllStudents = () => {
   const { t } = useTranslation("admAccounts");
@@ -97,7 +98,7 @@ const AllStudents = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={"viewStudent"}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENT}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
               {allStudents?.length > 0 ? (
                 allStudents?.map((student) => (
@@ -110,7 +111,7 @@ const AllStudents = () => {
                     <div className="absolute top-1 left-2 bg-white rounded-full">
                       <HiMiniCheckBadge className="text-green-500 text-xl" />
                     </div>
-                    {role == "admin" && (
+                    {role === "admin" && (
                       <>
                         <div
                           title={t("Update Info")}

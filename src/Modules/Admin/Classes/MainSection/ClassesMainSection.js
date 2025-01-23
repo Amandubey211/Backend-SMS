@@ -44,7 +44,7 @@ const ClassesMainSection = () => {
   }, [dispatch]);
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.TEACHER_GET_ALL_CLASSES}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_ALL_CLASSES} title={'Classes'}>
     <div className="min-h-screen p-4">
       {/* Conditionally show heading for teachers */}
       {role === "teacher" && (

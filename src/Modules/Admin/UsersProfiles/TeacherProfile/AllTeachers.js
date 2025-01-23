@@ -21,6 +21,7 @@ import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunk
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const AllTeachers = () => {
   const { t } = useTranslation("admAccounts");
@@ -164,7 +165,7 @@ const AllTeachers = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={"viewTeacher"}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_TEACHER}>
           <div className="p-4 relative">
             {/* Reusable Header Component */}
             <Header
