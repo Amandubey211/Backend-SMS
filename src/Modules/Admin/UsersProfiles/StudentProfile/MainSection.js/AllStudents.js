@@ -98,86 +98,87 @@ const AllStudents = () => {
           </div>
         ) : (
           <ProtectedSection requiredPermission={"viewStudent"}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-            {allStudents?.length > 0 ? (
-              allStudents?.map((student) => (
-                <div
-                  key={student?._id}
-                  className={`${bgColor(
-                    student?._id
-                  )} p-6 rounded-lg shadow-md text-white relative`}
-                >
-                  <div className="absolute top-1 left-2 bg-white rounded-full">
-                    <HiMiniCheckBadge className="text-green-500 text-xl" />
-                  </div>
-                  {role == "admin" && (
-                    <>
-                      <div
-                        title={t("Update Info")}
-                        className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer"
-                        onClick={() => {
-                          setStudentData(student);
-                          setIsUpdateSidebarOpen(true);
-                        }}
-                      >
-                        <MdEdit className="text-gray-500 text-lg" />
-                      </div>
-                      <div
-                        title={t("Change Class")}
-                        className="absolute top-12 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer"
-                        onClick={() => {
-                          setStudentData(student);
-                          setIsEditSidebarOpen(true);
-                        }}
-                      >
-                        <CgArrowsExchange className="text-gray-500 text-bold text-lg" />
-                      </div>{" "}
-                    </>
-                  )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
+              {allStudents?.length > 0 ? (
+                allStudents?.map((student) => (
+                  <div
+                    key={student?._id}
+                    className={`${bgColor(
+                      student?._id
+                    )} p-6 rounded-lg shadow-md text-white relative`}
+                  >
+                    <div className="absolute top-1 left-2 bg-white rounded-full">
+                      <HiMiniCheckBadge className="text-green-500 text-xl" />
+                    </div>
+                    {role == "admin" && (
+                      <>
+                        <div
+                          title={t("Update Info")}
+                          className="absolute top-4 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer"
+                          onClick={() => {
+                            setStudentData(student);
+                            setIsUpdateSidebarOpen(true);
+                          }}
+                        >
+                          <MdEdit className="text-gray-500 text-lg" />
+                        </div>
+                        <div
+                          title={t("Change Class")}
+                          className="absolute top-12 right-4 bg-white rounded-full p-1 shadow-lg cursor-pointer"
+                          onClick={() => {
+                            setStudentData(student);
+                            setIsEditSidebarOpen(true);
+                          }}
+                        >
+                          <CgArrowsExchange className="text-gray-500 text-bold text-lg" />
+                        </div>{" "}
+                      </>
+                    )}
 
-                  <NavLink to={`/users/students/${student?._id}`}>
-                    <div className="mb-4">
-                      <h2 className="text-lg font-semibold">
-                        {student?.firstName}
-                      </h2>
-                      <p className="text-sm">{student?.email}</p>
-                      <div className="flex items-center mt-2 text-sm">
-                        <p>
-                          {t("Contact")}: {student?.contactNumber}
-                        </p>
+                    <NavLink to={`/users/students/${student?._id}`}>
+                      <div className="mb-4">
+                        <h2 className="text-lg font-semibold">
+                          {student?.firstName}
+                        </h2>
+                        <p className="text-sm">{student?.email}</p>
+                        <div className="flex items-center mt-2 text-sm">
+                          <p>
+                            {t("Contact")}: {student?.contactNumber}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center mt-4">
-                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
-                        {student?.profile ? (
-                          <img
-                            src={student?.profile || profileIcon}
-                            alt="Student"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <CiUser size={24} />
-                        )}
+                      <div className="flex items-center mt-4">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
+                          {student?.profile ? (
+                            <img
+                              src={student?.profile || profileIcon}
+                              alt="Student"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <CiUser size={24} />
+                          )}
+                        </div>
+                        <div className="ml-3">
+                          <p className="text-sm font-medium">
+                            ID: {student?.admissionNumber}
+                          </p>
+                          <p className="text-sm">
+                            {t("Parent")}:{" "}
+                            {student?.fatherName || student?.motherName}
+                          </p>
+                        </div>
                       </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium">
-                          ID: {student?.admissionNumber}
-                        </p>
-                        <p className="text-sm">
-                          {t("Parent")}:{" "}
-                          {student?.fatherName || student?.motherName}
-                        </p>
-                      </div>
-                    </div>
-                  </NavLink>
+                    </NavLink>
+                  </div>
+                ))
+              ) : (
+                <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                  <NoDataFound />
                 </div>
-              ))
-            ) : (
-              <div className="flex w-[80vw] text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                <NoDataFound />
-              </div>
-            )}
-          </div></ProtectedSection>
+              )}
+            </div>
+          </ProtectedSection>
         )}
         <Sidebar
           isOpen={isUpdateSidebarOpen}
