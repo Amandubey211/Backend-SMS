@@ -20,7 +20,7 @@ export const fetchOneStudentFee = createAsyncThunk(
   async (studentId, { rejectWithValue, dispatch, getState }) => {
 
     try {
-      const getRole = getUserRole(getState);
+      
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -139,7 +139,7 @@ export const studentFeesGraph = createAsyncThunk(
   async (params, { rejectWithValue, dispatch, getState }) => {
 
     try {
-      const getRole = getUserRole(getState);
+     
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       // Default to the current year if no year is provided
