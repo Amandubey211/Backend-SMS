@@ -187,18 +187,17 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
           {sortedTimetables?.map((timetable) => (
             <div
               key={timetable._id}
-              className="relative p-6 bg-white border border-gray-200 shadow-lg rounded-xl transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
+              className="relative p-6 bg-white border border-gray-200 shadow-lg rounded-xl transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer flex flex-col"
               onClick={() => handleCardClick(timetable)}
             >
               {/* Active/Draft Tag and Dropdown */}
               <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                 {/* Active/Draft Tag */}
                 <span
-                  className={`text-sm font-normal px-2 rounded ${
-                    timetable.status === "active"
+                  className={`text-sm font-normal px-2 rounded ${timetable.status === "active"
                       ? "bg-green-100 text-green-700"
                       : "bg-red-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {timetable.status === "active" ? t("Active") : t("Draft")}
                 </span>
@@ -234,13 +233,13 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
                 </p>
 
                 {/* Class (with school) as a Tag */}
-                <p className="text-sm text-gray-600 mt-1 flex items-center">
-                  <strong className="mr-1">{t("Class")}:</strong>
-                  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full">
-                    {timetable.classId?.className ?? "N/A"},{" "}
-                    {timetable.schoolId?.nameOfSchool ?? "N/A"}
-                  </span>
-                </p>
+<p className="text-sm text-gray-600 mt-1 flex items-center flex-wrap">
+  <strong className="mr-1">{t("Class")}:</strong>
+  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full whitespace-normal">
+    {timetable.classId?.className ?? "N/A"},{" "}
+    {timetable.schoolId?.nameOfSchool ?? "N/A"}
+  </span>
+</p>
                 <p className="text-sm text-gray-600 mt-1">
                   <strong>{t("Academic Year")}:</strong> {timetable.academicYear?.year ?? "N/A"}
                 </p>
@@ -257,13 +256,13 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               </div>
 
               {/* Schedule Section */}
-              <div className="bg-gray-100 p-4 rounded-lg mb-4 border border-gray-200">
+              <div className="bg-gray-100 p-4 rounded-lg mb-4 border border-gray-200 flex-1">
                 <h3 className="text-md font-semibold text-gray-700">{t("Schedule")}</h3>
                 {renderSchedule(timetable)}
               </div>
 
               {/* View Button */}
-              <div className="flex justify-end">
+              <div className="mt-auto flex justify-end">
                 <button className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
                   {t("View Timetable")}
                 </button>
