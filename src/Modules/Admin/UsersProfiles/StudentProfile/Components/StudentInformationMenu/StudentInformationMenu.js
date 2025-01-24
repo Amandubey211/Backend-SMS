@@ -5,12 +5,13 @@ import InformationSection from "./subComponents/InformationSection";
 import ParentInformation from "./subComponents/ParentInformation";
 import StudentProfile from "./subComponents/StudentProfile";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const StudentInformationMenu = ({ student }) => (
   <>
   
     <div className="flex flex-col w-full">
-    <ProtectedSection requiredPermission={"viewstudentinfo"}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_INFO}>
       <div className="border-b border-gray-300 p-3">
         <InformationSection student={student} />
       </div>

@@ -113,7 +113,6 @@ export default function EditStudentFeesForm({ data }) {
     };
 
     return (
-<ProtectedSection requiredPermission="studentedit">
         <div className="flex w-full border flex-col">
             <div className="flex flex-row mx-4 gap-2 font-semibold justify-between my-2">
                 <div className="flex flex-row gap-2">
@@ -284,16 +283,17 @@ export default function EditStudentFeesForm({ data }) {
             value={values.document || ''}
           />
                         </div>
+                        { data.mode == 'Edit' &&
                         <button
                             type="submit"
                             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
                         >
                             Update Fees
                         </button>
+                        }
                     </Form>
                 )}
             </Formik>
         </div>
-        </ProtectedSection>
     );
 }

@@ -8,6 +8,7 @@ import { fetchCourseProgress, fetchStudentSubjectProgress } from '../../../../..
 import MainSection from './Module/MainSection'
 import Spinner from '../../../../../../Components/Common/Spinner'
 import ProtectedSection from '../../../../../../Routes/ProtectedRoutes/ProtectedSection'
+import { PERMISSIONS } from '../../../../../../config/permission'
 const StudentCourseProgress = ({student}) => {
   const {cid} = useParams()
   const {studentSubjectProgress,loading} = useSelector((store) => store.admin.all_students);
@@ -30,9 +31,9 @@ const StudentCourseProgress = ({student}) => {
   {loading?<div className='w-full h-[90vh] flex items-center justify-center text-gray-600'>
     <Spinner/>
   </div>:
-  <ProtectedSection requiredPermission={"viewstudentprogress"}>
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
         {studentSubjectProgress?.length > 0?
         studentSubjectProgress?.map((subject, index) => (
@@ -45,11 +46,14 @@ const StudentCourseProgress = ({student}) => {
         </div>
       }
       </div>
+      </ProtectedSection>
     </div>
     <div className='border-t-2'>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_PROGRESS_OF_SUBJECT}>
        <MainSection /> 
+       </ProtectedSection>
     </div>
-  </div></ProtectedSection>
+  </div>
   }</>
   )
 }
