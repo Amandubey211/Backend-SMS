@@ -13,6 +13,7 @@ import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earni
 import { FaPlusCircle } from "react-icons/fa";
 import { MdAttachMoney } from "react-icons/md";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -77,18 +78,18 @@ useEffect(() => {
         transition={{ duration: 0.3 }}
         className="flex-1 flex flex-col space-y-2"
       >
-        <ProtectedSection requiredPermission="studentfeecard">
+        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD} title={'Cards'}>
         {/* Cards Section */}
         <StudentCardSection />
         </ProtectedSection>
         {/* Graph Section */}
-        <ProtectedSection requiredPermission="studentfeegrapgh">
+        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_GRAPH_FOR_STUDENT_FEES} title={'Graph'}>
         <div className="w-full ">
           <StudentFeesGraph />
         </div>
         </ProtectedSection>
         {/* Summary Table */}
-        <ProtectedSection requiredPermission="StudentFeesSummaryTable">
+        <ProtectedSection requiredPermission={PERMISSIONS.SUMMARY_OF_STUDENT_FEES} title={'Summary'}>
         <div className="w-full">
           <StudentFeesSummaryTable />
         </div>

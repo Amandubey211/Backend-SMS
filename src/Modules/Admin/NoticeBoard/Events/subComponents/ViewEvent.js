@@ -6,6 +6,9 @@ import { CiLocationOn } from "react-icons/ci";
 import { setSidebarContent } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
 import { deleteEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../../config/permission";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const ViewEvent = () => {
   const dispatch = useDispatch();
@@ -42,6 +45,7 @@ const ViewEvent = () => {
   };
 
   return (
+   
     <div className="flex flex-col h-full max-w-xl mx-auto bg-white ">
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">
@@ -118,8 +122,9 @@ const ViewEvent = () => {
       {/* Sticky footer for buttons */}
       <div className="p-4 bg-white border-t sticky bottom-0 flex gap-4">
         {/* Conditionally render Edit and Delete buttons if role is not "teacher" */}
-        {role === "admin" && (
+        {!["parent","student"].includes(role) && (
           <>
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_EVENT}>
             <button
               className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
               onClick={handleDelete}
@@ -131,17 +136,21 @@ const ViewEvent = () => {
                 t("Delete")
               )}
             </button>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_EVENT}>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
               onClick={handleEdit}
             >
               {t("Edit")}
             </button>
+            </ProtectedAction>
           </>
         )}
       </div>
     </div>
-  );
+ 
+  )
 };
 
 export default ViewEvent;

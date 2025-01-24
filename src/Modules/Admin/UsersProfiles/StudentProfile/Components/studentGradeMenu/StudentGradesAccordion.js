@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const StudentGradesAccordion = ({ student }) => {
   const { t } = useTranslation('admAccounts');
@@ -25,7 +26,7 @@ const StudentGradesAccordion = ({ student }) => {
 
   return (
     <>
-    <ProtectedSection requiredPermission={"viewstudentgrades"}>
+    <ProtectedSection requiredPermission={PERMISSIONS. GET_STUDENT_GRADES}>
       <div className="flex flex-row w-[100%]">
         <div className="w-[75%] ">
           <GradeAccordionItem getData={(subjectId) => getStudentGrades(subjectId)} />
