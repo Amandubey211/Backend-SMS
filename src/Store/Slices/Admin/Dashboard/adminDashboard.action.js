@@ -12,11 +12,12 @@ import { getAY } from "../../../../Utils/academivYear";
 // Fetch Admin Dashboard Data
 export const fetchAdminDashboardData = createAsyncThunk(
   "adminDashboard/fetchAdminDashboardData",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/admin/dashboard?say=${say}`);
+      const response = await getData(`/${getRole}/dashboard?say=${say}`);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -30,8 +31,9 @@ export const fetchAttendanceData = createAsyncThunk(
   async ({ month, year }, { rejectWithValue, getState, dispatch }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/admin/dashboard/attendance?say=${say}`, {
+      const response = await getData(`/${getRole}/dashboard/attendance?say=${say}`, {
         month,
         year,
       });
@@ -51,8 +53,9 @@ export const fetchEarningsData = createAsyncThunk(
   ) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/admin/dashboard/earnings?say=${say}`, {
+      const response = await getData(`/${getRole}/dashboard/earnings?say=${say}`, {
         month,
         year,
         includeUnpaidExpenses,
@@ -67,12 +70,13 @@ export const fetchEarningsData = createAsyncThunk(
 // Fetch Notices
 export const fetchNotices = createAsyncThunk(
   "adminDashboard/fetchNotices",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `${baseUrl}/admin/dashboard/notices?say=${say}`
+        `${baseUrl}/${getRole}/dashboard/notices?say=${say}`
       );
       return response?.notices;
     } catch (error) {
@@ -84,12 +88,13 @@ export const fetchNotices = createAsyncThunk(
 // Fetch Top Students
 export const fetchTopStudents = createAsyncThunk(
   "adminDashboard/TopStudents",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/top/students/class/${classId}?say=${say}`
+        `/${getRole}/top/students/class/${classId}?say=${say}`
       );
       return response?.topStudents;
     } catch (error) {
@@ -101,12 +106,13 @@ export const fetchTopStudents = createAsyncThunk(
 // Fetch Filtered Events
 export const fetchFilteredEvents = createAsyncThunk(
   "adminDashboard/fetchFilteredEvents",
-  async ({ month, year }, { rejectWithValue, dispatch }) => {
+  async ({ month, year }, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/dashboard/events?say=${say}`,
+        `/${getRole}/dashboard/events?say=${say}`,
 
         { month, year }
       );
@@ -120,11 +126,12 @@ export const fetchFilteredEvents = createAsyncThunk(
 // Fetch Filtered Issue Books
 export const fetchFilteredIssueBooks = createAsyncThunk(
   "adminDashboard/fetchFilteredIssueBooks",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`${baseUrl}/admin/all/book?say=${say}`);
+      const response = await getData(`${baseUrl}/${getRole}/all/book?say=${say}`);
       return response?.books;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
