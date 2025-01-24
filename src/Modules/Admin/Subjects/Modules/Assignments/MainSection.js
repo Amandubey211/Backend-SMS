@@ -5,6 +5,7 @@ import AssignmentSection from "./AssignmentComponents/AssignmentSection";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAssignmentByIdThunk } from "../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import { useParams } from "react-router-dom";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const MainSection = () => {
   const { aid: assignmentId } = useParams();
@@ -21,19 +22,23 @@ const MainSection = () => {
   }, [assignmentId, dispatch]);
 
   return (
-    <div className="flex">
+    <div className="flex h-full w-full">
       <SubjectSideBar />
-      <div className="w-[65%] border">
-        <AssignmentSection />
-      </div>
-      <div className="w-[30%]">
-        <AssignmentDetailCard
-          isPublish={assignment?.publish}
-          assignment={assignment}
-          loading={loading}
-          error={error}
-        />
-      </div>
+      <ProtectedSection title="Assignment" requiredPermission="dd">
+        <div className="flex ">
+          <div className="w-[65%] border">
+            <AssignmentSection />
+          </div>
+          <div className="w-[30%]">
+            <AssignmentDetailCard
+              isPublish={assignment?.publish}
+              assignment={assignment}
+              loading={loading}
+              error={error}
+            />
+          </div>
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

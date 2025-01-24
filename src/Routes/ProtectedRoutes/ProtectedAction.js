@@ -28,7 +28,8 @@ const ProtectedAction = ({ requiredPermission, children }) => {
 
   // Bypass checks if admin
   if (role === ROLES.ADMIN) {
-    return <>{children}</>;
+    // return <>{children}</>;
+    return null;
   }
 
   // Check if user has the required permission

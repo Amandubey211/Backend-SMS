@@ -13,6 +13,8 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/Syllabus/syllabusThunk";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -65,33 +67,39 @@ const MainSection = () => {
     }
 
     return (
-      <NoDataFound
-        title={t("Syllabus")}
-        desc={t(
-          "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus .'"
-        )}
-        icon={AiOutlineFileAdd}
-        iconColor="text-gray-500"
-        textColor="text-gray-500"
-        bgColor="bg-white"
-      />
+      <div className="h-full w-full flex items-center justify-center">
+        <NoDataFound
+          title={t("Syllabus")}
+          desc={t(
+            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus .'"
+          )}
+          icon={AiOutlineFileAdd}
+          iconColor="text-gray-500"
+          textColor="text-gray-500"
+          bgColor="bg-white"
+        />
+      </div>
     );
   };
 
   return (
-    <div className="flex">
+    <div className="flex h-full w-full">
       <SubjectSideBar />
-      <div className="border-l w-full p-4 relative">
-        {renderContent()}
-        {syllabi && syllabi?.length === 0 && (
-          <NavLink
-            to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
-            className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-          >
-            <RiAddFill size={24} />
-          </NavLink>
-        )}
-      </div>
+      <ProtectedSection title="Syllabus" requiredPermission="view syllabus">
+        <div className="border-l w-full p-4 relative">
+          {renderContent()}
+          {syllabi && syllabi?.length === 0 && (
+            <ProtectedAction requiredPermission="AddSyllabus">
+              <NavLink
+                to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
+                className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+              >
+                <RiAddFill size={24} />
+              </NavLink>
+            </ProtectedAction>
+          )}
+        </div>
+      </ProtectedSection>
     </div>
   );
 };
