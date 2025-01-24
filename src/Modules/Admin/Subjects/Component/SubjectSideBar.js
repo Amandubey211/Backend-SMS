@@ -1,9 +1,10 @@
 import React from "react";
 import { NavLink, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Tooltip } from "antd";
 
 const SubjectSideBar = () => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const location = useLocation();
   const { cid, sid } = useParams();
 
@@ -25,7 +26,7 @@ const SubjectSideBar = () => {
   const getBasePath = (item) => `/class/${cid}/${formattedSid}/${item.path}`;
 
   return (
-    <div className="flex flex-col min-h-screen h-full w-[18%] space-y-4 p-4">
+    <div className="flex flex-col min-h-screen h-full w-[16%] space-y-3 p-3 border-r">
       {menuItems?.map((item, index) => {
         const basePath = getBasePath(item);
         const isActive = location.pathname.includes(
@@ -33,17 +34,21 @@ const SubjectSideBar = () => {
         );
 
         return (
-          <NavLink
-            key={index}
-            to={basePath}
-            className={
-              isActive
-                ? "text-purple-600 font-semibold bg-purple-100 rounded-full py-1 px-4"
-                : "text-gray-800 px-4 py-1"
-            }
-          >
-            {t(item.name)}
-          </NavLink>
+          <Tooltip key={index} title={t(item.name)} placement="right">
+            <NavLink
+              to={basePath}
+              className={`${
+                isActive
+                  ? "text-purple-600 font-semibold bg-purple-100 rounded-full py-1 px-4"
+                  : "text-gray-800 px-4 py-1"
+              } hover:bg-purple-200 hover:text-purple-500 hover:rounded-full`}
+              style={{
+                transition: "background-color 0.2s ease, color 0.2s ease",
+              }}
+            >
+              {t(item.name)}
+            </NavLink>
+          </Tooltip>
         );
       })}
     </div>

@@ -6,13 +6,15 @@ import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   return (
-    <div className="flex ">
+    <div className="flex w-full h-full ">
       <SubjectSideBar />
-      <div className="border-l p-2 w-full">
-   
-        <AnnouncementList />
-        
-      </div>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.TEACHER_GET_ALL_ANNOUNCEMENTS}
+      >
+        <div className="border-l p-2 w-full">
+          <AnnouncementList />
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

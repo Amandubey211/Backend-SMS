@@ -16,6 +16,8 @@ import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { FaBookOpen } from "react-icons/fa";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
@@ -141,134 +143,145 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen h-full w-full ">
       <SubjectSideBar />
-      {/* Main Module/Chapter Section */}
-      <div className="w-[60%] bg-white p-2 border-l">
-        {moduleLoading ? (
-          <Spinner />
-        ) : modulesData?.length === 0 ? (
-          // Centering NoDataFound when no modules exist
-          <div className="flex items-center justify-center h-screen">
-            <NoDataFound
-              title="Modules"
-              desc={t(
-                "No modules available yet! Start by adding your first module."
-              )}
-              icon={FaBookOpen}
-              iconColor="text-blue-500"
-              textColor="text-gray-600"
-            />
-          </div>
-        ) : (
-          <div className="bg-white p-2 rounded-lg">
-            <div className="flex justify-between px-4 mb-3 items-center">
-              <h1 className="text-lg font-semibold">
-                {selectedModule?.name
-                  ? selectedModule.name
-                  : t("Select a Module")}
-              </h1>
-              {selectedModule?.name && (
-                <button
-                  onClick={openAddChapter}
-                  className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
-                >
-                  <span className="text-gradient">{t("+ Add Chapter")}</span>
-                </button>
-              )}
-            </div>
-            {chapterLoading ? (
+      <ProtectedSection requiredPermission="dd" title="Module">
+        <div className="flex">
+          {/* Main Module/Chapter Section */}
+          <div className="w-[60%] bg-white p-2">
+            {moduleLoading ? (
               <Spinner />
-            ) : selectedModule?.chapters?.length > 0 ? (
-              selectedModule?.chapters?.map((chapter, index) => (
-                <Chapter
-                  key={index}
-                  chapterNumber={index + 1}
-                  chapter={chapter}
-                  isExpanded={expandedChapters.includes(index + 1)}
-                  onToggle={() => handleToggle(index + 1)}
-                  onEdit={() => handleEditChapter(chapter)}
-                />
-              ))
-            ) : (
-              // Centering NoDataFound for chapters when none exist
-              <div className="flex items-center justify-center min-h-[200px]">
+            ) : modulesData?.length === 0 ? (
+              // Centering NoDataFound when no modules exist
+              <div className="flex items-center justify-center h-screen">
                 <NoDataFound
-                  title={t("Chapter")}
+                  title="Modules"
                   desc={t(
-                    "No chapters available in this module yet! Start by adding your first chapter."
+                    "No modules available yet! Start by adding your first module."
                   )}
                   icon={FaBookOpen}
-                  iconColor="text-green-500"
+                  iconColor="text-blue-500"
                   textColor="text-gray-600"
                 />
               </div>
+            ) : (
+              <div className="bg-white p-2 rounded-lg">
+                <div className="flex justify-between px-4 mb-3 items-center">
+                  <h1 className="text-lg font-semibold">
+                    {selectedModule?.name
+                      ? selectedModule.name
+                      : t("Select a Module")}
+                  </h1>
+                  {selectedModule?.name && (
+                    <ProtectedAction requiredPermission="dd">
+                      <button
+                        onClick={openAddChapter}
+                        className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                      >
+                        <span className="text-gradient">
+                          {t("+ Add Chapter")}
+                        </span>
+                      </button>
+                    </ProtectedAction>
+                  )}
+                </div>
+                {chapterLoading ? (
+                  <Spinner />
+                ) : selectedModule?.chapters?.length > 0 ? (
+                  selectedModule?.chapters?.map((chapter, index) => (
+                    <Chapter
+                      key={index}
+                      chapterNumber={index + 1}
+                      chapter={chapter}
+                      isExpanded={expandedChapters.includes(index + 1)}
+                      onToggle={() => handleToggle(index + 1)}
+                      onEdit={() => handleEditChapter(chapter)}
+                    />
+                  ))
+                ) : (
+                  // Centering NoDataFound for chapters when none exist
+                  <div className="flex items-center justify-center min-h-[200px]">
+                    <NoDataFound
+                      title={t("Chapter")}
+                      desc={t(
+                        "No chapters available in this module yet! Start by adding your first chapter."
+                      )}
+                      icon={FaBookOpen}
+                      iconColor="text-green-500"
+                      textColor="text-gray-600"
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
 
-      {/* Modules List Section */}
-      {modulesData?.length > 0 && (
-        <div className="w-[35%] p-2 border">
-          <div className="bg-white p-4 rounded-lg">
-            <div className="flex items-center gap-1 mb-2">
-              <h1 className="text-xl font-semibold">{t("All Modules")}</h1>
-              <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-6 h-6">
-                <span className="text-gradient">{modulesData?.length}</span>
-              </p>
+          {/* Modules List Section */}
+          {modulesData?.length > 0 && (
+            <div className="w-[35%] p-2 border-l">
+              <div className="bg-white p-4 rounded-lg">
+                <div className="flex items-center gap-1 mb-2">
+                  <h1 className="text-xl font-semibold">{t("All Modules")}</h1>
+                  <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-6 h-6">
+                    <span className="text-gradient">{modulesData?.length}</span>
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {modulesData?.map((module) => (
+                    <ModuleCard
+                      key={module._id}
+                      module={module}
+                      onSelect={() => handleModuleSelect(module)}
+                      onEdit={() => handleEditModule(module)}
+                      onMove={() => handleMoveModule(module)}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-1 gap-2">
-              {modulesData?.map((module) => (
-                <ModuleCard
-                  key={module._id}
-                  module={module}
-                  onSelect={() => handleModuleSelect(module)}
-                  onEdit={() => handleEditModule(module)}
-                  onMove={() => handleMoveModule(module)}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Floating Add Module Button */}
-      <div className="relative">
-        <button
-          onClick={openAddModule}
-          className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
-          aria-label={t("Add Module")}
-        >
-          <RiAddFill size={24} />
-        </button>
-        <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
-          {t("Add Module")}
-        </span>
-      </div>
-
-      {/* Sidebar */}
-      {isSidebarOpen && (
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={handleSidebarClose}
-          title={
-            sidebarContent === "chapter"
-              ? t("Add New Chapter")
-              : sidebarContent === "module"
-              ? t("Add New Module")
-              : t("Edit Module")
-          }
-        >
-          {sidebarContent === "chapter" ? (
-            <AddChapter onClose={handleSidebarClose} />
-          ) : sidebarContent === "module" ? (
-            <AddModule onClose={handleSidebarClose} />
-          ) : (
-            sidebarContent
           )}
-        </Sidebar>
-      )}
+
+          {/* Floating Add Module Button */}
+          <div className="relative">
+            <ProtectedAction requiredPermission="dd">
+              <button
+                onClick={openAddModule}
+                className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
+                aria-label={t("Add Module")}
+              >
+                <RiAddFill size={24} />
+              </button>
+            </ProtectedAction>
+
+            <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
+              {t("Add Module")}
+            </span>
+          </div>
+
+          {/* Sidebar */}
+          {isSidebarOpen && (
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={
+                sidebarContent === "chapter"
+                  ? t("Add New Chapter")
+                  : sidebarContent === "module"
+                  ? t("Add New Module")
+                  : t("Edit Module")
+              }
+            >
+              {sidebarContent === "chapter" ? (
+                <AddChapter onClose={handleSidebarClose} />
+              ) : sidebarContent === "module" ? (
+                <AddModule onClose={handleSidebarClose} />
+              ) : (
+                sidebarContent
+              )}
+            </Sidebar>
+          )}
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { MdOutlineBlock } from "react-icons/md";
 import { deleteModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { useParams } from "react-router-dom";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const ModuleCard = ({ module, onSelect, onEdit, onMove }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -94,33 +95,40 @@ const ModuleCard = ({ module, onSelect, onEdit, onMove }) => {
           ref={menuRef}
           className="absolute top-0 right-12 bg-white border rounded-lg shadow-lg w-48 z-10"
         >
-          <ul className="py-2">
-            <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                onEdit();
-                setMenuOpen(false);
-              }}
-            >
-              <FaPen className="mr-2" /> Edit
-            </li>
-            <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={handleMove}
-            >
-              <FaArrowRight className="mr-2" /> Move to...
-            </li>
-            <li
-              className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDeleteModalOpen(true);
-                setMenuOpen(false);
-              }}
-            >
-              <FaTrashAlt className="mr-2" /> Remove
-            </li>
+          <ul className="">
+            <ProtectedAction requiredPermission="edit module">
+              <li
+                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit();
+                  setMenuOpen(false);
+                }}
+              >
+                <FaPen className="mr-2" /> Edit
+              </li>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission="move module">
+              <li
+                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={handleMove}
+              >
+                <FaArrowRight className="mr-2" /> Move to...
+              </li>
+            </ProtectedAction>
+
+            <ProtectedAction requiredPermission="remove module">
+              <li
+                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsDeleteModalOpen(true);
+                  setMenuOpen(false);
+                }}
+              >
+                <FaTrashAlt className="mr-2" /> Remove
+              </li>
+            </ProtectedAction>
           </ul>
         </div>
       )}

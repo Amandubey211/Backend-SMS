@@ -4,7 +4,6 @@ import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
-import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const Discussion = () => {
   const className = useSelector(
@@ -17,9 +16,7 @@ const Discussion = () => {
 
   return (
     <Layout title={`Discussion | Student Diwan`}>
-      <ProtectedSection requiredPermission={''}>
       <DashLayout children={<MainSection />} hideSearchbar={true} />
-      </ProtectedSection>
     </Layout>
   );
 };

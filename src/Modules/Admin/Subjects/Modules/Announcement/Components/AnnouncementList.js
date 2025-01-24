@@ -63,13 +63,11 @@ const AnnouncementList = () => {
               <AnnouncementCard key={announcement._id} {...announcement} />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center col-span-full py-10 text-gray-500">
+            <div className="flex flex-col items-center justify-center col-span-full py-10">
               <NoDataFound
                 title="Announcements"
                 desc="No announcements found. Please check back later or add a new announcement."
                 icon={AiOutlineBell}
-                iconColor="text-blue-500"
-                textColor="text-gray-500"
               />
             </div>
           )}

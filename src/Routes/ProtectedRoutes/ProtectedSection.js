@@ -6,7 +6,7 @@ import { ROLES } from "../../config/permission";
 import Spinner from "../../Components/Common/Spinner";
 
 // **Access Denied Component**
-const AccessDenied = ({title}) => (
+const AccessDenied = ({ title }) => (
   <motion.div
     className="w-full h-full flex items-center justify-center bg-gray-50"
     initial={{ opacity: 0 }}
@@ -26,15 +26,15 @@ const AccessDenied = ({title}) => (
         Access Denied
       </h3>
       <p className="text-md text-gray-600">
-        You do not have permission to view <strong>{title  || 'This'}</strong> Section. Please contact your
-        administrator.
+        You do not have permission to view <strong>{title || "This"}</strong>{" "}
+        Section. Please contact your administrator.
       </p>
     </motion.div>
   </motion.div>
 );
 
 // **ProtectedSection Component**
-const ProtectedSection = ({ requiredPermission, children, title}) => {
+const ProtectedSection = ({ requiredPermission, children, title, aman }) => {
   const { permissions, role, loading, error } = useSelector((state) => ({
     permissions: state.common.auth.permissions,
     role: state.common.auth.role,
@@ -49,7 +49,15 @@ const ProtectedSection = ({ requiredPermission, children, title}) => {
       </div>
     );
   }
-
+  if (role === ROLES.ADMIN && aman) {
+    return (
+      <div className="w-full h-full relative">
+        {/* Apply the blur effect to the content */}
+        <div className="absolute inset-0 " />
+        <AccessDenied title={title} />
+      </div>
+    );
+  }
   // Bypass permission checks for admin role
   if (role === ROLES.ADMIN) {
     return <div className="w-full h-full">{children}</div>;
@@ -64,7 +72,7 @@ const ProtectedSection = ({ requiredPermission, children, title}) => {
     <div className="w-full h-full relative">
       {/* Apply the blur effect to the content */}
       <div className="absolute inset-0 " />
-      <AccessDenied title={title}/>
+      <AccessDenied title={title} />
     </div>
   );
 };

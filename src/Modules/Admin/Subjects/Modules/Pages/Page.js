@@ -17,9 +17,7 @@ const Page = () => {
   return (
     <div>
       <Layout title={`Pages | Student Diwan`}>
-      <ProtectedSection requiredPermission={''}>
         <DashLayout children={<MainSection />} hideSearchbar={true} />
-        </ProtectedSection>
       </Layout>
     </div>
   );

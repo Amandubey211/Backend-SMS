@@ -8,6 +8,7 @@ import RubricButton from "./RubricButton";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useSelector } from "react-redux";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AssignmentDetailCard = () => {
   const {
@@ -69,12 +70,14 @@ const AssignmentDetailCard = () => {
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
       <ButtonsGroup type="Assignment" data={assignment} loading={loading} />
 
-      <SpeedGradeButton
-        type="Assignment"
-        sgid={assignment._id}
-        name={assignment.name}
-        isPublish={assignment?.publish}
-      />
+      <ProtectedAction requiredPermission="assign grade">
+        <SpeedGradeButton
+          type="Assignment"
+          sgid={assignment._id}
+          name={assignment.name}
+          isPublish={assignment?.publish}
+        />
+      </ProtectedAction>
 
       <div className="ps-3 ">
         {assignmentDetails?.map((detail, index) => {

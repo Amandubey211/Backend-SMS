@@ -7,6 +7,8 @@ import FilterCard from "../Component/FilterCard";
 import List from "../Component/List";
 import { fetchFilteredAssignments } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
@@ -35,28 +37,34 @@ const MainSection = () => {
   );
 
   return (
-    <div className="flex">
+    <div className="flex w-full h-full">
       <SubjectSideBar />
-      <div className="w-[65%] border-l">
-        <List
-          type={t("Assignment")}
-          title={t("All Assignments")}
-          data={assignments}
-          icon={<RiListCheck3 />}
-          loading={loading}
-          error={error}
-        />
-      </div>
-      <div className="w-[30%] p-2">
-        <FilterCard filters={filters} setFilters={setFilters} />
-      </div>
-      <NavLink
-        to={`/class/${cid}/${sid}/createassignment`}
-        aria-label={t("Create Assignment")}
-        {...navLinkStyles}
-      >
-        <RiAddFill size={24} />
-      </NavLink>
+      <ProtectedSection title="Assignemnt" requiredPermission="assignment list">
+        <div className="flex">
+          <div className="w-[65%] border-l">
+            <List
+              type={t("Assignment")}
+              title={t("All Assignments")}
+              data={assignments}
+              icon={<RiListCheck3 />}
+              loading={loading}
+              error={error}
+            />
+          </div>
+          <div className="w-[30%] p-2">
+            <FilterCard filters={filters} setFilters={setFilters} />
+          </div>
+          <ProtectedAction requiredPermission="create assignment">
+            <NavLink
+              to={`/class/${cid}/${sid}/createassignment`}
+              aria-label={t("Create Assignment")}
+              {...navLinkStyles}
+            >
+              <RiAddFill size={24} />
+            </NavLink>
+          </ProtectedAction>
+        </div>
+      </ProtectedSection>
     </div>
   );
 };
