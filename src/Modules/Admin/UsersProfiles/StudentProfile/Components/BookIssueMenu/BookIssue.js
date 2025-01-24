@@ -7,6 +7,7 @@ import { FiLoader } from "react-icons/fi";
 import { studentIssueBooks } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const BookIssue = () => {
   const { cid:id } = useParams();
@@ -35,7 +36,7 @@ const BookIssue = () => {
 
   return (
     <div className="min-h-screen p-4 ">
-      <ProtectedSection requiredPermission={"viewstudentbookissue"}>
+      <ProtectedSection requiredPermission={PERMISSIONS.STUDENT_BOOKISSUE_RECORD}>
       <div className="flex justify-between items-center mb-4">
 
       </div>

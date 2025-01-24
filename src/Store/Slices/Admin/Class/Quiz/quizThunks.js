@@ -9,6 +9,7 @@ import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchFilteredQuizzesThunk = createAsyncThunk(
   "quiz/fetchFilteredQuizzes",
@@ -17,6 +18,7 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
     { getState, rejectWithValue, dispatch }
   ) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
@@ -29,8 +31,8 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
       const subjectId =
         sid || getState().common.user.subjectInfo.selectedSubjectId;
 
-      const endpoint = `/admin/quizzes/${subjectId}?say=${say}`;
-      const response = await getData(endpoint,  params );
+      const endpoint = `/${getRole}/quizzes/${subjectId}?say=${say}`;
+      const response = await getData(endpoint, params);
 
       if (response.success) {
         return response.quizzes;
@@ -43,13 +45,14 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
 
 export const fetchQuizByIdThunk = createAsyncThunk(
   "quiz/fetchQuizById",
-  async (quizId, { rejectWithValue, dispatch }) => {
+  async (quizId, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/quiz/${quizId}?say=${say}`;
-      
+      const endpoint = `/${getRole}/quiz/${quizId}?say=${say}`;
+
       const response = await getData(endpoint);
 
       if (response.success) {
@@ -63,12 +66,13 @@ export const fetchQuizByIdThunk = createAsyncThunk(
 
 export const addQuestionThunk = createAsyncThunk(
   "quiz/addQuestion",
-  async ({ quizId, question }, { rejectWithValue, dispatch }) => {
+  async ({ quizId, question }, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/add_question/quiz/${quizId}?say=${say}`;
+      const endpoint = `/${getRole}/add_question/quiz/${quizId}?say=${say}`;
       const response = await putData(endpoint, question);
 
       if (response.success) {
@@ -89,12 +93,16 @@ export const addQuestionThunk = createAsyncThunk(
 
 export const updateQuestionThunk = createAsyncThunk(
   "quiz/updateQuestion",
-  async ({ quizId, questionId, question }, { rejectWithValue, dispatch }) => {
+  async (
+    { quizId, questionId, question },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/quiz/${quizId}/question/${questionId}?say=${say}`;
+      const endpoint = `/${getRole}/quiz/${quizId}/question/${questionId}?say=${say}`;
       const response = await putData(endpoint, question);
 
       if (response.success) {
@@ -110,12 +118,13 @@ export const updateQuestionThunk = createAsyncThunk(
 
 export const deleteQuestionThunk = createAsyncThunk(
   "quiz/deleteQuestion",
-  async ({ quizId, questionId }, { rejectWithValue, dispatch }) => {
+  async ({ quizId, questionId }, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/quiz/${quizId}/question/${questionId}?say=${say}`;
+      const endpoint = `/${getRole}/quiz/${quizId}/question/${questionId}?say=${say}`;
       const response = await deleteData(endpoint);
 
       if (response.success) {
@@ -131,12 +140,13 @@ export const deleteQuestionThunk = createAsyncThunk(
 
 export const createQuizThunk = createAsyncThunk(
   "quiz/createQuiz",
-  async (quizData, { rejectWithValue, dispatch }) => {
+  async (quizData, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/create_quiz?say=${say}`;
+      const endpoint = `/${getRole}/create_quiz?say=${say}`;
       const response = await postData(endpoint, quizData);
 
       if (response.success) {
@@ -152,12 +162,16 @@ export const createQuizThunk = createAsyncThunk(
 
 export const updateQuizThunk = createAsyncThunk(
   "quiz/updateQuiz",
-  async ({ quizId, quizData, navigate }, { rejectWithValue, dispatch }) => {
+  async (
+    { quizId, quizData, navigate },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/update_quiz/${quizId}?say=${say}`;
+      const endpoint = `/${getRole}/update_quiz/${quizId}?say=${say}`;
       const response = await putData(endpoint, quizData);
 
       if (response.success) {
@@ -181,10 +195,11 @@ export const deleteQuizThunk = createAsyncThunk(
   "quiz/deleteQuiz",
   async (quizId, { getState, rejectWithValue, dispatch }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const endpoint = `/admin/delete_quiz/${quizId}?say=${say}`;
+      const endpoint = `/${getRole}/delete_quiz/${quizId}?say=${say}`;
       const response = await deleteData(endpoint);
 
       if (response.success) {

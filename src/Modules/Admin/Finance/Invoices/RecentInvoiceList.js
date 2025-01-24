@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+
 import {
   Menu,
   Dropdown,
@@ -56,6 +55,7 @@ import toast from "react-hot-toast";
 import { MdOutlineDone } from "react-icons/md";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import { downloadPDF } from "../../../../Utils/xl";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -74,31 +74,10 @@ const RecentInvoiceList = () => {
 
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
-  const downloadPDF = async () => {
-    if (!pdfRef.current) return;
-
-    try {
-      // Capture the pdfRef element as a canvas
-      const canvas = await html2canvas(pdfRef.current, {
-        scale: 2, // Increase scale for higher resolution
-        useCORS: true, // Enable cross-origin
-        windowWidth: pdfRef.current.scrollWidth, // Match the element's width
-        windowHeight: pdfRef.current.scrollHeight, // Match the element's height
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4"); // A4 size PDF
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintain aspect ratio
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`); // Save the PDF
-    } catch (error) {
-      console.error("Failed to generate PDF", error);
-    }
-  };
-
+  const handleDownloadPDF=async (pdfRef,selectedInvoice)=>{
+    await downloadPDF(pdfRef,selectedInvoice,"Invoice")
+  }
+  
 
 
   // Filtered data based on search query
@@ -492,7 +471,7 @@ const RecentInvoiceList = () => {
                   {/* Close Button */}
                   <div className="flex justify-end space-x-2 mb-4">
                     <button
-                      onClick={downloadPDF}
+                      onClick={()=>handleDownloadPDF(pdfRef,selectedInvoice)}
                       className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                     >
                       Download PDF
@@ -506,12 +485,9 @@ const RecentInvoiceList = () => {
                   </div>
 
                   {/* Hidden container for PDF generation */}
-                  <div ref={pdfRef} className="hidden">
-                    <RecentInvoiceTemplate data={selectedInvoice} />
+                  <div >
+                    <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
                   </div>
-
-                  {/* Visible content */}
-                  <RecentInvoiceTemplate data={selectedInvoice} />
                 </div>
               </div>
             )}

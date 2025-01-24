@@ -28,6 +28,7 @@ import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../config/permission";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
@@ -129,13 +130,14 @@ const EventScheduler = () => {
   return (
     <Layout title={`${t("Event")} | ${t("Student Diwan")}`}>
       <DashLayout>
-      <ProtectedSection requiredPermission={PERMISSIONS.SHOW_EVENTS}>
+      <ProtectedSection requiredPermission={PERMISSIONS.SHOW_EVENTS} title={'Events'}>
         <div className="min-h-screen p-4 bg-gray-50 max-w-screen">
           <div className="flex flex-row justify-between">
             <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
               {t("Student Events")}
             </h1>
-            {role === "admin" && (
+            <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_EVENT}>
+            {!["parent","studnt"].includes(role) && (
               <button
                 className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
                 onClick={() => dispatch(setSidebarContent("addEvent"))}
@@ -143,6 +145,7 @@ const EventScheduler = () => {
                 {t("Add New Event")}
               </button>
             )}
+            </ProtectedAction>
           </div>
 
           {/* Event Cards Pagination */}

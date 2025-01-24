@@ -88,6 +88,7 @@ const LibraryAndBookIssue = () => {
               {activeTab === "Library" ? (
                 <ProtectedSection
                   requiredPermission={PERMISSIONS.MANAGE_LIBRARY}
+                  title={'Library'}
                 >
                   <LibraryTab handleSidebarOpen={handleSidebarOpen} />
                 </ProtectedSection>

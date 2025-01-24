@@ -36,7 +36,11 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
+
+import { downloadPDF } from "../../../../Utils/xl";
 
 
 const RecentQuotationList = () => {
@@ -54,7 +58,7 @@ const RecentQuotationList = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const receiptRef = useRef(null);
+  const pdfRef = useRef(null);
   // Local state for preview mode renamed to avoid collision with Redux action
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
   const [previewQuotation, setPreviewQuotation] = useState(null);
@@ -73,35 +77,10 @@ const RecentQuotationList = () => {
   }, [quotations]);
 
 
-  const handleDownloadPDF = async () => {
-    try {
-      if (!previewQuotation || !receiptRef.current) return;
-
-      const pdfTitle = previewQuotation.quotationNumber
-        ? `${previewQuotation.quotationNumber}.pdf`
-        : "quotation.pdf";
-
-      // Capture only the quotation content
-      const canvas = await html2canvas(receiptRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
-
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
-    } catch (error) {
-      console.error("Error generating PDF: ", error);
-      toast.error("Failed to generate PDF.");
-    }
-  };
+  const handleDownloadPDF=async (pdfRef,previewQuotation)=>{
+    await downloadPDF(pdfRef,previewQuotation,"Quotation")
+  }
+  
 
   // Debounced function to fetch adjustments with a fixed limit of 5
   const debouncedFetch = useCallback(
@@ -454,7 +433,7 @@ const RecentQuotationList = () => {
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                    onClick={handleDownloadPDF}
+                    onClick={()=> handleDownloadPDF(pdfRef,previewQuotation)}
                   >
                     Download PDF
                   </button>
@@ -468,8 +447,8 @@ const RecentQuotationList = () => {
                 </div>
 
                 {/* Quotation content container */}
-                <div ref={receiptRef}>
-                  <QuotationTemplate data={previewQuotation} />
+                <div >
+                  <QuotationTemplate data={previewQuotation} ref={pdfRef} />
                 </div>
               </div>
             </div>

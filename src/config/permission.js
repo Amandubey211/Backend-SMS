@@ -186,8 +186,4 @@ export const PERMISSIONS = {
   DELETE_QUIZ: "Delete Quiz",
   GET_QUIZ_BY_ID: "Get Quiz by ID",
   ASSIGN_QUIZ_GRADE: "Assign Quiz Grade",
-
-  
-
-
 };

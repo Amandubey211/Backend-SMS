@@ -6,18 +6,20 @@ import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action"
 import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../Utils/academivYear"
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 
 // Fetch Unverified Students
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
 
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await  getData(
-        `/admin/get_unverified_student_details?say=${say}`
+        `/${getRole}/get_unverified_student_details?say=${say}`
       );
 
       if (!response.students || response.students?.length === 0) {
@@ -37,9 +39,10 @@ export const fetchRejectedStudents = createAsyncThunk(
  
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/get_rejected_student_details?say=${say}`);
+        `/${getRole}/get_rejected_student_details?say=${say}`);
 
       if (!response.students || response.students?.length === 0) {
         return rejectWithValue("No rejected students found.");
@@ -54,14 +57,15 @@ export const fetchRejectedStudents = createAsyncThunk(
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
-  async (verificationDetails, { rejectWithValue,  dispatch }) => {
+  async (verificationDetails, { rejectWithValue,  dispatch , getState}) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
 
       // Step 1: Verify Student
       const verifyResponse = await putData(
-        `/admin/verify_student_info?say=${say}`,
+        `/${getRole}/verify_student_info?say=${say}`,
         verificationDetails
       );
 
@@ -80,7 +84,7 @@ export const verifyStudent = createAsyncThunk(
         };
 
         const assignResponse = await putData(
-          `/admin/assign_class?say=${say}`,
+          `/${getRole}/assign_class?say=${say}`,
           assignClassDetails
         );
 
@@ -102,7 +106,7 @@ export const verifyStudent = createAsyncThunk(
       };
 
       const sendCredentialsResponse = await postData(
-        `/admin/send_login_credential?say=${say}`,
+        `/${getRole}/send_login_credential?say=${say}`,
         mailConfiguration
       );
 
@@ -129,9 +133,10 @@ export const assignClassToStudent = createAsyncThunk(
   
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const  data  = await putData(
-        `/admin/assign_class?say=${say}`,
+        `/${getRole}/assign_class?say=${say}`,
         classDetails
       );
       if (data.success) {

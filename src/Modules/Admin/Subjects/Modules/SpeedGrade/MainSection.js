@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useTranslation } from "react-i18next";
+import { useTranslation, Trans } from "react-i18next";
 import StudentList from "./Components/StudentList";
 import AssignmentDetails from "./Components/AssignmentDetails";
 import SubmissionDetails from "./Components/SubmissionDetails";
-import Spinner from "../../../../../Components/Common/Spinner";
-import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import { MdOutlineAssignmentLate } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { useParams } from "react-router-dom";
 import {
@@ -16,17 +15,19 @@ import {
   fetchAssignedQuizStudents,
   fetchStudentQuiz,
 } from "../../../../../Store/Slices/Admin/Class/SpeedGrade/QuizSpeedGradeThunks";
+import ShimmerLoader from "../../../../../Components/Common/ShimmerLoader";
 
 const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [totalGrade, setTotalGrade] = useState(0);
   const { sgid, type } = useParams();
-  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'speedgrade'
+  const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
 
   const { loading, error, assignmentDetails, quizDetails, students } =
     useSelector((state) => state.admin.speedgrades);
 
+  // Fetch students based on type
   useEffect(() => {
     if (type === "Assignment") {
       dispatch(fetchAssignedAssignmentStudents(sgid));
@@ -34,6 +35,16 @@ const MainSection = () => {
       dispatch(fetchAssignedQuizStudents(sgid));
     }
   }, [dispatch, sgid, type]);
+
+  // Automatically select the first student when students are loaded
+  useEffect(() => {
+    if (students && students.length > 0 && !selectedStudent) {
+      handleStudentSelection(students[0]);
+    } else if (students && students.length === 0) {
+      setSelectedStudent(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [students]);
 
   const handleStudentSelection = (student) => {
     setSelectedStudent(student);
@@ -48,64 +59,118 @@ const MainSection = () => {
     }
   };
 
-  const loadingStatus = type === "Assignment" ? loading : loading;
-  const errorStatus = type === "Assignment" ? error : error;
+  const loadingStatus = loading;
   const details = type === "Assignment" ? assignmentDetails : quizDetails;
 
   const handleTotalGradeUpdate = (grade) => {
     setTotalGrade(grade);
+  };
+  console.log(selectedStudent, "dd");
+
+  // Construct the full name using firstName and lastName if fullName is unavailable
+  const getFullName = (student) => {
+    return (
+      student?.fullName ||
+      `${student?.firstName || ""} ${student?.lastName || ""}`.trim()
+    );
   };
 
   return (
     <div className="flex h-screen">
       {/* Student List Section */}
       <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
-        <StudentList
-          onSelectStudent={handleStudentSelection}
-          students={students}
-        />
+        {loading ? (
+          <>
+            {/* Shimmer Loaders for Student List */}
+            {[...Array(5)].map((_, index) => (
+              <ShimmerLoader
+                key={index}
+                width="100%"
+                height="40px"
+                className="mb-4"
+              />
+            ))}
+          </>
+        ) : students && students.length > 0 ? (
+          <StudentList
+            onSelectStudent={handleStudentSelection}
+            students={students}
+            selectedStudentId={selectedStudent?._id} // Pass selectedStudentId as prop
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center text-gray-500 mt-10">
+            <FaUserCircle className="text-6xl mb-4" />
+            <p className="text-lg font-semibold">
+              {t("No students present in this exam")}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Middle Section */}
-      {!selectedStudent ? (
-        <div className="flex flex-col items-center justify-center text-gray-400 h-full w-full">
-          <FaUserCircle className="text-9xl mb-4" /> {/* Large user icon */}
-          <p className="text-xl font-semibold">{t("Select a student to view details")}</p>
-        </div>
-      ) : (
-        <>
-          <div className="w-1/2 p-4 border-r border-gray-200 flex flex-col">
-            {loadingStatus ? (
-              <Spinner />
-            ) : errorStatus ? (
-              <NoDataFound />
-            ) : (
-              <AssignmentDetails
-                student={selectedStudent}
-                details={details}
-                type={type}
-                onTotalGradeUpdate={handleTotalGradeUpdate}
-              />
-            )}
+      <div className="w-1/2 p-4 border-r border-gray-200 flex flex-col">
+        {students && students.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-gray-500 h-full">
+            <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-400" />
+            <p className="text-2xl font-semibold">
+              {t("No students to display")}
+            </p>
           </div>
+        ) : !selectedStudent ? (
+          <div className="flex flex-col items-center justify-center text-gray-400 h-full">
+            <FaUserCircle className="text-9xl mb-4" />
+            <p className="text-xl font-semibold">
+              {t("Select a student to view details")}
+            </p>
+          </div>
+        ) : loadingStatus ? (
+          <div className="w-full p-4">
+            {/* Shimmer Loaders for Assignment Details */}
+            <ShimmerLoader width="80%" height="30px" className="mb-6" />
+            <ShimmerLoader width="100%" height="200px" className="mb-4" />
+            <ShimmerLoader width="60%" height="20px" />
+          </div>
+        ) : error || !details ? (
+          <div className="flex-grow flex flex-col items-center justify-center text-gray-500">
+            <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-400" />
+            {/* <Trans
+              i18nKey="noSubmissionForStudent"
+              components={{ strong: <strong /> }}
+              
+            > */}
 
-          {/* Right Section */}
-          <div className="w-1/4 flex flex-col">
-            {details ? (
-              <SubmissionDetails
-                details={details}
-                student={selectedStudent}
-                initialGrade={totalGrade}
-              />
-            ) : (
-              <div className="flex-grow flex flex-col items-center justify-center text-gray-400">
-                <FaUserCircle className="text-9xl mb-4" /> {/* Big icon */}
-                <p className="text-lg font-semibold">{t("No submission found")}</p>
-              </div>
-            )}
+            <div>
+              No submission found for{" "}
+              <span className="text-lg font-semibold capitalize">
+                {getFullName(selectedStudent)}
+              </span>
+            </div>
+
+            {/* </Trans> */}
+            {/* <p className="text-sm text-gray-400 mt-2 text-center">
+              {t(
+                "Please verify if the student has submitted the assignment or contact support for assistance."
+              )}
+            </p> */}
           </div>
-        </>
-      )}
+        ) : (
+          <AssignmentDetails
+            student={selectedStudent}
+            details={details}
+            type={type}
+            onTotalGradeUpdate={handleTotalGradeUpdate}
+          />
+        )}
+      </div>
+
+      {/* Right Section */}
+      <div className="w-1/4 flex flex-col">
+        <SubmissionDetails
+          details={details}
+          student={selectedStudent}
+          initialGrade={totalGrade}
+        />
+      </div>
     </div>
   );
 };

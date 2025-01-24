@@ -8,15 +8,19 @@ import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
 import { getData, putData } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Fetch students by class and section
 export const fetchStudentsByClassAndSection = createAsyncThunk(
   "students/fetchByClassAndSection",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/admin/student/${classId}?say=${say}`);
+      const response = await getData(
+        `/${getRole}/student/${classId}?say=${say}`
+      );
       console.log("API response from thunk:", response); // Debugging
       return response.data; // Ensure the structure is correct
     } catch (error) {
@@ -28,11 +32,14 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
 
 export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
   "students/fetchByClassAndSectionNames",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/admin/all/student/${classId}?say=${say}`);
+      const response = await getData(
+        `/${getRole}/all/student/${classId}?say=${say}`
+      );
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -43,11 +50,12 @@ export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
 // Fetch all students
 export const fetchAllStudents = createAsyncThunk(
   "students/fetchAll",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/admin/all/students?say=${say}`);
+      const response = await getData(`/${getRole}/all/students?say=${say}`);
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -65,13 +73,17 @@ export const promoteStudents = createAsyncThunk(
     const classId = getState().common.user.classInfo.selectedClassId;
 
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await putData(`/admin/promote/students?say=${say}`, {
-        StudentIds,
-        promotionClassId,
-        academicYearId,
-      });
+      const response = await putData(
+        `/${getRole}/promote/students?say=${say}`,
+        {
+          StudentIds,
+          promotionClassId,
+          academicYearId,
+        }
+      );
       toast.success("Student Promoted");
       dispatch(fetchStudentsByClassAndSection(classId));
       return response;
@@ -91,10 +103,11 @@ export const promoteInSameClassStudents = createAsyncThunk(
   ) => {
     const classId = getState().common.user.classInfo.selectedClassId;
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
       const response = await putData(
-        `/admin/promote/inSameClass/students?say=${say}`,
+        `/${getRole}/promote/inSameClass/students?say=${say}`,
         { studentIds, academicYearId }
       );
       dispatch(fetchStudentsByClassAndSection(classId));
@@ -111,11 +124,15 @@ export const graduateStudents = createAsyncThunk(
   async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
     const classId = getState().common.user.classInfo.selectedClassId;
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await putData(`/admin/graduate/students?say=${say}`, {
-        studentIds,
-      });
+      const response = await putData(
+        `/${getRole}/graduate/students?say=${say}`,
+        {
+          studentIds,
+        }
+      );
       if (response.success) {
         toast.success("Student graduated successfully");
       } else {
@@ -135,9 +152,10 @@ export const demoteStudents = createAsyncThunk(
   "students/demoteStudents",
   async ({ studentIds }, { getState, rejectWithValue, dispatch }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await putData(`/admin/demote/students?say=${say}`, {
+      const response = await putData(`/${getRole}/demote/students?say=${say}`, {
         studentIds,
       });
       return response;
@@ -150,13 +168,17 @@ export const demoteStudents = createAsyncThunk(
 // Fetch Graduates
 export const fetchGraduates = createAsyncThunk(
   "students/fetchGraduates",
-  async (queryParams, { rejectWithValue, dispatch }) => {
+  async (queryParams, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/admin/graduates/students?say=${say}`, {
-        queryParams,
-      });
+      const response = await getData(
+        `/${getRole}/graduates/students?say=${say}`,
+        {
+          queryParams,
+        }
+      );
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

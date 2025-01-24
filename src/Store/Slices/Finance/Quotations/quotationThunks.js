@@ -2,14 +2,16 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 // Fetch all quotations
 export const fetchAllQuotations = createAsyncThunk(
   "quotations/fetchAllQuotations",
-  async (params, { rejectWithValue }) => {
+  async (params, { rejectWithValue, getState }) => {
     try {
-      const say=getAY();
-      const response = await getData(`/finance/revenue/all/quotation?say=${say}`, params);
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      const response = await getData(`/${getRole}/revenue/all/quotation?say=${say}`, params);
       if (response) {
         return response;
       } else {
@@ -25,10 +27,11 @@ export const fetchAllQuotations = createAsyncThunk(
 // Create a new quotation
 export const addQuotation = createAsyncThunk(
   "quotations/addQuotation",
-  async (data, { rejectWithValue }) => {
+  async (data, { rejectWithValue, getState }) => {
     try {
-      const say=getAY();
-      const response = await postData(`/finance/revenue/create/quotation?say=${say}`, data);
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      const response = await postData(`/${getRole}/revenue/create/quotation?say=${say}`, data);
       if (response?.success) {
         toast.success("Quotation created successfully!");
         return response.data;
@@ -45,9 +48,10 @@ export const addQuotation = createAsyncThunk(
 // Cancel a quotation
 export const cancelQuotation = createAsyncThunk(
   "quotations/cancelQuotation",
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, getState }) => {
     try {
-      const response = await putData(`/finance/quotations/cancel/${id}`);
+      const getRole = getUserRole(getState);
+      const response = await putData(`/${getRole}/quotations/cancel/${id}`);
       if (response?.success) {
         toast.success("Quotation canceled successfully!");
         return response.data;
@@ -64,10 +68,11 @@ export const cancelQuotation = createAsyncThunk(
 // Fetch Dashboard CardData
 export const fetchQuotationCardData = createAsyncThunk(
   "quotations/fetchCardData",
-  async (params, { rejectWithValue }) => {
+  async (params, { rejectWithValue, getState }) => {
     try {
-      const say=getAY();
-      const response = await getData(`/finance/dashboard/quotation/cardData?academicYearId=${say}`, params);
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      const response = await getData(`/${getRole}/dashboard/quotation/cardData?academicYearId=${say}`, params);
       if (response?.success) {
         //toast.success("Quotation canceled successfully!");
         return response.data;
@@ -84,9 +89,10 @@ export const fetchQuotationCardData = createAsyncThunk(
 
 export const updateQuotationStatus = createAsyncThunk(
   "quotations/updateQuotationStatus",
-  async ({ id, status }, { rejectWithValue, dispatch }) => {
+  async ({ id, status }, { rejectWithValue, dispatch, getState }) => {
     try {
-      const response = await putData(`/finance/revenue/update/quotation/${id}`, { status });
+      const getRole = getUserRole(getState);
+      const response = await putData(`/${getRole}/revenue/update/quotation/${id}`, { status });
       if (response?.success) {
         toast.success(`Quotation ${status} successfully!`);
         return response.data;

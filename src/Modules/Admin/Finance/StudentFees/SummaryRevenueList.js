@@ -29,6 +29,7 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -237,7 +238,7 @@ const SummaryRevenueList = () => {
               type="link"
               icon={<EyeOutlined />}
               onClick={() => {
-                handleEditClick(record);
+                handleEditClick({...record,mode:'View'});
               }}
               className="text-blue-600 hover:text-blue-800 p-0"
               aria-label="View"
@@ -248,7 +249,7 @@ const SummaryRevenueList = () => {
               type="link"
               icon={<EditOutlined />}
               onClick={() => {
-                handleEditClick(record);
+                handleEditClick({...record,mode:'Edit'});
               }}
               className="text-blue-600 hover:text-blue-800 p-0"
               aria-label="Edit"
@@ -312,7 +313,7 @@ const SummaryRevenueList = () => {
   return (
     <Layout title="Finance | Student Fees">
     <AdminLayout>
-    <ProtectedSection requiredPermission="viewStudentFeeList">
+    <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_REVENUE} title={'Fees List'}>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">

@@ -6,6 +6,7 @@ import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import { customRequest, putData } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const addAttachment = createAsyncThunk(
   "attachment/addAttachment",
@@ -18,6 +19,7 @@ export const addAttachment = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 
@@ -31,12 +33,11 @@ export const addAttachment = createAsyncThunk(
 
       const response = await customRequest(
         "put",
-        `/admin/uploadChapterFiles?say=${say}`,
+        `/${getRole}/uploadChapterFiles?say=${say}`,
         formData,
         {
-            "Content-Type": "multipart/form-data",
-          },
-        
+          "Content-Type": "multipart/form-data",
+        }
       );
 
       if (response && response.uploadedFiles?.length) {
@@ -71,12 +72,16 @@ export const deleteAttachmentThunk = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
 
       const payload = { chapterId, subjectId, fileUrl };
 
-      const response = await putData(`/admin/removeChapterFiles?say=${say}`, payload);
+      const response = await putData(
+        `/${getRole}/removeChapterFiles?say=${say}`,
+        payload
+      );
 
       if (response && response.message == "File deleted successfully") {
         await dispatch(fetchModules({ cid, sid }));

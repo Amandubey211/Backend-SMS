@@ -1,8 +1,9 @@
-import React from "react";
+import React,{forwardRef} from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 
-const ReceiptTemplate = ({ data }) => {
+const ReceiptTemplate =forwardRef((props, ref) => {
+  const { data } = props;
   if (!data) return null;
 
   const {
@@ -49,35 +50,9 @@ const ReceiptTemplate = ({ data }) => {
 
 
   return (
-    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
+    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
       {/* Show "Cancelled" label if isCancel is true */}
-      {isCancel && (
-        <div
-        className="
-          absolute 
-          top-[35rem] 
-          left-[28rem] 
-          transform 
-          -translate-x-1/2 
-          -translate-y-1/2 
-          rotate-[-15deg] 
-          text-red-500 
-          text-4xl 
-          font-bold 
-          uppercase 
-          border-4 
-          border-red-500 
-          p-5 
-          px-10 
-          rounded-md 
-          bg-white/80 
-          shadow-md 
-          z-10
-        "
-      >
-        Cancelled
-      </div>
-      )}
+     
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
         <div className="w-full bg-pink-100 px-4 py-2 flex justify-between items-center rounded-t-lg">
@@ -100,7 +75,7 @@ const ReceiptTemplate = ({ data }) => {
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          RECEIPT
+        RECEIPT {isCancel && "CANCELLED"}
         </div>
       </div>
 
@@ -252,6 +227,7 @@ const ReceiptTemplate = ({ data }) => {
               "Thank you for doing business with us. If you have any questions, please contact us.",
               "Ensure to retain this document for future reference.",
               "For further details, reach out to our support team.",
+               `${isCancel && "This Receipt is cancelled"}`
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}
@@ -261,6 +237,6 @@ const ReceiptTemplate = ({ data }) => {
       </div>
     </div>
   );
-};
+});
 
 export default ReceiptTemplate;

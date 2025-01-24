@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { IoSearchOutline } from "react-icons/io5";
 import { VscSettings } from "react-icons/vsc";
-import Spinner from "../../../../../../Components/Common/Spinner";
+import { FaUserCircle } from "react-icons/fa"; // Import the default user icon
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useTranslation } from "react-i18next";
 
-function StudentList({ onSelectStudent, students }) {
+function StudentList({ onSelectStudent, students, selectedStudentId }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeIndex, setActiveIndex] = useState(null);
   const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'studentList'
 
   const filteredStudents = students.filter((student) =>
@@ -15,8 +14,7 @@ function StudentList({ onSelectStudent, students }) {
   );
 
   const handleStudentClick = useCallback(
-    (student, index) => {
-      setActiveIndex(index);
+    (student) => {
       onSelectStudent(student);
     },
     [onSelectStudent]
@@ -38,32 +36,50 @@ function StudentList({ onSelectStudent, students }) {
         </div>
       </div>
       <div className="flex gap-4 items-center mb-4">
-        <h2 className="text-md font-semibold">{t("All Students")}</h2> {/* Translated heading */}
+        <h2 className="text-md font-semibold">{t("All Students")}</h2>{" "}
+        {/* Translated heading */}
         <span className="text-sm bg-purple-100 text-purple-600 rounded-full px-2 py-1">
           {students?.length}
         </span>
       </div>
-      {!filteredStudents?.length && <NoDataFound title={t("Students")} />} {/* Translated title */}
-      <div className="flex-grow overflow-y-auto space-y-2 ">
-        {filteredStudents?.map((student, index) => (
+      {!filteredStudents?.length && <NoDataFound title={t("Students")} />}{" "}
+      {/* Translated title */}
+      <div className="flex-grow overflow-y-auto space-y-2">
+        {filteredStudents?.map((student) => (
           <div
             key={student._id}
             className={`flex items-center p-2 cursor-pointer rounded-full ${
-              activeIndex === index
+              student._id === selectedStudentId
                 ? "bg-gradient-to-r from-purple-100 to-pink-100"
                 : ""
             }`}
-            onClick={() => handleStudentClick(student, index)}
+            onClick={() => handleStudentClick(student)}
+            role="button"
+            aria-selected={student._id === selectedStudentId}
+            tabIndex={0}
+            onKeyPress={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                handleStudentClick(student);
+              }
+            }}
           >
-            <img
-              src={student.profile || "https://via.placeholder.com/50"} // Default image if profile is unavailable
-              alt={student.fullName}
-              className="w-8 h-8 rounded-full mr-3"
-            />
+            <div className="w-8 h-8 rounded-full mr-3 flex items-center justify-center bg-gray-200">
+              {student.profile ? (
+                <img
+                  src={student.profile}
+                  alt={student.fullName}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <FaUserCircle className="text-gray-400" size={24} />
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <h3
-                className={`text-sm font-medium ${
-                  activeIndex === index ? "text-purple-600" : "text-gray-900"
+                className={`text-sm font-medium capitalize ${
+                  student._id === selectedStudentId
+                    ? "text-purple-600"
+                    : "text-gray-900"
                 } truncate`}
                 style={{
                   overflow: "hidden",
@@ -74,7 +90,8 @@ function StudentList({ onSelectStudent, students }) {
                 {student.fullName}
               </h3>
               <p className="text-sm text-green-500">
-                {student?.presentSectionId?.sectionName || t("N/A")} {/* Translated "N/A" */}
+                {student?.presentSectionId?.sectionName || t("N/A")}{" "}
+                {/* Translated "N/A" */}
               </p>
             </div>
           </div>

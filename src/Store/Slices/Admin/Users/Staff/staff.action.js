@@ -35,12 +35,13 @@ export const addUser = createAsyncThunk(
   async ({ userData, address }, { rejectWithValue, getState, dispatch }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const formData = new FormData();
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
       formData.append("address", JSON.stringify(address));
 
-      const response = await customRequest('post',`/admin/staff_register?say=${say}`, formData,   {
+      const response = await customRequest('post',`/${getRole}/staff_register?say=${say}`, formData,   {
         "Content-Type": "multipart/form-data",
       }
 );
@@ -73,12 +74,13 @@ export const editUser = createAsyncThunk(
   async ({ userData, address, id }, { rejectWithValue, getState, dispatch }) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const formData = new FormData();
       Object.keys(userData).forEach((key) => formData.append(key, userData[key]));
       formData.append("address", JSON.stringify(address));
 
-      const response = await customRequest('put',`/admin/update_staff/${id}?say=${say}`, formData,   {
+      const response = await customRequest('put',`/${getRole}/update_staff/${id}?say=${say}`, formData,   {
         "Content-Type": "multipart/form-data",
       }
 );
@@ -102,9 +104,10 @@ export const deactiveUser = createAsyncThunk(
   "user/deactiveUser",
   async (userData, { rejectWithValue, getState, dispatch }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await deleteData(`${baseUrl}/admin/delete_staff/${userData.id}?say=${say}`);
+      const response = await deleteData(`${baseUrl}/${getRole}/delete_staff/${userData.id}?say=${say}`);
 
       if (response.success) {
         toast.success("User deactivated successfully");
@@ -128,8 +131,9 @@ export const activeUser = createAsyncThunk(
   async (userData, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
       const say = getAY();
-      const response = await putData(`${baseUrl}/admin/update_active_status?say=${say}`, userData);
+      const response = await putData(`${baseUrl}/${getRole}/update_active_status?say=${say}`, userData);
 
       if (response.success) {
         toast.success("User activated successfully");

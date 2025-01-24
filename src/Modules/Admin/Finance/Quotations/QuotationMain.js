@@ -48,7 +48,9 @@ const QuotationMain = () => {
                     </div>
 
                     {/* Add New Quotation Button */}
+
                     <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
+
                         <button
                             onClick={() => {
                                 dispatch(clearSelectedQuotation())
