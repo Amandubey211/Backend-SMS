@@ -1,4 +1,4 @@
-// src/store/finance/studentFees/studentFeesThunks.js
+// src/store/${getRole}/studentFees/studentFeesThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
@@ -11,16 +11,18 @@ import {
 } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
 import toast from "react-hot-toast";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 
 export const fetchOneStudentFee = createAsyncThunk(
   "studentFees/fetchOneStudentFee",
-  async (studentId, { rejectWithValue, dispatch }) => {
+  async (studentId, { rejectWithValue, dispatch ,getState}) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/finance/revenue/get/student/fee/${studentId}?say=${say}`
+        `/${getRole}/revenue/get/student/fee/${studentId}?say=${say}`
       );
       return response;
     } catch (error) {
@@ -32,12 +34,13 @@ export const fetchOneStudentFee = createAsyncThunk(
 
 export const createStudentFee = createAsyncThunk(
   "studentFees/createStudentFee",
-  async (feeData, { rejectWithValue, dispatch }) => {
+  async (feeData, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
     try {
+      const getRole = getUserRole(getState);
       const response = await postData(
-        `/finance/revenue/add/student/fee?say=${say}`,
+        `/${getRole}/revenue/add/student/fee?say=${say}`,
         { allData: feeData }
       );
       if (response.success) {
@@ -53,12 +56,13 @@ export const createStudentFee = createAsyncThunk(
 );
 export const createStudentFeeRecordForClass = createAsyncThunk(
   "studentFees/createStudentFeeRecordForClass",
-  async (feeData, { rejectWithValue, dispatch }) => {
+  async (feeData, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
     try {
+      const getRole = getUserRole(getState);
       const response = await postData(
-        `/finance/revenue/add/class/student/fee?say=${say}`,
+        `/${getRole}/revenue/add/class/student/fee?say=${say}`,
         { allData: feeData }
       );
       if (response.success) {
@@ -76,11 +80,12 @@ export const createStudentFeeRecordForClass = createAsyncThunk(
 
 export const updateStudentFee = createAsyncThunk(
   "studentFees/updateStudentFee",
-  async (data, { rejectWithValue, dispatch }) => {
+  async (data, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await putData(
-        `/finance/revenue/update/student/fee/${data.feeId}`,
+        `/${getRole}/revenue/update/student/fee/${data.feeId}`,
         data
       );
       if (response.success) {
@@ -99,11 +104,12 @@ export const updateStudentFee = createAsyncThunk(
 
 export const deleteStudentFees = createAsyncThunk(
   "studentFees/deleteStudentFees",
-  async (data, { rejectWithValue, dispatch }) => {
+  async (data, { rejectWithValue, dispatch ,getState}) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       // Since DELETE requests typically don't have a body, use customRequest to send data
-      const response = await customRequest('delete', "/finance/revenue/delete/student/fee",
+      const response = await customRequest('delete', `/${getRole}/revenue/delete/student/fee`,
         data
       );
 
@@ -116,8 +122,9 @@ export const deleteStudentFees = createAsyncThunk(
 
 export const studentFeesGraph = createAsyncThunk(
   "studentFees/studentFeesGraph",
-  async (params, { rejectWithValue, dispatch }) => {
+  async (params, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
 
       // Default to the current year if no year is provided
@@ -136,7 +143,7 @@ export const studentFeesGraph = createAsyncThunk(
       console.log("Query Parameters:", queryParams); // For debugging
 
       // Fix: Dynamic year value and correct URL construction
-      const url = `/finance/dashboard/revenue/studentFeeGraph?${queryParams}`;
+      const url = `/${getRole}/dashboard/revenue/studentFeeGraph?${queryParams}`;
 
       // Make the API call
       const response = await getData(url);
@@ -151,11 +158,12 @@ export const studentFeesGraph = createAsyncThunk(
 
 export const fetchStudentFeeCardData = createAsyncThunk(
   "studentFees/fetchStudentFeeCardData",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/finance/dashboard/revenue/studentFeeDashboard`
+        `/${getRole}/dashboard/revenue/studentFeeDashboard`
       );
       return response.data;
     } catch (error) {
