@@ -59,20 +59,37 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
     });
   }, [timetables]);
 
+  // Updated actionMenu to prevent event propagation
   const actionMenu = (record) => (
     <Menu>
-      <Menu.Item key="1" onClick={() => handleEditClick(record)}>
+      <Menu.Item
+        key="1"
+        onClick={(e) => {
+          e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
+          // For Ant Design v5 and above, use e.stopPropagation()
+          // e.stopPropagation();
+          handleEditClick(record);
+        }}
+      >
         <EditOutlined style={{ marginRight: 8 }} />
         {t("Edit")}
       </Menu.Item>
-      <Menu.Item key="2" onClick={() => handleDeleteClick(record)}>
+      <Menu.Item
+        key="2"
+        onClick={(e) => {
+          e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
+          // For Ant Design v5 and above, use e.stopPropagation()
+          // e.stopPropagation();
+          handleDeleteClick(record);
+        }}
+      >
         <DeleteOutlined style={{ marginRight: 8 }} />
         {t("Delete")}
       </Menu.Item>
     </Menu>
   );
 
-  // Updated renderSchedule function
+  // Ensure renderSchedule is defined before it's used
   const renderSchedule = (timetable) => {
     const { type, days } = timetable;
 
@@ -187,7 +204,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
           {sortedTimetables?.map((timetable) => (
             <div
               key={timetable._id}
-              className="relative p-6 bg-white border border-gray-200 shadow-lg rounded-xl transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
+              className="relative p-6 bg-white border border-gray-200 shadow-lg rounded-xl transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer flex flex-col"
               onClick={() => handleCardClick(timetable)}
             >
               {/* Active/Draft Tag and Dropdown */}
@@ -234,9 +251,9 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
                 </p>
 
                 {/* Class (with school) as a Tag */}
-                <p className="text-sm text-gray-600 mt-1 flex items-center">
+                <p className="text-sm text-gray-600 mt-1 flex items-center flex-wrap">
                   <strong className="mr-1">{t("Class")}:</strong>
-                  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full">
+                  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full whitespace-normal">
                     {timetable.classId?.className ?? "N/A"},{" "}
                     {timetable.schoolId?.nameOfSchool ?? "N/A"}
                   </span>
@@ -257,13 +274,13 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               </div>
 
               {/* Schedule Section */}
-              <div className="bg-gray-100 p-4 rounded-lg mb-4 border border-gray-200">
+              <div className="bg-gray-100 p-4 rounded-lg mb-4 border border-gray-200 flex-1">
                 <h3 className="text-md font-semibold text-gray-700">{t("Schedule")}</h3>
                 {renderSchedule(timetable)}
               </div>
 
               {/* View Button */}
-              <div className="flex justify-end">
+              <div className="mt-auto flex justify-end">
                 <button className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
                   {t("View Timetable")}
                 </button>
@@ -276,7 +293,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
       {/* Deletion Confirmation Modal */}
       {timetableToDelete && (
         <DeleteConfirmationModal // Corrected typo
-          isOpen={isModalOpen}
+          isOpen={isModalOpen} // Verify if your modal expects 'isOpen' or 'visible'
           onClose={closeModal}
           onConfirm={confirmDelete}
           loading={false}

@@ -32,14 +32,14 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
       dispatch(fetchAllClasses());
     }
   }, [dispatch, role]);
-  
+
   useEffect(() => {
     if (error && role !== "parent" && role !== "student") {
       // Handle the error silently or log it, as toast is removed
       console.error("Failed to load classes:", error);
     }
   }, [error, role]);
-  
+
 
   // Debounced function to handle name filtering
   const debouncedHandleNameFilter = useMemo(
@@ -89,30 +89,30 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
 
   return (
     <div className="p-4 bg-transparent mb-5">
-      <Row gutter={16} align="middle" justify="end">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Name Filter */}
-        <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Name")}</label>
+        <div>
+          <label className="font-medium text-gray-700">{t("Name")}</label>
           <Input
             placeholder={t("Search by Name")}
             prefix={<SearchOutlined />}
             value={filters.name}
             onChange={(e) => handleFilterChange("name", e.target.value)}
             allowClear
-            style={{ width: "200px" }}
+            className="w-full"
           />
-        </Col>
+        </div>
 
         {/* Class ID Filter - Exclude for Parent/Student */}
         {role !== "parent" && role !== "student" && (
-          <Col>
-            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Class")}</label>
+          <div>
+            <label className="font-medium text-gray-700">{t("Class")}</label>
             <Select
               placeholder={t("Select Class")}
               loading={loading}
               value={filters.classId}
               onChange={(value) => handleFilterChange("classId", value)}
-              style={{ width: "180px" }}
+              className="w-full"
               optionFilterProp="children"
               showSearch
               allowClear
@@ -124,17 +124,17 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
                 </Option>
               ))}
             </Select>
-          </Col>
+          </div>
         )}
 
         {/* Type Filter */}
-        <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Type")}</label>
+        <div>
+          <label className="font-medium text-gray-700">{t("Type")}</label>
           <Select
             placeholder={t("All Types")}
             value={filters.type}
             onChange={(value) => handleFilterChange("type", value)}
-            style={{ width: "180px" }}
+            className="w-full"
             allowClear
           >
             <Option value="">{t("All Types")}</Option>
@@ -143,55 +143,44 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
             <Option value="event">{t("Event")}</Option>
             <Option value="others">{t("Others")}</Option>
           </Select>
-        </Col>
+        </div>
 
         {/* Status Filter - Exclude for Parent/Student */}
         {role !== "parent" && role !== "student" && (
-          <Col>
-            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Status")}</label>
+          <div>
+            <label className="font-medium text-gray-700">{t("Status")}</label>
             <Select
               placeholder={t("All Statuses")}
               value={filters.status}
               onChange={(value) => handleFilterChange("status", value)}
-              style={{ width: "180px" }}
+              className="w-full"
               allowClear
             >
               <Option value="">{t("All Statuses")}</Option>
               <Option value="active">{t("Published")}</Option>
               <Option value="inactive">{t("Drafts")}</Option>
             </Select>
-          </Col>
+          </div>
         )}
 
         {/* Action Buttons */}
-        <Col>
-          <Space size="middle">
-            <Button
-              type="primary"
-              onClick={applyFilters}
-              style={{
-                borderRadius: "6px",
-                background: "linear-gradient(to right, #ec4899, #a855f7)",
-                color: "white",
-              }}
-              className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
-            >
-              {t("Apply Filters")}
-            </Button>
+        <div className="flex items-end justify-end md:justify-start md:flex-row flex-col gap-4">
+          <Button
+            type="primary"
+            onClick={applyFilters}
+            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-md px-4 py-2"
+          >
+            {t("Apply Filters")}
+          </Button>
 
-            <Button
-              onClick={clearFilters}
-              style={{
-                borderRadius: "6px",
-                color: "#1890ff",
-                borderColor: "#1890ff",
-              }}
-            >
-              {t("Clear Filters")}
-            </Button>
-          </Space>
-        </Col>
-      </Row>
+          <Button
+            onClick={clearFilters}
+            className="text-blue-500 border border-blue-500 rounded-md px-4 py-2"
+          >
+            {t("Clear Filters")}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

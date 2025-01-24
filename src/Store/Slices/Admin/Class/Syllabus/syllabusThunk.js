@@ -9,16 +9,18 @@ import {
   deleteData,
   getData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchSyllabus = createAsyncThunk(
   "syllabus/fetchSyllabus",
-  async ({ subjectId, classId }, { rejectWithValue, dispatch }) => {
+  async ({ subjectId, classId }, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+        const getRole = getUserRole(getState);
       const response = await getData(
-        `/admin/syllabus/${subjectId}/class/${classId}?say=${say}`,
+        `/${getRole}/syllabus/${subjectId}/class/${classId}?say=${say}`,
     
       );
 
@@ -33,12 +35,14 @@ export const fetchSyllabus = createAsyncThunk(
 
 export const deleteSyllabus = createAsyncThunk(
   "syllabus/deleteSyllabus",
-  async (syllabusId, { rejectWithValue, dispatch }) => {
+  async (syllabusId, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/syllabus/${syllabusId}?say=${say}`);
+      
+        const getRole = getUserRole(getState);
+      const response = await deleteData(`/${getRole}/syllabus/${syllabusId}?say=${say}`);
 
       if (response && response.status) {
         toast.success("Syllabus deleted successfully!");
@@ -52,13 +56,14 @@ export const deleteSyllabus = createAsyncThunk(
 
 export const createSyllabus = createAsyncThunk(
   "syllabus/createSyllabus",
-  async ({ title, content, subjectId }, { rejectWithValue, dispatch }) => {
+  async ({ title, content, subjectId }, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+        const getRole = getUserRole(getState);
       const payload = { title, content, subjectId };
-      const response = await postData(`/admin/syllabus?say=${say}`, payload);
+      const response = await postData(`/${getRole}/syllabus?say=${say}`, payload);
 
       if (response && response.status) {
         toast.success("Syllabus created successfully!");
@@ -72,17 +77,18 @@ export const createSyllabus = createAsyncThunk(
 
 export const editSyllabus = createAsyncThunk(
   "syllabus/editSyllabus",
-  async ({ syllabusId, data, cid }, { rejectWithValue, dispatch }) => {
+  async ({ syllabusId, data, cid }, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+        const getRole = getUserRole(getState);
       const formData = new FormData();
       for (const key in data) {
         formData.append(key, data[key]);
       }
 
-      const endpoint = `/admin/syllabus/${syllabusId}/class/${cid}?say=${say}`;
+      const endpoint = `/${getRole}/syllabus/${syllabusId}/class/${cid}?say=${say}`;
       const response = await customRequest(
         "put",
         endpoint,

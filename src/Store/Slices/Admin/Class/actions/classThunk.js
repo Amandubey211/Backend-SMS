@@ -9,16 +9,18 @@ import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/all/class?say=${say}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/all/class?say=${say}`;
+
       const response = await getData(endpoint);
       // console.log(response, "lk");
       if (response && response.status) {
@@ -33,13 +35,14 @@ export const fetchAllClasses = createAsyncThunk(
 
 export const fetchAllClassesDetails = createAsyncThunk(
   "class/fetchAllClassesDetails",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/class?say=${say}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/class?say=${say}`;
+
       const response = await getData(endpoint);
       // console.log(response, "lk");
       if (response && response.status) {
@@ -54,13 +57,14 @@ export const fetchAllClassesDetails = createAsyncThunk(
 
 export const fetchClassDetails = createAsyncThunk(
   "class/fetchClassDetails",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/class/${classId}?say=${say}`;
-    
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/class/${classId}?say=${say}`;
+
       const response = await getData(endpoint);
 
       if (response && response.status) {
@@ -74,13 +78,14 @@ export const fetchClassDetails = createAsyncThunk(
 
 export const createClass = createAsyncThunk(
   "class/createClass",
-  async (classData, { rejectWithValue, dispatch }) => {
+  async (classData, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/class?say=${say}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/class?say=${say}`;
+
       const response = await postData(endpoint, classData);
 
       if (response && response.success) {
@@ -96,12 +101,13 @@ export const createClass = createAsyncThunk(
 
 export const updateClass = createAsyncThunk(
   "class/updateClass",
-  async ({ classData, classId }, { rejectWithValue, dispatch }) => {
+  async ({ classData, classId }, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/update_class/${classId}?say=${say}`;
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/update_class/${classId}?say=${say}`;
       const response = await putData(endpoint, classData);
 
       if (response && response.success) {
@@ -117,12 +123,13 @@ export const updateClass = createAsyncThunk(
 
 export const deleteClass = createAsyncThunk(
   "class/deleteClass",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch,getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/delete_class/${classId}?say=${say}`;
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/delete_class/${classId}?say=${say}`;
       const response = await deleteData(endpoint);
 
       if (response && response.success) {

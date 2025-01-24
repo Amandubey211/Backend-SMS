@@ -9,15 +9,19 @@ import {
   getData,
   putData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchClassDiscussions = createAsyncThunk(
   "discussions/fetchClassDiscussions",
-  async ({ cid,sid }, { rejectWithValue, dispatch }) => {
+  async ({ cid, sid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/getDiscussion/class/${cid}/subject/${sid}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/getDiscussion/class/${cid}/subject/${sid}?say=${say}`
+      );
 
       if (response && response.status) {
         return response.data;
@@ -30,12 +34,15 @@ export const fetchClassDiscussions = createAsyncThunk(
 
 export const fetchDiscussionById = createAsyncThunk(
   "discussions/fetchDiscussionById",
-  async ({ did }, { rejectWithValue, dispatch }) => {
+  async ({ did }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/getDiscussionById/${did}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/getDiscussionById/${did}?say=${say}`
+      );
 
       if (response && response.status) {
         return response.data;
@@ -48,7 +55,7 @@ export const fetchDiscussionById = createAsyncThunk(
 
 export const createDiscussion = createAsyncThunk(
   "discussions/createDiscussion",
-  async ({ discussionData, cid }, { rejectWithValue, dispatch }) => {
+  async ({ discussionData, cid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -58,13 +65,14 @@ export const createDiscussion = createAsyncThunk(
     });
 
     try {
+      const getRole = getUserRole(getState);
       const response = await customRequest(
         "post",
-        `/admin/createDiscussion/class/${cid}?say=${say}`,
-        formData, {
-            "Content-Type": "multipart/form-data",
-          },
-
+        `/${getRole}/createDiscussion/class/${cid}?say=${say}`,
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
       );
 
       if (response && response.status) {
@@ -79,7 +87,10 @@ export const createDiscussion = createAsyncThunk(
 
 export const updateDiscussion = createAsyncThunk(
   "discussions/updateDiscussion",
-  async ({ discussionId, discussionData }, { rejectWithValue, dispatch }) => {
+  async (
+    { discussionId, discussionData },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -89,13 +100,14 @@ export const updateDiscussion = createAsyncThunk(
     });
 
     try {
+      const getRole = getUserRole(getState);
       const response = await customRequest(
         "put",
-        `/admin/updateDiscussion/${discussionId}?say=${say}`,
-        formData,{
-            "Content-Type": "multipart/form-data",
-          },
-        
+        `/${getRole}/updateDiscussion/${discussionId}?say=${say}`,
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
       );
 
       if (response && response.status) {
@@ -110,13 +122,15 @@ export const updateDiscussion = createAsyncThunk(
 
 export const deleteDiscussion = createAsyncThunk(
   "discussions/deleteDiscussion",
-  async ({ discussionId }, { rejectWithValue, dispatch }) => {
+  async ({ discussionId }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await deleteData(
-        `/admin/deleteDiscussion/${discussionId}?say=${say}`);
+        `/${getRole}/deleteDiscussion/${discussionId}?say=${say}`
+      );
 
       if (response && response.success) {
         toast.success("Discussion Deleted Successfully");
@@ -130,14 +144,15 @@ export const deleteDiscussion = createAsyncThunk(
 
 export const markAsReadDiscussion = createAsyncThunk(
   "discussions/markAsReadDiscussion",
-  async ({ discussionId }, { rejectWithValue, dispatch }) => {
+  async ({ discussionId }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await putData(
-        `/admin/discussion/readstatus/${discussionId}?say=${say}`,
-        {},
+        `/${getRole}/discussion/readstatus/${discussionId}?say=${say}`,
+        {}
       );
 
       if (response && response.success) {
@@ -151,15 +166,18 @@ export const markAsReadDiscussion = createAsyncThunk(
 
 export const updatePinStatus = createAsyncThunk(
   "discussions/updatePinStatus",
-  async ({ discussionId, isPinned }, { rejectWithValue, dispatch }) => {
+  async (
+    { discussionId, isPinned },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await putData(
-        `/admin/discussion/pinstatus/${discussionId}?say=${say}`,
-        { isPinned },
-        
+        `/${getRole}/discussion/pinstatus/${discussionId}?say=${say}`,
+        { isPinned }
       );
 
       if (response && response.success) {

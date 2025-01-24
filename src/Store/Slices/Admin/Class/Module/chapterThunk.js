@@ -11,6 +11,7 @@ import {
   customRequest,
   deleteData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 // thunks/chapterThunks.js
 
@@ -21,6 +22,7 @@ export const addChapter = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
@@ -36,7 +38,7 @@ export const addChapter = createAsyncThunk(
 
       const response = await customRequest(
         "post",
-        `/admin/add_chapter?say=${say}`,
+        `/${getRole}/add_chapter?say=${say}`,
         formData,
         {
           "Content-Type": "multipart/form-data",
@@ -77,6 +79,7 @@ export const editChapter = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
@@ -88,7 +91,7 @@ export const editChapter = createAsyncThunk(
         formData.append("thumbnail", thumbnail);
       }
 
-      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
+      const endpoint = `/${getRole}/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
 
       const response = await customRequest("put", endpoint, formData, {
         "Content-Type": "multipart/form-data",
@@ -131,10 +134,11 @@ export const deleteChapter = createAsyncThunk(
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
 
-      const endpoint = `/admin/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
+      const endpoint = `/${getRole}/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
 
       const response = await deleteData(endpoint);
 
