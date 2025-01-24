@@ -4,16 +4,17 @@ import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { getData, putData, postData } from "../../../../services/apiEndpoints";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { toast } from "react-hot-toast"
+import { getUserRole } from "../../../../Utils/getRoles";
 
 // Thunk to create an adjustment
 export const createAdjustment = createAsyncThunk(
   "penaltyandAdjustment/createAdjustment",
-  async (formValues, { rejectWithValue }) => {
+  async (formValues, { rejectWithValue, getState }) => {
     try {
       // 1) Fetch necessary IDs
       const storedSchoolId = localStorage.getItem("SelectedschoolId");
       const schoolId = storedSchoolId || "";
-
+      const getRole = getUserRole(getState);
       const academicYearId = getAY();
 
       // 2) Prepare payload
@@ -47,7 +48,7 @@ export const createAdjustment = createAsyncThunk(
       // }
 
       // 4) Make API request
-      const response = await postData("/finance/penaltyAdjustment/add", formData, {
+      const response = await postData(`/${getRole}/penaltyAdjustment/add`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -75,12 +76,13 @@ export const createAdjustment = createAsyncThunk(
 
 export const fetchReturnInvoice = createAsyncThunk(
   "fetchreturnInvoice",
-  async (params, { dispatch, rejectWithValue }) => {
+  async (params, { dispatch, rejectWithValue, getState }) => {
     const say = getAY();
+    const getRole = getUserRole(getState);
     dispatch(setShowError(false));
     try {
       const response = await getData(
-        `/finance/penaltyAdjustment/getAll?say=${say}`,
+        `/${getRole}/penaltyAdjustment/getAll?say=${say}`,
         params
       );
       return response.data;
@@ -92,12 +94,13 @@ export const fetchReturnInvoice = createAsyncThunk(
 
 export const fetchReturnCardData = createAsyncThunk(
   "card/fetchReturnInvoice",
-  async (params, { dispatch, rejectWithValue }) => {
+  async (params, { dispatch, rejectWithValue, getState }) => {
     const say = getAY();
+    const getRole = getUserRole(getState);
     dispatch(setShowError(false));
     try {
       const response = await getData(
-        `/finance/dashboard/penaltyAdjustment/cardData?academicYearId=${say}`,
+        `/${getRole}/dashboard/penaltyAdjustment/cardData?academicYearId=${say}`,
         params
       );
       return response?.data;
@@ -109,12 +112,13 @@ export const fetchReturnCardData = createAsyncThunk(
 
 export const cancleReturnInvoiceData = createAsyncThunk(
   "card/cancelReturnInvoice",
-  async ({ params, id }, { dispatch, rejectWithValue }) => {
+  async ({ params, id }, { dispatch, rejectWithValue, getState }) => {
     const say = getAY();
+    const getRole = getUserRole(getState);
     dispatch(setShowError(false));
     try {
       const response = await putData(
-        `/finance/penaltyAdjustment/cancel/${id}?say=${say}`
+        `/${getRole}/penaltyAdjustment/cancel/${id}?say=${say}`
       );
       dispatch(fetchReturnInvoice(params));
       dispatch(fetchReturnCardData());
