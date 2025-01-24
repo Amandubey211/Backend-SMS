@@ -13,7 +13,7 @@ export const fetchTeacherTimetable = createAsyncThunk(
       const say = getAY(); // Get academic year
       dispatch(setShowError(false));
       // Build API query
-      const response = await getData(`/api/teacher/timetable?say=${say}`);
+      const response = await getData(`/teacher/timetable?say=${say}`);
 
       return response; // Return timetable data
     } catch (error) {
