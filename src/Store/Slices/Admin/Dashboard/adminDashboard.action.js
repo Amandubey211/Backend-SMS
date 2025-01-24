@@ -17,6 +17,7 @@ export const fetchAdminDashboardData = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(`/${getRole}/dashboard?say=${say}`);
       return response;
@@ -33,6 +34,7 @@ export const fetchAttendanceData = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
         `/${getRole}/dashboard/attendance?say=${say}`,
@@ -58,6 +60,7 @@ export const fetchEarningsData = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
         `/${getRole}/dashboard/earnings?say=${say}`,
@@ -81,6 +84,7 @@ export const fetchNotices = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
         `${baseUrl}/${getRole}/dashboard/notices?say=${say}`
@@ -99,6 +103,7 @@ export const fetchTopStudents = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
         `/${getRole}/top/students/class/${classId}?say=${say}`
@@ -117,6 +122,7 @@ export const fetchFilteredEvents = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
         `/${getRole}/dashboard/events?say=${say}`,
@@ -137,7 +143,9 @@ export const fetchFilteredIssueBooks = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
+
       const response = await getData(
         `${baseUrl}/${getRole}/all/book?say=${say}`
       );
