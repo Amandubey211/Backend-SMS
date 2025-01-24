@@ -48,7 +48,9 @@ const QuotationMain = () => {
                     </div>
 
                     {/* Add New Quotation Button */}
-                    <ProtectedAction requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_QUOTATION}>
+
+                    <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
+
                         <button
                             onClick={() => {
                                 dispatch(clearSelectedQuotation())
@@ -66,7 +68,7 @@ const QuotationMain = () => {
                 </div>
 
                 {/* Cards Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_CARD_DATA_OF_QUOTATION}>
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_QUOTATION}>
                     <CardsSection />
                 </ProtectedSection>
 

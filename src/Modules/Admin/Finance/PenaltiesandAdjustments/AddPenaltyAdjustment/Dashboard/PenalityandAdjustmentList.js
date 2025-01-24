@@ -39,7 +39,12 @@ import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSu
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+
+
 import { downloadPDF } from "../../../../../../Utils/xl";
+
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
 
@@ -404,31 +409,31 @@ const PenalityandAdjustmentList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
-              <Button
-                type="primary"
-                icon={<ExportOutlined />}
-                onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-              >
-                Export
-              </Button>
-              <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_ADJUSTMENT}>
+              <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS}>
+                <Button
+                  type="primary"
+                  icon={<ExportOutlined />}
+                  onClick={() => setIsExportModalVisible(true)}
+                  className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                >
+                  Export
+                </Button>
+              </ProtectedAction>
+
+              <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
                 <button
                   onClick={() =>
-                    navigate(
-                      "/finance/penaltyAdjustment/add-new-penalty-adjustment"
-                    )
+                    navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment")
                   }
                   className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                 >
-                  <span className="text-gray-800 font-medium">
-                    Add New Adjustment
-                  </span>
+                  <span className="text-gray-800 font-medium">Add New Adjustment</span>
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                     <FiPlus size={16} />
                   </div>
                 </button>
-              </ProtectedSection>
+              </ProtectedAction>
+
             </div>
           </div>
 
@@ -450,7 +455,7 @@ const PenalityandAdjustmentList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_LIST_ALL_ADJUSTMENTS}>
+            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_ADJUSTMENTS}>
               <Table
                 dataSource={dataSource}
                 columns={columns}

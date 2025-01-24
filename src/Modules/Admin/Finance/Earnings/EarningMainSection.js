@@ -25,7 +25,7 @@ const EarningMainSection = () => {
     <Layout title="Earning Dashboard | Student Diwan">
       <AdminDashLayout>
         <div className="w-[100%] p-2">
-          <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD}>
+          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD}>
             <CardSection />
           </ProtectedSection>
           <TotalEarningGraph />

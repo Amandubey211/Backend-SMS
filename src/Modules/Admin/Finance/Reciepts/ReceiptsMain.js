@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import RecentReceipts from "./Components/RecentReceipts.table";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const ReceiptsMain = () => {
     useNavHeading("Finance", "Receipts");
@@ -16,7 +17,7 @@ const ReceiptsMain = () => {
         <AdminDashLayout>
             <div className="p-6 space-y-6">
                 {/* Header Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_RECEIPT}>
+                <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
                     <div className="flex justify-between items-center">
                         <div className="flex gap-4 justify-start items-center">
 
@@ -34,11 +35,11 @@ const ReceiptsMain = () => {
                         </button>
 
                     </div>
-                </ProtectedSection>
+                </ProtectedAction>
 
 
                 {/* Cards Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_EXPENSE_CARD_DATA}>
+                <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA}>
                     <CardsSection />
                 </ProtectedSection>
 

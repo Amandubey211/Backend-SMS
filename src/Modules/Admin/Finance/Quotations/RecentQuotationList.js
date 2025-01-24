@@ -36,7 +36,12 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
+
 import { downloadPDF } from "../../../../Utils/xl";
+
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -339,7 +344,7 @@ const RecentQuotationList = () => {
               >
                 Export
               </Button>
-              <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_QUOTATION}>
+              <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
                 <button
                   onClick={() => {
                     dispatch(clearSelectedQuotation());
@@ -355,7 +360,7 @@ const RecentQuotationList = () => {
                     <FiPlus size={16} />
                   </div>
                 </button>
-              </ProtectedSection>
+              </ProtectedAction>
             </div>
           </div>
 
@@ -377,7 +382,7 @@ const RecentQuotationList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_LIST_ALL_QUOTATION}>
+            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}>
               <Table
                 dataSource={dataSource}
                 columns={columns}

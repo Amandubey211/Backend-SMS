@@ -14,6 +14,9 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../config/permission";
+
 
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
@@ -174,25 +177,33 @@ const TimeTableMainSection = () => {
       />
 
       {/* Protected Section for Timetable */}
-      <ProtectedSection requiredPermission="viewTimetable">
-        {/* Create Timetable Button */}
-        {role === "admin" && (
-          <div className="flex justify-end mb-4 ml-5">
+
+      {/* Create Timetable Button */}
+      {role === "admin" && (
+
+        <div className="flex justify-end mb-4 ml-5">
+
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_TIMETABLE}>
             <button
               onClick={handleCreateTimeTable}
               className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
             >
               {t("+ Create TimeTable")}
             </button>
-          </div>
-        )}
+          </ProtectedAction>
+        </div>
+      )}
+      <ProtectedSection requiredPermission="viewTimetable">
 
-        {/* Display Timetable List */}
-        <TimeTableList
-          timetables={filteredTimetables}
-          loading={loadingFetch || classLoading}
-          onDelete={handleDelete}
-        />
+        <ProtectedAction requiredPermission={PERMISSIONS.TIMETABLE_VIEW}>
+          {/* Display Timetable List */}
+          <TimeTableList
+            timetables={filteredTimetables}
+            loading={loadingFetch || classLoading}
+            onDelete={handleDelete}
+          />
+        </ProtectedAction>
+
       </ProtectedSection>
     </div>
   );

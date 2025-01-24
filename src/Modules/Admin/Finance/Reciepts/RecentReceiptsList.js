@@ -33,7 +33,11 @@ import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
+
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
 import { downloadPDF } from "../../../../Utils/xl";
+
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -143,7 +147,7 @@ const RecentReceiptsList = () => {
     }
   };
 
-// --- Download PDF from preview ---
+  // --- Download PDF from preview ---
 
 
 
@@ -398,14 +402,17 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           </div>
 
           <div className="flex items-center space-x-4">
-            <button
-              className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
-              onClick={() => setExportModalOpen(true)}
-            >
-              <ExportOutlined className="text-sm" /> {/* Export Icon */}
-              <span>Export</span> {/* Button text */}
-            </button>
-            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_RECEIPT}>
+            <ProtectedAction requiredPermission={PERMISSIONS.EXPORT_RECEIPT_DATA}>
+              <button
+                className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
+                onClick={() => setExportModalOpen(true)}
+              >
+                <ExportOutlined className="text-sm" /> {/* Export Icon */}
+                <span>Export</span> {/* Button text */}
+              </button>
+            </ProtectedAction>
+
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
               <button
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                 onClick={handleNavigate}
@@ -415,7 +422,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
                   <FiUserPlus size={16} />
                 </div>
               </button>
-            </ProtectedSection>
+            </ProtectedAction>
           </div>
         </div>
         {loading ? (
@@ -433,7 +440,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           // Render Table and Custom Pagination
           <>
             {/* Table */}
-            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_ALL_RECEIPTS}>
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS}>
               <Table
                 rowKey={(record) => record._id}
                 columns={columns}

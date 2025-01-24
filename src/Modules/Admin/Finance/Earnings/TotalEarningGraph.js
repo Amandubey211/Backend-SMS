@@ -234,7 +234,7 @@ const TotalEarningGraph = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_REVENUE_GRAPH}>
+      <ProtectedSection requiredPermission={PERMISSIONS.VIEW_REVENUE_GRAPH}>
         <div className="w-[98%]  h-96 bg-white p-4 rounded-lg shadow">
           <Bar data={data} options={options} />
         </div>

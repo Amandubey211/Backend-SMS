@@ -386,7 +386,7 @@ const RecentInvoiceList = () => {
 
 
                   {/* Add New Fee Button */}
-                  {!PERMISSIONS.FINANCE_SHOWS_RECENT_AND_RETURN_INVOICE2 && (
+                  {!PERMISSIONS.CREATE_NEW_INVOICE && (
                     <button
                       onClick={() => {
 
