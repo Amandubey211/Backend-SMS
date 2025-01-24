@@ -9,15 +9,17 @@ import {
   putData,
   getData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const createAssignmentThunk = createAsyncThunk(
   "assignment/createAssignment",
-  async (assignmentData, { rejectWithValue, dispatch }) => {
+  async (assignmentData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/create_assignment?say=${say}`;
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/create_assignment?say=${say}`;
 
       const response = await postData(endpoint, assignmentData);
 
@@ -35,14 +37,15 @@ export const updateAssignmentThunk = createAsyncThunk(
   "assignment/updateAssignment",
   async (
     { assignmentId, assignmentData, sectionId },
-    { rejectWithValue, dispatch }
+    { rejectWithValue, dispatch, getState }
   ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/update_assignment/${assignmentId}?say=${say}`;
-  
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/update_assignment/${assignmentId}?say=${say}`;
+
       const payload = {
         ...assignmentData,
         sectionId,
@@ -64,13 +67,14 @@ export const updateAssignmentThunk = createAsyncThunk(
 
 export const deleteAssignmentThunk = createAsyncThunk(
   "assignment/deleteAssignment",
-  async (assignmentId, { rejectWithValue, dispatch }) => {
+  async (assignmentId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/delete_assignment/${assignmentId}?say=${say}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/delete_assignment/${assignmentId}?say=${say}`;
+
       const response = await deleteData(endpoint);
 
       if (response.success) {
@@ -85,13 +89,14 @@ export const deleteAssignmentThunk = createAsyncThunk(
 
 export const fetchAssignmentsByClassThunk = createAsyncThunk(
   "assignment/fetchAssignmentsByClass",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/class_assignments/${classId}?say=${say}`;
- 
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/class_assignments/${classId}?say=${say}`;
+
       const response = await getData(endpoint);
 
       if (response.success) {
@@ -107,19 +112,20 @@ export const fetchFilteredAssignments = createAsyncThunk(
   "assignments/fetchFiltered",
   async (
     { sid, moduleId, chapterId, publish },
-    { rejectWithValue, dispatch }
+    { rejectWithValue, dispatch, getState }
   ) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-      const endpoint = `/admin/assignments/${sid}?say=${say}`;
+      const endpoint = `/${getRole}/assignments/${sid}?say=${say}`;
 
-     let params = { };
+      let params = {};
       if (moduleId) params.moduleId = moduleId;
       if (chapterId) params.chapterId = chapterId;
       if (publish !== null && publish !== undefined) params.publish = publish;
 
-      const response = await getData(endpoint,params);
+      const response = await getData(endpoint, params);
 
       if (response.success) {
         return response.assignments;
@@ -132,13 +138,14 @@ export const fetchFilteredAssignments = createAsyncThunk(
 
 export const fetchAssignmentByIdThunk = createAsyncThunk(
   "assignment/fetchAssignmentById",
-  async (assignmentId, { rejectWithValue, dispatch }) => {
+  async (assignmentId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/assignment/${assignmentId}?say=${say}`;
-    
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/assignment/${assignmentId}?say=${say}`;
+
       const response = await getData(endpoint);
 
       if (response.success) {

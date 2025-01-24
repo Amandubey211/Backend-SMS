@@ -10,16 +10,18 @@ import {
   getData,
   putData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchAnnouncements = createAsyncThunk(
   "announcement/fetchAnnouncements",
-  async ({ cid, sid }, { rejectWithValue, dispatch }) => {
+  async ({ cid, sid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await getData(
-        `/admin/announcement/class/${cid}/subject/${sid}?say=${say}`
+        `/${getRole}/announcement/class/${cid}/subject/${sid}?say=${say}`
       );
 
       if (response && response.status) {
@@ -33,12 +35,13 @@ export const fetchAnnouncements = createAsyncThunk(
 
 export const markAsReadAnnouncement = createAsyncThunk(
   "announcement/markAsReadAnnouncement",
-  async ({ _id }, { rejectWithValue, dispatch }) => {
+  async ({ _id }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      await postData(`/admin/markAsRead/announcement/${_id}?say=${say}`);
+      const getRole = getUserRole(getState);
+      await postData(`/${getRole}/markAsRead/announcement/${_id}?say=${say}`);
 
       return _id;
     } catch (error) {
@@ -49,12 +52,15 @@ export const markAsReadAnnouncement = createAsyncThunk(
 
 export const fetchAnnouncementById = createAsyncThunk(
   "announcement/fetchAnnouncementById",
-  async (id, { rejectWithValue, dispatch }) => {
+  async (id, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/announcement/${id}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/announcement/${id}?say=${say}`
+      );
 
       if (response && response.status) {
         return response.data;
@@ -67,12 +73,15 @@ export const fetchAnnouncementById = createAsyncThunk(
 
 export const deleteAnnouncement = createAsyncThunk(
   "announcement/deleteAnnouncement",
-  async (id, { rejectWithValue, dispatch }) => {
+  async (id, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/announcement/${id}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await deleteData(
+        `/${getRole}/announcement/${id}?say=${say}`
+      );
 
       if (response && response.status) {
         toast.success("Announcement deleted successfully!");
@@ -86,7 +95,7 @@ export const deleteAnnouncement = createAsyncThunk(
 
 export const createAnnouncement = createAsyncThunk(
   "announcement/createAnnouncement",
-  async ({ data, files }, { rejectWithValue, dispatch }) => {
+  async ({ data, files }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -98,9 +107,10 @@ export const createAnnouncement = createAsyncThunk(
     }
 
     try {
+      const getRole = getUserRole(getState);
       const response = await customRequest(
         "post",
-        `/admin/announcement?say=${say}`,
+        `/${getRole}/announcement?say=${say}`,
         formData,
 
         {
@@ -120,7 +130,7 @@ export const createAnnouncement = createAsyncThunk(
 
 export const editAnnouncement = createAsyncThunk(
   "announcement/editAnnouncement",
-  async ({ id, data, files }, { rejectWithValue, dispatch }) => {
+  async ({ id, data, files }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -132,9 +142,10 @@ export const editAnnouncement = createAsyncThunk(
     }
 
     try {
+      const getRole = getUserRole(getState);
       const response = await customRequest(
         "put",
-        `/admin/announcement/${id}?say=${say}`,
+        `/${getRole}/announcement/${id}?say=${say}`,
         formData,
         {
           "Content-Type": "multipart/form-data",

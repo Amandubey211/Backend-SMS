@@ -4,16 +4,18 @@ import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchAssignedAssignmentStudents = createAsyncThunk(
   "speedGrade/fetchAssignedAssignmentStudents",
-  async (assignmentId, { rejectWithValue, dispatch }) => {
+  async (assignmentId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/speed_grade/students/${assignmentId}?say=${say}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/speed_grade/students/${assignmentId}?say=${say}`;
+
       const response = await getData(endpoint);
 
       if (response && response.success) {
@@ -27,13 +29,17 @@ export const fetchAssignedAssignmentStudents = createAsyncThunk(
 
 export const fetchStudentAssignment = createAsyncThunk(
   "speedGrade/fetchStudentAssignment",
-  async ({ studentId, assignmentId }, { rejectWithValue, dispatch }) => {
+  async (
+    { studentId, assignmentId },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/speed_grade/assignment?say=${say}&studentId=${studentId}&assignmentId=${assignmentId}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/speed_grade/assignment?say=${say}&studentId=${studentId}&assignmentId=${assignmentId}`;
+
       const response = await getData(endpoint);
 
       if (response && response.success) {
@@ -49,14 +55,15 @@ export const assignAssignmentGrade = createAsyncThunk(
   "speedGrade/assignAssignmentGrade",
   async (
     { studentId, assignmentId, grade, attemptDate, status },
-    { rejectWithValue, dispatch }
+    { rejectWithValue, dispatch, getState }
   ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/speed_grade/grade?say=${say}`;
-     
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/speed_grade/grade?say=${say}`;
+
       const requestBody = {
         studentId,
         assignmentId,

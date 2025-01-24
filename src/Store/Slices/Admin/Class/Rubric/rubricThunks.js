@@ -12,16 +12,20 @@ import {
 } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 import { setRubricField } from "./rubricSlice";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Fetch Rubrics by Subject ID Thunk
 export const fetchRubricsBySubjectId = createAsyncThunk(
   "rubric/fetchRubricsBySubjectId",
-  async (sid, { rejectWithValue, dispatch }) => {
+  async (sid, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/rubric/subject/${sid}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/rubric/subject/${sid}?say=${say}`
+      );
       return response.rubrics;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -32,12 +36,13 @@ export const fetchRubricsBySubjectId = createAsyncThunk(
 // Delete Rubric Thunk
 export const deleteRubricThunk = createAsyncThunk(
   "rubric/deleteRubric",
-  async (rubricId, { rejectWithValue, dispatch }) => {
+  async (rubricId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      await deleteData(`/admin/rubric/${rubricId}?say=${say}`);
+      const getRole = getUserRole(getState);
+      await deleteData(`/${getRole}/rubric/${rubricId}?say=${say}`);
 
       toast.success("Rubric deleted successfully");
       return rubricId;
@@ -50,12 +55,16 @@ export const deleteRubricThunk = createAsyncThunk(
 // Update Rubric Thunk
 export const updateRubricThunk = createAsyncThunk(
   "rubric/updateRubric",
-  async ({ rubricId, rubricData }, { rejectWithValue, dispatch }) => {
+  async ({ rubricId, rubricData }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await putData(`/admin/rubric/${rubricId}?say=${say}`, rubricData);
+      const getRole = getUserRole(getState);
+      const response = await putData(
+        `/${getRole}/rubric/${rubricId}?say=${say}`,
+        rubricData
+      );
 
       toast.success("Rubric updated successfully");
       return response.rubric;
@@ -68,12 +77,16 @@ export const updateRubricThunk = createAsyncThunk(
 // Create Assignment Rubric Thunk
 export const createAssignmentRubricThunk = createAsyncThunk(
   "rubric/createAssignmentRubric",
-  async (rubricData, { rejectWithValue, dispatch }) => {
+  async (rubricData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await postData(`/admin/create_rubric?say=${say}`, rubricData);
+      const getRole = getUserRole(getState);
+      const response = await postData(
+        `/${getRole}/create_rubric?say=${say}`,
+        rubricData
+      );
 
       toast.success("Assignment Rubric created successfully");
       // dispatch(fetchRubricsBySubjectId({sid}))
@@ -87,12 +100,16 @@ export const createAssignmentRubricThunk = createAsyncThunk(
 // Create Quiz Rubric Thunk
 export const createQuizRubricThunk = createAsyncThunk(
   "rubric/createQuizRubric",
-  async (rubricData, { rejectWithValue, dispatch }) => {
+  async (rubricData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await postData(`/admin/quiz/create_rubric?say=${say}`, rubricData);
+      const getRole = getUserRole(getState);
+      const response = await postData(
+        `/${getRole}/quiz/create_rubric?say=${say}`,
+        rubricData
+      );
 
       toast.success("Quiz Rubric created successfully");
       // dispatch(fetchRubricsBySubjectId({sid}))
@@ -111,8 +128,9 @@ export const getRubricByIdThunk = createAsyncThunk(
     const say = getAY();
 
     try {
+      const getRole = getUserRole(getState);
       // Fetch the rubric by ID (assignmentId or quizId)
-      const response = await getData(`/admin/rubric/${id}?say=${say}`);
+      const response = await getData(`/${getRole}/rubric/${id}?say=${say}`);
 
       const { success, rubric } = response;
 
