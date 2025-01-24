@@ -9,17 +9,18 @@ import {
   putData,
 } from "../../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../../Utils/getRoles";
 
 export const fetchComments = createAsyncThunk(
   "discussionComments/fetchComments",
-  async (discussionId, { rejectWithValue, dispatch }) => {
+  async (discussionId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await getData(
-        `/admin/getDiscussionComment/${discussionId}?say=${say}`,
-       
+        `/${getRole}/getDiscussionComment/${discussionId}?say=${say}`
       );
 
       if (response && response.status) {
@@ -33,14 +34,15 @@ export const fetchComments = createAsyncThunk(
 
 export const addComment = createAsyncThunk(
   "discussionComments/addComment",
-  async ({ discussionId, text }, { rejectWithValue, dispatch }) => {
+  async ({ discussionId, text }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const payload = { content: text, parentId: null };
       const response = await postData(
-        `/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`,
+        `/${getRole}/createCommentDiscussion/${discussionId}/replies?say=${say}`,
         payload
       );
 
@@ -56,14 +58,18 @@ export const addComment = createAsyncThunk(
 
 export const addReply = createAsyncThunk(
   "discussionComments/addReply",
-  async ({ discussionId, parentId, text }, { rejectWithValue, dispatch }) => {
+  async (
+    { discussionId, parentId, text },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const payload = { content: text, parentId };
       const response = await postData(
-        `/admin/createCommentDiscussion/${discussionId}/replies?say=${say}`,
+        `/${getRole}/createCommentDiscussion/${discussionId}/replies?say=${say}`,
         payload
       );
 
@@ -79,13 +85,14 @@ export const addReply = createAsyncThunk(
 
 export const deleteComment = createAsyncThunk(
   "discussionComments/deleteComment",
-  async (commentId, { rejectWithValue, dispatch }) => {
+  async (commentId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await deleteData(
-        `/admin/deleteCommentDiscussion/${commentId}?say=${say}`
+        `/${getRole}/deleteCommentDiscussion/${commentId}?say=${say}`
       );
 
       if (response && response.status) {
@@ -100,13 +107,14 @@ export const deleteComment = createAsyncThunk(
 
 export const deleteReply = createAsyncThunk(
   "discussionComments/deleteReply",
-  async (replyId, { rejectWithValue, dispatch }) => {
+  async (replyId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await deleteData(
-        `/admin/deleteCommentDiscussion/${replyId}?say=${say}`
+        `/${getRole}/deleteCommentDiscussion/${replyId}?say=${say}`
       );
 
       if (response && response.status) {
@@ -121,13 +129,14 @@ export const deleteReply = createAsyncThunk(
 
 export const toggleLikeMessage = createAsyncThunk(
   "discussionComments/toggleLike",
-  async (messageId, { rejectWithValue, dispatch }) => {
+  async (messageId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await putData(
-        `/admin/likeDiscussions/${messageId}?say=${say}`,
+        `/${getRole}/likeDiscussions/${messageId}?say=${say}`,
         {}
       );
 

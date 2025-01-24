@@ -9,15 +9,19 @@ import {
   getData,
   putData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchAllPages = createAsyncThunk(
   "pages/fetchAllPages",
-  async ({ cid }, { rejectWithValue, dispatch }) => {
+  async ({ cid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/api/pages/class/pages/${cid}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/api/pages/class/pages/${cid}?say=${say}`
+      );
 
       if (response && response.success) {
         return response.data;
@@ -30,12 +34,13 @@ export const fetchAllPages = createAsyncThunk(
 
 export const fetchPageById = createAsyncThunk(
   "pages/fetchPageById",
-  async ({ pid }, { rejectWithValue, dispatch }) => {
+  async ({ pid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await getData(`/admin/api/pages/${pid}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await getData(`/${getRole}/api/pages/${pid}?say=${say}`);
 
       if (response && response.success) {
         return response.data;
@@ -48,15 +53,15 @@ export const fetchPageById = createAsyncThunk(
 
 export const createPage = createAsyncThunk(
   "pages/createPage",
-  async ({ pageData, cid }, { rejectWithValue, dispatch }) => {
+  async ({ pageData, cid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
+      const getRole = getUserRole(getState);
       const response = await postData(
-        `/admin/api/pages/class/${cid}?say=${say}`,
-        pageData,
-     
+        `/${getRole}/api/pages/class/${cid}?say=${say}`,
+        pageData
       );
 
       if (response && response.success) {
@@ -71,12 +76,16 @@ export const createPage = createAsyncThunk(
 
 export const updatePage = createAsyncThunk(
   "pages/updatePage",
-  async ({ pageId, pageData }, { rejectWithValue, dispatch }) => {
+  async ({ pageId, pageData }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await putData(`/admin/api/pages/${pageId}?say=${say}`, pageData);
+      const getRole = getUserRole(getState);
+      const response = await putData(
+        `/${getRole}/api/pages/${pageId}?say=${say}`,
+        pageData
+      );
 
       if (response && response.success) {
         toast.success("Page Updated Successfully");
@@ -90,12 +99,15 @@ export const updatePage = createAsyncThunk(
 
 export const deletePage = createAsyncThunk(
   "pages/deletePage",
-  async ({ pid }, { rejectWithValue, dispatch }) => {
+  async ({ pid }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const response = await deleteData(`/admin/api/pages/${pid}?say=${say}`);
+      const getRole = getUserRole(getState);
+      const response = await deleteData(
+        `/${getRole}/api/pages/${pid}?say=${say}`
+      );
 
       if (response && response.success) {
         toast.success("Page Deleted Successfully");

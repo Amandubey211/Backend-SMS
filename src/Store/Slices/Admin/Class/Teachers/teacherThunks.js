@@ -13,15 +13,17 @@ import {
   postData,
   putData,
 } from "../../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Fetch all teachers
 export const fetchAllTeachers = createAsyncThunk(
   "teachers/fetchAllTeachers",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/admin/teacher?say=${say}`);
+      const response = await getData(`/${getRole}/teacher?say=${say}`);
       dispatch(setTeachers(response.data));
       dispatch(filterTeachersBySection());
       return response.data;
@@ -34,11 +36,12 @@ export const fetchAllTeachers = createAsyncThunk(
 // Fetch teachers by class
 export const fetchTeachersByClass = createAsyncThunk(
   "teachers/fetchByClass",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const { data } = await getData(`/admin/teacherByClass?say=${say}`, {
+      const { data } = await getData(`/${getRole}/teacherByClass?say=${say}`, {
         id: classId,
       });
       dispatch(setTeacherAssign(data));
@@ -53,11 +56,15 @@ export const fetchTeachersByClass = createAsyncThunk(
 // Assign teacher to a class
 export const assignTeacher = createAsyncThunk(
   "teacher/assignTeacher",
-  async (assignData, { rejectWithValue, dispatch }) => {
+  async (assignData, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await postData(`/admin/teacher?say=${say}`, assignData);
+      const response = await postData(
+        `/${getRole}/teacher?say=${say}`,
+        assignData
+      );
       dispatch(fetchTeachersByClass(assignData.classId));
       return response.data;
     } catch (error) {
@@ -69,12 +76,13 @@ export const assignTeacher = createAsyncThunk(
 // Unassign teacher from a class
 export const unassignTeacher = createAsyncThunk(
   "teacher/unassignTeacher",
-  async ({ teacherId, classId }, { rejectWithValue, dispatch }) => {
+  async ({ teacherId, classId }, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
       await deleteData(
-        `/admin/teacher/${teacherId}/class/${classId}?say=${say}`
+        `/${getRole}/teacher/${teacherId}/class/${classId}?say=${say}`
       );
       dispatch(fetchTeachersByClass(classId));
       return teacherId;
