@@ -15,7 +15,7 @@ export const fetchAdminDashboardData = createAsyncThunk(
   "adminDashboard/fetchAdminDashboardData",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {
-      const getRole = getUserRole(getState);
+      
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -32,7 +32,7 @@ export const fetchAttendanceData = createAsyncThunk(
   "adminDashboard/fetchAttendanceData",
   async ({ month, year }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const getRole = getUserRole(getState);
+     
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -58,7 +58,7 @@ export const fetchEarningsData = createAsyncThunk(
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
-      const getRole = getUserRole(getState);
+    
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -82,7 +82,7 @@ export const fetchNotices = createAsyncThunk(
   "adminDashboard/fetchNotices",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {
-      const getRole = getUserRole(getState);
+     
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -101,7 +101,7 @@ export const fetchTopStudents = createAsyncThunk(
   "adminDashboard/TopStudents",
   async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
-      const getRole = getUserRole(getState);
+  
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -120,7 +120,7 @@ export const fetchFilteredEvents = createAsyncThunk(
   "adminDashboard/fetchFilteredEvents",
   async ({ month, year }, { rejectWithValue, dispatch, getState }) => {
     try {
-      const getRole = getUserRole(getState);
+     
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -141,7 +141,7 @@ export const fetchFilteredIssueBooks = createAsyncThunk(
   "adminDashboard/fetchFilteredIssueBooks",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {
-      const getRole = getUserRole(getState);
+    
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
