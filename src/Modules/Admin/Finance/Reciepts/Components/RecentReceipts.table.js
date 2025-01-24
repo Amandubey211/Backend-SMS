@@ -19,6 +19,7 @@ import { PERMISSIONS } from "../../../../../config/permission";
 // Import jsPDF and html2canvas
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 // Your renamed Receipt component
 import Receipt from "../../../../../Utils/FinanceTemplate/Receipt";
@@ -304,28 +305,31 @@ const RecentReceipts = () => {
 
         {/* View More Button with counts */}
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <button
-            onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
-          >
-            View More ({pagination.totalRecords || 0})
-          </button>
+          <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS}>
+            <button
+              onClick={() => navigate("/finance/receipts/receipt-list")}
+              className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
+            >
+              View More ({pagination.totalRecords || 0})
+            </button>
+          </ProtectedAction>
+
         </div>
       </div>
+      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS}>
+        {/* Loading Indicator */}
+        {fetching || loading ? (
+          <div style={{ textAlign: "center", padding: "16px" }}>
+            <Spinner />
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
+            <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
+            <p>Unable to fetch the receipts.</p>
+          </div>
+        ) : (
+          // The Receipts Table with Custom No Data
 
-      {/* Loading Indicator */}
-      {fetching || loading ? (
-        <div style={{ textAlign: "center", padding: "16px" }}>
-          <Spinner />
-        </div>
-      ) : error ? (
-        <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
-          <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-          <p>Unable to fetch the receipts.</p>
-        </div>
-      ) : (
-        // The Receipts Table with Custom No Data
-        <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_ALL_RECEIPTS}>
 
           <Table
             rowKey={(record) => record._id}
@@ -353,10 +357,10 @@ const RecentReceipts = () => {
             pagination={false} // Disable Ant Design pagination
 
           />
-        </ProtectedSection>
 
-      )}
 
+        )}
+      </ProtectedSection>
       {/* Cancel Receipt Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={modalVisible}

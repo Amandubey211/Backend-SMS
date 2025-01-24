@@ -494,7 +494,7 @@ const TotalExpenseList = () => {
       <DashLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_EXPENSE_CARD_DATA}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {cardDataWithValues.map((card, index) => (
                 <Card
@@ -575,7 +575,7 @@ const TotalExpenseList = () => {
 
           {/* Table Wrapper (responsive container) */}
           <div className="w-full overflow-x-auto">
-            <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_ALL_EXPENSES}>
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_ALL_EXPENSES}>
               <Table
                 dataSource={dataSource}
                 columns={columns}

@@ -176,7 +176,7 @@ const SummaryTotalRevenue = () => {
         </div>
       )}
       {/* Table */}
-      <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_LIST_ALL_REVENUE}>
+      <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_REVENUE}>
         <Table
           dataSource={dataSource}
           columns={columns}

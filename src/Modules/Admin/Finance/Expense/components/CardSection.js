@@ -154,14 +154,14 @@ const CardSection = () => {
 
   return (
     <div className="w-full mb-2">
-      <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_VIEW_EXPENSE_CARD_DATA}>
+      <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA}>
         {/* Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {compactCardMapping}
         </div>
       </ProtectedSection>
 
-      <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_ADD_NEW_EVENT_ACTIVITY_EXPENSE}>
+      <ProtectedSection requiredPermission={PERMISSIONS.ADD_NEW_EVENT_ACTIVITY_EXPENSE}>
         <div className="flex justify-end items-center mt-4">
           <button
             onClick={() => navigate("/finance/expenses/add")}

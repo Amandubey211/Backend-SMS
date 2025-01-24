@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CardSection from "../Components/CardSection";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AdjustmentDashboard = () => {
   useNavHeading("Finance", "Penality & Adjustment");
@@ -17,7 +18,7 @@ const AdjustmentDashboard = () => {
       <AdminDashLayout>
         <div className="w-[100%] p-8">
           {/* Header Section */}
-          <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_ADJUSTMENT}>
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
             <div className="flex justify-end items-center">
               <button
                 onClick={() => navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment")}
@@ -29,17 +30,16 @@ const AdjustmentDashboard = () => {
                 </div>
               </button>
             </div>
-          </ProtectedSection>
+          </ProtectedAction>
 
           {/* Card Section */}
-          <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}>
+          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}>
             <CardSection />
           </ProtectedSection>
 
           {/* Summary Section */}
-          {/* <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_SUMMARY_OF_RETURN_INVOICE}> */}
-            <SummaryPenalityandAdjustment />
-          {/* </ProtectedSection> */}
+          <SummaryPenalityandAdjustment />
+
 
         </div>
 

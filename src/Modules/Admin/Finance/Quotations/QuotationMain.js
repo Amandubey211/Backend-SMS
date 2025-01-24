@@ -9,6 +9,7 @@ import { useDispatch } from "react-redux";
 import { clearSelectedQuotation, setReadOnly } from "../../../../Store/Slices/Finance/Quotations/quotationSlice";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const QuotationMain = () => {
     useNavHeading("Finance", "Quotation");
@@ -47,7 +48,7 @@ const QuotationMain = () => {
                     </div>
 
                     {/* Add New Quotation Button */}
-                    <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_CREATE_NEW_QUOTATION}>
+                    <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
                         <button
                             onClick={() => {
                                 dispatch(clearSelectedQuotation())
@@ -61,11 +62,11 @@ const QuotationMain = () => {
                                 <FiPlus size={16} />
                             </div>
                         </button>
-                    </ProtectedSection>
+                    </ProtectedAction>
                 </div>
 
                 {/* Cards Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.FINANCE_SHOWS_CARD_DATA_OF_QUOTATION}>
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_QUOTATION}>
                     <CardsSection />
                 </ProtectedSection>
 

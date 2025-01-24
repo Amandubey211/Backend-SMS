@@ -34,7 +34,7 @@ export const PERMISSIONS = {
   LIST_ALL_ADJUSTMENTS: "List all adjustments",
   SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT: "Shows card data of penalty and adjustment",
   SHOWS_SUMMARY_OF_RETURN_INVOICE: "Shows summary of return invoice",
-
+  
   // Dashboard
   GET_DASHBOARD_DATA: "Get dashboard data",
   VIEW_NOTICE: "View notice",
@@ -54,7 +54,8 @@ export const PERMISSIONS = {
 
   // TimeTable
   TIMETABLE_VIEW: "Timetable View",
-
+  TIMETABLE_EDIT: "Timetable Edit",
+  TIMETABLE_DELETE: "Timetable Delete",
   // Student View
   GET_ALL_CLASSES: "Get All Classes",
   SHOW_ALL_STUDENTS: "Show All Students",
@@ -153,7 +154,7 @@ export const PERMISSIONS = {
   // Receipt
   SHOWS_RECEIPT_CARD_DATA: "Shows receipt card data",
   CANCEL_RECEIPT: "Cancel receipt",
-
+  EXPORT_RECEIPT_DATA: "Export receipt data",
   // Penalty and Adjustment
   SHOWS_ALL_ADJUSTMENTS: "Shows all adjustments",
   CANCEL_PENALTY: "Cancel penalty",
