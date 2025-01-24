@@ -177,7 +177,7 @@ const TimeTableMainSection = () => {
       <ProtectedSection requiredPermission="viewTimetable">
         {/* Create Timetable Button */}
         {role === "admin" && (
-          <div className="flex justify-start mb-4 ml-5">
+          <div className="flex justify-end mb-4 ml-5">
             <button
               onClick={handleCreateTimeTable}
               className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
