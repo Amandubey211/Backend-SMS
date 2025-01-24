@@ -59,20 +59,37 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
     });
   }, [timetables]);
 
+  // Updated actionMenu to prevent event propagation
   const actionMenu = (record) => (
     <Menu>
-      <Menu.Item key="1" onClick={() => handleEditClick(record)}>
+      <Menu.Item
+        key="1"
+        onClick={(e) => {
+          e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
+          // For Ant Design v5 and above, use e.stopPropagation()
+          // e.stopPropagation();
+          handleEditClick(record);
+        }}
+      >
         <EditOutlined style={{ marginRight: 8 }} />
         {t("Edit")}
       </Menu.Item>
-      <Menu.Item key="2" onClick={() => handleDeleteClick(record)}>
+      <Menu.Item
+        key="2"
+        onClick={(e) => {
+          e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
+          // For Ant Design v5 and above, use e.stopPropagation()
+          // e.stopPropagation();
+          handleDeleteClick(record);
+        }}
+      >
         <DeleteOutlined style={{ marginRight: 8 }} />
         {t("Delete")}
       </Menu.Item>
     </Menu>
   );
 
-  // Updated renderSchedule function
+  // Ensure renderSchedule is defined before it's used
   const renderSchedule = (timetable) => {
     const { type, days } = timetable;
 
@@ -194,10 +211,11 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                 {/* Active/Draft Tag */}
                 <span
-                  className={`text-sm font-normal px-2 rounded ${timetable.status === "active"
+                  className={`text-sm font-normal px-2 rounded ${
+                    timetable.status === "active"
                       ? "bg-green-100 text-green-700"
                       : "bg-red-100 text-gray-700"
-                    }`}
+                  }`}
                 >
                   {timetable.status === "active" ? t("Active") : t("Draft")}
                 </span>
@@ -233,13 +251,13 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
                 </p>
 
                 {/* Class (with school) as a Tag */}
-<p className="text-sm text-gray-600 mt-1 flex items-center flex-wrap">
-  <strong className="mr-1">{t("Class")}:</strong>
-  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full whitespace-normal">
-    {timetable.classId?.className ?? "N/A"},{" "}
-    {timetable.schoolId?.nameOfSchool ?? "N/A"}
-  </span>
-</p>
+                <p className="text-sm text-gray-600 mt-1 flex items-center flex-wrap">
+                  <strong className="mr-1">{t("Class")}:</strong>
+                  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full whitespace-normal">
+                    {timetable.classId?.className ?? "N/A"},{" "}
+                    {timetable.schoolId?.nameOfSchool ?? "N/A"}
+                  </span>
+                </p>
                 <p className="text-sm text-gray-600 mt-1">
                   <strong>{t("Academic Year")}:</strong> {timetable.academicYear?.year ?? "N/A"}
                 </p>
@@ -275,7 +293,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
       {/* Deletion Confirmation Modal */}
       {timetableToDelete && (
         <DeleteConfirmationModal // Corrected typo
-          isOpen={isModalOpen}
+          isOpen={isModalOpen} // Verify if your modal expects 'isOpen' or 'visible'
           onClose={closeModal}
           onConfirm={confirmDelete}
           loading={false}
