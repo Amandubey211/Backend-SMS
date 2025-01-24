@@ -16,10 +16,13 @@ import { getUserRole } from "../../../../Utils/getRoles";
 
 export const fetchOneStudentFee = createAsyncThunk(
   "studentFees/fetchOneStudentFee",
-  async (studentId, { rejectWithValue, dispatch ,getState}) => {
+
+  async (studentId, { rejectWithValue, dispatch, getState }) => {
+
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
         `/${getRole}/revenue/get/student/fee/${studentId}?say=${say}`
@@ -34,8 +37,11 @@ export const fetchOneStudentFee = createAsyncThunk(
 
 export const createStudentFee = createAsyncThunk(
   "studentFees/createStudentFee",
-  async (feeData, { rejectWithValue, dispatch,getState }) => {
+
+  async (feeData, { rejectWithValue, dispatch, getState }) => {
+
     const say = getAY();
+    const getRole = getUserRole(getState);
     dispatch(setShowError(false));
     try {
       const getRole = getUserRole(getState);
@@ -49,15 +55,18 @@ export const createStudentFee = createAsyncThunk(
       return response;
     } catch (error) {
       toast.dismiss()
-        toast.error('Please fill the required Fields !');
+      toast.error('Please fill the required Fields !');
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 export const createStudentFeeRecordForClass = createAsyncThunk(
   "studentFees/createStudentFeeRecordForClass",
-  async (feeData, { rejectWithValue, dispatch,getState }) => {
+
+  async (feeData, { rejectWithValue, dispatch, getState }) => {
+
     const say = getAY();
+    const getRole = getUserRole(getState);
     dispatch(setShowError(false));
     try {
       const getRole = getUserRole(getState);
@@ -71,7 +80,7 @@ export const createStudentFeeRecordForClass = createAsyncThunk(
       return response;
     } catch (error) {
       toast.dismiss()
-        toast.error('Please fill the required Fields !');
+      toast.error('Please fill the required Fields !');
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -80,7 +89,9 @@ export const createStudentFeeRecordForClass = createAsyncThunk(
 
 export const updateStudentFee = createAsyncThunk(
   "studentFees/updateStudentFee",
-  async (data, { rejectWithValue, dispatch,getState }) => {
+
+  async (data, { rejectWithValue, dispatch, getState }) => {
+
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -104,7 +115,9 @@ export const updateStudentFee = createAsyncThunk(
 
 export const deleteStudentFees = createAsyncThunk(
   "studentFees/deleteStudentFees",
-  async (data, { rejectWithValue, dispatch ,getState}) => {
+
+  async (data, { rejectWithValue, dispatch, getState }) => {
+
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -122,11 +135,13 @@ export const deleteStudentFees = createAsyncThunk(
 
 export const studentFeesGraph = createAsyncThunk(
   "studentFees/studentFeesGraph",
-  async (params, { rejectWithValue, dispatch,getState }) => {
+
+  async (params, { rejectWithValue, dispatch, getState }) => {
+
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-
+      const getRole = getUserRole(getState);
       // Default to the current year if no year is provided
       const currentYear = new Date().getFullYear();
 
@@ -158,7 +173,9 @@ export const studentFeesGraph = createAsyncThunk(
 
 export const fetchStudentFeeCardData = createAsyncThunk(
   "studentFees/fetchStudentFeeCardData",
-  async (_, { rejectWithValue, dispatch,getState }) => {
+
+  async (_, { rejectWithValue, dispatch, getState }) => {
+
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
