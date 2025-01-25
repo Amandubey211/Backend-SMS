@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const CreateAssignmentHeader = ({
   onSave,
@@ -18,7 +17,7 @@ const CreateAssignmentHeader = ({
   saveLoading,
   publishLoading,
 }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const navigate = useNavigate();
   const [isModalOpen, setModalOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -58,7 +57,7 @@ const CreateAssignmentHeader = ({
   };
 
   return (
-    <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
+    <div className="flex items-center justify-between p-2 bg-white border border-gray-300 shadow-sm">
       <div className="flex items-center">
         <IoIosArrowBack
           className="mr-2 text-gray-600 text-2xl cursor-pointer"
@@ -69,23 +68,24 @@ const CreateAssignmentHeader = ({
           {isEditing ? t("Update Assignment") : t("Create New Assignment")}
         </h1>
       </div>
-      <div className="flex items-center space-x-2">
+      {/* <div className="flex items-center justify-center space-x-4">
+      
         <button
           onClick={() => onSave(true)}
-          className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+          className="flex items-center justify-center h-12 rounded-md px-8 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           disabled={publishLoading}
         >
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+          <div className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500 text-sm font-semibold">
             {publishLoading
               ? t("please wait...")
               : isEditing
               ? t("Update & Publish")
               : t("Save & Publish")}
-          </span>
+          </div>
         </button>
         <button
           onClick={() => onSave(false)}
-          className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+          className="flex items-center justify-center h-12 px-8 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
           disabled={saveLoading}
         >
           {saveLoading ? t("please wait...") : t("Save")}
@@ -114,6 +114,29 @@ const CreateAssignmentHeader = ({
             editMode={editMode}
           />
         </Sidebar>
+      </div> */}
+
+      <div className="flex items-center justify-center space-x-4">
+        <button
+          onClick={() => onSave(true)}
+          className="flex items-center justify-center h-12 rounded-md px-8 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+          disabled={publishLoading}
+        >
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500 text-sm font-semibold">
+            {publishLoading
+              ? t("please wait...")
+              : isEditing
+              ? t("Update & Publish")
+              : t("Save & Publish")}
+          </span>
+        </button>
+        <button
+          onClick={() => onSave(false)}
+          className="flex items-center justify-center h-12 px-8 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+          disabled={saveLoading}
+        >
+          {saveLoading ? t("please wait...") : t("Save")}
+        </button>
       </div>
     </div>
   );

@@ -14,7 +14,7 @@ import {
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const AddPage = () => {
-  const { t } = useTranslation('admAccounts');
+  const { t } = useTranslation("admAccounts");
   const { state } = useLocation();
   const dispatch = useDispatch();
   const [title, setTitle] = useState("");
@@ -105,34 +105,36 @@ const AddPage = () => {
           : t("Add Page | Student Diwan")
       }
     >
-      <ProtectedSection requiredPermission={''}>
-      <div className="flex w-full min-h-screen">
-        <SideMenubar />
-        <div
-          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
-          style={{ marginLeft: sidebarWidth }}
-        >
-          <AddPageHeader
-            onSave={handleSave}
-            isUpdating={isUpdating}
-            loadingType={loadingType}
-            isPublishDateSet={isPublishDateSet} // Passing the prop
-          />
-          <div className="flex w-full">
-            <div className="w-[70%]">
-              <EditorComponent
-                assignmentName={title}
-                assignmentLabel={t("Page Title")}
-                editorContent={editorContent}
-                onNameChange={handleNameChange}
-                onEditorChange={handleEditorChange}
-              />
-            </div>
-            <div className="w-[30%] border-l min-h-screen px-4 py-2">
-
-
-              <h2 className="text-lg font-semibold mb-4">{t("Option")}</h2>
-              {/* <div className="mb-4">
+      <ProtectedSection requiredPermission={""}>
+        <div className="flex w-full min-h-screen">
+          <SideMenubar />
+          <div
+            className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+            style={{ marginLeft: sidebarWidth }}
+          >
+            <AddPageHeader
+              onSave={handleSave}
+              isUpdating={isUpdating}
+              loadingType={loadingType}
+              isPublishDateSet={isPublishDateSet} // Passing the prop
+            />
+            <ProtectedSection
+              title="Add/Edit Page"
+              requiredPermission="add/edit page"
+            >
+              <div className="flex w-full">
+                <div className="w-[70%]">
+                  <EditorComponent
+                    assignmentName={title}
+                    assignmentLabel={t("Page Title")}
+                    editorContent={editorContent}
+                    onNameChange={handleNameChange}
+                    onEditorChange={handleEditorChange}
+                  />
+                </div>
+                <div className="w-[30%] border-l min-h-screen px-4 py-2">
+                  <h2 className="text-lg font-semibold mb-4">{t("Option")}</h2>
+                  {/* <div className="mb-4">
 
                 <label className="block text-gray-700" htmlFor="editPermission">
                   {t("Users allowed to edit this page")}
@@ -148,24 +150,29 @@ const AddPage = () => {
                   <option>{t("Instructor and TA")}</option>
                 </select>
               </div> */}
-              <DateInput
-                label={t("Publish at")}
-                name="publishAt"
-                value={publishAt}
-                handleChange={handlePublishDateChange}
-              />
-            </div>
+                  <DateInput
+                    label={t("Publish at")}
+                    name="publishAt"
+                    value={publishAt}
+                    handleChange={handlePublishDateChange}
+                  />
+                </div>
+              </div>
+            </ProtectedSection>
+
+            {loading && (
+              <p className="text-center my-4 text-indigo-600">
+                {t("Saving...")}
+              </p>
+            )}
+            {error && (
+              <p role="alert" className="text-red-400 text-current my-4">
+                {t("Error: ")}
+                {error}
+              </p>
+            )}
           </div>
-          {loading && (
-            <p className="text-center my-4 text-indigo-600">{t("Saving...")}</p>
-          )}
-          {error && (
-            <p role="alert" className="text-red-400 text-current my-4">
-              {t("Error: ")}{error}
-            </p>
-          )}
         </div>
-      </div>
       </ProtectedSection>
     </Layout>
   );

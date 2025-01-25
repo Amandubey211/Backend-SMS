@@ -149,40 +149,49 @@ const AddDiscussion = () => {
           : "Add Discussion | Student Diwan"
       }
     >
-       <ProtectedSection requiredPermission={''}>
       <div className="flex w-full min-h-screen">
         <SideMenubar />
+
         <div
-          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full w-full`}
           style={{ marginLeft: sidebarWidth }}
         >
           <>
             <AddDiscussionHeader onSave={handleSave} isUpdating={isEditing} />
-            <div className="flex w-full">
-              <div className="w-[70%]">
-                <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
-                  <TopicTitleInput
-                    value={assignmentName}
-                    onChange={handleNameChange}
-                  />
-                  <FileInput onChange={handleFileChange} file={file} />
-                </div>
+            <div className="w-full h-full">
+              <ProtectedSection
+                requiredPermission="update discussion"
+                title="Update discussion"
+                // aman={true}
+              >
+                <div className="flex w-full h-full">
+                  <div className="w-[70%]">
+                    <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
+                      <TopicTitleInput
+                        value={assignmentName}
+                        onChange={handleNameChange}
+                      />
+                      <FileInput onChange={handleFileChange} file={file} />
+                    </div>
 
-                <EditorComponent
-                  hideInput={true}
-                  assignmentLabel="Discussion Name"
-                  editorContent={editorContent}
-                  onNameChange={handleNameChange}
-                  onEditorChange={handleEditorChange}
-                />
-              </div>
-              <div className="w-[30%] border-l min-h-screen px-4 py-2">
-                <CreateDiscussionForm
-                  handleChange={handleFormChange}
-                  {...formState}
-                />
-              </div>
+                    <EditorComponent
+                      hideInput={true}
+                      assignmentLabel="Discussion Name"
+                      editorContent={editorContent}
+                      onNameChange={handleNameChange}
+                      onEditorChange={handleEditorChange}
+                    />
+                  </div>
+                  <div className="w-[30%] border-l min-h-screen px-4 py-2">
+                    <CreateDiscussionForm
+                      handleChange={handleFormChange}
+                      {...formState}
+                    />
+                  </div>
+                </div>
+              </ProtectedSection>
             </div>
+
             {isLoading && <Spinner />}
             {error && (
               <p role="alert" className="text-red-400 text-current my-4">
@@ -192,7 +201,6 @@ const AddDiscussion = () => {
           </>
         </div>
       </div>
-      </ProtectedSection>
     </Layout>
   );
 };

@@ -192,7 +192,6 @@ const AddRubricModal = ({ readonly = false }) => {
   };
 
   return (
-    <ProtectedSection requiredPermission={''}>
     <div
       className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-30 transition-opacity duration-300 ${
         isModalOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -216,218 +215,229 @@ const AddRubricModal = ({ readonly = false }) => {
             &times;
           </button>
         </div>
-
-        <div className="flex items-center px-2">
-          <div className="p-2 flex-1">
-            <label className="block mb-2 text-sm text-gray-700">
-              {t("Rubric Name")}
-            </label>
-            <input
-              type="text"
-              value={rubricName}
-              onChange={(e) =>
-                dispatch(
-                  setRubricField({ field: "rubricName", value: e.target.value })
-                )
-              }
-              className="block w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder={t("Type here")}
-              disabled={readonly}
-            />
-          </div>
-
-          {/* Assignment Dropdown */}
-          {selectedQuizId === "" && (
-            <div className="p-2 flex-1 relative" ref={dropdownRef}>
-              <label className="block text-gray-700 mb-1">
-                {t("Assignment")}
+        <ProtectedSection
+          requiredPermission="Add/Edit Rubric "
+          title="Add/Edit Rubric"
+        >
+          <div className="flex items-center px-2">
+            <div className="p-2 flex-1">
+              <label className="block mb-2 text-sm text-gray-700">
+                {t("Rubric Name")}
               </label>
-              <div
-                className={`block w-full pl-3 pr-10 py-2 text-base border rounded-md ${
-                  readonly ? "" : "cursor-pointer"
-                } focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                onClick={() => !readonly && setDropdownOpen(!dropdownOpen)}
-              >
-                {assignments?.find((a) => a._id === selectedAssignmentId)
-                  ?.name || t("Select")}
-              </div>
-              {dropdownOpen && !readonly && (
-                <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                  {assignments?.length === 0 ? (
-                    <li className="flex items-center justify-center py-2 text-gray-500">
-                      <CiBoxList className="mr-2" />{" "}
-                      {t("No assignments available")}
-                    </li>
-                  ) : (
-                    <>
-                      <li
-                        onClick={() => handleSelectAssignmentChange("reset")}
-                        className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
-                      >
-                        {t("Reset")}
-                      </li>
-                      {assignments?.map((assignment) => (
-                        <li
-                          key={assignment._id}
-                          onClick={() =>
-                            handleSelectAssignmentChange(assignment._id)
-                          }
-                          className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
-                        >
-                          {assignment.name}
-                        </li>
-                      ))}
-                    </>
-                  )}
-                </ul>
-              )}
-            </div>
-          )}
-
-          {/* Quiz Dropdown */}
-          {selectedAssignmentId === "" && (
-            <div className="p-2 flex-1 relative" ref={dropdownRef2}>
-              <label className="block text-gray-700 mb-1">{t("Quizzes")}</label>
-              <div
-                className={`block w-full pl-3 pr-10 py-2 text-base border rounded-md ${
-                  readonly ? "" : "cursor-pointer"
-                } focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                onClick={() => !readonly && setDropdownOpen2(!dropdownOpen2)}
-              >
-                {quizzes?.find((q) => q._id === selectedQuizId)?.name ||
-                  t("Select")}
-              </div>
-              {dropdownOpen2 && !readonly && (
-                <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
-                  {quizzes?.length === 0 ? (
-                    <li className="flex items-center justify-center py-4 text-gray-500">
-                      <CiBoxList className="mr-2" /> {t("No quizzes available")}
-                    </li>
-                  ) : (
-                    <>
-                      <li
-                        onClick={() => handleSelectQuizChange("reset")}
-                        className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
-                      >
-                        {t("Reset")}
-                      </li>
-                      {quizzes?.map((quiz) => (
-                        <li
-                          key={quiz._id}
-                          onClick={() => handleSelectQuizChange(quiz._id)}
-                          className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
-                        >
-                          {quiz.name}
-                        </li>
-                      ))}
-                    </>
-                  )}
-                </ul>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div
-          className={`m-2 overflow-auto border ${
-            readonly ? "h-[60vh]" : "h-[47vh]"
-          }`}
-        >
-          <div className="flex px-4 font-semibold justify-between items-center p-2 w-full bg-gradient-to-r from-pink-100 to-purple-100">
-            {["Criteria", "Ratings", "Point"]?.map((heading, idx) => (
-              <div
-                key={idx}
-                className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent"
-              >
-                {t(heading)}
-              </div>
-            ))}
-          </div>
-          {rubricLoading ? (
-            <div className="flex justify-center items-center h-full">
-              <Spinner />
-            </div>
-          ) : criteria?.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-              <CiBoxList className="text-6xl text-gray-300" />
-              <p className="mt-4 text-sm text-gray-600">
-                {t("No criteria added yet")}
-              </p>
-            </div>
-          ) : (
-            criteria?.map((item, index) => (
-              <RubricModalRow
-                key={index}
-                data={item}
-                criteriaIndex={index}
-                readonly={readonly}
+              <input
+                type="text"
+                value={rubricName}
+                onChange={(e) =>
+                  dispatch(
+                    setRubricField({
+                      field: "rubricName",
+                      value: e.target.value,
+                    })
+                  )
+                }
+                className="block w-full p-2 border rounded-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder={t("Type here")}
+                disabled={readonly}
               />
-            ))
-          )}
-        </div>
+            </div>
 
-        <div
-          className={`flex ${
-            !readonly ? "justify-between" : "justify-end"
-          } items-center p-4 border-t`}
-        >
-          {!readonly && (
-            <button
-              onClick={handleAddCriteria}
-              className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-            >
-              <HiOutlinePlus className="text-red-600 text-2xl" />
-              <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
-                {t("Add New Criteria")}
-              </span>
-            </button>
-          )}
-          <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
-            {selectedAssignmentId
-              ? t("Total Assignment Points: ") + totalPoints
-              : t("Total Quiz Points: ") + totalPoints}
+            {/* Assignment Dropdown */}
+            {selectedQuizId === "" && (
+              <div className="p-2 flex-1 relative" ref={dropdownRef}>
+                <label className="block text-gray-700 mb-1">
+                  {t("Assignment")}
+                </label>
+                <div
+                  className={`block w-full pl-3 pr-10 py-2 text-base border rounded-md ${
+                    readonly ? "" : "cursor-pointer"
+                  } focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  onClick={() => !readonly && setDropdownOpen(!dropdownOpen)}
+                >
+                  {assignments?.find((a) => a._id === selectedAssignmentId)
+                    ?.name || t("Select")}
+                </div>
+                {dropdownOpen && !readonly && (
+                  <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                    {assignments?.length === 0 ? (
+                      <li className="flex items-center justify-center py-2 text-gray-500">
+                        <CiBoxList className="mr-2" />{" "}
+                        {t("No assignments available")}
+                      </li>
+                    ) : (
+                      <>
+                        <li
+                          onClick={() => handleSelectAssignmentChange("reset")}
+                          className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                        >
+                          {t("Reset")}
+                        </li>
+                        {assignments?.map((assignment) => (
+                          <li
+                            key={assignment._id}
+                            onClick={() =>
+                              handleSelectAssignmentChange(assignment._id)
+                            }
+                            className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
+                          >
+                            {assignment.name}
+                          </li>
+                        ))}
+                      </>
+                    )}
+                  </ul>
+                )}
+              </div>
+            )}
+
+            {/* Quiz Dropdown */}
+            {selectedAssignmentId === "" && (
+              <div className="p-2 flex-1 relative" ref={dropdownRef2}>
+                <label className="block text-gray-700 mb-1">
+                  {t("Quizzes")}
+                </label>
+                <div
+                  className={`block w-full pl-3 pr-10 py-2 text-base border rounded-md ${
+                    readonly ? "" : "cursor-pointer"
+                  } focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                  onClick={() => !readonly && setDropdownOpen2(!dropdownOpen2)}
+                >
+                  {quizzes?.find((q) => q._id === selectedQuizId)?.name ||
+                    t("Select")}
+                </div>
+                {dropdownOpen2 && !readonly && (
+                  <ul className="absolute left-0 right-0 mt-2 max-h-72 overflow-auto bg-white border rounded-md shadow-lg z-10 py-2">
+                    {quizzes?.length === 0 ? (
+                      <li className="flex items-center justify-center py-4 text-gray-500">
+                        <CiBoxList className="mr-2" />{" "}
+                        {t("No quizzes available")}
+                      </li>
+                    ) : (
+                      <>
+                        <li
+                          onClick={() => handleSelectQuizChange("reset")}
+                          className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6 text-red-600"
+                        >
+                          {t("Reset")}
+                        </li>
+                        {quizzes?.map((quiz) => (
+                          <li
+                            key={quiz._id}
+                            onClick={() => handleSelectQuizChange(quiz._id)}
+                            className="px-4 py-2 hover:bg-gray-100 transition duration-300 transform cursor-pointer hover:translate-x-[-8px] ps-6"
+                          >
+                            {quiz.name}
+                          </li>
+                        ))}
+                      </>
+                    )}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
-        </div>
 
-        {!readonly && (
-          <div className="flex justify-end gap-3 items-center p-2 mb-2">
-            <button
-              onClick={() =>
-                dispatch(setRubricField({ field: "isModalOpen", value: false }))
-              }
-              className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
-            >
-              {t("Cancel")}
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-            >
-              {t("Save Rubric")}
-            </button>
-          </div>
-        )}
-
-        {!readonly && (
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={() => {
-              dispatch(
-                setRubricField({ field: "isSidebarOpen", value: false })
-              );
-              dispatch(setRubricField({ field: "editMode", value: false }));
-              dispatch(
-                setRubricField({ field: "criteriaToEdit", value: null })
-              );
-            }}
-            title={t(editMode ? "Update Criteria" : "Add New Criteria")}
+          <div
+            className={`m-2 overflow-auto border ${
+              readonly ? "h-[60vh]" : "h-[47vh]"
+            }`}
           >
-            <AddNewCriteriaForm editMode={editMode} />
-          </Sidebar>
-        )}
+            <div className="flex px-4 font-semibold justify-between items-center p-2 w-full bg-gradient-to-r from-pink-100 to-purple-100">
+              {["Criteria", "Ratings", "Point"]?.map((heading, idx) => (
+                <div
+                  key={idx}
+                  className="w-2/8 bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent"
+                >
+                  {t(heading)}
+                </div>
+              ))}
+            </div>
+            {rubricLoading ? (
+              <div className="flex justify-center items-center h-full">
+                <Spinner />
+              </div>
+            ) : criteria?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <CiBoxList className="text-6xl text-gray-300" />
+                <p className="mt-4 text-sm text-gray-600">
+                  {t("No criteria added yet")}
+                </p>
+              </div>
+            ) : (
+              criteria?.map((item, index) => (
+                <RubricModalRow
+                  key={index}
+                  data={item}
+                  criteriaIndex={index}
+                  readonly={readonly}
+                />
+              ))
+            )}
+          </div>
+
+          <div
+            className={`flex ${
+              !readonly ? "justify-between" : "justify-end"
+            } items-center p-4 border-t`}
+          >
+            {!readonly && (
+              <button
+                onClick={handleAddCriteria}
+                className="flex items-center gap-2 font-semibold p-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+              >
+                <HiOutlinePlus className="text-red-600 text-2xl" />
+                <span className="bg-gradient-to-r from-red-500 to-purple-500 bg-clip-text text-transparent">
+                  {t("Add New Criteria")}
+                </span>
+              </button>
+            )}
+            <div className="text-transparent text-xl font-bold bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500">
+              {selectedAssignmentId
+                ? t("Total Assignment Points: ") + totalPoints
+                : t("Total Quiz Points: ") + totalPoints}
+            </div>
+          </div>
+
+          {!readonly && (
+            <div className="flex justify-end gap-3 items-center p-2 mb-2">
+              <button
+                onClick={() =>
+                  dispatch(
+                    setRubricField({ field: "isModalOpen", value: false })
+                  )
+                }
+                className="text-gray-600 bg-gray-100 hover:bg-gray-200 p-2 px-4 rounded-md"
+              >
+                {t("Cancel")}
+              </button>
+              <button
+                onClick={handleSubmit}
+                className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+              >
+                {t("Save Rubric")}
+              </button>
+            </div>
+          )}
+
+          {!readonly && (
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={() => {
+                dispatch(
+                  setRubricField({ field: "isSidebarOpen", value: false })
+                );
+                dispatch(setRubricField({ field: "editMode", value: false }));
+                dispatch(
+                  setRubricField({ field: "criteriaToEdit", value: null })
+                );
+              }}
+              title={t(editMode ? "Update Criteria" : "Add New Criteria")}
+            >
+              <AddNewCriteriaForm editMode={editMode} />
+            </Sidebar>
+          )}
+        </ProtectedSection>
       </div>
     </div>
-    </ProtectedSection>
   );
 };
 

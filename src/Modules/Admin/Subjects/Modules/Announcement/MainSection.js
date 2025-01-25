@@ -10,6 +10,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <ProtectedSection
         requiredPermission={PERMISSIONS.TEACHER_GET_ALL_ANNOUNCEMENTS}
+        title="Announcement List"
       >
         <div className="border-l p-2 w-full">
           <AnnouncementList />

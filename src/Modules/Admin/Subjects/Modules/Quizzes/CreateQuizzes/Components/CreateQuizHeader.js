@@ -8,6 +8,7 @@ import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 
 import { fetchRubricsBySubjectId } from "../../../../../../../Store/Slices/Admin/Class/Rubric/rubricThunks";
 import toast from "react-hot-toast";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const CreateQuizHeader = ({
   onSave,
@@ -50,7 +51,6 @@ const CreateQuizHeader = ({
     setSidebarOpen(true);
   };
 
-
   return (
     <div className="flex items-center justify-between p-2 bg-white border-b border-gray-300 shadow-sm">
       <div className="flex items-center">
@@ -65,22 +65,26 @@ const CreateQuizHeader = ({
 
       {activeTab === "instructions" && (
         <div className="flex items-center space-x-2">
-         
-          <button
-            onClick={() => onSave(true)}
-            className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          >
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              {isEditing ? "Update & Publish" : "Save & Publish"}
-            </span>
-          </button>
-          <button
-            onClick={() => onSave(false)}
-            className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
-          >
-            Save
-          </button>
-         
+          <ProtectedAction aman={true} requiredPermission="update quiz">
+            <button
+              onClick={() => onSave(true)}
+              className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            >
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+                {isEditing ? "Update & Publish" : "Save & Publish"}
+              </span>
+            </button>
+          </ProtectedAction>
+
+          <ProtectedAction aman={true} requiredPermission="update quiz">
+            <button
+              onClick={() => onSave(false)}
+              className="px-4 py-2 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+            >
+              Save
+            </button>
+          </ProtectedAction>
+
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setSidebarOpen(false)} // Pass down function to close sidebar

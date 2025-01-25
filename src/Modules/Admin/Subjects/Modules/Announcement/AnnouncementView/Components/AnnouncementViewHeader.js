@@ -10,6 +10,7 @@ import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
 import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
 import { FaUserCircle } from "react-icons/fa";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AnnouncementViewHeader = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -115,52 +116,63 @@ const AnnouncementViewHeader = () => {
             Posted on: {formatDate(announcement?.createdAt) || "Date"}
           </span>
         </div>
-        <div className="flex items-center gap-2 justify-center relative">
-          <button
-            className="flex items-center space-x-1 px-4 py-2 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-            aria-label="Edit Announcement"
-            onClick={handleEditClick}
-          >
-            <AiOutlineEdit aria-hidden="true" />
-            <span>Edit</span>
-          </button>
-          <div className="relative">
+        <div className="flex items-center gap-2 justify-end relative">
+          <ProtectedAction requiredPermission="edit Announcment">
             <button
-              className="flex items-center space-x-1 border rounded-full p-1 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-              aria-label="More Options"
-              onClick={toggleMenu}
-              ref={menuButtonRef}
-              aria-expanded={menuOpen}
-              aria-haspopup="menu"
+              className="flex items-center space-x-1 px-4 py-2 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
+              aria-label="Edit Announcement"
+              onClick={handleEditClick}
             >
-              <HiOutlineDotsVertical aria-hidden="true" className="text-2xl" />
+              <AiOutlineEdit aria-hidden="true" />
+              <span>Edit</span>
             </button>
-            {menuOpen && (
-              <div
-                ref={menuRef}
-                className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-10"
-                style={{ top: "100%", right: "0" }}
-                role="menu"
-                aria-label="Options"
+          </ProtectedAction>
+          <ProtectedAction requiredPermission="delete Announcment">
+            <div className="relative">
+              <button
+                className="flex items-center space-x-1 border rounded-md p-2 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+                aria-label="More Options"
+                onClick={toggleMenu}
+                ref={menuButtonRef}
+                aria-expanded={menuOpen}
+                aria-haspopup="menu"
               >
-                <button
-                  className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                  onClick={handleDeleteClick}
-                  disabled={deleteLoading}
-                  role="menuitem"
+                <HiOutlineDotsVertical
+                  aria-hidden="true"
+                  className="text-2xl"
+                />
+              </button>
+              {menuOpen && (
+                <div
+                  ref={menuRef}
+                  className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-10"
+                  style={{ top: "100%", right: "0" }}
+                  role="menu"
+                  aria-label="Options"
                 >
-                  <RiDeleteBin5Line className="mr-2 text-red-700" />
-                  <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
-                </button>
-              </div>
-            )}
-          </div>
-          <button
-            onClick={handleSidebarOpen}
-            className="px-4 py-2 bg-gradient-to-r w-full from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
-          >
-            <BsChat /> <span> View Comments</span>
-          </button>
+                  <button
+                    className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
+                    onClick={handleDeleteClick}
+                    disabled={deleteLoading}
+                    role="menuitem"
+                  >
+                    <RiDeleteBin5Line className="mr-2 text-red-700" />
+                    <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          </ProtectedAction>
+
+          <ProtectedAction requiredPermission="View Announcment Comments">
+            <button
+              onClick={handleSidebarOpen}
+              className="px-4 py-2 bg-gradient-to-r w-full from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
+            >
+              <BsChat /> <span> View Comments</span>
+            </button>
+          </ProtectedAction>
+
           <Sidebar
             width="70%"
             title="Announcement"

@@ -11,7 +11,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { ROLES } from "../../config/permission";
 
-const ProtectedAction = ({ requiredPermission, children }) => {
+const ProtectedAction = ({ requiredPermission, children, aman }) => {
   // Extract necessary pieces from Redux
   const { permissions, role, loading } = useSelector((state) => ({
     permissions: state.common.auth.permissions,
@@ -25,11 +25,13 @@ const ProtectedAction = ({ requiredPermission, children }) => {
   if (loading) {
     return null; // or some small loader if you wish
   }
+  if (role === ROLES.ADMIN && aman) {
+    return null;
+  }
 
   // Bypass checks if admin
   if (role === ROLES.ADMIN) {
-    // return <>{children}</>;
-    return null;
+    return <>{children}</>;
   }
 
   // Check if user has the required permission

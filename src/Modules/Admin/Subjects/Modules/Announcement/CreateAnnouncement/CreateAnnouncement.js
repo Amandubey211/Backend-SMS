@@ -125,8 +125,7 @@ const CreateAnnouncement = () => {
     <Layout
       title={`${isEditing ? "Update" : "Create"} Announcement | Student Diwan`}
     >
-      <ProtectedSection requiredPermission={''}>
-      <div className="flex w-full min-h-screen">
+      <div className="flex w-full min-h-screen h-full">
         <SideMenubar />
         <div
           className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
@@ -139,34 +138,35 @@ const CreateAnnouncement = () => {
             loading={loading}
             isEditing={isEditing}
           />
-          <div className="flex w-full">
-            <div className="w-[75%]">
-              <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
-                <TopicTitleInput
-                  value={assignmentName}
-                  onChange={handleNameChange}
-                />
-                <FileInput onChange={handleFileChange} file={file} />
-              </div>
+          <ProtectedSection requiredPermission="add/update Announcement">
+            <div className="flex w-full">
+              <div className="w-[75%]">
+                <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
+                  <TopicTitleInput
+                    value={assignmentName}
+                    onChange={handleNameChange}
+                  />
+                  <FileInput onChange={handleFileChange} file={file} />
+                </div>
 
-              <EditorComponent
-                hideInput={true}
-                assignmentLabel="Discussion Name"
-                editorContent={editorContent}
-                onNameChange={handleNameChange}
-                onEditorChange={handleEditorChange}
-              />
+                <EditorComponent
+                  hideInput={true}
+                  assignmentLabel="Discussion Name"
+                  editorContent={editorContent}
+                  onNameChange={handleNameChange}
+                  onEditorChange={handleEditorChange}
+                />
+              </div>
+              <div className="w-[25%] border-l min-h-screen px-4 py-2">
+                <CreateAnnouncementForm
+                  handleChange={handleFormChange}
+                  {...formState}
+                />
+              </div>
             </div>
-            <div className="w-[25%] border-l min-h-screen px-4 py-2">
-              <CreateAnnouncementForm
-                handleChange={handleFormChange}
-                {...formState}
-              />
-            </div>
-          </div>
+          </ProtectedSection>
         </div>
       </div>
-      </ProtectedSection>
     </Layout>
   );
 };

@@ -78,7 +78,11 @@ const MainSection = () => {
   return (
     <div className="flex w-full h-full ">
       <SubjectSideBar />
-      <ProtectedSection title="Grades" requiredPermission="see grades">
+      <ProtectedSection
+        title="Grades"
+        requiredPermission="see grades"
+        // aman={true}
+      >
         <div className="border-l w-full mr-2">
           <GradeHeader
             onSearch={handleSearchChange}

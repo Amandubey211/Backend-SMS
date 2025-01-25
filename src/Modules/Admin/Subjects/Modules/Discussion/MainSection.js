@@ -15,6 +15,7 @@ import { fetchClassDiscussions } from "../../../../../Store/Slices/Admin/Class/D
 import { resetDiscussion } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionSlice";
 import { FaComments } from "react-icons/fa";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 const MainSection = () => {
   const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
@@ -57,6 +58,7 @@ const MainSection = () => {
     <div className="flex w-full h-full">
       <SubjectSideBar />
       <ProtectedSection
+        // aman={true}
         title="Discussion Dashboard"
         requiredPermission="view discussion"
       >
@@ -113,13 +115,15 @@ const MainSection = () => {
               </div>
             </>
           )}
-          <NavLink
-            to={`/class/${cid}/${sid}/create_discussion`}
-            onClick={() => dispatch(resetDiscussion())}
-            className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-          >
-            <RiAddFill size={24} />
-          </NavLink>
+          <ProtectedAction requiredPermission="AddDiscussion">
+            <NavLink
+              to={`/class/${cid}/${sid}/create_discussion`}
+              onClick={() => dispatch(resetDiscussion())}
+              className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+            >
+              <RiAddFill size={24} />
+            </NavLink>
+          </ProtectedAction>
         </div>
       </ProtectedSection>
     </div>
