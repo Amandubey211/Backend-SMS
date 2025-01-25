@@ -2,9 +2,10 @@ import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const navigate = useNavigate();
 
   return (
@@ -28,22 +29,24 @@ const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
         >
           {t("Cancel")}
         </button>
-        <button
-          type="button"
-          onClick={onSave}
-          className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              {isEditing ? t("Updating...") : t("Saving....")}
-            </span>
-          ) : (
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-              {isEditing ? t("Update Syllabus") : t("Submit Syllabus")}
-            </span>
-          )}
-        </button>
+        <ProtectedAction requiredPermission="save Syllabus">
+          <button
+            type="button"
+            onClick={onSave}
+            className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            disabled={loading}
+          >
+            {loading ? (
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+                {isEditing ? t("Updating...") : t("Saving....")}
+              </span>
+            ) : (
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+                {isEditing ? t("Update Syllabus") : t("Submit Syllabus")}
+              </span>
+            )}
+          </button>
+        </ProtectedAction>
       </div>
     </div>
   );

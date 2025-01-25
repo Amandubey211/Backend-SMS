@@ -6,6 +6,7 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useParams } from "react-router-dom";
 import { fetchPageById } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -29,24 +30,26 @@ const MainSection = () => {
   }
 
   return (
-    <div className="w-full flex">
+    <div className="w-full h-full flex">
       <SubjectSideBar />
-      <div className="w-full border-l">
-        {page && (
-          <>
-            <ViewPageHeader
-              title={page.title}
-              LastEdit={page.updatedAt}
-              page={page}
-              // refetchPage={handleRefetchPage} // Pass the refetch function
-            />
-            <div
-              className="p-4"
-              dangerouslySetInnerHTML={{ __html: page.content }}
-            />
-          </>
-        )}
-      </div>
+      <ProtectedSection requiredPermission="View Page" title="Page">
+        <div className="w-full border-l">
+          {page && (
+            <>
+              <ViewPageHeader
+                title={page.title}
+                LastEdit={page.updatedAt}
+                page={page}
+                // refetchPage={handleRefetchPage} // Pass the refetch function
+              />
+              <div
+                className="p-4"
+                dangerouslySetInnerHTML={{ __html: page.content }}
+              />
+            </>
+          )}
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

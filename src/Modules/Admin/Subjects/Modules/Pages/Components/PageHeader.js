@@ -2,6 +2,7 @@ import { RiSearchLine } from "react-icons/ri";
 import React from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const PageHeader = ({ searchQuery, handleSearchChange }) => {
   const { cid, sid } = useParams();
@@ -24,16 +25,18 @@ const PageHeader = ({ searchQuery, handleSearchChange }) => {
             <RiSearchLine className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        <NavLink
-          to={`/class/${cid}/${sid}/page/create_Page`}
-          className="flex items-center border border-gray-300 ps-5 rounded-full"
-          aria-label={t("Add new Page")}
-        >
-          <span className="mr-2 font-normal">{t("Add new Page")}</span>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
-            <span className="text-3xl -mt-2">+</span>
-          </div>
-        </NavLink>
+        <ProtectedAction requiredPermission="Add Page">
+          <NavLink
+            to={`/class/${cid}/${sid}/page/create_Page`}
+            className="flex items-center border border-gray-300 ps-5 rounded-full"
+            aria-label={t("Add new Page")}
+          >
+            <span className="mr-2 font-normal">{t("Add new Page")}</span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+              <span className="text-3xl -mt-2">+</span>
+            </div>
+          </NavLink>
+        </ProtectedAction>
       </div>
     </div>
   );

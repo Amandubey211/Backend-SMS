@@ -15,6 +15,7 @@ import {
   deletePage,
   updatePage,
 } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -100,54 +101,67 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
       </div>
 
       <div className="relative flex justify-end gap-2 items-center w-full p-2 text-gray-700">
-        <button
-          className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-          aria-label={isPublished ? "Unpublish Page" : "Publish Page"}
-          onClick={handlePublishToggle}
-          disabled={deleteLoading}
-        >
-          {isPublished ? (
-            <>
-              <BsPatchCheckFill aria-hidden="true" className="text-green-600" />
-              <span>Publish</span>
-            </>
-          ) : (
-            <>
-              <MdOutlineBlock aria-hidden="true" />
-              <span>Unpublish</span>
-            </>
-          )}
-        </button>
-        <button
-          onClick={handleEdit}
-          className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-          aria-label="Edit Page"
-        >
-          <AiOutlineEdit aria-hidden="true" />
-          <span>Edit</span>
-        </button>
-        <button
-          className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition relative"
-          aria-label="More Options"
-          onClick={() => setShowMenu(!showMenu)}
-        >
-          <HiOutlineDotsVertical aria-hidden="true" />
-          {showMenu && (
-            <div
-              ref={menuRef} // Attach ref to menu
-              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
-            >
-              <button
-                onClick={handleDeleteClick}
-                className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
-                aria-label="Delete Page"
+        <ProtectedAction requiredPermission="Update page">
+          <button
+            className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+            aria-label={isPublished ? "Unpublish Page" : "Publish Page"}
+            onClick={handlePublishToggle}
+            disabled={deleteLoading}
+          >
+            {isPublished ? (
+              <>
+                <BsPatchCheckFill
+                  aria-hidden="true"
+                  className="text-green-600"
+                />
+                <span>Publish</span>
+              </>
+            ) : (
+              <>
+                <MdOutlineBlock aria-hidden="true" />
+                <span>Unpublish</span>
+              </>
+            )}
+          </button>
+        </ProtectedAction>
+
+        <ProtectedAction requiredPermission="Update page">
+          <button
+            onClick={handleEdit}
+            className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
+            aria-label="Edit Page"
+          >
+            <AiOutlineEdit aria-hidden="true" />
+            <span>Edit</span>
+          </button>
+        </ProtectedAction>
+        <ProtectedAction requiredPermission="delete page">
+          <button
+            className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition relative"
+            aria-label="More Options"
+            onClick={() => setShowMenu(!showMenu)}
+          >
+            <HiOutlineDotsVertical aria-hidden="true" />
+            {showMenu && (
+              <div
+                ref={menuRef} // Attach ref to menu
+                className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
               >
-                <AiOutlineDelete aria-hidden="true" className="text-red-600" />
-                <span>Delete</span>
-              </button>
-            </div>
-          )}
-        </button>
+                <button
+                  onClick={handleDeleteClick}
+                  className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
+                  aria-label="Delete Page"
+                >
+                  <AiOutlineDelete
+                    aria-hidden="true"
+                    className="text-red-600"
+                  />
+                  <span>Delete</span>
+                </button>
+              </div>
+            )}
+          </button>
+        </ProtectedAction>
       </div>
 
       <DeleteModal

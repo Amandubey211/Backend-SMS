@@ -6,6 +6,7 @@ import SpeedGradeButton from "../../../Component/SpeedGradeButton";
 import RubricButton from "../../Assignments/AssignmentComponents/RubricButton";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import { useSelector } from "react-redux";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const QuizzDetailCard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -73,16 +74,23 @@ const QuizzDetailCard = () => {
   };
   return (
     <div className="p-3 bg-white" aria-label="Quiz Card">
-      <ButtonsGroup type="Quiz" data={quiz} loading={updateLoading} />
-      <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
-        Submitted Students : 50/100{" "}
-      </p>
-      <SpeedGradeButton
+      <ButtonsGroup
         type="Quiz"
-        sgid={quiz?._id}
-        name={quiz?.name}
-        isPublish={quiz?.publish}
+        data={quiz}
+        loading={updateLoading}
+        requiredPermission="modification need here " //Aman
       />
+      {/* <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
+        Submitted Students : 50/100{" "}
+      </p> */}
+      <ProtectedAction requiredPermission="grade Quiz">
+        <SpeedGradeButton
+          type="Quiz"
+          sgid={quiz?._id}
+          name={quiz?.name}
+          isPublish={quiz?.publish}
+        />
+      </ProtectedAction>
 
       <div className="ps-3 ">
         {quizDetails?.map((detail, index) => {

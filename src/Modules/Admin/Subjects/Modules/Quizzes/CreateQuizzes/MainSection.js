@@ -16,6 +16,8 @@ import {
   updateQuestionThunk,
   deleteQuestionThunk,
 } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const initialFormState = {
   points: "",
@@ -364,21 +366,32 @@ const MainSection = ({ setIsEditing, isEditing }) => {
             {(activeTab) => (
               <div className="h-full">
                 {activeTab === "instructions" ? (
-                  <QuizInstructions
-                    assignmentName={assignmentName}
-                    instruction={instruction}
-                    handleNameChange={setAssignmentName}
-                    handleInstructionChange={handleInstructionChange}
-                  />
+                  <ProtectedSection
+                    title="Add/Edit Quiz Instructuin"
+                    requiredPermission="edit quiz instructuion"
+                    aman={true}
+                  >
+                    <QuizInstructions
+                      assignmentName={assignmentName}
+                      instruction={instruction}
+                      handleNameChange={setAssignmentName}
+                      handleInstructionChange={handleInstructionChange}
+                    />
+                  </ProtectedSection>
                 ) : (
-                  <QuestionListView
-                    quizId={quizId}
-                    allowShuffleAnswers={formState.allowShuffleAnswers}
-                    questionState={questions}
-                    handleSidebarOpen={handleAddNewQuestion}
-                    deleteQuestion={deleteQuestionHandler}
-                    editQuestion={editQuestionHandler}
-                  />
+                  <ProtectedSection
+                    requiredPermission="edit question"
+                    aman={true}
+                  >
+                    <QuestionListView
+                      quizId={quizId}
+                      allowShuffleAnswers={formState.allowShuffleAnswers}
+                      questionState={questions}
+                      handleSidebarOpen={handleAddNewQuestion}
+                      deleteQuestion={deleteQuestionHandler}
+                      editQuestion={editQuestionHandler}
+                    />
+                  </ProtectedSection>
                 )}
               </div>
             )}
@@ -387,7 +400,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
 
         {activeTab === "instructions" && (
           <div className="w-[30%] h-full ">
-            <CreateQuizForm {...formState} handleChange={handleFormChange} />
+            <ProtectedSection requiredPermission="edit quiz" aman={true}>
+              <CreateQuizForm {...formState} handleChange={handleFormChange} />
+            </ProtectedSection>
           </div>
         )}
       </div>

@@ -9,6 +9,7 @@ import {
   editSyllabus,
 } from "../../../../../../Store/Slices/Admin/Class/Syllabus/syllabusThunk";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const MainSection = ({ setIsEditing }) => {
   const { state } = useLocation();
@@ -69,15 +70,20 @@ const MainSection = ({ setIsEditing }) => {
           loading={loading}
           isEditing={Boolean(state?.syllabus?._id)}
         />
-        <EditorComponent
-          inputPlaceHolder="Syllabus Heading"
-          assignmentLabel="Page Title"
-          assignmentName={assignmentName}
-          editorContent={editorContent}
-          onNameChange={handleNameChange}
-          onEditorChange={handleEditorChange}
-        />
-        {loading && <Spinner />}
+        <ProtectedSection
+          requiredPermission="add/edit Syllabus"
+          title="Create/Update Syllabus"
+        >
+          <EditorComponent
+            inputPlaceHolder="Syllabus Heading"
+            assignmentLabel="Page Title"
+            assignmentName={assignmentName}
+            editorContent={editorContent}
+            onNameChange={handleNameChange}
+            onEditorChange={handleEditorChange}
+          />
+          {loading && <Spinner />}
+        </ProtectedSection>
       </div>
     </div>
   );
