@@ -494,7 +494,7 @@ const TotalExpenseList = () => {
       <DashLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_ALL_EXPENSES} title={"Expense List"}>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {cardDataWithValues.map((card, index) => (
                 <Card
@@ -506,7 +506,7 @@ const TotalExpenseList = () => {
                 />
               ))}
             </div>
-          </ProtectedSection>
+         
 
           {/* Header Section */}
           <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
@@ -575,7 +575,7 @@ const TotalExpenseList = () => {
 
           {/* Table Wrapper (responsive container) */}
           <div className="w-full overflow-x-auto">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_ALL_EXPENSES}>
+           
               <Table
                 dataSource={dataSource}
                 columns={columns}
@@ -620,7 +620,7 @@ const TotalExpenseList = () => {
                   },
                 })}
               />
-            </ProtectedSection>
+           
           </div>
 
           {/* Modals */}
@@ -641,6 +641,7 @@ const TotalExpenseList = () => {
             title="ExpensesData"
             sheet="expenses_report"
           />
+           </ProtectedSection>
           {/* Add other modals like FilterExpenseModal or BulkEntriesModal if needed */}
         </div>
       </DashLayout>

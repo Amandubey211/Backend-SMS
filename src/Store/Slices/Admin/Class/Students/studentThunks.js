@@ -38,7 +38,7 @@ export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(
-        `/${getRole}/all/student/${classId}?say=${say}`
+        `/admin/all/student/${classId}?say=${say}`
       );
       return response.data;
     } catch (error) {

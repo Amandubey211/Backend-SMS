@@ -19,7 +19,7 @@ export const fetchAllClasses = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
-      const endpoint = `/${getRole}/all/class?say=${say}`;
+      const endpoint = `/admin/all/class?say=${say}`;
 
       const response = await getData(endpoint);
       // console.log(response, "lk");

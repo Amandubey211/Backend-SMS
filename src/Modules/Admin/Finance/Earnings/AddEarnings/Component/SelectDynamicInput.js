@@ -43,7 +43,7 @@ export const SelectDynamicInput = ({ label, name, options, onChange, forWhom, di
         disabled={disabled}
       >
         <option value="" >Select</option>
-        {options.map((option, index) => (
+        {options?.map((option, index) => (
           <motion.option
             key={index}
             value={option?._id}

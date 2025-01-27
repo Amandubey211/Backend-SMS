@@ -23,6 +23,8 @@ import { formComponentsMap, initialValuesMap } from "./Config/formConfig";
 import { validationSchemas } from "./Config/validationSchemas";
 import toast from "react-hot-toast";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const AddEarnings = () => {
   const navigate = useNavigate();
@@ -458,11 +460,12 @@ const AddEarnings = () => {
           {({ resetForm, isSubmitting, values, setFieldValue }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
-              {readOnly && (
+              {/* {readOnly && (
                 <div className="flex justify-between items-center bg-yellow-100 text-yellow-700 p-2 rounded-md text-sm">
                   <span>
                     Currently in read-only mode. You cannot edit these fields.
                   </span>
+                  
                   <Button
                     type="primary"
                     size="small"
@@ -487,7 +490,7 @@ const AddEarnings = () => {
                     Edit
                   </Button>
                 </div>
-              )}
+              )} */}
 
               {/* Error Message */}
               {/* {error && showError && (
