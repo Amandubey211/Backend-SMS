@@ -8,9 +8,11 @@ import { deleteBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryT
 import Sidebar from "../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import { useTranslation } from "react-i18next";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const BookCard = ({ book }) => {
-  const { t } = useTranslation('admLibrary');
+  const { t } = useTranslation("admLibrary");
   const { _id, name, author, category, classId, copies, image } = book;
   const dispatch = useDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -54,23 +56,26 @@ const BookCard = ({ book }) => {
 
         {role !== "teacher" && (
           <div className="absolute right-2 bottom-2 flex gap-3">
-            <button
-              onClick={handleSidebarOpen}
-              className="text-indigo-600 hover:text-indigo-900"
-              aria-label={t("Edit")}
-            >
-              <FiEdit className="w-6 h-6" />
-            </button>
-            <button
-              onClick={handleDeleteModalOpen}
-              className="text-red-600 hover:text-red-900"
-              aria-label={t("Delete")}
-            >
-              <FiTrash2 className="w-6 h-6" />
-            </button>
+            <ProtectedAction requiredPermission={PERMISSIONS.EDIT_BOOK}>
+              <button
+                onClick={handleSidebarOpen}
+                className="text-indigo-600 hover:text-indigo-900"
+                aria-label={t("Edit")}
+              >
+                <FiEdit className="w-6 h-6" />
+              </button>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_BOOK}>
+              <button
+                onClick={handleDeleteModalOpen}
+                className="text-red-600 hover:text-red-900"
+                aria-label={t("Delete")}
+              >
+                <FiTrash2 className="w-6 h-6" />
+              </button>
+            </ProtectedAction>
           </div>
         )}
-
       </div>
 
       {/* Sidebar for editing the book */}

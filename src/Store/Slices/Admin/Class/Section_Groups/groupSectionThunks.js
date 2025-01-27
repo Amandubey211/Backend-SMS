@@ -73,7 +73,7 @@ export const fetchSectionsNamesByClass = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(
-        `/${getRole}/all/getSectionByclass/${classId}?say=${say}`
+        `/admin/all/getSectionByclass/${classId}?say=${say}`
       );
       return response.data;
     } catch (error) {

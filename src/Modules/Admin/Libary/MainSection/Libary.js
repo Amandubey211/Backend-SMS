@@ -88,12 +88,15 @@ const LibraryAndBookIssue = () => {
               {activeTab === "Library" ? (
                 <ProtectedSection
                   requiredPermission={PERMISSIONS.GET_ALL_BOOKS}
-                  title={'All Books'}
+                  title={"Library"}
                 >
                   <LibraryTab handleSidebarOpen={handleSidebarOpen} />
                 </ProtectedSection>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK} title={"Book Issue"}>
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.GET_ALL_ISSUE_BOOKS}
+                  title={"Book Issue"}
+                >
                   <BookIssueTab
                     handleSidebarOpen={handleSidebarOpen}
                     setEditIssueData={setEditIssueData}
@@ -110,17 +113,22 @@ const LibraryAndBookIssue = () => {
                 activeTab === "Library"
                   ? t("Add New Book")
                   : editIssueData
-                    ? t("Edit Book Issue")
-                    : t("Add Book Issue")
+                  ? t("Edit Book Issue")
+                  : t("Add Book Issue")
               }
             >
               {activeTab === "Library" ? (
-                <ProtectedSection requiredPermission={PERMISSIONS.ADD_NEW_BOOK} title={"Add New Book"}>
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.ADD_BOOK}
+                  title={"Add Book"}
+                >
                   <AddBook onClose={handleSidebarClose} />
                 </ProtectedSection>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK} title={"Add Book Issue"}>
-
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}
+                  title={"Add Book Issue"}
+                >
                   <AddIssue
                     editIssueData={editIssueData}
                     onClose={handleSidebarClose}
