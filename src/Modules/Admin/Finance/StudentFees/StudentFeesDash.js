@@ -13,11 +13,9 @@ const StudentFeesDashboard = () => {
   return (
     <Layout title="Finance | Student Fees">
       <AdminDashLayout>
-      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_INFO_FOR_STUDENT_FEES} title={'Student Fee'}>
         <div className="w-full max-w-screen-xl mx-auto overflow-x-hidden">
           <StudentFeesMain />
         </div>
-     </ProtectedSection>
       </AdminDashLayout>
     </Layout>
   );
