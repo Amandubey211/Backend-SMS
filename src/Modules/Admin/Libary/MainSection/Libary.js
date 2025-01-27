@@ -115,11 +115,11 @@ const LibraryAndBookIssue = () => {
               }
             >
               {activeTab === "Library" ? (
-                <ProtectedSection requiredPermission={PERMISSIONS.ADD_NEW_BOOK}>
+                <ProtectedSection requiredPermission={PERMISSIONS.ADD_NEW_BOOK} title={"Add New Book"}>
                   <AddBook onClose={handleSidebarClose} />
                 </ProtectedSection>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK} title={"Add Book Issue"}>
 
                   <AddIssue
                     editIssueData={editIssueData}

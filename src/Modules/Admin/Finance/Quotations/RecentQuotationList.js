@@ -382,7 +382,7 @@ const RecentQuotationList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}>
+            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION} title={"Quotation List"}>
               <Table
                 dataSource={dataSource}
                 columns={columns}
