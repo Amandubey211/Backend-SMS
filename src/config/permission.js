@@ -97,11 +97,12 @@ export const PERMISSIONS = {
   ADD_NEW_SERVICE_BASED_REVENUE: "Add new Service Based Revenue",
 
   // Earnings List
-  MODIFY_COMMUNITY_EXTERNAL_AFFAIRS_REVENUE: "Modify Community External Affairs Revenue",
-  MODIFY_FACILITY_BASED_REVENUE: "Modify Facility Based Revenue",
-  DELETE_FACILITY_BASED_REVENUE: "Delete Facility Based Revenue",
-  MODIFY_FINANCIAL_INVESTMENT_REVENUE: "Modify Financial Investment Revenue",
-  MODIFY_SERVICE_BASED_REVENUE: "Modify Service Based Revenue",
+  Community_MODIFY: "Modify Community External Affairs Revenue",
+  Facility_MODIFY: "Modify Facility Based Revenue",
+ // Facility_MODIFY: "Delete Facility Based Revenue",
+  Financial_MODIFY: "Modify Financial Investment Revenue",
+  Service_MODIFY: "Modify Service Based Revenue",
+  Other_MODIFY: "Modify Other Revenue",
   LIST_ALL_REVENUE: "List all Revenue",
   CREATE_NEW_INVOICE: "Create new Invoice",
 

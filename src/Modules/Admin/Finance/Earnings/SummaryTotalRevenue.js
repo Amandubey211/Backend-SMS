@@ -176,7 +176,6 @@ const SummaryTotalRevenue = () => {
         </div>
       )}
       {/* Table */}
-      <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_REVENUE}>
         <Table
           dataSource={dataSource}
           columns={columns}
@@ -190,7 +189,6 @@ const SummaryTotalRevenue = () => {
         //   emptyText: <Empty description="No Data Found" />, // Show default Ant Design empty icon + text
         // }}
         />
-      </ProtectedSection>
     </div>
   );
 };
