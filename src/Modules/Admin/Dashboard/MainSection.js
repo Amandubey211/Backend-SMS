@@ -20,6 +20,8 @@ import { useDispatch, useSelector } from "react-redux";
 // import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 import { fetchAdminDashboardData } from "../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
+import { PERMISSIONS } from "../../../config/permission";
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const MainSection = () => {
   const { dashboardData, errorDashboard, loadingDashboard } = useSelector(
@@ -100,11 +102,15 @@ const MainSection = () => {
 
   return (
     <div className="w-full overflow-x-hidden">
+      <ProtectedSection requiredPermission={PERMISSIONS.GET_DASHBOARD_CARD} title={t("Cards")}>
+
+    
       <div className="flex flex-wrap justify-center gap-3 py-4">
         {cardData?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>
+      </ProtectedSection>
 
       {loadingDashboard && (
         <div className="flex flex-col items-center justify-center w-full">

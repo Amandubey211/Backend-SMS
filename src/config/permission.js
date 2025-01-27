@@ -18,6 +18,61 @@ export const ROLES = {
 // 2) Define permissions
 //
 export const PERMISSIONS = {
+
+  //-------------------------------------------------------------------------//
+  // Dashboard 1
+        //common
+        GET_DASHBOARD_CARD: "get dashboard data",
+        DASH_VIEW_BOOKS : "view books",
+        DASH_VIEW_NOTICE : "view notice",
+        DASH_VIEW_EVENTS : "view events",
+
+
+        // teacher
+        GET_GRAPH_STUDENT_ATTENDENCE : "Get All Student Attendance",
+        GET_TOP_STUDENTS : "Get Top Students", // not working
+            
+
+        //librarian
+
+        // finace
+            GET_EARNING_EXPENSE_GRAPH:"View Expense and Earning Graph",
+        // other staff
+   
+
+     
+    // LIBARY
+           //  commom
+           GET_ALL_ISSUE_BOOKS :"Get All Issued Books",
+           GET_ALL_BOOKS :"Get All Books",
+
+           // Librarian
+              //Books
+              ADD_BOOK:"Add New Book",
+              REMOVE_BOOK:"Remove Book",
+              EDIT_BOOK:"Edit Book Information",
+              SHOW_BOOK_NAME:"Show Book Names",
+
+              // Books issue
+               ADD_ISSUE_BOOK:"Issue Book",
+               EDIT_ISSUE_BOOK:"Make changes in Issue Book",
+               VIEW_STUDENT_BY_SECTION_AND_CLASS:"View Students By Class And Section",
+               VIEW_SECTIONS:"View Sections",
+               VIEW_STUDENT:"Show All Students",
+   
+
+
+
+
+
+
+
+
+
+
+
+  //-------------------------------------------------------------------------//
+
   // Receipt Permissions
   CREATE_NEW_RECEIPT: "Create new receipt",
   SHOWS_ALL_RECEIPTS: "Shows all receipts",
@@ -41,7 +96,7 @@ export const PERMISSIONS = {
   VIEW_EVENTS: "View events",
 
   // Teacher dashboard
-  GET_TOP_STUDENTS: "Get top students",
+  //GET_TOP_STUDENTS: "Get top students",
   GET_ALL_STUDENTS: "Get All Students",
   
   // Managing Notices
@@ -168,7 +223,7 @@ export const PERMISSIONS = {
   // Book Management
   ADD_NEW_BOOK: "Add New Book",
   GET_ALL_BOOKS: "Get All Books",
-  REMOVE_BOOK: "Remove Book",
+ // REMOVE_BOOK: "Remove Book",
   EDIT_BOOK_INFORMATION: "Edit Book Information",
   SHOW_BOOK_NAMES: "Show Book Names",
 

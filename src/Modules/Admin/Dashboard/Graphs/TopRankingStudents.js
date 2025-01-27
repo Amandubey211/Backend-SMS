@@ -7,6 +7,8 @@ import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const TopRankingStudents = () => {
   const { t } = useTranslation("admTopRanking");
@@ -32,6 +34,7 @@ const TopRankingStudents = () => {
   };
 
   return (
+    <ProtectedSection requiredPermission={PERMISSIONS.DASH_VIEW_BOOKS} title={t("Top Student")}>
     <div className="bg-white p-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-semibold">{t("Top Ranking Students")}</h2>
@@ -168,6 +171,7 @@ const TopRankingStudents = () => {
         </>
       )}
     </div>
+    </ProtectedSection>
   );
 };
 
