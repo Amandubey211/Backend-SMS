@@ -232,7 +232,7 @@ const sidebarData = [
           ROLES.FINANCE,
           ROLES.STAFF,
         ],
-        //requiredPermission: PERMISSIONS.VIEW_NOTICES, // Added permission reference
+        //requiredPermission: PERMISSIONS.VIEW_NOTICE, // Added permission reference
       },
       {
         title: "Events",

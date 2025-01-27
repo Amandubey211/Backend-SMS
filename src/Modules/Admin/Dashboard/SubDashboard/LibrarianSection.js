@@ -16,7 +16,7 @@ const LibrarianSection = () => {
         {/* Notice Board Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_NOTICES}>
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_NOTICE}>
               <NoticeBoard descriptionLength={140} />
             </ProtectedSection>
           </div>

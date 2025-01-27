@@ -93,7 +93,7 @@ const LibraryAndBookIssue = () => {
                   <LibraryTab handleSidebarOpen={handleSidebarOpen} />
                 </ProtectedSection>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}  title={"Book Issue"}>
+                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK} title={"Book Issue"}>
                   <BookIssueTab
                     handleSidebarOpen={handleSidebarOpen}
                     setEditIssueData={setEditIssueData}
@@ -110,17 +110,22 @@ const LibraryAndBookIssue = () => {
                 activeTab === "Library"
                   ? t("Add New Book")
                   : editIssueData
-                  ? t("Edit Book Issue")
-                  : t("Add Book Issue")
+                    ? t("Edit Book Issue")
+                    : t("Add Book Issue")
               }
             >
               {activeTab === "Library" ? (
-                <AddBook onClose={handleSidebarClose} />
+                <ProtectedSection requiredPermission={PERMISSIONS.ADD_NEW_BOOK}>
+                  <AddBook onClose={handleSidebarClose} />
+                </ProtectedSection>
               ) : (
-                <AddIssue
-                  editIssueData={editIssueData}
-                  onClose={handleSidebarClose}
-                />
+                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+
+                  <AddIssue
+                    editIssueData={editIssueData}
+                    onClose={handleSidebarClose}
+                  />
+                </ProtectedSection>
               )}
             </Sidebar>
           </div>
