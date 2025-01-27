@@ -26,7 +26,7 @@ const StudentGradesAccordion = ({ student }) => {
 
   return (
     <>
-    <ProtectedSection requiredPermission={PERMISSIONS. GET_STUDENT_GRADES}>
+    <ProtectedSection requiredPermission={PERMISSIONS. GET_STUDENT_GRADES}  title={"Grades"}>
       <div className="flex flex-row w-[100%]">
         <div className="w-[75%] ">
           <GradeAccordionItem getData={(subjectId) => getStudentGrades(subjectId)} />

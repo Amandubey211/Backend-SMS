@@ -35,7 +35,7 @@ const StudentFinance = ({ student }) => {
 
   return (
     <>
-    <ProtectedSection requiredPermission={"viewstudentfinance"}>
+    <ProtectedSection requiredPermission={"viewstudentfinance"}  title={"Student Fees"}>
       <div className="flex flex-col">
         <div className="w-full border p-4">
           <div className="flex flex-row gap-3 p-4">

@@ -36,7 +36,7 @@ const BookIssue = () => {
 
   return (
     <div className="min-h-screen p-4 ">
-      <ProtectedSection requiredPermission={PERMISSIONS.STUDENT_BOOKISSUE_RECORD}>
+      <ProtectedSection requiredPermission={PERMISSIONS.STUDENT_BOOKISSUE_RECORD}  title={"Book Issue"}>
       <div className="flex justify-between items-center mb-4">
 
       </div>

@@ -167,7 +167,7 @@ const AllStaff = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STAFF}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STAFF} title={"Staff"}>
           <div className="p-4 relative">
             {/* Reusable Header Component with currentSort and currentFilters */}
             <Header

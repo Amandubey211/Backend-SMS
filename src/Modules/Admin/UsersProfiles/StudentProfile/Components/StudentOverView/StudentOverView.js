@@ -23,14 +23,14 @@ const StudentOverView = () => {
     <>
 
       <div className="flex flex-col">
-      <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}>
+      <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS} title={"Subjects"}>
         <div className="">
           <AllSubjects />
         </div>
         </ProtectedSection>
         <div className="mt-4 w-full h-96 p-5 justify-center items-center flex self-center border-t-2 flex-col">
           <h1 className="mb-4 font-bold">{t("Attendance")}</h1>
-          <ProtectedSection requiredPermission={PERMISSIONS.GET_YEARLY_ATTENDEC}>
+          <ProtectedSection requiredPermission={PERMISSIONS.GET_YEARLY_ATTENDEC}  title={"Attendence Graph"}>
           <AttendanceGraph />
           </ProtectedSection>
         </div>
@@ -40,10 +40,10 @@ const StudentOverView = () => {
         </div>
 
         <div className="flex flex-row bg-white h-[20rem] w-full">
-        <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}>
+        <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}  title={"Grades Chart"}>
           <StudentGradePieChart />
           </ProtectedSection>
-          <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_TASK}>
+          <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_TASK}  title={"Task Chart"}>
           <TaskChart />
           </ProtectedSection>
         </div>

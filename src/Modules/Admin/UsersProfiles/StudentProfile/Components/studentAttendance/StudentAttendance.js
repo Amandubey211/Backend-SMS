@@ -35,7 +35,7 @@ const StudentAttendance = ({ student }) => {
                 <Spinner />
             </div>
         ) : (
-            <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_ATTENDENCE}>
+            <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_ATTENDENCE}  title={"Attendence"}>
             <div className="container mx-auto py-4">
                 {/* Attendance Summary */}
                 <div className="flex justify-around px-4 space-x-4">

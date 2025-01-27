@@ -165,7 +165,7 @@ const AllTeachers = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_TEACHER}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_TEACHER}  title={"Teacher"}>
           <div className="p-4 relative">
             {/* Reusable Header Component */}
             <Header
