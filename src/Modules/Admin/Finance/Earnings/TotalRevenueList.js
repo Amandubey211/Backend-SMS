@@ -57,6 +57,7 @@ import Card from "../Expense/components/Card";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { flattenObject } from "../../../../Utils/xl";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -184,6 +185,7 @@ const TotalRevenueList = () => {
       <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
         {!isStudentBased && (
           <>
+            
             <Tooltip title="View">
               <Button
                 type="link"
@@ -202,6 +204,7 @@ const TotalRevenueList = () => {
                 aria-label="View"
               />
             </Tooltip>
+            <ProtectedAction requiredPermission={PERMISSIONS[`${record?.category?.categoryName?.split(/[\s-]/)[0]}_MODIFY`]}>
             <Tooltip title="Edit">
               <Button
                 type="link"
@@ -220,7 +223,7 @@ const TotalRevenueList = () => {
                 aria-label="Edit"
               />
             </Tooltip>
-
+            </ProtectedAction>
             <Tooltip title="Delete">
               <Button
                 type="link"
@@ -708,7 +711,6 @@ const TotalRevenueList = () => {
               })}
             />
           </div>
-
           {/* Modals */}
           <DeleteModal
             visible={isDeleteModalVisible}
