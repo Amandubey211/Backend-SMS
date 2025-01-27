@@ -1,11 +1,15 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import {
+  fetchSectionsByClass,
+  fetchSectionsNamesByClass,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import FormField from "../Components/FormField";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import BookIssueRow from "../Components/BookIssueRow";
 import { useTranslation } from "react-i18next";
-import { fetchBooksThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   const { t } = useTranslation("admLibrary");
@@ -14,11 +18,9 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   const { bookIssues, books } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
   const role = useSelector((store) => store.common.auth.role);
-useEffect(()=>{
-
-  //  dispatch(fetchBooksThunk())
-  
-},[])
+  useEffect(() => {
+    //  dispatch(fetchBooksThunk())
+  }, []);
   const sectionList = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
@@ -37,7 +39,7 @@ useEffect(()=>{
 
     // If the classLevel changes, fetch sections for that class
     if (name === "classLevel" && value) {
-      dispatch(fetchSectionsByClass(value)); // Dispatch the thunk to fetch sections by classId
+      dispatch(fetchSectionsNamesByClass(value)); // Dispatch the thunk to fetch sections by classId
     }
   };
 
@@ -110,12 +112,14 @@ useEffect(()=>{
           />
         </div>
         {role !== "teacher" && (
-          <button
-            onClick={handleSidebarOpen}
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-          >
-            {t("Add Book Issue")}
-          </button>
+          <ProtectedAction requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}>
+            <button
+              onClick={handleSidebarOpen}
+              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+            >
+              {t("Add Book Issue")}
+            </button>
+          </ProtectedAction>
         )}
       </div>
 
@@ -131,7 +135,11 @@ useEffect(()=>{
               <th className="px-6 py-3">{t("Status")}</th>
               {/* Conditionally render the Action column */}
               {role !== "teacher" && (
-                <th className="px-6 py-3">{t("Action")}</th>
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}
+                >
+                  <th className="px-6 py-3">{t("Action")}</th>
+                </ProtectedAction>
               )}
             </tr>
           </thead>

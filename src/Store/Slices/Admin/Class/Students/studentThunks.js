@@ -12,15 +12,13 @@ import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Fetch students by class and section
 export const fetchStudentsByClassAndSection = createAsyncThunk(
-  "students/fetchByClassAndSection",
+  "students/fetchStudentsByClassAndSection",
   async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(
-        `/${getRole}/student/${classId}?say=${say}`
-      );
+      const response = await getData(`/admin/student/${classId}?say=${say}`);
       console.log("API response from thunk:", response); // Debugging
       return response.data; // Ensure the structure is correct
     } catch (error) {

@@ -47,16 +47,18 @@ export const PERMISSIONS = {
               ADD_BOOK:"Add New Book",
               REMOVE_BOOK:"Remove Book",
               EDIT_BOOK:"Edit Book Information",
-              SHOW_BOOK_NAME:"Show Book Names",
+              SHOW_BOOK_NAME:"Show Book Names",//NW
 
               // Books issue
-               ADD_ISSUE_BOOK:"Issue Book",
+               ADD_ISSUE_BOOK:"New Issue Book",
                EDIT_ISSUE_BOOK:"Make changes in Issue Book",
-               VIEW_STUDENT_BY_SECTION_AND_CLASS:"View Students By Class And Section",
-               VIEW_SECTIONS:"View Sections",
+               VIEW_STUDENT_BY_SECTION_AND_CLASS:"View Students By Class And Section",//NW
+              //  VIEW_SECTIONS:"View Sections",
                VIEW_STUDENT:"Show All Students",
    
+
            // Finance 3
+
             //earning
                // earning-dashboard
              
@@ -64,6 +66,7 @@ export const PERMISSIONS = {
              SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD: "Shows revenue card data in dashboard",
              // earning-view
              VIEW_ALL_INCOMES: "View All Incomes",
+
 
                // add - earning 
              ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
@@ -131,6 +134,25 @@ export const PERMISSIONS = {
 
   
 
+
+               // add - earning 
+             ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
+             ADD_NEW_Facility_REVENUE: "Add new Facility Based Revenue",
+             ADD_NEW_Financial_REVENUE: "Add new Financial Investment Revenue",
+             ADD_NEW_SERVICE_BASED_REVENUE: "Add new Service Based Revenue",
+             ADD_NEW_OTHER_REVENUE: "Add new Other Revenue", // not in backend
+              
+              // edit-earning
+             Community_MODIFY: "Modify Community External Affairs Revenue",
+             Facility_MODIFY: "Modify Facility Based Revenue",
+             Financial_MODIFY: "Modify Financial Investment Revenue",
+             Service_MODIFY: "Modify Service Based Revenue",
+             Other_MODIFY: "Modify Other Revenue",
+             LIST_ALL_REVENUE: "List all Revenue",
+             CREATE_NEW_INVOICE: "Create new Invoice",
+
+             // delete-earning
+             Facility_DELETE: "Delete Facility Based Revenue",
 
 
 
@@ -222,6 +244,7 @@ export const PERMISSIONS = {
   // Staff View
   VIEW_STAFF: "Get All Staff",
   VIEW_FINANCE_USER: "Get All Staff",
+
 
 
 
