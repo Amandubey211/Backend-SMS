@@ -234,7 +234,6 @@ const SummaryRevenueList = () => {
       key: "action",
       render: (_, record) => (
         <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
-          <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_INFO_FOR_STUDENT_FEES}>
           <Tooltip title="View">
             <Button
               type="link"
@@ -247,7 +246,6 @@ const SummaryRevenueList = () => {
             />
            
           </Tooltip>
-          </ProtectedAction>
           <ProtectedAction requiredPermission={PERMISSIONS.EDIT_FEES}>
           <Tooltip title="Edit">
             <Button
@@ -319,7 +317,7 @@ const SummaryRevenueList = () => {
   return (
     <Layout title="Finance | Student Fees">
     <AdminLayout>
-    <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_REVENUE} title={'Fees List'}>
+    <ProtectedSection requiredPermission={PERMISSIONS.SUMMARY_OF_STUDENT_FEES} title={'Fees List'}>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
@@ -419,7 +417,8 @@ const SummaryRevenueList = () => {
                 />
                 <span className="text-gray-700">Unpaid</span>
               </label>
-              <div className="flex items-center space-x-4 ">
+              <ProtectedAction requiredPermission={PERMISSIONS.DELETE_FEES}>
+              <div className="flex items-center space-x-4">
                 {selectedRowIds?.length > 0 && (
                   <Button
                     type="danger"
@@ -430,10 +429,12 @@ const SummaryRevenueList = () => {
                   </Button>
                 )}
               </div>
+              </ProtectedAction>
             </div>
           </div>
           <div className="flex space-y-4  flex-col">
            <div className="flex ml-auto">
+           <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_FEES}>
            <button
               onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -443,6 +444,7 @@ const SummaryRevenueList = () => {
                 <GiTakeMyMoney size={20} />
               </div>
             </button>
+            </ProtectedAction>
            </div>
            <div className="flex gap-2 justify-between flex-row">
            {selectedRowIds?.length ==1 && selectedRecords?.length == 1 && (

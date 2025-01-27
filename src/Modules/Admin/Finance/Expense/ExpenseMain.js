@@ -12,6 +12,8 @@ import {
   fetchCardDataExpense,
   fetchExpenseGraph,
 } from "../../../../Store/Slices/Finance/Expenses/expensesThunks";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const ExpenseMain = () => {
   const dispatch = useDispatch();
@@ -27,9 +29,21 @@ const ExpenseMain = () => {
     <Layout title="Expense Dashboard | Student Diwan">
       <DashLayout>
         <div className="p-2 space-y-2 scroll-smooth overflow-y-auto h-full w-full mx-auto">
-          <CardSection />
+          <div>
+        <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA} title={'Cards'}>
+            <CardSection />
+          </ProtectedSection>
+          </div>
+          <div>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_GRAPH} title={'Graph'}>
           <ExpenseChart />
+          </ProtectedSection>
+          </div>
+          <div>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_SUMMARY_OF_EXPENSES} title={'List'}>
           <ExpenseTable />
+          </ProtectedSection>
+          </div>
         </div>
       </DashLayout>
     </Layout>
