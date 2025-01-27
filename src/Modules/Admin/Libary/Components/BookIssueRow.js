@@ -4,6 +4,8 @@ import { MdEdit } from "react-icons/md";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddIssue from "../Components/AddIssue"; // Now using AddIssue instead of EditBook
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
   const { t } = useTranslation("admLibrary");
@@ -90,20 +92,19 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
         <span
-          className={`inline-block px-3 py-1 text-xs font-semibold rounded-md ${
-            item.status === "Returned"
+          className={`inline-block px-3 py-1 text-xs font-semibold rounded-md ${item.status === "Returned"
               ? "bg-green-200 text-green-800"
               : item.status === "Pending"
-              ? "bg-sky-200 text-green-800"
-              : "bg-red-200 text-red-800"
-          }`}
+                ? "bg-sky-200 text-green-800"
+                : "bg-red-200 text-red-800"
+            }`}
         >
           {t(item.status)}
         </span>
       </td>
       {/* Conditionally render the Action column for non-teacher roles */}
       {role !== "teacher" && (
-        <td className="px-5 py-2 border-b border-gray-200 relative">  
+        <td className="px-5 py-2 border-b border-gray-200 relative">
           <button
             onClick={handleSidebarEditOpen}
             className="flex items-center gap-1 p-2 hover:bg-gray-200 w-auto text-left rounded-lg"
@@ -120,10 +121,13 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
             width="40%"
           >
             {item && (
-              <AddIssue
-                editIssueData={item} // Pass the current issue data for editing
-                onClose={handleSidebarClose}
-              />
+              <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+
+                <AddIssue
+                  editIssueData={item} // Pass the current issue data for editing
+                  onClose={handleSidebarClose}
+                />
+              </ProtectedSection>
             )}
           </Sidebar>
         </td>
