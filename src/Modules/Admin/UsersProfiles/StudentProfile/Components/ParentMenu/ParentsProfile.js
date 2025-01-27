@@ -15,7 +15,7 @@ const ParentsProfile = ({ student }) => {
   const address = `${student?.permanentAddress?.country}, ${student?.permanentAddress?.city}, ${student?.permanentAddress?.street}`;
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_INFO}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_INFO}  title={"Parent Profile"}>
     <div className="flex h-[500px] p-4 gap-5">
       <ParentProfileBlock
         title={t("Father Details")}

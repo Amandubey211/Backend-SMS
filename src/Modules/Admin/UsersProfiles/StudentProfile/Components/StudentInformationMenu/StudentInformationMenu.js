@@ -11,7 +11,7 @@ const StudentInformationMenu = ({ student }) => (
   <>
   
     <div className="flex flex-col w-full">
-    <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_INFO}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_INFO}  title={"Information"}>
       <div className="border-b border-gray-300 p-3">
         <InformationSection student={student} />
       </div>

@@ -12,6 +12,7 @@ import { fetchInvoice, fetchInvoiceCard } from "../../../../Store/Slices/Finance
 import { FaPlusCircle } from "react-icons/fa";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
@@ -24,7 +25,7 @@ const InvoicesMain = () => {
     return (
         <Layout title="Finance | Invoice">
         <AdminDashLayout>
-        <ProtectedSection requiredPermission="invoiceDashboard">
+      
             <div className="p-6 space-y-6">
                 {/* Header Section */}
                 <div className="flex justify-between items-center">
@@ -42,11 +43,15 @@ const InvoicesMain = () => {
                         </div>
                     </button>
                 </div>
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_INVOICE} title={'Invoice Cards'}>
                 <CardsSection />
+                </ProtectedSection>
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_RECENT_AND_RETURN_INVOICE} title={"Recent Invoice List"}>
                 <RecentInvoice />                
-                <ReturnInvoice />                
+                <ReturnInvoice />     
+                </ProtectedSection>           
             </div>
-            </ProtectedSection>
+            
         </AdminDashLayout>
         </Layout>
     );

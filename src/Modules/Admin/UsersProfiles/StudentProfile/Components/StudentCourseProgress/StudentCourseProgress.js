@@ -33,7 +33,7 @@ const StudentCourseProgress = ({student}) => {
   </div>:
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
-    <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}  title={"Subjects Progress"}>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
         {studentSubjectProgress?.length > 0?
         studentSubjectProgress?.map((subject, index) => (
@@ -49,7 +49,7 @@ const StudentCourseProgress = ({student}) => {
       </ProtectedSection>
     </div>
     <div className='border-t-2'>
-    <ProtectedSection requiredPermission={PERMISSIONS.GET_PROGRESS_OF_SUBJECT}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_PROGRESS_OF_SUBJECT}  title={"Subjects"}>
        <MainSection /> 
        </ProtectedSection>
     </div>

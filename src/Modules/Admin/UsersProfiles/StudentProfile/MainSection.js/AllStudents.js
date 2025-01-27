@@ -97,7 +97,7 @@ const AllStudents = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENT}>
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENT} title={"All Students"}>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
               {allStudents?.length > 0 ? (
                 allStudents?.map((student) => (

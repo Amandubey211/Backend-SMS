@@ -199,6 +199,7 @@ const RecentInvoiceList = () => {
               </Menu.Item>
 
               {/* Return */}
+              <ProtectedSection requiredPermission={PERMISSIONS.RETURN_INVOICE}>
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
                   icon={<RedoOutlined />}
@@ -210,6 +211,7 @@ const RecentInvoiceList = () => {
                   Return
                 </Menu.Item>
               )}
+              </ProtectedSection>
               {record.isReturn && (
                 <Menu.Item icon={<RedoOutlined />} disabled>
                   Return
@@ -222,6 +224,7 @@ const RecentInvoiceList = () => {
                   Canceled
                 </Menu.Item>
               ) : (
+                <ProtectedSection requiredPermission={PERMISSIONS.CANCEL_INVOICE}>
                 <Menu.Item
                   icon={<CloseCircleOutlined />}
                   onClick={() => {
@@ -237,8 +240,13 @@ const RecentInvoiceList = () => {
                 >
                   Cancel
                 </Menu.Item>
+                </ProtectedSection>
               )}
+              <ProtectedSection requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
+
+              
               {!record.isCancel && !record.isReturn && !record.isCompleted ?
+
                 <Menu.Item
                   icon={<MdOutlineDone />}
                   onClick={() => dispatch(completeInvoice(record._id))}
@@ -246,6 +254,7 @@ const RecentInvoiceList = () => {
                   Complete
                 </Menu.Item> : null
               }
+              </ProtectedSection>
               {!record.isCancel && !record.isReturn && record.isCompleted ?
                 <Menu.Item
                   icon={<MdOutlineDone />}

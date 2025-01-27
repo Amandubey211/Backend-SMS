@@ -84,7 +84,7 @@ const StudentParentProfile = () => {
               <Spinner />
             </div>
           ) : (
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_PARENT}>
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_PARENT} title={"Parents"}>
             <div className="min-h-screen p-4">
               <h2 className="text-xl font-semibold mb-4">
                 {t("All Parents")}{" "}

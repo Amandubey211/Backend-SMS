@@ -16,7 +16,7 @@ const ChildProfile = ({ children }) => {
   // console.log('Children data:', children);
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_PARENT_STUDENT_INFO}>
+    <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_PARENT_STUDENT_INFO} title={"Childern"}>
       <div className="flex flex-col gap-4 mt-2">
         {children?.map((child, index) => (
           <div key={index} className='flex flex-col text-center border border-gray-300 rounded-md items-center justify-around mx-5 py-5 gap-3'>

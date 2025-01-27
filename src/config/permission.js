@@ -1,5 +1,8 @@
 // config/permissions.js
 
+//
+// 1) Define roles
+//
 export const ROLES = {
   ADMIN: "admin",
   TEACHER: "teacher",
@@ -29,10 +32,9 @@ export const PERMISSIONS = {
   // Adjustments Permissions
   CREATE_NEW_ADJUSTMENT: "Create new adjustment",
   LIST_ALL_ADJUSTMENTS: "List all adjustments",
-  SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT:
-    "Shows card data of penalty and adjustment",
+  SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT: "Shows card data of penalty and adjustment",
   SHOWS_SUMMARY_OF_RETURN_INVOICE: "Shows summary of return invoice",
-  
+
   // Dashboard
   GET_DASHBOARD_DATA: "Get dashboard data",
   VIEW_NOTICE: "View notice",
@@ -52,24 +54,23 @@ export const PERMISSIONS = {
 
   // TimeTable
   TIMETABLE_VIEW: "Timetable View",
-  TIMETABLE_EDIT: "Timetable Edit",
-  TIMETABLE_DELETE: "Timetable Delete",
+
   // Student View
   GET_ALL_CLASSES: "Get All Classes",
   SHOW_ALL_STUDENTS: "Show All Students",
 
   //student management
 
-  STUDENT_BOOKISSUE_RECORD: "Get Book Issue Records",
-  GET_STUDENT_ATTENDENCE: "Get Student Attendance",
-  GET_STUDENT_SUBJECTS: "Get Student Subjects",
-  GET_STUDENT_GRADES: "Get Student Grades",
-  GET_STUDENT_INFO: "Get Student Information",
-  GET_COURSE_PROGRESS: "Get Course Progress",
-  GET_PROGRESS_OF_SUBJECT: "Get Course Progress by Subject",
-  GET_STUDENT_TASK: "Get Student Tasks",
-  GET_YEARLY_ATTENDEC: "Get Yearly Attendance",
-
+  STUDENT_BOOKISSUE_RECORD:'Get Book Issue Records',
+  GET_STUDENT_ATTENDENCE:'Get Student Attendance',
+  GET_STUDENT_SUBJECTS :'Get Student Subjects',
+  GET_STUDENT_GRADES:'Get Student Grades',
+  GET_STUDENT_INFO:'Get Student Information',
+  GET_COURSE_PROGRESS:'Get Course Progress',
+  GET_PROGRESS_OF_SUBJECT:'Get Course Progress by Subject',
+  GET_STUDENT_TASK:'Get Student Tasks',
+  GET_YEARLY_ATTENDEC:'Get Yearly Attendance',
+ 
   // Student Info
   SHOWS_STUDENT_INFO: "Shows Student Info",
 
@@ -90,15 +91,13 @@ export const PERMISSIONS = {
   VIEW_ALL_INCOMES: "View All Incomes",
   VIEW_REVENUE_GRAPH: "View Revenue Graph",
   SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD: "Shows revenue card data in dashboard",
-  ADD_NEW_COMMUNITY_EXTERNAL_AFFAIRS_REVENUE:
-    "Add new Community External Affairs Revenue",
+  ADD_NEW_COMMUNITY_EXTERNAL_AFFAIRS_REVENUE: "Add new Community External Affairs Revenue",
   ADD_NEW_FACILITY_BASED_REVENUE: "Add new Facility Based Revenue",
   ADD_NEW_FINANCIAL_INVESTMENT_REVENUE: "Add new Financial Investment Revenue",
   ADD_NEW_SERVICE_BASED_REVENUE: "Add new Service Based Revenue",
 
   // Earnings List
-  MODIFY_COMMUNITY_EXTERNAL_AFFAIRS_REVENUE:
-    "Modify Community External Affairs Revenue",
+  MODIFY_COMMUNITY_EXTERNAL_AFFAIRS_REVENUE: "Modify Community External Affairs Revenue",
   MODIFY_FACILITY_BASED_REVENUE: "Modify Facility Based Revenue",
   DELETE_FACILITY_BASED_REVENUE: "Delete Facility Based Revenue",
   MODIFY_FINANCIAL_INVESTMENT_REVENUE: "Modify Financial Investment Revenue",
@@ -111,6 +110,7 @@ export const PERMISSIONS = {
   SHOWS_GRAPH_FOR_STUDENT_FEES: "Shows Graph for student Fees",
   SUMMARY_OF_STUDENT_FEES: "Summary of student Fees",
   ADD_NEW_FEES: "Add new Fees",
+  EDIT_FEES: "Edit Fees",
 
   // Expense
   VIEW_EXPENSE_GRAPH: "View Expense graph",
@@ -150,11 +150,12 @@ export const PERMISSIONS = {
   SHOWS_CARD_DATA_OF_INVOICE: "Shows card data of invoice",
   CANCEL_INVOICE: "Cancel Invoice",
   RETURN_INVOICE: "Return Invoice",
+  COMPLETE_INVOICE: "Complete Invoice",
 
   // Receipt
   SHOWS_RECEIPT_CARD_DATA: "Shows receipt card data",
   CANCEL_RECEIPT: "Cancel receipt",
-  EXPORT_RECEIPT_DATA: "Export receipt data",
+
   // Penalty and Adjustment
   SHOWS_ALL_ADJUSTMENTS: "Shows all adjustments",
   CANCEL_PENALTY: "Cancel penalty",

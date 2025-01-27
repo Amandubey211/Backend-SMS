@@ -30,6 +30,7 @@ import { GiTakeMyMoney } from "react-icons/gi";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -233,6 +234,7 @@ const SummaryRevenueList = () => {
       key: "action",
       render: (_, record) => (
         <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+          <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_INFO_FOR_STUDENT_FEES}>
           <Tooltip title="View">
             <Button
               type="link"
@@ -243,7 +245,10 @@ const SummaryRevenueList = () => {
               className="text-blue-600 hover:text-blue-800 p-0"
               aria-label="View"
             />
+           
           </Tooltip>
+          </ProtectedAction>
+          <ProtectedAction requiredPermission={PERMISSIONS.EDIT_FEES}>
           <Tooltip title="Edit">
             <Button
               type="link"
@@ -255,6 +260,7 @@ const SummaryRevenueList = () => {
               aria-label="Edit"
             />
           </Tooltip>
+          </ProtectedAction>
         </div>
       ),
     },

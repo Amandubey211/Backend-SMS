@@ -87,13 +87,13 @@ const LibraryAndBookIssue = () => {
             <div className="flex-1">
               {activeTab === "Library" ? (
                 <ProtectedSection
-                  requiredPermission={PERMISSIONS.MANAGE_LIBRARY}
-                  title={'Library'}
+                  requiredPermission={PERMISSIONS.GET_ALL_BOOKS}
+                  title={'All Books'}
                 >
                   <LibraryTab handleSidebarOpen={handleSidebarOpen} />
                 </ProtectedSection>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}  title={"Book Issue"}>
                   <BookIssueTab
                     handleSidebarOpen={handleSidebarOpen}
                     setEditIssueData={setEditIssueData}
