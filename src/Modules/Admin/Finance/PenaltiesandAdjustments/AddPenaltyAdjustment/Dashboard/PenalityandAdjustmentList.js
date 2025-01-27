@@ -455,7 +455,7 @@ const PenalityandAdjustmentList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_ADJUSTMENTS}>
+            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
               <Table
                 dataSource={dataSource}
                 columns={columns}

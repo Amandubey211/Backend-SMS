@@ -204,7 +204,7 @@ const SummaryPenalityandAdjustment = () => {
       )} */}
       {/* Table */}
       {!loading && !error && (
-        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}>
+        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT} title={"Penalty & Adjustment"}>
           <Table
             dataSource={dataSource}
             columns={columns}

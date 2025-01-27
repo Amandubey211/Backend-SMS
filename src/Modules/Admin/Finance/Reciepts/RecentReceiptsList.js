@@ -412,7 +412,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
               </button>
             </ProtectedAction>
 
-            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT} >
               <button
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                 onClick={handleNavigate}
@@ -440,7 +440,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           // Render Table and Custom Pagination
           <>
             {/* Table */}
-            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS}>
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS} title={"Receipts List"}>
               <Table
                 rowKey={(record) => record._id}
                 columns={columns}

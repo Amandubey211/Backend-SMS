@@ -60,7 +60,7 @@ const Library = () => {
           {t("View All")}
         </button>
       </div>
-      <ProtectedSection requiredPermission={PERMISSIONS.GET_ALL_BOOKS}>
+      <ProtectedSection requiredPermission={PERMISSIONS.GET_ALL_BOOKS} title={t("Books")}>
         {latestBooks?.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[200px]">
             <FaBook className="text-gray-400 text-6xl mb-4" />
