@@ -124,7 +124,7 @@ const ViewEvent = () => {
         {/* Conditionally render Edit and Delete buttons if role is not "teacher" */}
         {!["parent","student"].includes(role) && (
           <>
-          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_EVENT}>
+          <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_EVENT}>
             <button
               className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
               onClick={handleDelete}
@@ -137,7 +137,7 @@ const ViewEvent = () => {
               )}
             </button>
             </ProtectedAction>
-            <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_EVENT}>
+            <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_EVENT}>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
               onClick={handleEdit}

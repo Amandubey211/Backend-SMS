@@ -21,54 +21,68 @@ export const PERMISSIONS = {
 
   //-------------------------------------------------------------------------//
   // Dashboard 1
-        //common
-        GET_DASHBOARD_CARD: "get dashboard data",
-        DASH_VIEW_BOOKS : "view books",
-        DASH_VIEW_NOTICE : "view notice",
-        DASH_VIEW_EVENTS : "view events",
+  //common
+  GET_DASHBOARD_CARD: "get dashboard data",
+  DASH_VIEW_BOOKS: "view books",
+  DASH_VIEW_NOTICE: "view notice",
+  DASH_VIEW_EVENTS: "view events",
 
 
-        // teacher
-        GET_GRAPH_STUDENT_ATTENDENCE : "Get All Student Attendance",
-        GET_TOP_STUDENTS : "Get Top Students", // not working
-            
+  // teacher
+  GET_GRAPH_STUDENT_ATTENDENCE: "Get All Student Attendance",
+  GET_TOP_STUDENTS: "Get Top Students", // not working
 
-        //librarian
 
-        // finace
-            GET_EARNING_EXPENSE_GRAPH:"View Expense and Earning Graph",
-        // other staff
-   
+  //librarian
 
-     
-    // LIBARY
-           //  commom
-           GET_ALL_ISSUE_BOOKS :"Get All Issued Books",
-           GET_ALL_BOOKS :"Get All Books",
-
-           // Librarian
-              //Books
-              ADD_BOOK:"Add New Book",
-              REMOVE_BOOK:"Remove Book",
-              EDIT_BOOK:"Edit Book Information",
-              SHOW_BOOK_NAME:"Show Book Names",
-
-              // Books issue
-               ADD_ISSUE_BOOK:"Issue Book",
-               EDIT_ISSUE_BOOK:"Make changes in Issue Book",
-               VIEW_STUDENT_BY_SECTION_AND_CLASS:"View Students By Class And Section",
-               VIEW_SECTIONS:"View Sections",
-               VIEW_STUDENT:"Show All Students",
-   
+  // finace
+  GET_EARNING_EXPENSE_GRAPH: "View Expense and Earning Graph",
+  // other staff
 
 
 
+  // LIBARY
+  //  commom
+  GET_ALL_ISSUE_BOOKS: "Get All Issued Books",
+  GET_ALL_BOOKS: "Get All Books",
+
+  // Librarian
+  //Books
+  ADD_BOOK: "Add New Book",
+  REMOVE_BOOK: "Remove Book",
+  EDIT_BOOK: "Edit Book Information",
+  SHOW_BOOK_NAME: "Show Book Names",
+
+  // Books issue
+  ADD_ISSUE_BOOK: "Issue Book",
+  EDIT_ISSUE_BOOK: "Make changes in Issue Book",
+  VIEW_STUDENT_BY_SECTION_AND_CLASS: "View Students By Class And Section",
+  VIEW_SECTIONS: "View Sections",
+  VIEW_STUDENT: "Show All Students",
 
 
+  // TimeTable
+  // Common
+  TIMETABLE_VIEW: "Get Teacher Timetable",
 
+  // Other Staff
+  TIMETABLE_CREATE: "Create Timetable", // not working
+  TIMETABLE_UPDATE: "Update Timetable", // not working
+  TIMETABLE_DELETE: "Delete Timetable", // not working
 
+  // Notices
+  // Common
+  ADD_NEW_NOTICE: "Add New Notice",
+  UPDATE_NOTICE: "Update Notice",
+  SHOW_NOTICES: "Show Notices",
+  REMOVE_NOTICE: "Remove Notice",
 
-
+  // Events
+  // Common
+  ADD_NEW_EVENT: "Add New Event",
+  UPDATE_EVENT: "Update Event",
+  SHOW_EVENTS: "Show Events",
+  REMOVE_EVENT: "Remove Event",
 
 
   //-------------------------------------------------------------------------//
@@ -98,21 +112,9 @@ export const PERMISSIONS = {
   // Teacher dashboard
   //GET_TOP_STUDENTS: "Get top students",
   GET_ALL_STUDENTS: "Get All Students",
-  
-  // Managing Notices
-  ADD_NEW_NOTICE: "Add New Notice",
-  UPDATE_NOTICE: "Update Notice",
-  SHOW_NOTICES: "Show Notices",
-  REMOVE_NOTICE: "Remove Notice",
 
-  // Managing Events
-  ADD_NEW_EVENT: "Add New Event",
-  UPDATE_EVENT: "Update Event",
-  SHOW_EVENTS: "Show Events",
-  REMOVE_EVENT: "Remove Event",
 
-  // TimeTable
-  TIMETABLE_VIEW: "Timetable View",
+
 
   // Student View
   GET_ALL_CLASSES: "Get All Classes",
@@ -120,16 +122,16 @@ export const PERMISSIONS = {
 
   //student management
 
-  STUDENT_BOOKISSUE_RECORD:'Get Book Issue Records',
-  GET_STUDENT_ATTENDENCE:'Get Student Attendance',
-  GET_STUDENT_SUBJECTS :'Get Student Subjects',
-  GET_STUDENT_GRADES:'Get Student Grades',
-  GET_STUDENT_INFO:'Get Student Information',
-  GET_COURSE_PROGRESS:'Get Course Progress',
-  GET_PROGRESS_OF_SUBJECT:'Get Course Progress by Subject',
-  GET_STUDENT_TASK:'Get Student Tasks',
-  GET_YEARLY_ATTENDEC:'Get Yearly Attendance',
- 
+  STUDENT_BOOKISSUE_RECORD: 'Get Book Issue Records',
+  GET_STUDENT_ATTENDENCE: 'Get Student Attendance',
+  GET_STUDENT_SUBJECTS: 'Get Student Subjects',
+  GET_STUDENT_GRADES: 'Get Student Grades',
+  GET_STUDENT_INFO: 'Get Student Information',
+  GET_COURSE_PROGRESS: 'Get Course Progress',
+  GET_PROGRESS_OF_SUBJECT: 'Get Course Progress by Subject',
+  GET_STUDENT_TASK: 'Get Student Tasks',
+  GET_YEARLY_ATTENDEC: 'Get Yearly Attendance',
+
   // Student Info
   SHOWS_STUDENT_INFO: "Shows Student Info",
 
@@ -158,7 +160,7 @@ export const PERMISSIONS = {
   // Earnings List
   Community_MODIFY: "Modify Community External Affairs Revenue",
   Facility_MODIFY: "Modify Facility Based Revenue",
- // Facility_MODIFY: "Delete Facility Based Revenue",
+  // Facility_MODIFY: "Delete Facility Based Revenue",
   Financial_MODIFY: "Modify Financial Investment Revenue",
   Service_MODIFY: "Modify Service Based Revenue",
   Other_MODIFY: "Modify Other Revenue",
@@ -223,7 +225,7 @@ export const PERMISSIONS = {
   // Book Management
   ADD_NEW_BOOK: "Add New Book",
   GET_ALL_BOOKS: "Get All Books",
- // REMOVE_BOOK: "Remove Book",
+  // REMOVE_BOOK: "Remove Book",
   EDIT_BOOK_INFORMATION: "Edit Book Information",
   SHOW_BOOK_NAMES: "Show Book Names",
 
