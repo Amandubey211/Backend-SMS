@@ -5,6 +5,8 @@ import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/ad
 import { FiCalendar, FiAlertCircle } from "react-icons/fi";
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from 'react-i18next';
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const TotalAttendanceGraph = () => {
   const { t } = useTranslation('admDashboad');
@@ -123,6 +125,8 @@ const TotalAttendanceGraph = () => {
   const yearLabel = year === currentYear ? t("Current Year") : t("Past Year");
 
   return (
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_GRAPH_STUDENT_ATTENDENCE} 
+    title={t("Attendence")}>
     <div className="bg-white p-4 h-[100%] ">
       <div className="flex justify-between items-center mb-4">
         <div>
@@ -266,6 +270,7 @@ const TotalAttendanceGraph = () => {
         </>
       ) : null}
     </div>
+    </ProtectedSection>
   );
 };
 

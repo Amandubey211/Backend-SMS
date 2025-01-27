@@ -16,18 +16,15 @@ const LibrarianSection = () => {
         {/* Notice Board Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_NOTICE} title={"Notices"}>
               <NoticeBoard descriptionLength={140} />
-            </ProtectedSection>
+         
           </div>
         </div>
 
         {/* Events Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EVENTS} title={"Events"}>
               <Events />
-            </ProtectedSection>
           </div>
         </div>
       </div>
@@ -37,9 +34,7 @@ const LibrarianSection = () => {
         {/* Library Section */}
         <div className="w-full p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.MANAGE_LIBRARY} title={"Library"}>
               <Library />
-            </ProtectedSection>
           </div>
         </div>
       </div>

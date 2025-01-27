@@ -8,6 +8,8 @@ import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png"; // Upd
 import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
 import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const icons = [icon1, icon2];
 
@@ -58,6 +60,8 @@ const NoticeBoard = (descriptionLength) => {
   const topNotices = noticesSort?.slice(0, 3);
 
   return (
+     <ProtectedSection requiredPermission={PERMISSIONS.DASH_VIEW_NOTICE} title={"Notices"}>
+   
     <div className="p-2">
       <div className="flex justify-between p-4 items-center px-6">
         <h2 className="text-xl font-semibold text-gray-600">
@@ -93,6 +97,8 @@ const NoticeBoard = (descriptionLength) => {
         ))
       )}
     </div>
+       
+    </ProtectedSection>
   );
 };
 

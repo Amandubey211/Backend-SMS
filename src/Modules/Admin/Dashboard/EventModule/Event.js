@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
 import { fetchFilteredEvents } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import the action
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const monthNames = [
   "JANUARY",
@@ -81,6 +83,7 @@ const Events = () => {
   const top5Events = events?.slice?.(0, 5) || [];
 
   return (
+    <ProtectedSection requiredPermission={PERMISSIONS.DASH_VIEW_EVENTS} title={t("Events")}>
     <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-medium">{t("Event")}</h2>
@@ -137,6 +140,7 @@ const Events = () => {
         )}
       </div>
     </div>
+    </ProtectedSection>
   );
 };
 
