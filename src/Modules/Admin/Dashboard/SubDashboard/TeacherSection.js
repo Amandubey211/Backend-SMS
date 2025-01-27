@@ -17,14 +17,14 @@ const TeacherSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300 "></div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center ">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_ATTENDANCE}>
+            <ProtectedSection requiredPermission={PERMISSIONS.GET_ATTENDANCE_STATS}>
               <TotalAttendanceGraph />
             </ProtectedSection>
           </div>
         </div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_TOP_RANKING}>
+            <ProtectedSection requiredPermission={PERMISSIONS.GET_TOP_STUDENTS}>
               <TopRankingStudents />
             </ProtectedSection>
           </div>
@@ -37,14 +37,14 @@ const TeacherSection = () => {
         <div className="absolute left-2/5 transform translate-x-1/2 top-0 bottom-0 "></div>
         <div className=" w-[35%]  p-2 h-auto flex items-center justify-center">
           <div className="w-auto h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENTS}>
+            <ProtectedSection requiredPermission={PERMISSIONS.GET_ALL_STUDENTS}>
               <TotalStudentsGraphjs />
             </ProtectedSection>
           </div>
         </div>
         <div className="w-[65%] p-2 h-auto flex items-center justify-center">
           <div className="w-full h-full">
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_LIBRARY}>
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_LIBRARIAN}>
               <Library />
             </ProtectedSection>
           </div>

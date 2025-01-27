@@ -40,6 +40,10 @@ export const PERMISSIONS = {
   VIEW_NOTICE: "View notice",
   VIEW_EVENTS: "View events",
 
+  // Teacher dashboard
+  GET_TOP_STUDENTS: "Get top students",
+  GET_ALL_STUDENTS: "Get All Students",
+  
   // Managing Notices
   ADD_NEW_NOTICE: "Add New Notice",
   UPDATE_NOTICE: "Update Notice",
