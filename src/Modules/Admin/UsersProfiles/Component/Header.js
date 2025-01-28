@@ -9,6 +9,8 @@ import { useSelector } from "react-redux";
 import { CiFilter } from "react-icons/ci";
 import { MdOutlineSort } from "react-icons/md";
 import { Button } from "antd";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 const Header = ({
   title,
   count,
@@ -87,25 +89,28 @@ const Header = ({
               </div>
             )}
 
-            <button
-              onClick={navigateToManageRoles}
-              className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md inline-flex items-center gap-2 hover:opacity-90 transition duration-200"
-            >
-              <FiLock className="text-white" />
-              {t("Manage Roles")}
-            </button>
-
-            <button
-              onClick={handleCreateRole}
-              className="inline-flex items-center border border-gray-300 rounded-full ps-4   bg-white hover:shadow-lg transition duration-200 gap-2"
-            >
-              <span className="text-gray-800 font-medium">
-                {t("Create Role")}
-              </span>
-              <div className="w-11 h-11 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiUserPlus size={20} />
-              </div>
-            </button>
+            <ProtectedAction requiredPermission={PERMISSIONS.GET_ALL_ROLE}>
+              <button
+                onClick={navigateToManageRoles}
+                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md inline-flex items-center gap-2 hover:opacity-90 transition duration-200"
+              >
+                <FiLock className="text-white" />
+                {t("Manage Roles")}
+              </button>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_ROLE}>
+              <button
+                onClick={handleCreateRole}
+                className="inline-flex items-center border border-gray-300 rounded-full ps-4   bg-white hover:shadow-lg transition duration-200 gap-2"
+              >
+                <span className="text-gray-800 font-medium">
+                  {t("Create Role")}
+                </span>
+                <div className="w-11 h-11 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                  <FiUserPlus size={20} />
+                </div>
+              </button>
+            </ProtectedAction>
           </div>
         )}
       </div>

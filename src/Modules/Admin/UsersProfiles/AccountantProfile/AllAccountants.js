@@ -230,7 +230,7 @@ const AllAccountants = () => {
               ? t("Quick View of Accountant")
               : sidebarContent === "createRole"
               ? t("Create New Role")
-              : t("Add/Edit Accountant")}
+              : accountantData ? t("Edit Finance User") : t("Add Finance User")}
           </span>
         }
         width={
