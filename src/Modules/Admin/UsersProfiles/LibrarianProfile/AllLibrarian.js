@@ -21,6 +21,7 @@ import Header from "../Component/Header";
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AllLibrarian = () => {
   const { t } = useTranslation("admAccounts");
@@ -170,53 +171,53 @@ const AllLibrarian = () => {
           </div>
         ) : (
           <ProtectedSection requiredPermission={PERMISSIONS.VIEW_LIBRARIAN} title={"All Librarians"}>
-          <div className="p-4 relative">
-            {/* Reusable Header Component with currentSort and currentFilters */}
-            <Header
-              title={t("All Librarians")}
-              count={librarian?.length || 0}
-              sortOptions={sortOptions}
-              filterOptions={filterOptionsList}
-              department="Librarians"
-              onSortFilterApply={handleSortFilterApply}
-              navigateToManageRoles={navigateToManageRoles}
-              handleCreateRole={handleCreateRole}
-              isAdmin={role === "admin"}
-              currentSort={sortOption} // Pass current sort
-              currentFilters={filterRoles} // Pass current filters
-            />
+            <div className="p-4 relative">
+              {/* Reusable Header Component with currentSort and currentFilters */}
+              <Header
+                title={t("All Librarians")}
+                count={librarian?.length || 0}
+                sortOptions={sortOptions}
+                filterOptions={filterOptionsList}
+                department="Librarians"
+                onSortFilterApply={handleSortFilterApply}
+                navigateToManageRoles={navigateToManageRoles}
+                handleCreateRole={handleCreateRole}
+                isAdmin={role === "admin"}
+                currentSort={sortOption} // Pass current sort
+                currentFilters={filterRoles} // Pass current filters
+              />
 
-            {/* Librarian List */}
-            <div className="flex flex-wrap -mx-2">
-              {sortedLibrarians?.length > 0 ? (
-                sortedLibrarians.map((lib) => (
-                  <ProfileCard
-                    key={lib._id} // Use a unique identifier
-                    profile={lib}
-                    onClick={() => handleLibrarianClick(lib)}
-                    editUser={
-                      role === "admin" ? (event) => editUser(event, lib) : null
-                    }
-                  />
-                ))
-              ) : (
-                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <NoDataFound />
-                </div>
-              )}
-            </div>
+              {/* Librarian List */}
+              <div className="flex flex-wrap -mx-2">
+                {sortedLibrarians?.length > 0 ? (
+                  sortedLibrarians.map((lib) => (
+                    <ProfileCard
+                      key={lib._id} // Use a unique identifier
+                      profile={lib}
+                      onClick={() => handleLibrarianClick(lib)}
+                      editUser={
+                        role === "admin" ? (event) => editUser(event, lib) : null
+                      }
+                    />
+                  ))
+                ) : (
+                  <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <NoDataFound />
+                  </div>
+                )}
+              </div>
 
-            {/* Floating Action Button */}
-            {role === "admin" && (
-              <button
-                onClick={handleAddLibrarianClick}
-                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
-                aria-label="Add New Librarian"
-              >
-                <GoPlus className="text-2xl" />
-              </button>
-            )}
-          </div></ProtectedSection>
+              {/* Floating Action Button */}
+              <ProtectedAction requiredPermission={PERMISSIONS.ADD_LIBRARIAN}>
+                <button
+                  onClick={handleAddLibrarianClick}
+                  className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                  aria-label="Add New Librarian"
+                >
+                  <GoPlus className="text-2xl" />
+                </button>
+              </ProtectedAction>
+            </div></ProtectedSection>
         )}
       </DashLayout>
 
@@ -230,16 +231,16 @@ const AllLibrarian = () => {
             {sidebarContent === "viewLibrarian"
               ? t("Quick View of Librarian")
               : sidebarContent === "createRole"
-              ? t("Create New Role")
-              : t("Add/Edit Librarian")}
+                ? t("Create New Role")
+                : librarianData ? t("Edit Librarian") : t("Add Librarian")}
           </span>
         }
         width={
           sidebarContent === "viewLibrarian"
             ? "30%"
             : sidebarContent === "createRole"
-            ? "60%"
-            : "75%"
+              ? "60%"
+              : "75%"
         }
         height="100%"
       >

@@ -10,17 +10,20 @@ import BookIssueRow from "../Components/BookIssueRow";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../config/permission";
+import { FaBook } from "react-icons/fa"; // Importing relevant icon
 
 const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
-  //useEffect(()=>{dispatch(fetchBooksThunk())},[])
   const { bookIssues, books } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
   const role = useSelector((store) => store.common.auth.role);
+
   useEffect(() => {
-    //  dispatch(fetchBooksThunk())
+    // Optionally fetch books or other data
+    // dispatch(fetchBooksThunk());
   }, []);
+
   const sectionList = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
@@ -32,18 +35,15 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
     status: "",
   });
 
-  // Handle filter change
   const handleIssueFilterChange = (e) => {
     const { name, value } = e.target;
     setLocalFilters((prev) => ({ ...prev, [name]: value }));
 
-    // If the classLevel changes, fetch sections for that class
     if (name === "classLevel" && value) {
-      dispatch(fetchSectionsNamesByClass(value)); // Dispatch the thunk to fetch sections by classId
+      dispatch(fetchSectionsNamesByClass(value));
     }
   };
 
-  // Filter book issues based on class, section, book, and status
   const filteredBookIssues = bookIssues?.filter((issue) => {
     const matchesClass =
       !localFilters.classLevel ||
@@ -74,7 +74,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             options={classList?.map((cls) => ({
               value: cls._id,
               label: cls.className,
-            }))} // Pass value and label
+            }))}
           />
           <FormField
             id="section"
@@ -85,8 +85,8 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             options={sectionList?.map((section) => ({
               value: section._id,
               label: section.sectionName,
-            }))} // Pass value and label
-            disabled={!localFilters.classLevel} // Disable if no class is selected
+            }))}
+            disabled={!localFilters.classLevel}
           />
           <FormField
             id="book"
@@ -97,7 +97,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             options={books?.map((book) => ({
               value: book._id,
               label: book.name,
-            }))} // Pass value and label
+            }))}
           />
           <FormField
             id="status"
@@ -133,7 +133,6 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
               <th className="px-6 py-3">{t("Author")}</th>
               <th className="px-6 py-3">{t("Issue Date")}</th>
               <th className="px-6 py-3">{t("Status")}</th>
-              {/* Conditionally render the Action column */}
               {role !== "teacher" && (
                 <ProtectedAction
                   requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}
@@ -149,15 +148,23 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
                 <BookIssueRow
                   key={issue._id}
                   item={issue}
-                  setEditIssueData={setEditIssueData} // Pass down the function
-                  handleSidebarOpen={handleSidebarOpen} // Open sidebar for editing
-                  role={role} // Pass role to the row component
+                  setEditIssueData={setEditIssueData}
+                  handleSidebarOpen={handleSidebarOpen}
+                  role={role}
                 />
               ))
             ) : (
               <tr>
                 <td colSpan="7" className="h-80">
-                  <NoDataFound message={t("No Book Issues Found")} />
+                  <NoDataFound
+                    title={t("Book Issues")}
+                    desc={t(
+                      "No book issues available. Try adding or adjusting filters."
+                    )}
+                    icon={FaBook} // Library-specific icon
+                    iconColor="text-blue-500"
+                    textColor="text-gray-600"
+                  />
                 </td>
               </tr>
             )}

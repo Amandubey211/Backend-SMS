@@ -6,7 +6,6 @@ import Spinner from "../../../../Components/Common/Spinner";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import TabButton from "../Components/TabButton";
 import {
-  fetchBooksThunk,
   fetchBookIssuesThunk,
   fetchBooksDetailsThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
@@ -120,14 +119,14 @@ const LibraryAndBookIssue = () => {
               {activeTab === "Library" ? (
                 <ProtectedSection
                   requiredPermission={PERMISSIONS.ADD_BOOK}
-                  title={"Add Book"}
+                  title={"Add Library Book"}
                 >
                   <AddBook onClose={handleSidebarClose} />
                 </ProtectedSection>
               ) : (
                 <ProtectedSection
                   requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}
-                  title={"Add Book Issue"}
+                  title={"Add Issue Book"}
                 >
                   <AddIssue
                     editIssueData={editIssueData}

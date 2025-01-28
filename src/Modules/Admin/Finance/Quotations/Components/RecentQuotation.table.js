@@ -164,7 +164,7 @@ const RecentQuotation = () => {
 
 
             </div>
-            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_SUMMARY_OF_QUOTATION}>
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_SUMMARY_OF_QUOTATION} title={"Summary of Quotation"}>
 
                 {/* Loading Indicator */}
                 {loading && (

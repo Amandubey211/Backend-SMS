@@ -33,7 +33,7 @@ const AdjustmentDashboard = () => {
           </ProtectedAction>
 
           {/* Card Section */}
-          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}>
+          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT} title={"Penality & Adjustment Cards"}>
             <CardSection />
           </ProtectedSection>
           <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS}>

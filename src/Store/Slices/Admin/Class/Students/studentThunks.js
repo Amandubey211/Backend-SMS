@@ -38,6 +38,7 @@ export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
       const response = await getData(
         `/admin/all/student/${classId}?say=${say}`
       );
+      console.log(response,"ddddd")
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -53,7 +54,7 @@ export const fetchAllStudents = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/${getRole}/all/students?say=${say}`);
+      const response = await getData(`/admin/all/students?say=${say}`);
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
