@@ -124,7 +124,7 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
               width="40%"
             >
               {item && (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+                <ProtectedSection requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}>
                   <AddIssue
                     editIssueData={item} // Pass the current issue data for editing
                     onClose={handleSidebarClose}

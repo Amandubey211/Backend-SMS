@@ -7,6 +7,7 @@ import { setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice"
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../config/permission";
+import { FaBookOpen } from "react-icons/fa"; // Importing relevant icon
 
 const LibraryTab = ({ handleSidebarOpen }) => {
   const { t } = useTranslation("admLibrary");
@@ -88,7 +89,13 @@ const LibraryTab = ({ handleSidebarOpen }) => {
           </div>
         ) : (
           <div className="flex justify-center items-center min-h-[50vh]">
-            <NoDataFound message={t("No Books Found")} />
+            <NoDataFound
+              title={t("Books")}
+              desc={t("Try adjusting your filters or adding new books.")}
+              icon={FaBookOpen} // Proper icon for library context
+              iconColor="text-blue-500" // Icon color for a friendly UI
+              textColor="text-gray-600"
+            />
           </div>
         )}
       </div>
