@@ -39,7 +39,7 @@ const ReceiptsMain = () => {
 
 
                 {/* Cards Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA} title={"Cards"}>
+                <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA} title={"Receipts Cards"}>
                     <CardsSection />
                 </ProtectedSection>
 

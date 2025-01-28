@@ -68,7 +68,7 @@ const QuotationMain = () => {
                 </div>
 
                 {/* Cards Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_QUOTATION} title={"Cards"}>
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_QUOTATION} title={"Quotation Cards"}>
                     <CardsSection />
                 </ProtectedSection>
 
