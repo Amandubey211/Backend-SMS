@@ -18,6 +18,7 @@ export const ROLES = {
 // 2) Define permissions
 //
 export const PERMISSIONS = {
+
   //-------------------------------------------------------------------------//
   // Dashboard 1
   //common
@@ -26,11 +27,16 @@ export const PERMISSIONS = {
   DASH_VIEW_NOTICE: "view notice",
   DASH_VIEW_EVENTS: "view events",
 
+
   // teacher
   GET_GRAPH_STUDENT_ATTENDENCE: "Get All Student Attendance",
   GET_TOP_STUDENTS: "Get Top Students", // not working
   // finace
   GET_EARNING_EXPENSE_GRAPH: "View Expense and Earning Graph",
+
+
+
+
 
   // LIBARY 2
   //  commom
@@ -42,14 +48,15 @@ export const PERMISSIONS = {
   ADD_BOOK: "Add New Book",
   REMOVE_BOOK: "Remove Book",
   EDIT_BOOK: "Edit Book Information",
-  SHOW_BOOK_NAME: "Show Book Names", //NW
+  SHOW_BOOK_NAME: "Show Book Names",//NW
 
   // Books issue
   ADD_ISSUE_BOOK: "New Issue Book",
   EDIT_ISSUE_BOOK: "Make changes in Issue Book",
-  VIEW_STUDENT_BY_SECTION_AND_CLASS: "View Students By Class And Section", //NW
+  VIEW_STUDENT_BY_SECTION_AND_CLASS: "View Students By Class And Section",//NW
   //  VIEW_SECTIONS:"View Sections",
   VIEW_STUDENT: "Show All Students",
+
 
   // Finance 3
 
@@ -61,7 +68,8 @@ export const PERMISSIONS = {
   // earning-view
   VIEW_ALL_INCOMES: "View All Incomes",
 
-  // add - earning
+
+  // add - earning 
   ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
   ADD_NEW_Facility_REVENUE: "Add new Facility Based Revenue",
   ADD_NEW_Financial_REVENUE: "Add new financial Investment Revenue",
@@ -80,6 +88,7 @@ export const PERMISSIONS = {
   // delete-earning
   Facility_DELETE: "Delete Facility Based Revenue",
 
+
   // Student Fees
   SHOWS_INFO_FOR_STUDENT_FEES: "Shows Info for student Fees",
   SHOWS_GRAPH_FOR_STUDENT_FEES: "Shows Graph for student Fees ",
@@ -88,42 +97,106 @@ export const PERMISSIONS = {
   EDIT_FEES: "Edit Student Fee",
   DELETE_FEES: "Delete Student Fee",
 
+
   // Expense
 
   // Expense
+
   VIEW_EXPENSE_GRAPH: "View Expense graph",
   VIEW_EXPENSE_CARD_DATA: "View Expense Card Data",
   VIEW_SUMMARY_OF_EXPENSES: "View Summary of Expenses",
-  ADD_NEW_EVENT_ACTIVITY_EXPENSE: "Add new event, activity expense",
-  ADD_NEW_EXAM_AFFILIATION_EXPENSE: "Add new exam, affiliation expense",
-  ADD_NEW_LIBRARY_ACADEMIC_EXPENSE: "Add new library, Academic expense",
-  ADD_NEW_MARKETING_AD_EXPENSE: "Add new marketing, Ad. expense",
-  ADD_NEW_MISCELLANEOUS_EXPENSE: "Add new miscellaneous expense",
-  ADD_NEW_SALARY_WAGES_EXPENSE: "Add new salary, Wages expense",
-  ADD_NEW_SOFTWARE_EXPENSE: "Add new software expense",
-  ADD_NEW_SUPPLIES_EXPENSE: "Add new supplies expense",
-  ADD_NEW_UTILITY_MAINTENANCE_EXPENSE: "Add new utility, Maintenance expense",
+
+  ADD_NEW_Event_EXPENSE: "Add new event, activity expense",
+  ADD_NEW_exam_EXPENSE: "Add new exam, affiliation expense",
+  ADD_NEW_Library_EXPENSE: "Add new library, Academic expense",
+  ADD_NEW_Marketing_EXPENSE: "Add new marketing, Ad. expense",
+  ADD_NEW_Miscellaneous_EXPENSE: "Add new miscellaneous expense",
+  ADD_NEW_Salaries_EXPENSE: "Add new salary, Wages expense",
+  ADD_NEW_IT_EXPENSE: "Add new software expense",
+  ADD_NEW_Supplies_EXPENSE: "Add new supplies expense",
+  ADD_NEW_Supplies_EXPENSE: "Add new utility, Maintenance expense",
 
   // Expense List
   VIEW_ALL_EXPENSES: "View All Expenses",
-  EDIT_EVENT_ACTIVITY_EXPENSE: "Edit event, activity expense",
-  REMOVE_EVENT_ACTIVITY_EXPENSE: "Remove event, activity expense",
-  EDIT_LIBRARY_ACADEMIC_EXPENSE: "Edit library, Academic expense",
-  REMOVE_LIBRARY_ACADEMIC_EXPENSE: "Remove library, Academic expense",
-  EDIT_MARKETING_AD_EXPENSE: "Edit marketing, Ad. expense",
-  REMOVE_MARKETING_AD_EXPENSE: "Remove marketing, Ad. expense",
-  EDIT_MISCELLANEOUS_EXPENSE: "Edit miscellaneous expense",
-  REMOVE_MISCELLANEOUS_EXPENSE: "Remove miscellaneous expense",
-  EDIT_SALARY_WAGES_EXPENSE: "Edit salary, Wages expense",
-  REMOVE_SALARY_WAGES_EXPENSE: "Remove salary, Wages expense",
-  EDIT_SOFTWARE_EXPENSE: "Edit software expense",
-  REMOVE_SOFTWARE_EXPENSE: "Remove software expense",
-  EDIT_SUPPLIES_EXPENSE: "Edit supplies expense",
-  REMOVE_SUPPLIES_EXPENSE: "Remove supplies expense",
-  EDIT_UTILITY_MAINTENANCE_EXPENSE: "Edit utility, Maintenance expense",
-  REMOVE_UTILITY_MAINTENANCE_EXPENSE: "Remove utility, Maintenance expense",
 
-  // add - earning
+
+    //edit-expense
+     EDIT_Event_EXPENSE: "Edit event, activity expense",
+     EDIT_Library_EXPENSE: "Edit library, Academic expense",
+     EDIT_Marketing_EXPENSE: "Edit marketing, Ad. expense",
+     EDIT_Miscellaneous_EXPENSE: "Edit miscellaneous expense",
+     EDIT_Salaries_EXPENSE: "Edit salary, Wages expense",
+     EDIT_IT_EXPENSE: "Edit software expense",
+     EDIT_Supplies_EXPENSE: "Edit supplies expense",
+     EDIT_Utilities_EXPENSE: "Edit utility, Maintenance expense",
+     EDIT_Examination_EXPENSE: "Edit Examination and Affiliation", // not in backend
+  
+
+
+    // delete-expense
+    REMOVE_Utilities_EXPENSE: "Remove utility, Maintenance expense",
+    REMOVE_Supplies_EXPENSE: "Remove supplies expense",
+    REMOVE_IT_EXPENSE: "Remove software expense",
+    REMOVE_Salaries_EXPENSE: "Remove salary, Wages expense",
+    REMOVE_Miscellaneous_EXPENSE: "Remove miscellaneous expense",
+    REMOVE_Marketing_EXPENSE: "Remove marketing, Ad. expense",
+    REMOVE_Library_EXPENSE: "Remove library, Academic expense",
+    REMOVE_Event_EXPENSE: "Remove event, activity expense",
+    REMOVE_Examination_EXPENSE: "Remove exam,affiliation expense",
+
+
+               // add - earning 
+             ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
+             ADD_NEW_Facility_REVENUE: "Add new Facility Based Revenue",
+             ADD_NEW_Financial_REVENUE: "Add new Financial Investment Revenue",
+             ADD_NEW_SERVICE_BASED_REVENUE: "Add new Service Based Revenue",
+             ADD_NEW_Other_REVENUE: "Add new Other Revenue", // not in backend
+              
+              // edit-earning
+             Community_MODIFY: "Modify Community External Affairs Revenue",
+             Facility_MODIFY: "Modify Facility Based Revenue",
+             Financial_MODIFY: "Modify Financial Investment Revenue",
+             Service_MODIFY: "Modify Service Based Revenue",
+             Other_MODIFY: "Modify Other Revenue",
+             LIST_ALL_REVENUE: "List all Revenue",
+          
+
+             // delete-earning
+             Facility_DELETE: "Delete Facility Based Revenue",
+            
+
+              //Invoices 
+              SHOWS_RECENT_AND_RETURN_INVOICE: "Shows recent and return invoice",
+              SHOWS_CARD_DATA_OF_INVOICE: "Shows card data of invoice",
+              CANCEL_INVOICE: "Cancel Invoice",
+              CREATE_NEW_INVOICE: "Create new Invoice",
+              RETURN_INVOICE: "Return Invoice",
+              COMPLETE_INVOICE: "Complete Invoice", // not in backend
+
+               // receipt
+               SHOWS_RECEIPT_CARD_DATA: "Shows receipt card data",
+               CREATE_NEW_RECEIPT: "Create new receipt",
+               SHOWS_ALL_RECEIPTS: "Shows all receipts",
+               VIEW_RECENT_RECEIPTS: "View recent receipts",
+               VIEW_EXPENSE_CARD_DATA: "Shows receipt card data",
+               CANCEL_RECEIPTS: "Cancel receipt",
+
+               //quotation
+               CREATE_NEW_QUOTATION: "Create new quotation",
+              LIST_ALL_QUOTATION: "List all quotation",
+              SHOWS_CARD_DATA_OF_QUOTATION: "Shows card data of quotation",
+               SHOWS_SUMMARY_OF_QUOTATION: "Shows summary of quotation",
+               CANCEL_QUOTATION: "Cancel quotation",
+               ACCEPT_QUOTATION: "Accept quotation",
+               REJECT_QUOTATION: "Accept quotation", // not in backend
+
+               SHOWS_ALL_ADJUSTMENTS: "Shows all adjustments",
+               CREATE_NEW_ADJUSTMENT: "Create new adjustment",
+               SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT: "Shows card data of penalty and adjustment",
+                CANCEL_PENALTY: "Cancel penalty",
+
+
+  // add - earning 
   ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
   ADD_NEW_Facility_REVENUE: "Add new Facility Based Revenue",
   ADD_NEW_Financial_REVENUE: "Add new Financial Investment Revenue",
@@ -141,6 +214,11 @@ export const PERMISSIONS = {
 
   // delete-earning
   Facility_DELETE: "Delete Facility Based Revenue",
+
+
+
+
+
 
   // TimeTable 4
   // Common
@@ -165,8 +243,40 @@ export const PERMISSIONS = {
   SHOW_EVENTS: "Show Events",
   REMOVE_EVENT: "Remove Event",
 
+  // USERS STAFFS 7
+    // teacher
+    VIEW_TEACHER: "view Teacher",
+    ADD_TEACHER: "Add Teacher",
+
+    // other staff
+    VIEW_STAFF: "view Staff",
+    ADD_STAFF: "Add Staff",
+
+    //librarian
+    VIEW_LIBRARIAN: "view Librarian",
+    ADD_LIBRARIAN: "Add Librarian",
+
+    //finance
+    VIEW_FINANCE_USER: "view Finance",
+    ADD_FINANCE: "Add Finance",
+  
+  
+  
+// ---------------------------------------------------------------
+  // ROLE MANAGEMENT PERMISSIONS (NEW) 8
+  // ---------------------------------------------------------------
+
+  // Common Role Management 
+  CREATE_ROLE: "Create Role",
+  EDIT_ROLE: "Edit Role",
+  GET_ALL_ROLE: "Get All Role",
+  ASSIGN_ROLE: "Assign Role",
+  REMOVE_ROLE: "Remove Role",
+
+  
+ // Classes 9
 //------------------------start of Class Variables ---------------------------------------------------------------------------------
-// Classes 
+
   
   // =========================
   // Announcements Management
@@ -390,26 +500,18 @@ export const PERMISSIONS = {
   STUDENT_SUBJECTS_GRADE: "Get Student Subjects",
   //------------------------------------------------End of Class Variables ---------------------------------------------------------
 
+  
+
+
   //-------------------------------------------------------------------------//
 
   // Receipt Permissions
-  CREATE_NEW_RECEIPT: "Create new receipt",
-  SHOWS_ALL_RECEIPTS: "Shows all receipts",
-  VIEW_RECENT_RECEIPTS: "View recent receipts",
+  
 
   // Quotation Permissions
-  CREATE_NEW_QUOTATION: "Create new quotation",
-  LIST_ALL_QUOTATION: "List all quotation",
-  SHOWS_CARD_DATA_OF_QUOTATION: "Shows card data of quotation",
-  SHOWS_SUMMARY_OF_QUOTATION: "Shows summary of quotation",
+  
 
-  // Adjustments Permissions
-  CREATE_NEW_ADJUSTMENT: "Create new adjustment",
-  LIST_ALL_ADJUSTMENTS: "List all adjustments",
-  SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT:
-    "Shows card data of penalty and adjustment",
-  SHOWS_SUMMARY_OF_RETURN_INVOICE: "Shows summary of return invoice",
-
+ 
   // Dashboard
   GET_DASHBOARD_DATA: "Get dashboard data",
   VIEW_NOTICE: "View notice",
@@ -419,21 +521,24 @@ export const PERMISSIONS = {
   //GET_TOP_STUDENTS: "Get top students",
   GET_ALL_STUDENTS: "Get All Students",
 
+
+
+
   // Student View
   GET_ALL_CLASSES: "Get All Classes",
   SHOW_ALL_STUDENTS: "Show All Students",
 
   //student management
 
-  STUDENT_BOOKISSUE_RECORD: "Get Book Issue Records",
-  GET_STUDENT_ATTENDENCE: "Get Student Attendance",
-  GET_STUDENT_SUBJECTS: "Get Student Subjects",
-  GET_STUDENT_GRADES: "Get Student Grades",
-  GET_STUDENT_INFO: "Get Student Information",
-  GET_COURSE_PROGRESS: "Get Course Progress",
-  GET_PROGRESS_OF_SUBJECT: "Get Course Progress by Subject",
-  GET_STUDENT_TASK: "Get Student Tasks",
-  GET_YEARLY_ATTENDEC: "Get Yearly Attendance",
+  STUDENT_BOOKISSUE_RECORD: 'Get Book Issue Records',
+  GET_STUDENT_ATTENDENCE: 'Get Student Attendance',
+  GET_STUDENT_SUBJECTS: 'Get Student Subjects',
+  GET_STUDENT_GRADES: 'Get Student Grades',
+  GET_STUDENT_INFO: 'Get Student Information',
+  GET_COURSE_PROGRESS: 'Get Course Progress',
+  GET_PROGRESS_OF_SUBJECT: 'Get Course Progress by Subject',
+  GET_STUDENT_TASK: 'Get Student Tasks',
+  GET_YEARLY_ATTENDEC: 'Get Yearly Attendance',
 
   // Student Info
   SHOWS_STUDENT_INFO: "Shows Student Info",
@@ -444,29 +549,27 @@ export const PERMISSIONS = {
   SHOWS_PARENT_STUDENT_INFO: "Shows Student Info",
 
   // Teacher View
-  VIEW_TEACHER: "View Teacher",
-  VIEW_LIBRARIAN: "Get All Staff",
+  
+  
 
   // Staff View
-  VIEW_STAFF: "Get All Staff",
-  VIEW_FINANCE_USER: "Get All Staff",
+  
+  
 
   // Student Fees
 
+
+
+
   // Invoice
-  SHOWS_RECENT_AND_RETURN_INVOICE: "Shows recent and return invoice",
-  SHOWS_CARD_DATA_OF_INVOICE: "Shows card data of invoice",
-  CANCEL_INVOICE: "Cancel Invoice",
-  RETURN_INVOICE: "Return Invoice",
-  COMPLETE_INVOICE: "Complete Invoice",
+  
 
   // Receipt
-  SHOWS_RECEIPT_CARD_DATA: "Shows receipt card data",
+
   CANCEL_RECEIPT: "Cancel receipt",
 
   // Penalty and Adjustment
-  SHOWS_ALL_ADJUSTMENTS: "Shows all adjustments",
-  CANCEL_PENALTY: "Cancel penalty",
+  
 
   // Book Management
   ADD_NEW_BOOK: "Add New Book",
@@ -496,38 +599,10 @@ export const PERMISSIONS = {
   GET_QUIZ_BY_ID: "Get Quiz by ID",
   ASSIGN_QUIZ_GRADE: "Assign Quiz Grade",
 
-  // ---------------------------------------------------------------
-  // ROLE MANAGEMENT PERMISSIONS (NEW)
-  // ---------------------------------------------------------------
 
-  // Librarian Role Management
-  LIBRARIAN_CREATE_ROLE: "Create Role",
-  LIBRARIAN_EDIT_ROLE: "Edit Role",
-  LIBRARIAN_GET_ALL_ROLE: "Get All Role",
-  LIBRARIAN_ASSIGN_ROLE: "Assign Role",
-  LIBRARIAN_REMOVE_NOTICE: "Remove Notice",
 
-  // Teacher Role Management
-  TEACHER_CREATE_ROLE: "Create Role",
-  TEACHER_EDIT_ROLE: "Edit Role",
-  TEACHER_GET_ALL_ROLE: "Get All Role",
-  TEACHER_ASSIGN_ROLE: "Assign Role",
-  TEACHER_REMOVE_NOTICE: "Remove Notice",
+  
 
-  // OtherStaff Role Management
-  OTHERSTAFF_CREATE_ROLE: "Create Role",
-  OTHERSTAFF_EDIT_ROLE: "Edit Role",
-  OTHERSTAFF_GET_ALL_ROLE: "Get All Role",
-  OTHERSTAFF_ASSIGN_ROLE: "Assign Role",
-  OTHERSTAFF_REMOVE_NOTICE: "Remove Notice",
 
-  // Finance Role Management
-  FINANCE_CREATE_ROLE: "Create Role",
-  FINANCE_EDIT_ROLE: "Edit Role",
-  FINANCE_GET_ALL_ROLE: "Get All Role",
-  FINANCE_ASSIGN_ROLE: "Assign Role",
-  FINANCE_REMOVE_NOTICE: "Remove Notice",
-
-  //---------------------------------------------------------------------------------
 
 };

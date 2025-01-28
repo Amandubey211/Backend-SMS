@@ -367,7 +367,7 @@ const AddExpenses = () => {
           {({ isSubmitting, setFieldValue, values }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
-              {readOnly && (
+              {/* {readOnly && (
                 <div className="flex justify-between items-center bg-yellow-100 text-yellow-700 p-2 rounded-md text-sm">
                   <span>
                     Currently in read-only mode. You cannot edit these fields.
@@ -381,7 +381,7 @@ const AddExpenses = () => {
                     Edit
                   </Button>
                 </div>
-              )}
+              )} */}
 
               {/* Error Message */}
               {/* {error && showError && (

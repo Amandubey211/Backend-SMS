@@ -3,6 +3,8 @@
 import React, { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoIosArrowForward } from "react-icons/io";
+import { PERMISSIONS } from "../../../../../../config/permission";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const DropdownCard = ({
   label,
@@ -90,6 +92,7 @@ const DropdownCard = ({
             aria-labelledby={`label-${id}`}
           >
             {options?.map((item, index) => (
+            <ProtectedAction requiredPermission={PERMISSIONS[`ADD_NEW_${item?.split(/[\s-]/)[0]}_EXPENSE`]}>
               <li
                 key={index}
                 className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
@@ -108,6 +111,7 @@ const DropdownCard = ({
               >
                 {item}
               </li>
+              </ProtectedAction>
             ))}
           </motion.ul>
         )}

@@ -402,7 +402,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           </div>
 
           <div className="flex items-center space-x-4">
-            <ProtectedAction requiredPermission={PERMISSIONS.EXPORT_RECEIPT_DATA}>
+          
               <button
                 className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
                 onClick={() => setExportModalOpen(true)}
@@ -410,7 +410,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
                 <ExportOutlined className="text-sm" /> {/* Export Icon */}
                 <span>Export</span> {/* Button text */}
               </button>
-            </ProtectedAction>
+         
 
             <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT} >
               <button
@@ -429,18 +429,11 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           <div style={{ textAlign: "center", padding: "16px" }}>
             <Spinner />
           </div>
-        ) : error ? (
-          <div
-            style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
-          >
-            <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-            <p>Unable to fetch the receipts.</p>
-          </div>
-        ) : (
+        )  : (
           // Render Table and Custom Pagination
           <>
             {/* Table */}
-            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS} title={"Receipts List"}>
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS} title={"Receipts List"}>
               <Table
                 rowKey={(record) => record._id}
                 columns={columns}

@@ -264,7 +264,7 @@ export const fetchTeachingStaff = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`${getRole}/teachingStaff`);
+      const response = await getData(`admin/teachingStaff`);
 
       if (response?.success) {
         return response.data; // Assuming data is the array of teaching staff
@@ -281,7 +281,7 @@ export const fetchNonTeachingStaff = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/${getRole}/nonTeachingStaff`);
+      const response = await getData(`/admin/nonTeachingStaff`);
 
       if (response?.success) {
         return response.data; // Assuming data is the array of non-teaching staff

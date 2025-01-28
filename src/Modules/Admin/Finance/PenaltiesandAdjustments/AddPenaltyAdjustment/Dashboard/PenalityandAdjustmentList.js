@@ -293,10 +293,12 @@ const PenalityandAdjustmentList = () => {
           {
             key: "3",
             label: (
+              <ProtectedSection requiredPermission={PERMISSIONS.CANCEL_PENALTY}>
               <span>
                 <CloseCircleOutlined style={{ marginRight: 8 }} />
                 {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
-              </span>
+              </span>          
+                  </ProtectedSection>
             ),
             onClick: () => {
               if (record?.status !== "Cancelled") handleCancleReturnInvoice(record?.key);
@@ -409,7 +411,7 @@ const PenalityandAdjustmentList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
-              <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS}>
+              
                 <Button
                   type="primary"
                   icon={<ExportOutlined />}
@@ -418,7 +420,7 @@ const PenalityandAdjustmentList = () => {
                 >
                   Export
                 </Button>
-              </ProtectedAction>
+            
 
               <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
                 <button
@@ -443,19 +445,10 @@ const PenalityandAdjustmentList = () => {
               <Spin tip="Loading..." />
             </div>
           )}
-          {/* Error Message */}
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-            />
-          )}
+
           {/* Table */}
           {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
               <Table
                 dataSource={dataSource}
                 columns={columns}
