@@ -74,7 +74,7 @@ const sidebarData = [
         title: "Manage Role",
         icon: <MdOutlineManageAccounts />,
         path: "/users/manage-roles",
-        roles: [ROLES.ADMIN],
+        roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.FINANCE, ROLES.LIBRARIAN, ROLES.STAFF],
         //requiredPermission: PERMISSIONS.MANAGE_ROLES, // Added permission reference
       },
 
@@ -82,7 +82,7 @@ const sidebarData = [
         title: "Teacher",
         icon: <FaChalkboardTeacher />,
         path: "/users/teachers",
-        roles: [ROLES.ADMIN, ROLES.FINANCE, ROLES.LIBRARIAN, ROLES.STAFF],
+        roles: [ROLES.ADMIN, ROLES.FINANCE, ROLES.LIBRARIAN, ROLES.TEACHER],
         //requiredPermission: PERMISSIONS.VIEW_TEACHERS, // Added permission reference
       },
       {
@@ -105,7 +105,6 @@ const sidebarData = [
         path: "/users/staffs",
         roles: [
           ROLES.ADMIN,
-          ROLES.TEACHER,
           ROLES.FINANCE,
           ROLES.LIBRARIAN,
           ROLES.STAFF,

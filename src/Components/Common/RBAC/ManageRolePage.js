@@ -19,6 +19,15 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 const ManageRolePage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
+
+  // Grab the user’s role from Redux
+  // userType can be "admin", "teacher", "finance", "librarian", "otherstaff", etc.
+  // -----------------------------------------------------------------------------//
+  // ADDED:
+  const userType = useSelector((state) => state.common.auth.role);
+  const userTypeNormalized = userType?.toLowerCase() || "";
+  // -----------------------------------------------------------------------------//
+
   const { roles, permissions, loading, error } = useSelector(
     (state) => state.admin.rbac
   );
@@ -34,7 +43,7 @@ const ManageRolePage = () => {
     );
   }, [roles]);
 
-  // Extract department names from permissions, ensuring consistent casing
+  // Original list of all department-permission objects
   const permissionDepartments = useMemo(() => {
     if (!permissions || !Array.isArray(permissions)) return [];
     return permissions.map((dept) => ({
@@ -43,6 +52,21 @@ const ManageRolePage = () => {
     }));
   }, [permissions]);
 
+  // Filter out permissions if user is NOT admin; only show userType’s department
+  // -----------------------------------------------------------------------------//
+  // ADDED:
+  const filteredPermissionDepartments = useMemo(() => {
+    if (!permissionDepartments.length) return [];
+    if (userTypeNormalized === "admin") {
+      return permissionDepartments; // Admin sees everything
+    }
+    // For teacher, finance, librarian, otherstaff, etc.
+    return permissionDepartments.filter(
+      (deptObj) => deptObj.department === userTypeNormalized
+    );
+  }, [permissionDepartments, userTypeNormalized]);
+  // -----------------------------------------------------------------------------//
+
   const departmentNames = permissionDepartments.map((d) => d.department);
 
   // Pre-fill from location.state if available
@@ -50,6 +74,7 @@ const ManageRolePage = () => {
   const initialRole = location.state?.role || "";
   const initialEditMode = location.state?.editMode || false;
 
+  // Local states
   const [department, setDepartment] = useState(
     initialDepartment ? initialDepartment.toLowerCase() : ""
   );
@@ -58,7 +83,7 @@ const ManageRolePage = () => {
   const [originalPermissions, setOriginalPermissions] = useState([]);
   const [description, setDescription] = useState("");
   const [isEditMode, setIsEditMode] = useState(initialEditMode);
-  const [isAlertEnabled, setIsAlertEnabled] = useState(false); // Corrected setter
+  const [isAlertEnabled, setIsAlertEnabled] = useState(false);
 
   // Delete confirmation modal
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -74,10 +99,21 @@ const ManageRolePage = () => {
     dispatch(getPermissionsThunk());
   }, [dispatch]);
 
+  // If user is not admin, force the department dropdown to match their userType
+  // so they can’t manually switch to another department.
+  // -----------------------------------------------------------------------------//
+  // ADDED:
+  useEffect(() => {
+    if (userTypeNormalized !== "admin") {
+      setDepartment(userTypeNormalized);
+    }
+  }, [userTypeNormalized]);
+  // -----------------------------------------------------------------------------//
+
   // Filter roles based on selected department
   const filteredRoles = useMemo(() => {
-    if (!department) return availableRoles;
-    return availableRoles.filter((role) => role.department === department);
+    if (!department) return availableRoles; // or show none if you want
+    return availableRoles.filter((r) => r.department === department);
   }, [availableRoles, department]);
 
   // Find the selected role object
@@ -91,7 +127,7 @@ const ManageRolePage = () => {
       setSelectedPermissions(selectedRoleObj.permission || []);
       setOriginalPermissions(selectedRoleObj.permission || []);
       setDescription(selectedRoleObj.description || "");
-      setIsAlertEnabled(false); // Reset alert toggle on role change
+      setIsAlertEnabled(false);
     } else {
       setSelectedPermissions([]);
       setOriginalPermissions([]);
@@ -105,15 +141,16 @@ const ManageRolePage = () => {
     setIsAlertEnabled((prev) => !prev);
   };
 
-  // Compute all route IDs from the displayed departments for select-all logic
+  // Compute all route IDs from the displayed departments for "select all"
   const allDisplayedRouteIds = useMemo(() => {
-    return permissionDepartments
+    return filteredPermissionDepartments
       .filter((deptObj) => !department || deptObj.department === department)
       .flatMap((deptObj) =>
         deptObj.groups.flatMap((groupObj) => groupObj.routes.map((r) => r._id))
       );
-  }, [permissionDepartments, department]);
+  }, [filteredPermissionDepartments, department]);
 
+  // Keeps the "select all" checkbox in sync (checked, unchecked, or indeterminate)
   useEffect(() => {
     const selectAllCheckbox = document.querySelector("#select-all-checkbox");
     if (!selectAllCheckbox) return;
@@ -184,11 +221,9 @@ const ManageRolePage = () => {
         description: description,
       };
 
-      await dispatch(
-        editRoleThunk({ roleId: selectedRoleObj.id, updates })
-      ).unwrap();
+      await dispatch(editRoleThunk({ roleId: selectedRoleObj.id, updates })).unwrap();
       toast.success("Permissions successfully updated!");
-      setOriginalPermissions(selectedPermissions); // Now current permissions are saved
+      setOriginalPermissions(selectedPermissions);
     } catch (err) {
       console.error("Error updating permissions:", err);
       toast.error("Failed to update permissions");
@@ -223,11 +258,9 @@ const ManageRolePage = () => {
 
   const handleEditClick = () => {
     if (isEditMode) {
-      // Create sorted copies to avoid mutating the original arrays
+      // Compare sorted arrays to detect unsaved changes
       const sortedSelectedPermissions = [...selectedPermissions].sort();
       const sortedOriginalPermissions = [...originalPermissions].sort();
-
-      // Check for unsaved changes
       const changesUnsaved =
         JSON.stringify(sortedSelectedPermissions) !==
           JSON.stringify(sortedOriginalPermissions) ||
@@ -240,7 +273,6 @@ const ManageRolePage = () => {
         if (!confirmLeave) {
           return; // User canceled
         } else {
-          // Discard changes
           setSelectedPermissions(originalPermissions);
           setDescription(selectedRoleObj?.description || "");
           setIsAlertEnabled(false);
@@ -254,15 +286,12 @@ const ManageRolePage = () => {
 
   const handleDepartmentChange = (selectedDepartment) => {
     setDepartment(selectedDepartment.toLowerCase());
-    setRole(""); // Reset role when department changes
+    setRole("");
     setSelectedPermissions([]);
     setOriginalPermissions([]);
     setDescription("");
     setIsAlertEnabled(false);
   };
-
-  // Determine if operations should be disabled
-  const isOperationDisabled = loading || (!isEditMode && selectedRoleObj);
 
   return (
     <Layout title="Manage Roles | Student Diwan">
@@ -274,11 +303,12 @@ const ManageRolePage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
+            {/* HEADER */}
             <div className="flex justify-between bg-gray-50 items-center mb-4 px-4 py-3 rounded-t-lg">
               <h2 className="text-lg font-bold">Manage Role Permissions</h2>
               <div className="flex items-center gap-4">
                 <button
-                  className={`hover:text-gray-500 relative`}
+                  className="hover:text-gray-500 relative"
                   onClick={handleEditClick}
                   aria-label="Toggle edit mode"
                 >
@@ -304,7 +334,7 @@ const ManageRolePage = () => {
               </div>
             </div>
 
-            {/* Department, Role, Description Inputs */}
+            {/* DEPARTMENT / ROLE / DESCRIPTION */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
                 <label
@@ -319,6 +349,8 @@ const ManageRolePage = () => {
                   onChange={(e) => handleDepartmentChange(e.target.value)}
                   className="w-full px-3 py-2 border capitalize border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
                   aria-label="Select Department"
+                  // Disable department selection if user isn’t admin
+                  disabled={userTypeNormalized !== "admin"}
                 >
                   <option value="">All Departments</option>
                   {departmentNames.map((dept) => (
@@ -375,7 +407,7 @@ const ManageRolePage = () => {
               </div>
             </div>
 
-            {/* Permissions Section */}
+            {/* PERMISSIONS LIST */}
             <div className="mb-6">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-2">
@@ -405,9 +437,7 @@ const ManageRolePage = () => {
                         ? "bg-gradient-to-r from-pink-500 to-purple-500"
                         : ""
                     } ${
-                      !isEditMode
-                        ? "opacity-50 cursor-not-allowed"
-                        : "cursor-pointer"
+                      !isEditMode ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
                     }`}
                     aria-label="Toggle user alerts"
                     tabIndex={!isEditMode ? -1 : 0}
@@ -435,13 +465,14 @@ const ManageRolePage = () => {
                       transition={{ duration: 0.2 }}
                       className="space-y-4"
                     >
-                      {permissionDepartments.length === 0 && department && (
+                      {/* Replace permissionDepartments with filteredPermissionDepartments */}
+                      {filteredPermissionDepartments.length === 0 && department && (
                         <div className="text-sm text-gray-500">
                           No Permission Or Department Found.
                         </div>
                       )}
 
-                      {permissionDepartments
+                      {filteredPermissionDepartments
                         .filter(
                           (deptObj) =>
                             !department || deptObj.department === department
@@ -453,8 +484,8 @@ const ManageRolePage = () => {
                                 deptObj.department.slice(1)}
                             </h4>
                             {deptObj.groups.map((groupObj) => {
-                              const allGroupSelected = groupObj.routes.every(
-                                (r) => selectedPermissions.includes(r._id)
+                              const allGroupSelected = groupObj.routes.every((r) =>
+                                selectedPermissions.includes(r._id)
                               );
                               const someSelected =
                                 !allGroupSelected &&
@@ -497,15 +528,13 @@ const ManageRolePage = () => {
                                     {groupObj.routes.map((route) => (
                                       <label
                                         key={route._id}
-                                        className={`inline-flex items-center space-x-2`}
+                                        className="inline-flex items-center space-x-2"
                                         aria-label={`Permission: ${route.name}`}
                                       >
                                         <input
                                           type="checkbox"
                                           className="form-checkbox text-purple-500"
-                                          checked={selectedPermissions.includes(
-                                            route._id
-                                          )}
+                                          checked={selectedPermissions.includes(route._id)}
                                           onChange={(e) =>
                                             handleRouteChange(
                                               route._id,
@@ -514,9 +543,7 @@ const ManageRolePage = () => {
                                           }
                                           disabled={!isEditMode}
                                         />
-                                        <span className="text-sm">
-                                          {route.name}
-                                        </span>
+                                        <span className="text-sm">{route.name}</span>
                                       </label>
                                     ))}
                                   </div>
@@ -531,14 +558,13 @@ const ManageRolePage = () => {
               )}
             </div>
 
+            {/* SAVE BUTTON */}
             <div className="flex justify-end">
               <button
                 onClick={handleSetPermissions}
                 className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-500 text-white rounded-lg hover:opacity-90 disabled:cursor-not-allowed"
                 aria-label="Set Permissions"
-                disabled={
-                  !isEditMode || isSettingPermissions || !selectedRoleObj
-                }
+                disabled={!isEditMode || isSettingPermissions || !selectedRoleObj}
               >
                 {isSettingPermissions ? "Saving..." : "Set Permissions"}
               </button>
