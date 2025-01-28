@@ -274,6 +274,233 @@ export const PERMISSIONS = {
   REMOVE_ROLE: "Remove Role",
 
   
+ // Classes 9
+//------------------------start of Class Variables ---------------------------------------------------------------------------------
+
+  
+  // =========================
+  // Announcements Management
+  // =========================
+  ADD_NEW_ANNOUNCEMENT: "Add New Announcement",
+  EDIT_ANNOUNCEMENT: "Edit Announcement",
+  DELETE_ANNOUNCEMENT: "Delete Announcement",
+  ALL_ANNOUNCEMENTS: "Get All Announcements",
+  ANNOUNCEMENT_BY_ID: "Get Announcement by ID",
+  MARK_ANNOUNCEMENT_AS_READ: "Mark Announcement as Read",
+
+  // ==================================
+  // Announcement Comments Management
+  // ==================================
+  CREATE_COMMENT_ON_ANNOUNCEMENT: "Create Comment on Announcement",
+  EDIT_COMMENT_ON_ANNOUNCEMENT: "Edit Comment on Announcement",
+  DELETE_COMMENT_ON_ANNOUNCEMENT: "Delete Comment on Announcement",
+  COMMENTS_BY_ANNOUNCEMENT: "Get Comments by Announcement",
+  LIKE_COMMENT_ON_ANNOUNCEMENT: "Like Comment on Announcement",
+  MARK_COMMENT_AS_READ: "Mark Comment as Read",
+
+  // ========================
+  // Assignments Management
+  // ========================
+  CREATE_ASSIGNMENT: "Create Assignment",
+  UPDATE_ASSIGNMENT: "Update Assignment",
+  DELETE_ASSIGNMENT: "Delete Assignment",
+  ASSIGNMENT_BY_ID: "Get Assignment by ID",
+  FILTERED_ASSIGNMENTS: "Get Filtered Assignments",
+
+  // ========================
+  // Speed Grade Management
+  // ========================
+  SUBMITTED_ASSIGNMENT_OF_A_STUDENT: "Get Submitted Assignment of a Student",
+  ASSIGN_GRADE_FOR_ALL_STUDENTS: "Assign Grade for All Students",
+  ASSIGNMENT_OF_A_STUDENT: "Get Assignment of a Student",
+  ASSIGN_GRADE_TO_A_STUDENT: "Assign Grade to a Student",
+  ASSIGNED_STUDENTS_FOR_AN_ASSIGNMENT:
+    "Get Assigned Students for an Assignment",
+
+  // =======================
+  // Discussions Management
+  // =======================
+  CREATE_DISCUSSION: "Create Discussion",
+  UPDATE_DISCUSSION: "Update Discussion",
+  DELETE_DISCUSSION: "Delete Discussion",
+  ALL_DISCUSSIONS: "Get All Discussions",
+  DISCUSSION_BY_ID: "Get Discussion by ID",
+  UPDATE_PIN_STATUS_OF_DISCUSSION: "Update Pin Status of Discussion",
+  MARK_DISCUSSION_AS_READ: "Mark Discussion as Read",
+
+  // =================================
+  // Discussion Comments Management
+  // =================================
+  CREATE_COMMENT_ON_DISCUSSION: "Create Comment on Discussion",
+  EDIT_COMMENT_ON_DISCUSSION: "Edit Comment on Discussion",
+  DELETE_COMMENT_ON_DISCUSSION: "Delete Comment on Discussion",
+  LIKE_A_DISCUSSION_COMMENT: "Like a Discussion Comment",
+  MARK_DISCUSSION_COMMENT_AS_READ: "Mark Discussion Comment as Read",
+  COMMENTS_BY_DISCUSSION: "Get Comments by Discussion",
+
+  // ====================
+  // Grades Management
+  // ====================
+  GRADES_OF_ONE_CLASS: "Get Grades of One Class",
+  MODULES_FOR_A_STUDENT: "Get Modules for a Student",
+  FILTERED_ASSIGNMENTS_GRADES: "Get Filtered Assignments",
+  FILTERED_QUIZZES: "Get Filtered Quizzes",
+  GRADES_OF_ONE_STUDENT: "Get Grades of One Student",
+
+  // =====================
+  // Modules Management
+  // =====================
+  MODULES_FOR_A_STUDENT_MODULES: "Get Modules for a Student",
+  ADD_MODULE: "Add Module",
+  REORDER_MODULES: "Reorder Modules",
+  EDIT_MODULE: "Edit Module",
+  DELETE_MODULE: "Delete Module",
+
+  // ======================
+  // Chapters Management
+  // ======================
+  ADD_CHAPTER: "Add Chapter",
+  REORDER_CHAPTERS: "Reorder Chapters",
+  EDIT_CHAPTER: "Edit Chapter",
+  DELETE_CHAPTER: "Delete Chapter",
+  UPLOAD_CHAPTER_FILES: "Upload Chapter Files",
+  REMOVE_CHAPTER_FILES: "Remove Chapter Files",
+
+  // ===================
+  // Pages Management
+  // ===================
+  CREATE_PAGE: "Create Page",
+  ALL_PAGES_FOR_A_CLASS: "Get All Pages for a Class",
+  UPDATE_PAGE: "Update Page",
+  PAGE_DETAILS: "Get Page Details",
+  DELETE_PAGE: "Delete Page",
+
+  // ===================
+  // Quiz Management
+  // ===================
+  CREATE_QUIZ: "Create Quiz",
+  UPDATE_QUIZ: "Update Quiz",
+  ADD_QUESTION_TO_QUIZ: "Add Question to Quiz",
+  DELETE_QUIZ: "Delete Quiz",
+  QUIZ_BY_ID: "Get Quiz by ID",
+  FILTERED_QUIZZES_BY_SUBJECT: "Get Filtered Quizzes by Subject",
+  UPDATE_QUESTION_IN_QUIZ: "Update Question in Quiz",
+  DELETE_QUESTION_FROM_QUIZ: "Delete Question from Quiz",
+
+  // ===============
+  // speedGrade
+  // ===============
+  ASSIGN_QUIZ_GRADE: "Assign Quiz Grade",
+  QUIZ_ASSIGNED_STUDENTS: "Get Quiz Assigned Students",
+  QUIZ_OF_A_STUDENT: "Get Quiz of a Student",
+
+  // ===================
+  // Rubric Management
+  // ===================
+  RUBRIC_BY_SUBJECT_ID: "Get Rubric by Subject ID",
+  ASSIGNMENTS_FOR_RUBRIC: "Get Assignments for Rubric",
+  QUIZZES_FOR_RUBRIC: "Get Quizzes for Rubric",
+  CREATE_RUBRIC: "Create Rubric",
+  CREATE_QUIZ_RUBRIC: "Create Quiz Rubric",
+  RUBRIC_DETAILS: "Get Rubric Details",
+  DELETE_RUBRIC: "Delete Rubric",
+  UPDATE_RUBRIC: "Update Rubric",
+
+  // =====================
+  // Syllabus Management
+  // =====================
+  CREATE_SYLLABUS: "Create Syllabus",
+  EDIT_SYLLABUS: "Edit Syllabus",
+  SYLLABUS: "Get Syllabus",
+  DELETE_SYLLABUS: "Delete Syllabus",
+
+  // =======================
+  // Attendance Management
+  // =======================
+  ATTENDANCE_STATS: "Get Attendance Stats",
+  SECTION_BY_CLASS_ATTENDANCE: "Get Section by Class",
+  GROUP_BY_CLASS: "Get Group by Class",
+  STUDENT_MONTHLY_ATTENDANCE_LIST: "Get Student Monthly Attendance List",
+  STUDENT_LIST_FOR_ATTENDANCE: "Get Student List for Attendance",
+  MARK_ATTENDANCE: "Mark Attendance",
+  YEARLY_ATTENDANCE_FOR_STUDENT: "Get Yearly Attendance for Student",
+
+  // ===================
+  // Class Management
+  // ===================
+  ALL_CLASSES: "Get All Classes",
+  SPECIFIC_CLASS: "Get Specific Class",
+
+  // =======================
+  // Dashboard Management
+  // =======================
+  ALL_STUDENT_ATTENDANCE: "Get All Student Attendance",
+  TOP_STUDENTS: "Get Top Students",
+  VIEW_BOOKS: "view books",
+  VIEW_NOTICE: "view notice",
+  VIEW_EVENTS: "view events",
+  DASHBOARD_DATA: "get dashboard data",
+
+  // ======================
+  // Instructor Management
+  // ======================
+  ALL_TEACHERS: "Get All Teachers",
+  SUBJECTS_BY_CLASS: "Get Subjects by Class",
+  TEACHERS_BY_CLASS: "Get Teachers by Class",
+  SECTION_BY_INSTRUCTOR: "Get Section by Instructor",
+
+  // ======================
+  // Library Management
+  // ======================
+  ALL_BOOKS: "Get All Books",
+  ALL_ISSUED_BOOKS: "Get All Issued Books",
+
+  // =========
+  // Notices
+  // =========
+  SHOW_NOTICES: "Show Notices",
+  ADD_NEW_NOTICE: "Add New Notice",
+  UPDATE_NOTICE: "Update Notice",
+  REMOVE_NOTICE: "Remove Notice",
+
+  // =======
+  // Events
+  // =======
+  ADD_NEW_EVENT: "Add New Event",
+  UPDATE_EVENT: "Update Event",
+  SHOW_EVENTS: "Show Events",
+  REMOVE_EVENT: "Remove Event",
+
+  // =====================
+  // Section Management
+  // =====================
+  STUDENTS_BY_CLASS_AND_SECTION: "Get Students by Class and Section",
+  UNASSIGNED_STUDENTS: "Get Unassigned Students",
+  SECTION_BY_CLASS: "Get Section by Class",
+  GROUP_BY_CLASS_SECTION: "Get Group by Class",
+  ASSIGN_STUDENT_TO_SECTION: "Assign Student to Section",
+  GROUP_BY_SECTION: "Get Group by Section",
+
+  // ==========================
+  // Section Grade Management
+  // ==========================
+  GRADES_OF_ONE_STUDENT_SECTION: "Get Grades of One Student",
+  STUDENT_SUBJECTS: "Get Student Subjects",
+
+  // ======================
+  // Student Management
+  // ======================
+  SECTION_BY_CLASS_STUDENT: "Get Section by Class",
+  STUDENTS_BY_CLASS_AND_SECTION_STUDENT: "Get Students by Class and Section",
+
+  // ====================
+  // Grade Management
+  // ====================
+  GRADES_OF_ONE_STUDENT_GRADE: "Get Grades of One Student",
+  STUDENT_SUBJECTS_GRADE: "Get Student Subjects",
+  //------------------------------------------------End of Class Variables ---------------------------------------------------------
+
+  
 
 
   //-------------------------------------------------------------------------//
