@@ -21,6 +21,7 @@ import Header from "../Component/Header";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -168,53 +169,53 @@ const AllAccountants = () => {
           </div>
         ) : (
           <ProtectedSection requiredPermission={PERMISSIONS} title={"All Accountants"}>
-          <div className="p-4 relative">
-            {/* Reusable Header Component with currentSort and currentFilters */}
-            <Header
-              title={t("All Finance")}
-              count={finance?.length || 0}
-              sortOptions={sortOptions}
-              filterOptions={filterOptionsList}
-              department="Finance"
-              onSortFilterApply={handleSortFilterApply}
-              navigateToManageRoles={navigateToManageRoles}
-              handleCreateRole={handleCreateRole}
-              isAdmin={role === "admin"}
-              currentSort={sortOption} // Pass current sort
-              currentFilters={filterRoles} // Pass current filters
-            />
+            <div className="p-4 relative">
+              {/* Reusable Header Component with currentSort and currentFilters */}
+              <Header
+                title={t("All Finance")}
+                count={finance?.length || 0}
+                sortOptions={sortOptions}
+                filterOptions={filterOptionsList}
+                department="Finance"
+                onSortFilterApply={handleSortFilterApply}
+                navigateToManageRoles={navigateToManageRoles}
+                handleCreateRole={handleCreateRole}
+                isAdmin={role === "admin"}
+                currentSort={sortOption} // Pass current sort
+                currentFilters={filterRoles} // Pass current filters
+              />
 
-            {/* Accountant List */}
-            <div className="flex flex-wrap -mx-2">
-              {sortedAccountants?.length > 0 ? (
-                sortedAccountants.map((acc) => (
-                  <ProfileCard
-                    key={acc._id} // Use a unique identifier
-                    profile={acc}
-                    onClick={() => handleAccountantClick(acc)}
-                    editUser={
-                      role === "admin" ? (event) => editUser(event, acc) : null
-                    }
-                  />
-                ))
-              ) : (
-                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <NoDataFound />
-                </div>
-              )}
+              {/* Accountant List */}
+              <div className="flex flex-wrap -mx-2">
+                {sortedAccountants?.length > 0 ? (
+                  sortedAccountants.map((acc) => (
+                    <ProfileCard
+                      key={acc._id} // Use a unique identifier
+                      profile={acc}
+                      onClick={() => handleAccountantClick(acc)}
+                      editUser={
+                        role === "admin" ? (event) => editUser(event, acc) : null
+                      }
+                    />
+                  ))
+                ) : (
+                  <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <NoDataFound />
+                  </div>
+                )}
+              </div>
+
+              {/* Floating Action Button */}
+              <ProtectedAction requiredPermission={PERMISSIONS.ADD_FINANCE}>
+                <button
+                  onClick={handleAddAccountantClick}
+                  className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                  aria-label="Add New Accountant"
+                >
+                  <GoPlus className="text-2xl" />
+                </button>
+              </ProtectedAction>
             </div>
-
-            {/* Floating Action Button */}
-            {role === "admin" && (
-              <button
-                onClick={handleAddAccountantClick}
-                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
-                aria-label="Add New Accountant"
-              >
-                <GoPlus className="text-2xl" />
-              </button>
-            )}
-          </div>
           </ProtectedSection>
         )}
       </DashLayout>
@@ -229,16 +230,16 @@ const AllAccountants = () => {
             {sidebarContent === "viewAccountant"
               ? t("Quick View of Accountant")
               : sidebarContent === "createRole"
-              ? t("Create New Role")
-              : accountantData ? t("Edit Finance User") : t("Add Finance User")}
+                ? t("Create New Role")
+                : accountantData ? t("Edit Finance User") : t("Add Finance User")}
           </span>
         }
         width={
           sidebarContent === "viewAccountant"
             ? "30%"
             : sidebarContent === "createRole"
-            ? "60%"
-            : "75%"
+              ? "60%"
+              : "75%"
         }
         height="100%"
       >

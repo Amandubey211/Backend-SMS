@@ -21,6 +21,7 @@ import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunk
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
@@ -168,55 +169,55 @@ const AllStaff = () => {
           </div>
         ) : (
           <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STAFF} title={"Staff"}>
-          <div className="p-4 relative">
-            {/* Reusable Header Component with currentSort and currentFilters */}
-            <Header
-              title={t("All Staff")}
-              count={staff?.length || 0}
-              sortOptions={sortOptions}
-              filterOptions={filterOptionsList}
-              department="Staff"
-              onSortFilterApply={handleSortFilterApply}
-              navigateToManageRoles={navigateToManageRoles}
-              handleCreateRole={handleCreateRole}
-              isAdmin={role === "admin"}
-              currentSort={sortOption} // Pass current sort
-              currentFilters={filterRoles} // Pass current filters
-            />
+            <div className="p-4 relative">
+              {/* Reusable Header Component with currentSort and currentFilters */}
+              <Header
+                title={t("All Staff")}
+                count={staff?.length || 0}
+                sortOptions={sortOptions}
+                filterOptions={filterOptionsList}
+                department="Staff"
+                onSortFilterApply={handleSortFilterApply}
+                navigateToManageRoles={navigateToManageRoles}
+                handleCreateRole={handleCreateRole}
+                isAdmin={role === "admin"}
+                currentSort={sortOption} // Pass current sort
+                currentFilters={filterRoles} // Pass current filters
+              />
 
-            {/* Staff List */}
-            <div className="flex flex-wrap -mx-2">
-              {sortedStaff?.length > 0 ? (
-                sortedStaff.map((member) => (
-                  <ProfileCard
-                    key={member._id} // Use a unique identifier
-                    profile={member}
-                    onClick={() => handleStaffClick(member)}
-                    editUser={
-                      role === "admin"
-                        ? (event) => editUser(event, member)
-                        : null
-                    }
-                  />
-                ))
-              ) : (
-                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <NoDataFound />
-                </div>
-              )}
-            </div>
+              {/* Staff List */}
+              <div className="flex flex-wrap -mx-2">
+                {sortedStaff?.length > 0 ? (
+                  sortedStaff.map((member) => (
+                    <ProfileCard
+                      key={member._id} // Use a unique identifier
+                      profile={member}
+                      onClick={() => handleStaffClick(member)}
+                      editUser={
+                        role === "admin"
+                          ? (event) => editUser(event, member)
+                          : null
+                      }
+                    />
+                  ))
+                ) : (
+                  <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <NoDataFound />
+                  </div>
+                )}
+              </div>
 
-            {/* Floating Action Button */}
-            {role === "admin" && (
-              <button
-                onClick={handleAddStaffClick}
-                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
-                aria-label="Add New Staff"
-              >
-                <GoPlus className="text-2xl" />
-              </button>
-            )}
-          </div></ProtectedSection>
+              {/* Floating Action Button */}
+              <ProtectedAction requiredPermission={PERMISSIONS.ADD_STAFF}>
+                <button
+                  onClick={handleAddStaffClick}
+                  className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                  aria-label="Add New Staff"
+                >
+                  <GoPlus className="text-2xl" />
+                </button>
+              </ProtectedAction>
+            </div></ProtectedSection>
         )}
       </DashLayout>
 
@@ -230,16 +231,16 @@ const AllStaff = () => {
             {sidebarContent === "viewStaff"
               ? t("Quick View of Staff")
               : sidebarContent === "createRole"
-              ? t("Create New Role")
-              : staffData ? t("Edit Staff") : t("Add Staff")}
+                ? t("Create New Role")
+                : staffData ? t("Edit Staff") : t("Add Staff")}
           </span>
         }
         width={
           sidebarContent === "viewStaff"
             ? "30%"
             : sidebarContent === "createRole"
-            ? "60%"
-            : "75%"
+              ? "60%"
+              : "75%"
         }
         height="100%"
       >
