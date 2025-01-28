@@ -231,7 +231,7 @@ const AllLibrarian = () => {
               ? t("Quick View of Librarian")
               : sidebarContent === "createRole"
               ? t("Create New Role")
-              : t("Add/Edit Librarian")}
+              : librarianData ? t("Edit Librarian") : t("Add Librarian")}
           </span>
         }
         width={

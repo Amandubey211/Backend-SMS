@@ -16,9 +16,11 @@ import {
 } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import { motion } from "framer-motion";
 import { toast } from "react-hot-toast";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const AddUser = ({ role, data }) => {
-  console.log(data, "jjjjjjjj");
+
   const dispatch = useDispatch();
   const { roles } = useSelector((store) => store.admin.rbac);
   const { loading, error } = useSelector((store) => store.admin.all_staff);
@@ -92,8 +94,8 @@ const AddUser = ({ role, data }) => {
       const existingRoleNames = Array.isArray(data.position)
         ? data.position
         : data.position
-        ? [data.position]
-        : [];
+          ? [data.position]
+          : [];
 
       const initialSelectedRoles =
         roles
@@ -564,83 +566,84 @@ const AddUser = ({ role, data }) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.5 }}
           >
-            <h2 className="text-xl font-semibold border-b pb-4">
-              Role Assignment
-            </h2>
-            <p className="text-base text-gray-600">
-              You can select multiple roles by clicking on them below.
-            </p>
-            <div className="relative">
-              <button
-                type="button"
-                onClick={toggleRoleDropdown}
-                className="w-full bg-white border border-gray-300 rounded-md px-4 py-3 text-left flex justify-between items-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                aria-haspopup="listbox"
-                aria-expanded={isRoleDropdownOpen}
-              >
-                <span>Select Roles</span>
-                <FaChevronDown />
-              </button>
-              {isRoleDropdownOpen && (
-                <div
-                  id="role-dropdown"
-                  className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-auto"
-                  role="listbox"
-                  aria-label="Available Roles"
+            <ProtectedSection requiredPermission={PERMISSIONS.ASSIGN_ROLE}>
+              <h2 className="text-xl font-semibold border-b pb-4">
+                Role Assignment
+              </h2>
+              <p className="text-base text-gray-600">
+                You can select multiple roles by clicking on them below.
+              </p>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={toggleRoleDropdown}
+                  className="w-full bg-white border border-gray-300 rounded-md px-4 py-3 text-left flex justify-between items-center hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  aria-haspopup="listbox"
+                  aria-expanded={isRoleDropdownOpen}
                 >
-                  {roles?.flatMap((dept) => dept.roles)?.length === 0 ? (
-                    <div className="text-center p-4">
-                      <FaUsersSlash className="text-3xl text-gray-400 mx-auto" />
-                      <p className="text-base text-gray-500">
-                        No roles available.
-                      </p>
-                    </div>
-                  ) : (
-                    roles
-                      ?.flatMap((dept) => dept.roles)
-                      ?.map((roleItem) => (
-                        <button
-                          key={roleItem.id}
-                          type="button"
-                          onClick={() => handleRoleSelect(roleItem)}
-                          className={`block w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-base ${
-                            selectedRoles.some((r) => r.id === roleItem.id)
+                  <span>Select Roles</span>
+                  <FaChevronDown />
+                </button>
+                {isRoleDropdownOpen && (
+                  <div
+                    id="role-dropdown"
+                    className="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-md shadow-lg max-h-80 overflow-auto"
+                    role="listbox"
+                    aria-label="Available Roles"
+                  >
+                    {roles?.flatMap((dept) => dept.roles)?.length === 0 ? (
+                      <div className="text-center p-4">
+                        <FaUsersSlash className="text-3xl text-gray-400 mx-auto" />
+                        <p className="text-base text-gray-500">
+                          No roles available.
+                        </p>
+                      </div>
+                    ) : (
+                      roles
+                        ?.flatMap((dept) => dept.roles)
+                        ?.map((roleItem) => (
+                          <button
+                            key={roleItem.id}
+                            type="button"
+                            onClick={() => handleRoleSelect(roleItem)}
+                            className={`block w-full text-left px-4 py-3 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none text-base ${selectedRoles.some((r) => r.id === roleItem.id)
                               ? "bg-gray-200"
                               : ""
-                          }`}
-                          role="option"
-                          aria-selected={selectedRoles.some(
-                            (r) => r.id === roleItem.id
-                          )}
-                        >
-                          {roleItem.name}
-                        </button>
-                      ))
-                  )}
+                              }`}
+                            role="option"
+                            aria-selected={selectedRoles.some(
+                              (r) => r.id === roleItem.id
+                            )}
+                          >
+                            {roleItem.name}
+                          </button>
+                        ))
+                    )}
+                  </div>
+                )}
+              </div>
+              {/* Display Selected Roles */}
+              {selectedRoles?.length > 0 && (
+                <div className="flex flex-wrap gap-3 mt-4">
+                  {selectedRoles.map((roleItem) => (
+                    <motion.div
+                      key={roleItem.id}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="flex items-center bg-pink-100 text-pink-800 px-4 py-2 rounded-full text-base"
+                    >
+                      {roleItem.name}
+                      <FiX
+                        className="ml-3 cursor-pointer hover:text-red-500"
+                        onClick={() => handleRoleRemove(roleItem.id)}
+                        aria-label={`Remove ${roleItem.name}`}
+                      />
+                    </motion.div>
+                  ))}
                 </div>
               )}
-            </div>
-            {/* Display Selected Roles */}
-            {selectedRoles?.length > 0 && (
-              <div className="flex flex-wrap gap-3 mt-4">
-                {selectedRoles.map((roleItem) => (
-                  <motion.div
-                    key={roleItem.id}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    className="flex items-center bg-pink-100 text-pink-800 px-4 py-2 rounded-full text-base"
-                  >
-                    {roleItem.name}
-                    <FiX
-                      className="ml-3 cursor-pointer hover:text-red-500"
-                      onClick={() => handleRoleRemove(roleItem.id)}
-                      aria-label={`Remove ${roleItem.name}`}
-                    />
-                  </motion.div>
-                ))}
-              </div>
-            )}
+            </ProtectedSection>
           </motion.div>
         )}
 
@@ -657,11 +660,10 @@ const AddUser = ({ role, data }) => {
               disabled={loading}
               whileHover={!loading ? { scale: 1.05 } : {}}
               whileTap={!loading ? { scale: 0.95 } : {}}
-              className={`${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-              } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
+              className={`${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
               aria-label="Update User"
             >
               {loading ? (
@@ -676,11 +678,10 @@ const AddUser = ({ role, data }) => {
               disabled={loading}
               whileHover={!loading ? { scale: 1.05 } : {}}
               whileTap={!loading ? { scale: 0.95 } : {}}
-              className={`${
-                loading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
-              } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
+              className={`${loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
+                } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
               aria-label="Add New User"
             >
               {loading ? (

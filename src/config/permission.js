@@ -302,31 +302,13 @@ export const PERMISSIONS = {
   // ROLE MANAGEMENT PERMISSIONS (NEW)
   // ---------------------------------------------------------------
 
-  // Librarian Role Management
-  LIBRARIAN_CREATE_ROLE: "Create Role", 
-  LIBRARIAN_EDIT_ROLE: "Edit Role", 
-  LIBRARIAN_GET_ALL_ROLE: "Get All Role", 
-  LIBRARIAN_ASSIGN_ROLE: "Assign Role", 
-  LIBRARIAN_REMOVE_NOTICE: "Remove Notice",
+  // Common Role Management 
+  CREATE_ROLE: "Create Role", 
+  EDIT_ROLE: "Edit Role", 
+  GET_ALL_ROLE: "Get All Role", 
+  ASSIGN_ROLE: "Assign Role", 
+  REMOVE_ROLE: "Remove Role",
 
-  // Teacher Role Management
-  TEACHER_CREATE_ROLE: "Create Role",
-  TEACHER_EDIT_ROLE: "Edit Role",
-  TEACHER_GET_ALL_ROLE: "Get All Role",
-  TEACHER_ASSIGN_ROLE: "Assign Role",
-  TEACHER_REMOVE_NOTICE: "Remove Notice",
+  
 
-  // OtherStaff Role Management
-  OTHERSTAFF_CREATE_ROLE: "Create Role",
-  OTHERSTAFF_EDIT_ROLE: "Edit Role",
-  OTHERSTAFF_GET_ALL_ROLE: "Get All Role",
-  OTHERSTAFF_ASSIGN_ROLE: "Assign Role",
-  OTHERSTAFF_REMOVE_NOTICE: "Remove Notice",
-
-  // Finance Role Management
-  FINANCE_CREATE_ROLE: "Create Role",
-  FINANCE_EDIT_ROLE: "Edit Role",
-  FINANCE_GET_ALL_ROLE: "Get All Role",
-  FINANCE_ASSIGN_ROLE: "Assign Role",
-  FINANCE_REMOVE_NOTICE: "Remove Notice",
 };

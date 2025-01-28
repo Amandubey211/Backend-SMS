@@ -231,7 +231,7 @@ const AllStaff = () => {
               ? t("Quick View of Staff")
               : sidebarContent === "createRole"
               ? t("Create New Role")
-              : t("Add/Edit Staff")}
+              : staffData ? t("Edit Staff") : t("Add Staff")}
           </span>
         }
         width={

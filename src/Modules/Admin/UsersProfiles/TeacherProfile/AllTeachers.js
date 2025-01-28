@@ -216,6 +216,7 @@ const AllTeachers = () => {
       </DashLayout>
 
       {/* Sidebar */}
+
       <SidebarSlide
         key={sidebarContent}
         isOpen={isSidebarOpen}
@@ -226,7 +227,7 @@ const AllTeachers = () => {
               ? t("Quick View of Teacher")
               : sidebarContent === "createRole"
               ? t("Create New Role")
-              : t("Add/Edit Teacher")}
+              : teacherData ? t("Edit Teacher") : t("Add Teacher")}
           </span>
         }
         width={sidebarContent === "viewTeacher" ? "30%" : "75%"}
