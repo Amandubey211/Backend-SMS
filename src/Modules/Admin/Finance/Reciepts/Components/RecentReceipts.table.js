@@ -316,7 +316,7 @@ const RecentReceipts = () => {
 
         </div>
       </div>
-      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS}>
+      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS} title={"Recent Receipts"}>
         {/* Loading Indicator */}
         {fetching || loading ? (
           <div style={{ textAlign: "center", padding: "16px" }}>
