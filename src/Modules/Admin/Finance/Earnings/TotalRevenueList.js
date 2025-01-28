@@ -224,6 +224,7 @@ const TotalRevenueList = () => {
               />
             </Tooltip>
             </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS[`${record?.category?.categoryName?.split(/[\s-]/)[0]}_DELETE`]}>
             <Tooltip title="Delete">
               <Button
                 type="link"
@@ -241,6 +242,7 @@ const TotalRevenueList = () => {
                 aria-label="Delete"
               />
             </Tooltip>
+            </ProtectedAction>
           </>
         )}
       </div>

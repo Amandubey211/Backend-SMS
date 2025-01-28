@@ -39,12 +39,13 @@ const ReceiptsMain = () => {
 
 
                 {/* Cards Section */}
-                <ProtectedSection requiredPermission={PERMISSIONS.VIEW_EXPENSE_CARD_DATA} title={"Cards"}>
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_RECEIPT_CARD_DATA} title={"Cards"}>
                     <CardsSection />
                 </ProtectedSection>
-
+                <ProtectedSection requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS} title={"list"}>
                 {/* Recent Receipts */}
-                    <RecentReceipts />
+                <RecentReceipts />
+            </ProtectedSection>
             </div>
         </AdminDashLayout >
     );

@@ -52,12 +52,12 @@ const StaffSelect = ({
 
   // Fetch staff data on component mount or when staffType changes
   useEffect(() => {
-    if (staffType === "non-teaching" && nonTeachingStaff.length === 0) {
+    if (staffType === "non-teaching" && nonTeachingStaff?.length === 0) {
       dispatch(fetchNonTeachingStaff());
-    } else if (staffType === "teaching" && teachingStaff.length === 0) {
+    } else if (staffType === "teaching" && teachingStaff?.length === 0) {
       dispatch(fetchTeachingStaff());
     }
-  }, [dispatch, staffType, teachingStaff.length, nonTeachingStaff.length]);
+  }, [dispatch, staffType, teachingStaff?.length, nonTeachingStaff?.length]);
 
   // Handle selection change
   const handleChange = (selectedId) => {
@@ -104,7 +104,7 @@ const StaffSelect = ({
     const parts = text.split(regex);
     return (
       <>
-        {parts.map((part, index) =>
+        {parts?.map((part, index) =>
           regex.test(part) ? (
             <span
               key={index}
@@ -163,7 +163,7 @@ const StaffSelect = ({
             justifyContent: "flex-end",
           }}
         >
-          {staff.role.map((role, index) => (
+          {staff?.role?.map((role, index) => (
             <Tag
               color="blue"
               key={index}
@@ -215,7 +215,7 @@ const StaffSelect = ({
           staffType === "non-teaching" ? "Non-Teaching" : "Teaching"
         } Staff Select`}
       >
-        {filteredStaff.map((staff) => (
+        {filteredStaff?.map((staff) => (
           <Option key={staff._id} value={staff._id}>
             {renderOptionContent(staff)}
           </Option>

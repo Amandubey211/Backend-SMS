@@ -322,14 +322,7 @@ const RecentReceipts = () => {
           <div style={{ textAlign: "center", padding: "16px" }}>
             <Spinner />
           </div>
-        ) : error ? (
-          <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
-            <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-            <p>Unable to fetch the receipts.</p>
-          </div>
-        ) : (
-          // The Receipts Table with Custom No Data
-
+        )  : (
 
           <Table
             rowKey={(record) => record._id}

@@ -223,7 +223,7 @@ const RecentQuotationList = () => {
               key="2"
               onClick={() => {
                 const quotationToView = quotationIdMap[record.key];
-                console.log("THis is Quotation View: ", quotationToView);
+           
                 if (quotationToView) {
                   dispatch(setReadOnly(true)); // Set readOnly to true for viewing
                   dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected quotation to Redux for view mode
@@ -235,18 +235,22 @@ const RecentQuotationList = () => {
             >
               <EyeOutlined style={{ marginRight: 8 }} /> View(Read-only)
             </Menu.Item>
+            <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>    
             <Menu.Item
               key="3"
               onClick={() => handleStatusChange(record.key, "accept")}
             >
               <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
             </Menu.Item>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
             <Menu.Item
               key="4"
               onClick={() => handleStatusChange(record.key, "reject")}
             >
               <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
             </Menu.Item>
+            </ProtectedAction>
             {/* 4) Send Mail */}
             <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
               <MailOutlined style={{ marginRight: 8 }} /> Send Mail
@@ -369,16 +373,6 @@ const RecentQuotationList = () => {
             <div className="flex justify-center">
               <Spin tip="Loading..." />
             </div>
-          )}
-          {/* Error Message */}
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-            />
           )}
           {/* Table */}
           {!loading && !error && (
