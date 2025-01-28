@@ -172,16 +172,6 @@ const RecentQuotation = () => {
                         <Spinner tip="Loading..." />
                     </div>
                 )}
-                {/* Error Message */}
-                {error && (
-                    <Alert
-                        message="Error"
-                        description={error}
-                        type="error"
-                        showIcon
-                        closable
-                    />
-                )}
                 {/* No Data Placeholder */}
                 {/* {!loading && quotations.length === 0 && !error && (
                 <div className="text-center text-gray-500 text-xs py-4">

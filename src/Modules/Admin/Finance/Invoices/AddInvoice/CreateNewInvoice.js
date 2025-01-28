@@ -10,6 +10,7 @@ import TextInput from "./Components/TextInput";
 import SelectInput from "./Components/SelectInput";
 import { TotalInputs } from "./TotalInputs";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const CreateNewInvoice = () => {
   const [loading, setLoading] = useState(false);
@@ -103,7 +104,7 @@ const CreateNewInvoice = () => {
   return (
     <Layout title="Finance | Invoice">
       <AdminDashLayout>
-      <ProtectedSection requiredPermission="addInvoice">
+      <ProtectedSection requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
         <div className="p-6 min-h-screen">
           <Formik
             initialValues={initialValues}

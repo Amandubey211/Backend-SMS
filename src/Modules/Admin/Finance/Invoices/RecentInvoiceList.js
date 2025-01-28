@@ -56,6 +56,7 @@ import { MdOutlineDone } from "react-icons/md";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 import { downloadPDF } from "../../../../Utils/xl";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -199,7 +200,7 @@ const RecentInvoiceList = () => {
               </Menu.Item>
 
               {/* Return */}
-              <ProtectedSection requiredPermission={PERMISSIONS.RETURN_INVOICE}>
+              <ProtectedAction requiredPermission={PERMISSIONS.RETURN_INVOICE}>
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
                   icon={<RedoOutlined />}
@@ -211,7 +212,7 @@ const RecentInvoiceList = () => {
                   Return
                 </Menu.Item>
               )}
-              </ProtectedSection>
+              </ProtectedAction>
               {record.isReturn && (
                 <Menu.Item icon={<RedoOutlined />} disabled>
                   Return
@@ -224,7 +225,7 @@ const RecentInvoiceList = () => {
                   Canceled
                 </Menu.Item>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.CANCEL_INVOICE}>
+                <ProtectedAction requiredPermission={PERMISSIONS.CANCEL_INVOICE}>
                 <Menu.Item
                   icon={<CloseCircleOutlined />}
                   onClick={() => {
@@ -240,11 +241,9 @@ const RecentInvoiceList = () => {
                 >
                   Cancel
                 </Menu.Item>
-                </ProtectedSection>
+                </ProtectedAction>
               )}
-              <ProtectedSection requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
-
-              
+              <ProtectedAction requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
               {!record.isCancel && !record.isReturn && !record.isCompleted ?
 
                 <Menu.Item
@@ -254,7 +253,7 @@ const RecentInvoiceList = () => {
                   Complete
                 </Menu.Item> : null
               }
-              </ProtectedSection>
+              </ProtectedAction>
               {!record.isCancel && !record.isReturn && record.isCompleted ?
                 <Menu.Item
                   icon={<MdOutlineDone />}
@@ -334,7 +333,7 @@ const RecentInvoiceList = () => {
   return (
     <Layout title="Finance | Invoice">
       <AdminLayout>
-        <ProtectedSection requiredPermission="invoiceList">
+        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_RECENT_AND_RETURN_INVOICE}>
           <div className="p-4 bg-white rounded-lg ">
             <div className="p-1 bg-white rounded-lg">
               {/* Filters and Buttons Section */}

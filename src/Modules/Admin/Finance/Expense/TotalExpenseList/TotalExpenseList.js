@@ -44,6 +44,7 @@ import DeleteModal from "../../Earnings/Components/DeleteModal";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../config/permission";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const TotalExpenseList = () => {
   useNavHeading("Finance", "Expense List");
@@ -172,6 +173,7 @@ const TotalExpenseList = () => {
           aria-label="View"
         />
       </Tooltip>
+      <ProtectedAction requiredPermission={PERMISSIONS[`EDIT_${record?.category?.categoryName?.split(/[\s-]/)[0]}_EXPENSE`]}>
       <Tooltip title="Edit">
         <Button
           type="link"
@@ -181,6 +183,9 @@ const TotalExpenseList = () => {
           aria-label="Edit"
         />
       </Tooltip>
+      </ProtectedAction>
+      <ProtectedAction requiredPermission={PERMISSIONS[`REMOVE_${record?.category?.categoryName?.split(/[\s-]/)[0]}_EXPENSE`]}>
+      
       <Tooltip title="Delete">
         <Button
           type="link"
@@ -190,6 +195,7 @@ const TotalExpenseList = () => {
           aria-label="Delete"
         />
       </Tooltip>
+      </ProtectedAction>
     </div>
   );
 

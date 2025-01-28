@@ -36,11 +36,9 @@ const AdjustmentDashboard = () => {
           <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT} title={"Penality & Adjustment Cards"}>
             <CardSection />
           </ProtectedSection>
-
-          {/* Summary Section */}
+          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS}>
           <SummaryPenalityandAdjustment />
-
-
+          </ProtectedSection>
         </div>
 
       </AdminDashLayout>
