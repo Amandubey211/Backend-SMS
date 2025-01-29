@@ -14,6 +14,7 @@ import {
   setSelectedSubjectName,
 } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 import { useTranslation } from "react-i18next";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const SubjectCard = ({
   data,
@@ -42,20 +43,24 @@ const SubjectCard = ({
     >
       {role === "admin" && (
         <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={() => onEdit(data)}
-            className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-            aria-label={t("Edit")}
-          >
-            <MdOutlineModeEdit className="text-green-800 bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
-          </button>
-          <button
-            className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-            onClick={() => setIsModalOpen(true)}
-            aria-label={t("Delete")}
-          >
-            <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
-          </button>
+          <ProtectedAction>
+            <button
+              onClick={() => onEdit(data)}
+              className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+              aria-label={t("Edit")}
+            >
+              <MdOutlineModeEdit className="text-green-800 bg-green-50 p-1 text-3xl rounded-full cursor-pointer" />
+            </button>
+          </ProtectedAction>
+          <ProtectedAction>
+            <button
+              className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+              onClick={() => setIsModalOpen(true)}
+              aria-label={t("Delete")}
+            >
+              <RiDeleteBin6Line className="text-red-800 bg-red-50 p-1 text-3xl rounded-full cursor-pointer" />
+            </button>
+          </ProtectedAction>
         </div>
       )}
 

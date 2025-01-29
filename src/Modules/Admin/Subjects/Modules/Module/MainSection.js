@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import { FaBookOpen } from "react-icons/fa";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
@@ -173,7 +174,9 @@ const MainSection = () => {
                       : t("Select a Module")}
                   </h1>
                   {selectedModule?.name && (
-                    <ProtectedAction requiredPermission="dd">
+                    <ProtectedAction
+                      requiredPermission={PERMISSIONS.ADD_CHAPTER}
+                    >
                       <button
                         onClick={openAddChapter}
                         className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
