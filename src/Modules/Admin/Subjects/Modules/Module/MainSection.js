@@ -146,7 +146,10 @@ const MainSection = () => {
   return (
     <div className="flex min-h-screen h-full w-full ">
       <SubjectSideBar />
-      <ProtectedSection requiredPermission="dd" title="Module">
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.MODULES_FOR_A_STUDENT_MODULES}
+        title="Module"
+      >
         <div className="flex">
           {/* Main Module/Chapter Section */}
           <div className="w-[60%] bg-white p-2">
@@ -246,7 +249,7 @@ const MainSection = () => {
 
           {/* Floating Add Module Button */}
           <div className="relative">
-            <ProtectedAction requiredPermission="dd">
+            <ProtectedAction requiredPermission={PERMISSIONS.ADD_MODULE}>
               <button
                 onClick={openAddModule}
                 className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"

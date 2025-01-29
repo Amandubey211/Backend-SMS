@@ -25,6 +25,7 @@ import toast from "react-hot-toast";
 import { deleteAttachmentThunk } from "../../../../../../Store/Slices/Admin/Class/Module/attachmentThunk";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const Chapter = ({ onEdit, chapterNumber, chapter }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -175,7 +176,9 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
           </div>
         </div>
         <div className="flex items-center space-x-2 relative">
-          <ProtectedAction requiredPermission="add attachment">
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.UPLOAD_CHAPTER_FILES}
+          >
             <div className="relative">
               <button
                 className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
@@ -210,7 +213,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
               aria-label="Options Menu"
             >
               <ul>
-                <ProtectedAction requiredPermission="edit chapter">
+                <ProtectedAction requiredPermission={PERMISSIONS.EDIT_CHAPTER}>
                   <li
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={(e) => {
@@ -223,7 +226,9 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                     <FaPen className="mr-2" /> Edit
                   </li>
                 </ProtectedAction>
-                <ProtectedAction requiredPermission="delete chapter">
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS.DELETE_CHAPTER}
+                >
                   <li
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={(e) => {
@@ -252,7 +257,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
       {/* Chapter Content */}
       {chapterExpanded && (
-        <ProtectedSection title="Chapters" requiredPermission="view Chapters">
+        <ProtectedSection title="Chapters" requiredPermission="View Chapters">
           <div
             id={`chapter-content-${chapterId}`}
             className="mt-2 transition-all duration-300 ease-in-out"
@@ -287,19 +292,26 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <button
-                              onClick={() =>
-                                openPreviewModal(
-                                  attachment.url,
-                                  attachment.type
-                                )
+                            <ProtectedAction requiredPermission={"dd"}>
+                              <button
+                                onClick={() =>
+                                  openPreviewModal(
+                                    attachment.url,
+                                    attachment.type
+                                  )
+                                }
+                                className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                                aria-label="Preview"
+                              >
+                                <FaEye size={20} />
+                              </button>
+                            </ProtectedAction>
+
+                            <ProtectedAction
+                              requiredPermission={
+                                PERMISSIONS.REMOVE_CHAPTER_FILES
                               }
-                              className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                              aria-label="Preview"
                             >
-                              <FaEye size={20} />
-                            </button>
-                            <ProtectedAction requiredPermission="delete Attachment">
                               <button
                                 type="button"
                                 className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
