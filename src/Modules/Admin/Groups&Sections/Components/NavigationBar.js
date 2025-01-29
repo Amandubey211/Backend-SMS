@@ -97,7 +97,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
             </button>
           ))}
           {/* Conditionally render the Add Section button only if the role is not "teacher" */}
-          {role !== "teacher" && (
+          {role == "admin" && (
             <button
               onClick={openAddSectionSidebar}
               className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
@@ -107,7 +107,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           )}
         </div>
         {/* Conditionally render the Group button only if the role is not "teacher" */}
-        {role !== "teacher" && (
+        {role == "admin" && (
           <button
             onClick={openAddGroupSidebar}
             className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"

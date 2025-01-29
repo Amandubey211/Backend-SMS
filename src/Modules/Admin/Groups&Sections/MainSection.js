@@ -16,6 +16,9 @@ import {
   fetchStudentSubjectProgress,
 } from "../../../Store/Slices/Admin/Users/Students/student.action";
 import { clearGroupsList } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice";
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../config/permission";
+import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
@@ -77,18 +80,28 @@ const MainSection = () => {
   };
 
   return (
+    
     <div className="flex flex-col h-screen">
+      <ProtectedAction requiredPermission={PERMISSIONS.SECTION_BY_CLASS}>
       <NavigationBar
         onSectionChange={handleSectionChange}
         selectedSection={activeSection}
       />
+      </ProtectedAction>
       <div className="flex flex-grow">
-        <div className="w-80 h-full flex-shrink-0">
+      <div className="w-80 h-full flex-shrink-0">
+        <ProtectedSection requiredPermission={PERMISSIONS.UNASSIGNED_STUDENTS} title={"Unassigned Student"}>
+     
           <UnAssignedStudentList />
+        
+        </ProtectedSection>
         </div>
         <div className="flex-grow h-full border-l">
+        <ProtectedSection requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION} title={"Groups"}>
           <GroupList onSeeGradeClick={onSeeGradeClick} />
+          </ProtectedSection>
         </div>
+
         <StudentGradeModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
@@ -96,6 +109,7 @@ const MainSection = () => {
         />
       </div>
     </div>
+  
   );
 };
 

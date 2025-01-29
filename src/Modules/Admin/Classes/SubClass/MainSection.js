@@ -102,7 +102,7 @@ const MainSection = () => {
 
   return (
     <>
-    <ProtectedSection requiredPermission={"dd"}>
+    <ProtectedSection requiredPermission={PERMISSIONS.SPECIFIC_CLASS} title={'Subjects'}>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <Spinner />
