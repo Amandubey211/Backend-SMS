@@ -15,6 +15,9 @@ import {
   resetActiveReplyId,
 } from "../../../../../../Store/Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
 import { useParams } from "react-router-dom";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const DiscussionMessage = () => {
   const dispatch = useDispatch();
@@ -86,21 +89,30 @@ const DiscussionMessage = () => {
           handleRefresh={handleRefresh}
         />
       </div>
-      <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
-        <CommentSection
-          comments={filteredComments}
-          deleteComment={handleDeleteComment}
-          deleteReply={handleDeleteReply}
-          addNestedReply={handleAddReply}
-          activeReplyId={activeReplyId}
-          setActiveReplyId={(id) => dispatch(setActiveReplyId(id))}
-          loading={loading}
-          error={error}
-        />
-      </div>
-      <div className="flex-none h-[15%]">
-        <InputComment addComment={handleAddComment} />
-      </div>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_DISCUSSION}
+        title="Discussion Comments"
+      >
+        <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
+          <CommentSection
+            comments={filteredComments}
+            deleteComment={handleDeleteComment}
+            deleteReply={handleDeleteReply}
+            addNestedReply={handleAddReply}
+            activeReplyId={activeReplyId}
+            setActiveReplyId={(id) => dispatch(setActiveReplyId(id))}
+            loading={loading}
+            error={error}
+          />
+        </div>
+      </ProtectedSection>
+      <ProtectedAction
+        requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_DISCUSSION}
+      >
+        <div className="flex-none h-[15%]">
+          <InputComment addComment={handleAddComment} />
+        </div>
+      </ProtectedAction>
     </div>
   );
 };

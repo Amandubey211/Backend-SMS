@@ -16,6 +16,7 @@ import { resetDiscussion } from "../../../../../Store/Slices/Admin/Class/Discuss
 import { FaComments } from "react-icons/fa";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../config/permission";
 const MainSection = () => {
   const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
@@ -58,9 +59,8 @@ const MainSection = () => {
     <div className="flex w-full h-full">
       <SubjectSideBar />
       <ProtectedSection
-        // aman={true}
         title="Discussion Dashboard"
-        requiredPermission="view discussion"
+        requiredPermission={PERMISSIONS.ALL_DISCUSSIONS}
       >
         <div className="w-full p-3 border-l">
           <DiscussionHeader
@@ -115,7 +115,7 @@ const MainSection = () => {
               </div>
             </>
           )}
-          <ProtectedAction requiredPermission="AddDiscussion">
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_DISCUSSION}>
             <NavLink
               to={`/class/${cid}/${sid}/create_discussion`}
               onClick={() => dispatch(resetDiscussion())}
