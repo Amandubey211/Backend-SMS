@@ -3,6 +3,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
   const { t } = useTranslation("admModule");
@@ -29,7 +30,7 @@ const CreateSyllabusHeader = ({ onSave, loading, isEditing }) => {
         >
           {t("Cancel")}
         </button>
-        <ProtectedAction requiredPermission="save Syllabus">
+        <ProtectedAction requiredPermission={PERMISSIONS.CREATE_SYLLABUS}>
           <button
             type="button"
             onClick={onSave}
