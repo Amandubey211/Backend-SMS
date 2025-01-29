@@ -95,7 +95,7 @@ const ButtonsGroup = ({ type, data, loading, requiredPermission }) => {
 
   return (
     <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">
-      <ProtectedAction requiredPermission={requiredPermission}>
+      <ProtectedAction requiredPermission={requiredPermission[0]}>
         <button
           className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
           aria-label={data?.publish ? "Unpublish" : "Publish"}
@@ -130,7 +130,7 @@ const ButtonsGroup = ({ type, data, loading, requiredPermission }) => {
         </button>
       </ProtectedAction>
 
-      <ProtectedAction requiredPermission={requiredPermission}>
+      <ProtectedAction requiredPermission={requiredPermission[1]}>
         <button
           onClick={handleEdit}
           className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
@@ -142,7 +142,7 @@ const ButtonsGroup = ({ type, data, loading, requiredPermission }) => {
         </button>
       </ProtectedAction>
 
-      <ProtectedAction requiredPermission={requiredPermission}>
+      <ProtectedAction requiredPermission={requiredPermission[2]}>
         <button
           className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition relative"
           aria-label="More Options"

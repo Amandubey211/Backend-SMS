@@ -4,6 +4,7 @@ import MainSection from "./MainSection";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import { useSelector } from "react-redux";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const CreateAssignment = () => {
   const isSidebarOpen = useSelector(
@@ -21,7 +22,6 @@ const CreateAssignment = () => {
           : "Create Assignment | Student Diwan"
       }
     >
-      <ProtectedSection requiredPermission={''}>
       <div className="flex w-full min-h-screen">
         {/* Sidebar is fixed on the left */}
         <SideMenubar />
@@ -36,7 +36,6 @@ const CreateAssignment = () => {
           </div>
         </div>
       </div>
-      </ProtectedSection>
     </Layout>
   );
 };

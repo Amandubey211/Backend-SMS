@@ -5,6 +5,8 @@ import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
 import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 import { useTranslation } from "react-i18next";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const CreateAssignmentHeader = ({
   onSave,
@@ -68,75 +70,33 @@ const CreateAssignmentHeader = ({
           {isEditing ? t("Update Assignment") : t("Create New Assignment")}
         </h1>
       </div>
-      {/* <div className="flex items-center justify-center space-x-4">
-      
-        <button
-          onClick={() => onSave(true)}
-          className="flex items-center justify-center h-12 rounded-md px-8 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          disabled={publishLoading}
-        >
-          <div className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500 text-sm font-semibold">
-            {publishLoading
-              ? t("please wait...")
-              : isEditing
-              ? t("Update & Publish")
-              : t("Save & Publish")}
-          </div>
-        </button>
-        <button
-          onClick={() => onSave(false)}
-          className="flex items-center justify-center h-12 px-8 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
-          disabled={saveLoading}
-        >
-          {saveLoading ? t("please wait...") : t("Save")}
-        </button>
-
-        <AddRubricModal
-          isOpen={isModalOpen}
-          AssignmentId={id}
-          onSubmit={handleSubmit}
-          onClose={() => setModalOpen(false)}
-          criteriaList={criteriaList}
-          onEditCriteria={handleEditCriteria}
-          setCriteriaList={setCriteriaList}
-          setExistingRubricId={setExistingRubricId}
-          readonly={false}
-        />
-
-        <Sidebar
-          isOpen={isSidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          title={t("Add New Criteria")}
-        >
-          <AddNewCriteriaForm
-            onSave={handleAddNewCriteria}
-            initialData={criteriaToEdit}
-            editMode={editMode}
-          />
-        </Sidebar>
-      </div> */}
 
       <div className="flex items-center justify-center space-x-4">
-        <button
-          onClick={() => onSave(true)}
-          className="flex items-center justify-center h-12 rounded-md px-8 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-          disabled={publishLoading}
-        >
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500 text-sm font-semibold">
-            {publishLoading
-              ? t("please wait...")
-              : isEditing
-              ? t("Update & Publish")
-              : t("Save & Publish")}
-          </span>
-        </button>
-        <button
-          onClick={() => onSave(false)}
-          className="flex items-center justify-center h-12 px-8 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
-          disabled={saveLoading}
-        >
-          {saveLoading ? t("please wait...") : t("Save")}
-        </button>
+        <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_ASSIGNMENT}>
+          <button
+            onClick={() => onSave(true)}
+            className="flex items-center justify-center h-12 rounded-md px-8 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            disabled={publishLoading}
+          >
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500 text-sm font-semibold">
+              {publishLoading
+                ? t("please wait...")
+                : isEditing
+                ? t("Update & Publish")
+                : t("Save & Publish")}
+            </span>
+          </button>
+        </ProtectedAction>
+
+        <ProtectedAction requiredPermission={PERMISSIONS.CREATE_ASSIGNMENT}>
+          <button
+            onClick={() => onSave(false)}
+            className="flex items-center justify-center h-12 px-8 text-white font-semibold rounded-md bg-gradient-to-r from-purple-500 to-red-500 hover:from-purple-600 hover:to-red-600 transition"
+            disabled={saveLoading}
+          >
+            {saveLoading ? t("please wait...") : t("Save")}
+          </button>
+        </ProtectedAction>
       </div>
     </div>
   );

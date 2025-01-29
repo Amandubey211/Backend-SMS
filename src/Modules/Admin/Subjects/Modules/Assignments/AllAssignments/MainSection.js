@@ -9,6 +9,7 @@ import { fetchFilteredAssignments } from "../../../../../../Store/Slices/Admin/C
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
@@ -39,7 +40,10 @@ const MainSection = () => {
   return (
     <div className="flex w-full h-full">
       <SubjectSideBar />
-      <ProtectedSection title="Assignemnt" requiredPermission="assignment list">
+      <ProtectedSection
+        title="Assignemnt"
+        requiredPermission={PERMISSIONS.FILTERED_ASSIGNMENTS}
+      >
         <div className="flex">
           <div className="w-[65%] border-l">
             <List
@@ -49,12 +53,13 @@ const MainSection = () => {
               icon={<RiListCheck3 />}
               loading={loading}
               error={error}
+              requiredPermission={PERMISSIONS.DELETE_ASSIGNMENT}
             />
           </div>
           <div className="w-[30%] p-2">
             <FilterCard filters={filters} setFilters={setFilters} />
           </div>
-          <ProtectedAction requiredPermission="create assignment">
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_ASSIGNMENT}>
             <NavLink
               to={`/class/${cid}/${sid}/createassignment`}
               aria-label={t("Create Assignment")}
