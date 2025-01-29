@@ -15,8 +15,17 @@ import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
-const List = ({ data, icon, title, type, loading, error }) => {
+const List = ({
+  data,
+  icon,
+  title,
+  type,
+  loading,
+  error,
+  requiredPermission,
+}) => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch(); // Hook to dispatch actions
   const [searchQuery, setSearchQuery] = useState("");
@@ -176,13 +185,17 @@ const List = ({ data, icon, title, type, loading, error }) => {
                         ref={menuRef}
                         className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
                       >
-                        <button
-                          onClick={() => handleDelete(item._id, item.name)}
-                          className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
+                        <ProtectedAction
+                          requiredPermission={requiredPermission}
                         >
-                          <FaTrashAlt className="text-red-600" />
-                          <span>Delete</span>
-                        </button>
+                          <button
+                            onClick={() => handleDelete(item._id, item.name)}
+                            className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
+                          >
+                            <FaTrashAlt className="text-red-600" />
+                            <span>Delete</span>
+                          </button>
+                        </ProtectedAction>
                       </div>
                     )}
                   </div>

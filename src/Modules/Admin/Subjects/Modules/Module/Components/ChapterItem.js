@@ -12,9 +12,10 @@ import { MdOutlineBlock } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { useDispatch, useSelector } from "react-redux";
-import {  deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import { deleteAssignmentThunk } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
-
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const getIcon = (type) => {
   switch (type) {
@@ -39,8 +40,12 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const optionsRef = useRef(null);
 
- const { loading: deleteAssignmentLoading } = useSelector((store)=>store.admin?.assignments);
- const { loading: deleteQuizLoading } = useSelector((store)=>store.admin?.quizzes);
+  const { loading: deleteAssignmentLoading } = useSelector(
+    (store) => store.admin?.assignments
+  );
+  const { loading: deleteQuizLoading } = useSelector(
+    (store) => store.admin?.quizzes
+  );
   const toggleMenu = (event) => {
     event.preventDefault();
     setMenuOpen((prev) => !prev);
@@ -63,7 +68,7 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
       document.removeEventListener("mousedown", closeMenu);
     };
   }, [menuOpen]);
-const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const handleDelete = async () => {
     try {
       if (type === "assignment") {
@@ -110,15 +115,18 @@ const dispatch = useDispatch()
             aria-label="Not Published"
           />
         )}
-        <button
-          onClick={toggleMenu}
-          className="p-2"
-          aria-expanded={menuOpen}
-          aria-haspopup="menu"
-          aria-label="Options"
-        >
-          <FaEllipsisV className="text-green-500" />
-        </button>
+        <ProtectedAction requiredPermission={PERMISSIONS.EDIT_CHAPTER}>
+          <button
+            onClick={toggleMenu}
+            className="p-2"
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
+            aria-label="Options"
+          >
+            <FaEllipsisV className="text-green-500" />
+          </button>
+        </ProtectedAction>
+
         {menuOpen && (
           <div
             ref={optionsRef}
@@ -126,16 +134,19 @@ const dispatch = useDispatch()
             role="menu"
             aria-label="Options Menu"
           >
-            <button
-              onClick={openDeleteModal}
-              className="flex items-center gap-2 w-full p-2 hover:bg-gray-100"
-              role="menuitem"
-              aria-label="Delete"
-              disabled={deleteAssignmentLoading || deleteQuizLoading}
-            >
-              <FaTrashAlt className="text-red-500" aria-hidden="true" />
-              <span>Delete</span>
-            </button>
+            <ProtectedAction requiredPermission={""}>
+              {/* Assignment and  quiz  */}
+              <button
+                onClick={openDeleteModal}
+                className="flex items-center gap-2 w-full p-2 hover:bg-gray-100"
+                role="menuitem"
+                aria-label="Delete"
+                disabled={deleteAssignmentLoading || deleteQuizLoading}
+              >
+                <FaTrashAlt className="text-red-500" aria-hidden="true" />
+                <span>Delete</span>
+              </button>
+            </ProtectedAction>
           </div>
         )}
       </div>
