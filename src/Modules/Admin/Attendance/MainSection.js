@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../Components/Common/Spinner";
 import NoDataFound from "../../../Components/Common/NoDataFound";
 import { fetchStudentsMonthAttendanceList } from "../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../config/permission";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -41,7 +43,9 @@ const MainSection = () => {
       ) : error ? (
         <NoDataFound title="Attendance" />
       ) : (
+        <ProtectedSection requiredPermission={PERMISSIONS.STUDENT_MONTHLY_ATTENDANCE_LIST} title={"Student Attendence"}>
         <AttendanceTable />
+        </ProtectedSection >
       )}
     </div>
   );

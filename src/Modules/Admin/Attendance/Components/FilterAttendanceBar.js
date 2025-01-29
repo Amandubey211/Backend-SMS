@@ -12,6 +12,8 @@ import {
   fetchGroupsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { setFilters } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const FilterAttendanceBar = () => {
   const { filters } = useSelector((state) => state.admin.attendance);
@@ -42,8 +44,10 @@ const FilterAttendanceBar = () => {
   return (
     <div className="flex items-center justify-between space-x-4 p-3">
       <div className="flex items-center gap-4">
+     
         {/* Section Dropdown */}
         <div className="relative w-48">
+        <ProtectedAction requiredPermission={PERMISSIONS.SECTION_BY_CLASS_ATTENDANCE}>
           <div
             className="relative"
             onClick={() => setIsSectionDropdownOpen(!isSectionDropdownOpen)}
@@ -90,10 +94,12 @@ const FilterAttendanceBar = () => {
               </div>
             )}
           </div>
+          </ProtectedAction>
         </div>
 
         {/* Group Dropdown */}
         <div className="relative w-48">
+        <ProtectedAction requiredPermission={PERMISSIONS.GROUP_BY_CLASS}>
           <div
             className="relative"
             onClick={() => setIsGroupDropdownOpen(!isGroupDropdownOpen)}
@@ -138,11 +144,15 @@ const FilterAttendanceBar = () => {
               </div>
             )}
           </div>
+          </ProtectedAction>
         </div>
+    
       </div>
 
       {/* Month Dropdown */}
+       
       <div className="relative w-64">
+      <ProtectedAction requiredPermission={PERMISSIONS.STUDENT_MONTHLY_ATTENDANCE_LIST}>
         <div
           className="flex items-center cursor-pointer p-2 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 rounded-lg"
           onClick={() => setIsMonthDropdownOpen(!isMonthDropdownOpen)}
@@ -175,7 +185,9 @@ const FilterAttendanceBar = () => {
             ))}
           </div>
         )}
+        </ProtectedAction>
       </div>
+      
     </div>
   );
 };

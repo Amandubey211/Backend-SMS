@@ -5,6 +5,9 @@ import { fetchAttendanceStats } from "../../../../Store/Slices/Admin/Class/Atten
 import AttendanceNavCard from "./AttendanceNavCard";
 import { navData } from "./Data/NavData";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const NavSection = () => {
   const dispatch = useDispatch();
@@ -42,14 +45,18 @@ const NavSection = () => {
         <h2 className="text-xl font-semibold text-gradient text-purple-600">
           {t("Student Attendance")}
         </h2>
+        <ProtectedAction requiredPermission={PERMISSIONS.MARK_ATTENDANCE}>
+
+
         <NavLink
           to={`/class/${cid}/take_attendance`}
           className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg"
         >
           {t("Take Attendance")}
         </NavLink>
+        </ProtectedAction>
       </div>
-
+<ProtectedSection requiredPermission={PERMISSIONS.ATTENDANCE_STATS} title={"Cards"}>
       <div className="flex space-x-4">
         {mappedData?.map((item) => (
           <AttendanceNavCard
@@ -63,6 +70,7 @@ const NavSection = () => {
           />
         ))}
       </div>
+      </ProtectedSection>
     </div>
   );
 };

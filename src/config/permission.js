@@ -429,6 +429,7 @@ export const PERMISSIONS = {
   // Class Management
   // ===================
   ALL_CLASSES: "Get All Classes",
+  ADD_CLASSES: "Add Classes", // not in backend
   SPECIFIC_CLASS: "Get Specific Class",
 
   // =======================
@@ -584,12 +585,6 @@ export const PERMISSIONS = {
   GET_ALL_ISSUED_BOOKS: "Get All Issued Books",
   VIEW_STUDENTS_BY_CLASS_AND_SECTION: "View Students By Class And Section",
   VIEW_SECTIONS: "View Sections",
-
-  // Attendance Management
-  GET_ATTENDANCE_STATS: "Get Attendance Stats",
-  GET_SECTION_BY_CLASS: "Get Section by Class",
-  MARK_ATTENDANCE: "Mark Attendance",
-  GET_YEARLY_ATTENDANCE_FOR_STUDENT: "Get Yearly Attendance for Student",
 
   // Quiz Management
   CREATE_QUIZ: "Create Quiz",

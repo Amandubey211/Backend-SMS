@@ -8,6 +8,7 @@ import {
   setSelectedSection,
   filterTeachersBySection,
 } from "../../../Store/Slices/Admin/Class/Teachers/teacherSlice";
+import { PERMISSIONS } from "../../../config/permission";
 
 const AssignTeacher = lazy(() => import("./AssignTeacher"));
 
@@ -59,7 +60,7 @@ const NavigationBar = () => {
         </div>
 
         {/* Conditionally render the Assign Instructor button */}
-        {role !== "teacher" && (
+        {role == "admin" && (
           <button
             onClick={handleSidebarOpen}
             className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
@@ -81,7 +82,7 @@ const NavigationBar = () => {
           <AssignTeacher />
         </Suspense>
       </Sidebar>
-
+      
       <div className="flex space-x-2 px-5">
         <button
           className={getButtonClass("Everyone")}
@@ -99,6 +100,7 @@ const NavigationBar = () => {
           </button>
         ))}
       </div>
+     
     </>
   );
 };

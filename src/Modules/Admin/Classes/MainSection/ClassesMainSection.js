@@ -69,7 +69,7 @@ const ClassesMainSection = () => {
               {schoolName}
             </h1>
           </div> */}
-            <ProtectedAction requiredPermission={PERMISSIONS.ALL_CLASSES}>
+            <ProtectedAction requiredPermission={PERMISSIONS.ADD_CLASSES}>
               <button
                 onClick={handleAddNewClass} // Open for adding new class
                 className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200 flex items-center gap-2"

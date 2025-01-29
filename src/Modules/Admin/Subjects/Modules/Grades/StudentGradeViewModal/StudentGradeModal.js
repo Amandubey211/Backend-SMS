@@ -6,6 +6,8 @@ import StudentGradeSummary from "./Component/StudentGradeSummary";
 import { FiLoader } from "react-icons/fi";
 import {fetchStudentGrades} from "../../../../../../Store/Slices/Admin/Users/Students/student.action"
 import { useParams } from "react-router-dom";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 const StudentGradeModal = ({ isOpen, onClose,student }) => {
   const { cid, sid } = useParams();
   const [filters, setFilters] = useState({
@@ -71,7 +73,8 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
           </div>
         </div>
       </> :
-        <><div
+        <ProtectedSection requiredPermission={PERMISSIONS.GRADES_OF_ONE_STUDENT_SECTION} title={"Student Grades"}>
+          <div
           className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
         >
@@ -101,7 +104,7 @@ const StudentGradeModal = ({ isOpen, onClose,student }) => {
               <StudentGradeSummary grades={grades} studentData={grades.student} />
             </div>
           </div>
-        </div></>}
+        </div></ProtectedSection>}
     </>
 
   );
