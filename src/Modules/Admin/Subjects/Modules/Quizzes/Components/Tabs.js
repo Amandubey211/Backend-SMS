@@ -1,6 +1,8 @@
 import React from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const Tabs = ({
   children,
@@ -73,15 +75,19 @@ const Tabs = ({
           </button>
         </div>
         {activeTab === "questions" && createPage && (
-          <button
-            onClick={handleSidebarOpen}
-            className="flex items-center border border-gray-300 ps-5  rounded-full"
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.ADD_QUESTION_TO_QUIZ}
           >
-            <span className="mr-2">Add new Question</span>
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
-              <span className="text-3xl -mt-2">+</span>
-            </div>
-          </button>
+            <button
+              onClick={handleSidebarOpen}
+              className="flex items-center border border-gray-300 ps-5  rounded-full"
+            >
+              <span className="mr-2">Add new Question</span>
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-10 h-10 flex items-center justify-center">
+                <span className="text-3xl -mt-2">+</span>
+              </div>
+            </button>
+          </ProtectedAction>
         )}
       </div>
       <div className="p-4">{children(activeTab)}</div>
