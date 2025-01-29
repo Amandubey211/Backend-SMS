@@ -11,6 +11,9 @@ import {
 import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { motion, AnimatePresence } from "framer-motion";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const ProfileCard = ({ profile, onClick, editUser }) => {
   const dispatch = useDispatch();
@@ -135,9 +138,10 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
           </span>
         )}
 
-        {role === "admin" && (
-          <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
-            {profile?.active && (
+
+        <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
+          {profile?.active && (
+            <ProtectedAction requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}>
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 onClick={(event) => editUser(event, profile)}
@@ -149,9 +153,11 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
                   <CiEdit className="text-sm text-green-500" />
                 )}
               </button>
-            )}
+            </ProtectedAction>
+          )}
 
-            {profile?.active ? (
+          {profile?.active ? (
+            <ProtectedAction requiredPermission={PERMISSIONS[`BLOCK_${role.toUpperCase()}`]}>
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 title="Deactivate"
@@ -163,7 +169,9 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
               >
                 <MdBlock className="text-sm text-red-500" />
               </button>
-            ) : (
+            </ProtectedAction>
+          ) : (
+            <ProtectedAction requiredPermission={PERMISSIONS[`ACTIVE_${role.toUpperCase()}`]}>
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 title="Activate"
@@ -172,9 +180,10 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
               >
                 <MdOutlinePublishedWithChanges className="text-sm text-green-500" />
               </button>
-            )}
-          </div>
-        )}
+            </ProtectedAction>
+          )}
+        </div>
+
 
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
           <img
