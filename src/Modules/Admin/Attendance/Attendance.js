@@ -15,9 +15,7 @@ const Attendance = () => {
   return (
     <div>
       <Layout title={`${className}  Attendance | Student diwan  `}>
-        <ProtectedSection requiredPermission="viewAttendence">
         <DashLayout children={<MainSection />} hideAvatarList={true} />
-        </ProtectedSection>
       </Layout>
     </div>
   );

@@ -14,9 +14,9 @@ const TakeAttendance = () => {
   useNavHeading(className, "Take Attendance");
   return (
     <Layout title={`Take Attendance | Student Diwan`}>
-      <ProtectedSection requiredPermission="takeAttendence">
+      
       <DashLayout children={<MainSection />} hideStudentView={true} />
-      </ProtectedSection>
+      
     </Layout>
   );
 };

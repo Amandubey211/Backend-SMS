@@ -13,9 +13,9 @@ const Group_Section = () => {
   useNavHeading(className, "Sections & Groups");
   return (
     <Layout title={`${className} | Group & Section | Student diwan`}>
-           <ProtectedSection requiredPermission="viewGroupsandsection">
+          
       <DashLayout children={<MainSection />} hideAvatarList={true} />
-      </ProtectedSection>
+     
     </Layout>
   );
 };
