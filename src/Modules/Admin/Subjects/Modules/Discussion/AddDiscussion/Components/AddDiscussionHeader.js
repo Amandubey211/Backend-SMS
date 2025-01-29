@@ -2,6 +2,7 @@ import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const AddDiscussionHeader = ({ onSave, isUpdating }) => {
   const navigate = useNavigate();
@@ -18,7 +19,11 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <ProtectedAction requiredPermission="Update Discussion">
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.UPDATE_DISCUSSION || PERMISSIONS.CREATE_DISCUSSION
+          }
+        >
           <button
             onClick={() => {
               onSave(true); // Save and publish the discussion
@@ -30,7 +35,11 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
             </span>
           </button>
         </ProtectedAction>
-        <ProtectedAction requiredPermission="Update Discussion">
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.UPDATE_DISCUSSION || PERMISSIONS.CREATE_DISCUSSION
+          }
+        >
           <button
             onClick={() => {
               onSave(false); // Save without publishing

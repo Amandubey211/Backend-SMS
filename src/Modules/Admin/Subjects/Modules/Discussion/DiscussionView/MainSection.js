@@ -7,6 +7,7 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { fetchDiscussionById } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const MainSection = () => {
   const { did } = useParams();
@@ -33,9 +34,8 @@ const MainSection = () => {
     <div className="flex h-full w-full">
       <SubjectSideBar />
       <ProtectedSection
-        requiredPermission="View Dicussion"
+        requiredPermission={PERMISSIONS.DISCUSSION_BY_ID}
         title="Discussion View"
-        // aman={true}
       >
         <div className="border-l w-full">
           <Header

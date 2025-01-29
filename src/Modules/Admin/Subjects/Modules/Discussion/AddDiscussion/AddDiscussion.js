@@ -15,6 +15,7 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 import toast from "react-hot-toast";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const AddDiscussion = () => {
   const { cid, sid } = useParams();
@@ -160,9 +161,8 @@ const AddDiscussion = () => {
             <AddDiscussionHeader onSave={handleSave} isUpdating={isEditing} />
             <div className="w-full h-full">
               <ProtectedSection
-                requiredPermission="update discussion"
+                requiredPermission={PERMISSIONS.UPDATE_DISCUSSION}
                 title="Update discussion"
-                // aman={true}
               >
                 <div className="flex w-full h-full">
                   <div className="w-[70%]">

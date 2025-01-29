@@ -18,6 +18,7 @@ import {
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import Spinner from "../../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const DiscussionMessage = React.lazy(() =>
   import("../../DiscussionMessage/DiscussionMessage")
@@ -104,7 +105,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
           {t("Due")}: {new Date(discussion.dueDate).toLocaleDateString()}
         </span>
         <div className="flex items-center space-x-4">
-          <ProtectedAction requiredPermission="update Discussiin">
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_DISCUSSION}>
             <button
               className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
               aria-label={
@@ -130,7 +131,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
               )}
             </button>
           </ProtectedAction>
-          <ProtectedAction requiredPermission="update Discussiin">
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_DISCUSSION}>
             <button
               className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
               aria-label={t("Edit Discussion")}
@@ -144,7 +145,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
               <span>{t("Edit")}</span>
             </button>
           </ProtectedAction>
-          <ProtectedAction requiredPermission="delete permission">
+          <ProtectedAction requiredPermission={PERMISSIONS.DELETE_DISCUSSION}>
             <button
               className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
               aria-label={t("More Options")}
@@ -160,8 +161,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
               className="absolute right-0 top-full mt-2 w-40 bg-white border rounded-md shadow-lg z-10"
             >
               <ProtectedAction
-                requiredPermission="delete permission"
-                // aman={true}
+                requiredPermission={PERMISSIONS.DELETE_DISCUSSION}
               >
                 <button
                   className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-gray-100 w-full"
@@ -177,7 +177,9 @@ const Header = ({ discussion, refetchDiscussion }) => {
               )} */}
             </div>
           )}
-          <ProtectedAction requiredPermission="View discussion Comment">
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_DISCUSSION}
+          >
             <button
               onClick={handleSidebarOpen}
               className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
@@ -193,13 +195,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
             onClose={handleSidebarClose}
           >
             <Suspense fallback={<Spinner />}>
-              <ProtectedSection
-                requiredPermission="view comment"
-                // aman={true}
-                title="Discussion Comments"
-              >
-                <DiscussionMessage />
-              </ProtectedSection>
+              <DiscussionMessage />
             </Suspense>
           </Sidebar>
         </div>
