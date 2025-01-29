@@ -15,6 +15,7 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -85,7 +86,10 @@ const MainSection = () => {
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
-      <ProtectedSection title="Syllabus" requiredPermission="view syllabus">
+      <ProtectedSection
+        title="Syllabus"
+        requiredPermission={PERMISSIONS.VIEW_SYLLABUS}
+      >
         <div className="border-l w-full p-4 relative">
           {renderContent()}
           {syllabi && syllabi?.length === 0 && (

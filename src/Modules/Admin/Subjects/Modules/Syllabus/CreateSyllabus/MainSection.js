@@ -10,6 +10,7 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/Syllabus/syllabusThunk";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const MainSection = ({ setIsEditing }) => {
   const { state } = useLocation();
@@ -71,7 +72,9 @@ const MainSection = ({ setIsEditing }) => {
           isEditing={Boolean(state?.syllabus?._id)}
         />
         <ProtectedSection
-          requiredPermission="add/edit Syllabus"
+          requiredPermission={
+            PERMISSIONS.EDIT_SYLLABUS || PERMISSIONS.CREATE_SYLLABUS
+          }
           title="Create/Update Syllabus"
         >
           <EditorComponent

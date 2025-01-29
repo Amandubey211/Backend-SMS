@@ -394,7 +394,7 @@ export const PERMISSIONS = {
   // =====================
   CREATE_SYLLABUS: "Create Syllabus",
   EDIT_SYLLABUS: "Edit Syllabus",
-  SYLLABUS: "Get Syllabus",
+  VIEW_SYLLABUS: "Get Syllabus",
   DELETE_SYLLABUS: "Delete Syllabus",
 
   // =======================
