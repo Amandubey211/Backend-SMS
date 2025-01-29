@@ -18,6 +18,7 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const initialFormState = {
   points: "",
@@ -368,8 +369,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
                 {activeTab === "instructions" ? (
                   <ProtectedSection
                     title="Add/Edit Quiz Instructuin"
-                    requiredPermission="edit quiz instructuion"
-                    aman={true}
+                    requiredPermission={PERMISSIONS.UPDATE_QUIZ}
                   >
                     <QuizInstructions
                       assignmentName={assignmentName}
@@ -380,8 +380,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
                   </ProtectedSection>
                 ) : (
                   <ProtectedSection
-                    requiredPermission="edit question"
-                    aman={true}
+                    requiredPermission={PERMISSIONS.ADD_QUESTION_TO_QUIZ}
                   >
                     <QuestionListView
                       quizId={quizId}
@@ -400,7 +399,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
 
         {activeTab === "instructions" && (
           <div className="w-[30%] h-full ">
-            <ProtectedSection requiredPermission="edit quiz" aman={true}>
+            <ProtectedSection requiredPermission={PERMISSIONS.UPDATE_QUIZ}>
               <CreateQuizForm {...formState} handleChange={handleFormChange} />
             </ProtectedSection>
           </div>
@@ -414,22 +413,31 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         title={editingQuestionId ? "Edit Question" : "Add new Question"}
         width="95%"
       >
-        <QuestionForm
-          question={question} // Pass question state here
-          answers={answers}
-          questionPoint={questionPoint}
-          questionType={questionType}
-          rightAnswerComment={rightAnswerComment}
-          wrongAnswerComment={wrongAnswerComment}
-          handleQuestionChange={handleQuestionChange}
-          handleAnswerChange={handleAnswerChange}
-          setAnswers={setAnswers}
-          setRightAnswerComment={setRightAnswerComment}
-          setWrongAnswerComment={setWrongAnswerComment}
-          setQuestionPoint={setQuestionPoint}
-          setQuestionType={setQuestionType}
-          addNewQuestion={editingQuestionId ? updateQuestion : addNewQuestion}
-        />
+        <ProtectedSection
+          title={"Add/Edit Question"}
+          requiredPermission={
+            PERMISSIONS.UPDATE_QUESTION_IN_QUIZ ||
+            PERMISSIONS.ADD_QUESTION_TO_QUIZ
+          }
+          aman={true}
+        >
+          <QuestionForm
+            question={question} // Pass question state here
+            answers={answers}
+            questionPoint={questionPoint}
+            questionType={questionType}
+            rightAnswerComment={rightAnswerComment}
+            wrongAnswerComment={wrongAnswerComment}
+            handleQuestionChange={handleQuestionChange}
+            handleAnswerChange={handleAnswerChange}
+            setAnswers={setAnswers}
+            setRightAnswerComment={setRightAnswerComment}
+            setWrongAnswerComment={setWrongAnswerComment}
+            setQuestionPoint={setQuestionPoint}
+            setQuestionType={setQuestionType}
+            addNewQuestion={editingQuestionId ? updateQuestion : addNewQuestion}
+          />
+        </ProtectedSection>
       </Sidebar>
     </div>
   );

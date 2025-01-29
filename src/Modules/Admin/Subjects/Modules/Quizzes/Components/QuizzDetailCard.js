@@ -7,6 +7,7 @@ import RubricButton from "../../Assignments/AssignmentComponents/RubricButton";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import { useSelector } from "react-redux";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const QuizzDetailCard = () => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -78,12 +79,16 @@ const QuizzDetailCard = () => {
         type="Quiz"
         data={quiz}
         loading={updateLoading}
-        requiredPermission="modification need here " //Aman
+        requiredPermission={[
+          PERMISSIONS.UPDATE_QUIZ,
+          PERMISSIONS.UPDATE_QUIZ,
+          PERMISSIONS.DELETE_QUIZ,
+        ]} //Aman
       />
       {/* <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
         Submitted Students : 50/100{" "}
       </p> */}
-      <ProtectedAction requiredPermission="grade Quiz">
+      <ProtectedAction requiredPermission={PERMISSIONS.ASSIGN_QUIZ_GRADE}>
         <SpeedGradeButton
           type="Quiz"
           sgid={quiz?._id}

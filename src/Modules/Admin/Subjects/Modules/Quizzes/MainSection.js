@@ -9,6 +9,7 @@ import { fetchQuizByIdThunk } from "../../../../../Store/Slices/Admin/Class/Quiz
 import { useParams } from "react-router-dom";
 import Spinner from "../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const [activeTab, setActiveTab] = useState("instructions");
@@ -23,7 +24,7 @@ const MainSection = () => {
   }, [qid, dispatch]);
 
   return (
-    <div className="flex">
+    <div className="flex h-full w-full">
       <SubjectSideBar />
       <div className="w-[65%] border-x">
         <Tabs
@@ -39,7 +40,7 @@ const MainSection = () => {
                 ) : (
                   <ProtectedSection
                     title="Quiz Instruction"
-                    requiredPermission="view quix detail"
+                    requiredPermission={PERMISSIONS.QUIZ_BY_ID}
                   >
                     <QuizInstructionSection />
                   </ProtectedSection>
@@ -50,7 +51,7 @@ const MainSection = () => {
                 ) : (
                   <ProtectedSection
                     title="Quiz Question"
-                    requiredPermission="View Quiz Question"
+                    requiredPermission={PERMISSIONS.QUIZ_BY_ID}
                   >
                     <QuizQuestions />
                   </ProtectedSection>
@@ -62,7 +63,7 @@ const MainSection = () => {
       <div className="w-[30%]">
         <ProtectedSection
           title="Quiz Detail"
-          requiredPermission="View Quiz Detail"
+          requiredPermission={PERMISSIONS.QUIZ_BY_ID}
         >
           <QuizzDetailCard />
         </ProtectedSection>
