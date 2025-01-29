@@ -247,18 +247,26 @@ export const PERMISSIONS = {
     // teacher
     VIEW_TEACHER: "view Teacher",
     ADD_TEACHER: "Add Teacher",
-
+    EDIT_TEACHER: "edit Teacher",
+    ACTIVE_TEACHER: "update status Teacher",
+    
     // other staff
     VIEW_STAFF: "view Staff",
     ADD_STAFF: "Add Staff",
+    EDIT_STAFF: "edit Staff",
+    ACTIVE_STAFF: "update status Staff", 
 
     //librarian
     VIEW_LIBRARIAN: "view Librarian",
     ADD_LIBRARIAN: "Add Librarian",
+    EDIT_LIBRARIAN: "edit Librarian", 
+    ACTIVE_LIBRARIAN: "update status Librarian",
 
     //finance
     VIEW_FINANCE_USER: "view Finance",
     ADD_FINANCE: "Add Finance",
+    EDIT_FINANCE: "Edit Finance", 
+    ACTIVE_FINANCE: "update status Finance", 
   
   
   
