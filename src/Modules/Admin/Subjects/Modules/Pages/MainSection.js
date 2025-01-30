@@ -10,6 +10,7 @@ import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { fetchAllPages } from "../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 import { useParams } from "react-router-dom";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -37,7 +38,10 @@ const MainSection = () => {
   return (
     <div className="flex w-full h-full">
       <SubjectSideBar />
-      <ProtectedSection title="Pages" requiredPermission="view page">
+      <ProtectedSection
+        title="Pages"
+        requiredPermission={PERMISSIONS.ALL_PAGES_FOR_A_CLASS}
+      >
         <div className="p-5 w-full border-l">
           <PageHeader
             searchQuery={searchQuery}

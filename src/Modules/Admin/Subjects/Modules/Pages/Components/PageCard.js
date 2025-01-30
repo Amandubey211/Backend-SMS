@@ -8,6 +8,7 @@ import Spinner from "../../../../../../Components/Common/Spinner";
 import { deletePage } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const PageCard = ({
   title,
@@ -85,7 +86,7 @@ const PageCard = ({
           </div>
         </div>
       </div>
-      <ProtectedAction requiredPermission="delete page" aman={true}>
+      <ProtectedAction requiredPermission={PERMISSIONS.DELETE_PAGE}>
         <div
           role="button"
           className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200"

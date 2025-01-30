@@ -5,6 +5,7 @@ import { ImSpinner8 } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types"; // For prop type validation (optional)
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const AddPageHeader = ({
   onSave,
@@ -27,7 +28,11 @@ const AddPageHeader = ({
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <ProtectedAction requiredPermission="add/edit page">
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE
+          }
+        >
           <button
             onClick={() => onSave(false)} // Save without publishing
             className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
@@ -51,7 +56,11 @@ const AddPageHeader = ({
             </span>
           </button>
         </ProtectedAction>
-        <ProtectedAction requiredPermission="add/edit page">
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE
+          }
+        >
           <button
             onClick={() => onSave(true)} // Save and publish
             className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
