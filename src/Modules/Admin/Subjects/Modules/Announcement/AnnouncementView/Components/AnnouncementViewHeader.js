@@ -11,6 +11,7 @@ import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementComme
 import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
 import { FaUserCircle } from "react-icons/fa";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const AnnouncementViewHeader = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -117,7 +118,7 @@ const AnnouncementViewHeader = () => {
           </span>
         </div>
         <div className="flex items-center gap-2 justify-end relative">
-          <ProtectedAction requiredPermission="edit Announcment">
+          <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ANNOUNCEMENT}>
             <button
               className="flex items-center space-x-1 px-4 py-2 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
               aria-label="Edit Announcement"
@@ -127,7 +128,7 @@ const AnnouncementViewHeader = () => {
               <span>Edit</span>
             </button>
           </ProtectedAction>
-          <ProtectedAction requiredPermission="delete Announcment">
+          <ProtectedAction requiredPermission={PERMISSIONS.DELETE_ANNOUNCEMENT}>
             <div className="relative">
               <button
                 className="flex items-center space-x-1 border rounded-md p-2 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
@@ -164,7 +165,9 @@ const AnnouncementViewHeader = () => {
             </div>
           </ProtectedAction>
 
-          <ProtectedAction requiredPermission="View Announcment Comments">
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.COMMENTS_BY_ANNOUNCEMENT}
+          >
             <button
               onClick={handleSidebarOpen}
               className="px-4 py-2 bg-gradient-to-r w-full from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"

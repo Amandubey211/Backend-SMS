@@ -47,7 +47,7 @@ const AnnouncementList = () => {
   }));
 
   // Filter announcements based on the search term
-  const filteredAnnouncements = coloredAnnouncements.filter((announcement) =>
+  const filteredAnnouncements = coloredAnnouncements?.filter((announcement) =>
     announcement.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

@@ -7,6 +7,7 @@ import AnnouncementViewHeader from "./Components/AnnouncementViewHeader";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const MainSection = () => {
   const { aid } = useParams();
@@ -23,8 +24,7 @@ const MainSection = () => {
     <div className="flex w-full h-full">
       <SubjectSideBar />
       <ProtectedSection
-        requiredPermission="view annoucnment"
-        // aman={true}
+        requiredPermission={PERMISSIONS.ANNOUNCEMENT_BY_ID}
         title="Announcement "
       >
         <div className="border-l w-full">

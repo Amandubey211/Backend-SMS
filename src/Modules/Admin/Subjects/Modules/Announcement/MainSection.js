@@ -9,7 +9,7 @@ const MainSection = () => {
     <div className="flex w-full h-full ">
       <SubjectSideBar />
       <ProtectedSection
-        requiredPermission={PERMISSIONS.TEACHER_GET_ALL_ANNOUNCEMENTS}
+        requiredPermission={PERMISSIONS.ALL_ANNOUNCEMENTS}
         title="Announcement List"
       >
         <div className="border-l p-2 w-full">
