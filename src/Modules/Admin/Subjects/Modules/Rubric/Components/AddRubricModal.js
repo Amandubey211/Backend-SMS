@@ -25,6 +25,8 @@ import AddNewCriteriaForm from "./AddNewCriteriaForm";
 import { fetchFilteredAssignments } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AddRubricModal = ({ readonly = false }) => {
   const { t } = useTranslation("admModule");
@@ -216,7 +218,9 @@ const AddRubricModal = ({ readonly = false }) => {
           </button>
         </div>
         <ProtectedSection
-          requiredPermission="Add/Edit Rubric "
+          requiredPermission={
+            PERMISSIONS.UPDATE_RUBRIC || PERMISSIONS.CREATE_RUBRIC
+          }
           title="Add/Edit Rubric"
         >
           <div className="flex items-center px-2">
@@ -409,12 +413,14 @@ const AddRubricModal = ({ readonly = false }) => {
               >
                 {t("Cancel")}
               </button>
-              <button
-                onClick={handleSubmit}
-                className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
-              >
-                {t("Save Rubric")}
-              </button>
+              <ProtectedAction requiredPermission={PERMISSIONS.CREATE_RUBRIC}>
+                <button
+                  onClick={handleSubmit}
+                  className="flex items-center gap-2 font-semibold p-2 px-4 rounded-md bg-gradient-to-r from-pink-100 to-purple-100 hover:shadow-md transition-shadow duration-300"
+                >
+                  {t("Save Rubric")}
+                </button>
+              </ProtectedAction>
             </div>
           )}
 

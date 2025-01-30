@@ -468,7 +468,7 @@ export const PERMISSIONS = {
   // ==========================
   // Section Grade Management
   // ==========================
-  GRADES_OF_ONE_STUDENT_SECTION: "Get Grades of One Student",
+  // GRADES_OF_ONE_STUDENT_SECTION: "Get Grades of One Student",
   STUDENT_SUBJECTS: "Get Student Subjects",
 
   // ======================
@@ -480,7 +480,7 @@ export const PERMISSIONS = {
   // ====================
   // Grade Management
   // ====================
-  GRADES_OF_ONE_STUDENT_GRADE: "Get Grades of One Student",
+  // GRADES_OF_ONE_STUDENT_GRADE: "Get Grades of One Student",
   STUDENT_SUBJECTS_GRADE: "Get Student Subjects",
   //------------------------------------------------End of Class Variables ---------------------------------------------------------
 

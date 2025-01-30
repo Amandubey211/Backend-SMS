@@ -19,6 +19,7 @@ import AddRubricModal from "./Components/AddRubricModal";
 import { useTranslation } from "react-i18next";
 import { FaClipboardList } from "react-icons/fa";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const { t } = useTranslation("admModule");
@@ -52,7 +53,10 @@ const MainSection = () => {
   return (
     <div className="w-full h-full flex">
       <SubjectSideBar />
-      <ProtectedSection title="Rubric" requiredPermission="view rubric">
+      <ProtectedSection
+        title="Rubric"
+        requiredPermission={PERMISSIONS.RUBRIC_BY_SUBJECT_ID}
+      >
         <div className="w-full p-3 border-l">
           <RubricHeader onAddRubric={handleAddRubric} />
           {loading ? (
