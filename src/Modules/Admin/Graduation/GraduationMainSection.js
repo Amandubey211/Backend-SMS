@@ -6,8 +6,9 @@ import Sidebar from "./Components/Sidebar";
 import DeleteConfirmationModal from "../../../Components/Common/DeleteConfirmationModal";
 import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action";
 import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice";
-import { toast } from "react-hot-toast"; // Ensure toast library is imported
+import { toast } from "react-hot-toast";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../config/permission";
 
 const GraduationMainSection = () => {
@@ -107,7 +108,7 @@ const GraduationMainSection = () => {
       <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
 
       {/* Display the filtered students */}
-      <ProtectedSection requiredPermission={PERMISSIONS.VIEW_GRADUATES}>
+      <ProtectedSection requiredPermission={""} title={"Graduates"}>
         <GraduateList
           students={filteredStudents}
           selectedStudents={selectedStudents}

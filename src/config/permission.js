@@ -558,4 +558,11 @@ export const PERMISSIONS = {
   DELETE_QUIZ: "Delete Quiz",
   GET_QUIZ_BY_ID: "Get Quiz by ID",
   ASSIGN_QUIZ_GRADE: "Assign Quiz Grade",
+
+
+  // Graduates Permissions
+  VIEW_ALL_GRADUATES: "View All Graduates",
+  DEMOTE_GRADUATE: "Demote Graduate",
+  VIEW_GRADUATE_DETAILS: "View Graduate Details",
+  
 };
