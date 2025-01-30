@@ -5,6 +5,7 @@ import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const RubricCard = ({ rubric, onDelete, onEdit }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,13 +75,13 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2 text-xl">
-          <ProtectedAction requiredPermission="delete rubric">
+          <ProtectedAction requiredPermission={PERMISSIONS.DELETE_RUBRIC}>
             <button className="text-red-600" onClick={handleDeleteClick}>
               <RiDeleteBin2Line />
             </button>
           </ProtectedAction>
 
-          <ProtectedAction requiredPermission="edit rubric">
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_RUBRIC}>
             <button className="text-green-600" onClick={handleEditClick}>
               <MdOutlineModeEditOutline />
             </button>
