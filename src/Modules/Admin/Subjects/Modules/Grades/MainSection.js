@@ -12,6 +12,7 @@ import { fetchFilteredAssignments } from "../../../../../Store/Slices/Admin/Clas
 import { fetchModules } from "../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { fetchFilteredQuizzesThunk } from "../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 const MainSection = () => {
   const { cid, sid } = useParams();
   const [search, setSearch] = useState("");
@@ -80,8 +81,7 @@ const MainSection = () => {
       <SubjectSideBar />
       <ProtectedSection
         title="Grades"
-        requiredPermission="see grades"
-        // aman={true}
+        requiredPermission={PERMISSIONS.GRADES_OF_ONE_CLASS}
       >
         <div className="border-l w-full mr-2">
           <GradeHeader
