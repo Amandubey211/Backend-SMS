@@ -17,7 +17,7 @@ export const fetchAllStudents = createAsyncThunk(
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`${baseUrl}/${getRole}/all/students?say=${say}`, filter);
+      const response = await getData(`/${getRole}/all/students?say=${say}`, filter);
       return response?.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -97,8 +97,9 @@ export const fetchStudentDocument = createAsyncThunk(
 // Fetch Student Attendance
 export const fetchStudentAttendance = createAsyncThunk(
   "student/studentAttendance",
-  async ({ month, year, studentId }, { rejectWithValue, dispatch }) => {
+  async ({ month, year, studentId }, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(`/api/studentDashboard/myAttendance?say=${say}`, { month, year, studentId },
@@ -136,6 +137,7 @@ export const fetchStudentSubjects = createAsyncThunk(
   "student/studentSubjects",
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(`/api/studentDashboard/subjects/${id}?say=${say}`);
@@ -151,6 +153,7 @@ export const fetchStudentFinance = createAsyncThunk(
   "student/studentFinance",
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(`/student/fees/${id}?say=${say}`);
@@ -182,9 +185,10 @@ export const fetchAttendanceData = createAsyncThunk(
   "student/AttendanceData",
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/api/teacher/attendance/getYearlyAttendance/${id}?say=${say}`);
+      const response = await getData(`/${getRole}/attendance/getYearlyAttendance/${id}?say=${say}`);
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -200,7 +204,7 @@ export const fetchCourseProgress = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const say = getAY();
-      const response = await getData(`${baseUrl}/${getRole}/course/progress/student/${ids.studentId}/subject/${ids.subjectId}?say=${say}`);
+      const response = await getData(`/${getRole}/course/progress/student/${ids.studentId}/subject/${ids.subjectId}?say=${say}`);
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
