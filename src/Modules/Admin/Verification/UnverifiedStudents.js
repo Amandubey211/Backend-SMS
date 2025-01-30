@@ -71,13 +71,13 @@ const UnverifiedStudents = () => {
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ProtectedSection permission={PERMISSIONS.VIEW_UNVERIFIED_STUDENT} title={t("Unverified Students")}>
+      <ProtectedSection permission={PERMISSIONS.VIEW_UNVERIFIED_STUDENT} title={t("Unverified Students")}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStudents?.map((student) => (
             <UnVerifiedStudentCard key={student._id} studentId={student._id} />
           ))}
-        </ProtectedSection>
-      </div>
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

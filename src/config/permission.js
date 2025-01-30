@@ -568,6 +568,6 @@ export const PERMISSIONS = {
   VIEW_GRADUATE_DETAILS: "View Graduate Details", // not in backend
 
   // Verify Students
-  VIEW_UNVERIFIED_STUDENT: "View Unverified Student",
-  VIEW_REJECTED_STUDENTS: "View Rejected Students",
+  VIEW_UNVERIFIED_STUDENT: "View Unverified Student", // not in backend
+  VIEW_REJECTED_STUDENTS: "View Rejected Students", // not in backend
 };
