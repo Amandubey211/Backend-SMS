@@ -110,7 +110,6 @@ export const editUser = createAsyncThunk(
       );
 
       if (response.success) {
-        toast.success("User updated successfully");
         userData.role === "teacher"
           ? dispatch(fetchAllTeachers())
           : dispatch(fetchAllStaff());

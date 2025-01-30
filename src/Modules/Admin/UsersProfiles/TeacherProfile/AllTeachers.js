@@ -166,7 +166,10 @@ const AllTeachers = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_TEACHER} title={"Teacher"}>
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_TEACHER}
+            title={"Teacher"}
+          >
             <div className="p-4 relative">
               {/* Reusable Header Component */}
               <Header
@@ -227,8 +230,10 @@ const AllTeachers = () => {
             {sidebarContent === "viewTeacher"
               ? t("Quick View of Teacher")
               : sidebarContent === "createRole"
-                ? t("Create New Role")
-                : teacherData ? t("Edit Teacher") : t("Add Teacher")}
+              ? t("Create New Role")
+              : teacherData
+              ? t("Edit Teacher")
+              : t("Add Teacher")}
           </span>
         }
         width={sidebarContent === "viewTeacher" ? "30%" : "75%"}

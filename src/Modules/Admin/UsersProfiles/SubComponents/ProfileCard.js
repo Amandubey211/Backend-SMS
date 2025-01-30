@@ -19,7 +19,6 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
   const dispatch = useDispatch();
   const { loading } = useSelector((store) => store.admin.all_staff);
   const role = useSelector((store) => store.common.auth.role);
-  console.log(profile, "Profile Data");
 
   // State for Modals and Tooltips
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,18 +44,25 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
     dispatch(activeUser(userData));
   };
 
-  // Function to Truncate Name
+  /**
+   * Truncates the full name to the specified limit,
+   * showing a single "..." ONLY as a clickable element.
+   * This avoids double dots in the UI.
+   */
   const getTruncatedName = (firstName, lastName, limit = 20) => {
     const fullName = `${firstName} ${lastName}`;
     if (fullName.length <= limit) {
       return <span>{fullName}</span>;
     }
-    const truncated = fullName.slice(0, limit - 3) + "...";
+
+    // We slice but do NOT add "..." here to avoid double dots
+    const truncated = fullName.slice(0, limit);
+
     return (
       <div className="relative inline-block">
-        <span>{truncated} </span>
+        <span>{truncated}</span>
         <span
-          className="text-blue-600 font-bold cursor-pointer"
+          className="text-blue-600 font-bold cursor-pointer ml-1"
           onMouseEnter={() => setIsNameTooltipVisible(true)}
           onMouseLeave={() => setIsNameTooltipVisible(false)}
           aria-label={`Show full name: ${fullName}`}
@@ -138,10 +144,11 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
           </span>
         )}
 
-
         <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
           {profile?.active && (
-            <ProtectedAction requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}>
+            <ProtectedAction
+              requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}
+            >
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 onClick={(event) => editUser(event, profile)}
@@ -157,7 +164,9 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
           )}
 
           {profile?.active ? (
+
             <ProtectedAction requiredPermission={PERMISSIONS[`DEACTIVE_${role.toUpperCase()}`]}>
+
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 title="Deactivate"
@@ -171,7 +180,9 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
               </button>
             </ProtectedAction>
           ) : (
-            <ProtectedAction requiredPermission={PERMISSIONS[`ACTIVE_${role.toUpperCase()}`]}>
+            <ProtectedAction
+              requiredPermission={PERMISSIONS[`ACTIVE_${role.toUpperCase()}`]}
+            >
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 title="Activate"
@@ -183,7 +194,6 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
             </ProtectedAction>
           )}
         </div>
-
 
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
           <img

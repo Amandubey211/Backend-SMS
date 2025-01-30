@@ -168,7 +168,10 @@ const AllStaff = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STAFF} title={"Staff"}>
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_STAFF}
+            title={"Staff"}
+          >
             <div className="p-4 relative">
               {/* Reusable Header Component with currentSort and currentFilters */}
               <Header
@@ -217,7 +220,8 @@ const AllStaff = () => {
                   <GoPlus className="text-2xl" />
                 </button>
               </ProtectedAction>
-            </div></ProtectedSection>
+            </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 
@@ -231,16 +235,18 @@ const AllStaff = () => {
             {sidebarContent === "viewStaff"
               ? t("Quick View of Staff")
               : sidebarContent === "createRole"
-                ? t("Create New Role")
-                : staffData ? t("Edit Staff") : t("Add Staff")}
+              ? t("Create New Role")
+              : staffData
+              ? t("Edit Staff")
+              : t("Add Staff")}
           </span>
         }
         width={
           sidebarContent === "viewStaff"
             ? "30%"
             : sidebarContent === "createRole"
-              ? "60%"
-              : "75%"
+            ? "60%"
+            : "75%"
         }
         height="100%"
       >
