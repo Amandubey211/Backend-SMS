@@ -138,7 +138,12 @@ const CreateAnnouncement = () => {
             loading={loading}
             isEditing={isEditing}
           />
-          <ProtectedSection requiredPermission="add/update Announcement">
+          <ProtectedSection
+            requiredPermission={
+              PERMISSIONS.ADD_NEW_ANNOUNCEMENT || PERMISSIONS.EDIT_ANNOUNCEMENT
+            }
+            title={""}
+          >
             <div className="flex w-full">
               <div className="w-[75%]">
                 <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">

@@ -3,6 +3,7 @@ import { CiSearch } from "react-icons/ci";
 import { NavLink, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const AnnouncementHeader = ({ onSearch }) => {
   const [filter, setFilter] = useState("all");
@@ -23,7 +24,7 @@ const AnnouncementHeader = ({ onSearch }) => {
     <div className="p-3">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold mb-4">{t("All Announcements")}</h2>
-        <ProtectedAction requiredPermission="Add Announcement">
+        <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_ANNOUNCEMENT}>
           <NavLink
             to={`/class/${cid}/${sid}/announcements/create_announcement`}
             className="flex items-center border border-gray-300 ps-5 py-2 rounded-full transition-all duration-300 ease-in-out hover:shadow-md"
