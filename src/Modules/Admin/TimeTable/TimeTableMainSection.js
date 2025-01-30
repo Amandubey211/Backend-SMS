@@ -193,7 +193,7 @@ const TimeTableMainSection = () => {
           </ProtectedAction>
         </div>
       )}
-      <ProtectedSection requiredPermission="viewTimetable">
+      <ProtectedSection requiredPermission={PERMISSIONS.TIMETABLE_VIEW} title={t("TimeTable")}>
 
         <ProtectedAction requiredPermission={PERMISSIONS.TIMETABLE_VIEW}>
           {/* Display Timetable List */}

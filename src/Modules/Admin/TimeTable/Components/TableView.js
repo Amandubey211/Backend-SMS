@@ -238,18 +238,19 @@ const TableView = () => {
           </>
         )}
       </Row>
-
-      <Table
-        columns={getColumns(timetable?.type)}
-        dataSource={filteredData}
-        pagination={{
-          ...pagination,
-          total: filteredData?.length,
-          showSizeChanger: true,
-        }}
-        onChange={handleTableChange}
-        bordered
-      />
+      <ProtectedSection requiredPermission={PERMISSIONS.TIMETABLE_VIEW} title={t("Timetable View")}>
+        <Table
+          columns={getColumns(timetable?.type)}
+          dataSource={filteredData}
+          pagination={{
+            ...pagination,
+            total: filteredData?.length,
+            showSizeChanger: true,
+          }}
+          onChange={handleTableChange}
+          bordered
+        />
+      </ProtectedSection>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmatiomModal

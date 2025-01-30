@@ -14,6 +14,9 @@ import {
   EyeOutlined,
   MailOutlined,
 } from "@ant-design/icons";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
   const { t } = useTranslation("admTimeTable");
@@ -62,30 +65,35 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
   // Updated actionMenu to prevent event propagation
   const actionMenu = (record) => (
     <Menu>
-      <Menu.Item
-        key="1"
-        onClick={(e) => {
-          e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
-          // For Ant Design v5 and above, use e.stopPropagation()
-          // e.stopPropagation();
-          handleEditClick(record);
-        }}
-      >
-        <EditOutlined style={{ marginRight: 8 }} />
-        {t("Edit")}
-      </Menu.Item>
-      <Menu.Item
-        key="2"
-        onClick={(e) => {
-          e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
-          // For Ant Design v5 and above, use e.stopPropagation()
-          // e.stopPropagation();
-          handleDeleteClick(record);
-        }}
-      >
-        <DeleteOutlined style={{ marginRight: 8 }} />
-        {t("Delete")}
-      </Menu.Item>
+      <ProtectedAction requiredPermission={"PERMISSIONS.UPDATE_TIMETABLE"}>
+        <Menu.Item
+          key="1"
+          onClick={(e) => {
+            e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
+            // For Ant Design v5 and above, use e.stopPropagation()
+            // e.stopPropagation();
+            handleEditClick(record);
+          }}
+        >
+          <EditOutlined style={{ marginRight: 8 }} />
+          {t("Edit")}
+        </Menu.Item>
+      </ProtectedAction>
+      
+      <ProtectedAction requiredPermission={"PERMISSIONS.DELETE_TIMETABLE"}>
+        <Menu.Item
+          key="2"
+          onClick={(e) => {
+            e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
+            // For Ant Design v5 and above, use e.stopPropagation()
+            // e.stopPropagation();
+            handleDeleteClick(record);
+          }}
+        >
+          <DeleteOutlined style={{ marginRight: 8 }} />
+          {t("Delete")}
+        </Menu.Item>
+      </ProtectedAction>
     </Menu>
   );
 
@@ -211,11 +219,10 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
               <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
                 {/* Active/Draft Tag */}
                 <span
-                  className={`text-sm font-normal px-2 rounded ${
-                    timetable.status === "active"
+                  className={`text-sm font-normal px-2 rounded ${timetable.status === "active"
                       ? "bg-green-100 text-green-700"
                       : "bg-red-100 text-gray-700"
-                  }`}
+                    }`}
                 >
                   {timetable.status === "active" ? t("Active") : t("Draft")}
                 </span>
