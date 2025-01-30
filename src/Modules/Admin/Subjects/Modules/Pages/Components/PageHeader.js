@@ -3,6 +3,7 @@ import React from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const PageHeader = ({ searchQuery, handleSearchChange }) => {
   const { cid, sid } = useParams();
@@ -25,7 +26,7 @@ const PageHeader = ({ searchQuery, handleSearchChange }) => {
             <RiSearchLine className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        <ProtectedAction requiredPermission="Add Page">
+        <ProtectedAction requiredPermission={PERMISSIONS.CREATE_PAGE}>
           <NavLink
             to={`/class/${cid}/${sid}/page/create_Page`}
             className="flex items-center border border-gray-300 ps-5 rounded-full"

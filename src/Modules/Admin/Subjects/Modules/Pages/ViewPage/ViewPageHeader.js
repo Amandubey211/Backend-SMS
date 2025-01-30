@@ -16,6 +16,7 @@ import {
   updatePage,
 } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -101,7 +102,7 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
       </div>
 
       <div className="relative flex justify-end gap-2 items-center w-full p-2 text-gray-700">
-        <ProtectedAction requiredPermission="Update page">
+        <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_PAGE}>
           <button
             className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
             aria-label={isPublished ? "Unpublish Page" : "Publish Page"}
@@ -125,7 +126,7 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
           </button>
         </ProtectedAction>
 
-        <ProtectedAction requiredPermission="Update page">
+        <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_PAGE}>
           <button
             onClick={handleEdit}
             className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
@@ -135,7 +136,7 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
             <span>Edit</span>
           </button>
         </ProtectedAction>
-        <ProtectedAction requiredPermission="delete page">
+        <ProtectedAction requiredPermission={PERMISSIONS.DELETE_PAGE}>
           <button
             className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition relative"
             aria-label="More Options"
