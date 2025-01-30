@@ -561,8 +561,12 @@ export const PERMISSIONS = {
 
 
   // Graduates Permissions
-  VIEW_ALL_GRADUATES: "View All Graduates",
-  DEMOTE_GRADUATE: "Demote Graduate",
-  VIEW_GRADUATE_DETAILS: "View Graduate Details",
+  VIEW_ALL_GRADUATES: "View All Graduates", // not in backend
+  DEMOTE_GRADUATE: "Demote Graduate", // not in backend
+  VIEW_GRADUATE_DETAILS: "View Graduate Details", // not in backend
   
+
+  // Verify Students
+  VIEW_UNVERIFIED_STUDENT: "View Unverified Student",
+  VIEW_REJECTED_STUDENTS: "View Rejected Students",
 };
