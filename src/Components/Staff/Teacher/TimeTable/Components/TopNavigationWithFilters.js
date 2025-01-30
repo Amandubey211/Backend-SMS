@@ -43,7 +43,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
   // Handle filter changes
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
-  
+
     if (filterName === "name") {
       // Trigger frontend filter change with debounce
       debouncedHandleNameFilter(value);
@@ -52,7 +52,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
       onBackendFilterChange({ ...filters, [filterName]: value });
     }
   };
-  
+
 
   const applyFilters = () => {
     onBackendFilterChange(filters);

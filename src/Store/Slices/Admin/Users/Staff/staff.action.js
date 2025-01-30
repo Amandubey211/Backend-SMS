@@ -133,7 +133,7 @@ export const deactiveUser = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY();
       const response = await deleteData(
-        `${baseUrl}/${getRole}/delete_staff/${userData.id}?say=${say}`
+        `/${getRole}/delete_staff/${userData.id}?say=${say}`
       );
 
       if (response.success) {
@@ -162,7 +162,7 @@ export const activeUser = createAsyncThunk(
       const getRole = getUserRole(getState);
       const say = getAY();
       const response = await putData(
-        `${baseUrl}/${getRole}/update_active_status?say=${say}`,
+        `/${getRole}/update_active_status?say=${say}`,
         userData
       );
 

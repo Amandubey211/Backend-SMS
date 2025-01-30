@@ -164,9 +164,9 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
           )}
 
           {profile?.active ? (
-            <ProtectedAction
-              requiredPermission={PERMISSIONS[`BLOCK_${role.toUpperCase()}`]}
-            >
+
+            <ProtectedAction requiredPermission={PERMISSIONS[`DEACTIVE_${role.toUpperCase()}`]}>
+
               <button
                 className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
                 title="Deactivate"

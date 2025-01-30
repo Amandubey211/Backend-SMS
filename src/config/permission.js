@@ -227,26 +227,29 @@ export const PERMISSIONS = {
   VIEW_TEACHER: "view Teacher",
   ADD_TEACHER: "Add Teacher",
   EDIT_TEACHER: "edit Teacher",
-  ACTIVE_TEACHER: "update status Teacher",
+  ACTIVE_TEACHER: "activate Teacher",
+  DEACTIVE_TEACHER: "deactivate Teacher",
 
   // other staff
   VIEW_STAFF: "view Staff",
   ADD_STAFF: "Add Staff",
   EDIT_STAFF: "edit Staff",
-  ACTIVE_STAFF: "update status Staff",
+  ACTIVE_STAFF: "activate Staff",
+  DEACTIVE_STAFF: "deactivate Staff",
 
   //librarian
   VIEW_LIBRARIAN: "view Librarian",
   ADD_LIBRARIAN: "Add Librarian",
   EDIT_LIBRARIAN: "edit Librarian",
-  ACTIVE_LIBRARIAN: "update status Librarian",
-
+  ACTIVE_LIBRARIAN: "activate Librarian",
+  DEACTIVE_LIBRARIAN: "deactivate Librarian",
   //finance
   VIEW_FINANCE_USER: "view Finance",
   ADD_FINANCE: "Add Finance",
   EDIT_FINANCE: "Edit Finance",
-  ACTIVE_FINANCE: "update status Finance",
-
+  ACTIVE_FINANCE: "activate Finance",
+  DEACTIVE_FINANCE: "deactivate Finance",
+  
   // ---------------------------------------------------------------
   // ROLE MANAGEMENT PERMISSIONS (NEW) 8
   // ---------------------------------------------------------------
@@ -558,4 +561,16 @@ export const PERMISSIONS = {
   DELETE_QUIZ: "Delete Quiz",
   GET_QUIZ_BY_ID: "Get Quiz by ID",
   ASSIGN_QUIZ_GRADE: "Assign Quiz Grade",
+
+  // Graduates Permissions
+  VIEW_ALL_GRADUATES: "View All Graduates", // not in backend
+  DEMOTE_GRADUATE: "Demote Graduate", // not in backend
+  VIEW_GRADUATE_DETAILS: "View Graduate Details", // not in backend
+
+  // Verify Students
+  VIEW_UNVERIFIED_STUDENT: "View Unverified Student", // not in backend
+  VIEW_REJECTED_STUDENTS: "View Rejected Students", // not in backend
+
+  // Admission to Student
+  CREATE_ADMISSION: "Create Admission", // not in backend
 };
