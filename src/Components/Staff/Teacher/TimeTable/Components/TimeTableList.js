@@ -185,7 +185,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 
   return (
     <>
-      <ProtectedSection requiredPermission={PERMISSIONS.TIMETABLE_VIEW}>
+      <ProtectedSection requiredPermission={PERMISSIONS.TIMETABLE_VIEW} title={t("Time Tables")}>
         {/* Heading */}
         <div className="flex items-center justify-between mb-6 px-4">
           <h1 className="text-2xl font-bold text-gray-800">{t("Timetables:")}</h1>
