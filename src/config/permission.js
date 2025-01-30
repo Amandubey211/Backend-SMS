@@ -570,4 +570,7 @@ export const PERMISSIONS = {
   // Verify Students
   VIEW_UNVERIFIED_STUDENT: "View Unverified Student", // not in backend
   VIEW_REJECTED_STUDENTS: "View Rejected Students", // not in backend
+
+  // Admission to Student
+  CREATE_ADMISSION: "Create Admission", // not in backend
 };
