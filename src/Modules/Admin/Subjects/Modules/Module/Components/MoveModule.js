@@ -30,7 +30,6 @@ const MoveModule = ({ moduleId, currentPosition, modulesData, onClose }) => {
     <ProtectedSection
       requiredPermission={PERMISSIONS.REORDER_MODULES}
       title={"Move Module"}
-      // aman={true}
     >
       <div className="h-full flex flex-col justify-between p-6 transition-transform duration-300 ease-out transform scale-100">
         <div className="w-full mb-4">

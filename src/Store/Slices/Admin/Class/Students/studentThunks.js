@@ -19,7 +19,7 @@ export const fetchStudentsByClassAndSection = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(`/admin/student/${classId}?say=${say}`);
-      console.log("API response from thunk:", response); // Debugging
+      console.log(response.data, "dddd");
       return response.data; // Ensure the structure is correct
     } catch (error) {
       console.error("Error in thunk:", error); // Debugging
@@ -38,7 +38,7 @@ export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
       const response = await getData(
         `/admin/all/student/${classId}?say=${say}`
       );
-      console.log(response,"ddddd")
+      console.log(response, "ddddd");
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
