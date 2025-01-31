@@ -391,23 +391,33 @@ const TotalExpenseList = () => {
     [selectedRowKey, expenseIdMap]
   );
 
+  console.log("expense data:-", expenses);
+
   // Transform expense data for export
   const transformExpenseData = (expenses) =>
-    expenses?.map(({ _id, category, ...expense }, index) => ({
-      sNo: index + 1,
-      category: category?.[0]?.categoryName || "N/A",
-      description: expense.description || "N/A",
-      paymentType: expense.paymentType || "N/A",
-      discount: expense.discount || 0,
-      discountType: expense.discountType || "percentage",
-      finalAmount: expense.finalAmount || 0,
-      paidAmount: expense.paidAmount || 0,
-      remainingAmount: expense.remainingAmount || 0,
-      penalty: expense.penalty || 0,
-      expenseDate: expense?.createdAt || "N/A", // Mapped from createdAt
-      totalAmount: expense.totalAmount || 0,
-      academicYearDetails: expense.academicYearDetails?.year || "N/A",
-    })) || [];
+
+    expenses?.map((expense) => ({
+      key: expense?._id,
+      categoryName: expense?.category?.categoryName || "N/A",
+      subcategory: expense?.subcategory || "N/A",
+      description: expense?.description || "N/A",
+      discount: expense?.discount || 0,
+      discountType: expense?.discountType || "percentage",
+      finalAmount: expense?.finalAmount || 0,
+      paidAmount: expense?.paidAmount || 0,
+      paymentType: expense?.paymentType || "N/A",
+      paymentStatus: expense?.paymentStatus || "N/A",
+      remainingAmount: expense?.remainingAmount || 0,
+      penalty: expense?.penalty || 0,
+      remainingAmount: expense?.remainingAmount || 0,
+      tax: expense?.tax || 0,
+      totalAllowance: expense?.totalAllowance || 0,
+      totalDeduction: expense?.totalDeduction || 0,
+      totalAmount: expense?.totalAmount || 0,
+      staffType: expense?.staffType || "N/A",
+      ...expense,
+    })) || [expenses];
+
 
   // Map expenses to data source with camelCase fields
   const dataSource = useMemo(
@@ -539,8 +549,11 @@ const TotalExpenseList = () => {
             </div>
 
             {/* Header Section */}
+    <div className="flex items-center gap-4 ms-4">
+
             <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4 my-2">
               <div className="flex items-center gap-4 ms-1">
+
                 <Input
                   placeholder="Search by Description"
                   prefix={<SearchOutlined />}
@@ -554,7 +567,9 @@ const TotalExpenseList = () => {
                   }}
                 />
               </div>
+
               <div className="flex flex-wrap items-center gap-2 ">
+
                 {selectedRowKey && (
                   <Tooltip title="Create an invoice for the selected unpaid record">
                     <Button
