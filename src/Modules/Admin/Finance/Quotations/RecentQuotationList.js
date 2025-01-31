@@ -36,12 +36,13 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
-import { sendEmail } from "../../../../Store/Slices/Common/SendEmail/sendEmailThunk";
+
 
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 
 import { downloadPDF } from "../../../../Utils/xl";
+import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 
 
 const RecentQuotationList = () => {
