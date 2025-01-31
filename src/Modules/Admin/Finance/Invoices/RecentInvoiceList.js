@@ -394,7 +394,9 @@ const RecentInvoiceList = () => {
 
 
                   {/* Add New Fee Button */}
-                  {!PERMISSIONS.CREATE_NEW_INVOICE && (
+                 <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
+
+                 
                     <button
                       onClick={() => {
 
@@ -411,7 +413,7 @@ const RecentInvoiceList = () => {
                         <FiPlus size={16} />
                       </div>
                     </button>
-                  )}
+               </ProtectedAction>
                 </div>
               </div>
             </div>

@@ -13,6 +13,7 @@ import { FaPlusCircle } from "react-icons/fa";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const InvoicesMain = () => {
     useNavHeading("Finance", "Invoices");
@@ -31,7 +32,7 @@ const InvoicesMain = () => {
                 <div className="flex justify-between items-center">
                     <div className="flex gap-4 justify-start items-center">
                     </div>
-                    {/* Add New Invoice Button */}
+                    <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
                     <button
                        onClick={() => {dispatch(setInvoiceData());navigate('/finance/invoices/add-new-invoice')}}
                         className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -42,6 +43,7 @@ const InvoicesMain = () => {
                              <FiPlus size={16} />
                         </div>
                     </button>
+                    </ProtectedAction>
                 </div>
                 <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_INVOICE} title={'Invoice Cards'}>
                 <CardsSection />

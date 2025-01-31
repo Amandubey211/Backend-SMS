@@ -33,15 +33,15 @@ const OfflineModal = ({ error, onDismiss }) => {
           maxWidth: "500px",
         }}
       >
-        <Alert
-          message={error || "Something is wrong"}
+        {/* <Alert
+          message={error  || "Something is wrong"}
           type="error"
           showIcon
           closable
           onClose={onDismiss}
           // Ant Design styling enhancements
           style={{ boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}
-        />
+        /> */}
       </motion.div>
       {/* )} */}
     </AnimatePresence>

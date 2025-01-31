@@ -49,7 +49,8 @@ export const PERMISSIONS = {
   EDIT_ISSUE_BOOK: "Make changes in Issue Book",
   VIEW_STUDENT_BY_SECTION_AND_CLASS: "View Students By Class And Section", //NW
   //  VIEW_SECTIONS:"View Sections",
-  VIEW_STUDENT: "Show All Students",
+  VIEW_STUDENT: "View Students",
+  VIEW_PARENT: "View Parents",
 
   // Finance 3
 
@@ -63,7 +64,7 @@ export const PERMISSIONS = {
 
   // add - earning
   ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
-  ADD_NEW_Facility_REVENUE: "Add new Facility Based Revenue",
+  ADD_NEW_Facility_REVENUE: "Add new Facality Based Revenue",
   ADD_NEW_Financial_REVENUE: "Add new financial Investment Revenue",
   ADD_NEW_Service_REVENUE: "Add new Service Based Revenue",
   ADD_NEW_Other_REVENUE: "Add new Other Revenue", // not in backend
@@ -75,6 +76,7 @@ export const PERMISSIONS = {
   Service_MODIFY: "Modify Service Based Revenue",
   Other_MODIFY: "Modify Other Revenue",
   LIST_ALL_REVENUE: "List all Revenue",
+
   CREATE_NEW_INVOICE: "Create new Invoice",
 
   // delete-earning
@@ -479,7 +481,17 @@ export const PERMISSIONS = {
   // ======================
   SECTION_BY_CLASS_STUDENT: "Get Section by Class",
   STUDENTS_BY_CLASS_AND_SECTION_STUDENT: "Get Students by Class and Section",
+ //student management
 
+ STUDENT_BOOKISSUE_RECORD: "Get Book Issue Records",
+ GET_STUDENT_ATTENDENCE: "Get Student Attendance",
+ GET_STUDENT_SUBJECTS: "Get Student Subjects",
+ GET_STUDENT_GRADES: "Get Student Grades",
+ GET_STUDENT_INFO: "Get Student Information",
+ GET_COURSE_PROGRESS: "Get Course Progress",
+ GET_PROGRESS_OF_SUBJECT: "Get Course Progress by Subject",
+ GET_STUDENT_TASK: "Get Student Tasks",
+ GET_YEARLY_ATTENDEC: "Get Yearly Attendance",
   // ====================
   // Grade Management
   // ====================
@@ -504,26 +516,16 @@ export const PERMISSIONS = {
 
   // Student View
   GET_ALL_CLASSES: "Get All Classes",
-  SHOW_ALL_STUDENTS: "Show All Students",
+  SHOW_ALL_STUDENTS: "View Students",
 
-  //student management
-
-  STUDENT_BOOKISSUE_RECORD: "Get Book Issue Records",
-  GET_STUDENT_ATTENDENCE: "Get Student Attendance",
-  GET_STUDENT_SUBJECTS: "Get Student Subjects",
-  GET_STUDENT_GRADES: "Get Student Grades",
-  GET_STUDENT_INFO: "Get Student Information",
-  GET_COURSE_PROGRESS: "Get Course Progress",
-  GET_PROGRESS_OF_SUBJECT: "Get Course Progress by Subject",
-  GET_STUDENT_TASK: "Get Student Tasks",
-  GET_YEARLY_ATTENDEC: "Get Yearly Attendance",
+ 
 
   // Student Info
   SHOWS_STUDENT_INFO: "Shows Student Info",
 
   // Parent View
-  VIEW_PARENT: "View Parent",
-  VIEW_STUDENT: "View Student",
+  
+  //VIEW_STUDENT: "View Student",
   SHOWS_PARENT_STUDENT_INFO: "Shows Student Info",
 
   // Teacher View
