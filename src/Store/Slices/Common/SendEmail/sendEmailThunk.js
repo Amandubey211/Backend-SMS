@@ -5,11 +5,10 @@ import { getUserRole } from "../../../../Utils/getRoles";
 
 export const sendEmail = createAsyncThunk(
     "sendEmail/send",
-    async ({ id, type, data }, { rejectWithValue, getState }) => {
-        
+    async ({ id, type }, { rejectWithValue, getState }) => {
         try {
             const getRole = getUserRole(getState);
-            const response = await postData(`/${getRole}/invoice/send/${type}/${id}`, data);
+            const response = await postData(`/${getRole}/invoice/send/${type}/${id}`);
 
             if (response?.success) {
                 toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} sent successfully!`);
