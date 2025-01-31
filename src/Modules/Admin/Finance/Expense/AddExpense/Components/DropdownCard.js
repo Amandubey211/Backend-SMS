@@ -91,28 +91,55 @@ const DropdownCard = ({
             role="listbox"
             aria-labelledby={`label-${id}`}
           >
-            {options?.map((item, index) => (
-            <ProtectedAction requiredPermission={PERMISSIONS[`ADD_NEW_${item?.split(/[\s-]/)[0]}_EXPENSE`]}>
-              <li
-                key={index}
-                className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
-                  item === value ? "bg-pink-200 font-bold text-gray-900" : ""
-                }`}
-                onClick={() => onSelect(item)}
-                role="option"
-                aria-selected={item === value}
-                tabIndex={0} // Make focusable
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    onSelect(item);
-                  }
-                }}
-              >
-                {item}
-              </li>
-              </ProtectedAction>
-            ))}
+           {options?.map((item, index) => {
+    // Extract the first word or main keyword for permission mapping
+    const permissionKey = `ADD_NEW_${item.replace(/[\s-]/g, "_").split("_")[0]}_EXPENSE`;
+
+    console.log(permissionKey, PERMISSIONS[permissionKey]); // Debugging
+
+    return PERMISSIONS[permissionKey] ? (
+      <ProtectedAction requiredPermission={PERMISSIONS[permissionKey]}>
+        <li
+          key={index}
+          className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+            item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+          }`}
+          onClick={() => onSelect(item)}
+          role="option"
+          aria-selected={item === value}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onSelect(item);
+            }
+          }}
+        >
+          {item}
+        </li>
+      </ProtectedAction>
+    ) : (
+      <li
+        key={index}
+        className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+          item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+        }`}
+        onClick={() => onSelect(item)}
+        role="option"
+        aria-selected={item === value}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelect(item);
+          }
+        }}
+      >
+        {item}
+      </li>
+    );
+  })}
+
           </motion.ul>
         )}
       </AnimatePresence>

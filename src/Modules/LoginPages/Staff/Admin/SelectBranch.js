@@ -7,7 +7,7 @@ import {
 import Layout from "../../../../Components/Common/Layout";
 import Logo from "../../../../Components/Common/Logo";
 import { CiSearch } from "react-icons/ci";
-import { LuLoader } from "react-icons/lu";
+import { LuLoader, LuSchool } from "react-icons/lu";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { setLocalCookies } from "../../../../Utils/academivYear";
@@ -37,7 +37,7 @@ const SelectBranch = () => {
   };
 
   const HandleBranch = () => {
-    const data = { schoolId: selectedBranch?._id };
+    const data = { schoolId: selectedBranch?._id,logo:selectedBranch.logo || '' };
     dispatch(updateBranch({ navigate, data })).then(() => {
       setLocalCookies("SelectedschoolId", selectedBranch?._id);
     });
@@ -51,7 +51,7 @@ const SelectBranch = () => {
   // Fallback image URL (until images are added)
   const getBranchImage = (branch) => {
     return (
-      branch?.image ||
+      branch?.logo ||
       "https://i.ibb.co/WGN5285/Screenshot-2024-11-29-121940.png"
     );
   };
@@ -133,11 +133,11 @@ const SelectBranch = () => {
                       </div>
                       <div className="flex items-center justify-center">
                         <div className="w-16 h-16 mb-1 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
-                          <img
-                            src={getBranchImage(branch)}
+                         {!branch.logo ? <LuSchool size={30} />: <img
+                            src={branch.logo}
                             alt={branch?.nameOfSchool}
                             className="w-full h-full object-cover"
-                          />
+                          />}
                         </div>
                       </div>
                     </motion.div>
@@ -168,11 +168,12 @@ const SelectBranch = () => {
                 {/* Branch Details */}
                 <div className="mt-4">
                   <div className="flex items-center justify-center mb-4">
-                    <img
-                      src={getBranchImage(selectedBranch)}
-                      alt={selectedBranch?.nameOfSchool}
-                      className="w-32 h-32 object-contain rounded-full border-4 border-white"
-                    />
+                    {!selectedBranch?.logo ? <LuSchool size={60} />: <img
+                            src={selectedBranch?.logo}
+                            alt={selectedBranch?.nameOfSchool}
+                            className="w-32 h-32 object-contain rounded-full border-4 border-white"
+
+                          />}
                   </div>
                 </div>
               </div>
