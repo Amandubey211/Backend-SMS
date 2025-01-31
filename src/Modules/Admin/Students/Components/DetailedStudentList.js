@@ -7,7 +7,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
     activeSection === "Everyone"
       ? students
-      : students.filter((student) => student.sectionName === activeSection);
+      : students?.filter((student) => student.sectionName === activeSection);
 
   return (
     <div className="w-full p-4 bg-white">
@@ -88,9 +88,11 @@ const StudentDetails = React.memo(({ student }) => (
       <div className="text-sm text-gray-500 truncate">
         {student?.sectionName || "N/A"}
       </div>
-      <div className="text-sm text-gray-500 truncate">{`${
-        student?.groups[0]?.groupName || "N/A"
-      }`}</div>
+      {student?.groups.length > 0 && (
+        <div className="text-sm text-gray-500 truncate">
+          {student?.groups[0]?.groupName || "N/A"}
+        </div>
+      )}
     </div>
     <div className="flex flex-col pl-8 text-sm gap-1 items-start justify-start w-1/3 truncate">
       <div className="truncate">{student.email}</div>
