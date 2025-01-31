@@ -280,6 +280,15 @@ const TotalExpenseList = () => {
         width: 120,
         ellipsis: true,
       },
+      // New Expense Date Column (Third Position)
+      {
+        title: "Expense Date",
+        dataIndex: "expenseDate",
+        key: "expenseDate",
+        render: (date) => <span className="text-xs">{formatDate(date)}</span>,
+        width: 150,
+        ellipsis: true,
+      },
       {
         title: "Status",
         dataIndex: "paymentStatus",
@@ -386,6 +395,7 @@ const TotalExpenseList = () => {
 
   // Transform expense data for export
   const transformExpenseData = (expenses) =>
+
     expenses?.map((expense) => ({
       key: expense?._id,
       categoryName: expense?.category?.categoryName || "N/A",
@@ -408,6 +418,7 @@ const TotalExpenseList = () => {
       ...expense,
     })) || [expenses];
 
+
   // Map expenses to data source with camelCase fields
   const dataSource = useMemo(
     () =>
@@ -427,8 +438,7 @@ const TotalExpenseList = () => {
         remainingAmount: expense.remainingAmount || 0,
         penalty: expense.penalty || 0,
         paymentStatus: expense.paymentStatus || "N/A",
-        earnedDate: expense.paidDate || expense.generateDate || null,
-        totalAmount: expense.totalAmount || 0,
+        expenseDate: expense.createdAt || "N/A", // Mapped from createdAt
         academicYearDetails: expense.academicYearDetails?.year || "N/A",
       })),
     [expenses]
@@ -459,19 +469,20 @@ const TotalExpenseList = () => {
 
     return (
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={5}>
+        <Table.Summary.Cell index={0} colSpan={6}>
           <strong>Totals:</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={4}>
+        <Table.Summary.Cell index={6}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5}>
+        <Table.Summary.Cell index={7} />
+        <Table.Summary.Cell index={8}>
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={6}>
+        <Table.Summary.Cell index={9}>
           <strong>{formatCurrency(totalPaidAmountSum)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={7}>
+        <Table.Summary.Cell index={10}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
       </Table.Summary.Row>
@@ -538,8 +549,11 @@ const TotalExpenseList = () => {
             </div>
 
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
-              <div className="flex items-center gap-4 ms-4">
+    <div className="flex items-center gap-4 ms-4">
+
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4 my-2">
+              <div className="flex items-center gap-4 ms-1">
+
                 <Input
                   placeholder="Search by Description"
                   prefix={<SearchOutlined />}
@@ -553,7 +567,9 @@ const TotalExpenseList = () => {
                   }}
                 />
               </div>
-              <div className="flex flex-wrap items-center gap-2">
+
+              <div className="flex flex-wrap items-center gap-2 ">
+
                 {selectedRowKey && (
                   <Tooltip title="Create an invoice for the selected unpaid record">
                     <Button
