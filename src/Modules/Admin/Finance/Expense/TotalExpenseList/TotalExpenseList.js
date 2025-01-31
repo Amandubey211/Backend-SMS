@@ -173,28 +173,41 @@ const TotalExpenseList = () => {
           aria-label="View"
         />
       </Tooltip>
-      <ProtectedAction requiredPermission={PERMISSIONS[`EDIT_${record?.category?.categoryName?.split(/[\s-]/)[0]}_EXPENSE`]}>
-      <Tooltip title="Edit">
-        <Button
-          type="link"
-          icon={<EditOutlined />}
-          onClick={() => handleEdit(record)}
-          className="text-green-600 hover:text-green-800 p-0"
-          aria-label="Edit"
-        />
-      </Tooltip>
+      <ProtectedAction
+        requiredPermission={
+          PERMISSIONS[
+            `EDIT_${record?.category?.categoryName?.split(/[\s-]/)[0]}_EXPENSE`
+          ]
+        }
+      >
+        <Tooltip title="Edit">
+          <Button
+            type="link"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            className="text-green-600 hover:text-green-800 p-0"
+            aria-label="Edit"
+          />
+        </Tooltip>
       </ProtectedAction>
-      <ProtectedAction requiredPermission={PERMISSIONS[`REMOVE_${record?.category?.categoryName?.split(/[\s-]/)[0]}_EXPENSE`]}>
-      
-      <Tooltip title="Delete">
-        <Button
-          type="link"
-          icon={<DeleteOutlined />}
-          onClick={() => showDeleteModal(record)}
-          className="text-red-600 hover:text-red-800 p-0"
-          aria-label="Delete"
-        />
-      </Tooltip>
+      <ProtectedAction
+        requiredPermission={
+          PERMISSIONS[
+            `REMOVE_${
+              record?.category?.categoryName?.split(/[\s-]/)[0]
+            }_EXPENSE`
+          ]
+        }
+      >
+        <Tooltip title="Delete">
+          <Button
+            type="link"
+            icon={<DeleteOutlined />}
+            onClick={() => showDeleteModal(record)}
+            className="text-red-600 hover:text-red-800 p-0"
+            aria-label="Delete"
+          />
+        </Tooltip>
       </ProtectedAction>
     </div>
   );
@@ -369,23 +382,31 @@ const TotalExpenseList = () => {
     [selectedRowKey, expenseIdMap]
   );
 
+  console.log("expense data:-", expenses);
+
   // Transform expense data for export
   const transformExpenseData = (expenses) =>
-    expenses?.map(({ _id, category, ...expense }, index) => ({
-      sNo: index + 1,
-      category: category?.[0]?.categoryName || "N/A",
-      description: expense.description || "N/A",
-      paymentType: expense.paymentType || "N/A",
-      discount: expense.discount || 0,
-      discountType: expense.discountType || "percentage",
-      finalAmount: expense.finalAmount || 0,
-      paidAmount: expense.paidAmount || 0,
-      remainingAmount: expense.remainingAmount || 0,
-      penalty: expense.penalty || 0,
-      earnedDate: expense.paidDate || expense.generateDate || "N/A",
-      totalAmount: expense.totalAmount || 0,
-      academicYearDetails: expense.academicYearDetails?.year || "N/A",
-    })) || [];
+    expenses?.map((expense) => ({
+      key: expense?._id,
+      categoryName: expense?.category?.categoryName || "N/A",
+      subcategory: expense?.subcategory || "N/A",
+      description: expense?.description || "N/A",
+      discount: expense?.discount || 0,
+      discountType: expense?.discountType || "percentage",
+      finalAmount: expense?.finalAmount || 0,
+      paidAmount: expense?.paidAmount || 0,
+      paymentType: expense?.paymentType || "N/A",
+      paymentStatus: expense?.paymentStatus || "N/A",
+      remainingAmount: expense?.remainingAmount || 0,
+      penalty: expense?.penalty || 0,
+      remainingAmount: expense?.remainingAmount || 0,
+      tax: expense?.tax || 0,
+      totalAllowance: expense?.totalAllowance || 0,
+      totalDeduction: expense?.totalDeduction || 0,
+      totalAmount: expense?.totalAmount || 0,
+      staffType: expense?.staffType || "N/A",
+      ...expense,
+    })) || [expenses];
 
   // Map expenses to data source with camelCase fields
   const dataSource = useMemo(
@@ -500,7 +521,10 @@ const TotalExpenseList = () => {
       <DashLayout>
         <div className="p-4 space-y-3">
           {/* Top Cards Row */}
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_ALL_EXPENSES} title={"Expense List"}>
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_ALL_EXPENSES}
+            title={"Expense List"}
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {cardDataWithValues.map((card, index) => (
                 <Card
@@ -508,80 +532,78 @@ const TotalExpenseList = () => {
                   title={card.title}
                   value={card.value}
                   icon={card.icon}
-                // Pass other props like comparison, percentage, icon, trend if needed
+                  // Pass other props like comparison, percentage, icon, trend if needed
                 />
               ))}
             </div>
-         
 
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
-            <div className="flex items-center gap-4 ms-4">
-              <Input
-                placeholder="Search by Description"
-                prefix={<SearchOutlined />}
-                className="w-full md:w-64 text-xs"
-                value={searchText}
-                onChange={handleSearch}
-                allowClear
-                style={{
-                  borderRadius: "0.375rem",
-                  height: "35px",
-                }}
-              />
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4">
+              <div className="flex items-center gap-4 ms-4">
+                <Input
+                  placeholder="Search by Description"
+                  prefix={<SearchOutlined />}
+                  className="w-full md:w-64 text-xs"
+                  value={searchText}
+                  onChange={handleSearch}
+                  allowClear
+                  style={{
+                    borderRadius: "0.375rem",
+                    height: "35px",
+                  }}
+                />
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                {selectedRowKey && (
+                  <Tooltip title="Create an invoice for the selected unpaid record">
+                    <Button
+                      type="primary"
+                      icon={<DollarCircleOutlined />}
+                      onClick={() => {
+                        const selectedExpense = expenseIdMap[selectedRowKey];
+                        if (selectedExpense) {
+                          // Navigate to the invoice creation page with selectedRow data
+                          navigate("/finance/invoices/add-new-invoice", {
+                            state: { expense: selectedExpense },
+                          });
+                        } else {
+                          toast.error("Selected expense not found.");
+                        }
+                      }}
+                      className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                    >
+                      Create Invoice
+                    </Button>
+                  </Tooltip>
+                )}
+                <Button
+                  type="primary"
+                  icon={<ExportOutlined />}
+                  onClick={() => setIsExportModalVisible(true)}
+                  className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-3 rounded-md shadow-md"
+                >
+                  Export
+                </Button>
+                <Button
+                  className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
+                  icon={<FilterOutlined />}
+                  disabled
+                  // onClick={() => setIsFilterModalVisible(true)}
+                >
+                  Filter
+                </Button>
+              </div>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {selectedRowKey && (
-                <Tooltip title="Create an invoice for the selected unpaid record">
-                  <Button
-                    type="primary"
-                    icon={<DollarCircleOutlined />}
-                    onClick={() => {
-                      const selectedExpense = expenseIdMap[selectedRowKey];
-                      if (selectedExpense) {
-                        // Navigate to the invoice creation page with selectedRow data
-                        navigate("/finance/invoices/add-new-invoice", {
-                          state: { expense: selectedExpense },
-                        });
-                      } else {
-                        toast.error("Selected expense not found.");
-                      }
-                    }}
-                    className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-                  >
-                    Create Invoice
-                  </Button>
-                </Tooltip>
-              )}
-              <Button
-                type="primary"
-                icon={<ExportOutlined />}
-                onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-3 rounded-md shadow-md"
-              >
-                Export
-              </Button>
-              <Button
-                className="flex items-center px-4 py-3 rounded-md text-xs bg-gradient-to-r from-pink-400 to-pink-300 text-white border-none shadow-md hover:from-pink-500 hover:to-pink-400 transition duration-200"
-                icon={<FilterOutlined />}
-                disabled
-              // onClick={() => setIsFilterModalVisible(true)}
-              >
-                Filter
-              </Button>
-            </div>
-          </div>
 
-          {/* No Data Placeholder */}
-          {!loading && expenses.length === 0 && !error && (
-            <div className="text-center text-gray-500 text-xs py-4">
-              No records found.
-            </div>
-          )}
+            {/* No Data Placeholder */}
+            {!loading && expenses.length === 0 && !error && (
+              <div className="text-center text-gray-500 text-xs py-4">
+                No records found.
+              </div>
+            )}
 
-          {/* Table Wrapper (responsive container) */}
-          <div className="w-full overflow-x-auto">
-           
+            {/* Table Wrapper (responsive container) */}
+            <div className="w-full overflow-x-auto">
               <Table
                 dataSource={dataSource}
                 columns={columns}
@@ -626,28 +648,27 @@ const TotalExpenseList = () => {
                   },
                 })}
               />
-           
-          </div>
+            </div>
 
-          {/* Modals */}
-          <DeleteModal
-            visible={isDeleteModalVisible}
-            onClose={() => {
-              setIsDeleteModalVisible(false);
-              setSelectedExpenseForDeletion(null);
-            }}
-            type="Expense"
-            expense={selectedExpenseForDeletion}
-          />
+            {/* Modals */}
+            <DeleteModal
+              visible={isDeleteModalVisible}
+              onClose={() => {
+                setIsDeleteModalVisible(false);
+                setSelectedExpenseForDeletion(null);
+              }}
+              type="Expense"
+              expense={selectedExpenseForDeletion}
+            />
 
-          <ExportModal
-            visible={isExportModalVisible}
-            onClose={() => setIsExportModalVisible(false)}
-            dataToExport={transformExpenseData(expenses)}
-            title="ExpensesData"
-            sheet="expenses_report"
-          />
-           </ProtectedSection>
+            <ExportModal
+              visible={isExportModalVisible}
+              onClose={() => setIsExportModalVisible(false)}
+              dataToExport={transformExpenseData(expenses)}
+              title="ExpensesData"
+              sheet="expenses_report"
+            />
+          </ProtectedSection>
           {/* Add other modals like FilterExpenseModal or BulkEntriesModal if needed */}
         </div>
       </DashLayout>
