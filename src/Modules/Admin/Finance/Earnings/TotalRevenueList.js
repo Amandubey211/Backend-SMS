@@ -185,7 +185,6 @@ const TotalRevenueList = () => {
       <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
         {!isStudentBased && (
           <>
-            
             <Tooltip title="View">
               <Button
                 type="link"
@@ -204,44 +203,56 @@ const TotalRevenueList = () => {
                 aria-label="View"
               />
             </Tooltip>
-            <ProtectedAction requiredPermission={PERMISSIONS[`${record?.category?.categoryName?.split(/[\s-]/)[0]}_MODIFY`]}>
-            <Tooltip title="Edit">
-              <Button
-                type="link"
-                icon={<EditOutlined />}
-                onClick={() => {
-                  const incomeToEdit = incomeIdMap[record.key];
-                  if (incomeToEdit) {
-                    dispatch(setReadOnly(false)); // Set readOnly to false for editing
-                    dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
-                    navigate("/finance/earning/add"); // Navigate to edit page
-                  } else {
-                    toast.error("Selected income not found.");
-                  }
-                }}
-                className="text-blue-600 hover:text-blue-800 p-0"
-                aria-label="Edit"
-              />
-            </Tooltip>
+            <ProtectedAction
+              requiredPermission={
+                PERMISSIONS[
+                  `${record?.category?.categoryName?.split(/[\s-]/)[0]}_MODIFY`
+                ]
+              }
+            >
+              <Tooltip title="Edit">
+                <Button
+                  type="link"
+                  icon={<EditOutlined />}
+                  onClick={() => {
+                    const incomeToEdit = incomeIdMap[record.key];
+                    if (incomeToEdit) {
+                      dispatch(setReadOnly(false)); // Set readOnly to false for editing
+                      dispatch(setSelectedIncome(incomeToEdit)); // Dispatch the selected income to Redux
+                      navigate("/finance/earning/add"); // Navigate to edit page
+                    } else {
+                      toast.error("Selected income not found.");
+                    }
+                  }}
+                  className="text-blue-600 hover:text-blue-800 p-0"
+                  aria-label="Edit"
+                />
+              </Tooltip>
             </ProtectedAction>
-            <ProtectedAction requiredPermission={PERMISSIONS[`${record?.category?.categoryName?.split(/[\s-]/)[0]}_DELETE`]}>
-            <Tooltip title="Delete">
-              <Button
-                type="link"
-                icon={<DeleteOutlined />}
-                onClick={() => {
-                  const incomeToDelete = incomeIdMap[record.key];
-                  if (incomeToDelete) {
-                    setSelectedIncomeForDeletion(incomeToDelete);
-                    setIsDeleteModalVisible(true);
-                  } else {
-                    toast.error("Selected income not found.");
-                  }
-                }}
-                className="text-red-600 hover:text-red-800 p-0"
-                aria-label="Delete"
-              />
-            </Tooltip>
+            <ProtectedAction
+              requiredPermission={
+                PERMISSIONS[
+                  `${record?.category?.categoryName?.split(/[\s-]/)[0]}_DELETE`
+                ]
+              }
+            >
+              <Tooltip title="Delete">
+                <Button
+                  type="link"
+                  icon={<DeleteOutlined />}
+                  onClick={() => {
+                    const incomeToDelete = incomeIdMap[record.key];
+                    if (incomeToDelete) {
+                      setSelectedIncomeForDeletion(incomeToDelete);
+                      setIsDeleteModalVisible(true);
+                    } else {
+                      toast.error("Selected income not found.");
+                    }
+                  }}
+                  className="text-red-600 hover:text-red-800 p-0"
+                  aria-label="Delete"
+                />
+              </Tooltip>
             </ProtectedAction>
           </>
         )}
@@ -301,6 +312,15 @@ const TotalRevenueList = () => {
         dataIndex: "categoryName",
         key: "categoryName",
         render: (text) => <span className="text-xs">{text}</span>,
+        width: 150,
+        ellipsis: true,
+      },
+      // New Paid Date Column (Third Position)
+      {
+        title: "Paid Date",
+        dataIndex: "earnedDate",
+        key: "paidDate",
+        render: (date) => <span className="text-xs">{formatDate(date)}</span>,
         width: 150,
         ellipsis: true,
       },
@@ -457,23 +477,23 @@ const TotalRevenueList = () => {
 
     return (
       <Table.Summary.Row>
-        <Table.Summary.Cell index={0} colSpan={4}>
+        <Table.Summary.Cell index={0} colSpan={5}>
           <strong>Totals:</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={4}>
+        <Table.Summary.Cell index={5}>
           <strong>{formatCurrency(totalPenalty)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={5} />
-        <Table.Summary.Cell index={6}>
+        <Table.Summary.Cell index={6} />
+        <Table.Summary.Cell index={7}>
           <strong>{formatCurrency(totalFinalAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={7}>
+        <Table.Summary.Cell index={8}>
           <strong>{formatCurrency(totalPaidAmountSum)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={8}>
+        <Table.Summary.Cell index={9}>
           <strong>{formatCurrency(totalRemainingAmount)}</strong>
         </Table.Summary.Cell>
-        <Table.Summary.Cell index={9} />
+        <Table.Summary.Cell index={10} />
       </Table.Summary.Row>
     );
   };
