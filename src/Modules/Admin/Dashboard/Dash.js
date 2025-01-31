@@ -7,15 +7,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getMyRolePermissionsThunk } from "../../../Store/Slices/Common/RBAC/rbacThunks.js";
 
 const Dash = () => {
-  const { role, permissions: mypermission } = useSelector(
-    (store) => store.common.auth
-  );
-  console.log(mypermission, "lllllll");
-
+  const { role } = useSelector((store) => store.common.auth);
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(getMyRolePermissionsThunk());
-  }, []);
+    if (role != "admin") {
+      dispatch(getMyRolePermissionsThunk());
+    }
+  }, [dispatch, role]);
   const formattedRole =
     role?.charAt(0)?.toUpperCase() + role?.slice(1)?.toLowerCase();
   useNavHeading(formattedRole);

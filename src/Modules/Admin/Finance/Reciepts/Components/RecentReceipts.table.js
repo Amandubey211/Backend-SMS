@@ -14,10 +14,12 @@ import {
   fetchAllReceipts,
   cancelReceipt,
 } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 // Import jsPDF and html2canvas
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 // Your renamed Receipt component
 import Receipt from "../../../../../Utils/FinanceTemplate/Receipt";
@@ -244,10 +246,10 @@ const RecentReceipts = () => {
       render: (date) =>
         date
           ? new Intl.DateTimeFormat("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            }).format(new Date(date))
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }).format(new Date(date))
           : "N/A",
     },
     // Action Column (Uncomment and customize if needed)
@@ -287,13 +289,7 @@ const RecentReceipts = () => {
 
   // -------------------- Render --------------------
   return (
-    <div
-      style={{
-        border: "2px solid #FFCEDB",
-        borderRadius: "8px",
-        padding: "16px",
-      }}
-    >
+    <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
       <div
         style={{
           display: "flex",
@@ -309,55 +305,55 @@ const RecentReceipts = () => {
 
         {/* View More Button with counts */}
         <div style={{ display: "flex", gap: "16px", alignItems: "center" }}>
-          <button
-            onClick={() => navigate("/finance/receipts/receipt-list")}
-            className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
-          >
-            View More ({pagination.totalRecords || 0})
-          </button>
+          <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS}>
+            <button
+              onClick={() => navigate("/finance/receipts/receipt-list")}
+              className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
+            >
+              View More ({pagination.totalRecords || 0})
+            </button>
+          </ProtectedAction>
+
         </div>
       </div>
+      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS} title={"Recent Receipts"}>
+        {/* Loading Indicator */}
+        {fetching || loading ? (
+          <div style={{ textAlign: "center", padding: "16px" }}>
+            <Spinner />
+          </div>
+        )  : (
 
-      {/* Loading Indicator */}
-      {fetching || loading ? (
-        <div style={{ textAlign: "center", padding: "16px" }}>
-          <Spinner />
-        </div>
-      ) : error ? (
-        <div style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}>
-          <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-          <p>Unable to fetch the receipts.</p>
-        </div>
-      ) : (
-        // The Receipts Table with Custom No Data
-        <Table
-          rowKey={(record) => record._id}
-          columns={columns}
-          dataSource={filteredData}
-          expandable={{
-            expandedRowRender: (record) => (
-              <div>
-                <strong>Line Items:</strong>
-                {record.lineItems && record.lineItems.length > 0 ? (
-                  <ul>
-                    {record.lineItems.map((item, index) => (
-                      <li key={index}>
-                        {item.revenueType}: {item.total} QR (Qty: {item.quantity})
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span>No line items available</span>
-                )}
-              </div>
-            ),
-          }}
-          size="small"
-          pagination={false} // Disable Ant Design pagination
-          
-        />
-      )}
+          <Table
+            rowKey={(record) => record._id}
+            columns={columns}
+            dataSource={filteredData}
+            expandable={{
+              expandedRowRender: (record) => (
+                <div>
+                  <strong>Line Items:</strong>
+                  {record.lineItems && record.lineItems.length > 0 ? (
+                    <ul>
+                      {record.lineItems.map((item, index) => (
+                        <li key={index}>
+                          {item.revenueType}: {item.total} QR (Qty: {item.quantity})
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span>No line items available</span>
+                  )}
+                </div>
+              ),
+            }}
+            size="small"
+            pagination={false} // Disable Ant Design pagination
 
+          />
+
+
+        )}
+      </ProtectedSection>
       {/* Cancel Receipt Confirmation Modal */}
       <DeleteConfirmationModal
         isOpen={modalVisible}

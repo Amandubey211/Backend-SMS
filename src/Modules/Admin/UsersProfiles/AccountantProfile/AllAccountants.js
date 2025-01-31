@@ -19,6 +19,9 @@ import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks"; // Ensure this path is correct
 import Header from "../Component/Header";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AllAccountants = () => {
   const { t } = useTranslation("admAccounts");
@@ -35,7 +38,7 @@ const AllAccountants = () => {
   const [sortedAccountants, setSortedAccountants] = useState([]);
 
   // Redux Selectors
-  const { accountant, loading: accountantLoading } = useSelector(
+  const { finance, loading: accountantLoading } = useSelector(
     (store) => store.admin.all_staff
   );
   const role = useSelector((store) => store.common.auth.role);
@@ -47,14 +50,14 @@ const AllAccountants = () => {
     dispatch(getAllRolesThunk()); // Fetch roles for filtering
   }, [dispatch]);
 
-  // Initialize sortedAccountants with accountant data
+  // Initialize sortedAccountants with finance data
   useEffect(() => {
-    setSortedAccountants(accountant);
-  }, [accountant]);
+    setSortedAccountants(finance);
+  }, [finance]);
 
   // Apply Sorting and Filtering
   useEffect(() => {
-    let filtered = [...accountant];
+    let filtered = [...finance];
 
     // Apply Role Filtering
     if (filterRoles.length > 0) {
@@ -80,7 +83,7 @@ const AllAccountants = () => {
     }
 
     setSortedAccountants(filtered);
-  }, [sortOption, filterRoles, accountant]);
+  }, [sortOption, filterRoles, finance]);
 
   // Handlers
   const handleSidebarOpen = (content, data = null) => {
@@ -109,7 +112,7 @@ const AllAccountants = () => {
   // Extract Accountant Roles from AllRoles
   const accountantRoles =
     AllRoles?.filter(
-      (dept) => dept.department.toLowerCase() === "accountant"
+      (dept) => dept.department.toLowerCase() === "finance"
     )?.flatMap((dept) => dept.roles) || [];
 
   // Define Sort and Filter Options
@@ -145,11 +148,11 @@ const AllAccountants = () => {
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewAccountant":
-        return <ViewAccountant accountant={selectedAccountant} />;
+        return <ViewAccountant finance={selectedAccountant} />;
       case "addAccountant":
-        return <AddUser role="accountant" />;
+        return <AddUser role="finance" />;
       case "editAccountant":
-        return <AddUser role="accountant" data={accountantData} />;
+        return <AddUser role="finance" data={accountantData} />;
       case "createRole":
         return <CreateRole onClose={handleSidebarClose} department="Finance" />;
       default:
@@ -165,53 +168,55 @@ const AllAccountants = () => {
             <Spinner />
           </div>
         ) : (
-          <div className="p-4 relative">
-            {/* Reusable Header Component with currentSort and currentFilters */}
-            <Header
-              title={t("All Finance")}
-              count={accountant?.length || 0}
-              sortOptions={sortOptions}
-              filterOptions={filterOptionsList}
-              department="Finance"
-              onSortFilterApply={handleSortFilterApply}
-              navigateToManageRoles={navigateToManageRoles}
-              handleCreateRole={handleCreateRole}
-              isAdmin={role === "admin"}
-              currentSort={sortOption} // Pass current sort
-              currentFilters={filterRoles} // Pass current filters
-            />
+          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_FINANCE_USER} title={"All Finance"}>
+            <div className="p-4 relative">
+              {/* Reusable Header Component with currentSort and currentFilters */}
+              <Header
+                title={t("All Finance")}
+                count={finance?.length || 0}
+                sortOptions={sortOptions}
+                filterOptions={filterOptionsList}
+                department="Finance"
+                onSortFilterApply={handleSortFilterApply}
+                navigateToManageRoles={navigateToManageRoles}
+                handleCreateRole={handleCreateRole}
+                isAdmin={role === "admin"}
+                currentSort={sortOption} // Pass current sort
+                currentFilters={filterRoles} // Pass current filters
+              />
 
-            {/* Accountant List */}
-            <div className="flex flex-wrap -mx-2">
-              {sortedAccountants?.length > 0 ? (
-                sortedAccountants.map((acc) => (
-                  <ProfileCard
-                    key={acc._id} // Use a unique identifier
-                    profile={acc}
-                    onClick={() => handleAccountantClick(acc)}
-                    editUser={
-                      role === "admin" ? (event) => editUser(event, acc) : null
-                    }
-                  />
-                ))
-              ) : (
-                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <NoDataFound />
-                </div>
-              )}
+              {/* Accountant List */}
+              <div className="flex flex-wrap -mx-2">
+                {sortedAccountants?.length > 0 ? (
+                  sortedAccountants.map((acc) => (
+                    <ProfileCard
+                      key={acc._id} // Use a unique identifier
+                      profile={acc}
+                      onClick={() => handleAccountantClick(acc)}
+                      editUser={
+                        role === "admin" ? (event) => editUser(event, acc) : null
+                      }
+                    />
+                  ))
+                ) : (
+                  <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <NoDataFound />
+                  </div>
+                )}
+              </div>
+
+              {/* Floating Action Button */}
+              <ProtectedAction requiredPermission={PERMISSIONS.ADD_FINANCE}>
+                <button
+                  onClick={handleAddAccountantClick}
+                  className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                  aria-label="Add New Accountant"
+                >
+                  <GoPlus className="text-2xl" />
+                </button>
+              </ProtectedAction>
             </div>
-
-            {/* Floating Action Button */}
-            {role === "admin" && (
-              <button
-                onClick={handleAddAccountantClick}
-                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
-                aria-label="Add New Accountant"
-              >
-                <GoPlus className="text-2xl" />
-              </button>
-            )}
-          </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 
@@ -225,16 +230,16 @@ const AllAccountants = () => {
             {sidebarContent === "viewAccountant"
               ? t("Quick View of Accountant")
               : sidebarContent === "createRole"
-              ? t("Create New Role")
-              : t("Add/Edit Accountant")}
+                ? t("Create New Role")
+                : accountantData ? t("Edit Finance User") : t("Add Finance User")}
           </span>
         }
         width={
           sidebarContent === "viewAccountant"
             ? "30%"
             : sidebarContent === "createRole"
-            ? "60%"
-            : "75%"
+              ? "60%"
+              : "75%"
         }
         height="100%"
       >

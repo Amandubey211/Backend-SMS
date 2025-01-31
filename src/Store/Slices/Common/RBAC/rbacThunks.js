@@ -9,6 +9,7 @@ import { setErrorMsg, setShowError } from "../Alerts/alertsSlice";
 import { getAY } from "../../../../Utils/academivYear";
 import { handleError } from "../Alerts/errorhandling.action";
 import { setPermissions } from "../Auth/reducers/authSlice";
+import { fetchAllStaff } from "../../Admin/Users/Staff/staff.action";
 
 export const createRoleThunk = createAsyncThunk(
   "rbac/createRole",
@@ -87,6 +88,7 @@ export const assignRoleThunk = createAsyncThunk(
         roleId,
         permission,
       });
+      dispatch(fetchAllStaff());
       return { staffId, ...response };
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
 import { fetchFilteredEvents } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import the action
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const monthNames = [
   "JANUARY",
@@ -81,62 +83,64 @@ const Events = () => {
   const top5Events = events?.slice?.(0, 5) || [];
 
   return (
-    <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-medium">{t("Event")}</h2>
-        <div className="flex items-center gap-3">
+    <ProtectedSection requiredPermission={PERMISSIONS.DASH_VIEW_EVENTS} title={t("Events")}>
+      <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-medium">{t("Event")}</h2>
+          <div className="flex items-center gap-3">
+            <button
+              className="p-1 border rounded-full"
+              onClick={handlePreviousMonth}
+            >
+              <IoIosArrowBack />
+            </button>
+            <h3 className="text-lg font-medium">
+              {monthNames?.[date?.month - 1]} {date?.year}
+            </h3>
+            <button className="p-1 border rounded-full" onClick={handleNextMonth}>
+              <IoIosArrowForward />
+            </button>
+          </div>
+
           <button
-            className="p-1 border rounded-full"
-            onClick={handlePreviousMonth}
+            className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
+            onClick={handleViewAll}
           >
-            <IoIosArrowBack />
-          </button>
-          <h3 className="text-lg font-medium">
-            {monthNames?.[date?.month - 1]} {date?.year}
-          </h3>
-          <button className="p-1 border rounded-full" onClick={handleNextMonth}>
-            <IoIosArrowForward />
+            {t("View All")}
           </button>
         </div>
-
-        <button
-          className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
-          onClick={handleViewAll}
-        >
-          {t("View All")}
-        </button>
+        <div className="grid grid-cols-3 gap-4 py-3 font-semibold text-left border-y border-gray-200">
+          <h1>{t("Event Name")}</h1>
+          <h1>{t("Event Type")}</h1>
+          <h1>{t("Start Date")}</h1>
+        </div>
+        <div className="divide-y divide-gray-200">
+          {loading ? (
+            <div className="flex justify-center items-center my-10">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center my-10">
+              <FaCalendarAlt className="text-red-400 text-6xl mb-4" />
+              <p className="text-gray-500 text-xl">Error: {error}</p>
+            </div>
+          ) : top5Events?.length === 0 ? (
+            <div className="flex flex-col items-center justify-center my-10">
+              <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
+              <p className="text-gray-500 text-xl">{t("No events found")}</p>
+            </div>
+          ) : (
+            top5Events?.map((event) => (
+              <EventItem
+                key={event?.id}
+                event={event}
+                onUpdate={handleUpdateEvent}
+              />
+            ))
+          )}
+        </div>
       </div>
-      <div className="grid grid-cols-3 gap-4 py-3 font-semibold text-left border-y border-gray-200">
-        <h1>{t("Event Name")}</h1>
-        <h1>{t("Event Type")}</h1>
-        <h1>{t("Start Date")}</h1>
-      </div>
-      <div className="divide-y divide-gray-200">
-        {loading ? (
-          <div className="flex justify-center items-center my-10">
-            <Spinner />
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center my-10">
-            <FaCalendarAlt className="text-red-400 text-6xl mb-4" />
-            <p className="text-gray-500 text-xl">Error: {error}</p>
-          </div>
-        ) : top5Events?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center my-10">
-            <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
-            <p className="text-gray-500 text-xl">{t("No events found")}</p>
-          </div>
-        ) : (
-          top5Events?.map((event) => (
-            <EventItem
-              key={event?.id}
-              event={event}
-              onUpdate={handleUpdateEvent}
-            />
-          ))
-        )}
-      </div>
-    </div>
+    </ProtectedSection>
   );
 };
 

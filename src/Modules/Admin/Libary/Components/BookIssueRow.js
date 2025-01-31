@@ -4,6 +4,9 @@ import { MdEdit } from "react-icons/md";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AddIssue from "../Components/AddIssue"; // Now using AddIssue instead of EditBook
 import { useTranslation } from "react-i18next";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
   const { t } = useTranslation("admLibrary");
@@ -103,30 +106,34 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
       </td>
       {/* Conditionally render the Action column for non-teacher roles */}
       {role !== "teacher" && (
-        <td className="px-5 py-2 border-b border-gray-200 relative">  
-          <button
-            onClick={handleSidebarEditOpen}
-            className="flex items-center gap-1 p-2 hover:bg-gray-200 w-auto text-left rounded-lg"
-          >
-            <MdEdit className="text-gray-500" />
-            <span>{t("Edit")}</span>
-          </button>
+        <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}>
+          <td className="px-5 py-2 border-b border-gray-200 relative">
+            <button
+              onClick={handleSidebarEditOpen}
+              className="flex items-center gap-1 p-2 hover:bg-gray-200 w-auto text-left rounded-lg"
+            >
+              <MdEdit className="text-gray-500" />
+              <span>{t("Edit")}</span>
+            </button>
 
-          {/* Sidebar for Editing Book Issue */}
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={handleSidebarClose}
-            title={t("Edit Book Issue")}
-            width="40%"
-          >
-            {item && (
-              <AddIssue
-                editIssueData={item} // Pass the current issue data for editing
-                onClose={handleSidebarClose}
-              />
-            )}
-          </Sidebar>
-        </td>
+            {/* Sidebar for Editing Book Issue */}
+            <Sidebar
+              isOpen={isSidebarOpen}
+              onClose={handleSidebarClose}
+              title={t("Edit Book Issue")}
+              width="40%"
+            >
+              {item && (
+                <ProtectedSection requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}>
+                  <AddIssue
+                    editIssueData={item} // Pass the current issue data for editing
+                    onClose={handleSidebarClose}
+                  />
+                </ProtectedSection>
+              )}
+            </Sidebar>
+          </td>
+        </ProtectedAction>
       )}
     </tr>
   );

@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { ImSpinner8 } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import PropTypes from "prop-types"; // For prop type validation (optional)
-
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const AddPageHeader = ({
   onSave,
@@ -13,7 +14,7 @@ const AddPageHeader = ({
   isPublishDateSet,
 }) => {
   const navigate = useNavigate();
-  const { t } = useTranslation('admAccounts');
+  const { t } = useTranslation("admAccounts");
 
   return (
     <div className="flex items-center justify-between p-2 pe-5 bg-white border-b border-gray-300 shadow-sm">
@@ -27,61 +28,73 @@ const AddPageHeader = ({
         </h1>
       </div>
       <div className="flex items-center space-x-2">
-        <button
-          onClick={() => onSave(false)} // Save without publishing
-          className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
-            loadingType === "save" || loadingType === "publish"
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-          disabled={loadingType === "save" || loadingType === "publish"}
-        >
-          <span className="text-gradient flex items-center justify-center">
-            {loadingType === "save" ? (
-              <>
-                <ImSpinner8 className="animate-spin mr-2" />
-                {isUpdating ? t("Updating...") : t("Saving...")}
-              </>
-            ) : isUpdating ? (
-              t("Update")
-            ) : (
-              t("Save")
-            )}
-          </span>
-        </button>
-        <button
-          onClick={() => onSave(true)} // Save and publish
-          className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
-            loadingType === "save" ||
-            loadingType === "publish" ||
-            !isPublishDateSet
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-          disabled={
-            loadingType === "save" ||
-            loadingType === "publish" ||
-            !isPublishDateSet
-          }
-          title={
-            !isPublishDateSet
-              ? "Publish date is required to publish the page."
-              : ""
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE
           }
         >
-          <span className="text-gradient flex items-center justify-center">
-            {loadingType === "publish" ? (
-              <>
-                <ImSpinner8 className="animate-spin mr-2" />
-                {isUpdating ? t("Updating...") : t("Publishing...")}
-              </>
-            ) : isUpdating ? (
-              t("Update & Publish")
-            ) : (
-              t("Save & Publish")
-            )}
-          </span>
-        </button>
+          <button
+            onClick={() => onSave(false)} // Save without publishing
+            className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
+              loadingType === "save" || loadingType === "publish"
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            disabled={loadingType === "save" || loadingType === "publish"}
+          >
+            <span className="text-gradient flex items-center justify-center">
+              {loadingType === "save" ? (
+                <>
+                  <ImSpinner8 className="animate-spin mr-2" />
+                  {isUpdating ? t("Updating...") : t("Saving...")}
+                </>
+              ) : isUpdating ? (
+                t("Update")
+              ) : (
+                t("Save")
+              )}
+            </span>
+          </button>
+        </ProtectedAction>
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE
+          }
+        >
+          <button
+            onClick={() => onSave(true)} // Save and publish
+            className={`flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition ${
+              loadingType === "save" ||
+              loadingType === "publish" ||
+              !isPublishDateSet
+                ? "opacity-50 cursor-not-allowed"
+                : ""
+            }`}
+            disabled={
+              loadingType === "save" ||
+              loadingType === "publish" ||
+              !isPublishDateSet
+            }
+            title={
+              !isPublishDateSet
+                ? "Publish date is required to publish the page."
+                : ""
+            }
+          >
+            <span className="text-gradient flex items-center justify-center">
+              {loadingType === "publish" ? (
+                <>
+                  <ImSpinner8 className="animate-spin mr-2" />
+                  {isUpdating ? t("Updating...") : t("Publishing...")}
+                </>
+              ) : isUpdating ? (
+                t("Update & Publish")
+              ) : (
+                t("Save & Publish")
+              )}
+            </span>
+          </button>
+        </ProtectedAction>
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import Layout from "../../../../../Components/Common/Layout";
 import MainSection from "./MainSection";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const Page = () => {
   const className = useSelector(

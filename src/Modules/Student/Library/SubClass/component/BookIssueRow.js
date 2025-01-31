@@ -23,7 +23,7 @@ const BookIssueRow = ({ item }) => {
           <div className="rounded-full border border-gray-200 overflow-hidden w-10 h-10 flex items-center justify-center">
             {item?.bookId?.image ? (
               <img
-                src={item.bookId.image}
+                src={item?.bookId?.image}
                 alt={`${item?.bookId?.name} || ${t("Unknown Title", gt.stdLibrary)} cover`}
                 className="h-full w-full object-cover"
               />

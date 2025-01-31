@@ -1,4 +1,4 @@
-// src/Store/Slices/Finance/Earnings/earningsThunks.js
+// src/Store/Slices/${getRole}/Earnings/earningsThunks.js
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
@@ -11,12 +11,13 @@ import {
 } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 /**
  * Helper function to determine the correct API endpoints based on category.
  */
-const getEndpointForCategory = (category, action, id) => {
-  const baseUrl = "/finance/revenue";
+const getEndpointForCategory = (getRole,category, action, id) => {
+  const baseUrl = `/${getRole}/revenue`;
   const facilityBase = `${baseUrl}/facility`;
 
   switch (category) {
@@ -44,10 +45,10 @@ const getEndpointForCategory = (category, action, id) => {
       break;
 
     case "Penalties":
-      // For penalties: create -> /finance/penaltyAdjustment/add
-      // update -> /finance/penaltyAdjustment/cancel/:id
-      if (action === "create") return `/finance/penaltyAdjustment/add`;
-      if (action === "update") return `/finance/penaltyAdjustment/cancel/${id}`;
+      // For penalties: create -> /${getRole}/penaltyAdjustment/add
+      // update -> /${getRole}/penaltyAdjustment/cancel/:id
+      if (action === "create") return `/${getRole}/penaltyAdjustment/add`;
+      if (action === "update") return `/${getRole}/penaltyAdjustment/cancel/${id}`;
       break;
 
     default:
@@ -57,9 +58,10 @@ const getEndpointForCategory = (category, action, id) => {
 
 export const addEarnings = createAsyncThunk(
   "earnings/addEarnings",
-  async ({ values, category }, { dispatch, rejectWithValue }) => {
+  async ({ values, category }, { dispatch, rejectWithValue,getState }) => {
     try {
-      const endpoint = getEndpointForCategory(category, "create");
+      const getRole = getUserRole(getState);
+      const endpoint = getEndpointForCategory(getRole,category, "create");
       const response = await postData(endpoint, values);
 
       if (response?.success) {
@@ -78,9 +80,10 @@ export const addEarnings = createAsyncThunk(
 
 export const updateEarnings = createAsyncThunk(
   "earnings/updateEarnings",
-  async ({ values, category, id }, { dispatch, rejectWithValue }) => {
+  async ({ values, category, id }, { dispatch, rejectWithValue,getState }) => {
     try {
-      const endpoint = getEndpointForCategory(category, "update", id);
+      const getRole = getUserRole(getState);
+      const endpoint = getEndpointForCategory(getRole,category, "update", id);
       const response = await putData(endpoint, values);
 
       if (response?.success) {
@@ -101,12 +104,13 @@ export const updateEarnings = createAsyncThunk(
 
 export const fetchAllIncomes = createAsyncThunk(
   "earnings/fetchAllIncomes",
-  async (params, { rejectWithValue, dispatch }) => {
+  async (params, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/finance/revenue/get-income?academicYear=${say}`,
+        `/${getRole}/revenue/get-income?academicYear=${say}`,
         params
       );
 
@@ -122,12 +126,13 @@ export const fetchAllIncomes = createAsyncThunk(
 );
 export const fetchIncomesGraph = createAsyncThunk(
   "earnings/fetchIncomesGraph",
-  async (params, { rejectWithValue, dispatch }) => {
+  async (params, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/finance/dashboard/revenue/graph?academicYear=${say}`,
+        `/${getRole}/dashboard/expenseAndEarningGraph?say=${say}`,
         params
       );
       return response.data
@@ -138,22 +143,18 @@ export const fetchIncomesGraph = createAsyncThunk(
 );
 export const fetchEarningGraph = createAsyncThunk(
   "earnings/fetchEarningGraph",
-  async ({ groupBy = "month" }, { rejectWithValue, dispatch }) => {
+  async ({ groupBy = "month" }, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData("/finance/dashboard/revenue/graph", {
+      const response = await getData(`/${getRole}/dashboard/revenue/graph`, {
         groupBy,
         say,
       });
 
       if (response?.success) {
         return response.data;
-      } else {
-        toast.error(response?.message || "Failed to fetch expense graph data.");
-        return rejectWithValue(
-          response?.message || "Failed to fetch expense graph data."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -163,11 +164,12 @@ export const fetchEarningGraph = createAsyncThunk(
 
 export const fetchCardDataRevenue = createAsyncThunk(
   "earnings/fetchCardDataRevenue",
-  async ({ year }, { rejectWithValue, dispatch }) => {
+  async ({ year }, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(`/finance/revenue/get-card-data-revenue`, {
+      const response = await getData(`/${getRole}/revenue/get-card-data-revenue`, {
         academicYearId: say,
         year,
       });
@@ -177,10 +179,6 @@ export const fetchCardDataRevenue = createAsyncThunk(
         return response.data;
         // const transformedData = transformCardData(response.data);
         // return transformedData;
-      } else {
-        return rejectWithValue(
-          response?.message || "Failed to fetch card data revenue."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -190,9 +188,10 @@ export const fetchCardDataRevenue = createAsyncThunk(
 
 export const deleteEarnings = createAsyncThunk(
   "earnings/deleteEarnings",
-  async ({ category, id }, { dispatch, rejectWithValue }) => {
+  async ({ category, id }, { dispatch, rejectWithValue,getState }) => {
     try {
-      const baseUrl = "/finance/revenue";
+      const getRole = getUserRole(getState);
+      const baseUrl = `/${getRole}/revenue`;
       let endpoint;
 
       // Determine the endpoint for deletion
@@ -210,7 +209,7 @@ export const deleteEarnings = createAsyncThunk(
           endpoint = `${baseUrl}/delete/serviceBased/${id}`;
           break;
         case "Penalties":
-          endpoint = `/finance/penaltyAdjustment/cancel/${id}`;
+          endpoint = `/${getRole}/penaltyAdjustment/cancel/${id}`;
           break;
         default:
           throw new Error(`Category ${category} not supported for deletion.`);
@@ -226,11 +225,6 @@ export const deleteEarnings = createAsyncThunk(
         };
         dispatch(fetchAllIncomes(params));
         return id;
-      } else {
-        toast.error(response?.message || "Failed to delete earnings.");
-        return rejectWithValue(
-          response?.message || "Failed to delete earnings."
-        );
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

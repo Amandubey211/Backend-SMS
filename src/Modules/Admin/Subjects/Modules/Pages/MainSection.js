@@ -3,11 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import PageHeader from "./Components/PageHeader";
 import PageCard from "./Components/PageCard";
-import { MdSearchOff } from "react-icons/md"; // Importing the icon
+import { MdSearchOff } from "react-icons/md"; // Importing the icon for search-related actions
+import { FaRegFileAlt } from "react-icons/fa"; // Better icon for pages placeholder
 import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { fetchAllPages } from "../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 import { useParams } from "react-router-dom";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -33,40 +36,74 @@ const MainSection = () => {
   );
 
   return (
-    <div className="flex">
+    <div className="flex w-full h-full">
       <SubjectSideBar />
-      <div className="p-5 w-full border-l">
-        <PageHeader
-          searchQuery={searchQuery}
-          handleSearchChange={handleSearchChange}
-        />
-        <div className="mt-5">
-          {loading && <Spinner />}
-          {error && <NoDataFound title="Pages" />}
-          {!loading && !error && filteredPages?.length === 0 && (
-            <div className="flex flex-col h-96 w-full items-center justify-center text-gray-500">
-              <MdSearchOff className="w-12 h-12 mb-3" />
-              <p className="text-lg font-semibold">No pages found</p>
-            </div>
-          )}
-          {!loading && !error && filteredPages?.length > 0 && (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredPages?.map((page) => (
-                <PageCard
-                  key={page._id}
-                  id={page._id}
-                  title={page.title}
-                  authorName={page.authorName}
-                  publishDate={page.createdAt}
-                  updateDate={page.updatedAt}
-                  publish={page.publish}
-                  onDeleteSuccess={() => dispatch(fetchAllPages({ cid }))} // Pass the refetch function
+      <ProtectedSection
+        title="Pages"
+        requiredPermission={PERMISSIONS.ALL_PAGES_FOR_A_CLASS}
+      >
+        <div className="p-5 w-full border-l">
+          <PageHeader
+            searchQuery={searchQuery}
+            handleSearchChange={handleSearchChange}
+          />
+          <div className="mt-5">
+            {loading && <Spinner />}
+
+            {!loading && error && (
+              <div className="flex flex-col h-96 w-full items-center justify-center text-gray-500">
+                <NoDataFound
+                  title="Pages"
+                  desc="An error occurred while fetching pages. Please try again later."
+                  icon={MdSearchOff}
+                  iconColor="text-red-500"
+                  textColor="text-gray-500"
                 />
-              ))}
-            </div>
-          )}
+              </div>
+            )}
+
+            {!loading && !error && pages?.length === 0 && (
+              <div className="flex flex-col h-96 w-full items-center justify-center text-gray-500">
+                <NoDataFound
+                  title="Pages"
+                  desc="No pages available. Please add your first page."
+                  icon={FaRegFileAlt}
+                  iconColor="text-blue-500"
+                  textColor="text-gray-500"
+                />
+              </div>
+            )}
+
+            {!loading &&
+              !error &&
+              pages?.length > 0 &&
+              filteredPages?.length === 0 &&
+              searchQuery !== "" && (
+                <div className="flex flex-col h-96 w-full items-center justify-center text-gray-500">
+                  <MdSearchOff className="w-12 h-12 mb-3" />
+                  <p className="text-lg font-semibold">No pages found</p>
+                </div>
+              )}
+
+            {!loading && !error && filteredPages?.length > 0 && (
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                {filteredPages?.map((page) => (
+                  <PageCard
+                    key={page._id}
+                    id={page._id}
+                    title={page.title}
+                    authorName={page.authorName}
+                    publishDate={page.createdAt}
+                    updateDate={page.updatedAt}
+                    publish={page.publish}
+                    onDeleteSuccess={() => dispatch(fetchAllPages({ cid }))}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      </ProtectedSection>
     </div>
   );
 };

@@ -15,13 +15,17 @@ import {
   deleteDiscussion,
   updateDiscussion,
 } from "../../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import Spinner from "../../../../../../../Components/Common/Spinner";
+import ProtectedSection from "../../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const DiscussionMessage = React.lazy(() =>
   import("../../DiscussionMessage/DiscussionMessage")
 );
 
 const Header = ({ discussion, refetchDiscussion }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -101,71 +105,88 @@ const Header = ({ discussion, refetchDiscussion }) => {
           {t("Due")}: {new Date(discussion.dueDate).toLocaleDateString()}
         </span>
         <div className="flex items-center space-x-4">
-          <button
-            className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-            aria-label={
-              isPublished ? t("Unpublish Discussion") : t("Publish Discussion")
-            }
-            onClick={handlePublishToggle}
-          >
-            {isPublished ? (
-              <>
-                <BsPatchCheckFill
-                  aria-hidden="true"
-                  className="text-green-600"
-                />
-                <span>{t("Publish")}</span>
-              </>
-            ) : (
-              <>
-                <MdOutlineBlock aria-hidden="true" />
-                <span>{t("Unpublish")}</span>
-              </>
-            )}
-          </button>
-          <button
-            className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-            aria-label={t("Edit Discussion")}
-            onClick={() =>
-              navigate(`/class/${cid}/${sid}/create_discussion`, {
-                state: { discussion },
-              })
-            }
-          >
-            <AiOutlineEdit aria-hidden="true" />
-            <span>{t("Edit")}</span>
-          </button>
-          <button
-            className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-            aria-label={t("More Options")}
-            onClick={() => setMenuOpen((prev) => !prev)}
-          >
-            <HiOutlineDotsVertical aria-hidden="true" />
-          </button>
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_DISCUSSION}>
+            <button
+              className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+              aria-label={
+                isPublished
+                  ? t("Unpublish Discussion")
+                  : t("Publish Discussion")
+              }
+              onClick={handlePublishToggle}
+            >
+              {isPublished ? (
+                <>
+                  <BsPatchCheckFill
+                    aria-hidden="true"
+                    className="text-green-600"
+                  />
+                  <span>{t("Publish")}</span>
+                </>
+              ) : (
+                <>
+                  <MdOutlineBlock aria-hidden="true" />
+                  <span>{t("Unpublish")}</span>
+                </>
+              )}
+            </button>
+          </ProtectedAction>
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_DISCUSSION}>
+            <button
+              className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
+              aria-label={t("Edit Discussion")}
+              onClick={() =>
+                navigate(`/class/${cid}/${sid}/create_discussion`, {
+                  state: { discussion },
+                })
+              }
+            >
+              <AiOutlineEdit aria-hidden="true" />
+              <span>{t("Edit")}</span>
+            </button>
+          </ProtectedAction>
+          <ProtectedAction requiredPermission={PERMISSIONS.DELETE_DISCUSSION}>
+            <button
+              className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
+              aria-label={t("More Options")}
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              <HiOutlineDotsVertical aria-hidden="true" />
+            </button>
+          </ProtectedAction>
+
           {isMenuOpen && (
             <div
               ref={menuRef}
               className="absolute right-0 top-full mt-2 w-40 bg-white border rounded-md shadow-lg z-10"
             >
-              <button
-                className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-gray-100 w-full"
-                onClick={handleDeleteClick}
-                disabled={deleteLoading}
+              <ProtectedAction
+                requiredPermission={PERMISSIONS.DELETE_DISCUSSION}
               >
-                <MdDelete aria-hidden="true" />
-                <span>{t("Delete")}</span>
-              </button>
-              {deleteError && (
+                <button
+                  className="flex items-center space-x-2 px-4 py-2 text-red-600 hover:bg-gray-100 w-full"
+                  onClick={handleDeleteClick}
+                  disabled={deleteLoading}
+                >
+                  <MdDelete aria-hidden="true" />
+                  <span>{t("Delete")}</span>
+                </button>
+              </ProtectedAction>
+              {/* {deleteError && (
                 <p className="text-red-500 text-sm px-4">{t(deleteError)}</p>
-              )}
+              )} */}
             </div>
           )}
-          <button
-            onClick={handleSidebarOpen}
-            className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_DISCUSSION}
           >
-            <BsChat /> <span>{t("Discussion")}</span>
-          </button>
+            <button
+              onClick={handleSidebarOpen}
+              className="px-4 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
+            >
+              <BsChat /> <span>{t("Discussion")}</span>
+            </button>
+          </ProtectedAction>
 
           <Sidebar
             width="70%"
@@ -173,7 +194,7 @@ const Header = ({ discussion, refetchDiscussion }) => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
           >
-            <Suspense fallback={<div>{t("Loading...")}</div>}>
+            <Suspense fallback={<Spinner />}>
               <DiscussionMessage />
             </Suspense>
           </Sidebar>

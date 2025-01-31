@@ -5,6 +5,8 @@ import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentFeesMain from "./StudentFeesMain";
 import { Toaster } from "react-hot-toast";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const StudentFeesDashboard = () => {
   useNavHeading("Finance","Student Fees")

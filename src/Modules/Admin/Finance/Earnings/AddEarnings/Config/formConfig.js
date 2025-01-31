@@ -34,7 +34,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Exam Center Fees": {
@@ -56,7 +56,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Parking Fees": {
@@ -79,17 +79,11 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Stationery Fees": {
-    stationeryItems: [
-      {
-        itemName: "",
-        quantity: 0,
-        unitCost: 0,
-      },
-    ],
+    stationeryItems: [{ itemName: "", quantity: 0, unitCost: 0 }],
     paymentType: "cash",
     paymentStatus: "paid",
     paid_amount: 0,
@@ -104,7 +98,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Other Facility Fees": {
@@ -124,7 +118,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Subscription Fees": {
@@ -144,7 +138,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Workshop/Training Fees": {
@@ -165,7 +159,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   "Canteen Profit": {
@@ -185,7 +179,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
   },
   Donations: {
@@ -206,7 +200,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
     subCategory: "Donations",
   },
@@ -228,7 +222,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: null,
+    receipt: "",
     description: "",
     subCategory: "Fundraising/Sponsorships",
   },
@@ -255,7 +249,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: "",
     final_amount: "",
-    receipt: null,
+    receipt: "",
     description: "",
   },
   // Repeat for other subCategories with flat fields

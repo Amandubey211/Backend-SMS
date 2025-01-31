@@ -48,7 +48,7 @@ const StudentDetails = ({setStudentDetail} ) => {
           
         />
         <SelectDynamicInput
-          label="Section*"
+          label="Section"
           name="sectionId"
           options={sectionList || []}
           forWhom='section'
@@ -57,7 +57,7 @@ const StudentDetails = ({setStudentDetail} ) => {
             <SelectDynamicInput
           label="Student*"
           name="studentId"
-          options={studentsList || []}
+          options={[{ firstName : 'ALL',lastName :'Students ', _id: 'ALL' },...studentsList] || []}
           forWhom='student'
           onChange={handleInputChange}
          disabled = {loading}

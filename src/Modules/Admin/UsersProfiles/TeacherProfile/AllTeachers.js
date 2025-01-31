@@ -20,6 +20,9 @@ import { fetchAllTeachers } from "../../../../Store/Slices/Admin/Class/Teachers/
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import Header from "../Component/Header";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AllTeachers = () => {
   const { t } = useTranslation("admAccounts");
@@ -163,55 +166,61 @@ const AllTeachers = () => {
             <Spinner />
           </div>
         ) : (
-          <div className="p-4 relative">
-            {/* Reusable Header Component */}
-            <Header
-              title={t("All Teachers")}
-              count={allTeachers?.length || 0}
-              sortOptions={sortOptions}
-              filterOptions={filterOptions}
-              department="Teachers"
-              onSortFilterApply={handleSortFilterApply}
-              navigateToManageRoles={navigateToManageRoles}
-              handleCreateRole={handleCreateRole}
-              isAdmin={role === "admin"}
-              currentSort={sortOption} // Pass current sort
-              currentFilters={filterRoles} // Pass current filters
-            />
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_TEACHER}
+            title={"Teacher"}
+          >
+            <div className="p-4 relative">
+              {/* Reusable Header Component */}
+              <Header
+                title={t("All Teachers")}
+                count={allTeachers?.length || 0}
+                sortOptions={sortOptions}
+                filterOptions={filterOptions}
+                department="Teachers"
+                onSortFilterApply={handleSortFilterApply}
+                navigateToManageRoles={navigateToManageRoles}
+                handleCreateRole={handleCreateRole}
+                isAdmin={role === "admin"}
+                currentSort={sortOption} // Pass current sort
+                currentFilters={filterRoles} // Pass current filters
+              />
 
-            {/* Teachers List */}
-            <div className="flex flex-wrap -mx-2">
-              {sortedTeachers?.length > 0 ? (
-                sortedTeachers.map((teacher) => (
-                  <ProfileCard
-                    key={teacher._id}
-                    profile={teacher}
-                    editUser={editUser}
-                    onClick={handleStaffClick}
-                  />
-                ))
-              ) : (
-                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <NoDataFound />
-                </div>
-              )}
+              {/* Teachers List */}
+              <div className="flex flex-wrap -mx-2">
+                {sortedTeachers?.length > 0 ? (
+                  sortedTeachers.map((teacher) => (
+                    <ProfileCard
+                      key={teacher._id}
+                      profile={teacher}
+                      editUser={editUser}
+                      onClick={handleStaffClick}
+                    />
+                  ))
+                ) : (
+                  <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <NoDataFound />
+                  </div>
+                )}
+              </div>
+
+              {/* Floating Action Button */}
+              <ProtectedAction requiredPermission={PERMISSIONS.ADD_TEACHER}>
+                <button
+                  onClick={() => handleSidebarOpen("addTeacher")}
+                  className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                  aria-label="Add New Teacher"
+                >
+                  <GoPlus className="text-2xl" />
+                </button>
+              </ProtectedAction>
             </div>
-
-            {/* Floating Action Button */}
-            {role === "admin" && (
-              <button
-                onClick={() => handleSidebarOpen("addTeacher")}
-                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
-                aria-label="Add New Teacher"
-              >
-                <GoPlus className="text-2xl" />
-              </button>
-            )}
-          </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 
       {/* Sidebar */}
+
       <SidebarSlide
         key={sidebarContent}
         isOpen={isSidebarOpen}
@@ -222,7 +231,9 @@ const AllTeachers = () => {
               ? t("Quick View of Teacher")
               : sidebarContent === "createRole"
               ? t("Create New Role")
-              : t("Add/Edit Teacher")}
+              : teacherData
+              ? t("Edit Teacher")
+              : t("Add Teacher")}
           </span>
         }
         width={sidebarContent === "viewTeacher" ? "30%" : "75%"}

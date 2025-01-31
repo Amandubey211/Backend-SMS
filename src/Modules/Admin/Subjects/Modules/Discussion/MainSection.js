@@ -13,9 +13,12 @@ import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import { fetchClassDiscussions } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
 import { resetDiscussion } from "../../../../../Store/Slices/Admin/Class/Discussion/discussionSlice";
-
+import { FaComments } from "react-icons/fa";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../config/permission";
 const MainSection = () => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
@@ -26,7 +29,7 @@ const MainSection = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchClassDiscussions({ cid,sid }));
+    dispatch(fetchClassDiscussions({ cid, sid }));
   }, [dispatch, cid]);
 
   const handleSearch = (query) => {
@@ -53,61 +56,76 @@ const MainSection = () => {
   );
 
   return (
-    <div className="flex">
+    <div className="flex w-full h-full">
       <SubjectSideBar />
-      <div className="w-full p-3 border-l">
-        <DiscussionHeader
-          onSearch={handleSearch}
-          onFilterChange={handleFilterChange}
-        />
-        {loading ? (
-          <Spinner />
-        ) : error ? (
-          <div className="flex justify-center">
-            <p role="alert" className="text-red-400 my-4">
-              {t(error)}
-            </p>
-          </div>
-        ) : (
-          <>
-            <PinnedDiscussions
-              discussions={pinnedDiscussions}
-              fetchClassDiscussions={() =>
-                dispatch(fetchClassDiscussions({ cid,sid }))
-              }
-            />
-            <div className="p-3">
-              <div className="flex items-center gap-2 ml-3 mb-2">
-                <GoDiscussionClosed className="text-xl text-green-600" />
-                <h2 className="text-xl">{t("All Discussions")}</h2>
-                <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
-              </div>
-              {filteredDiscussions?.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {filteredDiscussions?.map((discussion, index) => (
-                    <DiscussionCard
-                      key={index}
-                      discussion={discussion}
-                      fetchClassDiscussions={() =>
-                        dispatch(fetchClassDiscussions({ cid,sid }))
-                      }
-                    />
-                  ))}
-                </div>
-              ) : (
-                <NoDataFound title={t("Discussions")} />
-              )}
+      <ProtectedSection
+        title="Discussion Dashboard"
+        requiredPermission={PERMISSIONS.ALL_DISCUSSIONS}
+      >
+        <div className="w-full p-3 border-l">
+          <DiscussionHeader
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+          />
+          {loading ? (
+            <Spinner />
+          ) : error ? (
+            <div className="flex justify-center">
+              <p role="alert" className="text-red-400 my-4">
+                {t(error)}
+              </p>
             </div>
-          </>
-        )}
-        <NavLink
-          to={`/class/${cid}/${sid}/create_discussion`}
-          onClick={() => dispatch(resetDiscussion())}
-          className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-        >
-          <RiAddFill size={24} />
-        </NavLink>
-      </div>
+          ) : (
+            <>
+              <PinnedDiscussions
+                discussions={pinnedDiscussions}
+                fetchClassDiscussions={() =>
+                  dispatch(fetchClassDiscussions({ cid, sid }))
+                }
+              />
+              <div className="p-3">
+                <div className="flex items-center gap-2 ml-3 mb-2">
+                  <GoDiscussionClosed className="text-xl text-green-600" />
+                  <h2 className="text-xl">{t("All Discussions")}</h2>
+                  <MdKeyboardArrowDown className="text-gray-500 h-8 w-8" />
+                </div>
+                {filteredDiscussions?.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {filteredDiscussions?.map((discussion, index) => (
+                      <DiscussionCard
+                        key={index}
+                        discussion={discussion}
+                        fetchClassDiscussions={() =>
+                          dispatch(fetchClassDiscussions({ cid, sid }))
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <NoDataFound
+                    title={t("Discussions")}
+                    desc={t(
+                      "No discussions yet! Start a conversation by clicking 'Add New Discussion.'"
+                    )}
+                    icon={FaComments}
+                    iconColor="text-blue-500" // A visually appealing color
+                    textColor="text-gray-600"
+                  />
+                )}
+              </div>
+            </>
+          )}
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_DISCUSSION}>
+            <NavLink
+              to={`/class/${cid}/${sid}/create_discussion`}
+              onClick={() => dispatch(resetDiscussion())}
+              className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+            >
+              <RiAddFill size={24} />
+            </NavLink>
+          </ProtectedAction>
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

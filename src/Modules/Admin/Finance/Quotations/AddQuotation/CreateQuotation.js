@@ -149,13 +149,13 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
                       name={`lineItems?.${index}?.revenueType`}
                       label="Revenue Type"
                       options={[
-                        "studentFee",
-                        "FacilityRevenue",
-                        "service_based_revenue",
-                        "community_externalaffair_revenue",
-                        "financial_investment_revenue",
-                        "Penalties",
-                        "Other",
+                        { label: "Student Fee", value: "studentFee" },
+                        { label: "Facility Revenue", value: "FacilityRevenue" },
+                        { label: "Service-Based Revenue", value: "service_based_revenue" },
+                        { label: "Community & External Affairs Revenue", value: "community_externalaffair_revenue" },
+                        { label: "Financial Investment Revenue", value: "financial_investment_revenue" },
+                        { label: "Penalties", value: "Penalties" },
+                        { label: "Other", value: "Other" },
                       ]}
                       required={true}
                       readOnly={readOnly}
@@ -245,7 +245,10 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
         <SelectInput
           name="discountType"
           label="Discount Type"
-          options={["percentage", "amount"]}
+          options={[
+            { label: "Percentage", value: "percentage" },
+            { label: "Amount", value: "amount" },
+          ]}
           required={true}
           readOnly={readOnly}
           disabled={readOnly}
@@ -264,7 +267,11 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
         <SelectInput
           name="status"
           label="Status"
-          options={["pending", "accept", "reject"]}
+          options={[
+            { label: "Pending", value: "pending" },
+            { label: "Accept", value: "accept" },
+            { label: "Reject", value: "reject" },
+          ]}
           required={true}
           readOnly={readOnly}
           disabled={readOnly}

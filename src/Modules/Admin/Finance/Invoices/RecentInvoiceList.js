@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+
 import {
   Menu,
   Dropdown,
@@ -21,10 +20,11 @@ import {
   ExportOutlined,
   MoreOutlined,
   SearchOutlined,
-  MailOutlined,
+
   EyeOutlined,
   RedoOutlined,
   CloseCircleOutlined,
+  MailOutlined,
 } from "@ant-design/icons";
 
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
@@ -39,6 +39,7 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import {
   cancelInvoice,
+  completeInvoice,
   fetchInvoice,
 } from "../../../../Store/Slices/Finance/Invoice/invoice.thunk";
 
@@ -50,7 +51,12 @@ import {
 import ExportModal from "../Earnings/Components/ExportModal";
 import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
+import { MdOutlineDone } from "react-icons/md";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import { downloadPDF } from "../../../../Utils/xl";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -69,31 +75,10 @@ const RecentInvoiceList = () => {
 
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
-  const downloadPDF = async () => {
-    if (!pdfRef.current) return;
-
-    try {
-      // Capture the pdfRef element as a canvas
-      const canvas = await html2canvas(pdfRef.current, {
-        scale: 2, // Increase scale for higher resolution
-        useCORS: true, // Enable cross-origin
-        windowWidth: pdfRef.current.scrollWidth, // Match the element's width
-        windowHeight: pdfRef.current.scrollHeight, // Match the element's height
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", "a4"); // A4 size PDF
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width; // Maintain aspect ratio
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${selectedInvoice.invoiceNumber || "Invoice"}.pdf`); // Save the PDF
-    } catch (error) {
-      console.error("Failed to generate PDF", error);
-    }
-  };
-
+  const handleDownloadPDF=async (pdfRef,selectedInvoice)=>{
+    await downloadPDF(pdfRef,selectedInvoice,"Invoice")
+  }
+  
 
 
   // Filtered data based on search query
@@ -196,7 +181,7 @@ const RecentInvoiceList = () => {
             <Menu>
               {/* Preview */}
               <Menu.Item
-                icon={<EyeOutlined style={{ marginRight: 8 }}/>}
+                icon={<EyeOutlined />}
                 onClick={() => {
                   setSelectedInvoice(record);
                   setInvoiceVisible(true);
@@ -204,10 +189,8 @@ const RecentInvoiceList = () => {
               >
                 Preview
               </Menu.Item>
-
-              {/* View (Read Only) */}
               <Menu.Item
-                icon={<EyeOutlined style={{ marginRight: 8 }}/>}
+                icon={<EyeOutlined />}
                 onClick={() => {
                   dispatch(setInvoiceData({ ...record, mode: 'view' }));
                   navigate("/finance/invoices/add-new-invoice");
@@ -215,10 +198,12 @@ const RecentInvoiceList = () => {
               >
                 View (Read Only)
               </Menu.Item>
+
               {/* Return */}
+              <ProtectedAction requiredPermission={PERMISSIONS.RETURN_INVOICE}>
               {!record.isCancel && !record.isReturn && (
                 <Menu.Item
-                  icon={<RedoOutlined style={{ marginRight: 8 }}/>}
+                  icon={<RedoOutlined />}
                   onClick={() => {
                     dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
                     navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
@@ -227,20 +212,22 @@ const RecentInvoiceList = () => {
                   Return
                 </Menu.Item>
               )}
+              </ProtectedAction>
               {record.isReturn && (
-                <Menu.Item icon={<RedoOutlined style={{ marginRight: 8 }}/>} disabled>
+                <Menu.Item icon={<RedoOutlined />} disabled>
                   Return
                 </Menu.Item>
               )}
 
               {/* Canceled */}
               {record.isCancel || record.isReturn ? (
-                <Menu.Item icon={<CloseCircleOutlined style={{ marginRight: 8 }}/>} disabled>
+                <Menu.Item icon={<CloseCircleOutlined />} disabled>
                   Canceled
                 </Menu.Item>
               ) : (
+                <ProtectedAction requiredPermission={PERMISSIONS.CANCEL_INVOICE}>
                 <Menu.Item
-                  icon={<CloseCircleOutlined style={{ marginRight: 8 }}/>}
+                  icon={<CloseCircleOutlined />}
                   onClick={() => {
                     dispatch(cancelInvoice(record._id)).then(() =>
                       dispatch(
@@ -254,11 +241,38 @@ const RecentInvoiceList = () => {
                 >
                   Cancel
                 </Menu.Item>
+                </ProtectedAction>
               )}
-              {/* 4) Send Mail */}
-              <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
-                <MailOutlined style={{ marginRight: 8 }}/> Send Mail
-              </Menu.Item>
+              <ProtectedAction requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
+              {!record.isCancel && !record.isReturn && !record.isCompleted ?
+
+                <Menu.Item
+                  icon={<MdOutlineDone />}
+                  onClick={() => dispatch(completeInvoice(record._id))}
+                >
+                  Complete
+                </Menu.Item> : null
+              }
+              </ProtectedAction>
+              {!record.isCancel && !record.isReturn && record.isCompleted ?
+                <Menu.Item
+                  icon={<MdOutlineDone />}
+                  disabled
+                >
+                  Completed
+                </Menu.Item> : null
+              }
+              {!record.isCancel && !record.isReturn ?
+                <Menu.Item
+                  icon={<MailOutlined />}
+                  onClick={() => {
+                  }}
+                >
+                  Send Mail
+                </Menu.Item> : null
+              }
+              {/* View (Read Only) */}
+
 
             </Menu>
           }
@@ -319,182 +333,185 @@ const RecentInvoiceList = () => {
   return (
     <Layout title="Finance | Invoice">
       <AdminLayout>
-        <div className="p-4 bg-white rounded-lg ">
-          <div className="p-1 bg-white rounded-lg">
-            {/* Filters and Buttons Section */}
-            <div className="flex justify-between items-start">
-              <div className="flex flex-col space-y-4">
-                <div className="flex gap-4">
-                  <Input
-                    prefix={<SearchOutlined />}
-                    placeholder="Search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64"
-                  />
-                </div>
-                <div className="flex space-x-6">
-                  <label className="flex items-center text-sm space-x-2">
-                    <input
-                      type="radio"
-                      name="status"
-                      className="form-radio text-green-600"
-                      value="all"
-                      defaultChecked
-                      onChange={filterOnchange}
+        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_RECENT_AND_RETURN_INVOICE}>
+          <div className="p-4 bg-white rounded-lg ">
+            <div className="p-1 bg-white rounded-lg">
+              {/* Filters and Buttons Section */}
+              <div className="flex justify-between items-start">
+                <div className="flex flex-col space-y-4">
+                  <div className="flex gap-4">
+                    <Input
+                      prefix={<SearchOutlined />}
+                      placeholder="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-64"
                     />
-                    <span className="text-green-600 font-medium">All</span>
-                  </label>
-                  <label className="flex items-center text-sm space-x-2">
-                    <input
-                      type="radio"
-                      name="status"
-                      className="form-radio text-gray-500"
-                      value="isCancel"
-                      onChange={filterOnchange}
-                    />
-                    <span className="text-gray-700">Cancel</span>
-                  </label>
-                  <label className="flex items-center text-sm space-x-2">
-                    <input
-                      type="radio"
-                      name="status"
-                      className="form-radio text-gray-500"
-                      value="isReturn"
-                      onChange={filterOnchange}
-                    />
-                    <span className="text-gray-700">Return</span>
-                  </label>
-                </div>
-              </div>
-              {/* Right Side: Buttons */}
-              <div className="flex items-center space-x-4">
-                {/* Export Button */}
-                <Button
-                  type="primary"
-                  icon={<ExportOutlined />}
-                  onClick={() => setIsExportModalVisible(true)}
-                  className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-                >Export</Button>
-
-
-                {/* Add New Fee Button */}
-                <button
-                  onClick={() => {
-
-                    dispatch(setInvoiceData());
-
-                    navigate("/finance/invoices/add-new-invoice");
-                  }}
-                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-                >
-                  <span className="text-gray-800 font-medium">
-                    Add New Invoice
-                  </span>
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                    <FiPlus size={16} />
                   </div>
-                </button>
+                  <div className="flex space-x-6">
+                    <label className="flex items-center text-sm space-x-2">
+                      <input
+                        type="radio"
+                        name="status"
+                        className="form-radio text-green-600"
+                        value="all"
+                        defaultChecked
+                        onChange={filterOnchange}
+                      />
+                      <span className="text-green-600 font-medium">All</span>
+                    </label>
+                    <label className="flex items-center text-sm space-x-2">
+                      <input
+                        type="radio"
+                        name="status"
+                        className="form-radio text-gray-500"
+                        value="isCancel"
+                        onChange={filterOnchange}
+                      />
+                      <span className="text-gray-700">Cancel</span>
+                    </label>
+                    <label className="flex items-center text-sm space-x-2">
+                      <input
+                        type="radio"
+                        name="status"
+                        className="form-radio text-gray-500"
+                        value="isReturn"
+                        onChange={filterOnchange}
+                      />
+                      <span className="text-gray-700">Return</span>
+                    </label>
+                  </div>
+                </div>
+                {/* Right Side: Buttons */}
+                <div className="flex items-center space-x-4">
+                  {/* Export Button */}
+                  <Button
+                    type="primary"
+                    icon={<ExportOutlined />}
+                    onClick={() => setIsExportModalVisible(true)}
+                    className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                  >Export</Button>
+
+
+                  {/* Add New Fee Button */}
+                 <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
+
+                 
+                    <button
+                      onClick={() => {
+
+                        dispatch(setInvoiceData());
+
+                        navigate("/finance/invoices/add-new-invoice");
+                      }}
+                      className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                    >
+                      <span className="text-gray-800 font-medium">
+                        Add New Invoice
+                      </span>
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                        <FiPlus size={16} />
+                      </div>
+                    </button>
+               </ProtectedAction>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Custom Table */}
-          <div className="my-8 border shadow-sm rounded-lg">
-            {/* Table Section */}
-            {loading ? (
-              <div className="flex justify-center items-center py-20">
-                <Spin tip="Loading..." />
+            {/* Custom Table */}
+            <div className="my-8 border shadow-sm rounded-lg">
+              {/* Table Section */}
+              {loading ? (
+                <div className="flex justify-center items-center py-20">
+                  <Spin tip="Loading..." />
+                </div>
+              ) : (
+                <Table
+                  dataSource={filteredData}
+                  columns={columns}
+                  rowKey="invoiceNumber"
+                  pagination={{
+                    current: pagination?.currentPage,
+                    total: pagination?.totalItems,
+                    pageSize: pageSize,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20", "50"],
+                    size: "small",
+                    showTotal: (total, range) =>
+                      `Page ${pagination?.currentPage} of ${pagination?.totalPages} | Total ${pagination?.totalItems} records`,
+                    onChange: (page, pageSize) => {
+                      setPageSize(pageSize);
+                      const filters = {
+                        page,
+                        limit: pageSize,
+                      };
+                      dispatch(fetchInvoice(filters));
+                    },
+                    onShowSizeChange: (current, size) => {
+                      setPageSize(size);
+                    },
+                  }}
+                  size="small"
+                  onRow={(record) => ({
+                    onClick: () => {
+                      setSelectedInvoice(record);
+                    },
+                  })}
+                />
+              )}
+            </div>
+
+
+
+            {/* PDF Preview Modal */}
+            {isInvoiceVisible && selectedInvoice && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center">
+                {/* Full-screen blur background */}
+                <div
+                  className="absolute inset-0 bg-black bg-opacity-60"
+                  style={{ backdropFilter: "blur(8px)" }}
+                  onClick={() => setInvoiceVisible(false)}
+                />
+                {/* Centered content */}
+                <div
+                  ref={popupRef}
+                  className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Close Button */}
+                  <div className="flex justify-end space-x-2 mb-4">
+                    <button
+                      onClick={()=>handleDownloadPDF(pdfRef,selectedInvoice)}
+                      className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                    >
+                      Download PDF
+                    </button>
+                    <button
+                      onClick={() => setInvoiceVisible(false)}
+                      className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Hidden container for PDF generation */}
+                  <div >
+                    <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                  </div>
+                </div>
               </div>
-            ) : (
-              <Table
-                dataSource={filteredData}
-                columns={columns}
-                rowKey="invoiceNumber"
-                pagination={{
-                  current: pagination?.currentPage,
-                  total: pagination?.totalItems,
-                  pageSize: pageSize,
-                  showSizeChanger: true,
-                  pageSizeOptions: ["5", "10", "20", "50"],
-                  size: "small",
-                  showTotal: (total, range) =>
-                    `Page ${pagination?.currentPage} of ${pagination?.totalPages} | Total ${pagination?.totalItems} records`,
-                  onChange: (page, pageSize) => {
-                    setPageSize(pageSize);
-                    const filters = {
-                      page,
-                      limit: pageSize,
-                    };
-                    dispatch(fetchInvoice(filters));
-                  },
-                  onShowSizeChange: (current, size) => {
-                    setPageSize(size);
-                  },
-                }}
-                size="small"
-                onRow={(record) => ({
-                  onClick: () => {
-                    setSelectedInvoice(record);
-                  },
-                })}
-              />
             )}
+
+
+            <ExportModal
+              visible={isExportModalVisible}
+              onClose={() => setIsExportModalVisible(false)}
+              dataToExport={transformQuotationData(invoices)}
+              title="Invoice Data"
+              sheet="invoice_report"
+            />
           </div>
-
-
-
-          {/* PDF Preview Modal */}
-          {isInvoiceVisible && selectedInvoice && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center">
-              {/* Full-screen blur background */}
-              <div
-                className="absolute inset-0 bg-black bg-opacity-60"
-                style={{ backdropFilter: "blur(8px)" }}
-                onClick={() => setInvoiceVisible(false)}
-              />
-              {/* Centered content */}
-              <div
-                ref={popupRef}
-                className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {/* Close Button */}
-                <div className="flex justify-end space-x-2 mb-4">
-                  <button
-                    onClick={downloadPDF}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                  >
-                    Download PDF
-                  </button>
-                  <button
-                    onClick={() => setInvoiceVisible(false)}
-                    className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                {/* Hidden container for PDF generation */}
-                <div ref={pdfRef} className="hidden">
-                  <RecentInvoiceTemplate data={selectedInvoice} />
-                </div>
-
-                {/* Visible content */}
-                <RecentInvoiceTemplate data={selectedInvoice} />
-              </div>
-            </div>
-          )}
-
-
-          <ExportModal
-            visible={isExportModalVisible}
-            onClose={() => setIsExportModalVisible(false)}
-            dataToExport={transformQuotationData(invoices)}
-            title="Invoice Data"
-            sheet="invoice_report"
-          />
-        </div>
+        </ProtectedSection>
       </AdminLayout>
     </Layout>
   );

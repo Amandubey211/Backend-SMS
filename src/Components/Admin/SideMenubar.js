@@ -139,7 +139,7 @@ const SideMenubar = () => {
     } else if (
       [
         "teacher",
-        "accountant",
+        "finance",
         "librarian",
         "staff",
         "student",

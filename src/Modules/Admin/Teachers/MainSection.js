@@ -6,6 +6,8 @@ import NavigationBar from "./NavigationBar";
 import Spinner from "../../../Components/Common/Spinner";
 import NoDataFound from "../../../Components/Common/NoDataFound";
 import { fetchTeachersByClass } from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../config/permission";
 
 const MainSection = () => {
   const { cid } = useParams();
@@ -38,8 +40,8 @@ const MainSection = () => {
 
   return (
     <>
+    <ProtectedSection requiredPermission={PERMISSIONS.TEACHERS_BY_CLASS}>
       <NavigationBar />
-
       <div className="flex flex-wrap justify-start px-2 items-center">
         {loading ? (
           <div className="h-96 w-full flex justify-center items-center">
@@ -59,6 +61,7 @@ const MainSection = () => {
           ))
         )}
       </div>
+      </ProtectedSection>
     </>
   );
 };

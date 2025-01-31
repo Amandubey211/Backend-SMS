@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { FaCheckCircle, FaTimesCircle, FaRegCircle } from "react-icons/fa";
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 // Utility function to shuffle an array
 function shuffleArray(array) {
@@ -55,16 +57,25 @@ const QuestionCard = ({
           <span className="text-black">{question.questionPoint}</span>
         </div>
         <div className="flex space-x-2">
-          <FiEdit2
-            className="text-green-600 cursor-pointer text-xl"
-            onClick={editQuestion}
-            title="Edit Question"
-          />
-          <FiTrash2
-            className="text-red-600 cursor-pointer text-xl"
-            onClick={deleteQuestion}
-            title="Delete Question"
-          />
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.DELETE_QUESTION_FROM_QUIZ}
+          >
+            <FiEdit2
+              className="text-green-600 cursor-pointer text-xl"
+              onClick={editQuestion}
+              title="Edit Question"
+            />
+          </ProtectedAction>
+
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.DELETE_QUESTION_FROM_QUIZ}
+          >
+            <FiTrash2
+              className="text-red-600 cursor-pointer text-xl"
+              onClick={deleteQuestion}
+              title="Delete Question"
+            />
+          </ProtectedAction>
         </div>
       </div>
 

@@ -37,6 +37,14 @@ import jsPDF from "jspdf";
 import { toast } from "react-hot-toast";
 import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSuccess, clearSelectedInvoiceNumber } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
+import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
+
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+
+
+import { downloadPDF } from "../../../../../../Utils/xl";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -56,11 +64,11 @@ const PenalityandAdjustmentList = () => {
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isReceiptVisible, setReceiptVisible] = useState(false);
-  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [selectedReturnInvoice, setSelectedReturnInvoice] = useState(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const pdfRef = useRef(null);
   // Reference for the popup/modal
   const popupRef = useRef(null);
 
@@ -87,47 +95,42 @@ const PenalityandAdjustmentList = () => {
 
   // Handle previewing a return invoice
   const handleReturnPreview = (record) => {
-    setSelectedReceipt(record);
+    setSelectedReturnInvoice(record);
     setReceiptVisible(true);
   };
 
   // Handle downloading the PDF
-  const handleDownloadPDF = async () => {
+
+  const handleDownloadPDF = async (pdfRef, selectedReturnInvoice) => {
+    await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice")
+  }
+
+  const handleSendEmail = async (record) => {
+    if (!record._id) {
+      toast.error("Invalid adjustment ID.");
+      return;
+    }
+
+    console.log("Attempting to send email for adjustment:", record);
+
     try {
-      if (!selectedReceipt) {
-        toast.error("No receipt selected for download.");
-        return;
+      const result = await dispatch(
+        sendEmail({
+          id: record._id,
+          type: "adjustment",
+        })
+      );
+
+      console.log("Send email result:", result);
+
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(result.payload || "Failed to send email.");
       }
-
-      if (!popupRef.current) {
-        toast.error("Receipt content is not available.");
-        return;
-      }
-
-      const pdfTitle = selectedReceipt.return_invoice_no
-        ? `${selectedReceipt.return_invoice_no}.pdf`
-        : "penalty_adjustment.pdf";
-
-      const canvas = await html2canvas(popupRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
-
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
-
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
-
-      toast.success("PDF downloaded successfully!");
-    } catch (error) {
-      console.error("Error generating PDF: ", error);
-      toast.error("Failed to generate PDF.");
+    } catch (err) {
+      console.error("Error sending email:", err);
+      toast.error("Error sending email.");
     }
   };
 
@@ -319,10 +322,12 @@ const PenalityandAdjustmentList = () => {
           {
             key: "3",
             label: (
-              <span>
-                <CloseCircleOutlined style={{ marginRight: 8 }} />
-                {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
-              </span>
+              <ProtectedSection requiredPermission={PERMISSIONS.CANCEL_PENALTY}>
+                <span>
+                  <CloseCircleOutlined style={{ marginRight: 8 }} />
+                  {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
+                </span>
+              </ProtectedSection>
             ),
             onClick: () => {
               if (record?.status !== "Cancelled") handleCancleReturnInvoice(record?.key);
@@ -332,15 +337,15 @@ const PenalityandAdjustmentList = () => {
           {
             key: "4",
             label: (
-              <span>
+              <span onClick={() => handleSendEmail(record)}>
                 <MailOutlined style={{ marginRight: 8 }} />
                 Send Mail
               </span>
             ),
-            // Implement Send Mail functionality if needed
           },
+          ,
         ];
-    
+
         return (
           <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
             <MoreOutlined
@@ -435,6 +440,7 @@ const PenalityandAdjustmentList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
+
               <Button
                 type="primary"
                 icon={<ExportOutlined />}
@@ -443,21 +449,22 @@ const PenalityandAdjustmentList = () => {
               >
                 Export
               </Button>
-              <button
-                onClick={() =>
-                  navigate(
-                    "/finance/penaltyAdjustment/add-new-penalty-adjustment"
-                  )
-                }
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              >
-                <span className="text-gray-800 font-medium">
-                  Add New Adjustment
-                </span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiPlus size={16} />
-                </div>
-              </button>
+
+
+              <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
+                <button
+                  onClick={() =>
+                    navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment")
+                  }
+                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                >
+                  <span className="text-gray-800 font-medium">Add New Adjustment</span>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                    <FiPlus size={16} />
+                  </div>
+                </button>
+              </ProtectedAction>
+
             </div>
           </div>
 
@@ -467,42 +474,35 @@ const PenalityandAdjustmentList = () => {
               <Spin tip="Loading..." />
             </div>
           )}
-          {/* Error Message */}
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-            />
-          )}
+
           {/* Table */}
           {!loading && !error && (
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              pagination={{
-                current: currentPage,
-                total: totalRecords,
-                pageSize: computedPageSize,
-                showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "20", "50"],
-                size: "small",
-                showTotal: () =>
-                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                onChange: (page, pageSize) => {
-                  dispatch(setCurrentPage(page));
-                },
-                onShowSizeChange: (current, size) => {
-                  dispatch(setCurrentPage(1)); // Reset to first page on size change
-                },
-              }}
-              className="rounded-lg shadow text-xs"
-              bordered
-              size="small"
-              tableLayout="fixed"
-            />
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={{
+                  current: currentPage,
+                  total: totalRecords,
+                  pageSize: computedPageSize,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["5", "10", "20", "50"],
+                  size: "small",
+                  showTotal: () =>
+                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                  onChange: (page, pageSize) => {
+                    dispatch(setCurrentPage(page));
+                  },
+                  onShowSizeChange: (current, size) => {
+                    dispatch(setCurrentPage(1)); // Reset to first page on size change
+                  },
+                }}
+                className="rounded-lg shadow text-xs"
+                bordered
+                size="small"
+                tableLayout="fixed"
+              />
+            </ProtectedSection>
           )}
           {/* Export Modal */}
           <ExportModal
@@ -513,29 +513,28 @@ const PenalityandAdjustmentList = () => {
             sheet="penalty_adjustment_report"
           />
           {/* Receipt Preview Overlay */}
-          {isReceiptVisible && (
+          {isReceiptVisible && selectedReturnInvoice && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
               {/* Dim / Blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
+                onClick={() => setReceiptVisible(false)}
               />
-
               {/* Centered content */}
               <div
                 ref={popupRef}
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                onClick={(e) => e.stopPropagation()}
               >
                 {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
-                  {/* Download PDF button */}
                   <button
+                    onClick={() => handleDownloadPDF(pdfRef, selectedReturnInvoice)}
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                    onClick={handleDownloadPDF}
                   >
                     Download PDF
                   </button>
-                  {/* Close button */}
                   <button
                     onClick={() => setReceiptVisible(false)}
                     className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
@@ -545,13 +544,14 @@ const PenalityandAdjustmentList = () => {
                   </button>
                 </div>
 
-                {/* The actual receipt content */}
-                <div className="mt-4">
-                  <PenaltyAdjustmentTemplate data={selectedReceipt} />
+                {/* Receipt content container */}
+                <div >
+                  <PenaltyAdjustmentTemplate data={selectedReturnInvoice} ref={pdfRef} />
                 </div>
               </div>
             </div>
           )}
+
 
         </div>
       </AdminDashLayout>

@@ -8,11 +8,13 @@ import EditAdmin from "./EditProfile";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa";
-import { updatePasswordThunk } from "../../../../Store/Slices/Common/User/actions/userActions";
+import { updatePasswordThunk, updateSchoolLogo } from "../../../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
 import { useTranslation } from "react-i18next";
 import { LuSchool } from "react-icons/lu";
-
+import ImageUpload from "../../Libary/Components/ImageUpload";
+import useCloudinaryUpload from "../../../../Hooks/CommonHooks/useCloudinaryUpload";
+import Cookies from "js-cookie";
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation('admProfile');
@@ -62,7 +64,32 @@ const UserProfile = () => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
   const [showPaasword, setShowPassword] = useState(false);
-
+  const [logo, setLogo] = useState(null);
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLogo(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
+  const CLOUDINARY_FOLDER = "expenses"; // Updated folder name for clarity
+  const {uploadFile} = useCloudinaryUpload(CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_FOLDER)
+  const handleUploadLogo = async()=>{
+ const a = await uploadFile(logo);
+ const data = {logo:a,schoolId:userDetails.schoolId};
+ dispatch(updateSchoolLogo(data))
+  }
+  useEffect(()=>{
+      const getlogo = Cookies.get("logo");
+      if(getlogo){
+        setLogo(getlogo)
+      }
+  },[])
   return (
     <>
       <Layout title={t("myProfile")}>
@@ -76,13 +103,13 @@ const UserProfile = () => {
               />
               <div className="flex flex-row justify-between w-full">
                 <div className="flex flex-col">
-                <h2 className="text-xl font-semibold">{userDetails?.fullName}</h2>
+                  <h2 className="text-xl font-semibold">{userDetails?.fullName}</h2>
 
-                <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool/></span>{userDetails?.schoolName}</h2>
-                
+                  <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool /></span>{userDetails?.schoolName}</h2>
+
                 </div>
-           
-                 <button
+
+                <button
 
                   onClick={handleSidebarOpen}
                   className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
@@ -121,6 +148,21 @@ const UserProfile = () => {
                   </span>
                 </div>
               </div>
+
+              <div className="flex item-center justify-center flex-col  ">
+                <p>Logo</p>
+                <ImageUpload
+                  imagePreview={logo}
+                  handleImageChange={handleImageChange}
+                  handleRemoveImage={() => setLogo(null)}
+
+                />
+                {logo && <button
+                  onClick={handleUploadLogo}
+                  className="flex items-center mt-2 justify-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+                >Update</button>}
+              </div>
+
             </div>
 
             <h3 className="text-lg font-semibold mb-4">{t("resetYourPassword")}</h3>

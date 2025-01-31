@@ -86,7 +86,7 @@ const Navbar = () => {
       admin: "/users/admin",
       student: "/users/student/profile",
       teacher: "/users/my/profile",
-      accountant: "/users/my/profile",
+      finance: "/users/my/profile",
       librarian: "/users/my/profile",
       staff: "/users/my/profile",
     };

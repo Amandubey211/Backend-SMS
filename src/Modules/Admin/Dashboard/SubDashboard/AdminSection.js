@@ -6,7 +6,8 @@ import TopRankingStudents from "../Graphs/TopRankingStudents";
 import Library from "../LibraryModule/Library";
 import Events from "../EventModule/Event";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
-
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 const AdminSection = () => {
   return (
     <div className="w-full h-full overflow-hidden">
@@ -15,12 +16,16 @@ const AdminSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
+            
             <TotalAttendanceGraph />
+             
           </div>
         </div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
+            
             <TotalEarningsGraph />
+             
           </div>
         </div>
       </div>
@@ -30,12 +35,16 @@ const AdminSection = () => {
         <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-full md:w-2/3 h-full p-2 flex items-center justify-center">
           <div className="w-full h-full">
+          
             <TopRankingStudents />
+             
           </div>
         </div>
         <div className="w-full md:w-1/3 h-full p-2 flex items-center justify-center">
           <div className="w-full h-full">
+            
             <TotalStudentsGraphjs />
+             
           </div>
         </div>
       </div>
@@ -45,12 +54,16 @@ const AdminSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
+            
             <NoticeBoard descriptionLength={58} />
+             
           </div>
         </div>
         <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
+          
             <Events />
+          
           </div>
         </div>
       </div>
@@ -58,7 +71,7 @@ const AdminSection = () => {
       {/* Full Width Library Section */}
       <div className="w-full p-4 h-full flex items-center justify-center max-w-screen">
         <div className="w-full h-full">
-          <Library />
+            <Library />
         </div>
       </div>
     </div>

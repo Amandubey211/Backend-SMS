@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { CiSearch } from "react-icons/ci";
-import { FaEllipsisV, FaTrashAlt } from "react-icons/fa";
+import {
+  FaEllipsisV,
+  FaTrashAlt,
+  FaClipboardList,
+  FaQuestionCircle,
+} from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
@@ -10,8 +15,17 @@ import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
-const List = ({ data, icon, title, type, loading, error }) => {
+const List = ({
+  data,
+  icon,
+  title,
+  type,
+  loading,
+  error,
+  requiredPermission,
+}) => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch(); // Hook to dispatch actions
   const [searchQuery, setSearchQuery] = useState("");
@@ -20,6 +34,25 @@ const List = ({ data, icon, title, type, loading, error }) => {
   const [currentDeleteId, setCurrentDeleteId] = useState(null);
   const [currentDeleteTitle, setCurrentDeleteTitle] = useState("");
   const menuRef = useRef(null);
+
+  // Define no data props based on type
+  const noDataProps =
+    type === "Assignment"
+      ? {
+          title: "Assignment",
+          desc: "Assignments help track progress. Start by creating one for your class!",
+          icon: FaClipboardList,
+          iconColor: "text-blue-500",
+          textColor: "text-gray-500",
+        }
+      : {
+          title: "Quiz",
+          desc: " Quizzes help assess student understanding. Start by creating one for your class!",
+          icon: FaQuestionCircle,
+          iconColor: "text-green-500",
+          textColor: "text-gray-500",
+        };
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -91,9 +124,11 @@ const List = ({ data, icon, title, type, loading, error }) => {
             <Spinner />
           </div>
         ) : error ? (
-          <NoDataFound />
+          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
+            <NoDataFound {...noDataProps} />
+          </div>
         ) : filteredData?.length > 0 ? (
-          filteredData?.reverse()?.map((item) => (
+          filteredData.reverse().map((item) => (
             <div key={item._id} className="relative mb-3">
               <div className="flex items-center gap-3 p-1 rounded-lg">
                 <NavLink
@@ -150,13 +185,17 @@ const List = ({ data, icon, title, type, loading, error }) => {
                         ref={menuRef}
                         className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
                       >
-                        <button
-                          onClick={() => handleDelete(item._id, item.name)}
-                          className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
+                        <ProtectedAction
+                          requiredPermission={requiredPermission}
                         >
-                          <FaTrashAlt className="text-red-600" />
-                          <span>Delete</span>
-                        </button>
+                          <button
+                            onClick={() => handleDelete(item._id, item.name)}
+                            className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
+                          >
+                            <FaTrashAlt className="text-red-600" />
+                            <span>Delete</span>
+                          </button>
+                        </ProtectedAction>
                       </div>
                     )}
                   </div>
@@ -166,7 +205,7 @@ const List = ({ data, icon, title, type, loading, error }) => {
           ))
         ) : (
           <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <NoDataFound />
+            <NoDataFound {...noDataProps} />
           </div>
         )}
       </ul>

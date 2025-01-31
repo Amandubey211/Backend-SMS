@@ -30,7 +30,7 @@ const allStudentSlice = createSlice({
         state.student= action.payload;
       },
       setIssueBooks(state,action){
-        state.bookIssue = action.payload.books
+        state.bookIssue = action.payload?.books
       },
       clearError(state) {
         state.error = null;
@@ -57,7 +57,7 @@ const allStudentSlice = createSlice({
         })
         .addCase(studentIssueBooks.fulfilled, (state, action) => {
           state.loading = false;
-          state.bookIssue = action.payload.books;
+          state.bookIssue = action.payload?.books;
         })
         .addCase(studentIssueBooks.rejected, (state, action) => {
           state.loading = false;

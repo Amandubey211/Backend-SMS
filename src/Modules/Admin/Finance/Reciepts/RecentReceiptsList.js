@@ -28,9 +28,18 @@ import EmailModal from "../../../../Components/Common/EmailModal";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
+import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
+
+
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
+import { downloadPDF } from "../../../../Utils/xl";
+import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
+
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -40,6 +49,11 @@ const RecentReceiptsList = () => {
     (state) => state.admin.receipts || {}
   );
 
+
+  const { loading: emailLoading, successMessage, emailError } = useSelector(
+    (state) => state.common.sendEmail
+  );
+  
   // Basic states
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -63,7 +77,7 @@ const RecentReceiptsList = () => {
 
   // Ref for outside-click detection & PDF generation
   const popupRef = useRef(null);
-
+  const pdfRef = useRef(null);
   // --- 1) Fetch receipts when component mounts or pagination changes ---
   useEffect(() => {
     dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
@@ -118,6 +132,33 @@ const RecentReceiptsList = () => {
     });
   };
 
+
+  // --- Handle Send Email ---
+  const handleSendEmail = async (record) => {
+    if (!record._id) {
+        toast.error("Invalid receipt ID.");
+        return;
+    }
+
+    try {
+        const result = await dispatch(
+            sendEmail({
+                id: record._id,
+                type: "receipt",
+            })
+        );
+
+        if (sendEmail.fulfilled.match(result)) {
+            toast.success("Email sent successfully!");
+        } else {
+            toast.error(result.payload || "Failed to send email.");
+        }
+    } catch (err) {
+        toast.error("Error sending email.");
+    }
+};
+
+
   // --- Delete receipt ---
   const handleDeleteReceipt = async (record) => {
     const confirmDelete = window.confirm(
@@ -141,34 +182,18 @@ const RecentReceiptsList = () => {
   };
 
   // --- Download PDF from preview ---
-  const handleDownloadPDF = async () => {
-    try {
-      if (!selectedReceipt) return;
 
-      const pdfTitle = selectedReceipt.receiptNumber
-        ? `${selectedReceipt.receiptNumber}.pdf`
-        : "receipt.pdf";
 
-      const canvas = await html2canvas(popupRef.current, { scale: 2 });
-      const imgData = canvas.toDataURL("image/png");
 
-      const pdf = new jsPDF("p", "pt", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
 
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
-      const ratio = Math.min(pageWidth / imgWidth, pageHeight / imgHeight);
-      const newWidth = imgWidth * ratio;
-      const newHeight = imgHeight * ratio;
 
-      pdf.addImage(imgData, "PNG", 0, 0, newWidth, newHeight);
-      pdf.save(pdfTitle);
-    } catch (error) {
-      console.error("Error generating PDF: ", error);
-      toast.error("Failed to generate PDF.");
-    }
-  };
+  // --- Download PDF from preview ---
+  const handleDownloadPDF = async (pdfRef, selectedReceipt) => {
+    await downloadPDF(pdfRef, selectedReceipt, "Receipt")
+  }
+
+
+
 
   // --- Navigate to Add New Receipt Page (normal create) ---
   const handleNavigate = () => {
@@ -260,9 +285,10 @@ const RecentReceiptsList = () => {
       </Menu.Item>
 
       {/* 4) Send Mail */}
-      <Menu.Item key="4" onClick={() => toast.success("Send Mail clicked!")}>
+      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
         <MailOutlined /> Send Mail
       </Menu.Item>
+
     </Menu>
   );
 
@@ -376,10 +402,10 @@ const RecentReceiptsList = () => {
       render: (date) =>
         date
           ? new Date(date).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
           : "N/A",
     },
     {
@@ -387,6 +413,7 @@ const RecentReceiptsList = () => {
       key: "action",
       render: (_, record) => (
         <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+
           <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
         </Dropdown>
       ),
@@ -396,7 +423,7 @@ const RecentReceiptsList = () => {
   // Render
   return (
     <AdminLayout>
-      <div className="p-4 bg-white rounded-lg shadow-lg">
+      <div className="p-4 ">
         {/* Header / Search / Export / Add New */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-4">
@@ -410,6 +437,7 @@ const RecentReceiptsList = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+
             <button
               className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
               onClick={() => setExportModalOpen(true)}
@@ -418,113 +446,111 @@ const RecentReceiptsList = () => {
               <span>Export</span> {/* Button text */}
             </button>
 
-            <button
-              className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              onClick={handleNavigate}
-            >
-              <span className="text-gray-800 font-medium">Add New Receipt</span>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <FiUserPlus size={16} />
-              </div>
-            </button>
+
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT} >
+              <button
+                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                onClick={handleNavigate}
+              >
+                <span className="text-gray-800 font-medium">Add New Receipt</span>
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                  <FiUserPlus size={16} />
+                </div>
+              </button>
+            </ProtectedAction>
           </div>
         </div>
         {loading ? (
           <div style={{ textAlign: "center", padding: "16px" }}>
             <Spinner />
           </div>
-        ) : error ? (
-          <div
-            style={{ textAlign: "center", color: "#FF4D4F", marginTop: "16px" }}
-          >
-            <ExclamationCircleOutlined style={{ fontSize: "48px" }} />
-            <p>Unable to fetch the receipts.</p>
-          </div>
         ) : (
           // Render Table and Custom Pagination
           <>
             {/* Table */}
-            <Table
-              rowKey={(record) => record._id}
-              columns={columns}
-              dataSource={filteredData}
-              expandable={{
-                expandedRowRender: (record) => (
-                  <div>
-                    <strong>Line Items:</strong>
-                    {record.lineItems && record.lineItems.length > 0 ? (
-                      <ul>
-                        {record.lineItems.map((item, index) => (
-                          <li key={index}>
-                            {item.revenueType || item.name || "Item"}:{" "}
-                            {item.total || 0} QR
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <span>No line items available</span>
-                    )}
-                  </div>
-                ),
-              }}
-              pagination={{
-                current: currentPage, // Use state
-                total: pagination.totalRecords, // Total records from API response
-                pageSize: pageLimit, // Use state for limit
-                showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "20", "50"],
-                size: "small",
-                showTotal: (total) =>
-                  `Page ${currentPage} of ${Math.ceil(
-                    pagination.totalRecords / pageLimit
-                  )} | Total ${total} records`,
-                onChange: (page) => {
-                  setCurrentPage(page); // Update currentPage state
-                },
-                onShowSizeChange: (current, size) => {
-                  setPageLimit(size); // Update pageLimit state
-                  setCurrentPage(1); // Reset to the first page
-                },
-              }}
-              summary={() => {
-                let totalPaidAmount = 0;
-                let totalTax = 0;
-                let totalDiscount = 0;
-                let totalPenalty = 0;
+            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS} title={"Receipts List"}>
+              <Table
+                rowKey={(record) => record._id}
+                columns={columns}
+                dataSource={filteredData}
+                expandable={{
+                  expandedRowRender: (record) => (
+                    <div>
+                      <strong>Line Items:</strong>
+                      {record.lineItems && record.lineItems.length > 0 ? (
+                        <ul>
+                          {record.lineItems.map((item, index) => (
+                            <li key={index}>
+                              {item.revenueType || item.name || "Item"}:{" "}
+                              {item.total || 0} QR
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span>No line items available</span>
+                      )}
+                    </div>
+                  ),
+                }}
+                pagination={{
+                  current: currentPage, // Use state
+                  total: pagination.totalRecords, // Total records from API response
+                  pageSize: pageLimit, // Use state for limit
+                  showSizeChanger: true,
+                  pageSizeOptions: ["5", "10", "20", "50"],
+                  size: "small",
+                  showTotal: (total) =>
+                    `Page ${currentPage} of ${Math.ceil(
+                      pagination.totalRecords / pageLimit
+                    )} | Total ${total} records`,
+                  onChange: (page) => {
+                    setCurrentPage(page); // Update currentPage state
+                  },
+                  onShowSizeChange: (current, size) => {
+                    setPageLimit(size); // Update pageLimit state
+                    setCurrentPage(1); // Reset to the first page
+                  },
+                }}
+                summary={() => {
+                  let totalPaidAmount = 0;
+                  let totalTax = 0;
+                  let totalDiscount = 0;
+                  let totalPenalty = 0;
 
-                // Calculate totals from filteredData
-                filteredData.forEach((record) => {
-                  totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
-                  totalTax += parseFloat(record.tax) || 0;
-                  totalDiscount += parseFloat(record.discount) || 0;
-                  totalPenalty += parseFloat(record.penalty) || 0;
-                });
+                  // Calculate totals from filteredData
+                  filteredData.forEach((record) => {
+                    totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
+                    totalTax += parseFloat(record.tax) || 0;
+                    totalDiscount += parseFloat(record.discount) || 0;
+                    totalPenalty += parseFloat(record.penalty) || 0;
+                  });
 
-                // Uncomment if you want to display totals
-                // return (
-                //   <Table.Summary.Row>
-                //     <Table.Summary.Cell index={0} colSpan={3}>
-                //       <strong>Totals:</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={1}>
-                //       <strong>{totalDiscount.toLocaleString()} %</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={2}>
-                //       <strong>{totalTax.toLocaleString()} QR</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={3}>
-                //       <strong>{totalPaidAmount.toLocaleString()} QR</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={4}>
-                //       <strong>{totalPenalty.toLocaleString()} QR</strong>
-                //     </Table.Summary.Cell>
-                //     <Table.Summary.Cell index={5} />
-                //   </Table.Summary.Row>
-                // );
-              }}
-              size="small"
-              bordered
-            />
+                  // Uncomment if you want to display totals
+                  // return (
+                  //   <Table.Summary.Row>
+                  //     <Table.Summary.Cell index={0} colSpan={3}>
+                  //       <strong>Totals:</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={1}>
+                  //       <strong>{totalDiscount.toLocaleString()} %</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={2}>
+                  //       <strong>{totalTax.toLocaleString()} QR</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={3}>
+                  //       <strong>{totalPaidAmount.toLocaleString()} QR</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={4}>
+                  //       <strong>{totalPenalty.toLocaleString()} QR</strong>
+                  //     </Table.Summary.Cell>
+                  //     <Table.Summary.Cell index={5} />
+                  //   </Table.Summary.Row>
+                  // );
+                }}
+                size="small"
+                bordered
+              />
+            </ProtectedSection>
           </>
         )}
         {/* Cancel Confirmation Modal */}
@@ -564,19 +590,20 @@ const RecentReceiptsList = () => {
           <div
             className="absolute inset-0 bg-black bg-opacity-60"
             style={{ backdropFilter: "blur(8px)" }}
+            onClick={() => setReceiptVisible(false)}
           />
           {/* Centered content */}
           <div
             ref={popupRef}
-            className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+            className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+            onClick={(e) => e.stopPropagation()}
           >
             {/* Close + Download PDF buttons */}
             <div className="flex justify-end space-x-2 mb-4">
-              
               {/* Download PDF button */}
               <button
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                onClick={handleDownloadPDF}
+                onClick={() => handleDownloadPDF(pdfRef, selectedReceipt)}
               >
                 Download PDF
               </button>
@@ -589,15 +616,19 @@ const RecentReceiptsList = () => {
               </button>
             </div>
 
-            {/* The actual receipt content */}
-            {selectedReceipt ? (
-              <Receipt data={selectedReceipt} />
-            ) : (
-              <p>No receipt data available.</p>
-            )}
+            {/* Receipt content container */}
+            <div className="receipt-container">
+              {selectedReceipt ? (
+                <ReceiptTemplate data={selectedReceipt} ref={pdfRef} />
+              ) : (
+                <p className="text-center text-gray-500">No receipt data available.</p>
+              )}
+            </div>
           </div>
         </div>
       )}
+
+
     </AdminLayout>
   );
 };

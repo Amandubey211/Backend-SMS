@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { activeUser, addUser, deactiveUser, editUser, fetchAllStaff } from "./staff.action";
 const initialState = {
-    accountant:[],
+    finance:[],
     staff:[],
     librarian:[],
     error:null,
@@ -12,7 +12,7 @@ const allStaffSlice = createSlice({
     initialState,
     reducers: {
       setAllStaffs(state, action) {
-        state.accountant = action.payload.accountant;
+        state.finance = action.payload.finance;
         state.staff = action.payload.staff;
         state.librarian = action.payload.librarian;
       },
@@ -28,7 +28,7 @@ const allStaffSlice = createSlice({
           state.error = null;
         })
         .addCase(fetchAllStaff.fulfilled, (state, action) => {
-          state.accountant = action.payload.accountant;
+          state.finance = action.payload.finance;
           state.staff = action.payload.staff;
           state.librarian = action.payload.librarian;
           state.loading = false;

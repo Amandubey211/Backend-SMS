@@ -17,9 +17,11 @@ import { RiDashboardFill } from "react-icons/ri";
 import Spinner from "../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
+// import { createStaffSalary } from "../../../Store/Slices/Admin/Accounting/Expenses/expenses.action";
 import { fetchAdminDashboardData } from "../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
+import { PERMISSIONS } from "../../../config/permission";
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const MainSection = () => {
   const { dashboardData, errorDashboard, loadingDashboard } = useSelector(
@@ -40,11 +42,11 @@ const MainSection = () => {
     dispatch(fetchAdminDashboardData());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (role == "admin" || role == "accountant") {
-      dispatch(createStaffSalary({ status: "unpaid", action: "pay now" }));
-    }
-  }, [dispatch, createStaffSalary]);
+  // useEffect(() => {
+  //   if (role == "admin" || role == "finance") {
+  //     dispatch(createStaffSalary({ status: "unpaid", action: "pay now" }));
+  //   }
+  // }, [dispatch, createStaffSalary]);
 
   function capitalizeFirstLetter(string) {
     if (!string) return "";
@@ -100,11 +102,15 @@ const MainSection = () => {
 
   return (
     <div className="w-full overflow-x-hidden">
+      <ProtectedSection requiredPermission={PERMISSIONS.GET_DASHBOARD_CARD} title={t("Cards")}>
+
+    
       <div className="flex flex-wrap justify-center gap-3 py-4">
         {cardData?.map((item, index) => (
           <DashCard key={index} {...item} />
         ))}
       </div>
+      </ProtectedSection>
 
       {loadingDashboard && (
         <div className="flex flex-col items-center justify-center w-full">
@@ -128,7 +134,7 @@ const MainSection = () => {
         <>
           {role === "admin" && <AdminSection />}
           {role === "teacher" && <TeacherSection />}
-          {role === "accountant" && <AccountantSection />}
+          {role === "finance" && <AccountantSection />}
           {role === "librarian" && <LibrarianSection />}
           {role === "staff" && <StaffSection />}
         </>

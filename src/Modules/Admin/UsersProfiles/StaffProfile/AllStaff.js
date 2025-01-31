@@ -19,6 +19,9 @@ import { fetchAllStaff } from "../../../../Store/Slices/Admin/Users/Staff/staff.
 import Header from "../Component/Header";
 import { getAllRolesThunk } from "../../../../Store/Slices/Common/RBAC/rbacThunks";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AllStaff = () => {
   const { t } = useTranslation("admAccounts");
@@ -151,7 +154,9 @@ const AllStaff = () => {
       case "editStaff":
         return <AddUser role="staff" data={staffData} />;
       case "createRole":
-        return <CreateRole onClose={handleSidebarClose} department="Staff" />;
+        return (
+          <CreateRole onClose={handleSidebarClose} department="otherStaff" />
+        );
       default:
         return <div>{t("Select an action")}</div>;
     }
@@ -165,55 +170,60 @@ const AllStaff = () => {
             <Spinner />
           </div>
         ) : (
-          <div className="p-4 relative">
-            {/* Reusable Header Component with currentSort and currentFilters */}
-            <Header
-              title={t("All Staff")}
-              count={staff?.length || 0}
-              sortOptions={sortOptions}
-              filterOptions={filterOptionsList}
-              department="Staff"
-              onSortFilterApply={handleSortFilterApply}
-              navigateToManageRoles={navigateToManageRoles}
-              handleCreateRole={handleCreateRole}
-              isAdmin={role === "admin"}
-              currentSort={sortOption} // Pass current sort
-              currentFilters={filterRoles} // Pass current filters
-            />
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_STAFF}
+            title={"Staff"}
+          >
+            <div className="p-4 relative">
+              {/* Reusable Header Component with currentSort and currentFilters */}
+              <Header
+                title={t("All Staff")}
+                count={staff?.length || 0}
+                sortOptions={sortOptions}
+                filterOptions={filterOptionsList}
+                department="Staff"
+                onSortFilterApply={handleSortFilterApply}
+                navigateToManageRoles={navigateToManageRoles}
+                handleCreateRole={handleCreateRole}
+                isAdmin={role === "admin"}
+                currentSort={sortOption} // Pass current sort
+                currentFilters={filterRoles} // Pass current filters
+              />
 
-            {/* Staff List */}
-            <div className="flex flex-wrap -mx-2">
-              {sortedStaff?.length > 0 ? (
-                sortedStaff.map((member) => (
-                  <ProfileCard
-                    key={member._id} // Use a unique identifier
-                    profile={member}
-                    onClick={() => handleStaffClick(member)}
-                    editUser={
-                      role === "admin"
-                        ? (event) => editUser(event, member)
-                        : null
-                    }
-                  />
-                ))
-              ) : (
-                <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
-                  <NoDataFound />
-                </div>
-              )}
+              {/* Staff List */}
+              <div className="flex flex-wrap -mx-2">
+                {sortedStaff?.length > 0 ? (
+                  sortedStaff.map((member) => (
+                    <ProfileCard
+                      key={member._id} // Use a unique identifier
+                      profile={member}
+                      onClick={() => handleStaffClick(member)}
+                      editUser={
+                        role === "admin"
+                          ? (event) => editUser(event, member)
+                          : null
+                      }
+                    />
+                  ))
+                ) : (
+                  <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-2xl">
+                    <NoDataFound />
+                  </div>
+                )}
+              </div>
+
+              {/* Floating Action Button */}
+              <ProtectedAction requiredPermission={PERMISSIONS.ADD_STAFF}>
+                <button
+                  onClick={handleAddStaffClick}
+                  className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
+                  aria-label="Add New Staff"
+                >
+                  <GoPlus className="text-2xl" />
+                </button>
+              </ProtectedAction>
             </div>
-
-            {/* Floating Action Button */}
-            {role === "admin" && (
-              <button
-                onClick={handleAddStaffClick}
-                className="fixed bottom-8 right-8 bg-gradient-to-r from-pink-500 to-purple-500 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg hover:opacity-90 transition duration-200"
-                aria-label="Add New Staff"
-              >
-                <GoPlus className="text-2xl" />
-              </button>
-            )}
-          </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 
@@ -228,7 +238,9 @@ const AllStaff = () => {
               ? t("Quick View of Staff")
               : sidebarContent === "createRole"
               ? t("Create New Role")
-              : t("Add/Edit Staff")}
+              : staffData
+              ? t("Edit Staff")
+              : t("Add Staff")}
           </span>
         }
         width={

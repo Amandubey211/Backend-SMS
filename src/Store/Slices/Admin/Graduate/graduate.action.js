@@ -3,6 +3,7 @@ import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action"
 import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../Utils/academivYear";
 import { getData, putData } from "../../../../services/apiEndpoints";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 
 
@@ -11,12 +12,13 @@ export const fetchGraduates = createAsyncThunk(
   "graduates/fetchGraduates",
   async (
     { batchStart, batchEnd, email, Q_Id, admissionNumber, page, limit },
-    { rejectWithValue,  dispatch }
+    { rejectWithValue,  dispatch, getState }
   ) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/admin/graduates/students?say=${say}`,
+      const response = await getData(`/${getRole}/graduates/students?say=${say}`,
          { batchStart, batchEnd, email, Q_Id, admissionNumber, page, limit },
       );
 
@@ -35,13 +37,14 @@ export const fetchGraduates = createAsyncThunk(
 // Demote Students
 export const demoteStudents = createAsyncThunk(
   "students/demoteStudents",
-  async ({ studentIds }, { rejectWithValue, dispatch }) => {
+  async ({ studentIds }, { rejectWithValue, dispatch , getState}) => {
     try {
       const say = getAY();
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       
       const response = await putData(
-        `/admin/demote/students?say=${say}`,
+        `/${getRole}/demote/students?say=${say}`,
         { studentIds },
       );
 

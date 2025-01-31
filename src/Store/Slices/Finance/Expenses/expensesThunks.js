@@ -1,4 +1,4 @@
-// src/Store/Slices/Finance/Expenses/expensesThunks.js
+// src/Store/Slices/${getRole}/Expenses/expensesThunks.js
 
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
@@ -11,13 +11,14 @@ import {
 } from "../../../../services/apiEndpoints"; // Ensure deleteData is implemented
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 /**
  * Helper function to determine the correct API endpoints based on expense category.
  */
-const getEndpointForCategory = (category, action, expenseId) => {
-  const baseUrl = "/finance/expense";
-  console.log(category, "kk");
+const getEndpointForCategory = (getRole,category, action, expenseId) => {
+  const baseUrl = `/${getRole}/expense`;
+  // console.log(category, "kk");
   switch (category) {
     case "Salaries and Wages":
       if (action === "create") return `${baseUrl}/add/salaryWages`;
@@ -98,12 +99,13 @@ const getEndpointForCategory = (category, action, expenseId) => {
  */
 export const fetchAllExpenses = createAsyncThunk(
   "expenses/fetchAllExpenses",
-  async (params, { dispatch, rejectWithValue }) => {
+  async (params, { dispatch, rejectWithValue,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/finance/expense/getAll?academicYear=${say}`,
+        `/${getRole}/expense/getAll?academicYear=${say}`,
         params
       );
 
@@ -125,9 +127,10 @@ export const fetchAllExpenses = createAsyncThunk(
  */
 export const addExpense = createAsyncThunk(
   "expenses/addExpense",
-  async ({ values, category }, { dispatch, rejectWithValue }) => {
+  async ({ values, category }, { dispatch, rejectWithValue,getState }) => {
     try {
-      const endpoint = getEndpointForCategory(category, "create");
+      const getRole = getUserRole(getState);
+      const endpoint = getEndpointForCategory(getRole,category, "create");
       const response = await postData(endpoint, values);
 
       if (response?.success) {
@@ -145,9 +148,10 @@ export const addExpense = createAsyncThunk(
 
 export const updateExpense = createAsyncThunk(
   "expenses/updateExpense",
-  async ({ values, category, expenseId }, { dispatch, rejectWithValue }) => {
+  async ({ values, category, expenseId }, { dispatch, rejectWithValue ,getState}) => {
     try {
-      const endpoint = getEndpointForCategory(category, "update", expenseId);
+      const getRole = getUserRole(getState);
+      const endpoint = getEndpointForCategory(getRole,category, "update", expenseId);
       const response = await putData(endpoint, values);
 
       if (response?.success) {
@@ -167,7 +171,8 @@ export const deleteExpense = createAsyncThunk(
   "expenses/deleteExpense",
   async ({ category, id }, { dispatch, rejectWithValue, getState }) => {
     try {
-      const endpoint = getEndpointForCategory(category, "delete", id);
+      const getRole = getUserRole(getState);
+      const endpoint = getEndpointForCategory(getRole,category, "delete", id);
       const response = await deleteData(endpoint);
 
       if (response?.success) {
@@ -195,11 +200,12 @@ export const deleteExpense = createAsyncThunk(
 
 export const fetchExpenseById = createAsyncThunk(
   "expenses/fetchExpenseById",
-  async ({ category, id }, { dispatch, rejectWithValue }) => {
+  async ({ category, id }, { dispatch, rejectWithValue ,getState}) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-      const endpoint = `/finance/expense/get/${category}/${id}`;
+      const endpoint = `/${getRole}/expense/get/${category}/${id}`;
       const response = await getData(endpoint);
 
       if (response?.success) {
@@ -213,11 +219,12 @@ export const fetchExpenseById = createAsyncThunk(
 
 export const fetchExpenseGraph = createAsyncThunk(
   "expenses/fetchExpenseGraph",
-  async ({ groupBy = "month" }, { rejectWithValue, dispatch }) => {
+  async ({ groupBy = "month" }, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY(); // Academic Year Identifier
       dispatch(setShowError(false));
-      const response = await getData("/finance/dashboard/expense/graph", {
+      const response = await getData(`/${getRole}/dashboard/expense/graph`, {
         groupBy,
         say,
       });
@@ -233,11 +240,12 @@ export const fetchExpenseGraph = createAsyncThunk(
 
 export const fetchCardDataExpense = createAsyncThunk(
   "expenses/fetchCardDataExpense",
-  async ({ year }, { rejectWithValue, dispatch }) => {
+  async ({ year }, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       const say = getAY(); // Academic Year Identifier
       dispatch(setShowError(false));
-      const response = await getData(`/finance/dashboard/expense/cardData`, {
+      const response = await getData(`/${getRole}/dashboard/expense/cardData`, {
         academicYearId: say,
         year,
       });
@@ -252,10 +260,11 @@ export const fetchCardDataExpense = createAsyncThunk(
 );
 export const fetchTeachingStaff = createAsyncThunk(
   "expenses/fetchTeachingStaff",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue ,getState}) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData("/admin/teachingStaff");
+      const response = await getData(`admin/teachingStaff`);
 
       if (response?.success) {
         return response.data; // Assuming data is the array of teaching staff
@@ -268,10 +277,11 @@ export const fetchTeachingStaff = createAsyncThunk(
 
 export const fetchNonTeachingStaff = createAsyncThunk(
   "expenses/fetchNonTeachingStaff",
-  async (_, { dispatch, rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue ,getState}) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData("/admin/nonTeachingStaff");
+      const response = await getData(`/admin/nonTeachingStaff`);
 
       if (response?.success) {
         return response.data; // Assuming data is the array of non-teaching staff

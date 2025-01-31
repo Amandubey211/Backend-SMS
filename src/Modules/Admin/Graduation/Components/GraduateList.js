@@ -2,6 +2,9 @@ import React from "react";
 import { FaExclamationTriangle, FaUserGraduate } from "react-icons/fa"; // Import icons
 import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from 'react-i18next';
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const GraduateList = ({
   students,
@@ -50,17 +53,18 @@ const GraduateList = ({
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-xl font-semibold">{t("All Graduates")}</h1>
-
-        {selectedStudents?.length > 0 && (
-          <button
-            className="px-4 py-2 bg-red-500 text-white rounded-md"
-            onClick={() => onDemoteStudents(selectedStudents)}
-          >
-            {selectedStudents?.length === 1
-              ? t("Demote Student")
-              : t("Demote All Students")}
-          </button>
-        )}
+        <ProtectedAction permission={"PERMISSIONS.DEMOTE_GRADUATE"}>
+          {selectedStudents?.length > 0 && (
+            <button
+              className="px-4 py-2 bg-red-500 text-white rounded-md"
+              onClick={() => onDemoteStudents(selectedStudents)}
+            >
+              {selectedStudents?.length === 1
+                ? t("Demote Student")
+                : t("Demote All Students")}
+            </button>
+          )}
+        </ProtectedAction>
       </div>
 
       <div className="overflow-hidden ">
@@ -163,7 +167,7 @@ const GraduateList = ({
                     />
                   </td>
                   <td className="py-2 px-3 text-sm whitespace-nowrap">
-                    {student.firstName  || 'N/A'} {student.lastName  || 'N/A'}
+                    {student.firstName || 'N/A'} {student.lastName || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-sm whitespace-nowrap">
                     {student.Q_Id || 'N/A'}
@@ -172,7 +176,7 @@ const GraduateList = ({
                     {student.admissionNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-sm whitespace-nowrap">
-                    {student.academicYear?.year  || 'N/A'}
+                    {student.academicYear?.year || 'N/A'}
                   </td>
                   <td className="py-2 px-3 text-sm truncate max-w-xs">
                     {student.email || 'N/A'}
@@ -184,12 +188,14 @@ const GraduateList = ({
                     {student.guardianContactNumber || 'N/A'}
                   </td>
                   <td className="py-2 px-3">
-                    <button
-                      onClick={() => onViewDetails(student)}
-                      className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 hover:shadow-md transition-all duration-200 text-sm"
-                    >
-                      {t("View Details")}
-                    </button>
+                    <ProtectedAction permission={"PERMISSIONS.VIEW_GRADUATE_DETAILS"}>
+                      <button
+                        onClick={() => onViewDetails(student)}
+                        className="px-2 py-1 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 hover:shadow-md transition-all duration-200 text-sm"
+                      >
+                        {t("View Details")}
+                      </button>
+                    </ProtectedAction>
                   </td>
                 </tr>
               ))}

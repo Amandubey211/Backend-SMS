@@ -23,6 +23,8 @@ import { formComponentsMap, initialValuesMap } from "./Config/formConfig";
 import { validationSchemas } from "./Config/validationSchemas";
 import toast from "react-hot-toast";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const AddEarnings = () => {
   const navigate = useNavigate();
@@ -59,8 +61,9 @@ const AddEarnings = () => {
       const subCategory = incomeData.subCategory || incomeData.sub_category;
 
       const categoryName =
-        incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
+        incomeData.category?.categoryName || "Facility-Based Revenue";
 
+      console.log(categoryName, "categoryNamecategoryName");
       // **2. Extract subcategory-specific fields from 'selectedIncome'**
       // Assuming subcategory-specific data is directly present in 'selectedIncome'
       // If they are nested, adjust accordingly (e.g., incomeData.rentIncome.name)
@@ -70,7 +73,6 @@ const AddEarnings = () => {
         case "Rent Income":
           specificFields = {
             name: incomeData.rentIncome.name || "",
-
             startDate: incomeData.rentIncome.startDate?.slice(0, 10) || "",
             endDate: incomeData.rentIncome.endDate?.slice(0, 10) || "",
             nameOfRenter: incomeData.rentIncome.nameOfRenter || "",
@@ -406,7 +408,7 @@ const AddEarnings = () => {
       const incomeData = selectedIncome;
       console.log("Income Data Loaded:", incomeData); // Debugging line
       const categoryName =
-        incomeData.category?.[0]?.categoryName || "Facility-Based Revenue";
+        incomeData.category?.categoryName || "Facility-Based Revenue";
       setSelectedCategory(categoryName);
       setSelectedSubCategory(incomeData.subCategory || "Rent Income"); // Use 'subCategory'
       setDescription(incomeData.description || "");
@@ -458,11 +460,12 @@ const AddEarnings = () => {
           {({ resetForm, isSubmitting, values, setFieldValue }) => (
             <Form className="p-3">
               {/* Read-Only Mode Notification */}
-              {readOnly && (
+              {/* {readOnly && (
                 <div className="flex justify-between items-center bg-yellow-100 text-yellow-700 p-2 rounded-md text-sm">
                   <span>
                     Currently in read-only mode. You cannot edit these fields.
                   </span>
+                  
                   <Button
                     type="primary"
                     size="small"
@@ -487,7 +490,7 @@ const AddEarnings = () => {
                     Edit
                   </Button>
                 </div>
-              )}
+              )} */}
 
               {/* Error Message */}
               {/* {error && showError && (

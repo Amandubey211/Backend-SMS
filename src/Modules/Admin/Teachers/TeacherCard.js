@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
+import { Tooltip } from "antd"; // Import Tooltip from antd
 import { useDispatch, useSelector } from "react-redux";
 import DeleteModal from "../../../Components/Common/DeleteModal";
 import { unassignTeacher } from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
@@ -22,7 +23,7 @@ const TeacherCard = ({ teacher }) => {
   const handleCloseModal = () => setIsModalOpen(false);
 
   return (
-    <div className="relative w-64 h-70 rounded-md overflow-hidden hover:shadow-lg border border-gray-200 p-4 m-4 flex flex-col items-center transform transition-transform duration-300 hover:scale-105 group">
+    <div className="relative w-64 h-80 rounded-md overflow-hidden hover:shadow-lg border border-gray-200 p-4 m-4 flex flex-col items-center transform transition-transform duration-300 hover:scale-105 group">
       {role === "admin" && (
         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <button
@@ -36,7 +37,7 @@ const TeacherCard = ({ teacher }) => {
       <div className="flex justify-center">
         {teacher.profile ? (
           <img
-            className="w-24 h-24 rounded-full"
+            className="w-24 h-24 rounded-full object-cover"
             src={teacher.profile}
             alt={teacher.firstName}
           />
@@ -45,9 +46,19 @@ const TeacherCard = ({ teacher }) => {
         )}
       </div>
       <div className="text-center mt-4">
-        <div className="font-bold capitalize text-xl mb-1">
-          {teacher.firstName} {teacher.lastName}
-        </div>
+        <Tooltip title={`${teacher.firstName} ${teacher.lastName}`}>
+          <div
+            className="font-bold capitalize text-xl mb-1 truncate"
+            style={{
+              maxWidth: "150px", // Limit width to create the truncate effect
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {teacher.firstName} {teacher.lastName}
+          </div>
+        </Tooltip>
         <p className="text-gray-700 text-sm ">Instructor</p>
       </div>
       <div className="text-center mt-4 border-t pt-2 w-full">

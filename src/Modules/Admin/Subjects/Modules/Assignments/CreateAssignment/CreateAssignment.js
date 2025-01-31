@@ -3,6 +3,8 @@ import Layout from "../../../../../../Components/Common/Layout";
 import MainSection from "./MainSection";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import { useSelector } from "react-redux";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const CreateAssignment = () => {
   const isSidebarOpen = useSelector(

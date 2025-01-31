@@ -8,6 +8,8 @@ import {
   createAssignmentThunk,
   updateAssignmentThunk,
 } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 // Memoized initial form state to avoid re-initialization
 const initialFormState = {
@@ -166,7 +168,7 @@ const MainSection = ({ setIsEditing }) => {
   );
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full h-full">
       <CreateAssignmentHeader
         onSave={handleSave}
         id={assignmentId}
@@ -178,27 +180,34 @@ const MainSection = ({ setIsEditing }) => {
         saveLoading={saveLoading}
         publishLoading={publishLoading}
       />
-      <div className="w-full flex">
-        {/* Prevent unnecessary re-renders by memoizing */}
-        <div className="w-[70%]">
-          <EditorComponent
-            assignmentLabel="Assignment Name"
-            assignmentName={assignmentName}
-            editorContent={editorContent}
-            onNameChange={handleNameChange}
-            onEditorChange={handleEditorChange}
-          />
+      <ProtectedSection
+        title={"Create Assignment"}
+        requiredPermission={
+          PERMISSIONS.CREATE_ASSIGNMENT || PERMISSIONS.UPDATE_ASSIGNMENT
+        }
+      >
+        <div className="w-full flex h-full">
+          {/* Prevent unnecessary re-renders by memoizing */}
+          <div className="w-[70%]">
+            <EditorComponent
+              assignmentLabel="Assignment Name"
+              assignmentName={assignmentName}
+              editorContent={editorContent}
+              onNameChange={handleNameChange}
+              onEditorChange={handleEditorChange}
+            />
+          </div>
+          <div className="w-[30%]">
+            <CreateAssignmentForm
+              {...formState}
+              setDisplayGrade={(grade) =>
+                setFormState((prev) => ({ ...prev, displayGrade: grade }))
+              }
+              handleChange={handleFormChange}
+            />
+          </div>
         </div>
-        <div className="w-[30%]">
-          <CreateAssignmentForm
-            {...formState}
-            setDisplayGrade={(grade) =>
-              setFormState((prev) => ({ ...prev, displayGrade: grade }))
-            }
-            handleChange={handleFormChange}
-          />
-        </div>
-      </div>
+      </ProtectedSection>
     </div>
   );
 };

@@ -11,15 +11,17 @@ import { setSubjects } from "./subjectSlice"; // Adjust the path as necessary
 import { fetchClassDetails } from "../actions/classThunk"; // Adjust the path as necessary
 import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 export const fetchSubjects = createAsyncThunk(
   "subject/fetchSubjects",
-  async (classId, { rejectWithValue, dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject/${classId}?say=${say}`;
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/subject/${classId}?say=${say}`;
       const response = await getData(endpoint);
 
       if (response && response.status) {
@@ -34,12 +36,13 @@ export const fetchSubjects = createAsyncThunk(
 
 export const createSubject = createAsyncThunk(
   "subject/createSubject",
-  async (subjectData, { rejectWithValue, dispatch }) => {
+  async (subjectData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject?say=${say}`;
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/subject?say=${say}`;
       const response = await postData(endpoint, subjectData);
 
       if (response && response.status) {
@@ -55,12 +58,16 @@ export const createSubject = createAsyncThunk(
 
 export const updateSubject = createAsyncThunk(
   "subject/updateSubject",
-  async ({ subjectId, subjectData }, { rejectWithValue, dispatch }) => {
+  async (
+    { subjectId, subjectData },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject/${subjectId}?say=${say}`;
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/subject/${subjectId}?say=${say}`;
 
       const response = await putData(endpoint, subjectData);
 
@@ -77,13 +84,14 @@ export const updateSubject = createAsyncThunk(
 
 export const deleteSubject = createAsyncThunk(
   "subject/deleteSubject",
-  async ({ subjectId, classId }, { rejectWithValue, dispatch }) => {
+  async ({ subjectId, classId }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const endpoint = `/admin/subject/${subjectId}?say=${say}`;
-   
+      const getRole = getUserRole(getState);
+      const endpoint = `/${getRole}/subject/${subjectId}?say=${say}`;
+
       const response = await deleteData(endpoint);
 
       if (response && response.success) {

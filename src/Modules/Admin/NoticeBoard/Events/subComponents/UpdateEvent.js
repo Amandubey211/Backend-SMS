@@ -89,6 +89,7 @@ const UpdateEvent = () => {
   };
 
   return (
+    
     <div className="flex flex-col h-full max-w-xl mx-auto border-t bg-white">
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">

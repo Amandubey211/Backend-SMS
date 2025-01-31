@@ -23,6 +23,9 @@ import { deleteChapter } from "../../../../../../Store/Slices/Admin/Class/Module
 import { fetchModules } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import toast from "react-hot-toast";
 import { deleteAttachmentThunk } from "../../../../../../Store/Slices/Admin/Class/Module/attachmentThunk";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const Chapter = ({ onEdit, chapterNumber, chapter }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -173,20 +176,25 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
           </div>
         </div>
         <div className="flex items-center space-x-2 relative">
-          <div className="relative">
-            <button
-              className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
-              aria-label="Add Attachment"
-              onClick={handleAddAttachment}
-            >
-              <GrAttachment />
-            </button>
-            {attachments?.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {attachments?.length}
-              </span>
-            )}
-          </div>
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.UPLOAD_CHAPTER_FILES}
+          >
+            <div className="relative">
+              <button
+                className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
+                aria-label="Add Attachment"
+                onClick={handleAddAttachment}
+              >
+                <GrAttachment />
+              </button>
+
+              {attachments?.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {attachments?.length}
+                </span>
+              )}
+            </div>
+          </ProtectedAction>
 
           <button
             className="border p-2 rounded-full hover:bg-gray-100 relative"
@@ -204,28 +212,34 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
               role="menu"
               aria-label="Options Menu"
             >
-              <ul className="py-2">
-                <li
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEdit();
-                    setMenuOpen(false);
-                  }}
-                  role="menuitem"
+              <ul>
+                <ProtectedAction requiredPermission={PERMISSIONS.EDIT_CHAPTER}>
+                  <li
+                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEdit();
+                      setMenuOpen(false);
+                    }}
+                    role="menuitem"
+                  >
+                    <FaPen className="mr-2" /> Edit
+                  </li>
+                </ProtectedAction>
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS.DELETE_CHAPTER}
                 >
-                  <FaPen className="mr-2" /> Edit
-                </li>
-                <li
-                  className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete();
-                  }}
-                  role="menuitem"
-                >
-                  <FaTrashAlt className="mr-2" /> Delete
-                </li>
+                  <li
+                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete();
+                    }}
+                    role="menuitem"
+                  >
+                    <FaTrashAlt className="mr-2" /> Delete
+                  </li>
+                </ProtectedAction>
               </ul>
             </div>
           )}
@@ -243,78 +257,91 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
       {/* Chapter Content */}
       {chapterExpanded && (
-        <div
-          id={`chapter-content-${chapterId}`}
-          className="mt-2 transition-all duration-300 ease-in-out"
-        >
-          <div className="flex flex-col space-y-4">
-            {/* Attachments */}
-            {attachments?.length > 0 && (
-              <div>
-                <h3 className="text-sm font-semibold text-green-600">
-                  Attachments ({attachments?.length})
-                </h3>
-                <div className="grid grid-cols-1 gap-2 mb-2">
-                  {attachments?.map((attachment, index) => (
-                    <div
-                      key={index}
-                      className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          {getFileIcon(attachment.type) || (
-                            <img
-                              src={attachment.url}
-                              alt={attachment.name}
-                              className="h-8 w-8 object-cover rounded-md"
-                            />
-                          )}
-                          <div className="flex flex-col ml-4">
-                            <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
-                              {attachment.name}
-                            </p>
-                            <p className="text-md">{attachment.label}</p>
+        <ProtectedSection title="Chapters" requiredPermission="View Chapters">
+          <div
+            id={`chapter-content-${chapterId}`}
+            className="mt-2 transition-all duration-300 ease-in-out"
+          >
+            <div className="flex flex-col space-y-4">
+              {/* Attachments */}
+              {attachments?.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-green-600">
+                    Attachments ({attachments?.length})
+                  </h3>
+                  <div className="grid grid-cols-1 gap-2 mb-2">
+                    {attachments?.map((attachment, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            {getFileIcon(attachment.type) || (
+                              <img
+                                src={attachment.url}
+                                alt={attachment.name}
+                                className="h-8 w-8 object-cover rounded-md"
+                              />
+                            )}
+                            <div className="flex flex-col ml-4">
+                              <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
+                                {attachment.name}
+                              </p>
+                              <p className="text-md">{attachment.label}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <ProtectedAction requiredPermission={"dd"}>
+                              <button
+                                onClick={() =>
+                                  openPreviewModal(
+                                    attachment.url,
+                                    attachment.type
+                                  )
+                                }
+                                className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                                aria-label="Preview"
+                              >
+                                <FaEye size={20} />
+                              </button>
+                            </ProtectedAction>
+
+                            <ProtectedAction
+                              requiredPermission={
+                                PERMISSIONS.REMOVE_CHAPTER_FILES
+                              }
+                            >
+                              <button
+                                type="button"
+                                className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                                onClick={() => {
+                                  setAttachmentToDelete(attachment);
+                                  setDeleteModalOpen(true);
+                                }}
+                                disabled={attachmentLoading[attachment.url]}
+                              >
+                                {attachmentLoading[attachment.url] ? (
+                                  <ImSpinner3
+                                    size={20}
+                                    className="animate-spin text-gray-700"
+                                  />
+                                ) : (
+                                  <RiDeleteBin5Line size={20} />
+                                )}
+                              </button>
+                            </ProtectedAction>
                           </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <button
-                            onClick={() =>
-                              openPreviewModal(attachment.url, attachment.type)
-                            }
-                            className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                            aria-label="Preview"
-                          >
-                            <FaEye size={20} />
-                          </button>
-                          <button
-                            type="button"
-                            className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                            onClick={() => {
-                              setAttachmentToDelete(attachment);
-                              setDeleteModalOpen(true);
-                            }}
-                            disabled={attachmentLoading[attachment.url]}
-                          >
-                            {attachmentLoading[attachment.url] ? (
-                              <ImSpinner3
-                                size={20}
-                                className="animate-spin text-gray-700"
-                              />
-                            ) : (
-                              <RiDeleteBin5Line size={20} />
-                            )}
-                          </button>
-                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Assignments and Quizzes */}
-            <div>
-              {/* {assignments?.length > 0 || quizzes?.length > 0 ? (
+              {/* Assignments and Quizzes */}
+              <div>
+                {/* {assignments?.length > 0 || quizzes?.length > 0 ? (
                 <>
                   {assignments?.map((assignment, index) => (
                     <ChapterItem
@@ -340,32 +367,33 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                   No Assignment or Quizz
                 </p>
               )} */}
-              {assignments?.length > 0 ||
-                (quizzes?.length > 0 && (
-                  <>
-                    {assignments?.map((assignment, index) => (
-                      <ChapterItem
-                        key={index}
-                        type="assignment"
-                        title={assignment.name}
-                        id={assignment._id}
-                        isPublished={assignment.isPublished}
-                      />
-                    ))}
-                    {quizzes?.map((quiz, index) => (
-                      <ChapterItem
-                        key={index}
-                        type="quiz"
-                        title={quiz.name}
-                        id={quiz._id}
-                        isPublished={quiz.isPublished}
-                      />
-                    ))}
-                  </>
-                ))}
+                {assignments?.length > 0 ||
+                  (quizzes?.length > 0 && (
+                    <>
+                      {assignments?.map((assignment, index) => (
+                        <ChapterItem
+                          key={index}
+                          type="assignment"
+                          title={assignment.name}
+                          id={assignment._id}
+                          isPublished={assignment.isPublished}
+                        />
+                      ))}
+                      {quizzes?.map((quiz, index) => (
+                        <ChapterItem
+                          key={index}
+                          type="quiz"
+                          title={quiz.name}
+                          id={quiz._id}
+                          isPublished={quiz.isPublished}
+                        />
+                      ))}
+                    </>
+                  ))}
+              </div>
             </div>
           </div>
-        </div>
+        </ProtectedSection>
       )}
 
       {/* Delete Modal for Chapter */}

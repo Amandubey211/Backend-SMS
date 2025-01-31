@@ -6,7 +6,8 @@ import Spinner from "../../../../Components/Common/Spinner";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchFilteredIssueBooks } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import { useTranslation } from 'react-i18next';
-
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 const Library = () => {
   const { t } = useTranslation('admLibrary');
   const dispatch = useDispatch();
@@ -59,25 +60,27 @@ const Library = () => {
           {t("View All")}
         </button>
       </div>
-      {latestBooks?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-[200px]">
-          <FaBook className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-500 text-xl">{t("No library data found")}</p>
-        </div>
-      ) : (
-        latestBooks?.map((book) => (
-          <BookItem
-            key={book?._id}
-            image={book?.image || "https://via.placeholder.com/50"}
-            title={book?.name || t("Untitled Book")}
-            category={book?.category || t("Uncategorized")}
-            copies={book?.copies || 0}
-            author={book?.author || t("Unknown")}
-            className={book?.classId?.className || t("Unknown Class")}
-            role={role}
-          />
-        ))
-      )}
+      <ProtectedSection requiredPermission={PERMISSIONS.DASH_VIEW_BOOKS} title={t("Books")}>
+        {latestBooks?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[200px]">
+            <FaBook className="text-gray-400 text-6xl mb-4" />
+            <p className="text-gray-500 text-xl">{t("No library data found")}</p>
+          </div>
+        ) : (
+          latestBooks?.map((book) => (
+            <BookItem
+              key={book?._id}
+              image={book?.image || "https://via.placeholder.com/50"}
+              title={book?.name || t("Untitled Book")}
+              category={book?.category || t("Uncategorized")}
+              copies={book?.copies || 0}
+              author={book?.author || t("Unknown")}
+              className={book?.classId?.className || t("Unknown Class")}
+              role={role}
+            />
+          ))
+        )}
+      </ProtectedSection>
     </div>
   );
 };

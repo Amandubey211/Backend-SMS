@@ -11,6 +11,8 @@ import {
   toggleLikeAnnouncementComment,
   deleteAnnouncementComment,
 } from "../../../../../../../../Store/Slices/Admin/Class/Announcement/Comment/announcementCommentsThunks";
+import ProtectedAction from "../../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../../config/permission";
 
 const AnnouncementComment = ({
   comment,
@@ -87,10 +89,14 @@ const AnnouncementComment = ({
             }`}
             onClick={() => setIsEditing((prev) => !prev)} // Toggle edit mode
           /> */}
-          <RxCross2
-            className="text-red-500 cursor-pointer text-xl"
-            onClick={handleDeleteComment} // Delete comment
-          />
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.EDIT_COMMENT_ON_ANNOUNCEMENT}
+          >
+            <RxCross2
+              className="text-red-500 cursor-pointer text-xl"
+              onClick={handleDeleteComment} // Delete comment
+            />
+          </ProtectedAction>
         </div>
       </div>
       {isEditing ? (
@@ -104,23 +110,32 @@ const AnnouncementComment = ({
         <p className="text-gray-700 mb-2">{comment.content}</p>
       )}
       <div className="flex items-center mb-2 pt-3 border-t">
-        {isLiked ? (
-          <FcLike
-            className="text-gray-500 cursor-pointer"
-            onClick={handleLikeComment}
+        <ProtectedAction
+          requiredPermission={PERMISSIONS.LIKE_COMMENT_ON_ANNOUNCEMENT}
+        >
+          {isLiked ? (
+            <FcLike
+              className="text-gray-500 cursor-pointer"
+              onClick={handleLikeComment}
+            />
+          ) : (
+            <FaRegHeart
+              className="text-gray-500 cursor-pointer"
+              onClick={handleLikeComment}
+            />
+          )}
+          <span className="ml-1 text-gray-500">{likesCount}</span>
+        </ProtectedAction>
+
+        <ProtectedAction
+          requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_ANNOUNCEMENT}
+        >
+          <FaRegComment
+            className="ml-4 text-gray-500 cursor-pointer"
+            onClick={() => handleReplyClick(comment._id)}
           />
-        ) : (
-          <FaRegHeart
-            className="text-gray-500 cursor-pointer"
-            onClick={handleLikeComment}
-          />
-        )}
-        <span className="ml-1 text-gray-500">{likesCount}</span>
-        <FaRegComment
-          className="ml-4 text-gray-500 cursor-pointer"
-          onClick={() => handleReplyClick(comment._id)}
-        />
-        <span className="ml-1 text-gray-500">Reply</span>
+          <span className="ml-1 text-gray-500">Reply</span>
+        </ProtectedAction>
       </div>
 
       {/* Replies Section */}

@@ -1,24 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooksThunk, issueBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
-import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import {
+  fetchBooksThunk,
+  issueBookThunk,
+} from "../../../../Store/Slices/Admin/Library/LibraryThunks";
+import {
+  fetchSectionsByClass,
+  fetchSectionsNamesByClass,
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import { useTranslation } from "react-i18next";
 
 const AddIssue = ({ onClose, editIssueData }) => {
- 
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
- 
+
   const { books } = useSelector((state) => state.admin.library);
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
-  const studentList = useSelector((state) => state.admin.students.studentsList);
+  const studentList = useSelector((state) => state.admin.students.allStudentsList);
   const classList = useSelector((state) => state.admin.class.classes);
-  const {loading} = useSelector((state) => state.admin.students);
-  
+  const { loading } = useSelector((state) => state.admin.students);
+
   const [issueData, setIssueData] = useState({
     class: "",
     section: "",
@@ -47,7 +52,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
 
       // Fetch sections for the selected class
       if (editIssueData.classId?._id) {
-        dispatch(fetchSectionsByClass(editIssueData.classId._id));
+        dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
       }
 
       // Fetch students for the selected section
@@ -72,7 +77,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "class") {
-      dispatch(fetchSectionsByClass(value));
+      dispatch(fetchSectionsNamesByClass(value));
       dispatch(fetchStudentsByClassAndSection(value));
     }
     if (name === "section") {

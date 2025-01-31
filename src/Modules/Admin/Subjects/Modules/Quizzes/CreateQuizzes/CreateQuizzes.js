@@ -4,6 +4,7 @@ import MainSection from "./MainSection";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const CreateQuizzes = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const CreateQuizzes = () => {
           : "Create Quiz | Student Diwan"
       }
     >
+      <ProtectedSection requiredPermission={''}>
       <div className="flex w-full min-h-screen">
         <SideMenubar />
         <div
@@ -41,6 +43,7 @@ const CreateQuizzes = () => {
           <MainSection setIsEditing={setIsEditing} isEditing={isEditing} />
         </div>
       </div>
+      </ProtectedSection>
     </Layout>
   );
 };

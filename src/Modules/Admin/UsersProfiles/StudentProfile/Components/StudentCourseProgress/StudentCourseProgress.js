@@ -7,6 +7,8 @@ import { GoAlertFill } from 'react-icons/go'
 import { fetchCourseProgress, fetchStudentSubjectProgress } from '../../../../../../Store/Slices/Admin/Users/Students/student.action'
 import MainSection from './Module/MainSection'
 import Spinner from '../../../../../../Components/Common/Spinner'
+import ProtectedSection from '../../../../../../Routes/ProtectedRoutes/ProtectedSection'
+import { PERMISSIONS } from '../../../../../../config/permission'
 const StudentCourseProgress = ({student}) => {
   const {cid} = useParams()
   const {studentSubjectProgress,loading} = useSelector((store) => store.admin.all_students);
@@ -31,6 +33,7 @@ const StudentCourseProgress = ({student}) => {
   </div>:
     <div className='py-2 max-w-[68vw]'>
     <div className='pb-2'>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}  title={"Subjects Progress"}>
       <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
         {studentSubjectProgress?.length > 0?
         studentSubjectProgress?.map((subject, index) => (
@@ -43,9 +46,12 @@ const StudentCourseProgress = ({student}) => {
         </div>
       }
       </div>
+      </ProtectedSection>
     </div>
     <div className='border-t-2'>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_PROGRESS_OF_SUBJECT}  title={"Subjects"}>
        <MainSection /> 
+       </ProtectedSection>
     </div>
   </div>
   }</>

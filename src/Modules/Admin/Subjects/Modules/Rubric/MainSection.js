@@ -17,6 +17,9 @@ import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import AddRubricModal from "./Components/AddRubricModal";
 import { useTranslation } from "react-i18next";
+import { FaClipboardList } from "react-icons/fa";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const { t } = useTranslation("admModule");
@@ -48,28 +51,42 @@ const MainSection = () => {
   };
 
   return (
-    <div className="w-full flex">
+    <div className="w-full h-full flex">
       <SubjectSideBar />
-      <div className="w-full p-3 border-l">
-        <RubricHeader onAddRubric={handleAddRubric} />
-        {loading ? (
-          <Spinner />
-        ) : rubrics?.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            {rubrics?.map((rubric) => (
-              <RubricCard
-                key={rubric._id}
-                rubric={rubric}
-                onDelete={handleDeleteRubric}
-                onEdit={handleEditRubric}
-              />
-            ))}
-          </div>
-        ) : (
-          <NoDataFound title={t("Rubrics")} />
-        )}
-        {isModalOpen && <AddRubricModal />}
-      </div>
+      <ProtectedSection
+        title="Rubric"
+        requiredPermission={PERMISSIONS.RUBRIC_BY_SUBJECT_ID}
+      >
+        <div className="w-full p-3 border-l">
+          <RubricHeader onAddRubric={handleAddRubric} />
+          {loading ? (
+            <Spinner />
+          ) : rubrics?.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+              {rubrics?.map((rubric) => (
+                <RubricCard
+                  key={rubric._id}
+                  rubric={rubric}
+                  onDelete={handleDeleteRubric}
+                  onEdit={handleEditRubric}
+                />
+              ))}
+            </div>
+          ) : (
+            <NoDataFound
+              title={t("Rubrics")}
+              desc={
+                "Click 'Add New Rubric' to define your evaluation criteria."
+              }
+              icon={FaClipboardList}
+              iconColor="text-blue-500"
+              textColor="text-gray-700"
+              bgColor="bg-gray-100"
+            />
+          )}
+          {isModalOpen && <AddRubricModal />}
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

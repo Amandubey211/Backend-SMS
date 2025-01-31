@@ -1,8 +1,9 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
-
-const QuotationTemplate = ({ data }) => {
+import Cookies from "js-cookie";
+const QuotationTemplate = forwardRef((props, ref) => {
+  const { data } = props;
   if (!data) return null;
 
   // Destructure necessary fields from the response data
@@ -52,66 +53,37 @@ const QuotationTemplate = ({ data }) => {
   const displayedDiscountPercentage = ((discountAmount / totalBeforeDiscount) * 100).toFixed(2);
 
 
-  const { address, branchName, city, code, logo, nameOfSchool } = schoolId;
+  const { address, branchName, city, code,  nameOfSchool } = schoolId;
 
 
   // Calculate final amount
   const finalAmount = final_amount
   console.log(isCancel)
-  console.log(data)
+  console.log(data);
+  const logo = Cookies.get('logo')
   return (
-    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto">
+    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
       {/* Show "Cancelled" label if isCancel is true */}
-      {status === "reject" && (
-        <div
-        className="
-          absolute 
-          top-[92%] 
-          left-[51%] 
-          transform 
-          -translate-x-1/2 
-          -translate-y-1/2 
-          rotate-[-15deg] 
-          text-red-500 
-          text-4xl 
-          font-bold 
-          uppercase 
-          border-4 
-          border-red-500 
-          p-5 
-          px-10 
-          rounded-md 
-          bg-white/80 
-          shadow-md 
-          z-10
-        "
-      >
-        Rejected
-      </div>
-      )}
+      
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
-        <div className="w-full bg-pink-100 px-4 py-2 flex justify-between items-center rounded-t-lg">
+        <div className="w-full bg-pink-100 flex-row px-4 py-2 flex justify-between items-center rounded-t-lg">
           <div>
             <h1 className="font-bold text-lg">{nameOfSchool || 'N/A'}</h1>
             <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
           </div>
 
           {/* School Logo */}
-          {/* <div className="flex items-center space-x-4">
-            <img src={IconLogo} alt="Icon Logo" className="w-8 h-8" />
-            <img
-              src={StudentDiwanLogo}
-              alt="Student Diwan"
-              className="w-20 h-20"
-            />
-          </div> */}
+         {logo && <div>
+         <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+          </div>}
         </div>
+
         <div
           className="w-full text-center text-white font-bold py-2"
           style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
         >
-          QUOTATION
+          QUOTATION {status === "reject" && "REJECTED"}
         </div>
       </div>
 
@@ -127,6 +99,7 @@ const QuotationTemplate = ({ data }) => {
           <p>Phone no: {receiver?.phone || "N/A"}</p>
         </div>
         <div>
+       
           <p>
             <strong>Quotation No:</strong> {quotationNumber || "QN0001-202412-0001"}
           </p>
@@ -261,6 +234,7 @@ const QuotationTemplate = ({ data }) => {
               "Thank you for doing business with us. If you have any questions, please contact us.",
               "Ensure to retain this document for future reference.",
               "For further details, reach out to our support team.",
+               `${isCancel && "This Quotation is cancelled"}`
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}
@@ -268,47 +242,10 @@ const QuotationTemplate = ({ data }) => {
           </ul>
         </div>
 
-        {/* Summary Table aligned to the right */}
-        {/* <table className="text-sm border border-gray-300 rounded-md w-1/2">
-          <tbody>
-            <tr className="bg-white">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Total Amount
-              </td>
-              <td className="p-2 border border-gray-300 text-right">
-                {total_amount.toLocaleString()} QAR
-              </td>
-            </tr>
-            <tr className="bg-gray-50">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Tax
-              </td>
-              <td className="p-2 border border-gray-300 text-right">
-                {taxAmount.toFixed(2)} %
-              </td>
-            </tr>
-            <tr className="bg-white">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Discount ({discountType === "percentage" ? `${discount}%` : `${discount} QAR`})
-              </td>
-              <td className="p-2 border border-gray-300 text-right">
-                {discountType === "percentage" ? `${discountAmount.toFixed(2)}%` : `${discountAmount.toFixed(2)} QAR`}
-              </td>
-            </tr>
-
-            <tr className="font-bold text-gray-900 bg-gray-50">
-              <td className="p-2 border border-gray-300" colSpan="4">
-                Final Amount
-              </td>
-              <td className="p-2 border border-gray-300 text-right text-pink-600">
-                {finalAmount} QAR
-              </td>
-            </tr>
-          </tbody>
-        </table> */}
+      
       </div>
     </div>
   );
-};
+});
 
 export default QuotationTemplate;

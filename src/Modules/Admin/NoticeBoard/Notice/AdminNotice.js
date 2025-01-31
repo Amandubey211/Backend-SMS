@@ -25,6 +25,7 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const AdminNotice = () => {
   const { t } = useTranslation("admNotice");
@@ -90,7 +91,7 @@ const AdminNotice = () => {
             {role === "librarian" && t("Librarian Notice Board")}
             {role === "teacher" && t("Teacher Notice Board")}
             {role === "staff" && t("Staff Notice Board")}
-            {role === "accountant" && t("Accountant Notice Board")}
+            {role === "finance" && t("Accountant Notice Board")}
           </h1>
           {/* Search Bar */}
           <div className="flex p-2 justify-between">
@@ -107,20 +108,22 @@ const AdminNotice = () => {
               </div>
             </div>
             {(role === "admin" ||
-              role === "accountant" ||
+              role === "finance" ||
               role === "teacher" ||
               role === "librarian") && (
-              <button
-                className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
-                onClick={() => setSidebarOpen(true)} // Open sidebar
-              >
-                <FiPlus className="mr-2" />
-                {t("Add Notice")}
-              </button>
-            )}
+                <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_NOTICE}>
+                  <button
+                    className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
+                    onClick={() => setSidebarOpen(true)} // Open sidebar
+                  >
+                    <FiPlus className="mr-2" />
+                    {t("Add Notice")}
+                  </button>
+                </ProtectedAction>
+              )}
           </div>
 
-          <ProtectedSection requiredPermission={PERMISSIONS.GET_NOTICE}>
+          <ProtectedSection requiredPermission={PERMISSIONS.SHOW_NOTICES} title={'Notices'}>
             <div className="mt-5">
               {loading ? (
                 <Spinner />
@@ -146,7 +149,6 @@ const AdminNotice = () => {
             </div>
           </ProtectedSection>
           {/* Notices List */}
-
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}

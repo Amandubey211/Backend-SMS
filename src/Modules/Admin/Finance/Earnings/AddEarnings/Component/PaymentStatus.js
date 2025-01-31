@@ -46,9 +46,11 @@ const paymentStatusFields = [
     readOnly: true, // Make it read-only as it's calculated
   },
   {
-    name: "receipt",
-    label: "Add Receipt/Document",
-    type: "file",
+    type: "array",
+    label: "Documents",
+    name: "document",
+    fields: [{ type: "file", label: "Document", name: "document" }],
+    emptyItem: "",
   },
 ];
 

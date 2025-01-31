@@ -32,6 +32,18 @@ import Layout from "../../../../Components/Common/Layout";
 import toast from "react-hot-toast";
 import ExportModal from "../Earnings/Components/ExportModal";
 import QuotationTemplate from "../../../../Utils/FinanceTemplate/QuotationTemplate";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+
+
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
+
+import { downloadPDF } from "../../../../Utils/xl";
+import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
+
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -48,13 +60,11 @@ const RecentQuotationList = () => {
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-
+  const pdfRef = useRef(null);
+  // Local state for preview mode renamed to avoid collision with Redux action
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
-  const [selectedQuotation, setSelectedQuotation] = useState(null);
+  const [previewQuotation, setPreviewQuotation] = useState(null);
   const popupRef = useRef(null);
-
-
 
   const paze_size =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
@@ -68,6 +78,42 @@ const RecentQuotationList = () => {
     return map;
   }, [quotations]);
 
+
+  const handleDownloadPDF = async (pdfRef, previewQuotation) => {
+    await downloadPDF(pdfRef, previewQuotation, "Quotation")
+  }
+
+  const handleSendEmail = async (record) => {
+    console.log(record)
+    if (!record.key) {
+      toast.error("Invalid quotation ID.");
+      return;
+    }
+  
+    console.log("Attempting to send email for quotation:", record);
+  
+    try {
+      const result = await dispatch(
+        sendEmail({
+          id: record.key,
+          type: "quotation",
+        })
+      );
+  
+      console.log("Send email result:", result);
+  
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(result.payload || "Failed to send email.");
+      }
+    } catch (err) {
+      console.error("Error sending email:", err);
+      toast.error("Error sending email.");
+    }
+  };
+  
+
   // Debounced function to fetch adjustments with a fixed limit of 5
   const debouncedFetch = useCallback(
     debounce((params) => {
@@ -76,13 +122,13 @@ const RecentQuotationList = () => {
     [dispatch]
   );
 
-  // Fetch data on component mount with limit set to 5
+  // Fetch data on component mount with limit set to 10
   useEffect(() => {
     console.log("Fetching data...", { searchText, currentPage, pageSize });
     const params = {
       //search: searchText,
       page: 1, // Always fetch the first page
-      limit: 10, // Limit to 5 records
+      limit: 10, // Limit to 10 records
       //sortBy: "createdAt",
       //sortOrder: "desc",
     };
@@ -195,7 +241,8 @@ const RecentQuotationList = () => {
               onClick={() => {
                 const quotationToPreview = quotationIdMap[record.key];
                 if (quotationToPreview) {
-                  setSelectedQuotation(quotationToPreview);
+                  // Use local state for preview mode
+                  setPreviewQuotation(quotationToPreview);
                   setQuotationPreviewVisible(true);
                 } else {
                   toast.error("Quotation not found.");
@@ -208,10 +255,10 @@ const RecentQuotationList = () => {
               key="2"
               onClick={() => {
                 const quotationToView = quotationIdMap[record.key];
-                console.log("THis is Quotation View: ",quotationToView)
+
                 if (quotationToView) {
                   dispatch(setReadOnly(true)); // Set readOnly to true for viewing
-                  dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected income to Redux
+                  dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected quotation to Redux for view mode
                   navigate("/finance/quotations/add-new-quotations"); // Navigate to view page
                 } else {
                   toast.error("Selected income not found.");
@@ -220,21 +267,25 @@ const RecentQuotationList = () => {
             >
               <EyeOutlined style={{ marginRight: 8 }} /> View(Read-only)
             </Menu.Item>
-            <Menu.Item
-              key="3"
-              onClick={() => handleStatusChange(record.key, "accept")}
-            >
-              <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
-            </Menu.Item>
-            <Menu.Item
-              key="4"
-              onClick={() => handleStatusChange(record.key, "reject")}
-            >
-              <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
-            </Menu.Item>
+            <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
+              <Menu.Item
+                key="3"
+                onClick={() => handleStatusChange(record.key, "accept")}
+              >
+                <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
+              </Menu.Item>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
+              <Menu.Item
+                key="4"
+                onClick={() => handleStatusChange(record.key, "reject")}
+              >
+                <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
+              </Menu.Item>
+            </ProtectedAction>
             {/* 4) Send Mail */}
-            <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
-              <MailOutlined style={{ marginRight: 8 }}/> Send Mail
+            <Menu.Item onClick={() => handleSendEmail(record)}>
+              <MailOutlined style={{ marginRight: 8 }} /> Send Mail
             </Menu.Item>
 
           </Menu>
@@ -257,7 +308,7 @@ const RecentQuotationList = () => {
     },
   ];
 
-  // Transform adjustments data to table dataSource and limit to 10 records
+  // Transform quotations data for table dataSource
   const dataSource = quotations?.map((quotation) => ({
     key: quotation._id,
     quotationNumber: quotation.quotationNumber || "N/A",
@@ -319,8 +370,6 @@ const RecentQuotationList = () => {
               style={{
                 borderRadius: "0.375rem",
                 height: "35px",
-                //borderColor: "#ff6bcb",
-                //boxShadow: "0 2px 4px rgba(255, 105, 180, 0.2)",
               }}
             />
             <div className="flex justify-end items-center gap-2">
@@ -332,29 +381,24 @@ const RecentQuotationList = () => {
               >
                 Export
               </Button>
-              <button
-                onClick={() => {
-                  dispatch(clearSelectedQuotation());
-                  dispatch(setReadOnly(false));
-                  navigate("/finance/quotations/add-new-quotations");
-                }}
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-              >
-                <span className="text-gray-800 font-medium">
-                  Add New Quotation
-                </span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiPlus size={16} />
-                </div>
-              </button>
+              <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
+                <button
+                  onClick={() => {
+                    dispatch(clearSelectedQuotation());
+                    dispatch(setReadOnly(false));
+                    navigate("/finance/quotations/add-new-quotations");
+                  }}
+                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                >
+                  <span className="text-gray-800 font-medium">
+                    Add New Quotation
+                  </span>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                    <FiPlus size={16} />
+                  </div>
+                </button>
+              </ProtectedAction>
             </div>
-            {/* <Button
-              onClick={handleViewMore}
-              className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-              size="small"
-            >
-              View More ({totalRecords})
-            </Button> */}
           </div>
 
           {/* Loading Indicator */}
@@ -363,52 +407,38 @@ const RecentQuotationList = () => {
               <Spin tip="Loading..." />
             </div>
           )}
-          {/* Error Message */}
-          {error && (
-            <Alert
-              message="Error"
-              description={error}
-              type="error"
-              showIcon
-              closable
-            />
-          )}
-          {/* No Data Placeholder */}
-          {/* {!loading && !error && (
-                        <div className="text-center text-gray-500 text-xs py-4">
-                            No records found.
-                        </div>
-                    )} */}
           {/* Table */}
           {!loading && !error && (
-            <Table
-              dataSource={dataSource}
-              columns={columns}
-              pagination={{
-                current: currentPage,
-                total: totalRecords,
-                pageSize: computedPageSize,
-                showSizeChanger: true,
-                size: "small",
-                showTotal: () =>
-                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                onChange: (page, pageSize) => {
-                  setCurrentPage(page); // Update the current page
-                  setComputedPageSize(pageSize); // Update the page size
-                },
-                onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size); // Handle page size change
-                },
-              }}
-              onChange={(pagination) => {
-                const newPage = pagination.current;
-                dispatch(setCurrentPage(newPage));
-              }}
-              className="rounded-lg shadow text-xs"
-              bordered
-              size="small"
-              tableLayout="fixed" // Fixed table layout
-            />
+            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION} title={"Quotation List"}>
+              <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={{
+                  current: currentPage,
+                  total: totalRecords,
+                  pageSize: computedPageSize,
+                  showSizeChanger: true,
+                  size: "small",
+                  showTotal: () =>
+                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                  onChange: (page, pageSize) => {
+                    setCurrentPage(page);
+                    setComputedPageSize(pageSize);
+                  },
+                  onShowSizeChange: (current, size) => {
+                    setComputedPageSize(size);
+                  },
+                }}
+                onChange={(pagination) => {
+                  const newPage = pagination.current;
+                  dispatch(setCurrentPage(newPage));
+                }}
+                className="rounded-lg shadow text-xs"
+                bordered
+                size="small"
+                tableLayout="fixed"
+              />
+            </ProtectedSection>
           )}
 
           {/* Quotation Preview Overlay */}
@@ -418,26 +448,22 @@ const RecentQuotationList = () => {
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
-                onClick={() => setQuotationPreviewVisible(false)} // Close on background click
+                onClick={() => setQuotationPreviewVisible(false)}
               />
               {/* Centered content */}
               <div
-                ref={popupRef}
+                ref={popupRef} // Ref for the overall modal (optional)
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
-                onClick={(e) => e.stopPropagation()} // Prevent click events from bubbling
+                onClick={(e) => e.stopPropagation()}
               >
                 {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
-                  {/* Download PDF button */}
                   <button
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                    onClick={() => {
-                      // Add your PDF download logic here
-                    }}
+                    onClick={() => handleDownloadPDF(pdfRef, previewQuotation)}
                   >
                     Download PDF
                   </button>
-                  {/* Close button */}
                   <button
                     onClick={() => setQuotationPreviewVisible(false)}
                     className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
@@ -447,13 +473,14 @@ const RecentQuotationList = () => {
                   </button>
                 </div>
 
-                {/* The actual quotation content */}
-                <div className="mt-4">
-                  <QuotationTemplate data={selectedQuotation} />
+                {/* Quotation content container */}
+                <div >
+                  <QuotationTemplate data={previewQuotation} ref={pdfRef} />
                 </div>
               </div>
             </div>
           )}
+
 
           <ExportModal
             visible={isExportModalVisible}

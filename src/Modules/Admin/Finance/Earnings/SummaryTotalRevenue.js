@@ -1,4 +1,6 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
+// src/Modules/Admin/Finance/Components/SummaryTotalRevenue.jsx
+
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Table, Spin, Button, Tooltip, Tag, Empty } from "antd";
 import {
   DollarOutlined,
@@ -10,6 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import debounce from "lodash.debounce";
 import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
@@ -51,102 +55,123 @@ const SummaryTotalRevenue = () => {
     navigate("/finance/earning/total-revenue-list");
   };
 
+  // Formatting function for dates
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString() : "N/A";
+
   // Define table columns with fixed widths and ellipsis
-  const columns = [
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      render: (text) => <span className="text-xs">{text}</span>,
-      width: 120,
-      ellipsis: true,
-    },
-    {
-      title: "Subcategory",
-      dataIndex: "subCategory",
-      key: "subCategory",
-      render: (text) => <span className="text-xs">{text}</span>,
-      width: 150,
-      ellipsis: true,
-    },
-    {
-      title: "Payment Type",
-      dataIndex: "paymentType",
-      key: "paymentType",
-      render: (text) => (
-        <Tooltip
-          title={`Payment Type: ${
-            text.charAt(0).toUpperCase() + text.slice(1)
-          }`}
-        >
-          <span className="text-xs flex items-center gap-1">
-            {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
-            {text.charAt(0).toUpperCase() + text.slice(1)}
-          </span>
-        </Tooltip>
-      ),
-      width: 130,
-      ellipsis: true,
-    },
-    {
-      title: "Discount",
-      dataIndex: "discount",
-      key: "discount",
-      render: (value, record) =>
-        record.discountType === "percentage" ? (
-          <Tag color="purple" className="text-xs">
-            {value || 0}%
-          </Tag>
-        ) : (
-          <Tag color="orange" className="text-xs">
-            {value || 0} QR
-          </Tag>
+  const columns = useMemo(
+    () => [
+      {
+        title: "Category",
+        dataIndex: "category",
+        key: "category",
+        render: (text) => <span className="text-xs">{text}</span>,
+        width: 120,
+        ellipsis: true,
+      },
+      {
+        title: "Subcategory",
+        dataIndex: "subCategory",
+        key: "subCategory",
+        render: (text) => <span className="text-xs">{text}</span>,
+        width: 150,
+        ellipsis: true,
+      },
+      // New Paid Date Column (Third Position)
+      {
+        title: "Paid Date",
+        dataIndex: "paidDate",
+        key: "paidDate",
+        render: (date) => <span className="text-xs">{formatDate(date)}</span>,
+        width: 150,
+        ellipsis: true,
+      },
+      {
+        title: "Payment Type",
+        dataIndex: "paymentType",
+        key: "paymentType",
+        render: (text) => (
+          <Tooltip
+            title={`Payment Type: ${
+              text.charAt(0).toUpperCase() + text.slice(1)
+            }`}
+          >
+            <span className="text-xs flex items-center gap-1">
+              {paymentTypeIcons[text.toLowerCase()] || <CreditCardOutlined />}
+              {text.charAt(0).toUpperCase() + text.slice(1)}
+            </span>
+          </Tooltip>
         ),
-      width: 100,
-      ellipsis: true,
-    },
-    {
-      title: "Final Amount (QR)",
-      dataIndex: "final_amount",
-      key: "final_amount",
-      render: (value) => <span className="text-xs">{value || "0"} QR</span>,
-      width: 120,
-      ellipsis: true,
-    },
-    {
-      title: "Paid Amount (QR)",
-      dataIndex: "paid_amount",
-      key: "paid_amount",
-      render: (value) => (
-        <span className="text-xs text-green-600">{value || "0"} QR</span>
-      ),
-      width: 120,
-      ellipsis: true,
-    },
-    {
-      title: "Remaining Amount (QR)",
-      dataIndex: "remaining_amount",
-      key: "remaining_amount",
-      render: (value) => (
-        <span className="text-xs text-red-600">{value || "0"} QR</span>
-      ),
-      width: 140,
-      ellipsis: true,
-    },
-  ];
+        width: 130,
+        ellipsis: true,
+      },
+      {
+        title: "Discount",
+        dataIndex: "discount",
+        key: "discount",
+        render: (value, record) =>
+          record.discountType === "percentage" ? (
+            <Tag color="purple" className="text-xs">
+              {value || 0}%
+            </Tag>
+          ) : (
+            <Tag color="orange" className="text-xs">
+              {value || 0} QR
+            </Tag>
+          ),
+        width: 100,
+        ellipsis: true,
+      },
+      {
+        title: "Final Amount (QR)",
+        dataIndex: "final_amount",
+        key: "final_amount",
+        render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+        width: 120,
+        ellipsis: true,
+      },
+      {
+        title: "Paid Amount (QR)",
+        dataIndex: "paid_amount",
+        key: "paid_amount",
+        render: (value) => (
+          <span className="text-xs text-green-600">{value || "0"} QR</span>
+        ),
+        width: 120,
+        ellipsis: true,
+      },
+      {
+        title: "Remaining Amount (QR)",
+        dataIndex: "remaining_amount",
+        key: "remaining_amount",
+        render: (value) => (
+          <span className="text-xs text-red-600">{value || "0"} QR</span>
+        ),
+        width: 140,
+        ellipsis: true,
+      },
+    ],
+    []
+  );
 
   // Transform incomes data to table dataSource and limit to 5 records
-  const dataSource = incomes?.slice(0, 5).map((income) => ({
-    key: income._id,
-    category: income.category?.[0]?.categoryName || "N/A",
-    subCategory: income.subCategory || "N/A",
-    paymentType: income.paymentType || "N/A",
-    discount: income.discount || 0,
-    discountType: income.discountType || "percentage",
-    final_amount: income.final_amount || 0,
-    paid_amount: income.paid_amount || 0,
-    remaining_amount: income.remaining_amount || 0,
-  }));
+  const dataSource = useMemo(
+    () =>
+      incomes?.slice(0, 5).map((income) => ({
+        key: income._id,
+        category: income.category?.[0]?.categoryName || "N/A",
+        subCategory: income.subCategory || "N/A",
+        paymentType: income.paymentType || "N/A",
+        discount: income.discount || 0,
+        discountType: income.discountType || "percentage",
+        final_amount: income.final_amount || 0,
+        paid_amount: income.paid_amount || 0,
+        remaining_amount: income.remaining_amount || 0,
+        paidDate: income.paidDate || "N/A",
+      })),
+    [incomes]
+  );
 
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
@@ -165,16 +190,12 @@ const SummaryTotalRevenue = () => {
       </div>
 
       {/* Loading Indicator */}
-      {/* {loading && (
-        <div className="flex justify-center">
-          <Spin tip="Loading..." />
-        </div>
-      )} */}
       {!loading && incomes.length === 0 && !error && (
         <div className="text-center text-gray-500 text-xs py-4">
           No records found.
         </div>
       )}
+
       {/* Table */}
       <Table
         dataSource={dataSource}
@@ -185,9 +206,6 @@ const SummaryTotalRevenue = () => {
         size="small"
         tableLayout="fixed" // Fixed table layout
         loading={loading} // Show spinner on loading
-        // locale={{
-        //   emptyText: <Empty description="No Data Found" />, // Show default Ant Design empty icon + text
-        // }}
       />
     </div>
   );

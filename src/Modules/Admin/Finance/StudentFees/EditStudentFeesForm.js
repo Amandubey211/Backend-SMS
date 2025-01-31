@@ -8,6 +8,7 @@ import { useDispatch } from "react-redux";
 import { updateStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import toast from "react-hot-toast";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 export default function EditStudentFeesForm({ data }) {
     const [initialValues, setInitialValues] = useState({
@@ -112,7 +113,6 @@ export default function EditStudentFeesForm({ data }) {
     };
 
     return (
-
         <div className="flex w-full border flex-col">
             <div className="flex flex-row mx-4 gap-2 font-semibold justify-between my-2">
                 <div className="flex flex-row gap-2">
@@ -129,7 +129,7 @@ export default function EditStudentFeesForm({ data }) {
             <Formik
                 enableReinitialize
                 initialValues={initialValues}
-                validationSchema={validationSchema}
+               // validationSchema={validationSchema}
                 onSubmit={(values) => {
                     const { finalAmount, remainingAmount, advanceAmount } =
                         calculateAmounts(values);
@@ -283,12 +283,14 @@ export default function EditStudentFeesForm({ data }) {
             value={values.document || ''}
           />
                         </div>
+                        { data.mode == 'Edit' &&
                         <button
                             type="submit"
                             className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
                         >
                             Update Fees
                         </button>
+                        }
                     </Form>
                 )}
             </Formik>

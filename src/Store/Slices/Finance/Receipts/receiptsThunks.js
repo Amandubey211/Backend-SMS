@@ -2,12 +2,14 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, postData, putData, deleteData } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
+import { getUserRole } from "../../../../Utils/getRoles";
 
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
-  async ({ page = 1, limit = 10 }, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue, getState }) => {
     try {
-      const response = await getData(`/finance/revenue/all/receipt?page=${page}&limit=${limit}`); // Backend API with pagination
+      const getRole = getUserRole(getState);
+      const response = await getData(`/${getRole}/revenue/all/receipt?page=${page}&limit=${limit}`); // Backend API with pagination
       if (response?.data) {
         const { data, pagination } = response;
         return { receipts: data, pagination }; // Include pagination metadata
@@ -24,7 +26,7 @@ export const fetchAllReceipts = createAsyncThunk(
 // Create a receipt
 export const createReceipt = createAsyncThunk(
   "receipts/createReceipt",
-  async (formValues, { rejectWithValue }) => {
+  async (formValues, { rejectWithValue, getState }) => {
     try {
       // 1) Fetch schoolId
       const storedSchoolId = localStorage.getItem("SelectedschoolId");
@@ -70,9 +72,9 @@ export const createReceipt = createAsyncThunk(
       //   console.log("Attaching document:", payload.document);
       //   formData.append("document", payload.document);
       // }
-
+      const getRole = getUserRole(getState);
       // 5) POST
-      const response = await postData("/finance/revenue/create/receipt", formData, {
+      const response = await postData(`/${getRole}/revenue/create/receipt`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -103,11 +105,11 @@ export const createReceipt = createAsyncThunk(
 // Update a receipt
 export const updateReceipt = createAsyncThunk(
   "receipts/updateReceipt",
-  async ({ id, formValues }, { rejectWithValue }) => {
+  async ({ id, formValues }, { rejectWithValue, getState }) => {
     try {
       const storedSchoolId = localStorage.getItem("SelectedschoolId");
       const schoolId = storedSchoolId || "";
-
+      const getRole = getUserRole(getState);
       const academicYearId = getAY(); // Fetch active academic year
 
       // Merge in the schoolId and academicYear
@@ -149,7 +151,7 @@ export const updateReceipt = createAsyncThunk(
       }
 
       // Now PUT the FormData
-      const response = await putData(`/finance/revenue/update/receipt/${id}`, formData, {
+      const response = await putData(`/${getRole}/revenue/update/receipt/${id}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -171,9 +173,10 @@ export const updateReceipt = createAsyncThunk(
 // Cancel a receipt
 export const cancelReceipt = createAsyncThunk(
   "receipts/cancelReceipt",
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue , getState}) => {
     try {
-      const response = await putData(`/finance/revenue/cancel/receipt/${id}`);
+      const getRole = getUserRole(getState);
+      const response = await putData(`/${getRole}/revenue/cancel/receipt/${id}`);
       if (response?.success) {
         toast.success("Receipt canceled successfully!");
         return response.data;
@@ -190,8 +193,9 @@ export const cancelReceipt = createAsyncThunk(
 // Fetch Receipt Dashboard Card Data
 export const fetchReceiptCardData = createAsyncThunk(
   "receipts/fetchReceiptCardData",
-  async ({ year, month }, { rejectWithValue }) => {
+  async ({ year, month }, { rejectWithValue , getState}) => {
     try {
+      const getRole = getUserRole(getState);
       // Automatically fetch the academic year ID
       const academicYearId = getAY();
 
@@ -201,7 +205,7 @@ export const fetchReceiptCardData = createAsyncThunk(
       if (month) queryParams.append("month", month);
       if (academicYearId) queryParams.append("academicYearId", academicYearId);
 
-      const response = await getData(`/finance/dashboard/receipt/cardData?${queryParams.toString()}`);
+      const response = await getData(`/${getRole}/dashboard/receipt/cardData?${queryParams.toString()}`);
 
       if (response) {
         console.log(response)
@@ -220,9 +224,10 @@ export const fetchReceiptCardData = createAsyncThunk(
 // Delete Receipt
 export const deleteReceipt = createAsyncThunk(
   "receipts/deleteReceipt",
-  async (id, { rejectWithValue }) => {
+  async (id, { rejectWithValue, getState }) => {
     try {
-      const response = await deleteData(`/finance/revenue/delete/receipt/${id}`);
+      const getRole = getUserRole(getState);
+      const response = await deleteData(`/${getRole}/revenue/delete/receipt/${id}`);
 
       if (response?.message === "Receipt deleted successfully") {
         toast.success("Receipt deleted successfully!");

@@ -5,7 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { fetchAllQuotations } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import Spinner from "../../../../../Components/Common/Spinner";
-
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
+import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const RecentQuotation = () => {
     const navigate = useNavigate();
@@ -149,49 +151,48 @@ const RecentQuotation = () => {
                 <h2 className="text-lg font-medium text-gray-700">
                     Summary of Quotation ({dataSource?.length || 5}/{totalRecords})
                 </h2>
-                <Button
-                    onClick={handleViewMore}
-                    className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-                    size="small"
-                >
-                    View More ({totalRecords})
-                </Button>
-            </div>
 
-            {/* Loading Indicator */}
-            {loading && (
-                <div className="flex justify-center">
-                    <Spinner tip="Loading..." />
-                </div>
-            )}
-            {/* Error Message */}
-            {error && (
-                <Alert
-                    message="Error"
-                    description={error}
-                    type="error"
-                    showIcon
-                    closable
-                />
-            )}
-            {/* No Data Placeholder */}
-            {/* {!loading && quotations.length === 0 && !error && (
+                <ProtectedAction requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}>
+                    <Button
+                        onClick={handleViewMore}
+                        className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+                        size="small"
+                    >
+                        View More ({totalRecords})
+                    </Button>
+                </ProtectedAction>
+
+
+            </div>
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_SUMMARY_OF_QUOTATION} title={"Summary of Quotation"}>
+
+                {/* Loading Indicator */}
+                {loading && (
+                    <div className="flex justify-center">
+                        <Spinner tip="Loading..." />
+                    </div>
+                )}
+                {/* No Data Placeholder */}
+                {/* {!loading && quotations.length === 0 && !error && (
                 <div className="text-center text-gray-500 text-xs py-4">
                     No records found.
                 </div>
             )} */}
-            {/* Table */}
-            {!loading && !error && (
-                <Table
-                    dataSource={dataSource}
-                    columns={columns}
-                    pagination={false} // Removed pagination controls
-                    className="rounded-lg shadow text-xs"
-                    bordered
-                    size="small"
-                    tableLayout="fixed" // Fixed table layout
-                />
-            )}
+                {/* Table */}
+                {!loading && !error && (
+                    <Table
+                        dataSource={dataSource}
+                        columns={columns}
+                        pagination={false} // Removed pagination controls
+                        className="rounded-lg shadow text-xs"
+                        bordered
+                        size="small"
+                        tableLayout="fixed" // Fixed table layout
+                    />
+
+                )}
+            </ProtectedSection>
+
         </div>
     );
 };

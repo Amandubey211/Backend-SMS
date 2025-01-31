@@ -11,6 +11,8 @@ import {
   fetchStudentGrades,
   fetchStudentSubjectProgress,
 } from "../../../Store/Slices/Admin/Users/Students/student.action";
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../config/permission";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
@@ -55,12 +57,15 @@ const MainSection = () => {
   };
 
   return (
+   
     <div className="p-2 w-full">
+      <ProtectedSection requiredPermission={PERMISSIONS.STUDENTS_BY_CLASS_AND_SECTION} title={"Student"}>
       <NavigationBar
         setActiveSection={setActiveSection}
         activeSection={activeSection}
         totalStudents={students?.length}
       />
+    
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <Spinner />
@@ -82,6 +87,7 @@ const MainSection = () => {
         onClose={handleCloseModal}
         student={studentData}
       />
+       </ProtectedSection>
     </div>
   );
 };

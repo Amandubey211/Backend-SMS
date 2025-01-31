@@ -17,6 +17,8 @@ import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action.js";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection.js";
+import { PERMISSIONS } from "../../../../../config/permission.js";
 
 
 const SingleStudent = () => {
@@ -24,7 +26,7 @@ const SingleStudent = () => {
   const {allStudents,loading} = useSelector((store) => store.admin.all_students);
   const {role} = useSelector((store) => store.common.auth);
   const dispatch = useDispatch();
-  const [activeItem, setActiveItem] = useState(role == "librarian"?"Information":role == "accountant" ?"Information" :"OverView");
+  const [activeItem, setActiveItem] = useState(role == "librarian"?"Information":role == "finance" ?"Information" :"OverView");
   useEffect(() => {
     dispatch(fetchAllStudents());
   }, [dispatch])
@@ -33,11 +35,11 @@ const SingleStudent = () => {
   if (!loading && !student) {
     return <div className="text-center my-10">Student not found</div>;
   }
+  //   "Finance": <StudentFinance student={student} />,
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView student={student} />,
        "Course Progress": <StudentCourseProgress student={student} />,
-       "Finance": <StudentFinance student={student} />,
        "Information": <StudentInformationMenu student={student} />,
        "Parents": <ParentsProfile student={student} />,
        "Grades": <StudentGradesAccordion student={student} />,
@@ -50,18 +52,19 @@ const SingleStudent = () => {
   return (
     <Layout title="Student Details">
       <DashLayout>
+      
         <div className="flex gap-2   ">
           <div className="flex flex-col  h-auto w-[25%]">
             <StudentProfile student={student} />
             <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={role == "admin"?[
-              "OverView", "Course Progress", "Finance", "Information", 
+              "OverView", "Course Progress",  "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
             ]:role == "teacher" ?[
               "OverView", "Course Progress",  "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
-            ]:role == "accountant" ?[
+            ]:role == "finance" ?[
                 "Information", 
-              "Parents", "Finance",
+              "Parents",
             ]:role == "librarian" ?[
               "Information", 
             "Parents", "Book Issue",
@@ -71,6 +74,7 @@ const SingleStudent = () => {
             <div className="w-full">{renderContent()}</div>
           </div>
         </div>
+     
       </DashLayout>
     </Layout>
   );

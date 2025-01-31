@@ -9,6 +9,9 @@ import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/
 import FilterCard from "../../Assignments/Component/FilterCard";
 import { useTranslation } from "react-i18next";
 import { clearQuizDetail } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizSlice";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const MainSection = () => {
   const { cid, sid } = useParams();
@@ -46,30 +49,40 @@ const MainSection = () => {
   }, [refetchQuizzes]);
 
   return (
-    <div className="flex">
+    <div className="flex w-full h-full">
       <SubjectSideBar />
-      <div className="w-[65%] border-l">
-        <List
-          title={t("All Quizzes")}
-          data={quizzes}
-          icon={<RiFileUnknowLine />}
-          type={t("Quiz")}
-          loading={loading}
-          error={error}
-          refetchData={refetchQuizzes} // Pass the correct prop
-        />
-      </div>
-      <div className="w-[30%] px-2 pt-2">
-        <FilterCard filters={filters} setFilters={setFilters} />
-      </div>
-      <NavLink
-        onClick={HandleClear}
-        to={`/class/${cid}/${sid}/create_quiz`}
-        aria-label={t("Create Quiz")}
-        className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+      <ProtectedSection
+        title="Quiz List"
+        requiredPermission={PERMISSIONS.FILTERED_QUIZZES_BY_SUBJECT}
       >
-        <RiAddFill size={24} />
-      </NavLink>
+        <div className="flex">
+          <div className="w-[65%] border-l">
+            <List
+              title={t("All Quizzes")}
+              data={quizzes}
+              icon={<RiFileUnknowLine />}
+              type={t("Quiz")}
+              loading={loading}
+              error={error}
+              refetchData={refetchQuizzes} // Pass the correct prop
+              requiredPermission={PERMISSIONS.DELETE_QUIZ}
+            />
+          </div>
+          <div className="w-[30%] px-2 pt-2">
+            <FilterCard filters={filters} setFilters={setFilters} />
+          </div>
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_QUIZ}>
+            <NavLink
+              onClick={HandleClear}
+              to={`/class/${cid}/${sid}/create_quiz`}
+              aria-label={t("Create Quiz")}
+              className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
+            >
+              <RiAddFill size={24} />
+            </NavLink>
+          </ProtectedAction>
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

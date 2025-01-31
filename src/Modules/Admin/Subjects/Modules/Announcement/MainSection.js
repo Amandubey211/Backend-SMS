@@ -1,14 +1,21 @@
 import React from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import AnnouncementList from "./Components/AnnouncementList";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   return (
-    <div className="flex ">
+    <div className="flex w-full h-full ">
       <SubjectSideBar />
-      <div className="border-l p-2 w-full">
-        <AnnouncementList />
-      </div>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.ALL_ANNOUNCEMENTS}
+        title="Announcement List"
+      >
+        <div className="border-l p-2 w-full">
+          <AnnouncementList />
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

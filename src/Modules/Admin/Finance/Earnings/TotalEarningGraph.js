@@ -10,6 +10,8 @@ import {
 } from "chart.js";
 import { useSelector } from "react-redux";
 import { Spin, Alert } from "antd";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -232,9 +234,11 @@ const TotalEarningGraph = () => {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="w-[98%]  h-96 bg-white p-4 rounded-lg shadow">
-        <Bar data={data} options={options} />
-      </div>
+      <ProtectedSection requiredPermission={PERMISSIONS.VIEW_REVENUE_GRAPH}>
+        <div className="w-[98%]  h-96 bg-white p-4 rounded-lg shadow">
+          <Bar data={data} options={options} />
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

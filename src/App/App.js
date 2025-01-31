@@ -395,7 +395,7 @@ function App() {
             "parent",
             "student",
             "teacher",
-            "accountant",
+            "finance",
             "librarian",
             "staff",
           ]}
@@ -463,7 +463,7 @@ function App() {
             "parent",
             "student",
             "teacher",
-            "accountant",
+            "finance",
             "librarian",
             "staff",
           ]}
@@ -481,7 +481,7 @@ function App() {
             "admin",
             "teacher",
             "librarian",
-            "accountant",
+            "finance",
             "staff",
           ]}
         />
@@ -504,7 +504,7 @@ function App() {
             "admin",
             "teacher",
             "librarian",
-            "accountant",
+            "finance",
             "staff",
           ]}
         />
@@ -802,7 +802,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AccountingSection}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -861,7 +861,7 @@ function App() {
             "teacher",
             "librarian",
             "peon",
-            "accountant",
+            "finance",
             "staff",
           ]}
         />
@@ -878,7 +878,7 @@ function App() {
             "teacher",
             "librarian",
             "peon",
-            "accountant",
+            "finance",
             "staff",
           ]}
         />
@@ -890,7 +890,7 @@ function App() {
     //   element: (
     //     <ProtectRoute
     //       Component={Earning}
-    //       allowedRoles={["admin", "accountant"]}
+    //       allowedRoles={["admin", "finance"]}
     //     />
     //   ),
     //   errorElement: <Error />,
@@ -900,7 +900,7 @@ function App() {
     //   element: (
     //     <ProtectRoute
     //       Component={Expenses}
-    //       allowedRoles={["admin", "accountant"]}
+    //       allowedRoles={["admin", "finance"]}
     //     />
     //   ),
     //   errorElement: <Error />,
@@ -911,7 +911,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={EarningMainSection}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -921,7 +921,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={TotalRevenueList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -931,7 +931,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={ExpenseMain}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -941,7 +941,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={TotalExpenseList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -952,7 +952,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={addStudentFeesForm}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -962,7 +962,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentFeesDash}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -972,7 +972,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddEarnings}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -982,7 +982,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddExpense}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -992,7 +992,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={SummaryRevenueList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1002,7 +1002,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddNewFees}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1012,7 +1012,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={InvoicesMain}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1022,7 +1022,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateNewInvoice}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1032,7 +1032,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddReturnInvoice}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1042,7 +1042,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={RecentInvoiceList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1052,7 +1052,7 @@ function App() {
     //   element: (
     //     <ProtectRoute
     //       Component={ReturnInvoiceList}
-    //       allowedRoles={["admin", "accountant"]}
+    //       allowedRoles={["admin", "finance"]}
     //     />
     //   ),
     //   errorElement: <Error />,
@@ -1062,7 +1062,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={ReceiptsMain}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1072,7 +1072,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={RecentReceiptsList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1082,7 +1082,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateReceipt}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1092,7 +1092,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={QuotationMain}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1102,7 +1102,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateQuotation}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1112,7 +1112,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={RecentQuotationList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1122,7 +1122,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AdjustmentDashboard}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1132,7 +1132,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={PenalityandAdjustmentList}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1142,7 +1142,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreatePenaltyAdjustment}
-          allowedRoles={["admin", "accountant"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1155,7 +1155,7 @@ function App() {
     {
       path: "/users/manage-roles",
       element: (
-        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin"]} />
+        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin", "teacher", "finance", "librarian", "staff"]} />
       ),
       errorElement: <Error />,
     },
@@ -1190,7 +1190,7 @@ function App() {
           allowedRoles={[
             "admin",
             "teacher",
-            "accountant",
+            "finance",
             "librarian",
             "staff",
           ]}
@@ -1212,7 +1212,7 @@ function App() {
           Component={StaffMyProfile}
           allowedRoles={[
             "teacher",
-            "accountant",
+            "finance",
             "librarian",
             "staff",
             "librarian",

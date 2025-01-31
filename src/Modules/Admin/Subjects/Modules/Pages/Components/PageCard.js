@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import { deletePage } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const PageCard = ({
   title,
@@ -84,12 +86,16 @@ const PageCard = ({
           </div>
         </div>
       </div>
-      <div
-        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        onClick={openDeleteModal}
-      >
-        <IoTrashOutline className="h-5 w-5" />
-      </div>
+      <ProtectedAction requiredPermission={PERMISSIONS.DELETE_PAGE}>
+        <div
+          role="button"
+          className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          onClick={openDeleteModal}
+        >
+          <IoTrashOutline className="h-5 w-5" />
+        </div>
+      </ProtectedAction>
+
       {loading && <Spinner />}
       {error && (
         <p className="absolute top-2 left-2 text-sm text-red-500">{error}</p>

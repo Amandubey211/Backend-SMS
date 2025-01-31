@@ -3,9 +3,12 @@ import { Table, Button, Input, message, Row } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; 
-import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; 
+import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action";
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const TableView = () => {
   const { t } = useTranslation("admTimeTable");
@@ -210,37 +213,44 @@ const TableView = () => {
         />
         {(role === 'admin') && (
           <>
-            <Button
-              icon={<FaEdit />}
-              type="primary"
-              onClick={handleEdit}
-              style={{ marginRight: 5 }}
-            >
-              {t("Edit")}
-            </Button>
-            <Button
-              icon={<FaTrashAlt />}
-              type="primary"
-              danger
-              onClick={openDeleteModal}
-            >
-              {t("Delete")}
-            </Button>
+            <ProtectedAction requiredPermission={PERMISSIONS.TIMETABLE_EDIT}>
+              <Button
+                icon={<FaEdit />}
+                type="primary"
+                onClick={handleEdit}
+                style={{ marginRight: 5 }}
+              >
+                {t("Edit")}
+              </Button>
+            </ProtectedAction>
+
+            <ProtectedAction requiredPermission={PERMISSIONS.TIMETABLE_DELETE}>
+              <Button
+                icon={<FaTrashAlt />}
+                type="primary"
+                danger
+                onClick={openDeleteModal}
+              >
+                {t("Delete")}
+              </Button>
+            </ProtectedAction>
+
           </>
         )}
       </Row>
-
-      <Table
-        columns={getColumns(timetable?.type)}
-        dataSource={filteredData}
-        pagination={{
-          ...pagination,
-          total: filteredData?.length,
-          showSizeChanger: true,
-        }}
-        onChange={handleTableChange}
-        bordered
-      />
+      <ProtectedSection requiredPermission={PERMISSIONS.TIMETABLE_VIEW} title={t("Timetable View")}>
+        <Table
+          columns={getColumns(timetable?.type)}
+          dataSource={filteredData}
+          pagination={{
+            ...pagination,
+            total: filteredData?.length,
+            showSizeChanger: true,
+          }}
+          onChange={handleTableChange}
+          bordered
+        />
+      </ProtectedSection>
 
       {/* Delete Confirmation Modal */}
       <DeleteConfirmatiomModal

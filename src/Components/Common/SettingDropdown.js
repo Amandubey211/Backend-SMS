@@ -98,7 +98,7 @@ const SettingDropdown = ({
             }
           >
             <FaGraduationCap className="text-lg" />
-            {t("Academic", gt.setting)}
+            {t("Academic Year", gt.setting)}
           </NavLink>
           { role == "admin" && 
           <NavLink

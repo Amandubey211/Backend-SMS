@@ -9,7 +9,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
 import { fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.thunk";
-
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 // import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
 
 // Mapping payment types to corresponding icons
@@ -166,13 +168,16 @@ const SummaryPenalityandAdjustment = () => {
         <h2 className="text-lg font-medium text-gray-700">
           Summary of Return Invoice ({dataSource?.length || 0}/{totalRecords})
         </h2>
-        <Button
-          onClick={handleViewMore}
-          className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
-          size="small"
-        >
-          View More ({totalRecords})
-        </Button>
+        <ProtectedAction requiredPermission={PERMISSIONS.SHOWS_RECENT_AND_RETURN_INVOICE}>
+          <Button
+            onClick={handleViewMore}
+            className="px-4 py-2 bg-gradient-to-r from-[#C83B62] to-[#8E44AD] text-white rounded-md shadow hover:from-[#a3324e] hover:to-[#6e2384] transition text-xs"
+            size="small"
+          >
+            View More ({totalRecords})
+          </Button>
+        </ProtectedAction>
+
       </div>
 
       {/* Loading Indicator */}
@@ -199,15 +204,17 @@ const SummaryPenalityandAdjustment = () => {
       )} */}
       {/* Table */}
       {!loading && !error && (
-        <Table
-          dataSource={dataSource}
-          columns={columns}
-          pagination={false} // Removed pagination controls
-          className="rounded-lg shadow text-xs"
-          bordered
-          size="small"
-          tableLayout="fixed" // Fixed table layout
-        />
+        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT} title={"Penalty & Adjustment"}>
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={false} // Removed pagination controls
+            className="rounded-lg shadow text-xs"
+            bordered
+            size="small"
+            tableLayout="fixed" // Fixed table layout
+          />
+        </ProtectedSection>
       )}
     </div>
   );

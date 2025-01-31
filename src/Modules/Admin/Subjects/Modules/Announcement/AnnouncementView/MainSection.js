@@ -6,6 +6,8 @@ import SubjectSideBar from "../../../Component/SubjectSideBar";
 import AnnouncementViewHeader from "./Components/AnnouncementViewHeader";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const MainSection = () => {
   const { aid } = useParams();
@@ -19,30 +21,36 @@ const MainSection = () => {
   }, [aid, dispatch]);
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full h-full">
       <SubjectSideBar />
-      <div className="border-l w-full">
-        <AnnouncementViewHeader />
-        <div className="p-4 bg-white ">
-          {loading && <Spinner />}
-          {error && <NoDataFound title="Announcement" />}
-          {announcement && (
-            <>
-              {announcement.attachment && (
-                <img
-                  src={announcement.attachment || "default_image_url_here"}
-                  alt="Announcement"
-                  className=" w-full h-full"
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.ANNOUNCEMENT_BY_ID}
+        title="Announcement "
+      >
+        <div className="border-l w-full">
+          <AnnouncementViewHeader />
+
+          <div className="p-4 bg-white ">
+            {loading && <Spinner />}
+            {error && <NoDataFound title="Announcement" />}
+            {announcement && (
+              <>
+                {announcement.attachment && (
+                  <img
+                    src={announcement.attachment || "default_image_url_here"}
+                    alt="Announcement"
+                    className=" w-full h-full"
+                  />
+                )}
+                <div
+                  className="text-gray-700 mb-6"
+                  dangerouslySetInnerHTML={{ __html: announcement?.content }}
                 />
-              )}
-              <div
-                className="text-gray-700 mb-6"
-                dangerouslySetInnerHTML={{ __html: announcement?.content }}
-              />
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
+      </ProtectedSection>
     </div>
   );
 };

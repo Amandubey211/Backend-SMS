@@ -13,6 +13,9 @@ import {
 } from "../../../../../../../Store/Slices/Admin/Class/Announcement/Comment/announcementCommentsThunks";
 import Spinner from "../../../../../../../Components/Common/Spinner";
 import { useParams } from "react-router-dom";
+import ProtectedSection from "../../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const AnnouncementCommentSection = () => {
   const dispatch = useDispatch();
@@ -81,35 +84,44 @@ const AnnouncementCommentSection = () => {
 
   return (
     <div className="h-screen flex flex-col">
-      <div className="flex-none h-[10%]">
-        <AnnouncementCommentsHeader
-          handleSearch={handleSearch}
-          handleRefresh={handleRefresh}
-        />
-      </div>
-      <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
-        {loading && <Spinner />}
-        {error && <p className="text-red-500">Error: {error}</p>}
-        {!loading && !error && filteredComments?.length === 0 && (
-          <div className="text-center w-full mt-40">
-            <FaRegCommentDots size={64} className="mx-auto text-gray-500" />
-            <p className="mt-4 text-lg text-gray-500">No comments found</p>
-          </div>
-        )}
-        {filteredComments?.map((comment) => (
-          <AnnouncementComment
-            key={comment._id}
-            comment={comment}
-            activeReplyId={activeReplyId}
-            setActiveReplyId={setActiveReplyId}
-            addNestedReply={addNestedReply}
-            handleDeleteComment={handleDeleteComment}
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.COMMENTS_BY_ANNOUNCEMENT}
+      >
+        <div className="flex-none h-[10%]">
+          <AnnouncementCommentsHeader
+            handleSearch={handleSearch}
+            handleRefresh={handleRefresh}
           />
-        ))}
-      </div>
-      <div className="flex-none h-[15%]">
-        <AnnouncementInputComment addComment={handleAddComment} />
-      </div>
+        </div>
+        <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
+          {loading && <Spinner />}
+          {error && <p className="text-red-500">Error: {error}</p>}
+          {!loading && !error && filteredComments?.length === 0 && (
+            <div className="text-center w-full mt-40">
+              <FaRegCommentDots size={64} className="mx-auto text-gray-500" />
+              <p className="mt-4 text-lg text-gray-500">No comments found</p>
+            </div>
+          )}
+          {filteredComments?.map((comment) => (
+            <AnnouncementComment
+              key={comment._id}
+              comment={comment}
+              activeReplyId={activeReplyId}
+              setActiveReplyId={setActiveReplyId}
+              addNestedReply={addNestedReply}
+              handleDeleteComment={handleDeleteComment}
+            />
+          ))}
+        </div>
+      </ProtectedSection>
+
+      <ProtectedAction
+        requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_ANNOUNCEMENT}
+      >
+        <div className="flex-none h-[15%]">
+          <AnnouncementInputComment addComment={handleAddComment} />
+        </div>
+      </ProtectedAction>
     </div>
   );
 };

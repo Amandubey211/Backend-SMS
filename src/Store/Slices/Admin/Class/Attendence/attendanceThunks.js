@@ -1,11 +1,14 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { baseUrl } from "../../../../../config/Common";
 import { setErrorMsg, setShowError } from "../../../Common/Alerts/alertsSlice";
-import { ErrorMsg, handleError } from "../../../Common/Alerts/errorhandling.action";
+import {
+  ErrorMsg,
+  handleError,
+} from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
 import { getData, postData } from "../../../../../services/apiEndpoints";
-
+import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Utility to format date for handling API errors and consistency
 const formatDate = (date) => {
@@ -17,25 +20,23 @@ const formatDate = (date) => {
   return parsedDate.toISOString().split("T")[0]; // Format valid date to YYYY-MM-DD
 };
 
-
-
 // Fetch attendance data by class, section, group, and date
 export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
   "attendance/fetchAttendance",
   async (
     { classId, sectionId, groupId, date },
-    { rejectWithValue,  dispatch }
+    { rejectWithValue, dispatch, getState }
   ) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const say = getAY()
+      const say = getAY();
       const formattedDate = formatDate(date); // Format the date before sending
 
       const response = await getData(
-        `/api/teacher/attendance/getStudentList/${classId}?say=${say}`,
-        
-          { sectionId, groupId, date: formattedDate }, // Send the formatted date and filters
-        
+        `/${getRole}/attendance/getStudentList/${classId}?say=${say}`,
+
+        { sectionId, groupId, date: formattedDate } // Send the formatted date and filters
       );
 
       return response; // Return the response data
@@ -48,18 +49,18 @@ export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
 // Mark attendance
 export const markAttendance = createAsyncThunk(
   "attendance/markAttendance",
-  async (attendanceData, { rejectWithValue,  dispatch }) => {
+  async (attendanceData, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const say = getAY()
+      const say = getAY();
       const formattedDate = formatDate(attendanceData.date); // Format the date
 
       const response = await postData(
-        `${baseUrl}/api/teacher/attendance/mark?say=${say}`,
-        { ...attendanceData, date: formattedDate }, 
-       
+        `${baseUrl}/${getRole}/attendance/mark?say=${say}`,
+        { ...attendanceData, date: formattedDate }
       );
-        toast.success ('Attendance mark successfully');
+      toast.success("Attendance mark successfully");
       dispatch(setShowError(false));
       return response; // Return the response data
     } catch (error) {
@@ -71,19 +72,19 @@ export const markAttendance = createAsyncThunk(
 // Fetch attendance stats
 export const fetchAttendanceStats = createAsyncThunk(
   "attendance/fetchAttendanceStats",
-  async (classId, { rejectWithValue,  dispatch }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const say = getAY()
+      const say = getAY();
 
       const response = await getData(
-        `/api/teacher/attendance/getAttendanceStats/${classId}?say=${say}`,
-        
+        `/${getRole}/attendance/getAttendanceStats/${classId}?say=${say}`
       );
 
       return response; // Return the response data
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue); 
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -92,19 +93,19 @@ export const fetchAttendanceStats = createAsyncThunk(
 export const fetchStudentsMonthAttendanceList = createAsyncThunk(
   "attendance/fetchStudentsMonthAttendanceList",
   async (
-    { classId, sectionId, groupId, year, month }, 
-    { rejectWithValue,  dispatch }
+    { classId, sectionId, groupId, year, month },
+    { rejectWithValue, dispatch, getState }
   ) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const say = getAY()
+      const say = getAY();
       const response = await getData(
-        `/api/teacher/attendance/getStudentMonthList/${classId}?say=${say}`,
-       
-         { sectionId, groupId, year, month }, 
-        
+        `/${getRole}/attendance/getStudentMonthList/${classId}?say=${say}`,
+
+        { sectionId, groupId, year, month }
       );
-      return response
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

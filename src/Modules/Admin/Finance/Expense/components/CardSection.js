@@ -4,7 +4,8 @@ import { FaDollarSign, FaBook, FaBuilding, FaUniversity } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Card from "../../Earnings/Components/Cards";
-
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 const CardSection = () => {
   const { cardDataExpense, loading, error } = useSelector(
     (state) => state.admin.expenses
@@ -153,21 +154,26 @@ const CardSection = () => {
 
   return (
     <div className="w-full mb-2">
-      {/* Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {compactCardMapping}
-      </div>
-      <div className="flex justify-end items-center mt-4">
-        <button
-          onClick={() => navigate("/finance/expenses/add")}
-          className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-        >
-          <span className="text-gray-800 font-medium">Add New Expense</span>
-          <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-            <FaDollarSign size={16} />
-          </div>
-        </button>
-      </div>
+    
+        {/* Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {compactCardMapping}
+        </div>
+   
+
+  
+        <div className="flex justify-end items-center mt-4">
+          <button
+            onClick={() => navigate("/finance/expenses/add")}
+            className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+          >
+            <span className="text-gray-800 font-medium">Add New Expense</span>
+            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+              <FaDollarSign size={16} />
+            </div>
+          </button>
+        </div>
+   
     </div>
   );
 };

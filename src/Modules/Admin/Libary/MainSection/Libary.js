@@ -6,7 +6,6 @@ import Spinner from "../../../../Components/Common/Spinner";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import TabButton from "../Components/TabButton";
 import {
-  fetchBooksThunk,
   fetchBookIssuesThunk,
   fetchBooksDetailsThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
@@ -36,7 +35,7 @@ const LibraryAndBookIssue = () => {
     if (!books?.length) dispatch(fetchBooksDetailsThunk());
     if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
     if (!classList?.length) dispatch(fetchAllClasses());
-    if (!StudentList?.length) dispatch(fetchAllStudents());
+   // if (!StudentList?.length) dispatch(fetchAllStudents());
   }, [
     dispatch,
     books?.length,
@@ -87,12 +86,16 @@ const LibraryAndBookIssue = () => {
             <div className="flex-1">
               {activeTab === "Library" ? (
                 <ProtectedSection
-                  requiredPermission={PERMISSIONS.MANAGE_LIBRARY}
+                  requiredPermission={PERMISSIONS.GET_ALL_BOOKS}
+                  title={"Library"}
                 >
                   <LibraryTab handleSidebarOpen={handleSidebarOpen} />
                 </ProtectedSection>
               ) : (
-                <ProtectedSection requiredPermission={PERMISSIONS.ISSUE_BOOK}>
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.GET_ALL_ISSUE_BOOKS}
+                  title={"Book Issue"}
+                >
                   <BookIssueTab
                     handleSidebarOpen={handleSidebarOpen}
                     setEditIssueData={setEditIssueData}
@@ -114,12 +117,22 @@ const LibraryAndBookIssue = () => {
               }
             >
               {activeTab === "Library" ? (
-                <AddBook onClose={handleSidebarClose} />
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.ADD_BOOK}
+                  title={"Add Library Book"}
+                >
+                  <AddBook onClose={handleSidebarClose} />
+                </ProtectedSection>
               ) : (
-                <AddIssue
-                  editIssueData={editIssueData}
-                  onClose={handleSidebarClose}
-                />
+                <ProtectedSection
+                  requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}
+                  title={"Add Issue Book"}
+                >
+                  <AddIssue
+                    editIssueData={editIssueData}
+                    onClose={handleSidebarClose}
+                  />
+                </ProtectedSection>
               )}
             </Sidebar>
           </div>

@@ -7,6 +7,9 @@ import { fetchUnverifiedStudents } from "../../../Store/Slices/Admin/Verificatio
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUserSlash } from "react-icons/fa"; // Import a suitable icon
 import { useTranslation } from 'react-i18next';
+import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../config/permission";
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
@@ -52,23 +55,29 @@ const UnverifiedStudents = () => {
 
   if (filteredStudents?.length === 0) {
     return (
-      <div className="flex flex-col justify-center items-center h-64">
-        <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
-        <p className="text-center text-gray-500 text-xl">
-          {t("No Unverified Students found.")}
-        </p>{" "}
-        {/* Text below icon */}
-      </div>
+      <ProtectedSection permission={PERMISSIONS.VIEW_UNVERIFIED_STUDENT} title={t("Unverified Students")}>
+
+        <div className="flex flex-col justify-center items-center h-64">
+          <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
+          <p className="text-center text-gray-500 text-xl">
+            {t("No Unverified Students found.")}
+          </p>{" "}
+          {/* Text below icon */}
+        </div>
+      </ProtectedSection>
+
     );
   }
 
   return (
     <div className="animate-fadeIn">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredStudents?.map((student) => (
-          <UnVerifiedStudentCard key={student._id} studentId={student._id} />
-        ))}
-      </div>
+      <ProtectedSection permission={PERMISSIONS.VIEW_UNVERIFIED_STUDENT} title={t("Unverified Students")}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredStudents?.map((student) => (
+            <UnVerifiedStudentCard key={student._id} studentId={student._id} />
+          ))}
+        </div>
+      </ProtectedSection>
     </div>
   );
 };

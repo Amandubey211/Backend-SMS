@@ -8,6 +8,8 @@ import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png"; // Upd
 import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
 import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const icons = [icon1, icon2];
 
@@ -37,7 +39,7 @@ const NoticeBoard = (descriptionLength) => {
   } = useSelector((state) => state.admin.adminDashboard);
   useEffect(() => {
 
-  
+
     dispatch(fetchNotices())
 
   }, [dispatch]);
@@ -58,41 +60,44 @@ const NoticeBoard = (descriptionLength) => {
   const topNotices = noticesSort?.slice(0, 3);
 
   return (
-    <div className="p-2">
-      <div className="flex justify-between p-4 items-center px-6">
-        <h2 className="text-xl font-semibold text-gray-600">
-          {t("Notice Board")}
-        </h2>
-        <button
-          className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
-          onClick={() => navigate("/noticeboard/notice")}
-        >
-          {t("View All")}
-        </button>
-      </div>
-      {topNotices?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center my-10">
-          <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-500 text-xl">
-            {t("No noticeboard data found")}
-          </p>
+    <ProtectedSection requiredPermission={PERMISSIONS.SHOW_EVENTS} title={"Notices"}>
+      <div className="p-2">
+        <div className="flex justify-between p-4 items-center px-6">
+          <h2 className="text-xl font-semibold text-gray-600">
+            {t("Notice Board")}
+          </h2>
+          <button
+            className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
+            onClick={() => navigate("/noticeboard/notice")}
+          >
+            {t("View All")}
+          </button>
         </div>
-      ) : (
-        topNotices?.map((notice, index) => (
-          <Notice
-            key={index}
-            image={icons[index % icons?.length]} // Use cyclic icons
-            title={notice?.title}
-            authorName={notice?.authorName}
-            date={new Date(notice?.startDate).toLocaleDateString()} // Formatting date
-            priority={notice?.priority}
-            content={notice?.description} // Changed 'content' to 'description' based on API response
-            backgroundColor={generateRandomColor()}
-            descriptionLength={descriptionLength}
-          />
-        ))
-      )}
-    </div>
+        {topNotices?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center my-10">
+            <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
+            <p className="text-gray-500 text-xl">
+              {t("No noticeboard data found")}
+            </p>
+          </div>
+        ) : (
+          topNotices?.map((notice, index) => (
+            <Notice
+              key={index}
+              image={icons[index % icons?.length]} // Use cyclic icons
+              title={notice?.title}
+              authorName={notice?.authorName}
+              date={new Date(notice?.startDate).toLocaleDateString()} // Formatting date
+              priority={notice?.priority}
+              content={notice?.description} // Changed 'content' to 'description' based on API response
+              backgroundColor={generateRandomColor()}
+              descriptionLength={descriptionLength}
+            />
+          ))
+        )}
+      </div>
+
+    </ProtectedSection>
   );
 };
 

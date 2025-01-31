@@ -11,6 +11,8 @@ import { fetchStudentGrades } from "../../../../../Store/Slices/Admin/Users/Stud
 import { fetchFilteredAssignments } from "../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import { fetchModules } from "../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { fetchFilteredQuizzesThunk } from "../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 const MainSection = () => {
   const { cid, sid } = useParams();
   const [search, setSearch] = useState("");
@@ -40,7 +42,6 @@ const MainSection = () => {
   };
 
   const handleFilterChange = (name, value) => {
-
     const updatedFilters = {
       ...filters,
       [name]: value,
@@ -50,7 +51,8 @@ const MainSection = () => {
     const params = {};
     if (updatedFilters.moduleId) params.moduleId = updatedFilters.moduleId;
     if (updatedFilters.quizId) params.quizId = updatedFilters.quizId;
-    if (updatedFilters.assignmentId) params.assignmentId = updatedFilters.assignmentId;
+    if (updatedFilters.assignmentId)
+      params.assignmentId = updatedFilters.assignmentId;
     dispatch(
       fetchSubjectGrades({ classId: cid, subjectId: sid, filters: params })
     );
@@ -75,36 +77,41 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex  ">
+    <div className="flex w-full h-full ">
       <SubjectSideBar />
-      <div className="border-l w-full mr-2">
-        <GradeHeader
-          onSearch={handleSearchChange}
-          onFilterChange={handleFilterChange}
-        />
-        <div className="h-screen overflow-y-scroll no-scrollbar">
-          {loading ? (
-            <div className="flex items-center h-[80%] w-[100%] justify-center flex-col gap-2">
-              <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-              <p className="text-gray-800 text-lg">Loading...</p>
-            </div>
-          ) : (
-            <StudentTable
-              students={subjectGrades?.filter((i) =>
-                i?.studentName?.toLowerCase()?.includes(search?.toLowerCase())
-              )}
-              onRowClick={handleRowClick}
-            />
-          )}
+      <ProtectedSection
+        title="Grades"
+        requiredPermission={PERMISSIONS.GRADES_OF_ONE_CLASS}
+      >
+        <div className="border-l w-full mr-2">
+          <GradeHeader
+            onSearch={handleSearchChange}
+            onFilterChange={handleFilterChange}
+          />
+          <div className="h-screen overflow-y-scroll no-scrollbar">
+            {loading ? (
+              <div className="flex items-center h-[80%] w-[100%] justify-center flex-col gap-2">
+                <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
+                <p className="text-gray-800 text-lg">Loading...</p>
+              </div>
+            ) : (
+              <StudentTable
+                students={subjectGrades?.filter((i) =>
+                  i?.studentName?.toLowerCase()?.includes(search?.toLowerCase())
+                )}
+                onRowClick={handleRowClick}
+              />
+            )}
+          </div>
         </div>
-      </div>
-      {subjectGrades && (
-        <StudentGradeModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          student={student}
-        />
-      )}
+        {subjectGrades && (
+          <StudentGradeModal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            student={student}
+          />
+        )}
+      </ProtectedSection>
     </div>
   );
 };

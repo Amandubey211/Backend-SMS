@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
  * SelectInput
  * @param {string} label - Label text
  * @param {string} name - Field name (Formik)
- * @param {array} options - Array of option strings
+ * @param {array} options - Array of objects with {label, value}
  * @param {boolean} disabled - Disables the field
  * @param {boolean} required - Shows a red asterisk if field is required
  * @param {string} autoComplete - Browser autocomplete
@@ -65,11 +65,11 @@ const SelectInput = ({
         {options.map((option, index) => (
           <motion.option
             key={index}
-            value={option}
+            value={option.value}
             variants={fieldVariants}
             transition={{ delay: 0.2 }}
           >
-            {option}
+            {option.label}
           </motion.option>
         ))}
       </Field>

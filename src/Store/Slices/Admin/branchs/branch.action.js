@@ -7,12 +7,14 @@ import { setShowError } from "../../Common/Alerts/alertsSlice";
 import Cookies from 'js-cookie'
 
 import { setLocalCookies } from "../../../../Utils/academivYear";
+import { getUserRole } from "../../../../Utils/getRoles";
 export const fetchBranch = createAsyncThunk(
   "user/Branch",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const res = await getData(`/admin/getAllBranches`);
+      const res = await getData(`/${getRole}/getAllBranches`);
       return res?.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -22,14 +24,16 @@ export const fetchBranch = createAsyncThunk(
 
 export const updateBranch = createAsyncThunk(
   "user/updateBranch",
-  async ({ navigate, data }, { rejectWithValue, dispatch }) => {
+  async ({ navigate, data }, { rejectWithValue, dispatch,getState }) => {
     try {
+      const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const res = await postData(`/admin/selectBranch`, data);
+      const res = await postData(`/${getRole}/selectBranch`, data);
       toast.success("Branch updated successfully.");
       Cookies.remove("say");
       if (res?.data?.isAcademicYearActive) {
         setLocalCookies("say", res?.data?.academicYear?._id);
+        setLocalCookies("logo", data?.logo);
         navigate("/dashboard");
       } else {
         navigate("/create_academicYear");

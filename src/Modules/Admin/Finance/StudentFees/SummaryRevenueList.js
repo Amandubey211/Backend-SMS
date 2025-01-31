@@ -28,6 +28,9 @@ import Layout from "../../../../Components/Common/Layout";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { setInvoiceData } from "../../../../Store/Slices/Finance/Invoice/invoiceSlice";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
@@ -132,6 +135,9 @@ const SummaryRevenueList = () => {
 
   };
 
+  const capitalizeFirstLetter = (text) =>
+    text ? text.charAt(0).toUpperCase() + text.slice(1) : "N/A";
+  
   const columns = [
     {
       title: "Student",
@@ -139,9 +145,9 @@ const SummaryRevenueList = () => {
       key: "studentDetails",
       render: (studentDetails) => (
         <Tooltip
-          title={studentDetails?.firstName + " " + studentDetails?.lastName}
+          title={capitalizeFirstLetter(studentDetails?.firstName) + " " + capitalizeFirstLetter(studentDetails?.lastName)}
         >
-          {studentDetails?.firstName?.slice(0, 10) + ".." || "N/A"}
+          {capitalizeFirstLetter(studentDetails?.firstName?.slice(0, 10)) + ".." || "N/A"}
         </Tooltip>
       ),
     },
@@ -149,15 +155,14 @@ const SummaryRevenueList = () => {
       title: "Class",
       dataIndex: "classDetails",
       key: "classDetails",
-      render: (classDetails) => classDetails?.className || "N/A",
+      render: (classDetails) => capitalizeFirstLetter(classDetails?.className),
     },
     {
       title: "Sub-Category",
       dataIndex: "subCategory",
       key: "subCategory",
-      render: (text) => <span>{text || "N/A"}</span>,
+      render: (text) => <span>{capitalizeFirstLetter(text)}</span>,
     },
-
     {
       title: "Total Amount",
       dataIndex: "total_amount",
@@ -172,11 +177,11 @@ const SummaryRevenueList = () => {
       render: (value, record) =>
         record.discountType === "percentage" ? (
           <Tag color="purple" className="text-xs">
-            {value || 0}%
+            {`${value || 0}%`}
           </Tag>
         ) : (
           <Tag color="orange" className="text-xs">
-            {value || 0} QAR
+            {`${value || 0} QAR`}
           </Tag>
         ),
       width: 100,
@@ -210,7 +215,7 @@ const SummaryRevenueList = () => {
         }
         return (
           <Tag color={color} className="text-xs capitalize">
-            {status || "N/A"}
+            {capitalizeFirstLetter(status)}
           </Tag>
         );
       },
@@ -224,7 +229,6 @@ const SummaryRevenueList = () => {
       sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
       render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
-  
     {
       title: "Action",
       key: "action",
@@ -235,27 +239,31 @@ const SummaryRevenueList = () => {
               type="link"
               icon={<EyeOutlined />}
               onClick={() => {
-                handleEditClick(record);
+                handleEditClick({...record,mode:'View'});
               }}
               className="text-blue-600 hover:text-blue-800 p-0"
-              aria-label="Edit"
+              aria-label="View"
             />
+           
           </Tooltip>
+          <ProtectedAction requiredPermission={PERMISSIONS.EDIT_FEES}>
           <Tooltip title="Edit">
             <Button
               type="link"
               icon={<EditOutlined />}
               onClick={() => {
-                handleEditClick(record);
+                handleEditClick({...record,mode:'Edit'});
               }}
               className="text-blue-600 hover:text-blue-800 p-0"
               aria-label="Edit"
             />
           </Tooltip>
+          </ProtectedAction>
         </div>
       ),
     },
   ];
+  
 
   const subCategoryList = [
     "Tuition Fees",
@@ -309,6 +317,7 @@ const SummaryRevenueList = () => {
   return (
     <Layout title="Finance | Student Fees">
     <AdminLayout>
+    <ProtectedSection requiredPermission={PERMISSIONS.SUMMARY_OF_STUDENT_FEES} title={'Fees List'}>
       <div className="p-6 bg-white shadow-lg rounded-lg">
         {/* Filters and Buttons Section */}
         <div className="flex justify-between items-start">
@@ -408,7 +417,8 @@ const SummaryRevenueList = () => {
                 />
                 <span className="text-gray-700">Unpaid</span>
               </label>
-              <div className="flex items-center space-x-4 ">
+              <ProtectedAction requiredPermission={PERMISSIONS.DELETE_FEES}>
+              <div className="flex items-center space-x-4">
                 {selectedRowIds?.length > 0 && (
                   <Button
                     type="danger"
@@ -419,10 +429,12 @@ const SummaryRevenueList = () => {
                   </Button>
                 )}
               </div>
+              </ProtectedAction>
             </div>
           </div>
           <div className="flex space-y-4  flex-col">
            <div className="flex ml-auto">
+           <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_FEES}>
            <button
               onClick={() => navigate("/finance/studentfees/add/form")}
               className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -432,6 +444,7 @@ const SummaryRevenueList = () => {
                 <GiTakeMyMoney size={20} />
               </div>
             </button>
+            </ProtectedAction>
            </div>
            <div className="flex gap-2 justify-between flex-row">
            {selectedRowIds?.length ==1 && selectedRecords?.length == 1 && (
@@ -523,6 +536,7 @@ const SummaryRevenueList = () => {
         title="Student Fees Data"
         sheet="student_fees_report"
       />
+      </ProtectedSection>
     </AdminLayout>
     </Layout>
   );

@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 import QuotationReceipts from "./Components/RecentQuotation.table";
 import { useDispatch } from "react-redux";
 import { clearSelectedQuotation, setReadOnly } from "../../../../Store/Slices/Finance/Quotations/quotationSlice";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const QuotationMain = () => {
     useNavHeading("Finance", "Quotation");
@@ -45,26 +48,33 @@ const QuotationMain = () => {
                     </div>
 
                     {/* Add New Quotation Button */}
-                    <button
-                        onClick={() => {
-                            dispatch(clearSelectedQuotation())
-                            dispatch(setReadOnly(false))
-                            navigate("/finance/quotations/add-new-quotations")
-                        }}
-                        className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-                    >
-                        <span className="text-gray-800 font-medium">Add New Quotation</span>
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                            <FiPlus size={16} />
-                        </div>
-                    </button>
+
+                    <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
+
+                        <button
+                            onClick={() => {
+                                dispatch(clearSelectedQuotation())
+                                dispatch(setReadOnly(false))
+                                navigate("/finance/quotations/add-new-quotations")
+                            }}
+                            className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                        >
+                            <span className="text-gray-800 font-medium">Add New Quotation</span>
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                                <FiPlus size={16} />
+                            </div>
+                        </button>
+                    </ProtectedAction>
                 </div>
 
                 {/* Cards Section */}
-                <CardsSection />
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_QUOTATION} title={"Quotation Cards"}>
+                    <CardsSection />
+                </ProtectedSection>
 
-                {/* Recent Receipts */}
+                <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_SUMMARY_OF_QUOTATION} title={"List"}>
                 <QuotationReceipts />
+                </ProtectedSection>
             </div>
         </AdminDashLayout>
     );

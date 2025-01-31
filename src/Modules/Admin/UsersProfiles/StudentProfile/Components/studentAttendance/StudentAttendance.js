@@ -6,6 +6,8 @@ import { FaCheckCircle, FaDoorOpen, FaTimesCircle } from 'react-icons/fa';
 import { fetchStudentAttendance } from '../../../../../../Store/Slices/Admin/Users/Students/student.action';
 import Spinner from '../../../../../../Components/Common/Spinner';
 import { useTranslation } from 'react-i18next';
+import ProtectedSection from '../../../../../../Routes/ProtectedRoutes/ProtectedSection';
+import { PERMISSIONS } from '../../../../../../config/permission';
 
 const StudentAttendance = ({ student }) => {
     const { t } = useTranslation('admAccounts');
@@ -33,6 +35,7 @@ const StudentAttendance = ({ student }) => {
                 <Spinner />
             </div>
         ) : (
+            <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_ATTENDENCE}  title={"Attendence"}>
             <div className="container mx-auto py-4">
                 {/* Attendance Summary */}
                 <div className="flex justify-around px-4 space-x-4">
@@ -71,7 +74,7 @@ const StudentAttendance = ({ student }) => {
                         onPanelChange={onPanelChange}  // Pass the panel change handler to the CalendarHeader
                     />
                 </div>
-            </div>
+            </div></ProtectedSection>
         )
     );
 };

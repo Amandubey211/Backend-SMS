@@ -13,6 +13,8 @@ import NoDataFound from "../../../../Components/Common/NoDataFound";
 import Spinner from "../../../../Components/Common/Spinner";
 import { fetchClassDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { useTranslation } from "react-i18next";
+import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const colors = [
   "bg-yellow-300",
@@ -100,6 +102,7 @@ const MainSection = () => {
 
   return (
     <>
+    <ProtectedSection requiredPermission={PERMISSIONS.SPECIFIC_CLASS} title={'Subjects'}>
       {loading ? (
         <div className="flex justify-center items-center h-screen">
           <Spinner />
@@ -159,6 +162,7 @@ const MainSection = () => {
       >
         <AddNewSubject subject={editSubject} onClose={handleCloseSidebar} />
       </Sidebar>
+      </ProtectedSection>
     </>
   );
 };

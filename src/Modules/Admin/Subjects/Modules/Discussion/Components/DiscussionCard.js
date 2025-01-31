@@ -15,6 +15,8 @@ import {
   markAsReadDiscussion,
   updatePinStatus,
 } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
+import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
   const { sid, cid } = useParams();
@@ -71,17 +73,21 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
         </div>
       )}
       <div className="flex items-center justify-end space-x-2 mb-4 relative">
-        <button
-          onClick={handlePinClick}
-          disabled={discussion.pinLoading}
-          className="transition-transform transform hover:scale-110"
+        <ProtectedAction
+          requiredPermission={PERMISSIONS.UPDATE_PIN_STATUS_OF_DISCUSSION}
         >
-          {isPinned ? (
-            <MdPushPin className="text-green-600 w-6 h-6" />
-          ) : (
-            <MdOutlinePushPin className="text-gray-400 w-6 h-6" />
-          )}
-        </button>
+          <button
+            onClick={handlePinClick}
+            disabled={discussion.pinLoading}
+            className="transition-transform transform hover:scale-110"
+          >
+            {isPinned ? (
+              <MdPushPin className="text-green-600 w-6 h-6" />
+            ) : (
+              <MdOutlinePushPin className="text-gray-400 w-6 h-6" />
+            )}
+          </button>
+        </ProtectedAction>
 
         {/* {discussion.pulish ? (
           <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
@@ -105,12 +111,16 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
           </>
         )}
 
-        <button
-          className="border w-7 h-7 p-1 rounded-full transition-transform transform hover:scale-110"
-          onClick={() => setMenuOpen((prev) => !prev)}
+        <ProtectedAction
+          requiredPermission={PERMISSIONS.MARK_DISCUSSION_AS_READ}
         >
-          <FaEllipsisV />
-        </button>
+          <button
+            className="border w-7 h-7 p-1 rounded-full transition-transform transform hover:scale-110"
+            onClick={() => setMenuOpen((prev) => !prev)}
+          >
+            <FaEllipsisV />
+          </button>
+        </ProtectedAction>
         {isMenuOpen && (
           <div
             ref={menuRef}

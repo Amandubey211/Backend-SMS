@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from "react-redux";
 import AnnouncementHeader from "./AnnouncementHeader";
 import AnnouncementCard from "./AnnouncementCard";
 import Spinner from "../../../../../../Components/Common/Spinner";
-import { AiOutlineFileSearch } from "react-icons/ai";
 import { fetchAnnouncements } from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
 import { useParams } from "react-router-dom";
+import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import { AiOutlineBell } from "react-icons/ai";
 
-// Define an array of colors for random selection.
 const colors = [
   "#efc42f",
   "#ee69b6",
@@ -47,7 +47,7 @@ const AnnouncementList = () => {
   }));
 
   // Filter announcements based on the search term
-  const filteredAnnouncements = coloredAnnouncements.filter((announcement) =>
+  const filteredAnnouncements = coloredAnnouncements?.filter((announcement) =>
     announcement.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -63,9 +63,12 @@ const AnnouncementList = () => {
               <AnnouncementCard key={announcement._id} {...announcement} />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center col-span-full py-10 text-gray-500">
-              <AiOutlineFileSearch className="w-12 h-12 mb-3" />
-              <p className="text-lg font-semibold">No announcements found.</p>
+            <div className="flex flex-col items-center justify-center col-span-full py-10">
+              <NoDataFound
+                title="Announcements"
+                desc="No announcements found. Please check back later or add a new announcement."
+                icon={AiOutlineBell}
+              />
             </div>
           )}
         </div>
