@@ -134,29 +134,28 @@ const RecentReceiptsList = () => {
 
   // --- Handle Send Email ---
   const handleSendEmail = async (record) => {
-    if (!record.receiptNumber) {
-      toast.error("Invalid receipt ID.");
-      return;
+    if (!record._id) {
+        toast.error("Invalid receipt ID.");
+        return;
     }
-  
+
     try {
-      const result = await dispatch(
-        sendEmail({
-          id: record.receiptNumber,
-          type: "receipt",
-        })
-      );
-  
-      if (sendEmail.fulfilled.match(result)) {
-        toast.success("Email sent successfully!");
-      } else {
-        toast.error(result.payload || "Failed to send email.");
-      }
+        const result = await dispatch(
+            sendEmail({
+                id: record._id,
+                type: "receipt",
+            })
+        );
+
+        if (sendEmail.fulfilled.match(result)) {
+            toast.success("Email sent successfully!");
+        } else {
+            toast.error(result.payload || "Failed to send email.");
+        }
     } catch (err) {
-      toast.error("Error sending email.");
+        toast.error("Error sending email.");
     }
-  };
-  
+};
 
 
   // --- Delete receipt ---
