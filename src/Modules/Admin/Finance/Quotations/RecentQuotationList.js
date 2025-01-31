@@ -36,6 +36,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import { sendEmail } from "../../../../Store/Slices/Common/SendEmail/sendEmailThunk";
 
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
@@ -77,9 +78,39 @@ const RecentQuotationList = () => {
   }, [quotations]);
 
 
-  const handleDownloadPDF=async (pdfRef,previewQuotation)=>{
-    await downloadPDF(pdfRef,previewQuotation,"Quotation")
+  const handleDownloadPDF = async (pdfRef, previewQuotation) => {
+    await downloadPDF(pdfRef, previewQuotation, "Quotation")
   }
+
+  const handleSendEmail = async (record) => {
+    console.log(record)
+    if (!record.key) {
+      toast.error("Invalid quotation ID.");
+      return;
+    }
+  
+    console.log("Attempting to send email for quotation:", record);
+  
+    try {
+      const result = await dispatch(
+        sendEmail({
+          id: record.key,
+          type: "quotation",
+        })
+      );
+  
+      console.log("Send email result:", result);
+  
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(result.payload || "Failed to send email.");
+      }
+    } catch (err) {
+      console.error("Error sending email:", err);
+      toast.error("Error sending email.");
+    }
+  };
   
 
   // Debounced function to fetch adjustments with a fixed limit of 5
@@ -223,7 +254,7 @@ const RecentQuotationList = () => {
               key="2"
               onClick={() => {
                 const quotationToView = quotationIdMap[record.key];
-           
+
                 if (quotationToView) {
                   dispatch(setReadOnly(true)); // Set readOnly to true for viewing
                   dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected quotation to Redux for view mode
@@ -235,26 +266,27 @@ const RecentQuotationList = () => {
             >
               <EyeOutlined style={{ marginRight: 8 }} /> View(Read-only)
             </Menu.Item>
-            <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>    
-            <Menu.Item
-              key="3"
-              onClick={() => handleStatusChange(record.key, "accept")}
-            >
-              <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
-            </Menu.Item>
+            <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
+              <Menu.Item
+                key="3"
+                onClick={() => handleStatusChange(record.key, "accept")}
+              >
+                <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
+              </Menu.Item>
             </ProtectedAction>
             <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
-            <Menu.Item
-              key="4"
-              onClick={() => handleStatusChange(record.key, "reject")}
-            >
-              <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
-            </Menu.Item>
+              <Menu.Item
+                key="4"
+                onClick={() => handleStatusChange(record.key, "reject")}
+              >
+                <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
+              </Menu.Item>
             </ProtectedAction>
             {/* 4) Send Mail */}
-            <Menu.Item onClick={() => toast.success("Send Mail clicked!")}>
+            <Menu.Item onClick={() => handleSendEmail(record)}>
               <MailOutlined style={{ marginRight: 8 }} /> Send Mail
             </Menu.Item>
+
           </Menu>
         );
 
@@ -427,7 +459,7 @@ const RecentQuotationList = () => {
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                    onClick={()=> handleDownloadPDF(pdfRef,previewQuotation)}
+                    onClick={() => handleDownloadPDF(pdfRef, previewQuotation)}
                   >
                     Download PDF
                   </button>
