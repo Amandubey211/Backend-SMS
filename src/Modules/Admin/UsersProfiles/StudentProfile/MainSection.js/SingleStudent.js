@@ -35,11 +35,11 @@ const SingleStudent = () => {
   if (!loading && !student) {
     return <div className="text-center my-10">Student not found</div>;
   }
+  //   "Finance": <StudentFinance student={student} />,
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView student={student} />,
        "Course Progress": <StudentCourseProgress student={student} />,
-       "Finance": <StudentFinance student={student} />,
        "Information": <StudentInformationMenu student={student} />,
        "Parents": <ParentsProfile student={student} />,
        "Grades": <StudentGradesAccordion student={student} />,
@@ -57,14 +57,14 @@ const SingleStudent = () => {
           <div className="flex flex-col  h-auto w-[25%]">
             <StudentProfile student={student} />
             <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={role == "admin"?[
-              "OverView", "Course Progress", "Finance", "Information", 
+              "OverView", "Course Progress",  "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
             ]:role == "teacher" ?[
               "OverView", "Course Progress",  "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
             ]:role == "finance" ?[
                 "Information", 
-              "Parents", "Finance",
+              "Parents",
             ]:role == "librarian" ?[
               "Information", 
             "Parents", "Book Issue",

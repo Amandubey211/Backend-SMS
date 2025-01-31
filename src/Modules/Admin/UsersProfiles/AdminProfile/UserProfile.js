@@ -14,6 +14,7 @@ import { useTranslation } from "react-i18next";
 import { LuSchool } from "react-icons/lu";
 import ImageUpload from "../../Libary/Components/ImageUpload";
 import useCloudinaryUpload from "../../../../Hooks/CommonHooks/useCloudinaryUpload";
+import Cookies from "js-cookie";
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation('admProfile');
@@ -74,6 +75,7 @@ const UserProfile = () => {
       reader.readAsDataURL(file);
     }
   };
+  
   const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
   const CLOUDINARY_FOLDER = "expenses"; // Updated folder name for clarity
   const {uploadFile} = useCloudinaryUpload(CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_FOLDER)
@@ -82,6 +84,12 @@ const UserProfile = () => {
  const data = {logo:a,schoolId:userDetails.schoolId};
  dispatch(updateSchoolLogo(data))
   }
+  useEffect(()=>{
+      const getlogo = Cookies.get("logo");
+      if(getlogo){
+        setLogo(getlogo)
+      }
+  },[])
   return (
     <>
       <Layout title={t("myProfile")}>
@@ -142,7 +150,7 @@ const UserProfile = () => {
               </div>
 
               <div className="flex item-center justify-center flex-col  ">
-                <p>School Logo</p>
+                <p>Logo</p>
                 <ImageUpload
                   imagePreview={logo}
                   handleImageChange={handleImageChange}

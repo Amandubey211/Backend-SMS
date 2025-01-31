@@ -98,15 +98,15 @@ export const PERMISSIONS = {
   VIEW_EXPENSE_CARD_DATA: "View Expense Card Data",
   VIEW_SUMMARY_OF_EXPENSES: "View Summary of Expenses",
 
-  ADD_NEW_Event_EXPENSE: "Add new event, activity expense",
-  ADD_NEW_exam_EXPENSE: "Add new exam, affiliation expense",
-  ADD_NEW_Library_EXPENSE: "Add new library, Academic expense",
+  ADD_NEW_Event_EXPENSE: "Add new event,activity expense",
+  ADD_NEW_Examination_EXPENSE: "Add new exam,affiliation expense",
+  ADD_NEW_Library_EXPENSE: "Add new library,Academic expense",
   ADD_NEW_Marketing_EXPENSE: "Add new marketing, Ad. expense",
   ADD_NEW_Miscellaneous_EXPENSE: "Add new miscellaneous expense",
-  ADD_NEW_Salaries_EXPENSE: "Add new salary, Wages expense",
+  ADD_NEW_Salaries_EXPENSE: "Add new salary,Wages expense",
   ADD_NEW_IT_EXPENSE: "Add new software expense",
   ADD_NEW_Supplies_EXPENSE: "Add new supplies expense",
-  ADD_NEW_Supplies_EXPENSE: "Add new utility, Maintenance expense",
+  ADD_NEW_Utilities_EXPENSE: "Add new utility,Maintenance expense",
 
   // Expense List
   VIEW_ALL_EXPENSES: "View All Expenses",
@@ -134,11 +134,11 @@ export const PERMISSIONS = {
   REMOVE_Examination_EXPENSE: "Remove exam,affiliation expense",
 
   // add - earning
-  ADD_NEW_Community_REVENUE: "Add new Community External Affairs Revenue",
-  ADD_NEW_Facility_REVENUE: "Add new Facility Based Revenue",
-  ADD_NEW_Financial_REVENUE: "Add new Financial Investment Revenue",
-  ADD_NEW_SERVICE_BASED_REVENUE: "Add new Service Based Revenue",
-  ADD_NEW_Other_REVENUE: "Add new Other Revenue", // not in backend
+  ADD_NEW_Comm_REVENUE: "Add new Community External Affairs Revenue",
+  ADD_NEW_Faca_REVENUE: "Add new Facality Based Revenue",
+  ADD_NEW_Fina_REVENUE: "Add new financial Investment Revenue",
+  ADD_NEW_Serv_REVENUE: "Add new Service Based Revenue",
+  ADD_NEW_Othe_REVENUE: "Add new Other Revenue", // not in backend
 
   // edit-earning
   Community_MODIFY: "Modify Community External Affairs Revenue",
@@ -169,7 +169,7 @@ export const PERMISSIONS = {
 
   //quotation
   CREATE_NEW_QUOTATION: "Create new quotation",
-  LIST_ALL_QUOTATION: "List all quotation",
+  LIST_ALL_QUOTATION: "list all quotation",
   SHOWS_CARD_DATA_OF_QUOTATION: "Shows card data of quotation",
   SHOWS_SUMMARY_OF_QUOTATION: "Shows summary of quotation",
   CANCEL_QUOTATION: "Cancel quotation",

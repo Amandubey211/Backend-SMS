@@ -1,7 +1,7 @@
 import React, { forwardRef } from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
-
+import Cookies from "js-cookie";
 const QuotationTemplate = forwardRef((props, ref) => {
   const { data } = props;
   if (!data) return null;
@@ -53,34 +53,30 @@ const QuotationTemplate = forwardRef((props, ref) => {
   const displayedDiscountPercentage = ((discountAmount / totalBeforeDiscount) * 100).toFixed(2);
 
 
-  const { address, branchName, city, code, logo, nameOfSchool } = schoolId;
+  const { address, branchName, city, code,  nameOfSchool } = schoolId;
 
 
   // Calculate final amount
   const finalAmount = final_amount
   console.log(isCancel)
-  console.log(data)
+  console.log(data);
+  const logo = Cookies.get('logo')
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
       {/* Show "Cancelled" label if isCancel is true */}
       
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
-        <div className="w-full bg-pink-100 px-4 py-2 flex justify-between items-center rounded-t-lg">
+        <div className="w-full bg-pink-100 flex-row px-4 py-2 flex justify-between items-center rounded-t-lg">
           <div>
             <h1 className="font-bold text-lg">{nameOfSchool || 'N/A'}</h1>
             <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
           </div>
 
           {/* School Logo */}
-          {/* <div className="flex items-center space-x-4">
-            <img src={IconLogo} alt="Icon Logo" className="w-8 h-8" />
-            <img
-              src={StudentDiwanLogo}
-              alt="Student Diwan"
-              className="w-20 h-20"
-            />
-          </div> */}
+         {logo && <div>
+         <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+          </div>}
         </div>
 
         <div

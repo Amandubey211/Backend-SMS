@@ -11,7 +11,7 @@ import {
   fetchSectionsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
-import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { fetchStudentsByClassAndSection, fetchStudentsByClassAndSectionNames } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
 
 const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
@@ -25,6 +25,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
 
   const dispatch = useDispatch();
   const { cid } = useParams();
+  useEffect(()=>{
+    dispatch(fetchStudentsByClassAndSectionNames(cid));
+  },[])
 
   // Get unassigned students and loading/error state from Redux store
   const { unassignedStudents, loading, error } = useSelector((store) => ({
@@ -45,7 +48,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       setLeader(group?.leader || null); // Set leader
     }
     const classId = cid;
-    dispatch(fetchStudentsByClassAndSection(classId));
+    //dispatch(fetchStudentsByClassAndSection(classId));
+   
+    
   }, [isUpdate, group]); // Triggered only when editing
 
   useEffect(() => {
@@ -118,6 +123,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
       toast.error(err.message || t("Something went wrong"));
     }
   };
+  useEffect(() => {
+    console.log("studentsList:", studentsList);
+  }, [studentsList]);
 
   return (
     <form className="flex flex-col h-full" onSubmit={handleSubmit}>

@@ -87,45 +87,49 @@ const DropdownCard = ({
           role="listbox"
           aria-labelledby={`label-${id}`}
         >
-          {options?.map((item, index) => (
-          name == "category" ?   <ProtectedAction requiredPermission={PERMISSIONS[`ADD_NEW_${item?.split(/[\s-]/)[0]}_REVENUE`]}>
-           <li
-              key={index}
-              className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
-                item === value ? "bg-pink-200 font-bold text-gray-900" : ""
-              }`}
-              onClick={() => onSelect(item)}
-              role="option"
-              aria-selected={item === value}
-              tabIndex={0} // Make focusable
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  onSelect(item);
-                }
-              }}
-            >
-              {item} 
-            </li>
-          </ProtectedAction>:
-            <li
-              key={index}
-              className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
-                item === value ? "bg-pink-200 font-bold text-gray-900" : ""
-              }`}
-              onClick={() => onSelect(item)}
-              role="option"
-              aria-selected={item === value}
-              tabIndex={0} // Make focusable
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  onSelect(item);
-                }
-              }}
-            >
-              {item}
-            </li>
-            
-          ))}
+          {options?.map((item, index) => {
+    const permissionKey = `ADD_NEW_${item?.slice(0,3)}_REVENUE`;
+    return name === "category" && PERMISSIONS[permissionKey] ? (
+      <ProtectedAction requiredPermission={PERMISSIONS[permissionKey]}>
+        <li
+          key={index}
+          className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+            item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+          }`}
+          onClick={() => onSelect(item)}
+          role="option"
+          aria-selected={item === value}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              onSelect(item);
+            }
+          }}
+        >
+          {item} - {permissionKey}
+        </li>
+      </ProtectedAction>
+    ) : (
+      <li
+        key={index}
+        className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+          item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+        }`}
+        onClick={() => onSelect(item)}
+        role="option"
+        aria-selected={item === value}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            onSelect(item);
+          }
+        }}
+      >
+        {item}
+      </li>
+    );
+  })}
+
         </motion.ul>
       )}
     </div>
