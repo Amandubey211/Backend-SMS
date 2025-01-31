@@ -39,6 +39,7 @@ import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSu
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
@@ -100,10 +101,38 @@ const PenalityandAdjustmentList = () => {
 
   // Handle downloading the PDF
 
- const handleDownloadPDF=async (pdfRef,selectedReturnInvoice)=>{
-    await downloadPDF(pdfRef,selectedReturnInvoice,"ReturnInvoice")
+  const handleDownloadPDF = async (pdfRef, selectedReturnInvoice) => {
+    await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice")
   }
-  
+
+  const handleSendEmail = async (record) => {
+    if (!record._id) {
+      toast.error("Invalid adjustment ID.");
+      return;
+    }
+
+    console.log("Attempting to send email for adjustment:", record);
+
+    try {
+      const result = await dispatch(
+        sendEmail({
+          id: record._id,
+          type: "adjustment",
+        })
+      );
+
+      console.log("Send email result:", result);
+
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(result.payload || "Failed to send email.");
+      }
+    } catch (err) {
+      console.error("Error sending email:", err);
+      toast.error("Error sending email.");
+    }
+  };
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -294,11 +323,11 @@ const PenalityandAdjustmentList = () => {
             key: "3",
             label: (
               <ProtectedSection requiredPermission={PERMISSIONS.CANCEL_PENALTY}>
-              <span>
-                <CloseCircleOutlined style={{ marginRight: 8 }} />
-                {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
-              </span>          
-                  </ProtectedSection>
+                <span>
+                  <CloseCircleOutlined style={{ marginRight: 8 }} />
+                  {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
+                </span>
+              </ProtectedSection>
             ),
             onClick: () => {
               if (record?.status !== "Cancelled") handleCancleReturnInvoice(record?.key);
@@ -308,13 +337,13 @@ const PenalityandAdjustmentList = () => {
           {
             key: "4",
             label: (
-              <span>
+              <span onClick={() => handleSendEmail(record)}>
                 <MailOutlined style={{ marginRight: 8 }} />
                 Send Mail
               </span>
             ),
-            // Implement Send Mail functionality if needed
           },
+          ,
         ];
 
         return (
@@ -411,16 +440,16 @@ const PenalityandAdjustmentList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
-              
-                <Button
-                  type="primary"
-                  icon={<ExportOutlined />}
-                  onClick={() => setIsExportModalVisible(true)}
-                  className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-                >
-                  Export
-                </Button>
-            
+
+              <Button
+                type="primary"
+                icon={<ExportOutlined />}
+                onClick={() => setIsExportModalVisible(true)}
+                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+              >
+                Export
+              </Button>
+
 
               <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
                 <button
@@ -501,7 +530,7 @@ const PenalityandAdjustmentList = () => {
                 {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
-                    onClick={()=> handleDownloadPDF(pdfRef,selectedReturnInvoice)}
+                    onClick={() => handleDownloadPDF(pdfRef, selectedReturnInvoice)}
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                   >
                     Download PDF
