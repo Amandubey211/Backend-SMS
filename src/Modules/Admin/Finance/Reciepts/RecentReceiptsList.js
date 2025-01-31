@@ -33,6 +33,7 @@ import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
+import { sendEmail } from "../../../../Store/Slices/Common/SendEmail/sendEmailThunk";
 
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
@@ -47,6 +48,11 @@ const RecentReceiptsList = () => {
     (state) => state.admin.receipts || {}
   );
 
+
+  const { loading: emailLoading, successMessage, emailError } = useSelector(
+    (state) => state.common.sendEmail
+  );
+  
   // Basic states
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -125,6 +131,34 @@ const RecentReceiptsList = () => {
     });
   };
 
+
+  // --- Handle Send Email ---
+  const handleSendEmail = async (record) => {
+    if (!record.receiptNumber) {
+      toast.error("Invalid receipt ID.");
+      return;
+    }
+  
+    try {
+      const result = await dispatch(
+        sendEmail({
+          id: record.receiptNumber,
+          type: "receipt",
+        })
+      );
+  
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success("Email sent successfully!");
+      } else {
+        toast.error(result.payload || "Failed to send email.");
+      }
+    } catch (err) {
+      toast.error("Error sending email.");
+    }
+  };
+  
+
+
   // --- Delete receipt ---
   const handleDeleteReceipt = async (record) => {
     const confirmDelete = window.confirm(
@@ -153,10 +187,10 @@ const RecentReceiptsList = () => {
 
 
 
-// --- Download PDF from preview ---
-const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
-  await downloadPDF(pdfRef,selectedReceipt,"Receipt")
-}
+  // --- Download PDF from preview ---
+  const handleDownloadPDF = async (pdfRef, selectedReceipt) => {
+    await downloadPDF(pdfRef, selectedReceipt, "Receipt")
+  }
 
 
 
@@ -251,9 +285,10 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
       </Menu.Item>
 
       {/* 4) Send Mail */}
-      <Menu.Item key="4" onClick={() => toast.success("Send Mail clicked!")}>
+      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
         <MailOutlined /> Send Mail
       </Menu.Item>
+
     </Menu>
   );
 
@@ -402,15 +437,15 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           </div>
 
           <div className="flex items-center space-x-4">
-          
-              <button
-                className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
-                onClick={() => setExportModalOpen(true)}
-              >
-                <ExportOutlined className="text-sm" /> {/* Export Icon */}
-                <span>Export</span> {/* Button text */}
-              </button>
-         
+
+            <button
+              className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
+              onClick={() => setExportModalOpen(true)}
+            >
+              <ExportOutlined className="text-sm" /> {/* Export Icon */}
+              <span>Export</span> {/* Button text */}
+            </button>
+
 
             <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT} >
               <button
@@ -429,7 +464,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
           <div style={{ textAlign: "center", padding: "16px" }}>
             <Spinner />
           </div>
-        )  : (
+        ) : (
           // Render Table and Custom Pagination
           <>
             {/* Table */}
@@ -568,7 +603,7 @@ const handleDownloadPDF=async (pdfRef,selectedReceipt)=>{
               {/* Download PDF button */}
               <button
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                onClick={()=>handleDownloadPDF(pdfRef,selectedReceipt)}
+                onClick={() => handleDownloadPDF(pdfRef, selectedReceipt)}
               >
                 Download PDF
               </button>
