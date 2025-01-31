@@ -88,7 +88,25 @@ const DropdownCard = ({
           aria-labelledby={`label-${id}`}
         >
           {options?.map((item, index) => (
-            <ProtectedAction requiredPermission={PERMISSIONS[`ADD_NEW_${item?.split(/[\s-]/)[0]}_REVENUE`]}>
+          name == "category" ?   <ProtectedAction requiredPermission={PERMISSIONS[`ADD_NEW_${item?.split(/[\s-]/)[0]}_REVENUE`]}>
+           <li
+              key={index}
+              className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
+                item === value ? "bg-pink-200 font-bold text-gray-900" : ""
+              }`}
+              onClick={() => onSelect(item)}
+              role="option"
+              aria-selected={item === value}
+              tabIndex={0} // Make focusable
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  onSelect(item);
+                }
+              }}
+            >
+              {item} 
+            </li>
+          </ProtectedAction>:
             <li
               key={index}
               className={`px-3 py-2 hover:bg-pink-100 cursor-pointer text-sm ${
@@ -106,7 +124,7 @@ const DropdownCard = ({
             >
               {item}
             </li>
-            </ProtectedAction>
+            
           ))}
         </motion.ul>
       )}

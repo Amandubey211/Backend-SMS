@@ -52,7 +52,7 @@ const SingleStudent = () => {
   return (
     <Layout title="Student Details">
       <DashLayout>
-      <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_STUDENT_INFO}>
+      
         <div className="flex gap-2   ">
           <div className="flex flex-col  h-auto w-[25%]">
             <StudentProfile student={student} />
@@ -74,7 +74,7 @@ const SingleStudent = () => {
             <div className="w-full">{renderContent()}</div>
           </div>
         </div>
-        </ProtectedSection>
+     
       </DashLayout>
     </Layout>
   );

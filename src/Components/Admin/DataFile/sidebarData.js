@@ -89,14 +89,14 @@ const sidebarData = [
         title: "Finance",
         icon: <MdManageAccounts />,
         path: "/users/accountants",
-        roles: [ROLES.ADMIN],
+        roles: [ROLES.ADMIN,ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_ACCOUNTANTS, // Added permission reference
       },
       {
         title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
-        roles: [ROLES.ADMIN, ROLES.LIBRARIAN],
+        roles: [ROLES.ADMIN, ROLES.LIBRARIAN ,ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_LIBRARIANS, // Added permission reference
       },
       {

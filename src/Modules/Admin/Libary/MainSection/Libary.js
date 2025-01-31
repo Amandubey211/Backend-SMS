@@ -35,7 +35,7 @@ const LibraryAndBookIssue = () => {
     if (!books?.length) dispatch(fetchBooksDetailsThunk());
     if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
     if (!classList?.length) dispatch(fetchAllClasses());
-    if (!StudentList?.length) dispatch(fetchAllStudents());
+   // if (!StudentList?.length) dispatch(fetchAllStudents());
   }, [
     dispatch,
     books?.length,

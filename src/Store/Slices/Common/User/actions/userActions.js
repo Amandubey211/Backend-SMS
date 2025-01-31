@@ -80,4 +80,18 @@ export const updateAdminProfile = createAsyncThunk ("User/updateAdmin",
     }
   }
   )
+export const updateSchoolLogo = createAsyncThunk ("User/updateSchoolLogo",
+  async(data,{rejectWithValue,dispatch})=>{
+    try {
+      dispatch(setShowError(false));
+      const response = await customRequest('put',`/student_diwan/update_school/${data.schoolId}`,data, 
+        {"Content-Type": "multipart/form-data"}
+      );
+      return response;
+    } catch (error) {
+      toast.error('Something is wrong')
+      return handleError(error,dispatch,rejectWithValue)
+    }
+  }
+  )
 
