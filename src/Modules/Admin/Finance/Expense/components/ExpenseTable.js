@@ -1,4 +1,6 @@
-import React, { useEffect, useCallback } from "react";
+// src/Modules/Admin/Finance/Components/ExpenseTable.jsx
+
+import React, { useEffect, useCallback, useMemo } from "react";
 import { Table, Spin, Button, Tooltip, Tag } from "antd";
 import {
   DollarOutlined,
@@ -50,6 +52,10 @@ const ExpenseTable = () => {
     navigate("/finance/expenses/total-expense-list");
   };
 
+  // Formatting function for dates
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString() : "N/A";
+
   // Define table columns with fixed widths and ellipsis
   const columns = [
     {
@@ -65,6 +71,15 @@ const ExpenseTable = () => {
       dataIndex: "subCategory",
       key: "subCategory",
       render: (text) => <span className="text-xs capitalize">{text}</span>,
+      width: 150,
+      ellipsis: true,
+    },
+    // New Expense Date Column (Third Position)
+    {
+      title: "Expense Date",
+      dataIndex: "expenseDate",
+      key: "expenseDate",
+      render: (date) => <span className="text-xs">{formatDate(date)}</span>,
       width: 150,
       ellipsis: true,
     },
@@ -146,16 +161,21 @@ const ExpenseTable = () => {
   ];
 
   // Transform expenses data to table dataSource and limit to 5 records
-  const dataSource = expenses?.slice(0, 5).map((expense) => ({
-    key: expense._id,
-    category: expense.category?.categoryName || "",
-    subCategory: expense.subcategory || "",
-    paymentType: expense.paymentType || "N/A",
-    paymentStatus: expense.paymentStatus || "N/A",
-    finalAmount: expense.finalAmount || 0,
-    paidAmount: expense.paidAmount || 0,
-    remainingAmount: expense.remainingAmount || 0,
-  }));
+  const dataSource = useMemo(
+    () =>
+      expenses?.slice(0, 5).map((expense) => ({
+        key: expense._id,
+        category: expense.category?.categoryName || "N/A",
+        subCategory: expense.subcategory || "N/A",
+        paymentType: expense.paymentType || "N/A",
+        paymentStatus: expense.paymentStatus || "N/A",
+        finalAmount: expense.finalAmount || 0,
+        paidAmount: expense.paidAmount || 0,
+        remainingAmount: expense.remainingAmount || 0,
+        expenseDate: expense.createdAt || "N/A", // Mapped from createdAt
+      })),
+    [expenses]
+  );
 
   return (
     <div className="bg-white p-4 rounded-lg space-y-4 mt-3">
@@ -174,7 +194,6 @@ const ExpenseTable = () => {
       </div>
 
       {/* Loading Indicator */}
-
       {!loading && expenses.length === 0 && !error && (
         <div className="text-center text-gray-500 text-xs py-4">
           No records found.
@@ -191,9 +210,6 @@ const ExpenseTable = () => {
         size="small"
         tableLayout="fixed" // Fixed table layout
         loading={loading} // Show spinner on loading
-        // locale={{
-        //   emptyText: "No Data Found", // Default message for empty table
-        // }}
       />
     </div>
   );
