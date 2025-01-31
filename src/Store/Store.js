@@ -8,7 +8,7 @@ import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing 
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
-import sendEmailReducer from "./Slices/Common/SendEmail/sendEmailSlice";
+import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";

@@ -39,7 +39,7 @@ import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSu
 import SelectInput from "../Components/SelectInput"; // Ensure correct import path
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
-import { sendEmail } from "../../../../../../Store/Slices/Common/SendEmail/sendEmailThunk";
+import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 
