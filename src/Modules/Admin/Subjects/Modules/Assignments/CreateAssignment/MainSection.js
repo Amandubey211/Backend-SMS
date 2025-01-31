@@ -185,7 +185,6 @@ const MainSection = ({ setIsEditing }) => {
         requiredPermission={
           PERMISSIONS.CREATE_ASSIGNMENT || PERMISSIONS.UPDATE_ASSIGNMENT
         }
-        aman={true}
       >
         <div className="w-full flex h-full">
           {/* Prevent unnecessary re-renders by memoizing */}

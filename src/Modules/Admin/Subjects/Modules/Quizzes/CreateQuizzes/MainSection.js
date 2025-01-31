@@ -419,7 +419,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
             PERMISSIONS.UPDATE_QUESTION_IN_QUIZ ||
             PERMISSIONS.ADD_QUESTION_TO_QUIZ
           }
-          aman={true}
         >
           <QuestionForm
             question={question} // Pass question state here

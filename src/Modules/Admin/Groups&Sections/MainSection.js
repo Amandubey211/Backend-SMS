@@ -41,8 +41,6 @@ const MainSection = () => {
   // Handle section change
   useEffect(() => {
     if (activeSection != "Everyone" && activeSectionId) {
-      
-      
       dispatch(
         fetchGroupsByClassAndSection({
           classId: cid,
@@ -58,7 +56,7 @@ const MainSection = () => {
   const handleSectionChange = useCallback((section, sectionId) => {
     setActiveSection(section);
     setActiveSectionId(sectionId);
-   // dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
+    // dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
   }, []);
 
   const onSeeGradeClick = (student) => {
@@ -80,25 +78,28 @@ const MainSection = () => {
   };
 
   return (
-    
     <div className="flex flex-col h-screen">
       <ProtectedAction requiredPermission={PERMISSIONS.SECTION_BY_CLASS}>
-      <NavigationBar
-        onSectionChange={handleSectionChange}
-        selectedSection={activeSection}
-      />
+        <NavigationBar
+          onSectionChange={handleSectionChange}
+          selectedSection={activeSection}
+        />
       </ProtectedAction>
       <div className="flex flex-grow">
-      <div className="w-80 h-full flex-shrink-0">
-        <ProtectedSection requiredPermission={PERMISSIONS.UNASSIGNED_STUDENTS} title={"Unassigned Student"}>
-     
-          <UnAssignedStudentList />
-        
-        </ProtectedSection>
+        <div className="w-80 h-full flex-shrink-0">
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.UNASSIGNED_STUDENTS}
+            title={"Unassigned Student"}
+          >
+            <UnAssignedStudentList />
+          </ProtectedSection>
         </div>
         <div className="flex-grow h-full border-l">
-        <ProtectedSection requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION} title={"Groups"}>
-          <GroupList onSeeGradeClick={onSeeGradeClick} />
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION}
+            title={"Groups"}
+          >
+            <GroupList onSeeGradeClick={onSeeGradeClick} />
           </ProtectedSection>
         </div>
 
@@ -109,7 +110,6 @@ const MainSection = () => {
         />
       </div>
     </div>
-  
   );
 };
 

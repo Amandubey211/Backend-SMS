@@ -41,12 +41,32 @@ const studentSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchStudentsByClassAndSectionNames.fulfilled, (state, action) => {
+      .addCase(
+        fetchStudentsByClassAndSectionNames.fulfilled,
+        (state, action) => {
+          state.loading = false;
+          console.log(action.payload, "kkk");
+          state.studentsList = action.payload;
+        }
+      )
+
+      .addCase(
+        fetchStudentsByClassAndSectionNames.rejected,
+        (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        }
+      )
+
+      .addCase(fetchStudentsByClassAndSection.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStudentsByClassAndSection.fulfilled, (state, action) => {
         state.loading = false;
         state.studentsList = action.payload;
       })
-      
-      .addCase(fetchStudentsByClassAndSectionNames.rejected, (state, action) => {
+      .addCase(fetchStudentsByClassAndSection.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

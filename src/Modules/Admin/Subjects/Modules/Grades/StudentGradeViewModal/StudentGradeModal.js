@@ -103,7 +103,6 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
             </div>
             <ProtectedSection
               requiredPermission={PERMISSIONS.GRADES_OF_ONE_STUDENT}
-              aman={true}
               title={"Student Grades"}
             >
               <div className="flex w-full">
