@@ -203,12 +203,12 @@ export const PERMISSIONS = {
 
   // TimeTable 4
   // Common
-  TIMETABLE_VIEW: "Get Teacher Timetable",
+  TIMETABLE_VIEW: "Timetable View",
 
   // Other Staff
-  TIMETABLE_CREATE: "Create Timetable", // not working
-  TIMETABLE_UPDATE: "Update Timetable", // not working
-  TIMETABLE_DELETE: "Delete Timetable", // not working
+  TIMETABLE_CREATE: "Timetable Create", // not working now
+  TIMETABLE_UPDATE: "Timetable Update", // not working now
+  TIMETABLE_DELETE: "Timetable Remove", // not working now
 
   // Notices 5
   // Common
