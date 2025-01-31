@@ -49,7 +49,7 @@ export const PERMISSIONS = {
   EDIT_ISSUE_BOOK: "Make changes in Issue Book",
   VIEW_STUDENT_BY_SECTION_AND_CLASS: "View Students By Class And Section", //NW
   //  VIEW_SECTIONS:"View Sections",
-  VIEW_STUDENT: "View Students",
+  VIEW_STUDENT: "Get All Students",
   VIEW_PARENT: "View Parents",
 
   // Finance 3
@@ -526,7 +526,7 @@ export const PERMISSIONS = {
   // Parent View
   
   //VIEW_STUDENT: "View Student",
-  SHOWS_PARENT_STUDENT_INFO: "Shows Student Info",
+  SHOWS_PARENT_STUDENT_INFO: "Get All Students",
 
   // Teacher View
 
