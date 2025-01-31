@@ -33,11 +33,12 @@ import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
-import { sendEmail } from "../../../../Store/Slices/Common/SendEmail/sendEmailThunk";
+
 
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 import { downloadPDF } from "../../../../Utils/xl";
+import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 
 
 const RecentReceiptsList = () => {
