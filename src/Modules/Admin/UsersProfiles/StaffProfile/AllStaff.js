@@ -154,7 +154,9 @@ const AllStaff = () => {
       case "editStaff":
         return <AddUser role="staff" data={staffData} />;
       case "createRole":
-        return <CreateRole onClose={handleSidebarClose} department="Staff" />;
+        return (
+          <CreateRole onClose={handleSidebarClose} department="otherStaff" />
+        );
       default:
         return <div>{t("Select an action")}</div>;
     }
