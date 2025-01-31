@@ -391,8 +391,6 @@ const TotalExpenseList = () => {
     [selectedRowKey, expenseIdMap]
   );
 
-  console.log("expense data:-", expenses);
-
   // Transform expense data for export
   const transformExpenseData = (expenses) =>
 
@@ -417,8 +415,7 @@ const TotalExpenseList = () => {
       staffType: expense?.staffType || "N/A",
       ...expense,
     })) || [expenses];
-
-
+    
   // Map expenses to data source with camelCase fields
   const dataSource = useMemo(
     () =>
@@ -549,11 +546,8 @@ const TotalExpenseList = () => {
             </div>
 
             {/* Header Section */}
-    <div className="flex items-center gap-4 ms-4">
-
             <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-4 my-2">
               <div className="flex items-center gap-4 ms-1">
-
                 <Input
                   placeholder="Search by Description"
                   prefix={<SearchOutlined />}
@@ -567,9 +561,7 @@ const TotalExpenseList = () => {
                   }}
                 />
               </div>
-
               <div className="flex flex-wrap items-center gap-2 ">
-
                 {selectedRowKey && (
                   <Tooltip title="Create an invoice for the selected unpaid record">
                     <Button
