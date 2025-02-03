@@ -1,7 +1,55 @@
-import React, { memo, useState, useRef, useCallback, useMemo } from "react";
+import React, {
+  memo,
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react";
 import JoditEditor from "jodit-react";
-import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import useCloudinaryMediaUpload from "../../../../Hooks/CommonHooks/useCloudinaryMediaUpload";
+import useCloudinaryDeleteByToken from "../../../../Hooks/CommonHooks/useCloudinaryDeleteByToken";
+
+// Helper to create a non‑editable image wrapper with an inline-styled delete button
+function createImageWrapper(imageUrl, publicId, deleteToken) {
+  return `
+    <div class="uploaded-image-wrapper" 
+         data-public-id="${publicId}" 
+         data-delete-token="${deleteToken}"
+         contenteditable="false" 
+         style="position: relative; display: inline-block; margin: 5px;">
+      <img src="${imageUrl}" alt="Uploaded Image" style="max-width:100%; display:block; border-radius:8px;" />
+      <button class="delete-btn" 
+              style="position: absolute; top: 5px; right: 5px; width:24px; height:24px; border-radius:50%; background: rgba(0,0,0,0.6); color: #fff; border: none; font-size:16px; line-height:24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s;"
+              onmouseover="this.style.background='rgba(0,0,0,0.8)'"
+              onmouseout="this.style.background='rgba(0,0,0,0.6)'">
+        &times;
+      </button>
+    </div>
+  `;
+}
+
+// Helper to create a non‑editable file (PDF) wrapper with an inline-styled delete button
+function createFileWrapper(fileUrl, publicId, deleteToken) {
+  return `
+    <div class="uploaded-file-wrapper" 
+         data-public-id="${publicId}" 
+         data-delete-token="${deleteToken}"
+         contenteditable="false" 
+         style="position: relative; display: inline-block; margin: 5px;">
+      <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; padding: 8px 16px; background-color: #C71585; color: #fff; border-radius: 4px; text-decoration: none; font-weight: bold;">
+        📄 View PDF
+      </a>
+      <button class="delete-btn" 
+              style="position: absolute; top: 5px; right: 5px; width:24px; height:24px; border-radius:50%; background: rgba(0,0,0,0.6); color: #fff; border: none; font-size:16px; line-height:24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s;"
+              onmouseover="this.style.background='rgba(0,0,0,0.8)'"
+              onmouseout="this.style.background='rgba(0,0,0,0.6)'">
+        &times;
+      </button>
+    </div>
+  `;
+}
 
 const EditorComponent = ({
   assignmentLabel,
@@ -14,208 +62,291 @@ const EditorComponent = ({
   isCreateQuestion,
 }) => {
   const editor = useRef(null);
+  const containerRef = useRef(null); // Holds the editor container for global events
   const [scrollPosition, setScrollPosition] = useState(0);
+  // Set to track delete tokens that have already been processed (to avoid duplicate deletion calls)
+  const processedDeletions = useRef(new Set());
 
-  // Function to create and show a custom progress bar below the toolbar
-  const showProgressBar = (editorInstance) => {
-    const toolbar = editorInstance.toolbar.container;
+  const { uploadImage, uploadFile } = useCloudinaryMediaUpload();
+  const { deleteMediaByToken } = useCloudinaryDeleteByToken();
+
+  // ---------- Progress Bar Helpers ----------
+  // Creates a progress bar inside a given parent element.
+  const showProgressBar = useCallback((parentElement) => {
     const progressBarContainer = document.createElement("div");
     progressBarContainer.style.position = "relative";
     progressBarContainer.style.top = "0";
     progressBarContainer.style.left = "0";
     progressBarContainer.style.width = "100%";
     progressBarContainer.style.height = "5px";
-    progressBarContainer.style.backgroundColor = "#f0f0f0"; // Lighter background color for contrast
-
+    progressBarContainer.style.backgroundColor = "#f0f0f0";
     const progressBar = document.createElement("div");
     progressBar.style.width = "0%";
     progressBar.style.height = "100%";
-    progressBar.style.backgroundColor = "#C71585"; // Dark pink color
+    progressBar.style.backgroundColor = "#C71585";
     progressBar.style.transition = "width 0.3s";
-
     progressBarContainer.appendChild(progressBar);
-    toolbar.parentNode.insertBefore(progressBarContainer, toolbar.nextSibling);
+    parentElement.appendChild(progressBarContainer);
+    return { progressBar, progressBarContainer };
+  }, []);
 
-    return progressBar;
-  };
-
-  // Function to update the progress bar
-  const updateProgressBar = (progressBar, percentage) => {
+  const updateProgressBar = useCallback((progressBar, percentage) => {
     if (progressBar) {
       progressBar.style.width = `${percentage}%`;
     }
-  };
+  }, []);
 
-  // Function to remove the progress bar
-  const removeProgressBar = (editorInstance, progressBar) => {
-    if (progressBar) {
-      progressBar.style.width = "100%";
-      setTimeout(() => {
-        if (progressBar.parentNode) {
-          progressBar.parentNode.remove();
-        }
-      }, 500);
+  const removeProgressBar = useCallback((progressBarContainer) => {
+    if (progressBarContainer && progressBarContainer.parentNode) {
+      progressBarContainer.parentNode.removeChild(progressBarContainer);
     }
-  };
+  }, []);
 
-  // Handle image upload with progress bar
+  // ---------- Upload Handlers ----------
   const handleImageUpload = useCallback(
     async (file) => {
       if (!file) return;
-
       const editorInstance = editor.current;
-      let progressBar;
-
-      // Save the current scroll position
+      let progressBarObj;
       setScrollPosition(window.scrollY);
-
-      if (editorInstance) {
-        progressBar = showProgressBar(editorInstance); // Show custom progress bar below toolbar
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
-      formData.append("folder", "assignments"); // Specify folder name
-
-      try {
-        const response = await axios.post(
-          process.env.REACT_APP_CLOUDINARY_URL,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-            onUploadProgress: (progressEvent) => {
-              const percentage = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              updateProgressBar(progressBar, percentage); // Update progress bar
-            },
-          }
+      if (
+        editorInstance &&
+        editorInstance.toolbar &&
+        editorInstance.toolbar.container
+      ) {
+        // Show upload progress bar above the editor (same as upload progress)
+        progressBarObj = showProgressBar(
+          editorInstance.toolbar.container.parentNode
         );
-
-        if (response.data.secure_url) {
-          const imageUrl = response.data.secure_url;
-          const imgHTML = `<img src="${imageUrl}" alt="Uploaded Image" />`;
+      }
+      try {
+        const response = await uploadImage(file, (progressEvent) => {
+          const percentage = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          if (progressBarObj)
+            updateProgressBar(progressBarObj.progressBar, percentage);
+        });
+        if (
+          response.secure_url &&
+          response.public_id &&
+          response.delete_token
+        ) {
+          const imgHTML = createImageWrapper(
+            response.secure_url,
+            response.public_id,
+            response.delete_token
+          );
           editorInstance.selection.insertHTML(imgHTML);
           toast.success("Image Uploaded Successfully");
         } else {
-          toast.error("Image upload failed. No secure URL returned.");
+          toast.error("Image upload failed. Missing data in response.");
         }
       } catch (error) {
-        console.error("Error uploading image to Cloudinary", error);
         toast.error("Error uploading image. Please try again.");
       } finally {
-        if (editorInstance) {
-          removeProgressBar(editorInstance, progressBar); // Remove progress bar
-        }
-        window.scrollTo(0, scrollPosition); // Restore the scroll position
+        if (progressBarObj)
+          removeProgressBar(progressBarObj.progressBarContainer);
+        window.scrollTo(0, scrollPosition);
       }
     },
-    [scrollPosition]
+    [
+      uploadImage,
+      removeProgressBar,
+      showProgressBar,
+      updateProgressBar,
+      scrollPosition,
+    ]
   );
 
-  // Handle PDF file upload with progress bar and styled link
   const handleFileUpload = useCallback(
     async (file) => {
       if (!file) return;
-
       const editorInstance = editor.current;
-      let progressBar;
-
-      // Save the current scroll position
+      let progressBarObj;
       setScrollPosition(window.scrollY);
-
-      if (editorInstance) {
-        progressBar = showProgressBar(editorInstance); // Show custom progress bar below toolbar
-      }
-
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
-      formData.append("folder", "assignments"); // Specify folder name
-
-      try {
-        const response = await axios.post(
-          process.env.REACT_APP_CLOUDINARY_URL,
-          formData,
-          {
-            headers: { "Content-Type": "multipart/form-data" },
-            onUploadProgress: (progressEvent) => {
-              const percentage = Math.round(
-                (progressEvent.loaded * 100) / progressEvent.total
-              );
-              updateProgressBar(progressBar, percentage); // Update progress bar
-            },
-          }
+      if (
+        editorInstance &&
+        editorInstance.toolbar &&
+        editorInstance.toolbar.container
+      ) {
+        progressBarObj = showProgressBar(
+          editorInstance.toolbar.container.parentNode
         );
-
-        if (response.data.secure_url) {
-          const fileUrl = response.data.secure_url;
-
-          // Enhanced styled PDF link
-          const pdfLink = `
-            <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" style="
-              display: inline-flex;
-              align-items: center;
-              padding: 8px 16px;
-              background-color: #C71585;
-              color: #fff;
-              border-radius: 4px;
-              text-decoration: none;
-              font-weight: bold;
-              margin: 10px 0;
-            ">
-              📄 View PDF
-            </a>
-          `;
-
-          editorInstance.selection.insertHTML(pdfLink);
+      }
+      try {
+        const response = await uploadFile(file, (progressEvent) => {
+          const percentage = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          if (progressBarObj)
+            updateProgressBar(progressBarObj.progressBar, percentage);
+        });
+        if (
+          response.secure_url &&
+          response.public_id &&
+          response.delete_token
+        ) {
+          const fileHTML = createFileWrapper(
+            response.secure_url,
+            response.public_id,
+            response.delete_token
+          );
+          editorInstance.selection.insertHTML(fileHTML);
           toast.success("PDF Uploaded Successfully");
         } else {
-          toast.error("File upload failed. No secure URL returned.");
+          toast.error("File upload failed. Missing data in response.");
         }
       } catch (error) {
-        console.error("Error uploading PDF to Cloudinary", error);
         toast.error("Error uploading file. Please try again.");
       } finally {
-        if (editorInstance) {
-          removeProgressBar(editorInstance, progressBar); // Remove progress bar
-        }
-        window.scrollTo(0, scrollPosition); // Restore the scroll position
+        if (progressBarObj)
+          removeProgressBar(progressBarObj.progressBarContainer);
+        window.scrollTo(0, scrollPosition);
       }
     },
-    [scrollPosition]
+    [
+      uploadFile,
+      removeProgressBar,
+      showProgressBar,
+      updateProgressBar,
+      scrollPosition,
+    ]
   );
 
-  // Trigger image upload
   const triggerImageUpload = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
     input.onchange = (e) => {
       const file = e.target.files[0];
-      if (file) {
-        handleImageUpload(file);
-      }
+      if (file) handleImageUpload(file);
     };
     input.click();
   }, [handleImageUpload]);
 
-  // Trigger PDF upload
   const triggerFileUpload = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "application/pdf";
     input.onchange = (e) => {
       const file = e.target.files[0];
-      if (file) {
-        handleFileUpload(file);
-      }
+      if (file) handleFileUpload(file);
     };
     input.click();
   }, [handleFileUpload]);
 
-  // Jodit Editor Configuration
+  // ---------- Deletion Handler Using Delete Token ----------
+  // When the delete button is clicked, show the deletion progress bar above the editor (same as upload)
+  const handleDeleteClick = useCallback(
+    async (e) => {
+      if (e.target.classList.contains("delete-btn")) {
+        e.stopPropagation();
+        const wrapper =
+          e.target.closest(".uploaded-image-wrapper") ||
+          e.target.closest(".uploaded-file-wrapper");
+        if (wrapper) {
+          const deleteToken = wrapper.getAttribute("data-delete-token");
+          if (!deleteToken || processedDeletions.current.has(deleteToken)) {
+            return;
+          }
+          let progressBarObj;
+          const editorInstance = editor.current;
+          if (
+            editorInstance &&
+            editorInstance.toolbar &&
+            editorInstance.toolbar.container
+          ) {
+            // Show deletion progress bar above the editor
+            progressBarObj = showProgressBar(
+              editorInstance.toolbar.container.parentNode
+            );
+          }
+          try {
+            const data = await deleteMediaByToken(deleteToken);
+            if (data.result === "ok") {
+              if (progressBarObj)
+                updateProgressBar(progressBarObj.progressBar, 100);
+              processedDeletions.current.add(deleteToken);
+              setTimeout(() => {
+                if (progressBarObj)
+                  removeProgressBar(progressBarObj.progressBarContainer);
+                wrapper.remove();
+              }, 500);
+              toast.success("Asset deleted successfully");
+            } else {
+              if (progressBarObj)
+                updateProgressBar(progressBarObj.progressBar, 100);
+              setTimeout(() => {
+                if (progressBarObj)
+                  removeProgressBar(progressBarObj.progressBarContainer);
+              }, 500);
+              toast.error("Failed to delete asset");
+            }
+          } catch (error) {
+            if (progressBarObj)
+              updateProgressBar(progressBarObj.progressBar, 100);
+            setTimeout(() => {
+              if (progressBarObj)
+                removeProgressBar(progressBarObj.progressBarContainer);
+            }, 500);
+            toast.error("Error deleting asset. Please try again.");
+          }
+        }
+      }
+    },
+    [deleteMediaByToken, removeProgressBar, showProgressBar, updateProgressBar]
+  );
+
+  // ---------- MutationObserver for Manual Removal ----------
+  // If a non‑editable asset wrapper is manually removed, trigger deletion silently.
+  useEffect(() => {
+    if (containerRef.current) {
+      const observer = new MutationObserver((mutationsList) => {
+        mutationsList.forEach((mutation) => {
+          mutation.removedNodes.forEach((node) => {
+            if (node.nodeType === 1) {
+              if (
+                node.classList.contains("uploaded-image-wrapper") ||
+                node.classList.contains("uploaded-file-wrapper")
+              ) {
+                const deleteToken = node.getAttribute("data-delete-token");
+                if (
+                  deleteToken &&
+                  !processedDeletions.current.has(deleteToken)
+                ) {
+                  deleteMediaByToken(deleteToken)
+                    .then((data) => {
+                      if (data.result === "ok") {
+                        processedDeletions.current.add(deleteToken);
+                        toast.success(
+                          "Asset deleted successfully (manual removal)"
+                        );
+                      } else {
+                        toast.error("Failed to delete asset (manual removal)");
+                      }
+                    })
+                    .catch((error) => {
+                      console.error("Error during manual deletion:", error);
+                      toast.error(
+                        "Error deleting asset (manual removal). Please try again."
+                      );
+                    });
+                }
+              }
+            }
+          });
+        });
+      });
+      observer.observe(containerRef.current, {
+        childList: true,
+        subtree: true,
+      });
+      return () => observer.disconnect();
+    }
+  }, [deleteMediaByToken]);
+
+  // ---------- Jodit Editor Configuration ----------
   const config = useMemo(
     () => ({
       readonly: false,
@@ -253,12 +384,12 @@ const EditorComponent = ({
         {
           name: "image",
           tooltip: "Upload Image",
-          exec: triggerImageUpload, // Image upload logic
+          exec: triggerImageUpload,
         },
         {
           name: "file",
           tooltip: "Upload File (PDF)",
-          exec: triggerFileUpload, // PDF upload logic
+          exec: triggerFileUpload,
         },
         "video",
         "link",
@@ -272,11 +403,29 @@ const EditorComponent = ({
         },
         afterInit: (editorInstance) => {
           editor.current = editorInstance;
+          containerRef.current = editorInstance.container;
+          if (containerRef.current) {
+            containerRef.current.addEventListener("click", handleDeleteClick);
+          }
         },
       },
     }),
-    [isCreateQuestion, onEditorChange, triggerImageUpload, triggerFileUpload]
+    [
+      isCreateQuestion,
+      onEditorChange,
+      triggerImageUpload,
+      triggerFileUpload,
+      handleDeleteClick,
+    ]
   );
+
+  useEffect(() => {
+    return () => {
+      if (containerRef.current) {
+        containerRef.current.removeEventListener("click", handleDeleteClick);
+      }
+    };
+  }, [handleDeleteClick]);
 
   return (
     <div className="relative w-full bg-white mb-3 p-2">
@@ -298,7 +447,6 @@ const EditorComponent = ({
           </div>
         </div>
       )}
-
       <JoditEditor
         ref={editor}
         value={editorContent}
