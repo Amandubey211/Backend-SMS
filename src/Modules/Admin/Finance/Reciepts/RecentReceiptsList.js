@@ -33,10 +33,8 @@ import { PERMISSIONS } from "../../../../config/permission";
 import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
 import ExportModal from "../Earnings/Components/ExportModal";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
-
-
+import { formatDate } from "../../../../Utils/helperFunctions";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
-
 import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 
@@ -142,33 +140,68 @@ const RecentReceiptsList = () => {
     }
 
     try {
-      console.log("Dispatching sendEmail with:", {
-        id: record._id,
-        type: "receipt",
-        record: record, // ✅ Pass the entire record
-      });
+      const type = record.isCancel ? "cancelReceipt" : "receipt";
 
-      const result = await dispatch(
-        sendEmail({
-          id: record._id, // ✅ MongoDB ObjectId (String)
-          type: "receipt", // ✅ Document Type
-          record: record, // ✅ Pass full record to include all required fields
-        })
-      );
+      // ✅ Format the date properly
+      const formattedDate = formatDate(record.date, "long"); // e.g., "10 January 2025"
+
+      // ✅ Construct the payload (No unnecessary logic inside thunk)
+      const payload = {
+        receiver: {
+          email: record.receiver.email,
+          name: record.receiver?.name || "N/A",
+          address: record.receiver?.address || "N/A",
+          phone: record.receiver?.phone || "N/A",
+        },
+        schoolId: record.schoolId?._id || "N/A",
+        nameOfSchool: record.schoolId?.nameOfSchool || "N/A",
+        address: record.schoolId?.address || "N/A",
+        branchName: record.schoolId?.branchName || "N/A",
+        city: record.schoolId?.city || "N/A",
+        schoolLogo: record.schoolId?.logo || "",
+
+        receiptNumber: record.receiptNumber || "N/A",
+        invoiceNumber: record.invoiceNumber?.invoiceNumber || "N/A",
+        date: formattedDate, // ✅ Already formatted
+        govtRefNumber: record.govtRefNumber || "",
+
+        paymentMethod: record.paymentMethod || "N/A",
+        paymentStatus: record.paymentStatus || "N/A",
+
+        lineItems: record.lineItems.map((item) => ({
+          revenueType: item.revenueType || "N/A",
+          quantity: item.quantity || 1,
+          rate: item.total / (item.quantity || 1),
+          total: item.total || 0,
+        })),
+
+        totalAmount: record.totalAmount || 0,
+        tax: record.tax || 0,
+        penalty: record.penalty || 0,
+        discount: record.discount || 0,
+        discountType: record.discountType || "fixed",
+        finalAmount: record.finalAmount || 0,
+      };
+
+      console.log("Dispatching sendEmail with:", { id: record._id, type, payload });
+
+      const result = await dispatch(sendEmail({ id: record._id, type, payload }));
 
       console.log("sendEmail result:", result);
 
       if (sendEmail.fulfilled.match(result)) {
-        toast.success("Receipt email sent successfully!");
+        toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`);
       } else {
         console.error("Failed sendEmail response:", result);
-        toast.error(result.payload || "Failed to send receipt email.");
+        toast.error(result.payload || `Failed to send ${type} email.`);
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
-      toast.error("Error sending receipt email.");
+      toast.error(`Error sending email.`);
     }
   };
+
+
 
 
   // --- Delete receipt ---
