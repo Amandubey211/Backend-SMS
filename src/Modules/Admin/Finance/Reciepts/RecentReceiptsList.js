@@ -53,7 +53,7 @@ const RecentReceiptsList = () => {
   const { loading: emailLoading, successMessage, emailError } = useSelector(
     (state) => state.common.sendEmail
   );
-  
+
   // Basic states
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -136,27 +136,39 @@ const RecentReceiptsList = () => {
   // --- Handle Send Email ---
   const handleSendEmail = async (record) => {
     if (!record._id) {
-        toast.error("Invalid receipt ID.");
-        return;
+      toast.error("Invalid receipt ID.");
+      console.error("Error: Missing _id in record", record);
+      return;
     }
 
     try {
-        const result = await dispatch(
-            sendEmail({
-                id: record._id,
-                type: "receipt",
-            })
-        );
+      console.log("Dispatching sendEmail with:", {
+        id: record._id,
+        type: "receipt",
+        record: record, // ✅ Pass the entire record
+      });
 
-        if (sendEmail.fulfilled.match(result)) {
-            toast.success("Email sent successfully!");
-        } else {
-            toast.error(result.payload || "Failed to send email.");
-        }
+      const result = await dispatch(
+        sendEmail({
+          id: record._id, // ✅ MongoDB ObjectId (String)
+          type: "receipt", // ✅ Document Type
+          record: record, // ✅ Pass full record to include all required fields
+        })
+      );
+
+      console.log("sendEmail result:", result);
+
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success("Receipt email sent successfully!");
+      } else {
+        console.error("Failed sendEmail response:", result);
+        toast.error(result.payload || "Failed to send receipt email.");
+      }
     } catch (err) {
-        toast.error("Error sending email.");
+      console.error("Error in handleSendEmail:", err);
+      toast.error("Error sending receipt email.");
     }
-};
+  };
 
 
   // --- Delete receipt ---
