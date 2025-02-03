@@ -9,14 +9,15 @@ import React, {
 import JoditEditor from "jodit-react";
 import toast, { Toaster } from "react-hot-toast";
 import useCloudinaryMediaUpload from "../../../../Hooks/CommonHooks/useCloudinaryMediaUpload";
-import useCloudinaryDeleteByToken from "../../../../Hooks/CommonHooks/useCloudinaryDeleteByToken";
+import useCloudinaryDeleteByPublicId from "../../../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
 
-// Helper to create a non‑editable image wrapper with an inline-styled delete button
-function createImageWrapper(imageUrl, publicId, deleteToken) {
+// Helper to create a non‑editable image wrapper with inline CSS and an upload timestamp.
+function createImageWrapper(imageUrl, publicId) {
+  const now = Date.now();
   return `
     <div class="uploaded-image-wrapper" 
-         data-public-id="${publicId}" 
-         data-delete-token="${deleteToken}"
+         data-public-id="${publicId}"
+         data-uploaded-at="${now}"
          contenteditable="false" 
          style="position: relative; display: inline-block; margin: 5px;">
       <img src="${imageUrl}" alt="Uploaded Image" style="max-width:100%; display:block; border-radius:8px;" />
@@ -30,12 +31,13 @@ function createImageWrapper(imageUrl, publicId, deleteToken) {
   `;
 }
 
-// Helper to create a non‑editable file (PDF) wrapper with an inline-styled delete button
-function createFileWrapper(fileUrl, publicId, deleteToken) {
+// Helper to create a non‑editable file (PDF) wrapper with inline CSS and an upload timestamp.
+function createFileWrapper(fileUrl, publicId) {
+  const now = Date.now();
   return `
     <div class="uploaded-file-wrapper" 
-         data-public-id="${publicId}" 
-         data-delete-token="${deleteToken}"
+         data-public-id="${publicId}"
+         data-uploaded-at="${now}"
          contenteditable="false" 
          style="position: relative; display: inline-block; margin: 5px;">
       <a href="${fileUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; padding: 8px 16px; background-color: #C71585; color: #fff; border-radius: 4px; text-decoration: none; font-weight: bold;">
@@ -64,14 +66,16 @@ const EditorComponent = ({
   const editor = useRef(null);
   const containerRef = useRef(null); // Holds the editor container for global events
   const [scrollPosition, setScrollPosition] = useState(0);
-  // Set to track delete tokens that have already been processed (to avoid duplicate deletion calls)
+  // Set to track public_ids that have been processed for deletion (to avoid duplicate deletion calls)
   const processedDeletions = useRef(new Set());
+  // Flag to indicate if an upload is in progress
+  const uploadInProgress = useRef(false);
 
   const { uploadImage, uploadFile } = useCloudinaryMediaUpload();
-  const { deleteMediaByToken } = useCloudinaryDeleteByToken();
+  const { deleteMediaByPublicId } = useCloudinaryDeleteByPublicId();
 
   // ---------- Progress Bar Helpers ----------
-  // Creates a progress bar inside a given parent element.
+  // Creates a progress bar in the specified parent element (displayed above the editor toolbar)
   const showProgressBar = useCallback((parentElement) => {
     const progressBarContainer = document.createElement("div");
     progressBarContainer.style.position = "relative";
@@ -109,12 +113,13 @@ const EditorComponent = ({
       const editorInstance = editor.current;
       let progressBarObj;
       setScrollPosition(window.scrollY);
+      uploadInProgress.current = true;
       if (
         editorInstance &&
         editorInstance.toolbar &&
         editorInstance.toolbar.container
       ) {
-        // Show upload progress bar above the editor (same as upload progress)
+        // Show upload progress bar above the editor
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
@@ -127,15 +132,11 @@ const EditorComponent = ({
           if (progressBarObj)
             updateProgressBar(progressBarObj.progressBar, percentage);
         });
-        if (
-          response.secure_url &&
-          response.public_id &&
-          response.delete_token
-        ) {
+        if (response.secure_url && response.public_id) {
+          // Insert asset wrapper with a timestamp
           const imgHTML = createImageWrapper(
             response.secure_url,
-            response.public_id,
-            response.delete_token
+            response.public_id
           );
           editorInstance.selection.insertHTML(imgHTML);
           toast.success("Image Uploaded Successfully");
@@ -148,6 +149,7 @@ const EditorComponent = ({
         if (progressBarObj)
           removeProgressBar(progressBarObj.progressBarContainer);
         window.scrollTo(0, scrollPosition);
+        uploadInProgress.current = false;
       }
     },
     [
@@ -165,6 +167,7 @@ const EditorComponent = ({
       const editorInstance = editor.current;
       let progressBarObj;
       setScrollPosition(window.scrollY);
+      uploadInProgress.current = true;
       if (
         editorInstance &&
         editorInstance.toolbar &&
@@ -182,15 +185,10 @@ const EditorComponent = ({
           if (progressBarObj)
             updateProgressBar(progressBarObj.progressBar, percentage);
         });
-        if (
-          response.secure_url &&
-          response.public_id &&
-          response.delete_token
-        ) {
+        if (response.secure_url && response.public_id) {
           const fileHTML = createFileWrapper(
             response.secure_url,
-            response.public_id,
-            response.delete_token
+            response.public_id
           );
           editorInstance.selection.insertHTML(fileHTML);
           toast.success("PDF Uploaded Successfully");
@@ -203,6 +201,7 @@ const EditorComponent = ({
         if (progressBarObj)
           removeProgressBar(progressBarObj.progressBarContainer);
         window.scrollTo(0, scrollPosition);
+        uploadInProgress.current = false;
       }
     },
     [
@@ -236,8 +235,8 @@ const EditorComponent = ({
     input.click();
   }, [handleFileUpload]);
 
-  // ---------- Deletion Handler Using Delete Token ----------
-  // When the delete button is clicked, show the deletion progress bar above the editor (same as upload)
+  // ---------- Deletion Handler Using Public ID ----------
+  // When the delete button is clicked, display a deletion progress bar above the editor and delete the asset using its public_id.
   const handleDeleteClick = useCallback(
     async (e) => {
       if (e.target.classList.contains("delete-btn")) {
@@ -246,8 +245,9 @@ const EditorComponent = ({
           e.target.closest(".uploaded-image-wrapper") ||
           e.target.closest(".uploaded-file-wrapper");
         if (wrapper) {
-          const deleteToken = wrapper.getAttribute("data-delete-token");
-          if (!deleteToken || processedDeletions.current.has(deleteToken)) {
+          const publicId = wrapper.getAttribute("data-public-id");
+          // If no public_id or already processed, do nothing.
+          if (!publicId || processedDeletions.current.has(publicId)) {
             return;
           }
           let progressBarObj;
@@ -263,11 +263,11 @@ const EditorComponent = ({
             );
           }
           try {
-            const data = await deleteMediaByToken(deleteToken);
+            const data = await deleteMediaByPublicId(publicId);
             if (data.result === "ok") {
               if (progressBarObj)
                 updateProgressBar(progressBarObj.progressBar, 100);
-              processedDeletions.current.add(deleteToken);
+              processedDeletions.current.add(publicId);
               setTimeout(() => {
                 if (progressBarObj)
                   removeProgressBar(progressBarObj.progressBarContainer);
@@ -295,14 +295,21 @@ const EditorComponent = ({
         }
       }
     },
-    [deleteMediaByToken, removeProgressBar, showProgressBar, updateProgressBar]
+    [
+      deleteMediaByPublicId,
+      removeProgressBar,
+      showProgressBar,
+      updateProgressBar,
+    ]
   );
 
   // ---------- MutationObserver for Manual Removal ----------
-  // If a non‑editable asset wrapper is manually removed, trigger deletion silently.
+  // If an asset wrapper is manually removed (e.g. by the user editing the content), trigger deletion if it’s older than 3 seconds.
   useEffect(() => {
     if (containerRef.current) {
       const observer = new MutationObserver((mutationsList) => {
+        // Skip processing if an upload is in progress.
+        if (uploadInProgress.current) return;
         mutationsList.forEach((mutation) => {
           mutation.removedNodes.forEach((node) => {
             if (node.nodeType === 1) {
@@ -310,28 +317,35 @@ const EditorComponent = ({
                 node.classList.contains("uploaded-image-wrapper") ||
                 node.classList.contains("uploaded-file-wrapper")
               ) {
-                const deleteToken = node.getAttribute("data-delete-token");
-                if (
-                  deleteToken &&
-                  !processedDeletions.current.has(deleteToken)
-                ) {
-                  deleteMediaByToken(deleteToken)
-                    .then((data) => {
-                      if (data.result === "ok") {
-                        processedDeletions.current.add(deleteToken);
-                        toast.success(
-                          "Asset deleted successfully (manual removal)"
+                const publicId = node.getAttribute("data-public-id");
+                const uploadedAt = parseInt(
+                  node.getAttribute("data-uploaded-at"),
+                  10
+                );
+                // Only trigger deletion if the asset is older than 3 seconds.
+                if (publicId && !processedDeletions.current.has(publicId)) {
+                  const age = Date.now() - uploadedAt;
+                  if (age > 3000) {
+                    deleteMediaByPublicId(publicId)
+                      .then((data) => {
+                        if (data.result === "ok") {
+                          processedDeletions.current.add(publicId);
+                          toast.success(
+                            "Asset deleted successfully (manual removal)"
+                          );
+                        } else {
+                          toast.error(
+                            "Failed to delete asset (manual removal)"
+                          );
+                        }
+                      })
+                      .catch((error) => {
+                        console.error("Error during manual deletion:", error);
+                        toast.error(
+                          "Error deleting asset (manual removal). Please try again."
                         );
-                      } else {
-                        toast.error("Failed to delete asset (manual removal)");
-                      }
-                    })
-                    .catch((error) => {
-                      console.error("Error during manual deletion:", error);
-                      toast.error(
-                        "Error deleting asset (manual removal). Please try again."
-                      );
-                    });
+                      });
+                  }
                 }
               }
             }
@@ -344,7 +358,7 @@ const EditorComponent = ({
       });
       return () => observer.disconnect();
     }
-  }, [deleteMediaByToken]);
+  }, [deleteMediaByPublicId]);
 
   // ---------- Jodit Editor Configuration ----------
   const config = useMemo(
@@ -398,9 +412,7 @@ const EditorComponent = ({
         "print",
       ],
       events: {
-        change: (newContent) => {
-          onEditorChange(newContent);
-        },
+        change: (newContent) => onEditorChange(newContent),
         afterInit: (editorInstance) => {
           editor.current = editorInstance;
           containerRef.current = editorInstance.container;

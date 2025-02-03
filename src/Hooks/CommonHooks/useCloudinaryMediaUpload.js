@@ -8,9 +8,7 @@ function useCloudinaryMediaUpload() {
       formData.append("file", file);
       formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
       formData.append("folder", "assignments");
-      // Request that Cloudinary return a delete token.
-      formData.append("return_delete_token", "1");
-
+      // We are not using return_delete_token in this approach
       const response = await axios.post(
         process.env.REACT_APP_CLOUDINARY_URL,
         formData,
@@ -36,8 +34,6 @@ function useCloudinaryMediaUpload() {
       formData.append("file", file);
       formData.append("upload_preset", process.env.REACT_APP_CLOUDINARY_PRESET);
       formData.append("folder", "assignments");
-      formData.append("return_delete_token", "1");
-
       const response = await axios.post(
         process.env.REACT_APP_CLOUDINARY_URL,
         formData,
