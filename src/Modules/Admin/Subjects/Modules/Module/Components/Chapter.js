@@ -213,7 +213,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
               aria-label="Options Menu"
             >
               <ul>
-                <ProtectedAction requiredPermission={PERMISSIONS.EDIT_CHAPTER}>
+                
                   <li
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
                     onClick={(e) => {
@@ -225,7 +225,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                   >
                     <FaPen className="mr-2" /> Edit
                   </li>
-                </ProtectedAction>
+               
                 <ProtectedAction
                   requiredPermission={PERMISSIONS.DELETE_CHAPTER}
                 >
@@ -257,7 +257,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
       {/* Chapter Content */}
       {chapterExpanded && (
-        <ProtectedSection title="Chapters" requiredPermission="View Chapters">
+        
           <div
             id={`chapter-content-${chapterId}`}
             className="mt-2 transition-all duration-300 ease-in-out"
@@ -292,7 +292,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                             </div>
                           </div>
                           <div className="flex items-center space-x-2">
-                            <ProtectedAction requiredPermission={"dd"}>
+                        
                               <button
                                 onClick={() =>
                                   openPreviewModal(
@@ -305,7 +305,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                               >
                                 <FaEye size={20} />
                               </button>
-                            </ProtectedAction>
+                         
 
                             <ProtectedAction
                               requiredPermission={
@@ -393,7 +393,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
               </div>
             </div>
           </div>
-        </ProtectedSection>
+      
       )}
 
       {/* Delete Modal for Chapter */}

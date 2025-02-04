@@ -123,7 +123,6 @@ const StudentMenuOptions = ({
 
   return (
     <>
-      {role !== "teacher" && (
         <button
           ref={buttonRef}
           onClick={() => toggleMenu(studentId)}
@@ -133,8 +132,6 @@ const StudentMenuOptions = ({
         >
           <HiOutlineDotsVertical />
         </button>
-      )}
-
       {showMenu === studentId && (
         <div
           ref={menuRef}
