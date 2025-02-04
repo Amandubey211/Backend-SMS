@@ -4,53 +4,99 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { RiEyeFill, RiFileUploadLine } from "react-icons/ri";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { AiOutlineFilePdf } from "react-icons/ai"; // Correct import for AiOutlineFilePdf
+import { AiOutlineFilePdf } from "react-icons/ai"; // Icon for PDF files
 import { MdOutlineDocumentScanner } from "react-icons/md";
+import useCloudinaryDeleteByPublicId from "../../../../../../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
+
 const MediaUpload = ({ onSubmit }) => {
-  const [files, setFiles] = useState([]);
-  const [previews, setPreviews] = useState([]);
+  const [files, setFiles] = useState([]); // Array of file objects (either native File objects or augmented objects after upload)
+  const [previews, setPreviews] = useState([]); // Array of preview URLs (via URL.createObjectURL)
   const [selectedPreview, setSelectedPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadComplete, setUploadComplete] = useState(false);
   const [error, setError] = useState(null);
   const [skipFiles, setSkipFiles] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  // State to track which files are being deleted.
+  const [deletingFiles, setDeletingFiles] = useState({});
   const fileInputRef = useRef(null);
 
-  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB in bytes
+  // Hook to delete files from Cloudinary.
+  const { deleteMediaByPublicId } = useCloudinaryDeleteByPublicId();
 
+  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB
+
+  // Allowed file check uses the MIME type if available.
+  const allowedFile = (file) => {
+    return file.type?.startsWith("image/") || file.type === "application/pdf";
+  };
+
+  // Handle file input changes, filtering files by allowed type and size.
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const validFiles = selectedFiles.filter(
-      (file) => file.size <= FILE_SIZE_LIMIT
+      (file) => allowedFile(file) && file.size <= FILE_SIZE_LIMIT
     );
     const invalidFiles = selectedFiles.filter(
-      (file) => file.size > FILE_SIZE_LIMIT
+      (file) => !allowedFile(file) || file.size > FILE_SIZE_LIMIT
     );
 
-    if (validFiles?.length > 0) {
+    if (validFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles?.map((file) => URL.createObjectURL(file)),
+        ...validFiles.map((file) => URL.createObjectURL(file)),
       ]);
-      setSkipFiles(false); // Hide the checkbox when files are added
+      setSkipFiles(false); // Hide the "skip file submission" checkbox once files are added.
     }
 
-    if (invalidFiles?.length > 0) {
-      toast.error("Some files exceed the 10MB limit and were not added.");
+    if (invalidFiles.length > 0) {
+      toast.error(
+        "Only image and PDF files under 10MB are allowed. Some files were not added."
+      );
     }
   };
 
-  const handleRemoveFile = (index) => {
+  // Remove a file from the list.
+  // If the file has already been uploaded (has a public_id), call the Cloudinary deletion hook first.
+  const handleRemoveFile = async (index) => {
+    const fileToRemove = files[index];
+    // Create a unique key based on public_id or file name.
+    const key = fileToRemove.public_id || fileToRemove.name;
+    // Set deletion state for this file.
+    setDeletingFiles((prev) => ({ ...prev, [key]: true }));
+
+    if (fileToRemove.public_id) {
+      try {
+        await deleteMediaByPublicId(fileToRemove.public_id);
+        toast.success("File removed successfully from Cloudinary");
+      } catch (error) {
+        toast.error("Failed to remove file from Cloudinary");
+        // Clear deletion state on error.
+        setDeletingFiles((prev) => {
+          const newState = { ...prev };
+          delete newState[key];
+          return newState;
+        });
+        return; // Do not remove file from UI if deletion fails.
+      }
+    }
+    // Remove the file and its preview.
     const updatedFiles = [...files];
     const updatedPreviews = [...previews];
     updatedFiles.splice(index, 1);
     updatedPreviews.splice(index, 1);
     setFiles(updatedFiles);
     setPreviews(updatedPreviews);
+    // Clear deletion state.
+    setDeletingFiles((prev) => {
+      const newState = { ...prev };
+      delete newState[key];
+      return newState;
+    });
   };
 
+  // Open the preview modal for the selected file.
   const handlePreviewFile = (index) => {
     setSelectedPreview(previews[index]);
     setModalOpen(true);
@@ -60,8 +106,21 @@ const MediaUpload = ({ onSubmit }) => {
     setModalOpen(false);
   };
 
+  // isImage helper: if Cloudinary returned resource_type, use that; otherwise, check file extension.
+  const isImage = (file) => {
+    if (file.resource_type) {
+      return file.resource_type === "image";
+    }
+    if (file.name) {
+      const ext = file.name.split(".").pop().toLowerCase();
+      return ["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext);
+    }
+    return false;
+  };
+
+  // Upload files to Cloudinary and create updated file objects that preserve original properties.
   const handleUploadFiles = async () => {
-    if (files?.length === 0) {
+    if (files.length === 0) {
       toast.error("Please select at least one file.");
       return;
     }
@@ -77,44 +136,62 @@ const MediaUpload = ({ onSubmit }) => {
     setLoading(true);
     try {
       const responses = await Promise.all(
-        files?.map((file) => {
+        files.map((file) => {
           const formData = new FormData();
           formData.append("file", file);
           formData.append("upload_preset", cloudinaryPreset);
           return axios.post(cloudinaryUrl, formData);
         })
       );
-      const mediaData = responses?.map((res, index) => ({
-        url: res.data.secure_url,
-        name: files[index].name,
-        type: files[index].type,
+      // Create updated file objects that preserve original name, type, and size.
+      const updatedFiles = files.map((file, index) => {
+        const data = responses[index].data;
+        return {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          url: data.secure_url || data.url,
+          public_id: data.public_id,
+          resource_type: data.resource_type,
+        };
+      });
+      setFiles(updatedFiles);
+      const mediaData = updatedFiles.map((file) => ({
+        url: file.url,
+        name: file.name,
+        type: file.type,
+        public_id: file.public_id,
+        resource_type: file.resource_type,
       }));
-      onSubmit(mediaData); // Trigger the parent function for handling uploaded files
+      onSubmit(mediaData); // Pass uploaded media data back to parent.
       setUploadComplete(true);
       toast.success("Files uploaded successfully");
-    } catch (error) {
-      console.error("Error uploading files to Cloudinary", error);
+    } catch (err) {
+      console.error("Error uploading files to Cloudinary", err);
       setError("Error uploading files. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const isImage = (file) => {
-    return file && file.type.startsWith("image/");
-  };
-
+  // Render an icon based on the file's extension.
+  // This function uses file.name for checking.
   const getFileIcon = (file, index) => {
+    if (!file || !file.name) {
+      return <MdOutlineDocumentScanner size={30} />;
+    }
     const fileExtension = file.name.split(".").pop().toLowerCase();
-    if (["pdf", "doc", "docx"].includes(fileExtension)) {
+    if (fileExtension === "pdf") {
       return <AiOutlineFilePdf size={30} />;
     } else if (isImage(file)) {
-      return (
+      return previews[index] ? (
         <img
           src={previews[index]}
           alt="Preview"
           className="h-8 w-8 object-cover rounded-md"
         />
+      ) : (
+        <MdOutlineDocumentScanner size={30} />
       );
     } else {
       return <MdOutlineDocumentScanner size={30} />;
@@ -122,12 +199,13 @@ const MediaUpload = ({ onSubmit }) => {
   };
 
   return (
-    <div className="w-full p-6 bg-white   ">
+    <div className="w-full p-6 bg-white">
       <label className="block mb-2 text-sm font-medium text-gray-700">
         Upload Media
       </label>
-      {!files?.length && (
-        <div className="flex items-start  mb-4 ">
+      {/* Show skip option only when no files have been added */}
+      {!files.length && (
+        <div className="flex items-start mb-4">
           <input
             type="checkbox"
             id="skipFiles"
@@ -158,16 +236,17 @@ const MediaUpload = ({ onSubmit }) => {
             <input
               type="file"
               multiple
+              accept="image/*,application/pdf"
               onChange={handleFileChange}
               className="hidden"
               ref={fileInputRef}
             />
           </div>
 
-          {files?.length > 0 && (
-            <div className="flex-grow  overflow-y-auto mt-4 px-3 no-scrollbar">
+          {files.length > 0 && (
+            <div className="flex-grow overflow-y-auto mt-4 px-3 no-scrollbar">
               <div className="grid grid-cols-2 gap-2">
-                {files?.map((file, index) => (
+                {files.map((file, index) => (
                   <div
                     key={index}
                     className={`flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md ${
@@ -201,13 +280,20 @@ const MediaUpload = ({ onSubmit }) => {
                         >
                           <RiEyeFill size={20} />
                         </button>
-                        <button
-                          type="button"
-                          className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                          onClick={() => handleRemoveFile(index)}
-                        >
-                          <FaTimes />
-                        </button>
+                        {deletingFiles[file.public_id || file.name] ? (
+                          <FaSpinner
+                            className="animate-spin text-red-500"
+                            size={20}
+                          />
+                        ) : (
+                          <button
+                            type="button"
+                            className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
+                            onClick={() => handleRemoveFile(index)}
+                          >
+                            <FaTimes />
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -225,10 +311,10 @@ const MediaUpload = ({ onSubmit }) => {
         </div>
       ) : (
         <>
-          {!skipFiles && files?.length > 0 && (
+          {!skipFiles && files.length > 0 && (
             <button
               onClick={handleUploadFiles}
-              className="flex items-center justify-center w-full mt-4 px-4 py-2 bg-gradient-to-r from-green-400 to-teal-400 text-white rounded-md shadow-sm hover:from-green-500 hover:to-teal-500 transition duration-500 ease-in-out"
+              className="flex items-center justify-center w-full mt-4 px-4 py-2 bg-gradient-to-r from-pink-400 to-pink-800 text-white rounded-md shadow-sm hover:from-pink-500 hover:to-pink-950 transition duration-500 ease-in-out"
             >
               <RiFileUploadLine className="mr-2" />
               Upload Files
@@ -239,6 +325,7 @@ const MediaUpload = ({ onSubmit }) => {
 
       {error && <div className="text-red-500 mt-3">{error}</div>}
 
+      {/* Modal for file preview */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50 transition-opacity duration-500 ease-in-out">
           <div className="bg-white p-2 rounded-lg relative max-h-full max-w-3xl w-full overflow-y-auto shadow-lg transform transition-transform duration-500 ease-in-out scale-100">

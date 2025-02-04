@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { Input, Select, Button, Row, Col, Space } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import toast from "react-hot-toast";
+import { Input, Select, Button } from "antd";
+import { SearchOutlined, RedoOutlined } from "@ant-design/icons";
 import debounce from "lodash/debounce";
 import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
-const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChange, academicYears }) => {
+const TopNavigationWithFilters = ({
+  onBackendFilterChange,
+  onFrontendFilterChange,
+  academicYears,
+}) => {
   const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
 
@@ -21,12 +24,12 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
     name: "",
     classId: "",
     type: "",
-    status: "",
     academicYear: "",
   });
 
   // Fetch classes from Redux store
   const { classes, loading, error } = useSelector((state) => state.admin.class);
+
   useEffect(() => {
     if (role !== "parent" && role !== "student") {
       dispatch(fetchAllClasses());
@@ -35,11 +38,10 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
 
   useEffect(() => {
     if (error && role !== "parent" && role !== "student") {
-      // Handle the error silently or log it, as toast is removed
+      // Handle or log the error as needed
       console.error("Failed to load classes:", error);
     }
   }, [error, role]);
-
 
   // Debounced function to handle name filtering
   const debouncedHandleNameFilter = useMemo(
@@ -54,36 +56,36 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
 
+    // Trigger backend filter change for these filters
     if (
       filterName === "classId" ||
       filterName === "type" ||
-      filterName === "status" ||
       filterName === "academicYear"
     ) {
-      // Trigger backend filter change
       onBackendFilterChange({ ...filters, [filterName]: value });
     }
 
+    // Trigger frontend filter change for "name"
     if (filterName === "name") {
-      // Trigger frontend filter change with debounce
       debouncedHandleNameFilter(value);
     }
   };
 
+  // Apply filters if you want a button to force re-query
   const applyFilters = () => {
     onBackendFilterChange(filters);
     onFrontendFilterChange(filters.name);
   };
 
+  // Clear all filters
   const clearFilters = () => {
     setFilters({
       name: "",
       classId: "",
       type: "",
-      status: "",
       academicYear: "",
     });
-    onBackendFilterChange({}); // Trigger API request to load data without filters
+    onBackendFilterChange({}); // Reset backend filters
     onFrontendFilterChange(""); // Reset frontend filter
   };
 
@@ -103,7 +105,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
           />
         </div>
 
-        {/* Class ID Filter - Exclude for Parent/Student */}
+        {/* Class Filter (Exclude for Parent/Student) */}
         {role !== "parent" && role !== "student" && (
           <div>
             <label className="font-medium text-gray-700">{t("Class")}</label>
@@ -145,40 +147,39 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
           </Select>
         </div>
 
-        {/* Status Filter - Exclude for Parent/Student */}
-        {role !== "parent" && role !== "student" && (
+        {/* Academic Year Filter (if provided) */}
+        {academicYears?.length > 0 && (
           <div>
-            <label className="font-medium text-gray-700">{t("Status")}</label>
+            <label className="font-medium text-gray-700">
+              {t("Academic Year")}
+            </label>
             <Select
-              placeholder={t("All Statuses")}
-              value={filters.status}
-              onChange={(value) => handleFilterChange("status", value)}
+              placeholder={t("All Years")}
+              value={filters.academicYear}
+              onChange={(value) => handleFilterChange("academicYear", value)}
               className="w-full"
               allowClear
             >
-              <Option value="">{t("All Statuses")}</Option>
-              <Option value="active">{t("Published")}</Option>
-              <Option value="inactive">{t("Drafts")}</Option>
+              <Option value="">{t("All Years")}</Option>
+              {academicYears.map((year) => (
+                <Option key={year} value={year}>
+                  {year}
+                </Option>
+              ))}
             </Select>
           </div>
         )}
 
         {/* Action Buttons */}
         <div className="flex items-end justify-end md:justify-start md:flex-row flex-col gap-4">
-          <Button
-            type="primary"
-            onClick={applyFilters}
-            className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-md px-4 py-2"
-          >
-            {t("Apply Filters")}
-          </Button>
-
+          {/* Icon-Only Clear Filters Button with Hover Spin */}
           <Button
             onClick={clearFilters}
-            className="text-blue-500 border border-blue-500 rounded-md px-4 py-2"
-          >
-            {t("Clear Filters")}
-          </Button>
+            className="group text-blue-500 border border-blue-500 rounded-md px-4 py-2 flex items-center justify-center"
+            icon={
+              <RedoOutlined className="transition-transform duration-300 group-hover:animate-spin" />
+            }
+          />
         </div>
       </div>
     </div>
