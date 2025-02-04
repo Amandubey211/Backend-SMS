@@ -15,7 +15,7 @@ const BookItem = ({ image, title, category, copies, author, className, role }) =
           <p className="text-sm text-green-600">{category || t("Uncategorized")}</p>
         </div>
       </div>
-      <div className="flex flex-row text-right w-[50%]">
+      <div className="flex flex-col  w-[50%]  ">
         <div className="flex flex-row text-right gap-4 w-full justify-around">
           <div className="flex items-center gap-2">
             <p className="text-md text-gray-600">{t("Copies")}:</p>
@@ -25,12 +25,14 @@ const BookItem = ({ image, title, category, copies, author, className, role }) =
             <p className="text-md text-gray-600">{t("Author")}:</p>
             <p className="text-md font-medium text-gray-800">{author || t("Unknown")}</p>
           </div>
-          <div className="flex items-center gap-2">
+        
+        </div>
+        <div className="flex items-center pt-4 flex-row gap-2 px-4">
             <p className="text-md text-gray-600">{t("Class")}:</p>
             <p className="text-md font-medium text-gray-800">{className || t("Unknown Class")}</p>
           </div>
-        </div>
       </div>
+      
     </div>
   );
 };
