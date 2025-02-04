@@ -17,7 +17,6 @@ import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../config/permission";
 
-
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -56,9 +55,11 @@ const TimeTableMainSection = () => {
   });
 
   // Select classes state
-  const { classes, loading: classLoading, error: classError } = useSelector(
-    (state) => state.admin.class
-  );
+  const {
+    classes,
+    loading: classLoading,
+    error: classError,
+  } = useSelector((state) => state.admin.class);
 
   const [academicYears, setAcademicYears] = useState([]);
   const [backendFilters, setBackendFilters] = useState({
@@ -90,7 +91,7 @@ const TimeTableMainSection = () => {
     }
     //else if (role === "parent") {
     //   dispatch(fetchParentTimetable());
-    // } 
+    // }
     else if (role === "teacher") {
       dispatch(fetchTeacherTimetable());
     } else if (role === "admin") {
@@ -176,25 +177,10 @@ const TimeTableMainSection = () => {
         academicYears={academicYears}
       />
 
-      {/* Protected Section for Timetable */}
-
-      {/* Create Timetable Button */}
-      {role === "admin" && (
-
-        <div className="flex justify-end mb-4 ml-5">
-
-          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_TIMETABLE}>
-            <button
-              onClick={handleCreateTimeTable}
-              className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-            >
-              {t("+ Create TimeTable")}
-            </button>
-          </ProtectedAction>
-        </div>
-      )}
-      <ProtectedSection requiredPermission={PERMISSIONS.TIMETABLE_VIEW} title={t("TimeTable")}>
-
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.TIMETABLE_VIEW}
+        title={t("TimeTable")}
+      >
         <ProtectedAction requiredPermission={PERMISSIONS.TIMETABLE_VIEW}>
           {/* Display Timetable List */}
           <TimeTableList
@@ -203,7 +189,6 @@ const TimeTableMainSection = () => {
             onDelete={handleDelete}
           />
         </ProtectedAction>
-
       </ProtectedSection>
     </div>
   );

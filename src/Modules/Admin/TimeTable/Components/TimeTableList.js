@@ -2,38 +2,79 @@ import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Spinner from "../../../../Components/Common/Spinner";
 import PropTypes from "prop-types";
-import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal"; // Corrected typo
+import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { Dropdown, Menu, Tag, Tooltip } from "antd";
+import { Dropdown, Menu, Tooltip, Badge } from "antd";
 import {
   EllipsisOutlined,
   EditOutlined,
   DeleteOutlined,
-  FilePdfOutlined,
-  EyeOutlined,
-  MailOutlined,
 } from "@ant-design/icons";
-import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../config/permission";
+
+// React Icons
+import { FaRegCalendarAlt, FaRegClock, FaRegSun } from "react-icons/fa";
+import { AiOutlineFileSearch } from "react-icons/ai"; // For "No Results" icon
+
+/**
+ * Slightly lighter, pastel-like gradients that
+ * still provide noticeable color variation.
+ */
+const GRADIENTS = [
+  // Light Yellow -> Deeper Yellow-Orange
+  "linear-gradient(to bottom right, #fde68a, #f59e0b)",
+  // Light Blue -> Medium Blue
+  "linear-gradient(to bottom right, #bfdbfe, #3b82f6)",
+  // Light Green -> Medium Green
+  "linear-gradient(to bottom right, #bbf7d0, #22c55e)",
+  // Light Red -> Medium Red
+  "linear-gradient(to bottom right, #fecaca, #ef4444)",
+  // Light Purple -> Medium Purple
+  "linear-gradient(to bottom right, #e9d5ff, #9333ea)",
+  // Light Pink -> Medium Pink
+  "linear-gradient(to bottom right, #fbcfe8, #ec4899)",
+];
+
+const hashCode = (str) => {
+  let hash = 0;
+  if (!str) return hash;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // 32-bit
+  }
+  return Math.abs(hash);
+};
+
+const getBgColor = (id) => {
+  const hash = hashCode(id?.toString());
+  return GRADIENTS[hash % GRADIENTS.length];
+};
 
 const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
   const { t } = useTranslation("admTimeTable");
   const navigate = useNavigate();
   const role = useSelector((store) => store.common.auth.role);
 
+  // Modal states for deletion
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [timetableToDelete, setTimetableToDelete] = useState(null);
 
+  // Tabs: "all", "active", "draft"
+  const [selectedTab, setSelectedTab] = useState("all");
+
+  // Navigate to a single timetable’s details
   const handleCardClick = (timetable) => {
-    navigate(`/timetable/viewtable/${timetable.name}`, {
+    navigate(`/timetable/viewtable/${timetable?.name}`, {
       state: { timetable },
     });
   };
 
+  // Edit & Delete
   const handleEditClick = (record) => {
-    navigate(`/timetable/edit/${record._id}`);
+    navigate(`/timetable/edit/${record?._id}`);
   };
 
   const handleDeleteClick = (record) => {
@@ -43,7 +84,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 
   const confirmDelete = () => {
     if (timetableToDelete) {
-      onDelete(timetableToDelete._id);
+      onDelete(timetableToDelete?._id);
       setIsModalOpen(false);
       setTimetableToDelete(null);
     }
@@ -54,24 +95,48 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
     setTimetableToDelete(null);
   };
 
+  // Sort timetables or fallback to empty array
   const sortedTimetables = useMemo(() => {
-    return [...timetables]?.sort((a, b) => {
-      const dateA = a.validity?.startDate ? new Date(a.validity.startDate) : new Date(0);
-      const dateB = b.validity?.startDate ? new Date(b.validity.startDate) : new Date(0);
+    if (!timetables) return [];
+    return [...timetables].sort((a, b) => {
+      const dateA = a?.validity?.startDate
+        ? new Date(a.validity.startDate)
+        : new Date(0);
+      const dateB = b?.validity?.startDate
+        ? new Date(b.validity.startDate)
+        : new Date(0);
       return dateB - dateA;
     });
   }, [timetables]);
 
-  // Updated actionMenu to prevent event propagation
+  // Count totals
+  const totalCount = sortedTimetables.length;
+  const activeCount = sortedTimetables.filter(
+    (t) => t?.status === "active"
+  ).length;
+  const draftCount = sortedTimetables.filter(
+    (t) => t?.status !== "active"
+  ).length;
+
+  // Filter by tab
+  const filteredTimetables = useMemo(() => {
+    if (selectedTab === "all") {
+      return sortedTimetables;
+    } else if (selectedTab === "active") {
+      return sortedTimetables.filter((t) => t?.status === "active");
+    } else {
+      return sortedTimetables.filter((t) => t?.status !== "active");
+    }
+  }, [sortedTimetables, selectedTab]);
+
+  // Card actions
   const actionMenu = (record) => (
     <Menu>
-      <ProtectedAction requiredPermission={"PERMISSIONS.UPDATE_TIMETABLE"}>
+      <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_TIMETABLE}>
         <Menu.Item
-          key="1"
+          key="edit"
           onClick={(e) => {
-            e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
-            // For Ant Design v5 and above, use e.stopPropagation()
-            // e.stopPropagation();
+            e.domEvent.stopPropagation();
             handleEditClick(record);
           }}
         >
@@ -79,14 +144,11 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
           {t("Edit")}
         </Menu.Item>
       </ProtectedAction>
-      
-      <ProtectedAction requiredPermission={"PERMISSIONS.DELETE_TIMETABLE"}>
+      <ProtectedAction requiredPermission={PERMISSIONS.DELETE_TIMETABLE}>
         <Menu.Item
-          key="2"
+          key="delete"
           onClick={(e) => {
-            e.domEvent.stopPropagation(); // Prevent card click (Ant Design v4)
-            // For Ant Design v5 and above, use e.stopPropagation()
-            // e.stopPropagation();
+            e.domEvent.stopPropagation();
             handleDeleteClick(record);
           }}
         >
@@ -97,210 +159,275 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
     </Menu>
   );
 
-  // Ensure renderSchedule is defined before it's used
-  const renderSchedule = (timetable) => {
-    const { type, days } = timetable;
-
+  // Render date/time
+  const renderScheduleSummary = (timetable) => {
+    const days = timetable?.days;
     if (!days || days.length === 0) {
-      return <p className="text-gray-500">{t("No schedule available.")}</p>;
+      return (
+        <p className="text-gray-600 text-sm">{t("No schedule available.")}</p>
+      );
     }
 
     const firstDay = days[0];
-    const firstSlot = firstDay.slots?.[0];
-
-    if (!firstSlot) {
-      return <p className="text-gray-500">{t("No schedule available.")}</p>;
+    const slots = firstDay?.slots;
+    if (!slots || slots.length === 0) {
+      return (
+        <p className="text-gray-600 text-sm">{t("No schedule available.")}</p>
+      );
     }
 
-    // Depending on type, render different schedule details
-    if (type === "event") {
+    const firstSlot = slots[0];
+    if (!firstSlot) {
       return (
-        <div className="mt-2">
-          <p className="text-gray-600">
-            <strong>{t("Date")}:</strong>{" "}
-            {new Date(firstDay.date).toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-          <p className="text-sm text-gray-600 flex items-center">
-            <strong className="mr-1">{t("Event")}:</strong>
-            <span className="inline-flex items-center justify-center bg-purple-100 text-purple-700 text-sm font-medium px-2 ml-1 mt-1 rounded-md">
-              {firstSlot.eventName ?? "N/A"}
+        <p className="text-gray-600 text-sm">{t("No schedule available.")}</p>
+      );
+    }
+
+    const dateString = new Date(firstDay?.date).toLocaleDateString("en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+
+    switch (timetable?.type) {
+      case "event":
+      case "exam":
+        return (
+          <p className="text-gray-600 text-sm flex items-center gap-4">
+            <span className="flex items-center gap-2">
+              <FaRegCalendarAlt className="text-gray-500" />
+              {dateString}
+            </span>
+            <span>|</span>
+            <span className="flex items-center gap-2">
+              <FaRegClock className="text-gray-500" />
+              {firstSlot?.startTime} - {firstSlot?.endTime}
             </span>
           </p>
-          <p className="text-gray-600">
-            <strong>{t("Time")}:</strong> {firstSlot.startTime} – {firstSlot.endTime}
+        );
+      case "weekly":
+        return (
+          <p className="text-gray-600 text-sm flex items-center gap-4">
+            <span className="flex items-center gap-2">
+              <FaRegSun className="text-gray-500" />
+              {firstDay?.day}
+            </span>
+            <span>|</span>
+            <span className="flex items-center gap-2">
+              <FaRegClock className="text-gray-500" />
+              {firstSlot?.startTime} - {firstSlot?.endTime}
+            </span>
           </p>
-        </div>
-      );
-    } else if (type === "weekly") {
-      return (
-        <div className="mt-2">
-          <p className="text-gray-600">
-            <strong>{t("Day")}:</strong> {firstDay.day}
+        );
+      case "others":
+        return (
+          <p className="text-gray-600 text-sm flex items-center gap-4">
+            <span className="flex items-center gap-2">
+              <FaRegClock className="text-gray-500" />
+              {firstSlot?.startTime}
+            </span>
           </p>
-          <p className="text-gray-600">
-            <strong>{t("Subject")}:</strong>{" "}
-            {firstSlot.subjectId?.name ?? "N/A"}
-          </p>
-          <p className="text-gray-600">
-            <strong>{t("Time")}:</strong> {firstSlot.startTime} – {firstSlot.endTime}
-          </p>
-        </div>
-      );
-    } else if (type === "exam") {
-      return (
-        <div className="mt-2">
-          <p className="text-gray-600">
-            <strong>{t("Date")}:</strong>{" "}
-            {new Date(firstDay.date).toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-          <p className="text-gray-600">
-            <strong>{t("Subject")}:</strong>{" "}
-            {firstSlot.subjectId?.name ?? "N/A"}
-          </p>
-          <p className="text-gray-600">
-            <strong>{t("Time")}:</strong> {firstSlot.startTime} – {firstSlot.endTime}
-          </p>
-        </div>
-      );
-    } else if (type === "others") {
-      return (
-        <div className="mt-2">
-          {/* Since 'others' type does not have 'date' or 'day', we display 'startTime' and 'heading' */}
-          <p className="text-gray-600">
-            <strong>{t("Start Time")}:</strong> {firstSlot.startTime}
-          </p>
-          <p className="text-gray-600">
-            <strong>{t("Heading")}:</strong> {firstSlot.heading ?? "N/A"}
-          </p>
-        </div>
-      );
-    } else {
-      // For any other types, do not show schedule
-      return <p className="text-gray-500">{t("No schedule available.")}</p>;
+        );
+      default:
+        return null;
     }
   };
 
-  return (
-    <>
-      {/* Heading */}
-      <div className="flex items-center justify-between mb-6 px-4">
-        <h1 className="text-2xl font-bold text-gray-800">{t("Timetables")}</h1>
-        <div className="flex items-center">
-          <span className="text-lg font-semibold text-gray-700 mr-2">{t("Time Tables")}:</span>
-          <div className="flex items-center justify-center w-8 h-8 rounded-full text-white bg-gradient-to-r from-pink-500 to-purple-600">
-            {sortedTimetables?.length}
-          </div>
-        </div>
-      </div>
+  // Admin: Create timetable
+  const handleCreateTimeTable = () => {
+    navigate("/timetable/create-new-timeTable");
+  };
 
-      {loading ? (
-        <Spinner />
-      ) : sortedTimetables?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-96">
-          <p className="text-xl text-gray-400 mt-4">{t("No Timetables Yet!")}</p>
+  // If no timetables found in the selected tab
+  const renderTimetablesGrid = () => {
+    if (filteredTimetables.length === 0) {
+      return (
+        <div className="flex flex-col items-center justify-center h-96 px-4">
+          <AiOutlineFileSearch className="text-8xl text-gray-300 mb-4" />
+          <p className="text-xl text-gray-500">
+            {t("No timetables found for the selected filters.")}
+          </p>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4 py-6">
-          {sortedTimetables?.map((timetable) => (
-            <div
-              key={timetable._id}
-              className="relative p-6 bg-white border border-gray-200 shadow-lg rounded-xl transition duration-300 hover:scale-105 hover:shadow-xl cursor-pointer flex flex-col"
-              onClick={() => handleCardClick(timetable)}
-            >
-              {/* Active/Draft Tag and Dropdown */}
-              <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-                {/* Active/Draft Tag */}
+      );
+    }
+
+    // Render the timetable cards
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        {filteredTimetables.map((timetable) => (
+          <div
+            key={timetable?._id}
+            className="relative shadow-md rounded-lg overflow-hidden transition-transform duration-300 hover:scale-105 hover:shadow-lg cursor-pointer"
+            onClick={() => handleCardClick(timetable)}
+            style={{ background: getBgColor(timetable?._id) }}
+          >
+            {/* Top: Active/Draft & Type */}
+            <div className="p-4 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
                 <span
-                  className={`text-sm font-normal px-2 rounded ${timetable.status === "active"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-red-100 text-gray-700"
-                    }`}
+                  className={`text-xs font-semibold px-2 py-1 rounded ${
+                    timetable?.status === "active"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
                 >
-                  {timetable.status === "active" ? t("Active") : t("Draft")}
+                  {timetable?.status === "active" ? t("Active") : t("Draft")}
                 </span>
-                {/* Dropdown with Grey Circle Border */}
-                <Dropdown overlay={actionMenu(timetable)} trigger={["click"]}>
-                  <EllipsisOutlined
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click
-                    }}
-                    style={{
-                      fontSize: "18px",
-                      color: "gray",
-                      cursor: "pointer",
-                      border: "1px solid gray",
-                      borderRadius: "50%",
-                      padding: "4px",
-                    }}
-                  />
-                </Dropdown>
+                <span className="text-xs font-semibold px-2 py-1 rounded bg-gray-100 text-gray-800">
+                  {timetable?.type || t("Others")}
+                </span>
               </div>
+              <Dropdown overlay={actionMenu(timetable)} trigger={["click"]}>
+                <EllipsisOutlined
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-2 rounded-full text-gray-600 hover:text-gray-900 hover:bg-gray-200"
+                />
+              </Dropdown>
+            </div>
 
-              {/* Card Header */}
-              <h2 className="text-xl font-bold text-gray-800 mb-4 mt-8">{timetable.name}</h2>
-
-              {/* Details Section */}
-              <div className="mb-4">
-                {/* Type as a Tag */}
-                <p className="text-sm text-gray-600 flex items-center">
-                  <strong className="mr-1">{t("Type")}:</strong>
-                  <span className="inline-flex items-center justify-center bg-purple-100 text-purple-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full">
-                    {timetable.type}
-                  </span>
+            {/* Body */}
+            <div className="px-4 pb-4">
+              <h2
+                className="text-lg font-bold text-gray-800 truncate capitalize mb-2"
+                title={timetable?.name}
+              >
+                {timetable?.name || t("Untitled")}
+              </h2>
+              <div className="space-y-1 text-sm">
+                <p className="text-gray-700">
+                  <strong>{t("Class")}:</strong>{" "}
+                  {timetable?.classId?.className || "N/A"}
                 </p>
-
-                {/* Class (with school) as a Tag */}
-                <p className="text-sm text-gray-600 mt-1 flex items-center flex-wrap">
-                  <strong className="mr-1">{t("Class")}:</strong>
-                  <span className="inline-flex items-center justify-center bg-yellow-100 text-yellow-700 text-sm font-medium px-2 ml-1 mt-1 rounded-full whitespace-normal">
-                    {timetable.classId?.className ?? "N/A"},{" "}
-                    {timetable.schoolId?.nameOfSchool ?? "N/A"}
-                  </span>
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  <strong>{t("Academic Year")}:</strong> {timetable.academicYear?.year ?? "N/A"}
-                </p>
-                {timetable.validity?.startDate && (
-                  <p className="text-sm text-gray-600 mt-1">
+                {timetable?.validity?.startDate && (
+                  <p className="text-gray-700">
                     <strong>{t("Valid From")}:</strong>{" "}
-                    {new Date(timetable.validity.startDate).toLocaleDateString("en-US", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {new Date(timetable.validity.startDate).toLocaleDateString(
+                      "en-US",
+                      {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      }
+                    )}
                   </p>
                 )}
               </div>
 
-              {/* Schedule Section */}
-              <div className="bg-gray-100 p-4 rounded-lg mb-4 border border-gray-200 flex-1">
-                <h3 className="text-md font-semibold text-gray-700">{t("Schedule")}</h3>
-                {renderSchedule(timetable)}
-              </div>
+              {/* Divider */}
+              <hr className="my-3 border-gray-300" />
 
-              {/* View Button */}
-              <div className="mt-auto flex justify-end">
-                <button className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700">
-                  {t("View Timetable")}
-                </button>
-              </div>
+              {/* Summary */}
+              {renderScheduleSummary(timetable)}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
-      {/* Deletion Confirmation Modal */}
+  return (
+    <>
+      <div className="flex flex-col p-5">
+        {/* Tab Buttons + Create Button */}
+        <div className="flex justify-between mb-6 px-4 items-center">
+          <div className="flex space-x-4">
+            {/* All Tab */}
+            <Tooltip title={t("Show All Timetables")}>
+              <Badge
+                count={totalCount}
+                style={{ backgroundColor: "#6B7280" }}
+                offset={[-2, 2]}
+              >
+                <button
+                  className={`px-6 py-3 text-sm font-semibold rounded-md ${
+                    selectedTab === "all"
+                      ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+                      : "border border-gray-300 text-gray-600"
+                  }`}
+                  onClick={() => setSelectedTab("all")}
+                >
+                  {t("All")}
+                </button>
+              </Badge>
+            </Tooltip>
+
+            {/* Active Tab */}
+            <Tooltip title={t("Show Active Timetables")}>
+              <Badge
+                count={activeCount}
+                style={{ backgroundColor: "#6B7280" }}
+                offset={[-2, 2]}
+              >
+                <button
+                  className={`px-6 py-3 text-sm font-semibold rounded-md ${
+                    selectedTab === "active"
+                      ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+                      : "border border-gray-300 text-gray-600"
+                  }`}
+                  onClick={() => setSelectedTab("active")}
+                >
+                  {t("Active")}
+                </button>
+              </Badge>
+            </Tooltip>
+
+            {/* Draft Tab */}
+            <Tooltip title={t("Show Draft Timetables")}>
+              <Badge
+                count={draftCount}
+                style={{ backgroundColor: "#6B7280" }}
+                offset={[-2, 2]}
+              >
+                <button
+                  className={`px-6 py-3 text-sm font-semibold rounded-md ${
+                    selectedTab === "draft"
+                      ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white"
+                      : "border border-gray-300 text-gray-600"
+                  }`}
+                  onClick={() => setSelectedTab("draft")}
+                >
+                  {t("Draft")}
+                </button>
+              </Badge>
+            </Tooltip>
+          </div>
+
+          {/* Create Timetable (Admin Only) */}
+          {role === "admin" && (
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_TIMETABLE}>
+              <Tooltip title={t("Create a new timetable")}>
+                <button
+                  onClick={handleCreateTimeTable}
+                  className="px-6 py-3 text-sm font-semibold rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                >
+                  {t("+ Create TimeTable")}
+                </button>
+              </Tooltip>
+            </ProtectedAction>
+          )}
+        </div>
+
+        {/* Content */}
+        {loading ? (
+          <Spinner />
+        ) : sortedTimetables.length === 0 ? (
+          // No Timetables at all
+          <div className="flex flex-col items-center justify-center h-96 px-4">
+            <AiOutlineFileSearch className="text-8xl text-gray-300 mb-4" />
+            <p className="text-xl text-gray-500">
+              {t("No timetables available. Create one to get started!")}
+            </p>
+          </div>
+        ) : (
+          // Timetables exist, show filtered view or fallback
+          renderTimetablesGrid()
+        )}
+      </div>
+
+      {/* Delete Confirmation Modal */}
       {timetableToDelete && (
-        <DeleteConfirmationModal // Corrected typo
-          isOpen={isModalOpen} // Verify if your modal expects 'isOpen' or 'visible'
+        <DeleteConfirmationModal
+          isOpen={isModalOpen}
           onClose={closeModal}
           onConfirm={confirmDelete}
           loading={false}
@@ -312,9 +439,14 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 });
 
 TimeTableList.propTypes = {
-  timetables: PropTypes.array.isRequired,
-  loading: PropTypes.bool.isRequired,
+  timetables: PropTypes.array,
+  loading: PropTypes.bool,
   onDelete: PropTypes.func.isRequired,
+};
+
+TimeTableList.defaultProps = {
+  timetables: [],
+  loading: false,
 };
 
 export default TimeTableList;
