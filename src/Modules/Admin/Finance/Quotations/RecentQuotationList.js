@@ -96,10 +96,12 @@ const RecentQuotationList = () => {
     }
 
     try {
+      // Show a loading toast notification
+      const toastId = toast.loading("Sending email...");
+
       // Determine type based on whether the quotation is canceled
       const type = fullRecord.isCancel ? "quotation" : "cancelQuotation";
-      console.log("Sending email for type:", fullRecord);
-      console.log("Sending email for type:", type);
+
       // Format dates correctly
       const formattedDate = formatDate(fullRecord.date, "long"); // e.g., "10 January 2025"
       const formattedDueDate = formatDate(fullRecord.dueDate, "long"); // e.g., "10 January 2025"
@@ -138,17 +140,13 @@ const RecentQuotationList = () => {
       };
 
       console.log("Dispatching sendEmail with:", { id: quotationId, type, payload });
-
       const result = await dispatch(sendEmail({ id: quotationId, type, payload }));
-      console.log("sendEmail result:", result);
+      toast.dismiss(toastId);
 
-      if (sendEmail.fulfilled.match(result)) {
-        toast.success(
-          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
-        );
-      } else {
+      // Remove the additional success toast so that only the thunk's toast appears.
+      if (sendEmail.rejected.match(result)) {
         console.error("Failed sendEmail response:", result);
-        toast.error(result.payload || `Failed to send ${type} email.`);
+        // (The thunk already shows an error toast.)
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
@@ -439,14 +437,16 @@ const RecentQuotationList = () => {
             </div>
           </div>
 
-          {/* Loading Indicator */}
-          {loading && (
+          {/* Data State */}
+          {loading ? (
             <div className="flex justify-center">
               <Spin tip="Loading..." />
             </div>
-          )}
-          {/* Table */}
-          {!loading && !error && (
+          ) : error ? (
+            <div className="text-red-500 text-center">Error: {error}</div>
+          ) : quotations.length === 0 ? (
+            <div className="text-center">No data available.</div>
+          ) : (
             <ProtectedSection
               requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}
               title={"Quotation List"}
