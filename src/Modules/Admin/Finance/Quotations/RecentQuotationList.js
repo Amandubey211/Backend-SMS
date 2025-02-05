@@ -10,7 +10,7 @@ import {
   MailOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import { FiPlus, FiUserPlus } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,14 +36,10 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
-
-
+import { formatDate } from "../../../../Utils/helperFunctions";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
-
-
 import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
-
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -70,6 +66,7 @@ const RecentQuotationList = () => {
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
   const [computedPageSize, setComputedPageSize] = useState(paze_size);
 
+  // Build a map for full quotation objects (keyed by _id)
   const quotationIdMap = useMemo(() => {
     const map = {};
     quotations.forEach((quotation) => {
@@ -78,43 +75,88 @@ const RecentQuotationList = () => {
     return map;
   }, [quotations]);
 
-
   const handleDownloadPDF = async (pdfRef, previewQuotation) => {
-    await downloadPDF(pdfRef, previewQuotation, "Quotation")
-  }
+    await downloadPDF(pdfRef, previewQuotation, "Quotation");
+  };
 
   const handleSendEmail = async (record) => {
-    console.log(record)
-    if (!record.key) {
-      toast.error("Invalid quotation ID.");
+    // Get the full record from the quotationIdMap using the record's key
+    const fullRecord = quotationIdMap[record.key];
+    if (!fullRecord) {
+      toast.error("Quotation not found.");
+      console.error("Error: Full quotation record not found for key", record.key);
       return;
     }
-  
-    console.log("Attempting to send email for quotation:", record);
-  
+
+    const quotationId = fullRecord._id;
+    if (!quotationId) {
+      toast.error("Invalid quotation ID.");
+      console.error("Error: Missing quotation ID in record", fullRecord);
+      return;
+    }
+
     try {
-      const result = await dispatch(
-        sendEmail({
-          id: record.key,
-          type: "quotation",
-        })
-      );
-  
-      console.log("Send email result:", result);
-  
+      // Determine type based on whether the quotation is canceled
+      const type = fullRecord.isCancel ? "quotation" : "cancelQuotation";
+      console.log("Sending email for type:", fullRecord);
+      console.log("Sending email for type:", type);
+      // Format dates correctly
+      const formattedDate = formatDate(fullRecord.date, "long"); // e.g., "10 January 2025"
+      const formattedDueDate = formatDate(fullRecord.dueDate, "long"); // e.g., "10 January 2025"
+
+      // Construct the payload ensuring all required fields are present
+      const payload = {
+        receiver: {
+          email: fullRecord.receiver?.email,
+          name: fullRecord.receiver?.name || "N/A",
+          address: fullRecord.receiver?.address || "N/A",
+          phone: fullRecord.receiver?.phone || "N/A",
+        },
+        schoolId: fullRecord.schoolId?._id || "N/A",
+        nameOfSchool: fullRecord.schoolId?.nameOfSchool || "N/A",
+        schoolAddress: fullRecord.schoolId?.address || "N/A",
+        branchName: fullRecord.schoolId?.branchName || "N/A",
+        city: fullRecord.schoolId?.city || "N/A",
+        schoolLogo: fullRecord.schoolId?.logo || "",
+        quotationNumber: fullRecord.quotationNumber || "N/A",
+        date: formattedDate,
+        dueDate: formattedDueDate,
+        govtRefNumber: fullRecord.govtRefNumber || "",
+        purpose: fullRecord.purpose || "N/A",
+        status: fullRecord.status || "N/A",
+        academicYear: fullRecord.academicYear?.year || "N/A",
+        lineItems: fullRecord.lineItems?.map((item) => ({
+          revenueType: item.revenueType || "N/A",
+          quantity: item.quantity || 1,
+          amount: item.amount || 0,
+        })) || [],
+        totalAmount: fullRecord.total_amount || 0,
+        tax: fullRecord.tax || 0,
+        discount: fullRecord.discount || 0,
+        discountType: fullRecord.discountType || "fixed",
+        finalAmount: fullRecord.final_amount || 0,
+      };
+
+      console.log("Dispatching sendEmail with:", { id: quotationId, type, payload });
+
+      const result = await dispatch(sendEmail({ id: quotationId, type, payload }));
+      console.log("sendEmail result:", result);
+
       if (sendEmail.fulfilled.match(result)) {
-        toast.success("Email sent successfully!");
+        toast.success(
+          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
+        );
       } else {
-        toast.error(result.payload || "Failed to send email.");
+        console.error("Failed sendEmail response:", result);
+        toast.error(result.payload || `Failed to send ${type} email.`);
       }
     } catch (err) {
-      console.error("Error sending email:", err);
-      toast.error("Error sending email.");
+      console.error("Error in handleSendEmail:", err);
+      toast.error(`Error sending email.`);
     }
   };
-  
 
-  // Debounced function to fetch adjustments with a fixed limit of 5
+  // Debounced function to fetch quotations with a fixed limit of 10
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchAllQuotations(params));
@@ -122,7 +164,7 @@ const RecentQuotationList = () => {
     [dispatch]
   );
 
-  // Fetch data on component mount with limit set to 10
+  // Fetch data on component mount
   useEffect(() => {
     console.log("Fetching data...", { searchText, currentPage, pageSize });
     const params = {
@@ -241,7 +283,6 @@ const RecentQuotationList = () => {
               onClick={() => {
                 const quotationToPreview = quotationIdMap[record.key];
                 if (quotationToPreview) {
-                  // Use local state for preview mode
                   setPreviewQuotation(quotationToPreview);
                   setQuotationPreviewVisible(true);
                 } else {
@@ -255,11 +296,10 @@ const RecentQuotationList = () => {
               key="2"
               onClick={() => {
                 const quotationToView = quotationIdMap[record.key];
-
                 if (quotationToView) {
-                  dispatch(setReadOnly(true)); // Set readOnly to true for viewing
-                  dispatch(setSelectedQuotation(quotationToView)); // Dispatch the selected quotation to Redux for view mode
-                  navigate("/finance/quotations/add-new-quotations"); // Navigate to view page
+                  dispatch(setReadOnly(true));
+                  dispatch(setSelectedQuotation(quotationToView));
+                  navigate("/finance/quotations/add-new-quotations");
                 } else {
                   toast.error("Selected income not found.");
                 }
@@ -283,11 +323,9 @@ const RecentQuotationList = () => {
                 <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
               </Menu.Item>
             </ProtectedAction>
-            {/* 4) Send Mail */}
             <Menu.Item onClick={() => handleSendEmail(record)}>
               <MailOutlined style={{ marginRight: 8 }} /> Send Mail
             </Menu.Item>
-
           </Menu>
         );
 
@@ -325,16 +363,16 @@ const RecentQuotationList = () => {
     quotations?.map(({ _id, ...quotation }, index) => ({
       sNo: index + 1,
       quotationNo: quotation?.quotationNumber || "N/A",
-      receiver: quotation?.receiver?.name || "N?A",
-      receiverEmail: quotation?.receiver?.email || "N?A",
-      receiverPhone: quotation?.receiver?.phone || "N?A",
-      receiverAddress: quotation?.receiver?.address || "N?A",
+      receiver: quotation?.receiver?.name || "N/A",
+      receiverEmail: quotation?.receiver?.email || "N/A",
+      receiverPhone: quotation?.receiver?.phone || "N/A",
+      receiverAddress: quotation?.receiver?.address || "N/A",
       schoolName: quotation?.schoolName || "N/A",
       tax: `${parseFloat(quotation?.tax)} %` || 0,
       discount:
-        (quotation?.discountType === "percentage"
+        quotation?.discountType === "percentage"
           ? `${parseFloat(quotation?.discount)} %`
-          : `${parseFloat(quotation?.discount)} QR`) || 0,
+          : `${parseFloat(quotation?.discount)} QR` || 0,
       discountType: quotation?.discountType || "N/A",
       totalAmount: `${parseFloat(quotation?.total_amount)} QR` || 0,
       finalAmount: `${parseFloat(quotation?.final_amount)} QR` || 0,
@@ -357,7 +395,7 @@ const RecentQuotationList = () => {
   return (
     <Layout title={"Quotation List | Student Diwan"}>
       <AdminDashLayout>
-        <div className="bg-white p-4 rounded-lg  space-y-4 mt-3">
+        <div className="bg-white p-4 rounded-lg space-y-4 mt-3">
           {/* Header */}
           <div className="flex justify-between items-center">
             <Input
@@ -377,7 +415,7 @@ const RecentQuotationList = () => {
                 type="primary"
                 icon={<ExportOutlined />}
                 onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
               >
                 Export
               </Button>
@@ -409,7 +447,10 @@ const RecentQuotationList = () => {
           )}
           {/* Table */}
           {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION} title={"Quotation List"}>
+            <ProtectedSection
+              requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}
+              title={"Quotation List"}
+            >
               <Table
                 dataSource={dataSource}
                 columns={columns}
@@ -422,7 +463,7 @@ const RecentQuotationList = () => {
                   showTotal: () =>
                     `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
                   onChange: (page, pageSize) => {
-                    setCurrentPage(page);
+                    dispatch(setCurrentPage(page));
                     setComputedPageSize(pageSize);
                   },
                   onShowSizeChange: (current, size) => {
@@ -452,7 +493,7 @@ const RecentQuotationList = () => {
               />
               {/* Centered content */}
               <div
-                ref={popupRef} // Ref for the overall modal (optional)
+                ref={popupRef}
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                 onClick={(e) => e.stopPropagation()}
               >
@@ -474,13 +515,12 @@ const RecentQuotationList = () => {
                 </div>
 
                 {/* Quotation content container */}
-                <div >
+                <div>
                   <QuotationTemplate data={previewQuotation} ref={pdfRef} />
                 </div>
               </div>
             </div>
           )}
-
 
           <ExportModal
             visible={isExportModalVisible}
