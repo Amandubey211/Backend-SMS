@@ -30,24 +30,23 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
-import Receipt from "../../../../Utils/FinanceTemplate/Receipt"; // Adjust path if needed
-import ExportModal from "../Earnings/Components/ExportModal";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
+import ExportModal from "../Earnings/Components/ExportModal";
 import { formatDate } from "../../../../Utils/helperFunctions";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 
-
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useNavHeading("Finance", "Receipts List");
+
   const { receipts = [], loading, error, pagination = {} } = useSelector(
     (state) => state.admin.receipts || {}
   );
 
-
+  // Email sending state from common slice (if needed)
   const { loading: emailLoading, successMessage, emailError } = useSelector(
     (state) => state.common.sendEmail
   );
@@ -76,6 +75,7 @@ const RecentReceiptsList = () => {
   // Ref for outside-click detection & PDF generation
   const popupRef = useRef(null);
   const pdfRef = useRef(null);
+
   // --- 1) Fetch receipts when component mounts or pagination changes ---
   useEffect(() => {
     dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
@@ -121,7 +121,6 @@ const RecentReceiptsList = () => {
 
   // --- View in read-only mode (navigates to CreateReceipt with record data) ---
   const handleViewReadOnlyReceipt = (record) => {
-    // Navigate with state
     navigate("/finance/receipts/add-new-receipt", {
       state: {
         readOnly: true,
@@ -129,7 +128,6 @@ const RecentReceiptsList = () => {
       },
     });
   };
-
 
   // --- Handle Send Email ---
   const handleSendEmail = async (record) => {
@@ -140,12 +138,15 @@ const RecentReceiptsList = () => {
     }
 
     try {
+      // Start a loading toast notification
+      const toastId = toast.loading("Sending email...");
+
       const type = record.isCancel ? "cancelReceipt" : "receipt";
 
-      // ✅ Format the date properly
-      const formattedDate = formatDate(record.date, "long"); // e.g., "10 January 2025"
+      // Format the date properly
+      const formattedDate = formatDate(record.date, "long");
 
-      // ✅ Construct the payload (No unnecessary logic inside thunk)
+      // Construct the payload for sending email
       const payload = {
         receiver: {
           email: record.receiver.email,
@@ -162,7 +163,7 @@ const RecentReceiptsList = () => {
 
         receiptNumber: record.receiptNumber || "N/A",
         invoiceNumber: record.invoiceNumber?.invoiceNumber || "N/A",
-        date: formattedDate, // ✅ Already formatted
+        date: formattedDate,
         govtRefNumber: record.govtRefNumber || "",
 
         paymentMethod: record.paymentMethod || "N/A",
@@ -184,31 +185,29 @@ const RecentReceiptsList = () => {
       };
 
       console.log("Dispatching sendEmail with:", { id: record._id, type, payload });
-
       const result = await dispatch(sendEmail({ id: record._id, type, payload }));
 
-      console.log("sendEmail result:", result);
+      // Dismiss the loading toast
+      toast.dismiss(toastId);
 
+      console.log("sendEmail result:", result);
       if (sendEmail.fulfilled.match(result)) {
-        toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`);
+        toast.success(
+          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
+        );
       } else {
         console.error("Failed sendEmail response:", result);
         toast.error(result.payload || `Failed to send ${type} email.`);
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
-      toast.error(`Error sending email.`);
+      toast.error("Error sending email.");
     }
   };
 
-
-
-
   // --- Delete receipt ---
   const handleDeleteReceipt = async (record) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this receipt?"
-    );
+    const confirmDelete = window.confirm("Are you sure you want to delete this receipt?");
     if (!confirmDelete) return;
 
     try {
@@ -227,18 +226,9 @@ const RecentReceiptsList = () => {
   };
 
   // --- Download PDF from preview ---
-
-
-
-
-
-  // --- Download PDF from preview ---
   const handleDownloadPDF = async (pdfRef, selectedReceipt) => {
-    await downloadPDF(pdfRef, selectedReceipt, "Receipt")
-  }
-
-
-
+    await downloadPDF(pdfRef, selectedReceipt, "Receipt");
+  };
 
   // --- Navigate to Add New Receipt Page (normal create) ---
   const handleNavigate = () => {
@@ -258,7 +248,7 @@ const RecentReceiptsList = () => {
     "Receipt ID": item.receiptNumber || item._id || "N/A",
     "Recipient Name": item.reciever?.name || item.receiver?.name || "N/A",
     "Paid Date": item.date
-      ? new Date(item.date).toLocaleDateString("en-GB") // Use DD/MM/YYYY format
+      ? new Date(item.date).toLocaleDateString("en-GB")
       : "N/A",
     "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QR` : "N/A",
     Discount:
@@ -266,7 +256,7 @@ const RecentReceiptsList = () => {
         ? `${item.discount || 0}%`
         : `${item.discount || 0} QR`,
     Penalty: `${item.penalty || 0} QR`,
-    Status: item.isCancel ? "Cancelled" : "Active", // Include Status
+    Status: item.isCancel ? "Cancelled" : "Active",
     Remark: item.remark || "N/A",
   }));
 
@@ -281,10 +271,10 @@ const RecentReceiptsList = () => {
       receiverAddress: receipt?.receiver?.address || "N/A",
       tax: `${parseFloat(receipt?.tax)} %` || 0,
       discount:
-        (receipt?.discountType === "percentage"
+        receipt?.discountType === "percentage"
           ? `${parseFloat(receipt?.discount)} %`
-          : `${parseFloat(receipt?.discount)} QR`) || 0,
-      discountType: parseFloat(receipt?.discountType) || "percentage",
+          : `${parseFloat(receipt?.discount)} QR` || 0,
+      discountType: receipt?.discountType || "percentage",
       penalty: `${parseFloat(receipt?.penalty)} QR` || 0,
       totalPaidAmount: `${parseFloat(receipt?.totalPaidAmount)} QR` || 0,
       cancelReceipt: receipt?.isCancel ? "Yes" : "No",
@@ -314,7 +304,7 @@ const RecentReceiptsList = () => {
             setModalVisible(true);
           }
         }}
-        disabled={record.isCancel} // Disable the option if the receipt is already canceled
+        disabled={record.isCancel}
       >
         <Tooltip
           title={
@@ -333,7 +323,6 @@ const RecentReceiptsList = () => {
       <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
         <MailOutlined /> Send Mail
       </Menu.Item>
-
     </Menu>
   );
 
@@ -403,9 +392,7 @@ const RecentReceiptsList = () => {
       dataIndex: "penalty",
       key: "penalty",
       sorter: (a, b) => (a.penalty || 0) - (b.penalty || 0),
-      render: (penalty) => (
-        <span style={{ color: "red" }}>{penalty || 0} QR</span>
-      ),
+      render: (penalty) => <span style={{ color: "red" }}>{penalty || 0} QR</span>,
     },
     {
       title: "Paid Amount",
@@ -447,10 +434,10 @@ const RecentReceiptsList = () => {
       render: (date) =>
         date
           ? new Date(date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
           : "N/A",
     },
     {
@@ -458,14 +445,13 @@ const RecentReceiptsList = () => {
       key: "action",
       render: (_, record) => (
         <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
-
           <MoreOutlined style={{ fontSize: "16px", cursor: "pointer" }} />
         </Dropdown>
       ),
     },
   ];
 
-  // Render
+  // --- Render ---
   return (
     <AdminLayout>
       <div className="p-4 ">
@@ -482,17 +468,15 @@ const RecentReceiptsList = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-
             <button
               className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
               onClick={() => setExportModalOpen(true)}
             >
-              <ExportOutlined className="text-sm" /> {/* Export Icon */}
-              <span>Export</span> {/* Button text */}
+              <ExportOutlined className="text-sm" />
+              <span>Export</span>
             </button>
 
-
-            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT} >
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
               <button
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                 onClick={handleNavigate}
@@ -505,15 +489,18 @@ const RecentReceiptsList = () => {
             </ProtectedAction>
           </div>
         </div>
+
         {loading ? (
           <div style={{ textAlign: "center", padding: "16px" }}>
             <Spinner />
           </div>
         ) : (
-          // Render Table and Custom Pagination
           <>
             {/* Table */}
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS} title={"Receipts List"}>
+            <ProtectedSection
+              requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS}
+              title={"Receipts List"}
+            >
               <Table
                 rowKey={(record) => record._id}
                 columns={columns}
@@ -538,9 +525,9 @@ const RecentReceiptsList = () => {
                   ),
                 }}
                 pagination={{
-                  current: currentPage, // Use state
-                  total: pagination.totalRecords, // Total records from API response
-                  pageSize: pageLimit, // Use state for limit
+                  current: currentPage,
+                  total: pagination.totalRecords,
+                  pageSize: pageLimit,
                   showSizeChanger: true,
                   pageSizeOptions: ["5", "10", "20", "50"],
                   size: "small",
@@ -549,11 +536,11 @@ const RecentReceiptsList = () => {
                       pagination.totalRecords / pageLimit
                     )} | Total ${total} records`,
                   onChange: (page) => {
-                    setCurrentPage(page); // Update currentPage state
+                    setCurrentPage(page);
                   },
                   onShowSizeChange: (current, size) => {
-                    setPageLimit(size); // Update pageLimit state
-                    setCurrentPage(1); // Reset to the first page
+                    setPageLimit(size);
+                    setCurrentPage(1);
                   },
                 }}
                 summary={() => {
@@ -562,35 +549,12 @@ const RecentReceiptsList = () => {
                   let totalDiscount = 0;
                   let totalPenalty = 0;
 
-                  // Calculate totals from filteredData
                   filteredData.forEach((record) => {
                     totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
                     totalTax += parseFloat(record.tax) || 0;
                     totalDiscount += parseFloat(record.discount) || 0;
                     totalPenalty += parseFloat(record.penalty) || 0;
                   });
-
-                  // Uncomment if you want to display totals
-                  // return (
-                  //   <Table.Summary.Row>
-                  //     <Table.Summary.Cell index={0} colSpan={3}>
-                  //       <strong>Totals:</strong>
-                  //     </Table.Summary.Cell>
-                  //     <Table.Summary.Cell index={1}>
-                  //       <strong>{totalDiscount.toLocaleString()} %</strong>
-                  //     </Table.Summary.Cell>
-                  //     <Table.Summary.Cell index={2}>
-                  //       <strong>{totalTax.toLocaleString()} QR</strong>
-                  //     </Table.Summary.Cell>
-                  //     <Table.Summary.Cell index={3}>
-                  //       <strong>{totalPaidAmount.toLocaleString()} QR</strong>
-                  //     </Table.Summary.Cell>
-                  //     <Table.Summary.Cell index={4}>
-                  //       <strong>{totalPenalty.toLocaleString()} QR</strong>
-                  //     </Table.Summary.Cell>
-                  //     <Table.Summary.Cell index={5} />
-                  //   </Table.Summary.Row>
-                  // );
                 }}
                 size="small"
                 bordered
@@ -598,6 +562,7 @@ const RecentReceiptsList = () => {
             </ProtectedSection>
           </>
         )}
+
         {/* Cancel Confirmation Modal */}
         <DeleteConfirmationModal
           isOpen={modalVisible}
@@ -645,14 +610,12 @@ const RecentReceiptsList = () => {
           >
             {/* Close + Download PDF buttons */}
             <div className="flex justify-end space-x-2 mb-4">
-              {/* Download PDF button */}
               <button
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                 onClick={() => handleDownloadPDF(pdfRef, selectedReceipt)}
               >
                 Download PDF
               </button>
-              {/* Close button */}
               <button
                 onClick={() => setReceiptVisible(false)}
                 className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
@@ -666,14 +629,14 @@ const RecentReceiptsList = () => {
               {selectedReceipt ? (
                 <ReceiptTemplate data={selectedReceipt} ref={pdfRef} />
               ) : (
-                <p className="text-center text-gray-500">No receipt data available.</p>
+                <p className="text-center text-gray-500">
+                  No receipt data available.
+                </p>
               )}
             </div>
           </div>
         </div>
       )}
-
-
     </AdminLayout>
   );
 };

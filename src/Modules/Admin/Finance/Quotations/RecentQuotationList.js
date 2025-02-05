@@ -100,7 +100,7 @@ const RecentQuotationList = () => {
       const toastId = toast.loading("Sending email...");
 
       // Determine type based on whether the quotation is canceled
-      const type = fullRecord.isCancel ? "quotation" : "cancelQuotation";
+      const type = fullRecord.isCancel ? "cancelQuotation" : "quotation";
 
       // Format dates correctly
       const formattedDate = formatDate(fullRecord.date, "long"); // e.g., "10 January 2025"
