@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Input, Table, Tag, Tooltip } from "antd";
+import { Menu, Dropdown, Input, Table, Tag, Tooltip, Modal, Button } from "antd";
 import {
   MoreOutlined,
   ExclamationCircleOutlined,
@@ -27,16 +27,87 @@ import DeleteConfirmationModal from "../../../../Components/Common/DeleteConfirm
 import EmailModal from "../../../../Components/Common/EmailModal";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import jsPDF from "jspdf";
+import "jspdf-autotable"; // Ensure you have installed jsPDF autoTable plugin
 import html2canvas from "html2canvas";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 import ReceiptTemplate from "../../../../Utils/FinanceTemplate/Receipt";
-import ExportModal from "../Earnings/Components/ExportModal";
+import ExportModal from "../Earnings/Components/ExportModal"; // Your original ExportModal component
 import { formatDate } from "../../../../Utils/helperFunctions";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 import Layout from "../../../../Components/Common/Layout";
+import * as XLSX from "xlsx";
+
+// --- Helper function to format date & time ---
+const formatDateTime = (dateString) => {
+  if (!dateString) return "N/A";
+  const options = {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  };
+  return new Date(dateString).toLocaleString("en-GB", options);
+};
+
+// --- Updated ExportModal Component ---
+// This custom modal is used to provide options for exporting either as PDF or Excel.
+const CustomExportModal = ({ visible, onClose, dataToExport }) => {
+  // Function to export as PDF with proper table formatting
+  const exportPDF = () => {
+    const doc = new jsPDF();
+    const columns = [
+      { header: "S.No", dataKey: "sNo" },
+      { header: "Receipt ID", dataKey: "receiptNumber" },
+      { header: "Recipient Name", dataKey: "receiver" },
+      { header: "Discount", dataKey: "discount" },
+      { header: "Penalty", dataKey: "penalty" },
+      { header: "Paid Amount", dataKey: "totalPaidAmount" },
+      { header: "Invoice Ref ID", dataKey: "refInvoiceNumber" },
+      { header: "Status", dataKey: "cancelReceipt" },
+      { header: "Paid Date", dataKey: "Date" },
+      { header: "Academic Year", dataKey: "academicYearDetails" },
+    ];
+    doc.autoTable({
+      columns,
+      body: dataToExport,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [52, 58, 64] },
+    });
+    doc.save("Receipts.pdf");
+    onClose();
+  };
+
+  // Function to export as Excel
+  const exportExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Receipts");
+    XLSX.writeFile(workbook, "Receipts.xlsx");
+    onClose();
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      title="Export Receipts Data"
+      onCancel={onClose}
+      footer={null}
+    >
+      <div className="flex justify-around">
+        <Button type="primary" icon={<FilePdfOutlined />} onClick={exportPDF}>
+          Export as PDF
+        </Button>
+        <Button type="primary" onClick={exportExcel}>
+          Export as Excel
+        </Button>
+      </div>
+    </Modal>
+  );
+};
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -47,7 +118,6 @@ const RecentReceiptsList = () => {
     (state) => state.admin.receipts || {}
   );
 
-  // Email sending state from common slice (if needed)
   const { loading: emailLoading, successMessage, emailError } = useSelector(
     (state) => state.common.sendEmail
   );
@@ -67,9 +137,10 @@ const RecentReceiptsList = () => {
   const [isReceiptVisible, setReceiptVisible] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState(null);
 
-  // Export modal states
+  // Export modal state
   const [isExportModalOpen, setExportModalOpen] = useState(false);
 
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [pageLimit, setPageLimit] = useState(10);
 
@@ -105,7 +176,6 @@ const RecentReceiptsList = () => {
     const result = await dispatch(cancelReceipt(selectedReceiptId));
     if (result.payload === "Receipt cancel successfully") {
       toast.success("Receipt canceled successfully!");
-      // Fetch receipts again to update the list
       dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
     } else {
       toast.error("Failed to cancel receipt.");
@@ -114,13 +184,13 @@ const RecentReceiptsList = () => {
     setModalVisible(false);
   };
 
-  // --- Preview Receipt (opens modal) ---
+  // --- Preview Receipt ---
   const handlePreview = (record) => {
     setSelectedReceipt(record);
     setReceiptVisible(true);
   };
 
-  // --- View in read-only mode (navigates to CreateReceipt with record data) ---
+  // --- View in read-only mode ---
   const handleViewReadOnlyReceipt = (record) => {
     navigate("/finance/receipts/add-new-receipt", {
       state: {
@@ -137,17 +207,10 @@ const RecentReceiptsList = () => {
       console.error("Error: Missing _id in record", record);
       return;
     }
-
     try {
-      // Start a loading toast notification
       const toastId = toast.loading("Sending email...");
-
       const type = record.isCancel ? "cancelReceipt" : "receipt";
-
-      // Format the date properly
       const formattedDate = formatDate(record.date, "long");
-
-      // Construct the payload for sending email
       const payload = {
         receiver: {
           email: record.receiver.email,
@@ -161,22 +224,21 @@ const RecentReceiptsList = () => {
         branchName: record.schoolId?.branchName || "N/A",
         city: record.schoolId?.city || "N/A",
         schoolLogo: record.schoolId?.logo || "",
-
         receiptNumber: record.receiptNumber || "N/A",
-        invoiceNumber: record.invoiceNumber?.invoiceNumber || "N/A",
+        invoiceNumber:
+          typeof record.invoiceNumber === "object"
+            ? record.invoiceNumber.invoiceNumber
+            : record.invoiceNumber || "N/A",
         date: formattedDate,
         govtRefNumber: record.govtRefNumber || "",
-
         paymentMethod: record.paymentMethod || "N/A",
         paymentStatus: record.paymentStatus || "N/A",
-
         lineItems: record.lineItems.map((item) => ({
           revenueType: item.revenueType || "N/A",
           quantity: item.quantity || 1,
           rate: item.total / (item.quantity || 1),
           total: item.total || 0,
         })),
-
         totalAmount: record.totalAmount || 0,
         tax: record.tax || 0,
         penalty: record.penalty || 0,
@@ -184,14 +246,9 @@ const RecentReceiptsList = () => {
         discountType: record.discountType || "fixed",
         finalAmount: record.finalAmount || 0,
       };
-
       console.log("Dispatching sendEmail with:", { id: record._id, type, payload });
       const result = await dispatch(sendEmail({ id: record._id, type, payload }));
-
-      // Dismiss the loading toast
       toast.dismiss(toastId);
-
-      console.log("sendEmail result:", result);
       if (sendEmail.fulfilled.match(result)) {
         toast.success(
           `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
@@ -210,12 +267,10 @@ const RecentReceiptsList = () => {
   const handleDeleteReceipt = async (record) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this receipt?");
     if (!confirmDelete) return;
-
     try {
       const result = await dispatch(deleteReceipt(record._id));
       if (result.payload === "Receipt Deleted successfully") {
         toast.success("Receipt deleted successfully!");
-        // Fetch receipts again to update the list
         dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
       } else {
         toast.error("Failed to delete receipt.");
@@ -231,7 +286,7 @@ const RecentReceiptsList = () => {
     await downloadPDF(pdfRef, selectedReceipt, "Receipt");
   };
 
-  // --- Navigate to Add New Receipt Page (normal create) ---
+  // --- Navigate to Add New Receipt Page ---
   const handleNavigate = () => {
     navigate("/finance/receipts/add-new-receipt");
   };
@@ -245,87 +300,32 @@ const RecentReceiptsList = () => {
   };
 
   // --- Build data for Exporting ---
-  const exportData = receipts.map((item) => ({
-    "Receipt ID": item.receiptNumber || item._id || "N/A",
-    "Recipient Name": item.reciever?.name || item.receiver?.name || "N/A",
-    "Paid Date": item.date
-      ? new Date(item.date).toLocaleDateString("en-GB")
-      : "N/A",
-    "Paid Amount": item.totalPaidAmount ? `${item.totalPaidAmount} QR` : "N/A",
-    Discount:
-      item.discountType === "percentage"
-        ? `${item.discount || 0}%`
-        : `${item.discount || 0} QR`,
-    Penalty: `${item.penalty || 0} QR`,
-    Status: item.isCancel ? "Cancelled" : "Active",
-    Remark: item.remark || "N/A",
-  }));
-
   const transformReceiptData = (receipts) =>
     receipts?.map(({ _id, ...receipt }, index) => ({
       sNo: index + 1,
       receiptNumber: receipt?.receiptNumber || "N/A",
-      refInvoiceNumber: receipt?.invoiceNumber || "N/A",
+      refInvoiceNumber:
+        typeof receipt?.invoiceNumber === "object"
+          ? receipt?.invoiceNumber.invoiceNumber
+          : receipt?.invoiceNumber || "N/A",
       receiver: receipt?.receiver?.name || "N/A",
       receiverEmail: receipt?.receiver?.email || "N/A",
       receiverPhone: receipt?.receiver?.phone || "N/A",
       receiverAddress: receipt?.receiver?.address || "N/A",
-      tax: `${parseFloat(receipt?.tax)} %` || 0,
+      tax: receipt?.tax ? `${parseFloat(receipt?.tax)} %` : "0 %",
       discount:
         receipt?.discountType === "percentage"
           ? `${parseFloat(receipt?.discount)} %`
-          : `${parseFloat(receipt?.discount)} QR` || 0,
+          : `${parseFloat(receipt?.discount)} QR`,
       discountType: receipt?.discountType || "percentage",
-      penalty: `${parseFloat(receipt?.penalty)} QR` || 0,
-      totalPaidAmount: `${parseFloat(receipt?.totalPaidAmount)} QR` || 0,
+      penalty: receipt?.penalty ? `${parseFloat(receipt?.penalty)} QR` : "0 QR",
+      totalPaidAmount: receipt?.totalPaidAmount
+        ? `${parseFloat(receipt?.totalPaidAmount)} QR`
+        : "0 QR",
       cancelReceipt: receipt?.isCancel ? "Yes" : "No",
-      Date: receipt?.date || "N/A",
+      Date: receipt?.date ? formatDateTime(receipt.date) : "N/A",
       academicYearDetails: receipt?.academicYear?.year || "N/A",
     })) || [];
-
-  // --- 3-Dots Action Menu ---
-  const actionMenu = (record) => (
-    <Menu>
-      {/* 1) Preview -> PDF */}
-      <Menu.Item key="1" onClick={() => handlePreview(record)}>
-        <FilePdfOutlined /> Preview
-      </Menu.Item>
-
-      {/* 2) View (read-only) */}
-      <Menu.Item key="2" onClick={() => handleViewReadOnlyReceipt(record)}>
-        <EyeOutlined /> View (read-only)
-      </Menu.Item>
-
-      {/* 3) Cancel Receipt */}
-      <Menu.Item
-        key="3"
-        onClick={() => {
-          if (!record.isCancel) {
-            setSelectedReceiptId(record._id);
-            setModalVisible(true);
-          }
-        }}
-        disabled={record.isCancel}
-      >
-        <Tooltip
-          title={
-            record.isCancel
-              ? "This receipt is already canceled"
-              : "Cancel this receipt"
-          }
-        >
-          <span>
-            <CloseCircleOutlined /> Cancel Receipt
-          </span>
-        </Tooltip>
-      </Menu.Item>
-
-      {/* 4) Send Mail */}
-      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
-        <MailOutlined /> Send Mail
-      </Menu.Item>
-    </Menu>
-  );
 
   // --- Filter logic ---
   const filteredData = receipts.filter((item) => {
@@ -339,7 +339,6 @@ const RecentReceiptsList = () => {
     const dateString = item.date
       ? new Date(item.date).toLocaleDateString()
       : "";
-
     return (
       receiptNumber.includes(q) ||
       receiverName.includes(q) ||
@@ -348,7 +347,7 @@ const RecentReceiptsList = () => {
     );
   });
 
-  // --- Table columns ---
+  // --- Table columns including action-menu export button ---
   const columns = [
     {
       title: "Receipt ID",
@@ -404,10 +403,10 @@ const RecentReceiptsList = () => {
     },
     {
       title: "Invoice Ref ID",
-      dataIndex: "invoiceNumber",
-      key: "invoiceNumber",
+      dataIndex: "invoiceNumber.invoiceNumber",
+      key: "invoiceNumber.invoiceNumber",
       sorter: (a, b) =>
-        (a.invoiceNumber || "").localeCompare(b.invoiceNumber || ""),
+        (a.invoiceNumber || "").toString().localeCompare((b.invoiceNumber || "").toString()),
       render: (invoiceNumber) => invoiceNumber || "N/A",
     },
     {
@@ -435,10 +434,10 @@ const RecentReceiptsList = () => {
       render: (date) =>
         date
           ? new Date(date).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          })
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
           : "N/A",
     },
     {
@@ -451,6 +450,55 @@ const RecentReceiptsList = () => {
       ),
     },
   ];
+
+  // --- Action menu including an export option ---
+  const actionMenu = (record) => (
+    <Menu>
+      {/* 1) Preview -> PDF */}
+      <Menu.Item key="1" onClick={() => handlePreview(record)}>
+        <FilePdfOutlined /> Preview
+      </Menu.Item>
+
+      {/* 2) View (read-only) */}
+      <Menu.Item key="2" onClick={() => handleViewReadOnlyReceipt(record)}>
+        <EyeOutlined /> View (read-only)
+      </Menu.Item>
+
+      {/* 3) Cancel Receipt */}
+      <Menu.Item
+        key="3"
+        onClick={() => {
+          if (!record.isCancel) {
+            setSelectedReceiptId(record._id);
+            setModalVisible(true);
+          }
+        }}
+        disabled={record.isCancel}
+      >
+        <Tooltip
+          title={
+            record.isCancel
+              ? "This receipt is already canceled"
+              : "Cancel this receipt"
+          }
+        >
+          <span>
+            <CloseCircleOutlined /> Cancel Receipt
+          </span>
+        </Tooltip>
+      </Menu.Item>
+
+      {/* 4) Send Mail */}
+      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
+        <MailOutlined /> Send Mail
+      </Menu.Item>
+
+      {/* 5) Export this record (optional individual export) */}
+      <Menu.Item key="5" onClick={() => setExportModalOpen(true)}>
+        <ExportOutlined /> Export
+      </Menu.Item>
+    </Menu>
+  );
 
   // --- Render ---
   return (
@@ -470,6 +518,7 @@ const RecentReceiptsList = () => {
             </div>
 
             <div className="flex items-center space-x-4">
+              {/* Global Export Button */}
               <button
                 className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
                 onClick={() => setExportModalOpen(true)}
@@ -497,72 +546,53 @@ const RecentReceiptsList = () => {
               <Spinner />
             </div>
           ) : (
-            <>
-              {/* Table */}
-              <ProtectedSection
-                requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS}
-                title={"Receipts List"}
-              >
-                <Table
-                  rowKey={(record) => record._id}
-                  columns={columns}
-                  dataSource={filteredData}
-                  expandable={{
-                    expandedRowRender: (record) => (
-                      <div>
-                        <strong>Line Items:</strong>
-                        {record.lineItems && record.lineItems.length > 0 ? (
-                          <ul>
-                            {record.lineItems.map((item, index) => (
-                              <li key={index}>
-                                {item.revenueType || item.name || "Item"}:{" "}
-                                {item.total || 0} QR
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <span>No line items available</span>
-                        )}
-                      </div>
-                    ),
-                  }}
-                  pagination={{
-                    current: currentPage,
-                    total: pagination.totalRecords,
-                    pageSize: pageLimit,
-                    showSizeChanger: true,
-                    pageSizeOptions: ["5", "10", "20", "50"],
-                    size: "small",
-                    showTotal: (total) =>
-                      `Page ${currentPage} of ${Math.ceil(
-                        pagination.totalRecords / pageLimit
-                      )} | Total ${total} records`,
-                    onChange: (page) => {
-                      setCurrentPage(page);
-                    },
-                    onShowSizeChange: (current, size) => {
-                      setPageLimit(size);
-                      setCurrentPage(1);
-                    },
-                  }}
-                  summary={() => {
-                    let totalPaidAmount = 0;
-                    let totalTax = 0;
-                    let totalDiscount = 0;
-                    let totalPenalty = 0;
-
-                    filteredData.forEach((record) => {
-                      totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
-                      totalTax += parseFloat(record.tax) || 0;
-                      totalDiscount += parseFloat(record.discount) || 0;
-                      totalPenalty += parseFloat(record.penalty) || 0;
-                    });
-                  }}
-                  size="small"
-                  bordered
-                />
-              </ProtectedSection>
-            </>
+            <ProtectedSection
+              requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS}
+              title={"Receipts List"}
+            >
+              <Table
+                rowKey={(record) => record._id}
+                columns={columns}
+                dataSource={filteredData}
+                expandable={{
+                  expandedRowRender: (record) => (
+                    <div>
+                      <strong>Line Items:</strong>
+                      {record.lineItems && record.lineItems.length > 0 ? (
+                        <ul>
+                          {record.lineItems.map((item, index) => (
+                            <li key={index}>
+                              {item.revenueType || item.name || "Item"}: {item.total || 0} QR
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span>No line items available</span>
+                      )}
+                    </div>
+                  ),
+                }}
+                pagination={{
+                  current: currentPage,
+                  total: pagination.totalRecords,
+                  pageSize: pageLimit,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["5", "10", "20", "50"],
+                  size: "small",
+                  showTotal: (total) =>
+                    `Page ${currentPage} of ${Math.ceil(
+                      pagination.totalRecords / pageLimit
+                    )} | Total ${total} records`,
+                  onChange: (page) => setCurrentPage(page),
+                  onShowSizeChange: (current, size) => {
+                    setPageLimit(size);
+                    setCurrentPage(1);
+                  },
+                }}
+                size="small"
+                bordered
+              />
+            </ProtectedSection>
           )}
 
           {/* Cancel Confirmation Modal */}
@@ -577,40 +607,35 @@ const RecentReceiptsList = () => {
           {/* Email Modal */}
           <EmailModal
             isOpen={isEmailModalOpen}
-            onClose={closeEmailModal}
+            onClose={() => setEmailModalOpen(false)}
             sendButtonText="Send Receipt"
             onSubmit={() => {
               console.log("Send Receipt Clicked");
-              closeEmailModal();
+              setEmailModalOpen(false);
             }}
           />
         </div>
 
-        {/* Export Modal */}
-        <ExportModal
+        {/* Custom Export Modal */}
+        <CustomExportModal
           visible={isExportModalOpen}
           onClose={() => setExportModalOpen(false)}
           dataToExport={transformReceiptData(receipts)}
-          title="ReceiptsData"
-          sheet="Receipts_report"
         />
 
         {/* Receipt Preview Overlay */}
         {isReceiptVisible && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            {/* Dim / Blur background */}
             <div
               className="absolute inset-0 bg-black bg-opacity-60"
               style={{ backdropFilter: "blur(8px)" }}
               onClick={() => setReceiptVisible(false)}
             />
-            {/* Centered content */}
             <div
               ref={popupRef}
               className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close + Download PDF buttons */}
               <div className="flex justify-end space-x-2 mb-4">
                 <button
                   className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
@@ -625,8 +650,6 @@ const RecentReceiptsList = () => {
                   ✕
                 </button>
               </div>
-
-              {/* Receipt content container */}
               <div className="receipt-container">
                 {selectedReceipt ? (
                   <ReceiptTemplate data={selectedReceipt} ref={pdfRef} />
