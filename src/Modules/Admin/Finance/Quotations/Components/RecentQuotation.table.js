@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { Table, Spin, Alert, Button, Tag, Tooltip } from "antd";
+import { Table, Button, Tag, Alert } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
@@ -16,7 +16,7 @@ const RecentQuotation = () => {
     // Extracting necessary state from Redux store
     const { quotations, totalRecords, loading, error } = useSelector((state) => state.admin.quotations);
 
-    // Debounced function to fetch incomes with a fixed limit of 5
+    // Debounced function to fetch quotations with a fixed limit of 5
     const debouncedFetch = useCallback(
         debounce((params) => {
             dispatch(fetchAllQuotations(params));
@@ -29,8 +29,6 @@ const RecentQuotation = () => {
         const params = {
             page: 1, // Always fetch the first page
             limit: 5, // Limit to 5 records
-            //sortBy: "earnedDate",
-            //sortOrder: "desc",
         };
         debouncedFetch(params);
     }, [debouncedFetch]);
@@ -106,7 +104,7 @@ const RecentQuotation = () => {
             dataIndex: "status",
             key: "status",
             render: (status) => {
-                let color = "default";
+                let color;
                 switch (status) {
                     case "accept":
                         color = "green";
@@ -131,7 +129,7 @@ const RecentQuotation = () => {
         },
     ];
 
-    // Transform incomes data to table dataSource and limit to 5 records
+    // Transform quotations data to table dataSource
     const dataSource = quotations?.slice(0, 5).map((quotation) => ({
         key: quotation._id,
         quotationNumber: quotation.quotationNumber || "N/A",
@@ -141,15 +139,55 @@ const RecentQuotation = () => {
         discountType: quotation.discountType || "percentage",
         final_amount: quotation.final_amount || 0,
         total_amount: quotation.total_amount || 0,
-        status: quotation.status || 0,
+        status: quotation.status || "N/A",
     }));
+
+    // Helper function to render content based on state
+    const renderContent = () => {
+        if (loading) {
+            return (
+                <div className="flex justify-center">
+                    <Spinner tip="Loading..." />
+                </div>
+            );
+        }
+        if (error) {
+            return (
+                <Alert
+                    message="Error"
+                    description={error}
+                    type="error"
+                    showIcon
+                    className="my-4"
+                />
+            );
+        }
+        if (!quotations || quotations.length === 0) {
+            return (
+                <div className="text-center text-gray-500 text-xs py-4">
+                    No records found.
+                </div>
+            );
+        }
+        return (
+            <Table
+                dataSource={dataSource}
+                columns={columns}
+                pagination={false} // Removed pagination controls
+                className="rounded-lg shadow text-xs"
+                bordered
+                size="small"
+                tableLayout="fixed" // Fixed table layout
+            />
+        );
+    };
 
     return (
         <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <h2 className="text-lg font-medium text-gray-700">
-                    Summary of Quotation ({dataSource?.length || 5}/{totalRecords})
+                    Summary of Quotation ({dataSource?.length || 0}/{totalRecords})
                 </h2>
 
                 <ProtectedAction requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}>
@@ -161,38 +199,10 @@ const RecentQuotation = () => {
                         View More ({totalRecords})
                     </Button>
                 </ProtectedAction>
-
-
             </div>
-            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_SUMMARY_OF_QUOTATION} title={"Summary of Quotation"}>
-
-                {/* Loading Indicator */}
-                {loading && (
-                    <div className="flex justify-center">
-                        <Spinner tip="Loading..." />
-                    </div>
-                )}
-                {/* No Data Placeholder */}
-                {/* {!loading && quotations.length === 0 && !error && (
-                <div className="text-center text-gray-500 text-xs py-4">
-                    No records found.
-                </div>
-            )} */}
-                {/* Table */}
-                {!loading && !error && (
-                    <Table
-                        dataSource={dataSource}
-                        columns={columns}
-                        pagination={false} // Removed pagination controls
-                        className="rounded-lg shadow text-xs"
-                        bordered
-                        size="small"
-                        tableLayout="fixed" // Fixed table layout
-                    />
-
-                )}
+            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_SUMMARY_OF_QUOTATION} title="Summary of Quotation">
+                {renderContent()}
             </ProtectedSection>
-
         </div>
     );
 };

@@ -36,6 +36,7 @@ import { formatDate } from "../../../../Utils/helperFunctions";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
+import Layout from "../../../../Components/Common/Layout";
 
 const RecentReceiptsList = () => {
   const navigate = useNavigate();
@@ -434,10 +435,10 @@ const RecentReceiptsList = () => {
       render: (date) =>
         date
           ? new Date(date).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
           : "N/A",
     },
     {
@@ -453,191 +454,193 @@ const RecentReceiptsList = () => {
 
   // --- Render ---
   return (
-    <AdminLayout>
-      <div className="p-4 ">
-        {/* Header / Search / Export / Add New */}
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center space-x-4">
-            <Input
-              prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
-              placeholder="Search Receipt"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ width: "250px" }}
-            />
-          </div>
-
-          <div className="flex items-center space-x-4">
-            <button
-              className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
-              onClick={() => setExportModalOpen(true)}
-            >
-              <ExportOutlined className="text-sm" />
-              <span>Export</span>
-            </button>
-
-            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
-              <button
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-                onClick={handleNavigate}
-              >
-                <span className="text-gray-800 font-medium">Add New Receipt</span>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                  <FiUserPlus size={16} />
-                </div>
-              </button>
-            </ProtectedAction>
-          </div>
-        </div>
-
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "16px" }}>
-            <Spinner />
-          </div>
-        ) : (
-          <>
-            {/* Table */}
-            <ProtectedSection
-              requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS}
-              title={"Receipts List"}
-            >
-              <Table
-                rowKey={(record) => record._id}
-                columns={columns}
-                dataSource={filteredData}
-                expandable={{
-                  expandedRowRender: (record) => (
-                    <div>
-                      <strong>Line Items:</strong>
-                      {record.lineItems && record.lineItems.length > 0 ? (
-                        <ul>
-                          {record.lineItems.map((item, index) => (
-                            <li key={index}>
-                              {item.revenueType || item.name || "Item"}:{" "}
-                              {item.total || 0} QR
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span>No line items available</span>
-                      )}
-                    </div>
-                  ),
-                }}
-                pagination={{
-                  current: currentPage,
-                  total: pagination.totalRecords,
-                  pageSize: pageLimit,
-                  showSizeChanger: true,
-                  pageSizeOptions: ["5", "10", "20", "50"],
-                  size: "small",
-                  showTotal: (total) =>
-                    `Page ${currentPage} of ${Math.ceil(
-                      pagination.totalRecords / pageLimit
-                    )} | Total ${total} records`,
-                  onChange: (page) => {
-                    setCurrentPage(page);
-                  },
-                  onShowSizeChange: (current, size) => {
-                    setPageLimit(size);
-                    setCurrentPage(1);
-                  },
-                }}
-                summary={() => {
-                  let totalPaidAmount = 0;
-                  let totalTax = 0;
-                  let totalDiscount = 0;
-                  let totalPenalty = 0;
-
-                  filteredData.forEach((record) => {
-                    totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
-                    totalTax += parseFloat(record.tax) || 0;
-                    totalDiscount += parseFloat(record.discount) || 0;
-                    totalPenalty += parseFloat(record.penalty) || 0;
-                  });
-                }}
-                size="small"
-                bordered
+    <Layout title={"Receipts List | Student Diwan"}>
+      <AdminLayout>
+        <div className="p-4 ">
+          {/* Header / Search / Export / Add New */}
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center space-x-4">
+              <Input
+                prefix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+                placeholder="Search Receipt"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ width: "250px" }}
               />
-            </ProtectedSection>
-          </>
-        )}
-
-        {/* Cancel Confirmation Modal */}
-        <DeleteConfirmationModal
-          isOpen={modalVisible}
-          onClose={() => setModalVisible(false)}
-          onConfirm={handleConfirmCancelReceipt}
-          loading={cancelLoading}
-          text="Cancel Receipt"
-        />
-
-        {/* Email Modal */}
-        <EmailModal
-          isOpen={isEmailModalOpen}
-          onClose={closeEmailModal}
-          sendButtonText="Send Receipt"
-          onSubmit={() => {
-            console.log("Send Receipt Clicked");
-            closeEmailModal();
-          }}
-        />
-      </div>
-
-      {/* Export Modal */}
-      <ExportModal
-        visible={isExportModalOpen}
-        onClose={() => setExportModalOpen(false)}
-        dataToExport={transformReceiptData(receipts)}
-        title="ReceiptsData"
-        sheet="Receipts_report"
-      />
-
-      {/* Receipt Preview Overlay */}
-      {isReceiptVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          {/* Dim / Blur background */}
-          <div
-            className="absolute inset-0 bg-black bg-opacity-60"
-            style={{ backdropFilter: "blur(8px)" }}
-            onClick={() => setReceiptVisible(false)}
-          />
-          {/* Centered content */}
-          <div
-            ref={popupRef}
-            className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Close + Download PDF buttons */}
-            <div className="flex justify-end space-x-2 mb-4">
-              <button
-                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
-                onClick={() => handleDownloadPDF(pdfRef, selectedReceipt)}
-              >
-                Download PDF
-              </button>
-              <button
-                onClick={() => setReceiptVisible(false)}
-                className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
-              >
-                ✕
-              </button>
             </div>
 
-            {/* Receipt content container */}
-            <div className="receipt-container">
-              {selectedReceipt ? (
-                <ReceiptTemplate data={selectedReceipt} ref={pdfRef} />
-              ) : (
-                <p className="text-center text-gray-500">
-                  No receipt data available.
-                </p>
-              )}
+            <div className="flex items-center space-x-4">
+              <button
+                className="flex items-center px-2 py-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-normal rounded-md hover:opacity-90 space-x-2"
+                onClick={() => setExportModalOpen(true)}
+              >
+                <ExportOutlined className="text-sm" />
+                <span>Export</span>
+              </button>
+
+              <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
+                <button
+                  className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                  onClick={handleNavigate}
+                >
+                  <span className="text-gray-800 font-medium">Add New Receipt</span>
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                    <FiUserPlus size={16} />
+                  </div>
+                </button>
+              </ProtectedAction>
             </div>
           </div>
+
+          {loading ? (
+            <div style={{ textAlign: "center", padding: "16px" }}>
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              {/* Table */}
+              <ProtectedSection
+                requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS}
+                title={"Receipts List"}
+              >
+                <Table
+                  rowKey={(record) => record._id}
+                  columns={columns}
+                  dataSource={filteredData}
+                  expandable={{
+                    expandedRowRender: (record) => (
+                      <div>
+                        <strong>Line Items:</strong>
+                        {record.lineItems && record.lineItems.length > 0 ? (
+                          <ul>
+                            {record.lineItems.map((item, index) => (
+                              <li key={index}>
+                                {item.revenueType || item.name || "Item"}:{" "}
+                                {item.total || 0} QR
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <span>No line items available</span>
+                        )}
+                      </div>
+                    ),
+                  }}
+                  pagination={{
+                    current: currentPage,
+                    total: pagination.totalRecords,
+                    pageSize: pageLimit,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20", "50"],
+                    size: "small",
+                    showTotal: (total) =>
+                      `Page ${currentPage} of ${Math.ceil(
+                        pagination.totalRecords / pageLimit
+                      )} | Total ${total} records`,
+                    onChange: (page) => {
+                      setCurrentPage(page);
+                    },
+                    onShowSizeChange: (current, size) => {
+                      setPageLimit(size);
+                      setCurrentPage(1);
+                    },
+                  }}
+                  summary={() => {
+                    let totalPaidAmount = 0;
+                    let totalTax = 0;
+                    let totalDiscount = 0;
+                    let totalPenalty = 0;
+
+                    filteredData.forEach((record) => {
+                      totalPaidAmount += parseFloat(record.totalPaidAmount) || 0;
+                      totalTax += parseFloat(record.tax) || 0;
+                      totalDiscount += parseFloat(record.discount) || 0;
+                      totalPenalty += parseFloat(record.penalty) || 0;
+                    });
+                  }}
+                  size="small"
+                  bordered
+                />
+              </ProtectedSection>
+            </>
+          )}
+
+          {/* Cancel Confirmation Modal */}
+          <DeleteConfirmationModal
+            isOpen={modalVisible}
+            onClose={() => setModalVisible(false)}
+            onConfirm={handleConfirmCancelReceipt}
+            loading={cancelLoading}
+            text="Cancel Receipt"
+          />
+
+          {/* Email Modal */}
+          <EmailModal
+            isOpen={isEmailModalOpen}
+            onClose={closeEmailModal}
+            sendButtonText="Send Receipt"
+            onSubmit={() => {
+              console.log("Send Receipt Clicked");
+              closeEmailModal();
+            }}
+          />
         </div>
-      )}
-    </AdminLayout>
+
+        {/* Export Modal */}
+        <ExportModal
+          visible={isExportModalOpen}
+          onClose={() => setExportModalOpen(false)}
+          dataToExport={transformReceiptData(receipts)}
+          title="ReceiptsData"
+          sheet="Receipts_report"
+        />
+
+        {/* Receipt Preview Overlay */}
+        {isReceiptVisible && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Dim / Blur background */}
+            <div
+              className="absolute inset-0 bg-black bg-opacity-60"
+              style={{ backdropFilter: "blur(8px)" }}
+              onClick={() => setReceiptVisible(false)}
+            />
+            {/* Centered content */}
+            <div
+              ref={popupRef}
+              className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close + Download PDF buttons */}
+              <div className="flex justify-end space-x-2 mb-4">
+                <button
+                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                  onClick={() => handleDownloadPDF(pdfRef, selectedReceipt)}
+                >
+                  Download PDF
+                </button>
+                <button
+                  onClick={() => setReceiptVisible(false)}
+                  className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {/* Receipt content container */}
+              <div className="receipt-container">
+                {selectedReceipt ? (
+                  <ReceiptTemplate data={selectedReceipt} ref={pdfRef} />
+                ) : (
+                  <p className="text-center text-gray-500">
+                    No receipt data available.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </AdminLayout>
+    </Layout>
   );
 };
 

@@ -40,11 +40,9 @@ import SelectInput from "../Components/SelectInput"; // Ensure correct import pa
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
-
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
-
-
 import { downloadPDF } from "../../../../../../Utils/xl";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -65,6 +63,8 @@ const PenalityandAdjustmentList = () => {
   const [searchText, setSearchText] = useState("");
   const [isReceiptVisible, setReceiptVisible] = useState(false);
   const [selectedReturnInvoice, setSelectedReturnInvoice] = useState(null);
+  // <-- NEW: Local state to manage initial loading rendering -->
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -81,8 +81,12 @@ const PenalityandAdjustmentList = () => {
     dispatch(setCurrentPage(1));
   };
 
-  // Handle canceling a return invoice
-  const handleCancleReturnInvoice = (id) => {
+  // =======================
+  // Updated: Handle canceling a return invoice
+  // Now accepts the entire record and extracts the _id
+  // =======================
+  const handleCancleReturnInvoice = (record) => {
+    const { _id } = record;
     const params = {
       search: searchText,
       page: 1, // Always fetch the first page
@@ -90,7 +94,7 @@ const PenalityandAdjustmentList = () => {
       sortBy: "createdAt",
       sortOrder: "desc",
     };
-    dispatch(cancleReturnInvoiceData({ params, id }));
+    dispatch(cancleReturnInvoiceData({ params, id: _id }));
   };
 
   // Handle previewing a return invoice
@@ -100,10 +104,9 @@ const PenalityandAdjustmentList = () => {
   };
 
   // Handle downloading the PDF
-
   const handleDownloadPDF = async (pdfRef, selectedReturnInvoice) => {
-    await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice")
-  }
+    await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice");
+  };
 
   const handleSendEmail = async (record) => {
     if (!record._id) {
@@ -153,6 +156,13 @@ const PenalityandAdjustmentList = () => {
     };
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage, computedPageSize]);
+
+  // Monitor the loading state to disable the initial render once the API call completes
+  useEffect(() => {
+    if (!loading) {
+      setInitialLoad(false);
+    }
+  }, [loading]);
 
   // Close receipt preview modal on outside click
   useEffect(() => {
@@ -329,8 +339,9 @@ const PenalityandAdjustmentList = () => {
                 </span>
               </ProtectedSection>
             ),
+            // Updated: Pass the entire record to the cancellation handler.
             onClick: () => {
-              if (record?.status !== "Cancelled") handleCancleReturnInvoice(record?.key);
+              if (record?.status !== "Cancelled") handleCancleReturnInvoice(record);
             },
             disabled: record?.status === "Cancelled",
           },
@@ -343,7 +354,6 @@ const PenalityandAdjustmentList = () => {
               </span>
             ),
           },
-          ,
         ];
 
         return (
@@ -440,7 +450,6 @@ const PenalityandAdjustmentList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
-
               <Button
                 type="primary"
                 icon={<ExportOutlined />}
@@ -449,7 +458,6 @@ const PenalityandAdjustmentList = () => {
               >
                 Export
               </Button>
-
 
               <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
                 <button
@@ -464,46 +472,46 @@ const PenalityandAdjustmentList = () => {
                   </div>
                 </button>
               </ProtectedAction>
-
             </div>
           </div>
 
-          {/* Loading Indicator */}
-          {loading && (
+          {/* Render Spinner until initial API call is complete */}
+          {(initialLoad || loading) ? (
             <div className="flex justify-center">
-              <Spin tip="Loading..." />
+              <Spinner />
             </div>
+          ) : (
+            // Render the table only when not loading and after initial fetch has completed
+            !error && (
+              <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
+                <Table
+                  dataSource={dataSource}
+                  columns={columns}
+                  pagination={{
+                    current: currentPage,
+                    total: totalRecords,
+                    pageSize: computedPageSize,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20", "50"],
+                    size: "small",
+                    showTotal: () =>
+                      `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                    onChange: (page, pageSize) => {
+                      dispatch(setCurrentPage(page));
+                    },
+                    onShowSizeChange: (current, size) => {
+                      dispatch(setCurrentPage(1)); // Reset to first page on size change
+                    },
+                  }}
+                  className="rounded-lg shadow text-xs"
+                  bordered
+                  size="small"
+                  tableLayout="fixed"
+                />
+              </ProtectedSection>
+            )
           )}
 
-          {/* Table */}
-          {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
-              <Table
-                dataSource={dataSource}
-                columns={columns}
-                pagination={{
-                  current: currentPage,
-                  total: totalRecords,
-                  pageSize: computedPageSize,
-                  showSizeChanger: true,
-                  pageSizeOptions: ["5", "10", "20", "50"],
-                  size: "small",
-                  showTotal: () =>
-                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                  onChange: (page, pageSize) => {
-                    dispatch(setCurrentPage(page));
-                  },
-                  onShowSizeChange: (current, size) => {
-                    dispatch(setCurrentPage(1)); // Reset to first page on size change
-                  },
-                }}
-                className="rounded-lg shadow text-xs"
-                bordered
-                size="small"
-                tableLayout="fixed"
-              />
-            </ProtectedSection>
-          )}
           {/* Export Modal */}
           <ExportModal
             visible={isExportModalVisible}
@@ -545,14 +553,12 @@ const PenalityandAdjustmentList = () => {
                 </div>
 
                 {/* Receipt content container */}
-                <div >
+                <div>
                   <PenaltyAdjustmentTemplate data={selectedReturnInvoice} ref={pdfRef} />
                 </div>
               </div>
             </div>
           )}
-
-
         </div>
       </AdminDashLayout>
     </Layout>
