@@ -89,7 +89,7 @@ export const fetchSubjects = createAsyncThunk(
     
       const say = getAY();
       dispatch(setShowError(false));
-      const data =  await getData(`/api/studentDashboard/subjects/${userId}?say=${say}`);
+      const data =  await getData(`/admin/students/subjects/${userId}?say=${say}`);
       // console.log("escsasa->",data)
       return data?.subjects;
     } catch (error) {

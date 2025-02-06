@@ -68,7 +68,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
             options={categories}
           />
         </div>
-        {role !== "teacher" && (
+       
           <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK}>
             <button
               onClick={handleSidebarOpen}
@@ -77,7 +77,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
               {t("Add Book")}
             </button>
           </ProtectedAction>
-        )}
+       
       </div>
 
       <div className="flex justify-center items-center w-full min-h-[70vh]">

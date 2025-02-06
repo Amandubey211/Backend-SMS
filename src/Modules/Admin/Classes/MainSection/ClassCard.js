@@ -94,11 +94,11 @@ const ClassCard = ({ role, classData, onEdit }) => {
           <p>{teachersCount} Teachers</p>
           <img
             src={classIcons || centerLogo}
-            className="w-20 h-20 object-contain"
+            className="w-20 h-20 object-contain mb-2"
             alt="center_logo"
           />
         </NavLink>
-        <div className="flex justify-between items-center px-3">
+        <div className="flex justify-around items-center px-3">
           <div className="flex flex-col items-center gap-1">
             <p className="opacity-50">{t("Students")}</p>
             <span className="font-bold">{studentsCount}</span>
