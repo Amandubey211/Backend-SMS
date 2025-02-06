@@ -111,7 +111,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             ]}
           />
         </div>
-        {role !== "teacher" && (
+       
           <ProtectedAction requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}>
             <button
               onClick={handleSidebarOpen}
@@ -120,7 +120,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
               {t("Add Book Issue")}
             </button>
           </ProtectedAction>
-        )}
+        
       </div>
 
       <div className="overflow-x-auto bg-white shadow rounded-lg">
