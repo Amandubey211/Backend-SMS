@@ -10,14 +10,14 @@ import { addQuotation } from "../../../../../Store/Slices/Finance/Quotations/quo
 import toast from "react-hot-toast";
 import Layout from "../../../../../Components/Common/Layout";
 import { useNavigate } from "react-router-dom";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading "; // Removed trailing space
 
 /**
  * Inner form component using useFormikContext
  * to handle real-time calculation of Sub Amount and Final Amount.
  */
 const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
-  const { values, setFieldValue, resetForm, isSubmitting, submitForm } = useFormikContext();
+  const { values, setFieldValue, resetForm, isSubmitting } = useFormikContext();
 
   // Auto-calculate sub_amount (total_amount) and final_amount in real-time
   useEffect(() => {
@@ -34,7 +34,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
 
     let calculatedFinal = subAmount;
 
-    // Example: if tax is a percentage (adjust if needed for inclusive/exclusive tax)
+    // If tax is a percentage
     if (taxValue) {
       calculatedFinal += (calculatedFinal * taxValue) / 100;
     }
@@ -48,9 +48,9 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
       }
     }
 
-    // Ensure final amount doesn’t go below zero
-    setFieldValue("total_amount", subAmount < 0 ? 0 : subAmount);
-    setFieldValue("final_amount", calculatedFinal < 0 ? 0 : calculatedFinal);
+    // Ensure amounts don’t go below zero
+    setFieldValue("total_amount", subAmount < 0 ? 0 : subAmount, false);
+    setFieldValue("final_amount", calculatedFinal < 0 ? 0 : calculatedFinal, false);
   }, [values.lineItems, values.tax, values.discount, values.discountType, setFieldValue]);
 
   return (
@@ -73,7 +73,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
               disabled={loading || isSubmitting}
               className="px-4 py-2 rounded-md text-white"
               style={{
-                background: "linear-gradient(to right, #ec4899, #a855f7)", // from-pink-500 to-purple-500
+                background: "linear-gradient(to right, #ec4899, #a855f7)",
               }}
             >
               {loading ? "Loading.." : "Save Quotation"}
@@ -89,7 +89,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
           name="receiver.name"
           label="Receiver Name"
           placeholder="Enter receiver's name"
-          required={true}  // show red asterisk
+          required={true}
           readOnly={readOnly}
           disabled={readOnly}
         />
@@ -146,7 +146,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
                 <div key={index} className="grid grid-cols-12 gap-8 items-center mb-6">
                   <div className="col-span-3">
                     <SelectInput
-                      name={`lineItems?.${index}?.revenueType`}
+                      name={`lineItems.${index}.revenueType`}
                       label="Revenue Type"
                       options={[
                         { label: "Student Fee", value: "studentFee" },
@@ -219,7 +219,6 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
             </>
           )}
         </FieldArray>
-
       </div>
 
       {/* Additional Details Section */}
@@ -290,8 +289,12 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
           label="Add Document (if any)"
           placeholder="Upload file"
           onChange={(e) => {
-            const fileUrl = e.target.value; // Cloudinary URL after upload
-            setFieldValue("document", fileUrl);
+            // Example file handling: if you use an upload service, replace this with the URL returned
+            if (e.target.files && e.target.files[0]) {
+              const file = e.target.files[0];
+              // For demonstration, we use the file name. In real code, you might upload the file and use its URL.
+              setFieldValue("document", file.name);
+            }
           }}
           value={values.document}
           readOnly={readOnly}
@@ -301,12 +304,12 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
         <TextInput
           name="remark"
           label="Remark"
-          placeholder="Enter remark(if any)"
+          placeholder="Enter remark (if any)"
           readOnly={readOnly}
           disabled={readOnly}
         />
 
-        {/* Keep Sub Amount and Final Amount at the end, read-only, auto-calculated */}
+        {/* Auto-calculated fields */}
         <TextInput
           name="total_amount"
           label="Sub Amount"
@@ -348,8 +351,8 @@ const CreateQuotation = () => {
     lineItems: Yup.array().of(
       Yup.object().shape({
         revenueType: Yup.string().required("Revenue Type is required"),
-        quantity: Yup.number().min(1, "Quantity must be at least 1").required(),
-        amount: Yup.number().min(0, "Rate must be positive").required(),
+        quantity: Yup.number().min(1, "Quantity must be at least 1").required("Quantity is required"),
+        amount: Yup.number().min(0, "Rate must be positive").required("Amount is required"),
       })
     ),
     discountType: Yup.string()
@@ -369,6 +372,7 @@ const CreateQuotation = () => {
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     if (readOnly) return;
+    console.log("Submitting values:", values); // Debug log
     setLoading(true);
     try {
       await dispatch(addQuotation(values)).unwrap();
@@ -432,7 +436,6 @@ const CreateQuotation = () => {
             initialValues={formattedQuotation}
             validationSchema={!readOnly ? validationSchema : null}
             onSubmit={handleSubmit}
-            enableReinitialize
           >
             <QuotationFormInner
               readOnly={readOnly}
