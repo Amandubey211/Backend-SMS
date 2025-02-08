@@ -44,10 +44,10 @@ export default function EditStudentFeesForm({ data }) {
                 feeId: data._id || "",
                 subCategory: data.subCategory || "",
                 feeCycle: data.feeCycle?.type || "",
-                startDate: data.feeCycle?.startDate?.slice(0,10) || "",
-                endDate: data.feeCycle?.endDate?.slice(0,10) || "",
-                dueDate: data.dueDate?.slice(0,10) || "",
-                paidDate: data.paidDate?.slice(0,10) || "",
+                startDate: data.feeCycle?.startDate?.slice(0, 10) || "",
+                endDate: data.feeCycle?.endDate?.slice(0, 10) || "",
+                dueDate: data.dueDate?.slice(0, 10) || "",
+                paidDate: data.paidDate?.slice(0, 10) || "",
                 examType: data.examType || "",
                 paymentType: data.paymentType || "",
                 chequeNumber: data.chequeNumber || "",
@@ -60,7 +60,7 @@ export default function EditStudentFeesForm({ data }) {
                 advance_amount: data.advance_amount || 0,
                 penalty: data.penalty || 0,
                 paid_amount: data.paid_amount || 0,
-                final_amount:data.final_amount ||0,
+                final_amount: data.final_amount || 0,
                 paymentStatus: data.paymentStatus || "",
                 studentId: data.studentId,
                 classId: data.classId,
@@ -111,25 +111,25 @@ export default function EditStudentFeesForm({ data }) {
 
         return { finalAmount, remainingAmount, advanceAmount };
     };
-
+    const viewMode = data.mode == 'Edit' ? false : true
     return (
         <div className="flex w-full border flex-col">
             <div className="flex flex-row mx-4 gap-2 font-semibold justify-between my-2">
                 <div className="flex flex-row gap-2">
-                <h1 className="text-gray-500">Student : </h1>
-                <h1>{data?.studentDetails?.firstName}</h1>
-                <h1>{data?.studentDetails?.lastName}</h1>
+                    <h1 className="text-gray-500">Student : </h1>
+                    <h1>{data?.studentDetails?.firstName}</h1>
+                    <h1>{data?.studentDetails?.lastName}</h1>
                 </div>
                 <div className="flex flex-row mx-6 gap-2 ">
-                <h1 className="text-gray-500">Class :</h1>
-                <h1>{data?.classDetails?.className}</h1>
+                    <h1 className="text-gray-500">Class :</h1>
+                    <h1>{data?.classDetails?.className}</h1>
+                </div>
             </div>
-            </div>
-            
+
             <Formik
                 enableReinitialize
                 initialValues={initialValues}
-               // validationSchema={validationSchema}
+                // validationSchema={validationSchema}
                 onSubmit={(values) => {
                     const { finalAmount, remainingAmount, advanceAmount } =
                         calculateAmounts(values);
@@ -141,7 +141,7 @@ export default function EditStudentFeesForm({ data }) {
                     };
                     console.log("Submitted Data:", updatedValues);
                     dispatch(updateStudentFee(updatedValues)).then(() => {
-                       
+
                         dispatch(
                             fetchAllIncomes({
                                 page: 1,
@@ -196,36 +196,43 @@ export default function EditStudentFeesForm({ data }) {
                                     label="End Date"
                                     name="endDate"
                                     type="date"
+                                    disabled={viewMode}
                                 />}
                             <TextInput
                                 label="Due Date"
                                 name="dueDate"
                                 type="date"
+                                disabled={viewMode}
                             />
                             <TextInput
                                 label="Total Amount"
                                 name="total_amount"
                                 type="number"
+                                disabled={viewMode}
                             />
                             <TextInput
                                 label="Remaining Amount"
                                 name="remaining_amount"
                                 type="number"
+                                disabled={viewMode}
                             />
                             <TextInput
                                 label="Advance Amount"
                                 name="advance_amount"
                                 type="number"
+                                disabled={viewMode}
                             />
                             <TextInput
                                 label="Discount"
                                 name="discount"
                                 type="number"
+                                disabled={viewMode}
                             />
                             <TextInput
                                 label="Tax"
                                 name="tax"
                                 type="number"
+                                disabled={viewMode}
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-6 w-full">
@@ -233,16 +240,19 @@ export default function EditStudentFeesForm({ data }) {
                                 label="Penalty"
                                 name="penalty"
                                 type="number"
+                                disabled={viewMode}
                             />
-                              <TextInput
+                            <TextInput
                                 label="Final Amount"
                                 name="final_amount"
                                 type="number"
+                                disabled={viewMode}
                             />
-                             <TextInput
+                            <TextInput
                                 label="Paid Date"
                                 name="paidDate"
                                 type="date"
+                                disabled={viewMode}
                             />
                         </div>
                         <div className="grid grid-cols-3 gap-6 w-full">
@@ -250,46 +260,52 @@ export default function EditStudentFeesForm({ data }) {
                                 label="Paid Amount"
                                 name="paid_amount"
                                 type="number"
+                                disabled={viewMode}
                             />
                             <SelectInput
                                 label="Payment Type"
                                 name="paymentType"
                                 options={["cash", "card", "online", "cheque", "other"]}
+                                disabled={viewMode}
                             />
                             <SelectInput
                                 label={"Payment Status"}
                                 name="paymentStatus"
                                 options={["paid", "unpaid", "partial", "advance"]}
+                                disabled={viewMode}
                             />
                             {values.paymentType == "cheque" && <TextInput
                                 label="Cheque Number"
                                 name="chequeNumber"
+                                disabled={viewMode}
 
                             />}
                             {values.paymentType == "online" && <TextInput
                                 label="Online Transaction ID"
                                 name="onlineTransactionId"
+                                disabled={viewMode}
 
                             />}
                         </div>
                         <div className="grid grid-cols-3 gap-6 w-full">
-                        <FileInput
-            label="Add receipt/document"
-              name="document"
-            
-            onChange={
-              (e) => {setFieldValue("document", e.target.value || null)} 
-            }
-            value={values.document || ''}
-          />
+                            <FileInput
+                                label="Add receipt/document"
+                                name="document"
+
+                                onChange={
+                                    (e) => { setFieldValue("document", e.target.value || null) }
+                                }
+                                value={values.document || ''}
+                                disabled={viewMode}
+                            />
                         </div>
-                        { data.mode == 'Edit' &&
-                        <button
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
-                        >
-                            Update Fees
-                        </button>
+                        {data.mode == 'Edit' &&
+                            <button
+                                type="submit"
+                                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white text-sm font-medium px-6 py-2 rounded-md shadow-md hover:from-pink-600 hover:to-purple-600 transition"
+                            >
+                                Update Fees
+                            </button>
                         }
                     </Form>
                 )}
