@@ -312,7 +312,7 @@ const TotalRevenueList = () => {
         dataIndex: "categoryName",
         key: "categoryName",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 150,
+        width: 100,
         ellipsis: true,
       },
       // New Paid Date Column (Third Position)
@@ -321,7 +321,7 @@ const TotalRevenueList = () => {
         dataIndex: "earnedDate",
         key: "paidDate",
         render: (date) => <span className="text-xs">{formatDate(date)}</span>,
-        width: 150,
+        width: 100,
         ellipsis: true,
       },
       {
@@ -329,7 +329,7 @@ const TotalRevenueList = () => {
         dataIndex: "subCategory",
         key: "subCategory",
         render: (text) => <span className="text-xs">{text}</span>,
-        width: 150,
+        width: 100,
         ellipsis: true,
       },
       // Discount Column
@@ -395,7 +395,7 @@ const TotalRevenueList = () => {
         dataIndex: "finalAmount",
         key: "finalAmount",
         render: (value) => <span className="text-xs">{value || "0"} QR</span>,
-        width: 150,
+        width: 100,
         ellipsis: true,
       },
       {
@@ -405,17 +405,17 @@ const TotalRevenueList = () => {
         render: (value) => (
           <span className="text-xs text-green-600">{value || "0"} QR</span>
         ),
-        width: 120,
+        width: 100,
         ellipsis: true,
       },
       {
-        title: "Remaining Amount (QR)",
+        title: "Remaining (QR)",
         dataIndex: "remainingAmount",
         key: "remainingAmount",
         render: (value) => (
           <span className="text-xs text-red-600">{value || "0"} QR</span>
         ),
-        width: 120,
+        width: 100,
         ellipsis: true,
       },
       {

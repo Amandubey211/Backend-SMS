@@ -17,7 +17,8 @@ const StudentGradesAccordion = ({ student }) => {
     if (moduleId) params.moduleId = moduleId;
     if (chapterId) params.chapterId = chapterId;
     if (arrangeBy) params.arrangeBy = arrangeBy;
-    dispatch(fetchStudentGrades({ params, studentId: student?._id, studentClassId: student?.presentClassId }));
+    dispatch(fetchStudentGrades({ params, studentId: student?._id,
+       studentClassId: student?.presentClassId }));
   };
 
   useEffect(() => {

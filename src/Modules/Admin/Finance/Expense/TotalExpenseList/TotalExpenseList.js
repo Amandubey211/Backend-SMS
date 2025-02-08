@@ -646,7 +646,7 @@ const TotalExpenseList = () => {
                   tip: "Loading...",
                 }}
                 summary={summary}
-                scroll={{ x: true }} // allow horizontal scroll if needed
+                scroll={{ x: true }}
                 onRow={(record) => ({
                   onClick: () => {
                     if (record.paymentStatus !== "unpaid") {
