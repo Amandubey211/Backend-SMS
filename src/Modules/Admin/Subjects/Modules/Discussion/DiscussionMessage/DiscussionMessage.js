@@ -69,13 +69,13 @@ const DiscussionMessage = () => {
   };
 
   // Filter comments based on search query
-  const filteredComments = localComments.filter((comment) => {
+  const filteredComments = localComments?.filter((comment) => {
     const searchInComment = comment?.createdBy
-      ? comment.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
+      ? comment?.createdBy?.toLowerCase()?.includes(searchQuery.toLowerCase())
       : false;
-    const searchInReplies = comment.replies.some((reply) =>
+    const searchInReplies = comment?.replies?.some((reply) =>
       reply.createdBy
-        ? reply.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
+        ? reply?.createdBy?.toLowerCase()?.includes(searchQuery?.toLowerCase())
         : false
     );
     return searchInComment || searchInReplies;
