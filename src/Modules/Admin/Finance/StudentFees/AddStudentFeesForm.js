@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import StudentFeesForm from "../Earnings/AddEarnings/EarningsForm/StudentFeesForm";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 export default function AddStudentFeesForm() {
   const subCategories = [
@@ -43,6 +44,7 @@ export default function AddStudentFeesForm() {
       setFormData((prev) => prev.filter((item) => item.subCategory !== category));
     }
   };  
+  useNavHeading("Finance", "Add Student Fees");
   return (
     <Layout title="Finance | Add Student Fees">
       <AdminDashLayout>

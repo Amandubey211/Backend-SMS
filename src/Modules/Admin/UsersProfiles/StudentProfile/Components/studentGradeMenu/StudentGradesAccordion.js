@@ -17,7 +17,8 @@ const StudentGradesAccordion = ({ student }) => {
     if (moduleId) params.moduleId = moduleId;
     if (chapterId) params.chapterId = chapterId;
     if (arrangeBy) params.arrangeBy = arrangeBy;
-    dispatch(fetchStudentGrades({ params, studentId: student?._id, studentClassId: student?.presentClassId }));
+    dispatch(fetchStudentGrades({ params, studentId: student?._id,
+       studentClassId: student?.presentClassId }));
   };
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const StudentGradesAccordion = ({ student }) => {
 
   return (
     <>
-    <ProtectedSection requiredPermission={PERMISSIONS. GET_STUDENT_GRADES}  title={"Grades"}>
+    <ProtectedSection requiredPermission={PERMISSIONS.GET_STUDENT_GRADES}  title={"Grades"}>
       <div className="flex flex-row w-[100%]">
         <div className="w-[75%] ">
           <GradeAccordionItem getData={(subjectId) => getStudentGrades(subjectId)} />

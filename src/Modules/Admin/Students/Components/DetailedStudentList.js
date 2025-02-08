@@ -88,7 +88,7 @@ const StudentDetails = React.memo(({ student }) => (
       <div className="text-sm text-gray-500 truncate">
         {student?.sectionName || "N/A"}
       </div>
-      {student?.groups.length > 0 && (
+      {student?.groups?.length > 0 && (
         <div className="text-sm text-gray-500 truncate">
           {student?.groups[0]?.groupName || "N/A"}
         </div>

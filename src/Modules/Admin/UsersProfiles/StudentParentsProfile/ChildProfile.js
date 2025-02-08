@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ProtectedSection from '../../../../Routes/ProtectedRoutes/ProtectedSection';
 import { PERMISSIONS } from '../../../../config/permission';
+import ProtectedAction from '../../../../Routes/ProtectedRoutes/ProtectedAction';
 
 const ChildProfile = ({ children }) => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const ChildProfile = ({ children }) => {
   // console.log('Children data:', children);
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_PARENT_STUDENT_INFO} title={"Childern"}>
+
       <div className="flex flex-col gap-4 mt-2">
         {children?.map((child, index) => (
           <div key={index} className='flex flex-col text-center border border-gray-300 rounded-md items-center justify-around mx-5 py-5 gap-3'>
@@ -37,6 +38,7 @@ const ChildProfile = ({ children }) => {
               <span className='font-medium text-gray-800'>{child?.section}</span>
             </div>
             <div>
+            <ProtectedAction requiredPermission={PERMISSIONS.VIEW_STUDENT}>
               <button
                 className="border p-2 w-[300px] rounded bg-pink-100 text-center flex justify-center items-center"
                 onClick={() => navigate(`/users/students/${child?.id}`)}
@@ -45,11 +47,12 @@ const ChildProfile = ({ children }) => {
                   {t('View Profile')}
                 </span>
               </button>
+              </ProtectedAction>
             </div>
           </div>
         ))}
       </div>
-    </ProtectedSection>
+    
   );
 };
 

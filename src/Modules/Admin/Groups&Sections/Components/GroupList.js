@@ -145,7 +145,7 @@ const GroupList = ({ onSeeGradeClick }) => {
                     </span>
                   </span>
                 </div>
-                {role !== "teacher" && (
+
                   <div
                     className="relative"
                     ref={(el) => (menuRefs.current[groupIndex] = el)} // Attach reference to each group
@@ -185,8 +185,8 @@ const GroupList = ({ onSeeGradeClick }) => {
                       </div>
                     )}
                   </div>
-                )}
 
+                  
                 <svg
                   className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
                     expandedGroupIndex === groupIndex ? "rotate-180" : ""
