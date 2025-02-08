@@ -38,7 +38,7 @@ export const fetchOneStudentFee = createAsyncThunk(
 export const createStudentFee = createAsyncThunk(
   "studentFees/createStudentFee",
 
-  async (feeData, { rejectWithValue, dispatch, getState }) => {
+  async ({feeData,navigate}, { rejectWithValue, dispatch, getState }) => {
 
     const say = getAY();
     const getRole = getUserRole(getState);
@@ -50,7 +50,8 @@ export const createStudentFee = createAsyncThunk(
         { allData: feeData }
       );
       if (response.success) {
-        toast.success('Fees added  successfully!')
+        toast.success('Fees added  successfully!');
+        navigate('/finance/studentfees/total-revenue')
       }
       return response;
     } catch (error) {
