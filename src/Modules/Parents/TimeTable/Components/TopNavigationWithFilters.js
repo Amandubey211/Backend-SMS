@@ -9,7 +9,11 @@ import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
-const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChange, academicYears }) => {
+const TopNavigationWithFilters = ({
+  onBackendFilterChange,
+  onFrontendFilterChange,
+  academicYears,
+}) => {
   const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
 
@@ -32,14 +36,12 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
       dispatch(fetchAllClasses());
     }
   }, [dispatch, role]);
-  
+
   useEffect(() => {
     if (error && role !== "parent" && role !== "student") {
-      // Handle the error silently or log it, as toast is removed
       console.error("Failed to load classes:", error);
     }
   }, [error, role]);
-  
 
   // Debounced function to handle name filtering
   const debouncedHandleNameFilter = useMemo(
@@ -60,7 +62,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
       filterName === "status" ||
       filterName === "academicYear"
     ) {
-      // Trigger backend filter change
+      // Trigger backend filter change immediately
       onBackendFilterChange({ ...filters, [filterName]: value });
     }
 
@@ -76,23 +78,29 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
   };
 
   const clearFilters = () => {
-    setFilters({
+    const cleared = {
       name: "",
       classId: "",
       type: "",
       status: "",
       academicYear: "",
-    });
-    onBackendFilterChange({}); // Trigger API request to load data without filters
+    };
+    setFilters(cleared);
+    onBackendFilterChange({}); // Load data without filters
     onFrontendFilterChange(""); // Reset frontend filter
   };
 
   return (
     <div className="p-4 bg-transparent mb-5">
-      <Row gutter={16} align="middle" justify="end">
+      <Row gutter={16} align="middle" justify="start">
         {/* Name Filter */}
         <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Name")}</label>
+          <label
+            className="font-medium text-gray-700"
+            style={{ paddingRight: "8px" }}
+          >
+            {t("Name")}
+          </label>
           <Input
             placeholder={t("Search by Name")}
             prefix={<SearchOutlined />}
@@ -106,7 +114,12 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
         {/* Class ID Filter - Exclude for Parent/Student */}
         {role !== "parent" && role !== "student" && (
           <Col>
-            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Class")}</label>
+            <label
+              className="font-medium text-gray-700"
+              style={{ paddingRight: "8px" }}
+            >
+              {t("Class")}
+            </label>
             <Select
               placeholder={t("Select Class")}
               loading={loading}
@@ -129,7 +142,12 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
 
         {/* Type Filter */}
         <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Type")}</label>
+          <label
+            className="font-medium text-gray-700"
+            style={{ paddingRight: "8px" }}
+          >
+            {t("Type")}
+          </label>
           <Select
             placeholder={t("All Types")}
             value={filters.type}
@@ -148,7 +166,12 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
         {/* Status Filter - Exclude for Parent/Student */}
         {role !== "parent" && role !== "student" && (
           <Col>
-            <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Status")}</label>
+            <label
+              className="font-medium text-gray-700"
+              style={{ paddingRight: "8px" }}
+            >
+              {t("Status")}
+            </label>
             <Select
               placeholder={t("All Statuses")}
               value={filters.status}
@@ -163,10 +186,34 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
           </Col>
         )}
 
+        {/* Academic Year Filter */}
+        {/* <Col>
+          <label
+            className="font-medium text-gray-700"
+            style={{ paddingRight: "8px" }}
+          >
+            {t("Academic Year")}
+          </label>
+          <Select
+            placeholder={t("Select Academic Year")}
+            value={filters.academicYear}
+            onChange={(value) => handleFilterChange("academicYear", value)}
+            style={{ width: "180px" }}
+            allowClear
+          >
+            <Option value="">{t("Select Academic Year")}</Option>
+            {academicYears?.map((year, index) => (
+              <Option key={index} value={year}>
+                {year}
+              </Option>
+            ))}
+          </Select>
+        </Col> */}
+
         {/* Action Buttons */}
         <Col>
           <Space size="middle">
-            <Button
+            {/* <Button
               type="primary"
               onClick={applyFilters}
               style={{
@@ -177,7 +224,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
               className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
             >
               {t("Apply Filters")}
-            </Button>
+            </Button> */}
 
             <Button
               onClick={clearFilters}
