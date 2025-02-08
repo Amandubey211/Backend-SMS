@@ -15,6 +15,7 @@ const SubjectSideBar = () => {
     { name: "Module", path: "module" },
     { name: "Assignments", path: "assignment" },
     { name: "Quizzes", path: "quiz" },
+    { name: "Offline Exam", path: "offline_exam" },
     { name: "Discussions", path: "discussions" },
     { name: "Page", path: "page" },
     { name: "Grades", path: "grades" },
