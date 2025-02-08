@@ -19,15 +19,12 @@ const TimeTablePage = () => {
   // Determine the layout component based on the role
   const DashLayout = AdminDashLayout;
 
-
-  
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>
         <Routes>
           <Route index element={<TimeTableMainSection />} />
           <Route path="viewtable/:tablename" element={<TableView />} />
-          
         </Routes>
       </DashLayout>
     </Layout>
