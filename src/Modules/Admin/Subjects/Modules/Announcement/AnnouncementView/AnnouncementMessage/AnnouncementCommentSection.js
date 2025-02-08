@@ -71,7 +71,7 @@ const AnnouncementCommentSection = () => {
   };
 
   const filteredComments = localComments.filter((comment) => {
-    const searchInComment = comment.createdBy
+    const searchInComment = comment?.createdBy
       ? comment.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
       : false;
     const searchInReplies = comment.replies.some((reply) =>

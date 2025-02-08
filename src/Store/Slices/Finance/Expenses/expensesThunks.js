@@ -187,7 +187,7 @@ export const deleteExpense = createAsyncThunk(
         };
 
         await dispatch(fetchAllExpenses(params)); // Refetch the expenses list
-        toast.success("Expense deleted successfully!");
+       // toast.success("Expense deleted successfully!");
         return { id, category };
       } else {
         toast.error(response?.message || "Failed to delete expense.");

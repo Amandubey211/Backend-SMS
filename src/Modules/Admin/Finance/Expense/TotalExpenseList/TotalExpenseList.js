@@ -273,7 +273,7 @@ const TotalExpenseList = () => {
         ellipsis: true,
       },
       {
-        title: "Sub-Category/Name",
+        title: "Sub-Category",
         dataIndex: "subCategoryName",
         key: "subCategoryName",
         render: (text) => <span className="text-xs capitalize">{text}</span>,
@@ -282,7 +282,7 @@ const TotalExpenseList = () => {
       },
       // New Expense Date Column (Third Position)
       {
-        title: "Expense Date",
+        title: "Date",
         dataIndex: "expenseDate",
         key: "expenseDate",
         render: (date) => <span className="text-xs">{formatDate(date)}</span>,
@@ -318,7 +318,7 @@ const TotalExpenseList = () => {
         },
       },
       {
-        title: "Total Amount (QR)",
+        title: "Total (QR)",
         dataIndex: "totalAmount",
         key: "totalAmount",
         width: 100,
@@ -371,7 +371,7 @@ const TotalExpenseList = () => {
         ),
       },
       {
-        title: "Remaining Amount (QR)",
+        title: "Remaining (QR)",
         dataIndex: "remainingAmount",
         key: "remainingAmount",
         width: 100,
@@ -646,7 +646,7 @@ const TotalExpenseList = () => {
                   tip: "Loading...",
                 }}
                 summary={summary}
-                scroll={{ x: true }} // allow horizontal scroll if needed
+                scroll={{ x: true }}
                 onRow={(record) => ({
                   onClick: () => {
                     if (record.paymentStatus !== "unpaid") {

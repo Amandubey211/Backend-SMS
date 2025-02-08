@@ -1,17 +1,23 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { Input, Select, Button, Row, Col, Space } from "antd";
+import React, { useState, useMemo } from "react";
+import { Input, Select, Button, Row, Col } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import toast from "react-hot-toast";
 import debounce from "lodash/debounce";
 import { useTranslation } from "react-i18next";
 
 const { Option } = Select;
 
-const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChange, academicYears }) => {
+/**
+ * A top navigation bar with filters for timetable searches.
+ * - Label positioned above the inputs
+ * - Only a "Clear Filters" button (no apply button)
+ * - Left-aligned filter elements, with cleaner vertical alignment for the button
+ */
+const TopNavigationWithFilters = ({
+  onBackendFilterChange,
+  onFrontendFilterChange,
+  academicYears,
+}) => {
   const { t } = useTranslation("admTimeTable");
-  const dispatch = useDispatch();
 
   // Local filter state
   const [filters, setFilters] = useState({
@@ -19,20 +25,7 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
     type: "",
   });
 
-  // // Fetch classes from Redux store (this might not be needed since we're removing role-based conditions)
-  // const { classes, loading, error } = useSelector((state) => state.admin.class);
-  // useEffect(() => {
-  //   dispatch(fetchAllClasses());
-  // }, [dispatch]);
-
-  // useEffect(() => {
-  //   if (error) {
-  //     // Handle the error silently or log it
-  //     console.error("Failed to load classes:", error);
-  //   }
-  // }, [error]);
-
-  // Debounced function to handle name filtering
+  // Debounced name filter: calls the parent's onFrontendFilterChange
   const debouncedHandleNameFilter = useMemo(
     () =>
       debounce((value) => {
@@ -41,95 +34,89 @@ const TopNavigationWithFilters = ({ onBackendFilterChange, onFrontendFilterChang
     [onFrontendFilterChange]
   );
 
-  // Handle filter changes
+  /**
+   * Handle local filter changes:
+   * - `name` (frontend filter, debounced)
+   * - `type` (backend filter, immediate)
+   */
   const handleFilterChange = (filterName, value) => {
     setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
-  
+
     if (filterName === "name") {
-      // Trigger frontend filter change with debounce
+      // Frontend filter via debounce
       debouncedHandleNameFilter(value);
-    } else {
-      // Trigger backend filter change for type
+    } else if (filterName === "type") {
+      // Immediately update backend filter
       onBackendFilterChange({ ...filters, [filterName]: value });
     }
   };
-  
 
-  const applyFilters = () => {
-    onBackendFilterChange(filters);
-    onFrontendFilterChange(filters.name);
-  };
-
+  /**
+   * Clears all filters
+   */
   const clearFilters = () => {
     setFilters({
       name: "",
       type: "",
     });
-    onBackendFilterChange({}); // Trigger API request to load data without filters
-    onFrontendFilterChange(""); // Reset frontend filter
+    onBackendFilterChange({}); // Reload data without any filters
+    onFrontendFilterChange(""); // Reset name-based search
   };
 
   return (
     <div className="p-4 bg-transparent mb-5">
-      <Row gutter={16} align="middle" justify="end">
+      <Row gutter={16} align="bottom" justify="start">
         {/* Name Filter */}
         <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Name")}</label>
-          <Input
-            placeholder={t("Search by Name")}
-            prefix={<SearchOutlined />}
-            value={filters.name}
-            onChange={(e) => handleFilterChange("name", e.target.value)}
-            allowClear
-            style={{ width: "200px" }}
-          />
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-700 mb-1">
+              {t("Name")}
+            </label>
+            <Input
+              placeholder={t("Search by Name")}
+              prefix={<SearchOutlined />}
+              value={filters.name}
+              onChange={(e) => handleFilterChange("name", e.target.value)}
+              allowClear
+              style={{ width: "200px" }}
+            />
+          </div>
         </Col>
 
         {/* Type Filter */}
         <Col>
-          <label className="font-medium text-gray-700" style={{ paddingRight: "8px" }}>{t("Type")}</label>
-          <Select
-            placeholder={t("All Types")}
-            value={filters.type}
-            onChange={(value) => handleFilterChange("type", value)}
-            style={{ width: "180px" }}
-            allowClear
-          >
-            <Option value="">{t("All Types")}</Option>
-            <Option value="weekly">{t("Weekly")}</Option>
-            <Option value="exam">{t("Exam")}</Option>
-            <Option value="event">{t("Event")}</Option>
-            <Option value="others">{t("Others")}</Option>
-          </Select>
+          <div className="flex flex-col">
+            <label className="font-medium text-gray-700 mb-1">
+              {t("Type")}
+            </label>
+            <Select
+              placeholder={t("All Types")}
+              value={filters.type}
+              onChange={(value) => handleFilterChange("type", value)}
+              style={{ width: "180px" }}
+              allowClear
+            >
+              <Option value="">{t("All Types")}</Option>
+              <Option value="weekly">{t("Weekly")}</Option>
+              <Option value="exam">{t("Exam")}</Option>
+              <Option value="event">{t("Event")}</Option>
+              <Option value="others">{t("Others")}</Option>
+            </Select>
+          </div>
         </Col>
 
-        {/* Action Buttons */}
+        {/* Clear Filters Button */}
         <Col>
-          <Space size="middle">
-            <Button
-              type="primary"
-              onClick={applyFilters}
-              style={{
-                borderRadius: "6px",
-                background: "linear-gradient(to right, #ec4899, #a855f7)",
-                color: "white",
-              }}
-              className="hover:bg-gradient-to-r hover:from-pink-600 hover:to-purple-700"
-            >
-              {t("Apply Filters")}
-            </Button>
-
-            <Button
-              onClick={clearFilters}
-              style={{
-                borderRadius: "6px",
-                color: "#1890ff",
-                borderColor: "#1890ff",
-              }}
-            >
-              {t("Clear Filters")}
-            </Button>
-          </Space>
+          <Button
+            onClick={clearFilters}
+            style={{
+              borderRadius: "6px",
+              color: "#1890ff",
+              borderColor: "#1890ff",
+            }}
+          >
+            {t("Clear Filters")}
+          </Button>
         </Col>
       </Row>
     </div>
