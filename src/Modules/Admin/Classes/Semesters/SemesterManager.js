@@ -1,4 +1,3 @@
-// SemesterManagement.jsx
 import React, { useState, useEffect } from "react";
 import {
   Table,
@@ -27,11 +26,9 @@ import {
   updateSemester,
   deleteSemester,
 } from "../../../../Store/Slices/Admin/Class/Semester/semesterThunks";
+// Import the setSelectedSemester action from the common user slice
+import { setSelectedSemester } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 
-// Redux action to set the selected semester
-import { setSelectedSemester } from "../../../../Store/Slices/Admin/Class/Semester/semesterSlice";
-
-// Define theme colors
 const pinkColor = "#EC407A";
 const purpleColor = "#AB47BC";
 const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
@@ -42,42 +39,36 @@ const SemesterManagement = ({ classId }) => {
     semesters: reduxSemesters,
     loading,
     error,
-    selectedSemester,
   } = useSelector((state) => state.admin.semesters);
+  // Get the persisted selected semester from the common user slice
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
 
   // Local state for optimistic updates
   const [localSemesters, setLocalSemesters] = useState([]);
-  // Ant Design form hook
   const [form] = Form.useForm();
-  // State to track edit mode
   const [editingSemester, setEditingSemester] = useState(null);
-  // State for description modal
   const [descModalVisible, setDescModalVisible] = useState(false);
   const [modalDesc, setModalDesc] = useState("");
-  // Loading state for the create/update button
   const [formLoading, setFormLoading] = useState(false);
-  // State for guidelines modal
   const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
 
-  // Clear the form on mount (ensures form is empty when sidebar opens)
   useEffect(() => {
     form.resetFields();
     setEditingSemester(null);
   }, [form]);
 
-  // Synchronize local state with Redux state
   useEffect(() => {
     setLocalSemesters(reduxSemesters);
   }, [reduxSemesters]);
 
-  // Fetch semesters when classId changes
   useEffect(() => {
     if (classId) {
       dispatch(fetchSemestersByClass({ classId }));
     }
   }, [dispatch, classId]);
 
-  // Display errors if any
   useEffect(() => {
     if (error) {
       message.error(
@@ -86,10 +77,27 @@ const SemesterManagement = ({ classId }) => {
     }
   }, [error]);
 
-  // Handle semester selection with notification
+  // New useEffect: Clear persisted selectedSemester if it is not found in reduxSemesters.
+  // Note: We remove selectedSemester from the dependency array to prevent infinite loops.
+  useEffect(() => {
+    if (reduxSemesters && reduxSemesters.length > 0) {
+      // Check if the current selectedSemester is in the fetched array
+      if (
+        selectedSemester &&
+        !reduxSemesters.some((sem) => sem._id === selectedSemester.id)
+      ) {
+        dispatch(setSelectedSemester({ id: null, name: "" }));
+      }
+    } else {
+      // If there are no semesters, clear the selectedSemester
+      dispatch(setSelectedSemester({ id: null, name: "" }));
+    }
+  }, [reduxSemesters, dispatch]);
+
+  // Handle semester selection with notification (updates common user slice)
   const onSelectSemester = (semester) => {
     if (!semester) return;
-    dispatch(setSelectedSemester({ id: semester._id, title: semester.title }));
+    dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     message.success(`Semester "${semester.title}" selected`);
   };
 
@@ -119,8 +127,8 @@ const SemesterManagement = ({ classId }) => {
     form.setFieldsValue({
       title: semester.title,
       description: semester.description,
-      startDate: moment(semester.startDate),
-      endDate: moment(semester.endDate),
+      startDate: moment(semester.startDate, "DD-MM-YYYY"),
+      endDate: moment(semester.endDate, "DD-MM-YYYY"),
     });
   };
 
@@ -167,8 +175,8 @@ const SemesterManagement = ({ classId }) => {
     const payload = {
       title: values.title,
       description: values.description,
-      startDate: values.startDate.format("YYYY-MM-DD"),
-      endDate: values.endDate.format("YYYY-MM-DD"),
+      startDate: values.startDate.format("DD-MM-YYYY"),
+      endDate: values.endDate.format("DD-MM-YYYY"),
     };
 
     setFormLoading(true);
@@ -206,9 +214,7 @@ const SemesterManagement = ({ classId }) => {
   };
 
   // Define table columns with updated layout:
-  // - Less space for description (truncated length 30)
-  // - Merged "Dates" column showing start and end dates on one line
-  // - Selected row and title are highlighted with light pink
+  // - Truncated description, merged dates column, and row highlighting if selected
   const columns = [
     {
       title: "Select",
@@ -224,7 +230,7 @@ const SemesterManagement = ({ classId }) => {
       key: "title",
       className: "font-medium",
       render: (text, record) =>
-        record._id === selectedSemester?.id ? (
+        record._id === (selectedSemester ? selectedSemester.id : null) ? (
           <span className="bg-pink-100 px-1 rounded">{text}</span>
         ) : (
           text
@@ -265,8 +271,8 @@ const SemesterManagement = ({ classId }) => {
       key: "dates",
       render: (_, record) => (
         <span>
-          {moment(record.startDate).format("DD MMM YYYY")} -{" "}
-          {moment(record.endDate).format("DD MMM YYYY")}
+          {moment(record.startDate, "DD-MM-YYYY").format("DD MMM YYYY")} -{" "}
+          {moment(record.endDate, "DD-MM-YYYY").format("DD MMM YYYY")}
         </span>
       ),
     },
@@ -299,26 +305,18 @@ const SemesterManagement = ({ classId }) => {
 
   return (
     <div className="relative p-4">
-      {/* Global loader only for fetching data */}
       {loading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
           <Spin size="large" tip="Loading..." />
         </div>
       )}
       <div className="flex flex-col md:flex-row w-full">
-        {/* Left Column: Semester Table */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
           className="w-full md:w-2/3 p-4"
         >
-          <h2
-            className="text-3xl font-bold mb-4"
-            style={{ color: purpleColor }}
-          >
-            Semester List
-          </h2>
           <div className="overflow-x-auto">
             <Table
               dataSource={localSemesters}
@@ -328,13 +326,14 @@ const SemesterManagement = ({ classId }) => {
               pagination={{ pageSize: 5 }}
               bordered
               rowClassName={(record) =>
-                record._id === selectedSemester?.id ? "bg-pink-100" : ""
+                record._id === (selectedSemester ? selectedSemester.id : null)
+                  ? "bg-pink-100"
+                  : ""
               }
             />
           </div>
         </motion.div>
 
-        {/* Right Column: Create/Edit Form */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -343,7 +342,7 @@ const SemesterManagement = ({ classId }) => {
         >
           <div className="bg-white p-6 rounded-lg shadow-md">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold" style={{ color: purpleColor }}>
+              <h2 className="text-xl font-bold" style={{ color: purpleColor }}>
                 {editingSemester ? "Edit Semester" : "Create Semester"}
               </h2>
               <Tooltip title="View Semester Guidelines">
@@ -451,7 +450,6 @@ const SemesterManagement = ({ classId }) => {
         </motion.div>
       </div>
 
-      {/* Modal for full description view with getContainer set to false */}
       <Modal
         getContainer={false}
         title="Full Description"
@@ -466,7 +464,6 @@ const SemesterManagement = ({ classId }) => {
         <p>{modalDesc}</p>
       </Modal>
 
-      {/* Modal for Semester Guidelines with framer-motion animations */}
       <Modal
         getContainer={false}
         visible={guidelinesModalVisible}

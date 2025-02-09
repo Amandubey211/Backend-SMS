@@ -117,6 +117,12 @@ const userPersistConfig = {
   // ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
+const semesterPersistConfig = {
+  key: "semesters",
+  storage,
+  whitelist: ["semesters", "selectedSemester"], // Persist both the semesters array and the selectedSemester object
+};
+
 const stdSubjectPersistConfig = {
   key: "stdSubject",
   storage,
@@ -141,7 +147,7 @@ const commonReducer = combineReducers({
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
   class: classReducer,
-  semesters: semesterReducer,
+  semesters: persistReducer(semesterPersistConfig, semesterReducer),
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,
