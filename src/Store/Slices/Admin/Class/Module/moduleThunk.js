@@ -45,7 +45,7 @@ export const addModule = createAsyncThunk(
     { rejectWithValue, dispatch, getState }
   ) => {
     // Retrieve additional necessary parameters
-    const say = localStorage.getItem("say"); // or a function like `getAY()` if needed
+    const say = getAY();
     dispatch(setShowError(false)); // Ensure error visibility is reset
 
     try {
@@ -92,10 +92,11 @@ export const editModule = createAsyncThunk(
       const getRole = getUserRole(getState);
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
-
+      const semesterId = getState().common.user.cassInfo.selectedSemesterId;
       // Construct FormData for multipart/form-data
       const formData = new FormData();
       formData.append("name", name);
+      formData.append("semesterId", semesterId);
       if (thumbnail) formData.append("thumbnail", thumbnail);
 
       // API Call using customRequest for multipart/form-data with query parameter

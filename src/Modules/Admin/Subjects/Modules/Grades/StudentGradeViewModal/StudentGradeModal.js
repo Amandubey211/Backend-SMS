@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { Skeleton, Avatar } from "antd";
 import StudentGradeModalFilterHeader from "./Component/StudentGradeModalFilterHeader";
 import StudentModalGradeList from "./Component/StudentGradeModalList";
 import StudentGradeSummary from "./Component/StudentGradeSummary";
-import { FiLoader } from "react-icons/fi";
 import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useParams } from "react-router-dom";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+
 const StudentGradeModal = ({ isOpen, onClose, student }) => {
   const { cid, sid } = useParams();
   const [filters, setFilters] = useState({
@@ -25,10 +26,10 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     }));
     const params = {};
     if (sid) params.subjectId = sid;
-    if (name == "subject") params.subjectId = value;
-    if (name == "module") params.moduleId = value;
-    if (name == "chapter") params.chapterId = value;
-    if (name == "arrangeBy") params.arrangeBy = value;
+    if (name === "subject") params.subjectId = value;
+    if (name === "module") params.moduleId = value;
+    if (name === "chapter") params.chapterId = value;
+    if (name === "arrangeBy") params.arrangeBy = value;
     getStudentGrades(params);
   };
 
@@ -42,15 +43,11 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
       document.body.classList.remove("overflow-hidden");
     };
   }, [isOpen]);
+
   const { grades, loading } = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
+
   const getStudentGrades = async (params) => {
-    // const params = {};
-    //      if (sid) params.subjectId = sid;
-    //      if (filters.subject) params.subjectId   = filters.subject;
-    //      if (filters.module) params.moduleId   = filters.module;
-    //      if (filters.chapter) params.chapterId = filters.chapter;
-    //      if (filters.arrangeBy) params.arrangeBy = filters.arrangeBy;
     dispatch(
       fetchStudentGrades({
         params,
@@ -63,24 +60,123 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
   return (
     <>
       {loading ? (
-        <>
+        <div
+          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
+            isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
           <div
-            className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
-              isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${
+              isOpen ? "translate-y-0" : "translate-y-full"
             }`}
           >
-            <div
-              className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${
-                isOpen ? "translate-y-0" : "translate-y-full"
-              }`}
-            >
-              <div className="flex items-center h-[80%] w-[100%] justify-center flex-col gap-2">
-                <FiLoader className="animate-spin mr-2 w-[3rem] h-[3rem] " />
-                <p className="text-gray-800 text-lg">Loading...</p>
+            {/* Detailed Skeleton UI */}
+            <div className="space-y-6">
+              {/* Header Skeleton */}
+              <div className="flex justify-between items-center border-b pb-2">
+                <Skeleton.Input active style={{ width: "30%", height: 24 }} />
+                <Skeleton.Button
+                  active
+                  style={{ width: 40, height: 40 }}
+                  shape="circle"
+                />
+              </div>
+
+              {/* Main Content Skeleton */}
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Left Section: Filter & List */}
+                <div className="flex-1">
+                  {/* Mimic Filter Header */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <Skeleton.Input
+                      active
+                      style={{ width: "100%", height: 32 }}
+                    />
+                    <Skeleton.Input
+                      active
+                      style={{ width: "100%", height: 32 }}
+                    />
+                    <Skeleton.Input
+                      active
+                      style={{ width: "100%", height: 32 }}
+                    />
+                    <Skeleton.Input
+                      active
+                      style={{ width: "100%", height: 32 }}
+                    />
+                  </div>
+                  {/* Mimic Table Header */}
+                  <div className="flex justify-between items-center bg-gray-100 px-4 py-2">
+                    {Array.from({ length: 6 }).map((_, idx) => (
+                      <Skeleton.Input
+                        key={idx}
+                        active
+                        style={{
+                          width: "15%",
+                          height: 16,
+                          marginRight: idx < 5 ? 8 : 0,
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {/* Mimic Table Rows */}
+                  <div className="space-y-2">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <div
+                        key={index}
+                        className="flex justify-between items-center border-b px-4 py-2"
+                      >
+                        {Array.from({ length: 6 }).map((_, idx) => (
+                          <Skeleton.Input
+                            key={idx}
+                            active
+                            style={{
+                              width: "15%",
+                              height: 16,
+                              marginRight: idx < 5 ? 8 : 0,
+                            }}
+                          />
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right Section: Summary */}
+                <div className="w-full md:w-1/4 border-l pl-4">
+                  <div className="flex flex-col items-center border-b pb-4">
+                    <Avatar size={96} style={{ backgroundColor: "#f0f0f0" }} />
+                    <div className="mt-4">
+                      <Skeleton.Input
+                        active
+                        style={{ width: 120, height: 24 }}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                      <Skeleton.Input
+                        key={idx}
+                        active
+                        style={{ width: "100%", height: 20 }}
+                      />
+                    ))}
+                    <div className="flex justify-between items-center border-t pt-2">
+                      <Skeleton.Input
+                        active
+                        style={{ width: "40%", height: 24 }}
+                      />
+                      <Skeleton.Input
+                        active
+                        style={{ width: "30%", height: 24 }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <div
           className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${

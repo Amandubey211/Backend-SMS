@@ -12,7 +12,6 @@ const semesterSlice = createSlice({
   initialState: {
     semesters: [],
     semester: null,
-    selectedSemester: null, // Added field to store the selected semester (e.g. { id, title })
     loading: false,
     error: null,
   },
@@ -22,12 +21,6 @@ const semesterSlice = createSlice({
       state.semester = null;
       state.error = null;
       state.loading = false;
-      state.selectedSemester = null;
-    },
-    // Action to set the selected semester (e.g., when the user clicks "select" in the table)
-    setSelectedSemester: (state, action) => {
-      // action.payload should be an object containing the semester id and title
-      state.selectedSemester = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -92,5 +85,5 @@ const semesterSlice = createSlice({
   },
 });
 
-export const { resetSemester, setSelectedSemester } = semesterSlice.actions;
+export const { resetSemester } = semesterSlice.actions;
 export default semesterSlice.reducer;
