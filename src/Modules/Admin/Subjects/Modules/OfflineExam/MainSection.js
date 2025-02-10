@@ -65,7 +65,7 @@ const MainSection = () => {
           </div>
 
           {/* Right Section */}
-          <UploadAndFilter/>
+          <UploadAndFilter />
         </div>
       </ProtectedSection>
 

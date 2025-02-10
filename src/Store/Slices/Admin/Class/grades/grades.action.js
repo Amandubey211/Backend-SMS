@@ -17,7 +17,9 @@ export const fetchSubjectGrades = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
-      const endpoint = `/${getRole}/grades/class/${classId}/subject/${subjectId}?say=${say}`;
+      // const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
+      const endpoint = `/${getRole}/grades/class/${classId}/subject/${subjectId}?say=${say}`; //&semesterId=${semesterId}
 
       const response = await getData(endpoint, filters);
 

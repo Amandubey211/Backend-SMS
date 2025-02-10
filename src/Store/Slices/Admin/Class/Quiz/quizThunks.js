@@ -19,12 +19,15 @@ export const fetchFilteredQuizzesThunk = createAsyncThunk(
   ) => {
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
+
       const say = getAY();
       dispatch(setShowError(false));
 
       const params = {
         ...(moduleId && { moduleId }),
         ...(chapterId && { chapterId }),
+        ...(semesterId && { semesterId }),
         ...(publish !== undefined && { publish }),
       };
 

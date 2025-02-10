@@ -20,8 +20,10 @@ export const fetchAnnouncements = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await getData(
-        `/${getRole}/announcement/class/${cid}/subject/${sid}?say=${say}`
+        `/${getRole}/announcement/class/${cid}/subject/${sid}?say=${say}&semesterId=${semesterId}`
       );
 
       if (response && response.status) {
@@ -108,11 +110,12 @@ export const createAnnouncement = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await customRequest(
         "post",
-        `/${getRole}/announcement?say=${say}`,
+        `/${getRole}/announcement?say=${say}&semesterId=${semesterId}`,
         formData,
-
         {
           "Content-Type": "multipart/form-data",
         }
@@ -143,9 +146,11 @@ export const editAnnouncement = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await customRequest(
         "put",
-        `/${getRole}/announcement/${id}?say=${say}`,
+        `/${getRole}/announcement/${id}?say=${say}&semesterId=${semesterId}`,
         formData,
         {
           "Content-Type": "multipart/form-data",
