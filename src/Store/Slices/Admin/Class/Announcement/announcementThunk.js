@@ -101,20 +101,28 @@ export const createAnnouncement = createAsyncThunk(
     const say = getAY();
     dispatch(setShowError(false));
 
-    const formData = new FormData();
-    Object.keys(data).forEach((key) => formData.append(key, data[key]));
-
-    if (files && files.attachment) {
-      formData.append("attachment", files.attachment);
-    }
-
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
+
+      if (!semesterId) {
+        throw new Error("Semester ID is missing");
+      }
+
+      // Construct FormData for multipart/form-data requests
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => formData.append(key, data[key]));
+
+      // Append semesterId to the body
+      formData.append("semesterId", semesterId);
+
+      if (files && files.attachment) {
+        formData.append("attachment", files.attachment);
+      }
 
       const response = await customRequest(
         "post",
-        `/${getRole}/announcement?say=${say}&semesterId=${semesterId}`,
+        `/${getRole}/announcement?say=${say}`,
         formData,
         {
           "Content-Type": "multipart/form-data",
@@ -137,20 +145,28 @@ export const editAnnouncement = createAsyncThunk(
     const say = getAY();
     dispatch(setShowError(false));
 
-    const formData = new FormData();
-    Object.keys(data).forEach((key) => formData.append(key, data[key]));
-
-    if (files && files.attachment) {
-      formData.append("attachment", files.attachment);
-    }
-
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
+
+      if (!semesterId) {
+        throw new Error("Semester ID is missing");
+      }
+
+      // Construct FormData for multipart/form-data requests
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => formData.append(key, data[key]));
+
+      // Append semesterId to the body
+      formData.append("semesterId", semesterId);
+
+      if (files && files.attachment) {
+        formData.append("attachment", files.attachment);
+      }
 
       const response = await customRequest(
         "put",
-        `/${getRole}/announcement/${id}?say=${say}&semesterId=${semesterId}`,
+        `/${getRole}/announcement/${id}?say=${say}`,
         formData,
         {
           "Content-Type": "multipart/form-data",
@@ -166,3 +182,4 @@ export const editAnnouncement = createAsyncThunk(
     }
   }
 );
+
