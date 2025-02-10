@@ -19,6 +19,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
   const dispatch = useDispatch();
   const { loading } = useSelector((store) => store.admin.all_staff);
   const role = useSelector((store) => store.common.auth.role);
+  const MYId = useSelector((store) => store.common.user?.userDetails?.userId);
 
   // State for Modals and Tooltips
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -145,7 +146,9 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
         )}
 
         <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
-          {profile?.active && (
+         {
+          MYId == profile._id ?<div className="bg-purple-200 text-purple-800 px-2 rounded-md">My Profile</div>:<>
+           {profile?.active && (
             <ProtectedAction
               requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}
             >
@@ -193,6 +196,8 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
               </button>
             </ProtectedAction>
           )}
+          </>
+         }
         </div>
 
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
