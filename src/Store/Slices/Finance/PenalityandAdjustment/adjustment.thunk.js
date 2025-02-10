@@ -81,9 +81,10 @@ export const fetchReturnInvoice = createAsyncThunk(
     const getRole = getUserRole(getState);
     dispatch(setShowError(false));
     try {
+      // Pass the query parameters under the key "params"
       const response = await getData(
         `/${getRole}/penaltyAdjustment/getAll?say=${say}`,
-        params
+        { params } 
       );
       return response.data;
     } catch (error) {

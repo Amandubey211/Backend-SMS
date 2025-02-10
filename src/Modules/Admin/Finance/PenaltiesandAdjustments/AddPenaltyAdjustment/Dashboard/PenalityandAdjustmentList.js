@@ -80,7 +80,7 @@ const PenalityandAdjustmentList = () => {
   // Handle search input changes
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    dispatch(setCurrentPage(1));
+    dispatch(setCurrentPage(1)); 
   };
 
   // =======================
@@ -181,7 +181,6 @@ const PenalityandAdjustmentList = () => {
         onClick={() => {
           console.log("Selected Record for Export:", record);
           setSelectedExportRecord(record);
-          // Use a small delay to ensure state updates before opening the modal
           setTimeout(() => {
             setIsExportModalVisible(true);
           }, 100);
@@ -192,6 +191,7 @@ const PenalityandAdjustmentList = () => {
       </Menu.Item>
     </Menu>
   );
+  
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -203,15 +203,19 @@ const PenalityandAdjustmentList = () => {
 
   // Fetch data on component mount and when dependencies change
   useEffect(() => {
+    // Build the parameters including the search query, current page, and computed page size
     const params = {
-      search: searchText,
-      page: currentPage,
-      limit: computedPageSize,
-      sortBy: "createdAt",
-      sortOrder: "desc",
+      search: searchText,            // Include the search query from the state
+      page: currentPage,             // Use the current page (which resets to 1 on search change)
+      limit: computedPageSize,       // Use the computed page size
+      sortBy: "createdAt",           // Optional: set the sort field if needed
+      sortOrder: "desc",             // Optional: set the sort order if needed
     };
+  
+    // Call the debounced fetch function with the updated parameters
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage, computedPageSize]);
+  
 
   // Monitor the loading state to disable the initial render once the API call completes
   useEffect(() => {
@@ -431,15 +435,10 @@ const PenalityandAdjustmentList = () => {
         ];
 
         return (
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <MoreOutlined
-              style={{
-                fontSize: "15px",
-                cursor: "pointer",
-                transform: "rotate(180deg)",
-              }}
-            />
+          <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+            <MoreOutlined style={{ fontSize: "15px", cursor: "pointer", transform: "rotate(180deg)" }} />
           </Dropdown>
+
         );
       },
       width: 100,
@@ -466,56 +465,56 @@ const PenalityandAdjustmentList = () => {
   const transformAdjustmentData = (adjustmentData) =>
     Array.isArray(adjustmentData)
       ? adjustmentData.map((adjustment, index) => {
-          const {
-            _id,
-            returnInvoiceNumber = "N/A",
-            invoiceId = {},
-            tax = 0,
-            discount = 0,
-            discountType = "percentage",
-            penalty = 0,
-            adjustmentTotal = 0,
-            adjustmentAmount = 0,
-            adjustedBy = {},
-            adjustedAt = "N/A",
-            academicYear = {},
-            isCancel, // added to determine status
-          } = adjustment || {};
-  
-          return {
-            sNo: index + 1,
-            returnInvoiceNumber,
-            refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
-            receiver: invoiceId.receiver?.name || "N/A",
-            receiverEmail: invoiceId.receiver?.email || "N/A",
-            receiverPhone: invoiceId.receiver?.contact || "N/A",
-            receiverAddress: invoiceId.receiver?.address || "N/A",
-            tax: `${parseFloat(tax)} %`,
-            discount:
-              discountType === "percentage"
-                ? `${parseFloat(discount)} %`
-                : `${parseFloat(discount)} QR`,
-            discountType,
-            penalty: `${parseFloat(penalty)} QR`,
-            totalAmount: `${parseFloat(adjustmentTotal)} QR`,
-            finalAmount: `${parseFloat(adjustmentAmount)} QR`,
-            createdBy: adjustedBy.adminName || "N/A",
-            Date:
-              adjustedAt !== "N/A"
-                ? new Date(adjustedAt).toLocaleString("en-GB", {
-                    day: "2-digit",
-                    month: "2-digit",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "N/A",
-            academicYearDetails: academicYear.year || "N/A",
-            status: isCancel ? "Cancelled" : "Active",
-          };
-        })
+        const {
+          _id,
+          returnInvoiceNumber = "N/A",
+          invoiceId = {},
+          tax = 0,
+          discount = 0,
+          discountType = "percentage",
+          penalty = 0,
+          adjustmentTotal = 0,
+          adjustmentAmount = 0,
+          adjustedBy = {},
+          adjustedAt = "N/A",
+          academicYear = {},
+          isCancel, // added to determine status
+        } = adjustment || {};
+
+        return {
+          sNo: index + 1,
+          returnInvoiceNumber,
+          refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
+          receiver: invoiceId.receiver?.name || "N/A",
+          receiverEmail: invoiceId.receiver?.email || "N/A",
+          receiverPhone: invoiceId.receiver?.contact || "N/A",
+          receiverAddress: invoiceId.receiver?.address || "N/A",
+          tax: `${parseFloat(tax)} %`,
+          discount:
+            discountType === "percentage"
+              ? `${parseFloat(discount)} %`
+              : `${parseFloat(discount)} QR`,
+          discountType,
+          penalty: `${parseFloat(penalty)} QR`,
+          totalAmount: `${parseFloat(adjustmentTotal)} QR`,
+          finalAmount: `${parseFloat(adjustmentAmount)} QR`,
+          createdBy: adjustedBy.adminName || "N/A",
+          Date:
+            adjustedAt !== "N/A"
+              ? new Date(adjustedAt).toLocaleString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              : "N/A",
+          academicYearDetails: academicYear.year || "N/A",
+          status: isCancel ? "Cancelled" : "Active",
+        };
+      })
       : [];
-  
+
 
   return (
     <Layout title={"Penalty & Adjustment List | Student Diwan"}>
@@ -607,8 +606,8 @@ const PenalityandAdjustmentList = () => {
             }}
             dataToExport={
               selectedExportRecord
-                ? transformAdjustmentData([selectedExportRecord]) // Export selected record
-                : transformAdjustmentData(adjustmentData) // Export all if no selection
+                ? transformAdjustmentData([selectedExportRecord])
+                : transformAdjustmentData(adjustmentData)
             }
             columns={[
               { header: "S.No", dataKey: "sNo" },
@@ -621,14 +620,15 @@ const PenalityandAdjustmentList = () => {
               { header: "Penalty", dataKey: "penalty" },
               { header: "Status", dataKey: "status" },
               { header: "Date", dataKey: "Date" },
-              { header: "Academic Year", dataKey: "academicYearDetails" },
             ]}
             fileName={
               selectedExportRecord
                 ? `Penalty_Adjustment_${selectedExportRecord.returnInvoiceNumber}`
                 : "Penalty_Adjustments"
             }
+            alwaysRender={true}  // Ensures modal renders even if dataToExport is empty
           />
+
 
 
           {/* Receipt Preview Overlay */}

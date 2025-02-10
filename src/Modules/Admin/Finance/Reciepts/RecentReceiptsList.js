@@ -632,7 +632,6 @@ const RecentReceiptsList = () => {
             { header: "Invoice Ref ID", dataKey: "refInvoiceNumber" },
             { header: "Status", dataKey: "cancelReceipt" },
             { header: "Paid Date", dataKey: "Date" },
-            { header: "Academic Year", dataKey: "academicYearDetails" },
           ]}
           fileName="Receipts"
         />
