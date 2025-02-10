@@ -1,10 +1,6 @@
 import React, { useEffect, useCallback } from "react";
-import { Table, Spin, Alert, Button, Tag, Tooltip } from "antd";
-import {
-  DollarOutlined,
-  CloudOutlined,
-  CreditCardOutlined,
-} from "@ant-design/icons";
+import { Table, Spin, Alert, Button, Tag } from "antd";
+import { DollarOutlined, CloudOutlined, CreditCardOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
@@ -12,9 +8,9 @@ import { fetchReturnInvoice } from "../../../../../../Store/Slices/Finance/Penal
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
-// import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
-// Mapping payment types to corresponding icons
+// Mapping payment types to corresponding icons (if needed for future use)
 const paymentTypeIcons = {
   cash: <DollarOutlined />,
   online: <CloudOutlined />,
@@ -30,7 +26,7 @@ const SummaryPenalityandAdjustment = () => {
     (state) => state.admin.penaltyAdjustment
   );
 
-  // Debounced function to fetch incomes with a fixed limit of 5
+  // Debounced function to fetch adjustments with a fixed limit of 5
   const debouncedFetch = useCallback(
     debounce((params) => {
       dispatch(fetchReturnInvoice(params));
@@ -41,8 +37,8 @@ const SummaryPenalityandAdjustment = () => {
   // Fetch data on component mount with limit set to 5
   useEffect(() => {
     const params = {
-      page: 1, // Always fetch the first page
-      limit: 5, // Limit to 5 records
+      page: 1,       // Always fetch the first page
+      limit: 5,      // Limit to 5 records
       sortBy: "createdAt",
       sortOrder: "desc",
     };
@@ -54,7 +50,7 @@ const SummaryPenalityandAdjustment = () => {
     navigate("/finance/penaltyAdjustment-list");
   };
 
-  // Define table columns with fixed widths and ellipsis
+  // Define table columns with fixed widths, ellipsis, and sorters
   const columns = [
     {
       title: "Return Invoice No.",
@@ -105,19 +101,16 @@ const SummaryPenalityandAdjustment = () => {
     },
     {
       title: "Status",
-      dataIndex: "isCancel", // Use isCancel as the data source
+      dataIndex: "isCancel",
       key: "status",
       render: (isCancel) => (
-        <Tag
-          color={isCancel ? "red" : "green"} // Red for Cancelled, Green for Active
-          className="text-xs"
-        >
-          <span className="text-xs">{isCancel ? "Cancelled" : "Active"}</span>
+        <Tag color={isCancel ? "red" : "green"} className="text-xs">
+          {isCancel ? "Cancelled" : "Active"}
         </Tag>
       ),
       width: 100,
       ellipsis: true,
-      sorter: (a, b) => (a.isCancel === b.isCancel ? 0 : a.isCancel ? 1 : -1), // Sort based on isCancel
+      sorter: (a, b) => (a.isCancel === b.isCancel ? 0 : a.isCancel ? 1 : -1),
     },
     {
       title: "Date",
@@ -132,7 +125,6 @@ const SummaryPenalityandAdjustment = () => {
             day: "numeric",
           }).format(date)
           : "N/A";
-
         return <span className="text-xs">{formattedDate}</span>;
       },
       width: 120,
@@ -143,23 +135,65 @@ const SummaryPenalityandAdjustment = () => {
     },
   ];
 
-
-  // Transform adjustments data to table dataSource and limit to 10 records
+  // Transform adjustments data to table dataSource
   const dataSource = adjustmentData?.map((adjustment) => ({
     key: adjustment?._id,
     return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
     invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
     receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
-    // discount: adjustment.discount || 0,
-    // discountType: adjustment.discountType || "percentage",
-    // penalty: adjustment.adjustmentPenalty || "N/A",
-    // tax: adjustment.tax,
     adjustmentAmount: adjustment?.adjustmentTotal || 0,
     adjustmentTotal: adjustment?.adjustmentAmount || 0,
-    status: adjustment.isCancel ? "Cancelled" : "-",
+    isCancel: adjustment?.isCancel,
     adjustedAt: adjustment?.adjustedAt || "N/A",
-    ...adjustment
+    // Spread any additional properties if needed in future
+    ...adjustment,
   }));
+
+  // Helper function to render content based on the current state
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <div className="flex justify-center">
+          <Spinner />
+        </div>
+      );
+    }
+    if (error) {
+      return (
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          closable
+          className="my-4"
+        />
+      );
+    }
+    if (!adjustmentData || adjustmentData.length === 0) {
+      return (
+        <div className="text-center text-gray-500 text-xs py-4">
+          No records found.
+        </div>
+      );
+    }
+    return (
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}
+        title="Penalty & Adjustment"
+      >
+        <Table
+          dataSource={dataSource}
+          columns={columns}
+          pagination={false} // Removed pagination controls
+          className="rounded-lg shadow text-xs"
+          bordered
+          size="small"
+          tableLayout="fixed" // Fixed table layout
+        />
+      </ProtectedSection>
+    );
+  };
 
   return (
     <div className="bg-white p-4 rounded-lg shadow space-y-4 mt-3">
@@ -177,45 +211,10 @@ const SummaryPenalityandAdjustment = () => {
             View More ({totalRecords})
           </Button>
         </ProtectedAction>
-
       </div>
 
-      {/* Loading Indicator */}
-      {loading && (
-        <div className="flex justify-center">
-          <Spin tip="Loading..." />
-        </div>
-      )}
-      {/* Error Message */}
-      {error && (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          closable
-        />
-      )}
-      {/* No Data Placeholder */}
-      {/* {!loading &&  !error && (
-        <div className="text-center text-gray-500 text-xs py-4">
-          No records found.
-        </div>
-      )} */}
-      {/* Table */}
-      {!loading && !error && (
-        <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT} title={"Penalty & Adjustment"}>
-          <Table
-            dataSource={dataSource}
-            columns={columns}
-            pagination={false} // Removed pagination controls
-            className="rounded-lg shadow text-xs"
-            bordered
-            size="small"
-            tableLayout="fixed" // Fixed table layout
-          />
-        </ProtectedSection>
-      )}
+      {/* Render content based on loading, error, or data state */}
+      {renderContent()}
     </div>
   );
 };
