@@ -19,8 +19,10 @@ export const fetchClassDiscussions = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await getData(
-        `/${getRole}/getDiscussion/class/${cid}/subject/${sid}?say=${say}`
+        `/${getRole}/getDiscussion/class/${cid}/subject/${sid}?say=${say}&semesterId=${semesterId}`
       );
 
       if (response && response.status) {
@@ -66,9 +68,11 @@ export const createDiscussion = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await customRequest(
         "post",
-        `/${getRole}/createDiscussion/class/${cid}?say=${say}`,
+        `/${getRole}/createDiscussion/class/${cid}?say=${say}&semesterId=${semesterId}`,
         formData,
         {
           "Content-Type": "multipart/form-data",
@@ -101,9 +105,11 @@ export const updateDiscussion = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await customRequest(
         "put",
-        `/${getRole}/updateDiscussion/${discussionId}?say=${say}`,
+        `/${getRole}/updateDiscussion/${discussionId}?say=${say}&semesterId=${semesterId}`,
         formData,
         {
           "Content-Type": "multipart/form-data",

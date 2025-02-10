@@ -116,20 +116,24 @@ export const fetchFilteredAssignments = createAsyncThunk(
   ) => {
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
+
       const say = getAY();
       dispatch(setShowError(false));
       const endpoint = `/${getRole}/assignments/${sid}?say=${say}`;
 
-      let params = {};
-      if (moduleId) params.moduleId = moduleId;
-      if (chapterId) params.chapterId = chapterId;
-      if (publish !== null && publish !== undefined) params.publish = publish;
+      const params = {
+        ...(moduleId && { moduleId }),
+        ...(chapterId && { chapterId }),
+        ...(semesterId && { semesterId }),
+        ...(publish !== undefined && { publish }),
+      };
 
       const response = await getData(endpoint, params);
 
-      if (response.success) {
-        return response.assignments;
-      }
+      // if (response.success) {
+      return response.assignments;
+      // }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

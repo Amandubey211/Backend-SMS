@@ -77,7 +77,6 @@ const SemesterManagement = ({ classId }) => {
     }
   }, [error]);
 
-  // New useEffect: Clear persisted selectedSemester if it is not found in reduxSemesters.
   // Note: We remove selectedSemester from the dependency array to prevent infinite loops.
   useEffect(() => {
     if (reduxSemesters && reduxSemesters.length > 0) {

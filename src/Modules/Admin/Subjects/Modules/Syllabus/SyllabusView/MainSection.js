@@ -44,11 +44,28 @@ const MainSection = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <Spinner />;
+      return (
+        <div className="flex h-screen w-full items-center justify-center ">
+          <Spinner />;
+        </div>
+      );
     }
 
     if (error) {
-      return <NoDataFound title={t("Syllabus")} />;
+      return (
+        <div className="flex h-screen w-full items-center justify-center ">
+          <NoDataFound
+            title={t("Syllabus")}
+            desc={t(
+              "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus.'"
+            )}
+            icon={AiOutlineFileAdd}
+            iconColor="text-gray-500"
+            textColor="text-gray-500"
+            bgColor="bg-white"
+          />
+        </div>
+      );
     }
 
     if (syllabi && syllabi?.length > 0) {
@@ -60,19 +77,19 @@ const MainSection = () => {
             syllabus={syllabi[0]}
           />
           <SyllabusSection
-            title={syllabi[0].title}
-            content={syllabi[0].content}
+            title={syllabi[0]?.title}
+            content={syllabi[0]?.content}
           />
         </>
       );
     }
 
     return (
-      <div className="h-full w-full flex items-center justify-center">
+      <div className="flex h-screen w-full items-center justify-center ">
         <NoDataFound
           title={t("Syllabus")}
           desc={t(
-            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus .'"
+            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus.'"
           )}
           icon={AiOutlineFileAdd}
           iconColor="text-gray-500"
@@ -90,7 +107,7 @@ const MainSection = () => {
         title="Syllabus"
         requiredPermission={PERMISSIONS.VIEW_SYLLABUS}
       >
-        <div className="border-l w-full p-4 relative">
+        <div className="border-l w-full p-4 relative flex flex-col items-center justify-center">
           {renderContent()}
           {syllabi && syllabi?.length === 0 && (
             <ProtectedAction requiredPermission="AddSyllabus">
