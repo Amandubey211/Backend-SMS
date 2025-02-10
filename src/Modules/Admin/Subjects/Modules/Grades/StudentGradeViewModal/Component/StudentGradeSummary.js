@@ -3,7 +3,7 @@ import profileIcon from "../../../../../../../Assets/DashboardAssets/profileIcon
 import { useTranslation } from "react-i18next";
 
 const StudentGradeSummary = ({ grades, studentData }) => {
-  const { t } = useTranslation('admAccounts');
+  const { t } = useTranslation("admAccounts");
 
   return (
     <div className="flex-none w-1/4 border-l">
@@ -14,20 +14,21 @@ const StudentGradeSummary = ({ grades, studentData }) => {
           alt={t("Profile")}
         />
         <h2 className="mt-4 text-lg font-semibold">{studentData?.fullName}</h2>
-        {/* <p className="text-gray-500">{studentData?.sectionName}</p> */}
       </div>
       <div className="mt-4 p-3 border-l-2">
         <h3 className="text-md font-semibold mb-4">{t("Grade Summary")}</h3>
         <div className="flex justify-between mb-2">
           <p className="text-sm">{t("Assignment")}</p>
           <p className="text-sm">
-            {grades?.totalScoreOfSubmitAssignments} / {grades?.totalScoreOfAllAssignments}
+            {grades?.totalScoreOfSubmitAssignments} /{" "}
+            {grades?.totalScoreOfAllAssignments}
           </p>
         </div>
         <div className="flex justify-between mb-2">
           <p className="text-sm">{t("Group Assignment")}</p>
           <p className="text-sm">
-            {grades?.submittedGroupAssignmentScore} / {grades?.totalGroupAssignmentScore}
+            {grades?.submittedGroupAssignmentScore} /{" "}
+            {grades?.totalGroupAssignmentScore}
           </p>
         </div>
         <div className="flex justify-between mb-2">

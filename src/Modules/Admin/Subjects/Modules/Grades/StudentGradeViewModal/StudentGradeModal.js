@@ -1,38 +1,113 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Skeleton, Avatar } from "antd";
+import { useParams } from "react-router-dom";
+import { debounce } from "lodash";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
+import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+
 import StudentGradeModalFilterHeader from "./Component/StudentGradeModalFilterHeader";
 import StudentModalGradeList from "./Component/StudentGradeModalList";
 import StudentGradeSummary from "./Component/StudentGradeSummary";
-import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
-import { useParams } from "react-router-dom";
-import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
-import { PERMISSIONS } from "../../../../../../config/permission";
 
 const StudentGradeModal = ({ isOpen, onClose, student }) => {
   const { cid, sid } = useParams();
-  const [filters, setFilters] = useState({
+  const dispatch = useDispatch();
+
+  // Default filters: online mode is the default.
+  const defaultFilters = {
+    gradeMode: "online", // "online" or "offline"
     arrangeBy: "",
     module: "",
     chapter: "",
     status: "",
     subject: "",
-  });
-
-  const handleFilterChange = (name, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-    const params = {};
-    if (sid) params.subjectId = sid;
-    if (name === "subject") params.subjectId = value;
-    if (name === "module") params.moduleId = value;
-    if (name === "chapter") params.chapterId = value;
-    if (name === "arrangeBy") params.arrangeBy = value;
-    getStudentGrades(params);
   };
 
+  const [filters, setFilters] = useState(defaultFilters);
+
+  // Track if this is the very first load.
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  // Function to fetch student grades.
+  const getStudentGrades = async (params) => {
+    try {
+      dispatch(
+        fetchStudentGrades({
+          params,
+          studentId: student?.studentId || student?._id,
+          studentClassId: cid,
+        })
+      );
+    } catch (error) {
+      console.error("Failed to fetch student grades:", error);
+    }
+  };
+
+  // Create a debounced version of getStudentGrades.
+  const debouncedGetStudentGrades = useMemo(
+    () =>
+      debounce((params) => {
+        getStudentGrades(params);
+      }, 300),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  // Handle filter changes (including gradeMode).
+  const handleFilterChange = (name, value) => {
+    try {
+      let newFilters = { ...filters };
+      if (name === "gradeMode") {
+        newFilters = { ...newFilters, gradeMode: value };
+        // When offline is selected, clear online-specific filters.
+        if (value === "offline") {
+          newFilters = {
+            ...newFilters,
+            arrangeBy: "",
+            module: "",
+            chapter: "",
+            status: "",
+            subject: "",
+          };
+        }
+      } else {
+        newFilters = { ...newFilters, [name]: value };
+      }
+      setFilters(newFilters);
+
+      // Build query parameters.
+      const params = {};
+      if (sid) params.subjectId = sid;
+      if (name === "subject") params.subjectId = value;
+      if (name === "module") params.moduleId = value;
+      if (name === "chapter") params.chapterId = value;
+      if (name === "arrangeBy") params.arrangeBy = value;
+      // IMPORTANT: For offline mode, do not include the status filter in the query.
+      if (name === "status" && newFilters.gradeMode !== "offline") {
+        params.status = value;
+      }
+      // Set type based on grade mode.
+      params.type =
+        newFilters.gradeMode === "offline" ? "offline_exam" : "online";
+
+      debouncedGetStudentGrades(params);
+    } catch (error) {
+      console.error("Error handling filter change:", error);
+    }
+  };
+
+  // Reset filters to default.
+  const handleResetFilters = useCallback(() => {
+    setFilters(defaultFilters);
+    const params = {};
+    if (sid) params.subjectId = sid;
+    params.type = "online"; // default mode is online
+    debouncedGetStudentGrades(params);
+  }, [sid, debouncedGetStudentGrades, defaultFilters]);
+
+  // Manage body scroll.
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("overflow-hidden");
@@ -44,22 +119,21 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     };
   }, [isOpen]);
 
-  const { grades, loading } = useSelector((store) => store.admin.all_students);
-  const dispatch = useDispatch();
+  // Retrieve grade data from Redux store.
+  const { grades, loading } =
+    useSelector((store) => store.admin.all_students) || {};
 
-  const getStudentGrades = async (params) => {
-    dispatch(
-      fetchStudentGrades({
-        params,
-        studentId: student?.studentId || student?._id,
-        studentClassId: cid,
-      })
-    );
-  };
+  // Mark initial load complete once data is loaded.
+  useEffect(() => {
+    if (!loading && isInitialLoad) {
+      setIsInitialLoad(false);
+    }
+  }, [loading, isInitialLoad]);
 
   return (
     <>
-      {loading ? (
+      {isInitialLoad ? (
+        // Full-screen skeleton UI on initial load.
         <div
           className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
             isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -70,9 +144,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
               isOpen ? "translate-y-0" : "translate-y-full"
             }`}
           >
-            {/* Detailed Skeleton UI */}
             <div className="space-y-6">
-              {/* Header Skeleton */}
               <div className="flex justify-between items-center border-b pb-2">
                 <Skeleton.Input active style={{ width: "30%", height: 24 }} />
                 <Skeleton.Button
@@ -81,12 +153,8 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                   shape="circle"
                 />
               </div>
-
-              {/* Main Content Skeleton */}
               <div className="flex flex-col md:flex-row gap-4">
-                {/* Left Section: Filter & List */}
                 <div className="flex-1">
-                  {/* Mimic Filter Header */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <Skeleton.Input
                       active
@@ -105,7 +173,6 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                       style={{ width: "100%", height: 32 }}
                     />
                   </div>
-                  {/* Mimic Table Header */}
                   <div className="flex justify-between items-center bg-gray-100 px-4 py-2">
                     {Array.from({ length: 6 }).map((_, idx) => (
                       <Skeleton.Input
@@ -119,7 +186,6 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                       />
                     ))}
                   </div>
-                  {/* Mimic Table Rows */}
                   <div className="space-y-2">
                     {Array.from({ length: 5 }).map((_, index) => (
                       <div
@@ -141,8 +207,6 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                     ))}
                   </div>
                 </div>
-
-                {/* Right Section: Summary */}
                 <div className="w-full md:w-1/4 border-l pl-4">
                   <div className="flex flex-col items-center border-b pb-4">
                     <Avatar size={96} style={{ backgroundColor: "#f0f0f0" }} />
@@ -178,6 +242,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
           </div>
         </div>
       ) : (
+        // Normal UI after initial load.
         <div
           className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
             isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -209,14 +274,16 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                   />
                   <div className="h-96 overflow-y-scroll no-scrollbar">
                     <StudentModalGradeList
-                      data={grades?.grades}
+                      data={grades?.grades || []}
                       filters={filters}
+                      tableLoading={loading}
+                      onResetFilters={handleResetFilters}
                     />
                   </div>
                 </div>
                 <StudentGradeSummary
                   grades={grades}
-                  studentData={grades.student}
+                  studentData={grades?.student}
                 />
               </div>
             </ProtectedSection>
