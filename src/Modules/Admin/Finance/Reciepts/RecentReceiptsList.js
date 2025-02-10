@@ -39,6 +39,7 @@ import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 import Layout from "../../../../Components/Common/Layout";
 import * as XLSX from "xlsx";
+import ExportModalNew from "../../../../Components/Common/ExportModalNew";
 
 // --- Helper function to format date & time ---
 const formatDateTime = (dateString) => {
@@ -434,10 +435,10 @@ const RecentReceiptsList = () => {
       render: (date) =>
         date
           ? new Date(date).toLocaleDateString("en-GB", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
           : "N/A",
     },
     {
@@ -617,11 +618,25 @@ const RecentReceiptsList = () => {
         </div>
 
         {/* Custom Export Modal */}
-        <CustomExportModal
+        <ExportModalNew
           visible={isExportModalOpen}
           onClose={() => setExportModalOpen(false)}
           dataToExport={transformReceiptData(receipts)}
+          columns={[
+            { header: "S.No", dataKey: "sNo" },
+            { header: "Receipt ID", dataKey: "receiptNumber" },
+            { header: "Recipient Name", dataKey: "receiver" },
+            { header: "Discount", dataKey: "discount" },
+            { header: "Penalty", dataKey: "penalty" },
+            { header: "Paid Amount", dataKey: "totalPaidAmount" },
+            { header: "Invoice Ref ID", dataKey: "refInvoiceNumber" },
+            { header: "Status", dataKey: "cancelReceipt" },
+            { header: "Paid Date", dataKey: "Date" },
+            { header: "Academic Year", dataKey: "academicYearDetails" },
+          ]}
+          fileName="Receipts"
         />
+
 
         {/* Receipt Preview Overlay */}
         {isReceiptVisible && (

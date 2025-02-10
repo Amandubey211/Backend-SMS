@@ -5,6 +5,7 @@ import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import {
+  Menu,
   Alert,
   Button,
   Dropdown,
@@ -43,6 +44,7 @@ import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/se
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { downloadPDF } from "../../../../../../Utils/xl";
 import Spinner from "../../../../../../Components/Common/Spinner";
+import ExportModalNew from "../../../../../../Components/Common/ExportModalNew";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -63,7 +65,7 @@ const PenalityandAdjustmentList = () => {
   const [searchText, setSearchText] = useState("");
   const [isReceiptVisible, setReceiptVisible] = useState(false);
   const [selectedReturnInvoice, setSelectedReturnInvoice] = useState(null);
-  // <-- NEW: Local state to manage initial loading rendering -->
+  const [selectedExportRecord, setSelectedExportRecord] = useState(null);
   const [initialLoad, setInitialLoad] = useState(true);
 
   const dispatch = useDispatch();
@@ -136,6 +138,60 @@ const PenalityandAdjustmentList = () => {
       toast.error("Error sending email.");
     }
   };
+
+  const actionMenu = (record) => (
+    <Menu>
+      <Menu.Item key="1" onClick={() => handleReturnPreview(record)}>
+        <FilePdfOutlined style={{ marginRight: 8 }} />
+        Preview
+      </Menu.Item>
+      <Menu.Item key="2" onClick={() => {
+        const selectedAdjustment = adjustmentData.find(
+          (adjustment) => adjustment._id === record.key
+        );
+        if (selectedAdjustment) {
+          dispatch(setSelectedAdjustment(selectedAdjustment));
+          dispatch(setReadOnly(true));
+          navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
+        } else {
+          toast.error("Selected adjustment not found.");
+        }
+      }}>
+        <EyeOutlined style={{ marginRight: 8 }} />
+        View (Read-only)
+      </Menu.Item>
+      <Menu.Item
+        key="3"
+        onClick={() => {
+          if (!record?.status || record?.status !== "Cancelled") {
+            handleCancleReturnInvoice(record);
+          }
+        }}
+        disabled={record?.status === "Cancelled"}
+      >
+        <CloseCircleOutlined style={{ marginRight: 8 }} />
+        {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
+      </Menu.Item>
+      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
+        <MailOutlined style={{ marginRight: 8 }} />
+        Send Mail
+      </Menu.Item>
+      <Menu.Item
+        key="5"
+        onClick={() => {
+          console.log("Selected Record for Export:", record);
+          setSelectedExportRecord(record);
+          // Use a small delay to ensure state updates before opening the modal
+          setTimeout(() => {
+            setIsExportModalVisible(true);
+          }, 100);
+        }}
+      >
+        <ExportOutlined style={{ marginRight: 8 }} />
+        Export
+      </Menu.Item>
+    </Menu>
+  );
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -354,6 +410,24 @@ const PenalityandAdjustmentList = () => {
               </span>
             ),
           },
+          {
+            key: "5",
+            label: (
+              <span
+                onClick={() => {
+                  console.log("Selected Record for Export:", record);
+                  setSelectedExportRecord(record);
+                  setTimeout(() => {
+                    setIsExportModalVisible(true);
+                  }, 100);
+                }}
+              >
+                <ExportOutlined style={{ marginRight: 8 }} />
+                Export
+              </span>
+            ),
+          },
+
         ];
 
         return (
@@ -392,44 +466,56 @@ const PenalityandAdjustmentList = () => {
   const transformAdjustmentData = (adjustmentData) =>
     Array.isArray(adjustmentData)
       ? adjustmentData.map((adjustment, index) => {
-        const {
-          _id,
-          returnInvoiceNumber = "N/A",
-          invoiceId = {},
-          tax = 0,
-          discount = 0,
-          discountType = "percentage",
-          penalty = 0,
-          adjustmentTotal = 0,
-          adjustmentAmount = 0,
-          adjustedBy = {},
-          adjustedAt = "N/A",
-          academicYear = {},
-        } = adjustment || {};
-
-        return {
-          sNo: index + 1,
-          returnInvoiceNumber,
-          refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
-          receiver: invoiceId.receiver?.name || "N/A",
-          receiverEmail: invoiceId.receiver?.email || "N/A",
-          receiverPhone: invoiceId.receiver?.contact || "N/A",
-          receiverAddress: invoiceId.receiver?.address || "N/A",
-          tax: `${parseFloat(tax)} %`,
-          discount:
-            discountType === "percentage"
-              ? `${parseFloat(discount)} %`
-              : `${parseFloat(discount)} QR`,
-          discountType,
-          penalty: `${parseFloat(penalty)} QR`,
-          totalAmount: `${parseFloat(adjustmentTotal)} QR`,
-          finalAmount: `${parseFloat(adjustmentAmount)} QR`,
-          createdBy: adjustedBy.adminName || "N/A",
-          Date: adjustedAt,
-          academicYearDetails: academicYear.year || "N/A",
-        };
-      })
+          const {
+            _id,
+            returnInvoiceNumber = "N/A",
+            invoiceId = {},
+            tax = 0,
+            discount = 0,
+            discountType = "percentage",
+            penalty = 0,
+            adjustmentTotal = 0,
+            adjustmentAmount = 0,
+            adjustedBy = {},
+            adjustedAt = "N/A",
+            academicYear = {},
+            isCancel, // added to determine status
+          } = adjustment || {};
+  
+          return {
+            sNo: index + 1,
+            returnInvoiceNumber,
+            refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
+            receiver: invoiceId.receiver?.name || "N/A",
+            receiverEmail: invoiceId.receiver?.email || "N/A",
+            receiverPhone: invoiceId.receiver?.contact || "N/A",
+            receiverAddress: invoiceId.receiver?.address || "N/A",
+            tax: `${parseFloat(tax)} %`,
+            discount:
+              discountType === "percentage"
+                ? `${parseFloat(discount)} %`
+                : `${parseFloat(discount)} QR`,
+            discountType,
+            penalty: `${parseFloat(penalty)} QR`,
+            totalAmount: `${parseFloat(adjustmentTotal)} QR`,
+            finalAmount: `${parseFloat(adjustmentAmount)} QR`,
+            createdBy: adjustedBy.adminName || "N/A",
+            Date:
+              adjustedAt !== "N/A"
+                ? new Date(adjustedAt).toLocaleString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "N/A",
+            academicYearDetails: academicYear.year || "N/A",
+            status: isCancel ? "Cancelled" : "Active",
+          };
+        })
       : [];
+  
 
   return (
     <Layout title={"Penalty & Adjustment List | Student Diwan"}>
@@ -513,13 +599,38 @@ const PenalityandAdjustmentList = () => {
           )}
 
           {/* Export Modal */}
-          <ExportModal
+          <ExportModalNew
             visible={isExportModalVisible}
-            onClose={() => setIsExportModalVisible(false)}
-            dataToExport={transformAdjustmentData(adjustmentData)}
-            title="Penalty Adjustment Data"
-            sheet="penalty_adjustment_report"
+            onClose={() => {
+              setIsExportModalVisible(false);
+              setSelectedExportRecord(null); // Reset selection
+            }}
+            dataToExport={
+              selectedExportRecord
+                ? transformAdjustmentData([selectedExportRecord]) // Export selected record
+                : transformAdjustmentData(adjustmentData) // Export all if no selection
+            }
+            columns={[
+              { header: "S.No", dataKey: "sNo" },
+              { header: "Return Invoice No.", dataKey: "returnInvoiceNumber" },
+              { header: "Invoice Ref No.", dataKey: "refInvoiceNumber" },
+              { header: "Receiver", dataKey: "receiver" },
+              { header: "Total Amount", dataKey: "totalAmount" },
+              { header: "Final Amount", dataKey: "finalAmount" },
+              { header: "Discount", dataKey: "discount" },
+              { header: "Penalty", dataKey: "penalty" },
+              { header: "Status", dataKey: "status" },
+              { header: "Date", dataKey: "Date" },
+              { header: "Academic Year", dataKey: "academicYearDetails" },
+            ]}
+            fileName={
+              selectedExportRecord
+                ? `Penalty_Adjustment_${selectedExportRecord.returnInvoiceNumber}`
+                : "Penalty_Adjustments"
+            }
           />
+
+
           {/* Receipt Preview Overlay */}
           {isReceiptVisible && selectedReturnInvoice && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
