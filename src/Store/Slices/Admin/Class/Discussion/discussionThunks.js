@@ -61,18 +61,26 @@ export const createDiscussion = createAsyncThunk(
     const say = getAY();
     dispatch(setShowError(false));
 
-    const formData = new FormData();
-    Object.keys(discussionData).forEach((key) => {
-      formData.append(key, discussionData[key]);
-    });
-
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
+
+      if (!semesterId) {
+        throw new Error("Semester ID is missing");
+      }
+
+      // Append all discussion data to FormData
+      const formData = new FormData();
+      Object.keys(discussionData).forEach((key) => {
+        formData.append(key, discussionData[key]);
+      });
+
+      // Append semesterId to the request body
+      formData.append("semesterId", semesterId);
 
       const response = await customRequest(
         "post",
-        `/${getRole}/createDiscussion/class/${cid}?say=${say}&semesterId=${semesterId}`,
+        `/${getRole}/createDiscussion/class/${cid}?say=${say}`,
         formData,
         {
           "Content-Type": "multipart/form-data",

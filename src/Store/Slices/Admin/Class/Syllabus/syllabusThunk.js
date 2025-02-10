@@ -67,11 +67,17 @@ export const createSyllabus = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
 
-      const payload = { title, content, subjectId };
+      if (!semesterId) {
+        throw new Error("Semester ID is missing");
+      }
+
+      // Include semesterId in the request body
+      const payload = { title, content, subjectId, semesterId };
+
       const response = await postData(
-        `/${getRole}/syllabus?say=${say}&semesterId=${semesterId}`,
+        `/${getRole}/syllabus?say=${say}`,
         payload
       );
 

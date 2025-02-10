@@ -2,10 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 
 const SyllabusSection = ({ title, content }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
 
   return (
-    <div className="p-5 mb-6 mt-5 border border-gray-300 rounded-lg">
+    <div className="p-5 mb-6 mt-5 ">
       {title && content ? (
         <>
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">{title}</h2>

@@ -44,28 +44,11 @@ const MainSection = () => {
 
   const renderContent = () => {
     if (loading) {
-      return (
-        <div className="flex h-screen w-full items-center justify-center ">
-          <Spinner />;
-        </div>
-      );
+      return <Spinner />;
     }
 
     if (error) {
-      return (
-        <div className="flex h-screen w-full items-center justify-center ">
-          <NoDataFound
-            title={t("Syllabus")}
-            desc={t(
-              "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus.'"
-            )}
-            icon={AiOutlineFileAdd}
-            iconColor="text-gray-500"
-            textColor="text-gray-500"
-            bgColor="bg-white"
-          />
-        </div>
-      );
+      return <NoDataFound title={t("Syllabus")} />;
     }
 
     if (syllabi && syllabi?.length > 0) {
@@ -85,11 +68,11 @@ const MainSection = () => {
     }
 
     return (
-      <div className="flex h-screen w-full items-center justify-center ">
+      <div className="h-full w-full flex items-center justify-center">
         <NoDataFound
           title={t("Syllabus")}
           desc={t(
-            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus.'"
+            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus .'"
           )}
           icon={AiOutlineFileAdd}
           iconColor="text-gray-500"
@@ -107,7 +90,7 @@ const MainSection = () => {
         title="Syllabus"
         requiredPermission={PERMISSIONS.VIEW_SYLLABUS}
       >
-        <div className="border-l w-full p-4 relative flex flex-col items-center justify-center">
+        <div className="border-l w-full p-4 relative">
           {renderContent()}
           {syllabi && syllabi?.length === 0 && (
             <ProtectedAction requiredPermission="AddSyllabus">
