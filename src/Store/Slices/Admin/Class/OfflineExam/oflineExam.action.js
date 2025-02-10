@@ -21,7 +21,7 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const response = await getData(
         `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}`
       );
-      console.log(response);
+      console.log("fetchAllOfflineExam", response);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

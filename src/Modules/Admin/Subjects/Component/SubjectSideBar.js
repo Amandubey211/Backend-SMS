@@ -11,7 +11,7 @@ const SubjectSideBar = () => {
   // Convert sid to lowercase and replace spaces with underscores
   const formattedSid = sid.toLowerCase().replace(/ /g, "_");
 
-  const menuItems = [
+  const menuItems = [ 
     { name: "Module", path: "module" },
     { name: "Assignments", path: "assignment" },
     { name: "Quizzes", path: "quiz" },

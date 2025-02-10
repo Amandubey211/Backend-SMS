@@ -6,14 +6,11 @@ import { TbEdit } from "react-icons/tb";
 const OfflineExamCard = ({
   exampType,
   examName,
-  mode,
   semester,
   startDate,
   endDate,
-  students,
   maxScore,
 }) => {
-  //   const { sid, cid } = useParams();
   const loading = true;
 
   const handleDeleteClick = () => {};
@@ -26,12 +23,9 @@ const OfflineExamCard = ({
         <div className="flex w-full h-auto justify-between items-end">
           <div className="flex w-[70%] h-auto items-end gap-x-2">
             <h1 className="font-bold text-lg pr-2 truncate">{examName}</h1>
-            <div className="bg-blue-200 text-blue-700 text-xs font-semibold rounded-full px-2 py-1">
-              {exampType}
-            </div>
           </div>
-          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1">
-            {mode}
+          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+            {exampType}
           </div>
         </div>
         <div>

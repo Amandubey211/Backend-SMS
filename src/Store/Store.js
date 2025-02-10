@@ -53,7 +53,7 @@ import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
 import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
-// import offlineExamReducer from "./Slices/F"
+import adminOfflineExamReducer from "./Slices/Admin/Class/OfflineExam/offlineExamSlice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -182,7 +182,7 @@ const AdminReducer = combineReducers({
   studentFees: studentFeesReducer,
   invoices: invoiceReducer,
   penaltyAdjustment: penaltyAdjustmentReducer,
-  // offlineExam: adminOfflineExamReducer
+  offlineExam: adminOfflineExamReducer
 });
 
 const studentReducer = combineReducers({
