@@ -8,7 +8,6 @@ import { LiaClipboardListSolid } from "react-icons/lia";
 import { FcAdvertising } from "react-icons/fc";
 import { ImTable2 } from "react-icons/im";
 
-
 const sidebarData = [
   {
     title: "Dashboard",
@@ -20,11 +19,11 @@ const sidebarData = [
     icon: <RiGraduationCapLine />,
     path: "/student_class",
   },
-  {
-    title: "Finance",
-    icon: <HiOutlineCalculator />,
-    path: "/student_finance",
-  },
+  // {
+  //   title: "Finance",
+  //   icon: <HiOutlineCalculator />,
+  //   path: "/student_finance",
+  // },
   {
     title: "Library",
     icon: <MdLocalLibrary />,

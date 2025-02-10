@@ -3,17 +3,17 @@ import {
   fetchDashboardCards,
   fetchNotices,
   fetchChildren,
-  fetchAccountingData
+  fetchAccountingData,
 } from "./dashboard.action";
 
 const initialState = {
-  cardsData: null,
+  cardsData: [],
   notices: [],
   childrenData: [],
   accountingData: {
     fees: [],
-    totalPaidFees: "",
-    totalUnpaidFees: "",
+    totalPaidFees: "0",
+    totalUnpaidFees: "0",
   },
   loadingCards: false,
   loadingNotices: false,
@@ -38,11 +38,12 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchDashboardCards.fulfilled, (state, action) => {
         state.loadingCards = false;
-        state.cardsData = action.payload;
+        state.cardsData = action.payload || [];
       })
       .addCase(fetchDashboardCards.rejected, (state, action) => {
         state.loadingCards = false;
-        state.errorCards = action.payload || 'Failed to fetch dashboard cards';
+        state.errorCards = action.payload || "Failed to fetch dashboard cards";
+        state.cardsData = []; // Ensure fallback
       });
 
     // Notices
@@ -53,11 +54,12 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchNotices.fulfilled, (state, action) => {
         state.loadingNotices = false;
-        state.notices = action.payload;
+        state.notices = action.payload || [];
       })
       .addCase(fetchNotices.rejected, (state, action) => {
         state.loadingNotices = false;
-        state.errorNotices = action.payload ||'Failed to fetch notices';
+        state.errorNotices = action.payload || "Failed to fetch notices";
+        state.notices = []; // Ensure fallback
       });
 
     // Children Data
@@ -68,11 +70,12 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchChildren.fulfilled, (state, action) => {
         state.loadingChildren = false;
-        state.childrenData = action.payload;
+        state.childrenData = action.payload || [];
       })
       .addCase(fetchChildren.rejected, (state, action) => {
         state.loadingChildren = false;
-        state.errorChildren = action.payload || 'Failed to fetch children data';
+        state.errorChildren = action.payload || "Failed to fetch children data";
+        state.childrenData = []; // Ensure fallback
       });
 
     // Accounting Data
@@ -84,14 +87,20 @@ const dashboardSlice = createSlice({
       .addCase(fetchAccountingData.fulfilled, (state, action) => {
         state.loadingAccounting = false;
         state.accountingData = {
-          fees: action.payload.fees,
-          totalPaidFees: action.payload.totalPaidFees,
-          totalUnpaidFees: action.payload.totalUnpaidFees,
+          fees: action.payload?.fees || [],
+          totalPaidFees: action.payload?.totalPaidFees || "0",
+          totalUnpaidFees: action.payload?.totalUnpaidFees || "0",
         };
       })
       .addCase(fetchAccountingData.rejected, (state, action) => {
         state.loadingAccounting = false;
-        state.errorAccounting = action.payload || 'Failed to fetch accounting data';
+        state.errorAccounting =
+          action.payload || "Failed to fetch accounting data";
+        state.accountingData = {
+          fees: [],
+          totalPaidFees: "0",
+          totalUnpaidFees: "0",
+        }; // Ensure fallback
       });
   },
 });

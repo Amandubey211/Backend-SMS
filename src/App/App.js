@@ -364,7 +364,9 @@ const StudentAttendance = lazy(() =>
   )
 );
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
-
+const OfflineExamList = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamList.js")
+);
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
@@ -676,6 +678,26 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/class/:cid/:sid/offline_exam",
+      element: (
+        <ProtectRoute
+          Component={OfflineExamList}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    // {
+    //   path: "/class/:cid/:sid/create_offline_exam",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={CreateQuizzes}
+    //       allowedRoles={["admin", "teacher"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
       path: "/class/:cid/:sid/discussions",
       element: (

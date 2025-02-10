@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import TimeTableList from "./Components/TimeTableList";
 import { fetchStudentTimetable } from "../../../Store/Slices/Student/TimeTable/studentTimeTable.action";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
@@ -8,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import debounce from "lodash/debounce";
+import StudentTimeTableList from "./Components/StudentTimeTableList";
 
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
@@ -16,45 +16,56 @@ const TimeTableMainSection = () => {
 
   const role = useSelector((store) => store.common.auth.role);
 
+  // Redux data: Student Timetable & Classes (optional)
   const { timetables, loadingFetch, errorFetch } = useSelector(
     (state) => state.student.studentTimetable
   );
-  const { classes, loading: classLoading, error: classError } = useSelector(
-    (state) => state.admin.class
-  );
+  const {
+    classes,
+    loading: classLoading,
+    error: classError,
+  } = useSelector((state) => state.admin.class);
 
+  // Local state for academic years (from localStorage) & filters
   const [academicYears, setAcademicYears] = useState([]);
   const [filters, setFilters] = useState({
-    name: "", // Name filter
-    type: "", // Type filter
+    name: "", // name-based (frontend) filter
+    type: "", // type-based (backend) filter
   });
   const [filteredTimetables, setFilteredTimetables] = useState(timetables);
 
-  // Debounced function for real-time name search
+  /**
+   * Debounced function for real-time name search.
+   * Waits 300ms after the user stops typing.
+   */
   const debouncedFilter = useMemo(
     () =>
       debounce((value) => {
-        setFilters((prevFilters) => ({
-          ...prevFilters,
-          name: value, // Update name filter
+        setFilters((prev) => ({
+          ...prev,
+          name: value,
         }));
       }, 300),
     []
   );
 
-
-  // Fetch academic years from localStorage
+  /**
+   * Load academic years from localStorage.
+   */
   const fetchAcademicYearsFromStorage = () => {
     const persistedAuth = localStorage.getItem("persist:auth");
     if (persistedAuth) {
       const parsedAuth = JSON.parse(persistedAuth);
       const authData = JSON.parse(parsedAuth.auth || "{}");
-      if (authData && authData.AcademicYear) {
+      if (authData?.AcademicYear) {
         setAcademicYears(authData.AcademicYear);
       }
     }
   };
 
+  /**
+   * On mount, fetch academic years & classes (if not parent/student).
+   */
   useEffect(() => {
     fetchAcademicYearsFromStorage();
     if (role !== "parent" && role !== "student") {
@@ -62,85 +73,80 @@ const TimeTableMainSection = () => {
     }
   }, [dispatch, role]);
 
+  /**
+   * If class fetch fails and user is not parent/student, show error toast.
+   */
   useEffect(() => {
     if (classError && role !== "parent" && role !== "student") {
       toast.error(t("Failed to load classes. Please try again."));
     }
-  }, [classError, role]);
+  }, [classError, role, t]);
 
-  // Fetch timetables based on backend filters (e.g., type, status)
+  /**
+   * Fetch timetables from the server, applying type filter or other backend filters.
+   */
   useEffect(() => {
     const activeFilters = Object.fromEntries(
-      Object.entries(filters).filter(([key, value]) => value)
+      Object.entries(filters).filter(([_, v]) => v)
     );
-
-    // Only trigger fetch if there are any active filters
-   
-      dispatch(fetchStudentTimetable(activeFilters));
-    
+    dispatch(fetchStudentTimetable(activeFilters));
   }, [filters, dispatch]);
 
+  /**
+   * If there's an error fetching timetables, show a toast.
+   */
   useEffect(() => {
     if (errorFetch) {
       toast.error(`${t("Failed to load timetables")}: ${errorFetch}`);
     }
-  }, [errorFetch]);
+  }, [errorFetch, t]);
 
-  // Filter timetables based on both frontend (name) and backend (type) filters
+  /**
+   * Once timetables are fetched, apply local (name + type) filter to produce final results.
+   */
   useEffect(() => {
-    if (timetables && timetables?.length > 0) {
-      const filtered = timetables.filter((timetable) => {
-        const matchesName = timetable.name.toLowerCase().includes(filters.name.toLowerCase());
-        const matchesType = filters.type === "" || timetable.type === filters.type;
+    if (timetables && timetables.length > 0) {
+      const filtered = timetables.filter((tb) => {
+        const matchesName = tb.name
+          .toLowerCase()
+          .includes(filters.name.toLowerCase());
+        const matchesType = filters.type === "" || tb.type === filters.type;
         return matchesName && matchesType;
       });
       setFilteredTimetables(filtered);
     } else {
       setFilteredTimetables(timetables || []);
     }
-  }, [timetables, filters]); // Apply both name and type filters
+  }, [timetables, filters]);
 
-
-  // Handle backend filter changes (e.g., type)
+  /**
+   * Handle changes from the top filters (e.g. type).
+   */
   const handleBackendFilterChange = (updatedFilters) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
+    setFilters((prev) => ({
+      ...prev,
       ...updatedFilters,
     }));
   };
 
-  // Handle frontend filter changes (name search)
+  /**
+   * Handle the name-based (frontend) filter via the debounced function.
+   */
   const handleFrontendFilterChange = (name) => {
-    debouncedFilter(name); // Use debounced value for real-time search
-  };
-
-  const handleCreateTimeTable = () => {
-    navigate("/timetable/create-new-timeTable");
+    debouncedFilter(name);
   };
 
   return (
     <div className="relative p-5">
       {/* Filter Navigation */}
-      <TopNavigationWithFilters
+      {/* <TopNavigationWithFilters
         onBackendFilterChange={handleBackendFilterChange}
         onFrontendFilterChange={handleFrontendFilterChange}
         academicYears={academicYears}
-      />
+      /> */}
 
-      {/* Button to create a new timetable */}
-      {(role !== "parent" && role !== "student") && (
-        <div className="flex justify-start mb-4 ml-5">
-          <button
-            onClick={handleCreateTimeTable}
-            className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-          >
-            {t("+ Create TimeTable")}
-          </button>
-        </div>
-      )}
-
-      {/* Display filtered list of timetables */}
-      <TimeTableList
+      {/* Display the filtered list of timetables */}
+      <StudentTimeTableList
         timetables={filteredTimetables}
         loading={loadingFetch || classLoading}
       />

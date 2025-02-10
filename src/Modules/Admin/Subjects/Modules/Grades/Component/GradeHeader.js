@@ -1,16 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import Sidebar from "../../../../../../Components/Common/Sidebar";
-import Filter from "./Filter";
 
 const GradeHeader = ({ onSearch, onFilterChange }) => {
   const [search, setSearch] = useState("");
-  const [open, setOpen] = useState(false);
-  const { cid, sid } = useParams();
   const { t } = useTranslation("admClass");
+
+  // Retrieve lists for filtering from Redux
+  const { modules: moduleList } = useSelector((state) => state.admin.module);
+  const { assignments } = useSelector((state) => state.admin.assignments);
+  const { quizzes } = useSelector((state) => state.admin.quizzes);
+  // New: Get the semester list from the semesters slice
+  const { semesters: semesterList } = useSelector(
+    (state) => state.admin.semesters
+  );
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -21,25 +26,19 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
     onFilterChange(name, value);
   };
 
-  const { modules: moduleList } = useSelector((state) => state.admin.module);
-  const {
-    assignments
-  } = useSelector((state) => state.admin.assignments);
-  const {quizzes } = useSelector(
-    (state) => state.admin.quizzes
-  );
-
   return (
     <div className="p-2 bg-white">
-      <h2 className="text-xl ps-2 font-semibold mb-3">{t("All Grades")}</h2>
-      <div className="flex items-end justify-around gap-1 px-4">
-        <div className="relative flex flex-col">
+      <h2 className="text-xl ps-2 font-semibold mb-3">{t("Select Grades")}</h2>
+      {/* Container for Select fields in one row with horizontal scrolling on smSelect screens */}
+      <div className="flex flex-nowrap items-end gap-4 px-4 overflow-x-auto pb-1">
+        {/* Search Field */}
+        <div className="relative flex flex-col flex-shrink-0">
           <label className="text-gray-600 mb-1">{t("Search Student")}</label>
           <div className="relative">
             <input
               type="text"
               placeholder={t("Search")}
-              className="text px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-[13rem]"
+              className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 w-[12rem]"
               value={search}
               onChange={handleSearchChange}
               aria-label={t("Search")}
@@ -49,15 +48,17 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
             </button>
           </div>
         </div>
-        <div className="flex flex-col">
+
+        {/* Module Filter */}
+        <div className="flex flex-col flex-shrink-0">
           <label className="text-gray-600 mb-1">{t("Module")}</label>
           <select
             name="moduleId"
-            className="px-4 py-2 border w-[13rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("moduleId", e.target.value)}
             aria-label={t("Select Module")}
           >
-            <option value="">{t("All")}</option>
+            <option value="">{t("Select")}</option>
             {moduleList?.map((i) => (
               <option key={i._id} value={i._id}>
                 {i.moduleName?.slice(0, 15)}..
@@ -66,15 +67,16 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           </select>
         </div>
 
-        <div className="flex flex-col">
+        {/* Assignment Filter */}
+        <div className="flex flex-col flex-shrink-0">
           <label className="text-gray-600 mb-1">{t("Assignment")}</label>
           <select
             name="assignmentId"
-            className="px-4 py-2 border w-[13rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("assignmentId", e.target.value)}
             aria-label={t("Select Assignment")}
           >
-            <option value="">{t("All")}</option>
+            <option value="">{t("Select")}</option>
             {assignments?.map((i) => (
               <option key={i._id} value={i._id}>
                 {i.name?.slice(0, 15)}..
@@ -83,18 +85,37 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           </select>
         </div>
 
-        <div className="flex flex-col">
+        {/* Quiz Filter */}
+        <div className="flex flex-col flex-shrink-0">
           <label className="text-gray-600 mb-1">{t("Quizzes")}</label>
           <select
             name="quizId"
-            className="px-4 py-2 border w-[13rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("quizId", e.target.value)}
             aria-label={t("Select Quiz")}
           >
-            <option value="">{t("All")}</option>
+            <option value="">{t("Select")}</option>
             {quizzes?.map((i) => (
               <option key={i._id} value={i._id}>
                 {i.name?.slice(0, 15)}..
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Semester Filter */}
+        <div className="flex flex-col flex-shrink-0">
+          <label className="text-gray-600 mb-1">{t("Semester")}</label>
+          <select
+            name="semesterId"
+            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            onChange={(e) => handleFilterChange("semesterId", e.target.value)}
+            aria-label={t("Select Semester")}
+          >
+            <option value="">{t("Select")}</option>
+            {semesterList?.map((i) => (
+              <option key={i._id} value={i._id}>
+                {i.title}
               </option>
             ))}
           </select>

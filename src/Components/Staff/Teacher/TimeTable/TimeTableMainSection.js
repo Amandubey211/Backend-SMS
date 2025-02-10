@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import TimeTableList from "./Components/TimeTableList";
 import { fetchTeacherTimetable } from "../../../../Store/Slices/Teacher/teacherTimeTable.action";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
@@ -8,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import debounce from "lodash/debounce";
+import TeacherTimeTableList from "./Components/TeacherTimeTableList";
 
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
@@ -19,9 +19,11 @@ const TimeTableMainSection = () => {
   const { timetables, loadingFetch, errorFetch } = useSelector(
     (state) => state.admin.teacherTimetable
   );
-  const { classes, loading: classLoading, error: classError } = useSelector(
-    (state) => state.admin.class
-  );
+  const {
+    classes,
+    loading: classLoading,
+    error: classError,
+  } = useSelector((state) => state.admin.class);
 
   const [academicYears, setAcademicYears] = useState([]);
   const [filters, setFilters] = useState({
@@ -41,7 +43,6 @@ const TimeTableMainSection = () => {
       }, 300),
     []
   );
-
 
   // Fetch academic years from localStorage
   const fetchAcademicYearsFromStorage = () => {
@@ -71,7 +72,6 @@ const TimeTableMainSection = () => {
   // Fetch timetables based on backend filters (e.g., type, status)
   useEffect(() => {
     dispatch(fetchTeacherTimetable());
-
   }, [dispatch]);
 
   useEffect(() => {
@@ -84,8 +84,11 @@ const TimeTableMainSection = () => {
   useEffect(() => {
     if (timetables && timetables?.length > 0) {
       const filtered = timetables.filter((timetable) => {
-        const matchesName = timetable.name.toLowerCase().includes(filters.name.toLowerCase());
-        const matchesType = filters.type === "" || timetable.type === filters.type;
+        const matchesName = timetable.name
+          .toLowerCase()
+          .includes(filters.name.toLowerCase());
+        const matchesType =
+          filters.type === "" || timetable.type === filters.type;
         return matchesName && matchesType;
       });
       setFilteredTimetables(filtered);
@@ -93,7 +96,6 @@ const TimeTableMainSection = () => {
       setFilteredTimetables(timetables || []);
     }
   }, [timetables, filters]); // Apply both name and type filters
-
 
   // Handle backend filter changes (e.g., type)
   const handleBackendFilterChange = (updatedFilters) => {
@@ -121,10 +123,8 @@ const TimeTableMainSection = () => {
         academicYears={academicYears}
       />
 
-      
-
       {/* Display filtered list of timetables */}
-      <TimeTableList
+      <TeacherTimeTableList
         timetables={filteredTimetables}
         loading={loadingFetch || classLoading}
       />

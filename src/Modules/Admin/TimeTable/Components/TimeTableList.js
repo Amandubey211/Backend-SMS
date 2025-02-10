@@ -327,7 +327,7 @@ const TimeTableList = React.memo(({ timetables, loading, onDelete }) => {
 
   return (
     <>
-      <div className="flex flex-col p-5">
+      <div className="flex flex-col p-2">
         {/* Tab Buttons + Create Button */}
         <div className="flex justify-between mb-6 px-4 items-center">
           <div className="flex space-x-4">

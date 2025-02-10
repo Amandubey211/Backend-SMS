@@ -102,7 +102,7 @@ export const fetchStudentAttendance = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      const response = await getData(`/api/studentDashboard/myAttendance?say=${say}`, { month, year, studentId },
+      const response = await getData(`${getRole}/myAttendance?say=${say}`, { month, year, studentId },
       );
       const { report, summary } = response.report;
       const attendanceMap = report.reduce((acc, entry) => {

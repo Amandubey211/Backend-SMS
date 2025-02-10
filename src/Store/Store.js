@@ -14,6 +14,8 @@ import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
+import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; // Importing the combined admin reducer
+
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
@@ -36,7 +38,7 @@ import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 
 import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
 import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
-import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice"
+import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice";
 // import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
 import invoiceReducer from "./Slices/Finance/Invoice/invoiceSlice";
@@ -53,6 +55,8 @@ import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
 import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
+// import offlineExamReducer from "./Slices/F"
+
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -113,6 +117,12 @@ const userPersistConfig = {
   // ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
+const semesterPersistConfig = {
+  key: "semesters",
+  storage,
+  whitelist: ["semesters", "selectedSemester"], // Persist both the semesters array and the selectedSemester object
+};
+
 const stdSubjectPersistConfig = {
   key: "stdSubject",
   storage,
@@ -137,6 +147,7 @@ const commonReducer = combineReducers({
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
   class: classReducer,
+  semesters: persistReducer(semesterPersistConfig, semesterReducer),
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,
@@ -180,7 +191,8 @@ const AdminReducer = combineReducers({
   expenses: expensesReducer,
   studentFees: studentFeesReducer,
   invoices: invoiceReducer,
-  penaltyAdjustment:penaltyAdjustmentReducer,
+  penaltyAdjustment: penaltyAdjustmentReducer,
+  // offlineExam: adminOfflineExamReducer
 });
 
 const studentReducer = combineReducers({

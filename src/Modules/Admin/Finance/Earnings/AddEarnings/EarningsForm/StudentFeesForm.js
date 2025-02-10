@@ -11,10 +11,12 @@ import { useDispatch } from "react-redux";
 import { createStudentFee, createStudentFeeRecordForClass } from "../../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import StudentPaymentDetails from "../Component/StudentPaymentDetails";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormData, formData, studentDetail }) => {
   const formikRef = useRef(null);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const navigate  = useNavigate()
   const handleCustomSubmit = () => {
     if (formikRef.current) {
       const { values, validateForm } = formikRef.current;
@@ -66,7 +68,7 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormD
             if(updatedFormData[0]?.studentId  == 'ALL' ){
               dispatch(createStudentFeeRecordForClass(updatedFormData));
             }else{
-              dispatch(createStudentFee(updatedFormData));
+              dispatch(createStudentFee({feeData:updatedFormData, navigate}));
             }
        
           }
