@@ -89,12 +89,12 @@ const DiscussionMessage = () => {
     setComments(deleteReplyRecursively(comments));
   };
 
-  const filteredComments = comments.filter((comment) => {
-    const searchInComment = comment.author
+  const filteredComments = comments?.filter((comment) => {
+    const searchInComment = comment?.author
       .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const searchInReplies = comment.replies.some((reply) =>
-      reply.author.toLowerCase().includes(searchQuery.toLowerCase())
+      .includes(searchQuery?.toLowerCase());
+    const searchInReplies = comment?.replies?.some((reply) =>
+      reply?.author?.toLowerCase()?.includes(searchQuery?.toLowerCase())
     );
     return searchInComment || searchInReplies;
   });

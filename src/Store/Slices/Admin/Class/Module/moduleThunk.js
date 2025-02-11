@@ -44,27 +44,29 @@ export const addModule = createAsyncThunk(
     { name, thumbnail, subjectId },
     { rejectWithValue, dispatch, getState }
   ) => {
-    // Retrieve additional necessary parameters
-    const say = localStorage.getItem("say"); // or a function like `getAY()` if needed
-    dispatch(setShowError(false)); // Ensure error visibility is reset
+    const say = getAY();
+    dispatch(setShowError(false)); // Reset error state
 
     try {
       const getRole = getUserRole(getState);
-      // Extract class and subject IDs from the state
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
+      // Extract semesterId from the common user slice
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
 
       // Construct FormData for multipart/form-data requests
       const formData = new FormData();
       formData.append("name", name);
       formData.append("subjectId", subjectId);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
+      formData.append("semesterId", semesterId);
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
 
       // Define the endpoint for the API call
       const endpoint = `/${getRole}/add_module?say=${say}`;
-
       const response = await customRequest("post", endpoint, formData, {
-        "Content-Type": "multipart/form-data", // Specify the content type
+        "Content-Type": "multipart/form-data",
       });
 
       if (response && response.success) {
@@ -84,7 +86,7 @@ export const editModule = createAsyncThunk(
     { moduleId, name, thumbnail, subjectId },
     { rejectWithValue, dispatch, getState }
   ) => {
-    // Mandatory Lines
+    // Get academic year parameter and reset error state
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -92,13 +94,18 @@ export const editModule = createAsyncThunk(
       const getRole = getUserRole(getState);
       const cid = getState().common.user.classInfo.selectedClassId;
       const sid = getState().common.user.subjectInfo.selectedSubjectId;
+      // Extract semesterId from the common user slice
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
 
       // Construct FormData for multipart/form-data
       const formData = new FormData();
       formData.append("name", name);
-      if (thumbnail) formData.append("thumbnail", thumbnail);
+      formData.append("semesterId", semesterId);
+      if (thumbnail) {
+        formData.append("thumbnail", thumbnail);
+      }
 
-      // API Call using customRequest for multipart/form-data with query parameter
+      // API call using customRequest
       const endpoint = `/${getRole}/subjects/${subjectId}/modules/${moduleId}?say=${say}`;
       const response = await customRequest("put", endpoint, formData, {
         "Content-Type": "multipart/form-data",

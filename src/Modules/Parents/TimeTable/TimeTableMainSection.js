@@ -1,32 +1,29 @@
-// TimeTableMainSection.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import TimeTableList from "./Components/TimeTableList";
-import {
-  fetchParentTimetable
-} from "../../../Store/Slices/Parent/TimeTable/parentTimeTable.action";
+import { fetchParentTimetable } from "../../../Store/Slices/Parent/TimeTable/parentTimeTable.action";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import ParentTimeTableList from "./Components/ParentTimeTableList";
 
 const TimeTableMainSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation("admTimeTable");
 
-
   const role = useSelector((store) => store.common.auth.role);
 
-
-  // Correctly destructure timetables, loadingFetch, and errorFetch
+  // Destructure from Redux store
   const { timetables, loadingFetch, errorFetch } = useSelector(
     (state) => state.Parent.parentTimetable
   );
-  const { classes, loading: classLoading, error: classError } = useSelector(
-    (state) => state.admin.class
-  );
+  const {
+    classes,
+    loading: classLoading,
+    error: classError,
+  } = useSelector((state) => state.admin.class);
 
   const [academicYears, setAcademicYears] = useState([]);
   const [backendFilters, setBackendFilters] = useState({
@@ -36,10 +33,11 @@ const TimeTableMainSection = () => {
     academicYear: "",
   });
   const [frontendFilter, setFrontendFilter] = useState("");
-
   const [filteredTimetables, setFilteredTimetables] = useState([]);
 
-  // Function to fetch academic years from localStorage
+  /**
+   * Fetch academic years from localStorage.
+   */
   const fetchAcademicYearsFromStorage = () => {
     const persistedAuth = localStorage.getItem("persist:auth");
     if (persistedAuth) {
@@ -51,48 +49,66 @@ const TimeTableMainSection = () => {
     }
   };
 
-  // Fetch academic years on component mount
+  /**
+   * On mount, fetch academic years and (if not parent/student) classes.
+   */
   useEffect(() => {
     fetchAcademicYearsFromStorage();
-    // Only fetch classes if role is not parent or student
     if (role !== "parent" && role !== "student") {
       dispatch(fetchAllClasses());
     }
   }, [dispatch, role]);
 
-  // Handle class fetching errors, but skip for parent or student
+  /**
+   * Show a toast if class fetch fails (for non-parent/student).
+   */
   useEffect(() => {
     if (classError && role !== "parent" && role !== "student") {
       toast.error(t("Failed to load classes. Please try again."));
     }
-  }, [classError, role]);
+  }, [classError, role, t]);
 
-  // Fetch timetables based on backend filters
+  /**
+   * Fetch parent timetables from the server based on active backend filters.
+   */
   useEffect(() => {
     // Create a new object with only non-empty filter parameters
     const activeFilters = Object.fromEntries(
-      Object.entries(backendFilters).filter(([key, value]) => value)
+      Object.entries(backendFilters).filter(([_, value]) => value)
     );
-
-    // Dispatch fetchTimetables with the activeFilters
     dispatch(fetchParentTimetable(activeFilters));
   }, [backendFilters, dispatch]);
 
-  // console.log("raw timetable", timetables)
-
-  // Update filtered timetables when timetables or frontend filter changes
+  /**
+   * Show a toast if there's an error fetching timetables.
+   */
   useEffect(() => {
+    if (errorFetch) {
+      toast.error(`${t("Failed to load timetables")}: ${errorFetch}`);
+    }
+  }, [errorFetch, t]);
+
+  /**
+   * Filter timetables in memory by name (frontend filter).
+   * We first ensure we work with an array regardless of data shape.
+   */
+  useEffect(() => {
+    const timetableArray = Array.isArray(timetables)
+      ? timetables
+      : timetables?.timetables || [];
     if (frontendFilter.trim() === "") {
-      setFilteredTimetables(timetables);
+      setFilteredTimetables(timetableArray);
     } else {
-      const filtered = timetables.filter((timetable) =>
+      const filtered = timetableArray.filter((timetable) =>
         timetable.name.toLowerCase().includes(frontendFilter.toLowerCase())
       );
       setFilteredTimetables(filtered);
     }
   }, [timetables, frontendFilter]);
 
-  // Handle backend filter changes
+  /**
+   * Update backend filters (e.g., type, status, academicYear).
+   */
   const handleBackendFilterChange = (updatedFilters) => {
     setBackendFilters({
       classId: updatedFilters.classId || "",
@@ -102,35 +118,13 @@ const TimeTableMainSection = () => {
     });
   };
 
-  // Handle frontend filter changes (Name search)
+  /**
+   * Update the local name-based (frontend) filter.
+   */
   const handleFrontendFilterChange = (name) => {
     setFrontendFilter(name);
   };
 
-  // Handle create button click to navigate to a new route
-  const handleCreateTimeTable = () => {
-    navigate("/timetable/create-new-timeTable");
-  };
-  
-  // // Handle delete action
-  // const handleDelete = (id) => {
-  //   dispatch(deleteTimetable(id))
-  //     .unwrap()
-  //     .then(() => {
-  //       toast.success(t("Timetable deleted successfully."));
-  //     })
-  //     .catch((err) => {
-  //       toast.error(t("Failed to delete timetable."));
-  //     });
-  // };
-
-  // Handle fetching errors
-  useEffect(() => {
-    if (errorFetch) {
-      toast.error(`${t("Failed to load timetables")}: ${errorFetch}`);
-    }
-  }, [errorFetch]);
-  // console.log("Filter Timetables: ", filteredTimetables)
   return (
     <div className="relative p-5">
       {/* Filter Navigation */}
@@ -140,24 +134,11 @@ const TimeTableMainSection = () => {
         academicYears={academicYears}
       />
 
-      {/* Button to create a new timetable */}
-      {(role !== "parent" && role !== "student") && (
-        <div className="flex justify-start mb-4 ml-5">
-          <button
-            onClick={handleCreateTimeTable}
-            className="px-4 py-2 rounded-md text-white bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-          >
-            {t("+ Create TimeTable")}
-          </button>
-        </div>
-      )}
-
-
-      {/* Display list of timetables */}
-      <TimeTableList
+      {/* Timetables List */}
+      <ParentTimeTableList
         timetables={filteredTimetables}
         loading={loadingFetch || classLoading}
-        // onDelete={handleDelete}
+        // onDelete={handleDelete} // Uncomment if deletion is enabled
       />
     </div>
   );

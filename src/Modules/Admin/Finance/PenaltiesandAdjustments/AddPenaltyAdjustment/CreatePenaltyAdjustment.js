@@ -507,7 +507,7 @@ const CreatePenaltyAdjustment = () => {
                 <FieldArray name="items">
                   {({ remove, push }) => (
                     <div
-                      className="p-6 rounded-md"
+                      className="p-6 rounded-md mb-6"
                       style={{ backgroundColor: "#ECECEC" }} // Box background color
                     >
                       {Array.isArray(values.items) &&

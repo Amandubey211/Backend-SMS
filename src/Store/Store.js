@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { combineReducers } from "redux";
+
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
@@ -14,6 +15,8 @@ import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
+import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; // Importing the combined admin reducer
+
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
@@ -36,7 +39,7 @@ import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 
 import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
 import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
-import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice"
+import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice";
 // import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
 import invoiceReducer from "./Slices/Finance/Invoice/invoiceSlice";
@@ -114,6 +117,12 @@ const userPersistConfig = {
   // ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
+const semesterPersistConfig = {
+  key: "semesters",
+  storage,
+  whitelist: ["semesters", "selectedSemester"], // Persist both the semesters array and the selectedSemester object
+};
+
 const stdSubjectPersistConfig = {
   key: "stdSubject",
   storage,
@@ -138,6 +147,7 @@ const commonReducer = combineReducers({
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
   class: classReducer,
+  semesters: persistReducer(semesterPersistConfig, semesterReducer),
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,

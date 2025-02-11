@@ -5,6 +5,7 @@ import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import {
+  Menu,
   Alert,
   Button,
   Dropdown,
@@ -40,11 +41,10 @@ import SelectInput from "../Components/SelectInput"; // Ensure correct import pa
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
-
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
-
-
 import { downloadPDF } from "../../../../../../Utils/xl";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import ExportModalNew from "../../../../../../Components/Common/ExportModalNew";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -65,6 +65,8 @@ const PenalityandAdjustmentList = () => {
   const [searchText, setSearchText] = useState("");
   const [isReceiptVisible, setReceiptVisible] = useState(false);
   const [selectedReturnInvoice, setSelectedReturnInvoice] = useState(null);
+  const [selectedExportRecord, setSelectedExportRecord] = useState(null);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -78,11 +80,15 @@ const PenalityandAdjustmentList = () => {
   // Handle search input changes
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    dispatch(setCurrentPage(1));
+    dispatch(setCurrentPage(1)); 
   };
 
-  // Handle canceling a return invoice
-  const handleCancleReturnInvoice = (id) => {
+  // =======================
+  // Updated: Handle canceling a return invoice
+  // Now accepts the entire record and extracts the _id
+  // =======================
+  const handleCancleReturnInvoice = (record) => {
+    const { _id } = record;
     const params = {
       search: searchText,
       page: 1, // Always fetch the first page
@@ -90,7 +96,7 @@ const PenalityandAdjustmentList = () => {
       sortBy: "createdAt",
       sortOrder: "desc",
     };
-    dispatch(cancleReturnInvoiceData({ params, id }));
+    dispatch(cancleReturnInvoiceData({ params, id: _id }));
   };
 
   // Handle previewing a return invoice
@@ -100,10 +106,9 @@ const PenalityandAdjustmentList = () => {
   };
 
   // Handle downloading the PDF
-
   const handleDownloadPDF = async (pdfRef, selectedReturnInvoice) => {
-    await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice")
-  }
+    await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice");
+  };
 
   const handleSendEmail = async (record) => {
     if (!record._id) {
@@ -134,6 +139,60 @@ const PenalityandAdjustmentList = () => {
     }
   };
 
+  const actionMenu = (record) => (
+    <Menu>
+      <Menu.Item key="1" onClick={() => handleReturnPreview(record)}>
+        <FilePdfOutlined style={{ marginRight: 8 }} />
+        Preview
+      </Menu.Item>
+      <Menu.Item key="2" onClick={() => {
+        const selectedAdjustment = adjustmentData.find(
+          (adjustment) => adjustment._id === record.key
+        );
+        if (selectedAdjustment) {
+          dispatch(setSelectedAdjustment(selectedAdjustment));
+          dispatch(setReadOnly(true));
+          navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
+        } else {
+          toast.error("Selected adjustment not found.");
+        }
+      }}>
+        <EyeOutlined style={{ marginRight: 8 }} />
+        View (Read-only)
+      </Menu.Item>
+      <Menu.Item
+        key="3"
+        onClick={() => {
+          if (!record?.status || record?.status !== "Cancelled") {
+            handleCancleReturnInvoice(record);
+          }
+        }}
+        disabled={record?.status === "Cancelled"}
+      >
+        <CloseCircleOutlined style={{ marginRight: 8 }} />
+        {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
+      </Menu.Item>
+      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
+        <MailOutlined style={{ marginRight: 8 }} />
+        Send Mail
+      </Menu.Item>
+      <Menu.Item
+        key="5"
+        onClick={() => {
+          console.log("Selected Record for Export:", record);
+          setSelectedExportRecord(record);
+          setTimeout(() => {
+            setIsExportModalVisible(true);
+          }, 100);
+        }}
+      >
+        <ExportOutlined style={{ marginRight: 8 }} />
+        Export
+      </Menu.Item>
+    </Menu>
+  );
+  
+
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
     debounce((params) => {
@@ -144,15 +203,26 @@ const PenalityandAdjustmentList = () => {
 
   // Fetch data on component mount and when dependencies change
   useEffect(() => {
+    // Build the parameters including the search query, current page, and computed page size
     const params = {
-      search: searchText,
-      page: currentPage,
-      limit: computedPageSize,
-      sortBy: "createdAt",
-      sortOrder: "desc",
+      search: searchText,            // Include the search query from the state
+      page: currentPage,             // Use the current page (which resets to 1 on search change)
+      limit: computedPageSize,       // Use the computed page size
+      sortBy: "createdAt",           // Optional: set the sort field if needed
+      sortOrder: "desc",             // Optional: set the sort order if needed
     };
+  
+    // Call the debounced fetch function with the updated parameters
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage, computedPageSize]);
+  
+
+  // Monitor the loading state to disable the initial render once the API call completes
+  useEffect(() => {
+    if (!loading) {
+      setInitialLoad(false);
+    }
+  }, [loading]);
 
   // Close receipt preview modal on outside click
   useEffect(() => {
@@ -329,8 +399,9 @@ const PenalityandAdjustmentList = () => {
                 </span>
               </ProtectedSection>
             ),
+            // Updated: Pass the entire record to the cancellation handler.
             onClick: () => {
-              if (record?.status !== "Cancelled") handleCancleReturnInvoice(record?.key);
+              if (record?.status !== "Cancelled") handleCancleReturnInvoice(record);
             },
             disabled: record?.status === "Cancelled",
           },
@@ -343,19 +414,31 @@ const PenalityandAdjustmentList = () => {
               </span>
             ),
           },
-          ,
+          {
+            key: "5",
+            label: (
+              <span
+                onClick={() => {
+                  console.log("Selected Record for Export:", record);
+                  setSelectedExportRecord(record);
+                  setTimeout(() => {
+                    setIsExportModalVisible(true);
+                  }, 100);
+                }}
+              >
+                <ExportOutlined style={{ marginRight: 8 }} />
+                Export
+              </span>
+            ),
+          },
+
         ];
 
         return (
-          <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-            <MoreOutlined
-              style={{
-                fontSize: "15px",
-                cursor: "pointer",
-                transform: "rotate(180deg)",
-              }}
-            />
+          <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+            <MoreOutlined style={{ fontSize: "15px", cursor: "pointer", transform: "rotate(180deg)" }} />
           </Dropdown>
+
         );
       },
       width: 100,
@@ -395,6 +478,7 @@ const PenalityandAdjustmentList = () => {
           adjustedBy = {},
           adjustedAt = "N/A",
           academicYear = {},
+          isCancel, // added to determine status
         } = adjustment || {};
 
         return {
@@ -415,11 +499,22 @@ const PenalityandAdjustmentList = () => {
           totalAmount: `${parseFloat(adjustmentTotal)} QR`,
           finalAmount: `${parseFloat(adjustmentAmount)} QR`,
           createdBy: adjustedBy.adminName || "N/A",
-          Date: adjustedAt,
+          Date:
+            adjustedAt !== "N/A"
+              ? new Date(adjustedAt).toLocaleString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+              : "N/A",
           academicYearDetails: academicYear.year || "N/A",
+          status: isCancel ? "Cancelled" : "Active",
         };
       })
       : [];
+
 
   return (
     <Layout title={"Penalty & Adjustment List | Student Diwan"}>
@@ -440,7 +535,6 @@ const PenalityandAdjustmentList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
-
               <Button
                 type="primary"
                 icon={<ExportOutlined />}
@@ -449,7 +543,6 @@ const PenalityandAdjustmentList = () => {
               >
                 Export
               </Button>
-
 
               <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
                 <button
@@ -464,54 +557,80 @@ const PenalityandAdjustmentList = () => {
                   </div>
                 </button>
               </ProtectedAction>
-
             </div>
           </div>
 
-          {/* Loading Indicator */}
-          {loading && (
+          {/* Render Spinner until initial API call is complete */}
+          {(initialLoad || loading) ? (
             <div className="flex justify-center">
-              <Spin tip="Loading..." />
+              <Spinner />
             </div>
+          ) : (
+            // Render the table only when not loading and after initial fetch has completed
+            !error && (
+              <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
+                <Table
+                  dataSource={dataSource}
+                  columns={columns}
+                  pagination={{
+                    current: currentPage,
+                    total: totalRecords,
+                    pageSize: computedPageSize,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20", "50"],
+                    size: "small",
+                    showTotal: () =>
+                      `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                    onChange: (page, pageSize) => {
+                      dispatch(setCurrentPage(page));
+                    },
+                    onShowSizeChange: (current, size) => {
+                      dispatch(setCurrentPage(1)); // Reset to first page on size change
+                    },
+                  }}
+                  className="rounded-lg shadow text-xs"
+                  bordered
+                  size="small"
+                  tableLayout="fixed"
+                />
+              </ProtectedSection>
+            )
           )}
 
-          {/* Table */}
-          {!loading && !error && (
-            <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
-              <Table
-                dataSource={dataSource}
-                columns={columns}
-                pagination={{
-                  current: currentPage,
-                  total: totalRecords,
-                  pageSize: computedPageSize,
-                  showSizeChanger: true,
-                  pageSizeOptions: ["5", "10", "20", "50"],
-                  size: "small",
-                  showTotal: () =>
-                    `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                  onChange: (page, pageSize) => {
-                    dispatch(setCurrentPage(page));
-                  },
-                  onShowSizeChange: (current, size) => {
-                    dispatch(setCurrentPage(1)); // Reset to first page on size change
-                  },
-                }}
-                className="rounded-lg shadow text-xs"
-                bordered
-                size="small"
-                tableLayout="fixed"
-              />
-            </ProtectedSection>
-          )}
           {/* Export Modal */}
-          <ExportModal
+          <ExportModalNew
             visible={isExportModalVisible}
-            onClose={() => setIsExportModalVisible(false)}
-            dataToExport={transformAdjustmentData(adjustmentData)}
-            title="Penalty Adjustment Data"
-            sheet="penalty_adjustment_report"
+            onClose={() => {
+              setIsExportModalVisible(false);
+              setSelectedExportRecord(null); // Reset selection
+            }}
+            dataToExport={
+              selectedExportRecord
+                ? transformAdjustmentData([selectedExportRecord])
+                : transformAdjustmentData(adjustmentData)
+            }
+            columns={[
+              { header: "S.No", dataKey: "sNo" },
+              { header: "Return Invoice No.", dataKey: "returnInvoiceNumber" },
+              { header: "Invoice Ref No.", dataKey: "refInvoiceNumber" },
+              { header: "Receiver", dataKey: "receiver" },
+              { header: "Total Amount", dataKey: "totalAmount" },
+              { header: "Final Amount", dataKey: "finalAmount" },
+              { header: "Discount", dataKey: "discount" },
+              { header: "Penalty", dataKey: "penalty" },
+              { header: "Status", dataKey: "status" },
+              { header: "Date", dataKey: "Date" },
+            ]}
+            fileName={
+              selectedExportRecord
+                ? `Penalty_Adjustment_${selectedExportRecord.returnInvoiceNumber}`
+                : "Penalty_Adjustments"
+            }
+            alwaysRender={true}  // Ensures modal renders even if dataToExport is empty
           />
+
+
+
           {/* Receipt Preview Overlay */}
           {isReceiptVisible && selectedReturnInvoice && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
@@ -545,14 +664,12 @@ const PenalityandAdjustmentList = () => {
                 </div>
 
                 {/* Receipt content container */}
-                <div >
+                <div>
                   <PenaltyAdjustmentTemplate data={selectedReturnInvoice} ref={pdfRef} />
                 </div>
               </div>
             </div>
           )}
-
-
         </div>
       </AdminDashLayout>
     </Layout>

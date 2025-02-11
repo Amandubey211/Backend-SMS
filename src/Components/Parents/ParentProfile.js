@@ -78,7 +78,7 @@ const ParentProfile = () => {
             <div className="flex flex-row gap-28 px-6 py-8 border items-center rounded-md">
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">{t("Father's Name")}</span>
+                  <span className="font-normal text-gray-500">{t("Father's Nam")}</span>
                   <span className="font-medium text-gray-800">
                     {userDetails?.fatherName || userDetails?.guardianName}
                   </span>

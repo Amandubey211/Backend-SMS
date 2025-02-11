@@ -60,8 +60,8 @@ const MainSection = () => {
             syllabus={syllabi[0]}
           />
           <SyllabusSection
-            title={syllabi[0].title}
-            content={syllabi[0].content}
+            title={syllabi[0]?.title}
+            content={syllabi[0]?.content}
           />
         </>
       );

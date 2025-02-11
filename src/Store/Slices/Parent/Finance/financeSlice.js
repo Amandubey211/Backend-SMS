@@ -6,7 +6,7 @@ const initialState = {
   totalUnpaidFees: 0,
   totalPaidFees: 0,
   loading: false,
-  error: false,
+  error: null, // Changed to null for better error handling
 };
 
 const financeSlice = createSlice({
@@ -14,12 +14,12 @@ const financeSlice = createSlice({
   initialState,
   reducers: {
     setFinanceDetails(state, action) {
-      state.financeData = action.payload.fees;
-      state.totalUnpaidFees = action.payload.totalUnpaidFees;
-      state.totalPaidFees = action.payload.totalPaidFees;
+      state.financeData = action.payload?.fees || [];
+      state.totalUnpaidFees = action.payload?.totalUnpaidFees || 0;
+      state.totalPaidFees = action.payload?.totalPaidFees || 0;
     },
     clearError(state) {
-      state.error = false;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -30,13 +30,16 @@ const financeSlice = createSlice({
       })
       .addCase(fetchParentFinanceData.fulfilled, (state, action) => {
         state.loading = false;
-        state.financeData = action.payload.fees;
-        state.totalUnpaidFees = action.payload.totalUnpaidFees;
-        state.totalPaidFees = action.payload.totalPaidFees;
+        state.financeData = action.payload?.fees || [];
+        state.totalUnpaidFees = action.payload?.totalUnpaidFees || 0;
+        state.totalPaidFees = action.payload?.totalPaidFees || 0;
       })
       .addCase(fetchParentFinanceData.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || "Failed to fetch finance data";
+        state.financeData = []; // Ensure fallback
+        state.totalUnpaidFees = 0; // Ensure fallback
+        state.totalPaidFees = 0; // Ensure fallback
       });
   },
 });

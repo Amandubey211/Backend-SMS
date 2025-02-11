@@ -31,7 +31,6 @@ const MainSection = () => {
     }
   }, [cid, sid, dispatch]);
 
-  console.log("offline exam", offlineExamData.data, error);
 
   return (
     <div className="flex h-full w-full">

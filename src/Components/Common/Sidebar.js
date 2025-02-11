@@ -1,3 +1,4 @@
+// Sidebar.jsx
 import React, { useEffect, useRef, useCallback } from "react";
 import { RxCross2 } from "react-icons/rx";
 
@@ -5,42 +6,46 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
   const sidebarRef = useRef(null);
   const closeButtonRef = useRef(null); // Reference to the close button
 
-  // Focus trap logic
-  const trapFocus = useCallback(
-    (event) => {
-      if (event.key === "Tab" && sidebarRef.current) {
-        const focusableElements = sidebarRef.current.querySelectorAll(
-          'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
-        );
-
-        if (focusableElements?.length === 0) {
+  // Focus trap logic to keep focus within the sidebar when open
+  const trapFocus = useCallback((event) => {
+    if (event.key === "Tab" && sidebarRef.current) {
+      const focusableElements = sidebarRef.current.querySelectorAll(
+        'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusableElements?.length === 0) {
+        event.preventDefault();
+        return;
+      }
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      if (event.shiftKey) {
+        // Shift + Tab: cycle to the last element if at the beginning
+        if (document.activeElement === firstElement) {
           event.preventDefault();
-          return;
+          lastElement.focus();
         }
-
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements?.length - 1];
-
-        if (event.shiftKey) {
-          // Shift + Tab
-          if (document.activeElement === firstElement) {
-            event.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          // Tab
-          if (document.activeElement === lastElement) {
-            event.preventDefault();
-            firstElement.focus();
-          }
+      } else {
+        // Tab: cycle to the first element if at the end
+        if (document.activeElement === lastElement) {
+          event.preventDefault();
+          firstElement.focus();
         }
       }
-    },
-    [sidebarRef]
-  );
+    }
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // If the click is inside an Ant Design DatePicker dropdown, a modal, or its mask, ignore it.
+      if (
+        event.target.closest(".ant-picker-dropdown") ||
+        event.target.closest(".ant-modal") ||
+        event.target.closest(".ant-modal-mask") ||
+        document.querySelector(".ant-confirm, .ant-modal-confirm") // Check if a confirm modal is open
+      ) {
+        return;
+      }
+      // If the click target is outside the sidebar, close the sidebar.
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         onClose();
       }
@@ -49,21 +54,15 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
     if (isOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       document.addEventListener("keydown", trapFocus);
-
-      // Focus the close button when the sidebar is opened
-      // if (closeButtonRef.current) {
-      //   closeButtonRef.current.focus();
-      // }
     } else {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
     }
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, trapFocus]);
 
   return (
     <div
@@ -101,7 +100,6 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
             <RxCross2 className="text-xl" />
           </button>
         </div>
-
         {children}
       </div>
     </div>

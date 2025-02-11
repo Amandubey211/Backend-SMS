@@ -1,30 +1,63 @@
-import React, { useRef, useState } from "react";
-import "handsontable/dist/handsontable.full.min.css";
-import { HotTable } from "@handsontable/react";
+import React, { useEffect, useRef } from "react";
+import Handsontable from "handsontable";
+import "handsontable/dist/handsontable.full.css";
 
-const HandsontableComp = () => {
+const HandsontableComp = (fileData = []) => {
   const hotRef = useRef(null);
-  const [data, setData] = useState([
-    ["Student ID", "Name", "Score", "Max Marks", "Status"],
-    ["6731aabae94bad3d036d9de0", "John Doe", 40, 50, "Present"],
-    ["6731aabae94bad3d036d9de1", "Jane Smith", 45, 50, "Present"],
-    ["6731aabae94bad3d036d9de2", "Robert Brown", 30, 50, "Absent"],
-  ]);
+  const hotInstanceRef = useRef(null); // Store Handsontable instance
+  const data = fileData.data;
+  console.log("dsad", data);
+
+  useEffect(() => {
+    // Default empty table structure
+    const headers =
+      data.length > 0
+        ? data[0]
+        : [
+            "Name",
+            "AdmissionNumber",
+            "Quiz 1",
+            "Exam 1",
+            "Quiz 2",
+            "Exam 2",
+            "Project",
+          ];
+    const tableData =
+      data.length > 1 ? data.slice(1) : [["", "", "", "", "", "", ""]];
+    console.log("Headers:", headers);
+
+    if (hotInstanceRef.current) {
+      hotInstanceRef.current.updateSettings({
+        data: tableData,
+        colHeaders: headers,
+      });
+    } else {
+      hotInstanceRef.current = new Handsontable(hotRef.current, {
+        data: tableData,
+        colHeaders: headers,
+        rowHeaders: true,
+        width: "100%",
+        height: "auto",
+        stretchH: "all", // Auto-adjust column width
+        contextMenu: true, // Enable right-click menu
+        licenseKey: "non-commercial-and-evaluation",
+      });
+    }
+
+    return () => {
+      if (hotInstanceRef.current) {
+        hotInstanceRef.current.destroy();
+        hotInstanceRef.current = null;
+      }
+    };
+  }, [data]);
 
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-bold mb-4">Upload Sample Excel Data</h2>
-      <HotTable
+    <div className="w-full p-4 bg-white border shadow-md mt-6 ">
+      <div
         ref={hotRef}
-        data={data}
-        colHeaders={true}
-        rowHeaders={true}
-        width="100%"
-        height="auto"
-        stretchH="all"
-        licenseKey="non-commercial-and-evaluation"
-        className="border"
-      />
+        className="h-full w-full border rounded-sm shadow-sm bg-gray-50 overflow-auto"
+      ></div>
     </div>
   );
 };

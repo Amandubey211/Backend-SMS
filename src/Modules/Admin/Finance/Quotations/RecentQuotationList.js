@@ -40,6 +40,7 @@ import { formatDate } from "../../../../Utils/helperFunctions";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { downloadPDF } from "../../../../Utils/xl";
 import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
+import ExportModalNew from "../../../../Components/Common/ExportModalNew";
 
 const RecentQuotationList = () => {
   useNavHeading("Finance", "Quotation List");
@@ -60,6 +61,8 @@ const RecentQuotationList = () => {
   // Local state for preview mode renamed to avoid collision with Redux action
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
   const [previewQuotation, setPreviewQuotation] = useState(null);
+  const [selectedExportRecord, setSelectedExportRecord] = useState(null);
+
   const popupRef = useRef(null);
 
   const paze_size =
@@ -179,6 +182,64 @@ const RecentQuotationList = () => {
   const handleStatusChange = (quotationId, status) => {
     dispatch(updateQuotationStatus({ id: quotationId, status }));
   };
+  const actionMenu = (record) => (
+    <Menu>
+      <Menu.Item
+        key="1"
+        onClick={() => {
+          const quotationToPreview = quotationIdMap[record.key];
+          if (quotationToPreview) {
+            setPreviewQuotation(quotationToPreview);
+            setQuotationPreviewVisible(true);
+          } else {
+            toast.error("Quotation not found.");
+          }
+        }}
+      >
+        <FilePdfOutlined style={{ marginRight: 8 }} /> Preview
+      </Menu.Item>
+      <Menu.Item
+        key="2"
+        onClick={() => {
+          const quotationToView = quotationIdMap[record.key];
+          if (quotationToView) {
+            dispatch(setReadOnly(true));
+            dispatch(setSelectedQuotation(quotationToView));
+            navigate("/finance/quotations/add-new-quotations");
+          } else {
+            toast.error("Selected quotation not found.");
+          }
+        }}
+      >
+        <EyeOutlined style={{ marginRight: 8 }} /> View (Read-only)
+      </Menu.Item>
+      <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
+        <Menu.Item key="3" onClick={() => handleStatusChange(record.key, "accept")}>
+          <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
+        </Menu.Item>
+      </ProtectedAction>
+      <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
+        <Menu.Item key="4" onClick={() => handleStatusChange(record.key, "reject")}>
+          <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
+        </Menu.Item>
+      </ProtectedAction>
+      <Menu.Item key="5" onClick={() => handleSendEmail(record)}>
+        <MailOutlined style={{ marginRight: 8 }} /> Send Mail
+      </Menu.Item>
+      <Menu.Item
+        key="6"
+        onClick={() => {
+          console.log("Selected Record for Export:", record);
+          setSelectedExportRecord(record);
+          setTimeout(() => {
+            setIsExportModalVisible(true);
+          }, 100);
+        }}
+      >
+        <ExportOutlined style={{ marginRight: 8 }} /> Export
+      </Menu.Item>
+    </Menu>
+  );
 
   // Define table columns with fixed widths and ellipsis
   const columns = [
@@ -324,19 +385,28 @@ const RecentQuotationList = () => {
             <Menu.Item onClick={() => handleSendEmail(record)}>
               <MailOutlined style={{ marginRight: 8 }} /> Send Mail
             </Menu.Item>
+            <Menu.Item
+              key="5"
+              onClick={() => {
+                console.log("Selected Record for Export:", record);
+                setSelectedExportRecord(record);
+                setTimeout(() => {
+                  setIsExportModalVisible(true);
+                }, 100);
+              }}
+            >
+              <ExportOutlined style={{ marginRight: 8 }} />
+              Export
+            </Menu.Item>
+
           </Menu>
         );
 
         return (
-          <Dropdown overlay={menu} trigger={["click"]}>
-            <MoreOutlined
-              style={{
-                fontSize: "15px",
-                cursor: "pointer",
-                transform: "rotate(180deg)",
-              }}
-            />
+          <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+            <MoreOutlined style={{ fontSize: "15px", cursor: "pointer", transform: "rotate(180deg)" }} />
           </Dropdown>
+
         );
       },
       width: 100,
@@ -366,23 +436,41 @@ const RecentQuotationList = () => {
       receiverPhone: quotation?.receiver?.phone || "N/A",
       receiverAddress: quotation?.receiver?.address || "N/A",
       schoolName: quotation?.schoolName || "N/A",
-      tax: `${parseFloat(quotation?.tax)} %` || 0,
+      tax: quotation?.tax ? `${parseFloat(quotation.tax)} %` : "0 %",
       discount:
         quotation?.discountType === "percentage"
-          ? `${parseFloat(quotation?.discount)} %`
-          : `${parseFloat(quotation?.discount)} QR` || 0,
+          ? `${parseFloat(quotation.discount)} %`
+          : `${parseFloat(quotation.discount)} QR`,
       discountType: quotation?.discountType || "N/A",
-      totalAmount: `${parseFloat(quotation?.total_amount)} QR` || 0,
-      finalAmount: `${parseFloat(quotation?.final_amount)} QR` || 0,
+      totalAmount: quotation?.total_amount ? `${parseFloat(quotation.total_amount)} QR` : "0 QR",
+      finalAmount: quotation?.final_amount ? `${parseFloat(quotation.final_amount)} QR` : "0 QR",
       purpose: quotation?.purpose || "N/A",
       status: quotation?.status || "N/A",
       govtRefNumber: quotation?.govtRefNumber || "N/A",
       remark: quotation?.remark || "N/A",
-      cancleQuotation: quotation.isCancel ? "Yes" : "No",
-      date: quotation?.date || "N/A",
-      dueDate: quotation?.dueDate || "N/A",
+      cancleQuotation: quotation?.isCancel ? "Yes" : "No",
+      date: quotation?.date
+        ? new Date(quotation.date).toLocaleString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).replace(",", " at")
+        : "N/A",
+      dueDate: quotation?.dueDate
+        ? new Date(quotation.dueDate).toLocaleString("en-GB", {
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).replace(",", " at")
+        : "N/A",
+
       academicYear: quotation?.academicYear?.year || "N/A",
     })) || [];
+
 
   // Handle search input changes
   const handleSearch = (e) => {
@@ -522,13 +610,29 @@ const RecentQuotationList = () => {
             </div>
           )}
 
-          <ExportModal
+          <ExportModalNew
             visible={isExportModalVisible}
             onClose={() => setIsExportModalVisible(false)}
             dataToExport={transformQuotationData(quotations)}
-            title="Quotation Data"
-            sheet="quotation_report"
+            columns={[
+              { header: "S.No", dataKey: "sNo" },
+              { header: "Quotation No.", dataKey: "quotationNo" },
+              { header: "Receiver", dataKey: "receiver" },
+              { header: "Purpose", dataKey: "purpose" },
+              { header: "Discount", dataKey: "discount" },
+              { header: "Total Amount", dataKey: "totalAmount" },
+              { header: "Final Amount", dataKey: "finalAmount" },
+              { header: "Status", dataKey: "status" },
+              { header: "Date", dataKey: "date" },
+              { header: "Due Date", dataKey: "dueDate" },
+            ]}
+            fileName={selectedExportRecord?.quotationNumber 
+              ? `Quotation_${selectedExportRecord.quotationNumber}` 
+              : "Quotations"}
+            
+            alwaysRender={true}
           />
+
         </div>
       </AdminDashLayout>
     </Layout>

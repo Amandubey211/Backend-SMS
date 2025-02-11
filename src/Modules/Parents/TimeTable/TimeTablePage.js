@@ -1,8 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import AdminDashLayout from "../../../Components/Admin/AdminDashLayout";
-import TeacherDashLayout from "../../../Components/Admin/AdminDashLayout";
-import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
 import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 import Layout from "../../../Components/Common/Layout";
 import TimeTableMainSection from "./TimeTableMainSection";
@@ -23,8 +20,6 @@ const TimeTablePage = () => {
   // Determine the layout component based on the role
   const DashLayout = ParentDashLayout;
 
-
-  
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>

@@ -3,6 +3,7 @@ import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import {
+  customRequest,
   deleteData,
   getData,
   postData,
@@ -51,19 +52,27 @@ export const createOfflineExam = createAsyncThunk(
 
 export const UploadOfflineExamSheet = createAsyncThunk(
   "subject/offline_upload_exam_sheet",
-  async ({ payload }, { rejectWithValue, dispatch, getState }) => {
+  async (formData, { rejectWithValue, dispatch, getState }) => {
+    console.log("payload", formData);
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const response = await postData(
+      const response = await customRequest(
+        "post",
         `${getRole}/exam/uploadExcel?say=${say}`,
-        payload
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
       );
+
+      console.log("response", response);
 
       return response;
     } catch (error) {
+      console.log("excel Uploaded error", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
