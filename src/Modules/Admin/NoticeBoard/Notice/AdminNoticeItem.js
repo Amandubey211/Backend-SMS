@@ -25,7 +25,7 @@ const AdminNoticeItem = ({
   const handleDelete = () => {
     setDeleteModalOpen(true);
     setNoticeToDelete(notice._id);
-    dispatch(setTitleToDelete(notice.title)); // Set title in Redux
+    dispatch(setTitleToDelete(notice.title));
   };
 
   return (
