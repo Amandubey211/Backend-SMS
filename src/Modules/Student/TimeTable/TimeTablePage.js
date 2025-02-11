@@ -19,8 +19,6 @@ const TimeTablePage = () => {
   // Determine the layout component based on the role
   const DashLayout = StudentDashLayout;
 
-
-  
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashLayout>

@@ -8,16 +8,18 @@ import {
   Modal,
   Space,
   message,
+  Typography,
   Tooltip,
   Spin,
 } from "antd";
 import moment from "moment";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaRegEdit } from "react-icons/fa";
-import { FiEye, FiInfo, FiCheck } from "react-icons/fi"; // Added FiInfo and FiCheck
+import { FiEye, FiInfo, FiCheck } from "react-icons/fi";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 // Redux thunks for semester CRUD operations
 import {
@@ -40,12 +42,16 @@ const SemesterManagement = ({ classId }) => {
     loading,
     error,
   } = useSelector((state) => state.admin.semesters);
-  // Get the persisted selected semester from the common user slice
+
+  // Persisted selected semester from common user slice
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
 
-  // Local state for optimistic updates
+  const { t } = useTranslation("admClass");
+  const { Title } = Typography;
+
+  // Local state
   const [localSemesters, setLocalSemesters] = useState([]);
   const [form] = Form.useForm();
   const [editingSemester, setEditingSemester] = useState(null);
@@ -54,21 +60,28 @@ const SemesterManagement = ({ classId }) => {
   const [formLoading, setFormLoading] = useState(false);
   const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
 
+  /**
+   * Reset the form and clear editing state
+   * whenever the form itself is reset
+   */
   useEffect(() => {
     form.resetFields();
     setEditingSemester(null);
   }, [form]);
 
+  // Keep local copy of semesters in sync with Redux
   useEffect(() => {
     setLocalSemesters(reduxSemesters);
   }, [reduxSemesters]);
 
+  // Fetch semesters whenever classId changes
   useEffect(() => {
     if (classId) {
       dispatch(fetchSemestersByClass({ classId }));
     }
   }, [dispatch, classId]);
 
+  // Show errors if any
   useEffect(() => {
     if (error) {
       message.error(
@@ -77,30 +90,59 @@ const SemesterManagement = ({ classId }) => {
     }
   }, [error]);
 
-  // Note: We remove selectedSemester from the dependency array to prevent infinite loops.
+  /**
+   * Auto-select a semester if no valid one is selected:
+   * 1) Look for an active semester whose date range includes today's date.
+   * 2) If none found, select the first semester in the list.
+   * 3) If no semesters exist, clear any persisted selection.
+   */
   useEffect(() => {
     if (reduxSemesters && reduxSemesters.length > 0) {
-      // Check if the current selectedSemester is in the fetched array
-      if (
-        selectedSemester &&
-        !reduxSemesters.some((sem) => sem._id === selectedSemester.id)
-      ) {
-        dispatch(setSelectedSemester({ id: null, name: "" }));
+      const isValid =
+        selectedSemester && selectedSemester.id
+          ? reduxSemesters.some((sem) => sem._id === selectedSemester.id)
+          : false;
+      if (!isValid) {
+        const now = moment();
+        const activeSemester = reduxSemesters.find((sem) => {
+          const start = moment(sem.startDate);
+          const end = moment(sem.endDate);
+          return now.isBetween(start, end, "day", "[]");
+        });
+        if (activeSemester) {
+          dispatch(
+            setSelectedSemester({
+              id: activeSemester._id,
+              name: activeSemester.title,
+            })
+          );
+        } else {
+          // Otherwise, select the first available semester
+          const firstSemester = reduxSemesters[0];
+          dispatch(
+            setSelectedSemester({
+              id: firstSemester._id,
+              name: firstSemester.title,
+            })
+          );
+        }
       }
     } else {
-      // If there are no semesters, clear the selectedSemester
-      dispatch(setSelectedSemester({ id: null, name: "" }));
+      // If no semesters exist, clear selection
+      if (selectedSemester && selectedSemester.id) {
+        dispatch(setSelectedSemester({ id: null, name: "" }));
+      }
     }
-  }, [reduxSemesters, dispatch]);
+  }, [reduxSemesters, dispatch, selectedSemester?.id]);
 
-  // Handle semester selection with notification (updates common user slice)
+  // Handler to select a semester
   const onSelectSemester = (semester) => {
     if (!semester) return;
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     message.success(`Semester "${semester.title}" selected`);
   };
 
-  // Render the "Select" column with tooltip and icon
+  // Select column icon logic
   const renderSelectColumn = (semester) => {
     if (!semester) return null;
     return (
@@ -126,12 +168,13 @@ const SemesterManagement = ({ classId }) => {
     form.setFieldsValue({
       title: semester.title,
       description: semester.description,
-      startDate: moment(semester.startDate, "DD-MM-YYYY"),
-      endDate: moment(semester.endDate, "DD-MM-YYYY"),
+      // Convert from ISO string to moment for form fields
+      startDate: moment(semester.startDate),
+      endDate: moment(semester.endDate),
     });
   };
 
-  // Optimistic delete with Modal confirmation (maskClosable disabled)
+  // Confirm deletion
   const handleDelete = (semesterId) => {
     Modal.confirm({
       title: "Delete Semester",
@@ -161,7 +204,11 @@ const SemesterManagement = ({ classId }) => {
     });
   };
 
-  // Handle form submission for create/update with button-level loader
+  /**
+   * Handle form submission for CREATE or UPDATE.
+   * NOTE: We send dates in "YYYY-MM-DD" so the backend
+   * can parse them with `new Date(`${date}T00:00:00.000Z`)`
+   */
   const onFinish = (values) => {
     if (!values.startDate || !values.startDate.isValid()) {
       message.error("Invalid Start Date. Please select a valid date.");
@@ -171,15 +218,18 @@ const SemesterManagement = ({ classId }) => {
       message.error("Invalid End Date. Please select a valid date.");
       return;
     }
+
     const payload = {
       title: values.title,
       description: values.description,
-      startDate: values.startDate.format("DD-MM-YYYY"),
-      endDate: values.endDate.format("DD-MM-YYYY"),
+      startDate: values.startDate.format("YYYY-MM-DD"),
+      endDate: values.endDate.format("YYYY-MM-DD"),
     };
 
     setFormLoading(true);
+
     if (editingSemester) {
+      // Update an existing semester
       dispatch(
         updateSemester({
           semesterId: editingSemester._id,
@@ -188,32 +238,42 @@ const SemesterManagement = ({ classId }) => {
       )
         .unwrap()
         .then(() => {
-          setFormLoading(false);
           message.success("Semester updated successfully");
           setEditingSemester(null);
           form.resetFields();
           dispatch(fetchSemestersByClass({ classId }));
         })
-        .catch(() => {
+        .finally(() => {
           setFormLoading(false);
         });
     } else {
+      // Create a new semester
       dispatch(createSemester({ semesterData: payload, classId }))
         .unwrap()
-        .then(() => {
-          setFormLoading(false);
+        .then((newSemester) => {
           message.success("Semester created successfully");
           form.resetFields();
+
+          // Refresh the list
           dispatch(fetchSemestersByClass({ classId }));
+
+          // Auto-select the newly created semester
+          if (newSemester?.data) {
+            dispatch(
+              setSelectedSemester({
+                id: newSemester.data._id,
+                name: newSemester.data.title,
+              })
+            );
+          }
         })
-        .catch(() => {
+        .finally(() => {
           setFormLoading(false);
         });
     }
   };
 
-  // Define table columns with updated layout:
-  // - Truncated description, merged dates column, and row highlighting if selected
+  // Table columns
   const columns = [
     {
       title: "Select",
@@ -268,12 +328,12 @@ const SemesterManagement = ({ classId }) => {
     {
       title: "Dates",
       key: "dates",
-      render: (_, record) => (
-        <span>
-          {moment(record.startDate, "DD-MM-YYYY").format("DD MMM YYYY")} -{" "}
-          {moment(record.endDate, "DD-MM-YYYY").format("DD MMM YYYY")}
-        </span>
-      ),
+      render: (_, record) => {
+        // record.startDate & record.endDate are likely stored in ISO format
+        const start = moment(record.startDate).format("DD MMM YYYY");
+        const end = moment(record.endDate).format("DD MMM YYYY");
+        return <span>{`${start} - ${end}`}</span>;
+      },
     },
     {
       title: "Actions",
@@ -310,6 +370,7 @@ const SemesterManagement = ({ classId }) => {
         </div>
       )}
       <div className="flex flex-col md:flex-row w-full">
+        {/* Semester List */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -333,6 +394,7 @@ const SemesterManagement = ({ classId }) => {
           </div>
         </motion.div>
 
+        {/* Form Area */}
         <motion.div
           initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -375,6 +437,7 @@ const SemesterManagement = ({ classId }) => {
                   aria-label="Semester Title"
                 />
               </Form.Item>
+
               <Form.Item label="Description" name="description">
                 <Input.TextArea
                   placeholder="Enter description"
@@ -383,6 +446,7 @@ const SemesterManagement = ({ classId }) => {
                   aria-label="Semester Description"
                 />
               </Form.Item>
+
               <Form.Item
                 label="Start Date"
                 name="startDate"
@@ -391,6 +455,8 @@ const SemesterManagement = ({ classId }) => {
                 ]}
                 hasFeedback
               >
+                {/* Format "DD-MM-YYYY" for display if you like, 
+                    but the `onFinish` will submit "YYYY-MM-DD" */}
                 <DatePicker
                   style={{ width: "100%" }}
                   format="DD-MM-YYYY"
@@ -398,6 +464,7 @@ const SemesterManagement = ({ classId }) => {
                   aria-label="Start Date"
                 />
               </Form.Item>
+
               <Form.Item
                 label="End Date"
                 name="endDate"
@@ -411,6 +478,7 @@ const SemesterManagement = ({ classId }) => {
                   aria-label="End Date"
                 />
               </Form.Item>
+
               <Form.Item>
                 <Space>
                   <Tooltip title="Clear form fields">
@@ -449,6 +517,7 @@ const SemesterManagement = ({ classId }) => {
         </motion.div>
       </div>
 
+      {/* Full Description Modal */}
       <Modal
         getContainer={false}
         title="Full Description"
@@ -463,16 +532,13 @@ const SemesterManagement = ({ classId }) => {
         <p>{modalDesc}</p>
       </Modal>
 
+      {/* Guidelines Modal */}
       <Modal
-        getContainer={false}
         visible={guidelinesModalVisible}
         onCancel={() => setGuidelinesModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setGuidelinesModalVisible(false)}>
-            Close
-          </Button>,
-        ]}
-        title="Semester Creation Guidelines"
+        footer={null}
+        width={550}
+        className="rounded-xl shadow-lg"
       >
         <AnimatePresence>
           {guidelinesModalVisible && (
@@ -481,30 +547,57 @@ const SemesterManagement = ({ classId }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.3 }}
+              className="flex flex-col p-6"
             >
-              <ul className="list-disc ml-6 space-y-2">
-                <li className="flex items-center">
-                  <FiCheck className="mr-1" />
-                  Use a descriptive title for the semester.
+              {/* Header with Icon */}
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <FiInfo className="text-purple-600 text-4xl" />
+                </div>
+                <Title level={3} className="text-purple-800">
+                  {t("Semester Creation Guidelines")}
+                </Title>
+              </div>
+
+              {/* Left-Aligned Guidelines */}
+              <ul className="list-none text-gray-700 pl-6 space-y-2">
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>{t("Use a descriptive title for the semester.")}</span>
                 </li>
-                <li className="flex items-center">
-                  <FiCheck className="mr-1" />
-                  Provide a clear and concise description.
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>{t("Provide a clear and concise description.")}</span>
                 </li>
-                <li className="flex items-center">
-                  <FiCheck className="mr-1" />
-                  Ensure that start and end dates are valid and within the
-                  academic year.
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t(
+                      "Ensure start and end dates are valid and within the academic year."
+                    )}
+                  </span>
                 </li>
-                <li className="flex items-center">
-                  <FiCheck className="mr-1" />
-                  End date must be after the start date.
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>{t("End date must be after the start date.")}</span>
                 </li>
-                <li className="flex items-center">
-                  <FiCheck className="mr-1" />
-                  Fill all required fields before submission.
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t("Fill all required fields before submission.")}
+                  </span>
                 </li>
               </ul>
+
+              {/* Close Button (Right-Aligned) */}
+              <div className="flex justify-end mt-6">
+                <Button
+                  onClick={() => setGuidelinesModalVisible(false)}
+                  className="border border-gray-300 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-all"
+                >
+                  {t("Close")}
+                </Button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

@@ -14,12 +14,12 @@ import { getUserRole } from "../../../../../Utils/getRoles";
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
   async (_, { rejectWithValue, dispatch, getState }) => {
-    const say = getAY();
+    // const say = getAY();
     dispatch(setShowError(false));
 
     try {
-      const getRole = getUserRole(getState);
-      const endpoint = `/admin/all/class?say=${say}`;
+      // const getRole = getUserRole(getState);
+      const endpoint = `/admin/all/class`;
 
       const response = await getData(endpoint);
       // console.log(response, "lk");
@@ -35,7 +35,7 @@ export const fetchAllClasses = createAsyncThunk(
 
 export const fetchAllClassesDetails = createAsyncThunk(
   "class/fetchAllClassesDetails",
-  async (_, { rejectWithValue, dispatch,getState }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -57,7 +57,7 @@ export const fetchAllClassesDetails = createAsyncThunk(
 
 export const fetchClassDetails = createAsyncThunk(
   "class/fetchClassDetails",
-  async (classId, { rejectWithValue, dispatch,getState }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -78,7 +78,7 @@ export const fetchClassDetails = createAsyncThunk(
 
 export const createClass = createAsyncThunk(
   "class/createClass",
-  async (classData, { rejectWithValue, dispatch,getState }) => {
+  async (classData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -101,7 +101,7 @@ export const createClass = createAsyncThunk(
 
 export const updateClass = createAsyncThunk(
   "class/updateClass",
-  async ({ classData, classId }, { rejectWithValue, dispatch,getState }) => {
+  async ({ classData, classId }, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -123,7 +123,7 @@ export const updateClass = createAsyncThunk(
 
 export const deleteClass = createAsyncThunk(
   "class/deleteClass",
-  async (classId, { rejectWithValue, dispatch,getState }) => {
+  async (classId, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
 
