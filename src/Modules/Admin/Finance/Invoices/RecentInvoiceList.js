@@ -14,13 +14,11 @@ import {
   Pagination,
   Select,
   Descriptions,
-
 } from "antd";
 import {
   ExportOutlined,
   MoreOutlined,
   SearchOutlined,
-
   EyeOutlined,
   RedoOutlined,
   CloseCircleOutlined,
@@ -29,10 +27,7 @@ import {
 
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 
-
-
 import { FiPlus, FiUserPlus } from "react-icons/fi";
-
 
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -57,6 +52,7 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import { PERMISSIONS } from "../../../../config/permission";
 import { downloadPDF } from "../../../../Utils/xl";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -72,33 +68,24 @@ const RecentInvoiceList = () => {
   );
   const [pageSize, setPageSize] = useState(10);
 
-
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
-  const handleDownloadPDF=async (pdfRef,selectedInvoice)=>{
-    await downloadPDF(pdfRef,selectedInvoice,"Invoice")
-  }
-  
+  const handleDownloadPDF = async (pdfRef, selectedInvoice) => {
+    await downloadPDF(pdfRef, selectedInvoice, "Invoice");
+  };
 
-
-  // Filtered data based on search query
-  const filteredData = invoices?.filter(
-    (item) =>
-      item?.invoiceNumber?.toLowerCase()?.includes(searchQuery.toLowerCase()) ||
-      item?.receiver?.name
-        ?.toLowerCase()
-        ?.includes(searchQuery.toLowerCase()) ||
-      item?.finalAmount?.toString()?.includes(searchQuery.toLowerCase())
-  );
+  // Use backend-filtered data directly (the API now handles search)
+  const filteredData = invoices;
 
   useEffect(() => {
     const filters = {
       page: 1,
       limit: pageSize,
+      search: searchQuery, // Include search query in API filters
     };
 
     dispatch(fetchInvoice(filters));
-  }, [dispatch, pageSize]);
+  }, [dispatch, pageSize, searchQuery]);
 
   // Define Ant Design columns
   const columns = [
@@ -133,8 +120,6 @@ const RecentInvoiceList = () => {
       key: "dueDate",
       render: (dueDate) =>
         dueDate ? moment(dueDate).format("YYYY-MM-DD") : "N/A",
-
-
     },
     {
       title: "Total Amount",
@@ -142,7 +127,6 @@ const RecentInvoiceList = () => {
       key: "totalAmount",
       render: (totalAmount) => totalAmount?.toFixed(2) + " QR",
       sorter: (a, b) => a.totalAmount - b.totalAmount,
-
     },
     {
       title: "Final Amount",
@@ -192,33 +176,31 @@ const RecentInvoiceList = () => {
               <Menu.Item
                 icon={<EyeOutlined />}
                 onClick={() => {
-                  dispatch(setInvoiceData({ ...record, mode: 'view' }));
+                  dispatch(setInvoiceData({ ...record, mode: "view" }));
                   navigate("/finance/invoices/add-new-invoice");
                 }}
               >
                 View (Read Only)
               </Menu.Item>
-
               {/* Return */}
               <ProtectedAction requiredPermission={PERMISSIONS.RETURN_INVOICE}>
-              {!record.isCancel && !record.isReturn && (
-                <Menu.Item
-                  icon={<RedoOutlined />}
-                  onClick={() => {
-                    dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
-                    navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
-                  }}
-                >
-                  Return
-                </Menu.Item>
-              )}
+                {!record.isCancel && !record.isReturn && (
+                  <Menu.Item
+                    icon={<RedoOutlined />}
+                    onClick={() => {
+                      dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
+                      navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
+                    }}
+                  >
+                    Return
+                  </Menu.Item>
+                )}
               </ProtectedAction>
               {record.isReturn && (
                 <Menu.Item icon={<RedoOutlined />} disabled>
                   Return
                 </Menu.Item>
               )}
-
               {/* Canceled */}
               {record.isCancel || record.isReturn ? (
                 <Menu.Item icon={<CloseCircleOutlined />} disabled>
@@ -226,54 +208,53 @@ const RecentInvoiceList = () => {
                 </Menu.Item>
               ) : (
                 <ProtectedAction requiredPermission={PERMISSIONS.CANCEL_INVOICE}>
-                <Menu.Item
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => {
-                    dispatch(cancelInvoice(record._id)).then(() =>
-                      dispatch(
-                        fetchInvoice({
-                          page: 1,
-                          limit: pageSize,
-                        })
-                      )
-                    );
-                  }}
-                >
-                  Cancel
-                </Menu.Item>
+                  <Menu.Item
+                    icon={<CloseCircleOutlined />}
+                    onClick={() => {
+                      dispatch(cancelInvoice(record._id)).then(() =>
+                        dispatch(
+                          fetchInvoice({
+                            page: 1,
+                            limit: pageSize,
+                            search: searchQuery, // Include search on refresh
+                          })
+                        )
+                      );
+                    }}
+                  >
+                    Cancel
+                  </Menu.Item>
                 </ProtectedAction>
               )}
               <ProtectedAction requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
-              {!record.isCancel && !record.isReturn && !record.isCompleted ?
-
-                <Menu.Item
-                  icon={<MdOutlineDone />}
-                  onClick={() => dispatch(completeInvoice(record._id))}
-                >
-                  Complete
-                </Menu.Item> : null
-              }
+                {!record.isCancel &&
+                  !record.isReturn &&
+                  !record.isCompleted && (
+                    <Menu.Item
+                      icon={<MdOutlineDone />}
+                      onClick={() => dispatch(completeInvoice(record._id))}
+                    >
+                      Complete
+                    </Menu.Item>
+                  )}
               </ProtectedAction>
-              {!record.isCancel && !record.isReturn && record.isCompleted ?
-                <Menu.Item
-                  icon={<MdOutlineDone />}
-                  disabled
-                >
-                  Completed
-                </Menu.Item> : null
-              }
-              {!record.isCancel && !record.isReturn ?
+              {!record.isCancel &&
+                !record.isReturn &&
+                record.isCompleted && (
+                  <Menu.Item icon={<MdOutlineDone />} disabled>
+                    Completed
+                  </Menu.Item>
+                )}
+              {!record.isCancel && !record.isReturn && (
                 <Menu.Item
                   icon={<MailOutlined />}
                   onClick={() => {
+                    // Send Mail functionality here
                   }}
                 >
                   Send Mail
-                </Menu.Item> : null
-              }
-              {/* View (Read Only) */}
-
-
+                </Menu.Item>
+              )}
             </Menu>
           }
           trigger={["click"]}
@@ -281,7 +262,7 @@ const RecentInvoiceList = () => {
           <Button shape="circle" icon={<MoreOutlined />} />
         </Dropdown>
       ),
-    }
+    },
   ];
 
   const closeInvoice = (e) => {
@@ -289,7 +270,6 @@ const RecentInvoiceList = () => {
       setInvoiceVisible(false); // Close popup when clicking outside
     }
   };
-
 
   const filterOnchange = (e) => {
     const { name, value } = e.target;
@@ -301,8 +281,6 @@ const RecentInvoiceList = () => {
       dispatch(fetchInvoice({}));
     }
   };
-
-
 
   const transformQuotationData = (invoices) =>
     invoices?.map(({ _id, ...invoice }, index) => ({
@@ -328,6 +306,7 @@ const RecentInvoiceList = () => {
       date: invoice?.issueDate || "N/A",
       academicYear: invoice?.academicYear?.year || "N/A",
     })) || [];
+
   useNavHeading("Finance", "Invoices List");
 
   return (
@@ -390,18 +369,15 @@ const RecentInvoiceList = () => {
                     icon={<ExportOutlined />}
                     onClick={() => setIsExportModalVisible(true)}
                     className="flex items-center bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-                  >Export</Button>
+                  >
+                    Export
+                  </Button>
 
-
-                  {/* Add New Fee Button */}
-                 <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
-
-                 
+                  {/* Add New Invoice Button */}
+                  <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
                     <button
                       onClick={() => {
-
                         dispatch(setInvoiceData());
-
                         navigate("/finance/invoices/add-new-invoice");
                       }}
                       className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
@@ -413,11 +389,10 @@ const RecentInvoiceList = () => {
                         <FiPlus size={16} />
                       </div>
                     </button>
-               </ProtectedAction>
+                  </ProtectedAction>
                 </div>
               </div>
             </div>
-
             {/* Custom Table */}
             <div className="my-8 border shadow-sm rounded-lg">
               {/* Table Section */}
@@ -444,6 +419,7 @@ const RecentInvoiceList = () => {
                       const filters = {
                         page,
                         limit: pageSize,
+                        search: searchQuery, // Include search query on pagination change
                       };
                       dispatch(fetchInvoice(filters));
                     },
@@ -460,8 +436,6 @@ const RecentInvoiceList = () => {
                 />
               )}
             </div>
-
-
 
             {/* PDF Preview Modal */}
             {isInvoiceVisible && selectedInvoice && (
@@ -481,7 +455,7 @@ const RecentInvoiceList = () => {
                   {/* Close Button */}
                   <div className="flex justify-end space-x-2 mb-4">
                     <button
-                      onClick={()=>handleDownloadPDF(pdfRef,selectedInvoice)}
+                      onClick={() => handleDownloadPDF(pdfRef, selectedInvoice)}
                       className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                     >
                       Download PDF
@@ -495,13 +469,12 @@ const RecentInvoiceList = () => {
                   </div>
 
                   {/* Hidden container for PDF generation */}
-                  <div >
+                  <div>
                     <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
                   </div>
                 </div>
               </div>
             )}
-
 
             <ExportModal
               visible={isExportModalVisible}

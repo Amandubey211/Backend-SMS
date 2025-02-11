@@ -4,15 +4,24 @@ import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 import { getUserRole } from "../../../../Utils/getRoles";
 
+
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
-  async ({ page = 1, limit = 10 }, { rejectWithValue, getState }) => {
+  async ({ page = 1, limit = 10, search = "" }, { rejectWithValue, getState }) => {
     try {
       const getRole = getUserRole(getState);
-      const response = await getData(`/${getRole}/revenue/all/receipt?page=${page}&limit=${limit}`); // Backend API with pagination
+      // Manually construct the query string to match the backend's expectation
+      const query = new URLSearchParams({
+        page,
+        limit,
+        search,
+      }).toString();
+
+      const response = await getData(`/${getRole}/revenue/all/receipt?${query}`);
+
       if (response?.data) {
         const { data, pagination } = response;
-        return { receipts: data, pagination }; // Include pagination metadata
+        return { receipts: data, pagination };
       } else {
         return rejectWithValue(response?.message || "Failed to fetch receipts.");
       }
