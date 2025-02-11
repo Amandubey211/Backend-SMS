@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchAllQuotations,
   updateQuotationStatus,
-  cancelQuotation, // <-- Do not modify this import
+  cancelQuotation, // Do not modify this import
 } from "../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import EmailModal from "../../../../Components/Common/EmailModal";
@@ -59,7 +59,7 @@ const RecentQuotationList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const pdfRef = useRef(null);
-  // Local state for preview mode renamed to avoid collision with Redux action
+  // Local state for preview mode (renamed to avoid collision with Redux action)
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
   const [previewQuotation, setPreviewQuotation] = useState(null);
   const [selectedExportRecord, setSelectedExportRecord] = useState(null);
@@ -89,27 +89,23 @@ const RecentQuotationList = () => {
   };
 
   const handleSendEmail = async (record) => {
-    // Get the full record from the quotationIdMap using the record's key
     const fullRecord = quotationIdMap[record.key];
     if (!fullRecord) {
       toast.error("Quotation not found.");
       console.error("Error: Full quotation record not found for key", record.key);
       return;
     }
-
     const quotationId = fullRecord._id;
     if (!quotationId) {
       toast.error("Invalid quotation ID.");
       console.error("Error: Missing quotation ID in record", fullRecord);
       return;
     }
-
     try {
       const toastId = toast.loading("Sending email...");
       const type = fullRecord.isCancel ? "cancelQuotation" : "quotation";
       const formattedDate = formatDate(fullRecord.date, "long");
       const formattedDueDate = formatDate(fullRecord.dueDate, "long");
-
       const payload = {
         receiver: {
           email: fullRecord.receiver?.email,
@@ -165,7 +161,6 @@ const RecentQuotationList = () => {
 
   // --- Fetch data effect ---
   useEffect(() => {
-    // Before calling the API, show loading state
     setHasFetched(false);
     const params = {
       page: currentPage,
@@ -183,7 +178,10 @@ const RecentQuotationList = () => {
     dispatch(updateQuotationStatus({ id: quotationId, status }));
   };
 
-  // --- Action Menu with conditional actions and refresh after cancellation ---
+  // --- Action Menu ---
+  // New logic:
+  // - Show the Accept option only if status is "pending" and not cancelled.
+  // - Always show the Reject option (if not already rejected) regardless of status.
   const actionMenu = (record) => (
     <Menu>
       <Menu.Item
@@ -215,43 +213,43 @@ const RecentQuotationList = () => {
       >
         <EyeOutlined style={{ marginRight: 8 }} /> View (Read-only)
       </Menu.Item>
-      {record.status === "pending" && (
-        <>
-          <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
-            <Menu.Item
-              key="3"
-              onClick={() => handleStatusChange(record.key, "accept")}
-            >
-              <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
-            </Menu.Item>
-          </ProtectedAction>
-          <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
-            <Menu.Item
-              key="4"
-              onClick={() => {
-                // Dispatch cancelQuotation and then refresh data
-                dispatch(cancelQuotation(record.key))
-                  .unwrap()
-                  .then(() => {
-                    setHasFetched(false);
-                    const params = {
-                      page: currentPage,
-                      limit: computedPageSize,
-                      search: debouncedSearch,
-                    };
-                    dispatch(fetchAllQuotations(params))
-                      .unwrap()
-                      .finally(() => setHasFetched(true));
-                  })
-                  .catch((err) => {
-                    // Error handling is already done in the thunk
-                  });
-              }}
-            >
-              <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
-            </Menu.Item>
-          </ProtectedAction>
-        </>
+      {record.status === "pending" && !record.isCancel && (
+        <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
+          <Menu.Item
+            key="3"
+            onClick={() => handleStatusChange(record.key, "accept")}
+          >
+            <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
+          </Menu.Item>
+        </ProtectedAction>
+      )}
+      {record.status !== "reject" && (
+        <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
+          <Menu.Item
+            key="4"
+            onClick={() => {
+              // Dispatch cancelQuotation and then refresh data
+              dispatch(cancelQuotation(record.key))
+                .unwrap()
+                .then(() => {
+                  setHasFetched(false);
+                  const params = {
+                    page: currentPage,
+                    limit: computedPageSize,
+                    search: debouncedSearch,
+                  };
+                  dispatch(fetchAllQuotations(params))
+                    .unwrap()
+                    .finally(() => setHasFetched(true));
+                })
+                .catch((err) => {
+                  // Error handling is already done in the thunk
+                });
+            }}
+          >
+            <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
+          </Menu.Item>
+        </ProtectedAction>
       )}
       <Menu.Item key="5" onClick={() => handleSendEmail(record)}>
         <MailOutlined style={{ marginRight: 8 }} /> Send Mail
@@ -381,6 +379,7 @@ const RecentQuotationList = () => {
   ];
 
   // --- Transform quotations data for table dataSource ---
+  // Now include the isCancel flag so that the action menu logic can check it.
   const dataSource = quotations?.map((quotation) => ({
     key: quotation._id,
     quotationNumber: quotation.quotationNumber || "N/A",
@@ -391,6 +390,7 @@ const RecentQuotationList = () => {
     final_amount: quotation.final_amount || 0,
     total_amount: quotation.total_amount || 0,
     status: quotation.status || "pending",
+    isCancel: quotation.isCancel, // <-- Include the isCancel flag
   }));
 
   const transformQuotationData = (quotations) =>
@@ -442,7 +442,8 @@ const RecentQuotationList = () => {
     dispatch(setCurrentPage(1));
   };
 
-  // --- Render: Show loading spinner until API data has arrived ---
+  // --- Render ---
+  // Show a spinner until API data has been fetched.
   if (!hasFetched) {
     return (
       <Layout title={"Quotation List | Student Diwan"}>
@@ -501,14 +502,15 @@ const RecentQuotationList = () => {
           </div>
 
           {/* Data State */}
-          {loading ? (
-            <div className="flex justify-center">
-              <Spin tip="Loading..." />
-            </div>
-          ) : error ? (
-            <div className="text-red-500 text-center">Error: {error}</div>
-          ) : quotations.length === 0 ? (
-            <div className="text-center">No data available.</div>
+          {loading || error ? (
+            <>
+              {loading && (
+                <div className="flex justify-center">
+                  <Spin tip="Loading..." />
+                </div>
+              )}
+              {error && <div className="text-red-500 text-center">Error: {error}</div>}
+            </>
           ) : (
             <ProtectedSection
               requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}
