@@ -15,38 +15,48 @@ import { fetchFilteredQuizzesThunk } from "../../../../../Store/Slices/Admin/Cla
 
 const MainSection = () => {
   const { cid, sid } = useParams();
+  const dispatch = useDispatch();
+
+  // Search/filter states
   const [search, setSearch] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Store the clicked student in local state
   const [student, setStudent] = useState(null);
+
+  // Our filter object includes a semesterId property
   const [filters, setFilters] = useState({
     moduleId: "",
     classId: cid,
     assignmentId: "",
     quizId: "",
     subjectId: sid,
-    semesterId: "", // <-- New semester filter
+    semesterId: "", // new semester filter
   });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { subjectGrades, loading } = useSelector(
     (store) => store.admin.subject_grades
   );
-  const dispatch = useDispatch();
 
   useEffect(() => {
+    // On load or when filters change, fetch
     dispatch(fetchSubjectGrades({ classId: cid, subjectId: sid, filters }));
     dispatch(fetchModules({ cid, sid }));
     dispatch(fetchFilteredAssignments({ sid }));
     dispatch(fetchFilteredQuizzesThunk({ sid }));
   }, [dispatch, cid, sid, filters]);
 
+  // Handle top search
   const handleSearchChange = (value) => {
     setSearch(value);
   };
 
+  // When any filter changes in GradeHeader
   const handleFilterChange = (name, value) => {
     const updatedFilters = { ...filters, [name]: value };
     setFilters(updatedFilters);
 
-    // Only send filters with valid values
+    // Only add filter params that have valid values
     const params = {};
     if (updatedFilters.moduleId) params.moduleId = updatedFilters.moduleId;
     if (updatedFilters.quizId) params.quizId = updatedFilters.quizId;
@@ -54,30 +64,37 @@ const MainSection = () => {
       params.assignmentId = updatedFilters.assignmentId;
     if (updatedFilters.semesterId)
       params.semesterId = updatedFilters.semesterId;
+
     dispatch(
       fetchSubjectGrades({ classId: cid, subjectId: sid, filters: params })
     );
   };
 
-  const handleRowClick = (student) => {
+  // User clicks a student row
+  const handleRowClick = (clickedStudent) => {
+    // Load that student's grades
     const params = {};
     if (sid) params.subjectId = sid;
+
     dispatch(
       fetchStudentGrades({
         params,
-        studentId: student?.studentId,
+        studentId: clickedStudent?.studentId,
         studentClassId: cid,
       })
     );
-    setStudent(student);
+    // Keep track of this student in state
+    setStudent(clickedStudent);
     setIsModalOpen(true);
   };
 
+  // Modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setStudent(null); // Clear student if you want upon closing
   };
 
-  // Filter students based on search input
+  // Filter the displayed students by search text
   const filteredStudents = subjectGrades?.filter((i) =>
     i?.studentName?.toLowerCase().includes(search?.toLowerCase())
   );
@@ -106,7 +123,7 @@ const MainSection = () => {
           <StudentGradeModal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
-            student={student}
+            student={student} // Pass the entire student object
           />
         )}
       </ProtectedSection>

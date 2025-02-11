@@ -86,7 +86,7 @@ export const studentIssueBooks = createAsyncThunk(
       const getRole = getUserRole(getState);
       const say = getAY();
       const response = await getData(
-        `/${getRole}/all/bookIssue/?studentId=${id}&say=${say}`
+        `/${getRole}/all/bookIssue?studentId=${id}&say=${say}`
       );
       return response;
     } catch (error) {
