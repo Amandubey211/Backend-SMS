@@ -73,24 +73,43 @@ export const createAdjustment = createAsyncThunk(
   }
 );
 
-
 export const fetchReturnInvoice = createAsyncThunk(
   "fetchreturnInvoice",
-  async (params, { dispatch, rejectWithValue, getState }) => {
+  async ({ page = 1, limit = 10, search = "", sortBy = "createdAt", sortOrder = "desc" }, { dispatch, rejectWithValue, getState }) => {
     const say = getAY();
     const getRole = getUserRole(getState);
     dispatch(setShowError(false));
+
     try {
-      const response = await getData(
-        `/${getRole}/penaltyAdjustment/getAll?say=${say}`,
-        params
-      );
-      return response.data;
+      // Construct query parameters properly
+      const queryParams = new URLSearchParams({
+        page,
+        limit,
+        search,
+        sortBy,
+        sortOrder,
+      }).toString();
+
+      // Fetch data from API
+      const response = await getData(`/${getRole}/penaltyAdjustment/getAll?say=${say}&${queryParams}`);
+
+      if (response?.data?.adjustments) {
+        return {
+          adjustments: response.data.adjustments,
+          currentPage: response.data.currentPage,
+          totalPages: response.data.totalPages,
+          totalAdjustments: response.data.totalAdjustments,
+        };
+      } else {
+        toast.error(response?.message || "Failed to fetch return invoices.");
+        return rejectWithValue(response?.message || "Failed to fetch return invoices.");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 
 export const fetchReturnCardData = createAsyncThunk(
   "card/fetchReturnInvoice",

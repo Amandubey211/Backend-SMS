@@ -4,6 +4,7 @@ import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 import { getUserRole } from "../../../../../Utils/getRoles";
+import toast from "react-hot-toast";
 
 
 
@@ -71,7 +72,9 @@ export const deleteNoticeThunk = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       await deleteData(`/${getRole}/delete/notice/${noticeId}?say=${say}`);
+      toast.success('Notice Delete successfully')
       dispatch(fetchNoticesThunk());
+
       return noticeId;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

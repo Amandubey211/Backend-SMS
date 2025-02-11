@@ -51,7 +51,7 @@ export const cancelQuotation = createAsyncThunk(
   async (id, { rejectWithValue, getState }) => {
     try {
       const getRole = getUserRole(getState);
-      const response = await putData(`/${getRole}/quotations/cancel/${id}`);
+      const response = await putData(`/${getRole}/revenue/cancel/quotation/${id}`);
       if (response?.success) {
         toast.success("Quotation canceled successfully!");
         return response.data;

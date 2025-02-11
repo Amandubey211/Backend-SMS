@@ -1,10 +1,17 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  createListenerMiddleware,
+  isAnyOf,
+} from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { combineReducers } from "redux";
+
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
-import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
+import userReducer, {
+  setSelectedSemester,
+} from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
@@ -14,6 +21,8 @@ import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
 import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
+import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; // Importing the combined admin reducer
+
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
 import subjectQuizReducer from "./Slices/Admin/Class/Quiz/quizSlice";
@@ -36,7 +45,7 @@ import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 
 import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
 import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
-import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice"
+import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice";
 // import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
 import invoiceReducer from "./Slices/Finance/Invoice/invoiceSlice";
@@ -53,7 +62,7 @@ import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
 import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
-// import offlineExamReducer from "./Slices/F"
+import adminOfflineExamReducer from "./Slices/Admin/Class/OfflineExam/offlineExamSlice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -99,9 +108,19 @@ const authPersistConfig = {
     "token",
     "selectedLanguage",
     "userRoles",
+    "permissions",
   ], // Fields to persist
 };
+const listenerMiddleware = createListenerMiddleware();
 
+listenerMiddleware.startListening({
+  matcher: isAnyOf(setSelectedSemester),
+  effect: async (action, listenerApi) => {
+    // Wait 500ms to allow state persistence to complete
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    window.location.reload();
+  },
+});
 // Persist configuration for the User slice
 const userPersistConfig = {
   key: "user",
@@ -114,6 +133,12 @@ const userPersistConfig = {
   // ], // Whitelt fields based on the refined state structure in userSlicesed on the refined state structure in userSlice
 };
 
+const semesterPersistConfig = {
+  key: "semesters",
+  storage,
+  whitelist: ["semesters", "selectedSemester"], // Persist both the semesters array and the selectedSemester object
+};
+
 const stdSubjectPersistConfig = {
   key: "stdSubject",
   storage,
@@ -124,6 +149,10 @@ const stdClassPersistConfig = {
   key: "studentClass",
   storage,
 };
+// const rbacPersistConfig = {
+//   key: "rbac",
+//   storage,
+// };
 
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
@@ -138,6 +167,7 @@ const commonReducer = combineReducers({
 const AdminReducer = combineReducers({
   adminDashboard: adminDashboardReducer,
   class: classReducer,
+  semesters: persistReducer(semesterPersistConfig, semesterReducer),
   subject: subjectReducer,
   group_section: sectionReducer,
   teacher: teacherReducer,
@@ -175,6 +205,7 @@ const AdminReducer = combineReducers({
 
   //RBAC
   rbac: rbacReducer,
+  // rbac: persistReducer(rbacPersistConfig, rbacReducer),
 
   // Finance
   earnings: earnignsReducer,
@@ -182,7 +213,7 @@ const AdminReducer = combineReducers({
   studentFees: studentFeesReducer,
   invoices: invoiceReducer,
   penaltyAdjustment: penaltyAdjustmentReducer,
-  // offlineExam: adminOfflineExamReducer
+  offlineExam: adminOfflineExamReducer
 });
 
 const studentReducer = combineReducers({
@@ -237,8 +268,8 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Disable serializable check due to redux-persist
-    }), // Thunk is automatically included by Redux Toolkit
+      serializableCheck: false,
+    }).concat(listenerMiddleware.middleware), // Thunk is automatically included by Redux Toolkit
 });
 
 const persistor = persistStore(store);

@@ -70,13 +70,13 @@ const AnnouncementCommentSection = () => {
     }
   };
 
-  const filteredComments = localComments.filter((comment) => {
+  const filteredComments = localComments?.filter((comment) => {
     const searchInComment = comment?.createdBy
-      ? comment.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
+      ? comment?.createdBy?.toLowerCase()?.includes(searchQuery?.toLowerCase())
       : false;
-    const searchInReplies = comment.replies.some((reply) =>
-      reply.createdBy
-        ? reply.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
+    const searchInReplies = comment?.replies?.some((reply) =>
+      reply?.createdBy
+        ? reply?.createdBy?.toLowerCase()?.includes(searchQuery?.toLowerCase())
         : false
     );
     return searchInComment || searchInReplies;

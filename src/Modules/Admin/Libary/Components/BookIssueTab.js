@@ -39,7 +39,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
     const { name, value } = e.target;
     setLocalFilters((prev) => ({ ...prev, [name]: value }));
 
-    if (name === "classLevel" || name === "section"  && value) {
+    if (name === "classLevel"  && value) {
       dispatch(fetchSectionsNamesByClass(value));
     }
   };

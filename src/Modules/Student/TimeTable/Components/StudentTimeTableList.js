@@ -71,7 +71,7 @@ const StudentTimeTableList = ({ timetables, loading }) => {
    * Handle card click - navigates to the detailed view of the timetable.
    */
   const handleCardClick = (timetable) => {
-    navigate(`/timetable/viewtable/${timetable._id}`, { state: { timetable } });
+    navigate(`/viewtable/${timetable._id}`, { state: { timetable } });
   };
 
   /**

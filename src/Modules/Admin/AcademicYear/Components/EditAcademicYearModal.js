@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaSpinner } from "react-icons/fa";
-import toast from "react-hot-toast";
-import axios from "axios";
-import { baseUrl } from "../../../../config/Common";
 import { useDispatch } from "react-redux";
 import { updateAcademicYear } from "../../../../Store/Slices/Common/AcademicYear/academicYear.action";
 import { useTranslation } from "react-i18next"; // Import translation hook
@@ -145,9 +142,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
                 required
               />
               {errors.startDate && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.startDate}
-                </p>
+                <p className="text-red-500 text-xs mt-1">{errors.startDate}</p>
               )}
             </div>
 
@@ -182,9 +177,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
                 }
                 className="mr-2 ms-1 w-4 h-4"
               />
-              <label className="text-gray-700">
-                {t("Set as Active Year")}
-              </label>
+              <label className="text-gray-700">{t("Set as Active Year")}</label>
             </div>
 
             {/* Submit Button */}
@@ -205,7 +198,8 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
               >
                 {loading ? (
                   <>
-                    <FaSpinner className="animate-spin mr-2" /> {t("Updating...")}
+                    <FaSpinner className="animate-spin mr-2" />{" "}
+                    {t("Updating...")}
                   </>
                 ) : (
                   t("Update Academic Year")

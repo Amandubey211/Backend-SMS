@@ -10,6 +10,10 @@ const initialState = {
   step: 1,
   classInfo: {
     selectedClassId: null,
+    selectedSemester: {
+      id: null,
+      name: "",
+    },
     selectedClassName: "",
     selectedSection: null,
     selectedSectionName: "",
@@ -35,7 +39,7 @@ const initialState = {
 };
 
 const userSlice = createSlice({
-  name: "User",
+  name: "user",
   initialState,
   reducers: {
     setLeftHeading: (state, action) => {
@@ -52,6 +56,11 @@ const userSlice = createSlice({
     },
     setSelectedClassName: (state, action) => {
       state.classInfo.selectedClassName = action.payload;
+    },
+    // Replace setSelectedSemesterId and setSelectedSemesterName with one action:
+    setSelectedSemester: (state, action) => {
+      // action.payload should be an object containing { id, name }
+      state.classInfo.selectedSemester = action.payload;
     },
     setSelectedSectionId: (state, action) => {
       state.classInfo.selectedSection = action.payload;
@@ -83,7 +92,8 @@ const userSlice = createSlice({
     resetUserState: (state) => {
       state.userDetails = {};
       state.classInfo = {
-        selectedClass: null,
+        selectedClassId: null,
+        selectedSemester: { id: null, name: "" },
         selectedClassName: "",
         selectedSection: null,
         selectedSectionName: "",
@@ -94,7 +104,7 @@ const userSlice = createSlice({
         },
       };
       state.subjectInfo = {
-        selectedSubject: null,
+        selectedSubjectId: null,
         selectedSubjectName: "",
         selectedAssignmentName: null,
       };
@@ -152,8 +162,11 @@ const userSlice = createSlice({
 
 export const {
   setLeftHeading,
+  toggleSidebar,
+  closeSidebar,
   setSelectedClassId,
   setSelectedClassName,
+  setSelectedSemester, // New combined action
   setSelectedSectionId,
   setSelectedSectionName,
   setSelectedModule,
@@ -164,8 +177,6 @@ export const {
   setStudentId,
   resetUserState,
   setStep,
-  closeSidebar,
-  toggleSidebar,
 } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -19,8 +19,10 @@ export const fetchAllPages = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await getData(
-        `/${getRole}/api/pages/class/pages/${cid}?say=${say}`
+        `/${getRole}/api/pages/class/pages/${cid}?say=${say}&semesterId=${semesterId}`
       );
 
       if (response && response.success) {
@@ -59,9 +61,18 @@ export const createPage = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
+
+      if (!semesterId) {
+        throw new Error("Semester ID is missing");
+      }
+
+      // Include semesterId in the request body
+      const payload = { ...pageData, semesterId };
+
       const response = await postData(
         `/${getRole}/api/pages/class/${cid}?say=${say}`,
-        pageData
+        payload
       );
 
       if (response && response.success) {
@@ -82,8 +93,10 @@ export const updatePage = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await putData(
-        `/${getRole}/api/pages/${pageId}?say=${say}`,
+        `/${getRole}/api/pages/${pageId}?say=${say}&semesterId=${semesterId}`,
         pageData
       );
 

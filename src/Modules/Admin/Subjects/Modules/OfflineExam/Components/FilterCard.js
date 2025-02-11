@@ -7,13 +7,18 @@ const FilterCard = () => {
   const { t } = useTranslation("admModule");
   const [examType, setExamType] = useState("");
   const [startDate, setStartDate] = useState(new Date());
+  const [semester, setSemester] = useState("");
 
   const ExamTypeList = ["Quiz", "Viva", "practical"];
+  const SemesterList = ["Semester 1", "Semester 2", "Semester 3"];
 
   const handleApplyFilters = () => {};
 
   const handleExamTypeChange = (e) => {
     setExamType(e.target.value);
+  };
+  const handleSemesterChange = (e) => {
+    setSemester(e.target.value);
   };
 
   const handleResetFilters = () => {
@@ -46,6 +51,24 @@ const FilterCard = () => {
           {ExamTypeList?.map((type, index) => (
             <option key={index} value={type}>
               {type}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-gray-700" htmlFor="module-select">
+          Semester
+        </label>
+        <select
+          className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          value={examType}
+          onChange={handleSemesterChange}
+        >
+          <option value="">{t("Select")}</option>
+          {SemesterList?.map((name, index) => (
+            <option key={index} value={name}>
+              {name}
             </option>
           ))}
         </select>

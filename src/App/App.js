@@ -364,8 +364,13 @@ const StudentAttendance = lazy(() =>
   )
 );
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
+
 const OfflineExamList = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamList.js")
+);
+
+const OfflineExamViewList = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamViewList.js")
 );
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
@@ -479,13 +484,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Academic}
-          allowedRoles={[
-            "admin",
-            "teacher",
-            "librarian",
-            "finance",
-            "staff",
-          ]}
+          allowedRoles={["admin", "teacher", "librarian", "finance", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -502,13 +501,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Dash}
-          allowedRoles={[
-            "admin",
-            "teacher",
-            "librarian",
-            "finance",
-            "staff",
-          ]}
+          allowedRoles={["admin", "teacher", "librarian", "finance", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -688,11 +681,21 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/class/:cid/:sid/offline_exam/view",
+      element: (
+        <ProtectRoute
+          Component={OfflineExamViewList}
+          allowedRoles={["admin", "teacher"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
     // {
-    //   path: "/class/:cid/:sid/create_offline_exam",
+    //   path: "/class/:cid/:sid/offline_exam",
     //   element: (
     //     <ProtectRoute
-    //       Component={CreateQuizzes}
+    //       Component={Discussion}
     //       allowedRoles={["admin", "teacher"]}
     //     />
     //   ),
@@ -1177,7 +1180,10 @@ function App() {
     {
       path: "/users/manage-roles",
       element: (
-        <ProtectRoute Component={ManageRolePage} allowedRoles={["admin", "teacher", "finance", "librarian", "staff"]} />
+        <ProtectRoute
+          Component={ManageRolePage}
+          allowedRoles={["admin", "teacher", "finance", "librarian", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -1209,13 +1215,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentProfile}
-          allowedRoles={[
-            "admin",
-            "teacher",
-            "finance",
-            "librarian",
-            "staff",
-          ]}
+          allowedRoles={["admin", "teacher", "finance", "librarian", "staff"]}
         />
       ),
       errorElement: <Error />,

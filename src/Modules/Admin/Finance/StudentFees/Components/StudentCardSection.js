@@ -13,17 +13,17 @@ const StudentCardSection = () => {
   const studentCardsData = [
     {
       title: "Total Collected Fees",
-      value: `${stdFeesCardData?.totalCollected || 0} QAR`,
+      value: `${stdFeesCardData?.totalCollected?.toFixed(2) || 0} QAR`,
       icon: <FaDollarSign />, // Appropriate icon for collected fees
     },
     {
       title: "Total Due Fees",
-      value: `${stdFeesCardData?.totalDue || 0} QAR`,
+      value: `${stdFeesCardData?.totalDue?.toFixed(2) || 0} QAR`,
       icon: <FaWallet />, // Icon for due fees or wallet
     },
     {
       title: "Total Outstanding Balance",
-      value: `${stdFeesCardData?.totalOutstanding || 0} QAR`,
+      value: `${stdFeesCardData?.totalOutstanding?.toFixed(2) || 0} QAR`,
       icon: <FaExclamationCircle />, // Icon for outstanding balance (exclamation for pending)
     },
   ];

@@ -19,8 +19,10 @@ export const fetchClassDiscussions = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await getData(
-        `/${getRole}/getDiscussion/class/${cid}/subject/${sid}?say=${say}`
+        `/${getRole}/getDiscussion/class/${cid}/subject/${sid}?say=${say}&semesterId=${semesterId}`
       );
 
       if (response && response.status) {
@@ -59,13 +61,23 @@ export const createDiscussion = createAsyncThunk(
     const say = getAY();
     dispatch(setShowError(false));
 
-    const formData = new FormData();
-    Object.keys(discussionData).forEach((key) => {
-      formData.append(key, discussionData[key]);
-    });
-
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
+
+      if (!semesterId) {
+        throw new Error("Semester ID is missing");
+      }
+
+      // Append all discussion data to FormData
+      const formData = new FormData();
+      Object.keys(discussionData).forEach((key) => {
+        formData.append(key, discussionData[key]);
+      });
+
+      // Append semesterId to the request body
+      formData.append("semesterId", semesterId);
+
       const response = await customRequest(
         "post",
         `/${getRole}/createDiscussion/class/${cid}?say=${say}`,
@@ -101,9 +113,11 @@ export const updateDiscussion = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+
       const response = await customRequest(
         "put",
-        `/${getRole}/updateDiscussion/${discussionId}?say=${say}`,
+        `/${getRole}/updateDiscussion/${discussionId}?say=${say}&semesterId=${semesterId}`,
         formData,
         {
           "Content-Type": "multipart/form-data",
