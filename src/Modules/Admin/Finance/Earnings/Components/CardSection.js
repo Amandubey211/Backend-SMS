@@ -29,19 +29,19 @@ const CardSection = () => {
         dataPoints: [
           {
             title: "Total Revenue",
-            value: `${financialYearData.totalRevenue || 0} QAR`,
+            value: `${financialYearData.totalRevenue?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Remaining Balance",
-            value: `${financialYearData.totalRemainingBalance || 0} QAR`,
+            value: `${financialYearData.totalRemainingBalance?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Paid",
-            value: `${financialYearData.totalPaid || 0} QAR`,
+            value: `${financialYearData.totalPaid?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Advance",
-            value: `${financialYearData.totalAdvance || 0} QAR`,
+            value: `${financialYearData.totalAdvance?.toFixed(2) || 0} QAR`,
           },
         ],
         icon: <AiFillAccountBook />,
@@ -52,19 +52,19 @@ const CardSection = () => {
         dataPoints: [
           {
             title: "Total Revenue",
-            value: `${academicYearData.totalRevenue || 0} QAR`,
+            value: `${academicYearData.totalRevenue?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Remaining Balance",
-            value: `${academicYearData.totalRemainingBalance || 0} QAR`,
+            value: `${academicYearData.totalRemainingBalance?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Paid",
-            value: `${academicYearData.totalPaid || 0} QAR`,
+            value: `${academicYearData.totalPaid?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Advance",
-            value: `${academicYearData.totalAdvance || 0} QAR`,
+            value: `${academicYearData.totalAdvance?.toFixed(2) || 0} QAR`,
           },
         ],
         icon: <BiDonateHeart />,
@@ -75,16 +75,16 @@ const CardSection = () => {
         dataPoints: [
           {
             title: "Total Revenue",
-            value: `${todayData.totalRevenue || 0} QAR`,
+            value: `${todayData.totalRevenue?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Remaining Balance",
-            value: `${todayData.totalRemainingBalance || 0} QAR`,
+            value: `${todayData.totalRemainingBalance?.toFixed(2) || 0} QAR`,
           },
-          { title: "Total Paid", value: `${todayData.totalPaid || 0} QAR` },
+          { title: "Total Paid", value: `${todayData.totalPaid?.toFixed(2) || 0} QAR` },
           {
             title: "Total Advance",
-            value: `${todayData.totalAdvance || 0} QAR`,
+            value: `${todayData.totalAdvance?.toFixed(2) || 0} QAR`,
           },
         ],
         icon: <FaRegMoneyBillAlt />,
@@ -95,19 +95,19 @@ const CardSection = () => {
         dataPoints: [
           {
             title: "Total Revenue",
-            value: `${currentMonthData.totalRevenue || 0} QAR`,
+            value: `${currentMonthData.totalRevenue?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Remaining Balance",
-            value: `${currentMonthData.totalRemainingBalance || 0} QAR`,
+            value: `${currentMonthData.totalRemainingBalance?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Paid",
-            value: `${currentMonthData.totalPaid || 0} QAR`,
+            value: `${currentMonthData.totalPaid?.toFixed(2) || 0} QAR`,
           },
           {
             title: "Total Advance",
-            value: `${currentMonthData.totalAdvance || 0} QAR`,
+            value: `${currentMonthData.totalAdvance?.toFixed(2) || 0} QAR`,
           },
         ],
         icon: <MdOutlineMoneyOff />,
