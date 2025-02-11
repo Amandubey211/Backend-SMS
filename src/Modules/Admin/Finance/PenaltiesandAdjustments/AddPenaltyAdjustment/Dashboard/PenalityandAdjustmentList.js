@@ -1,16 +1,14 @@
 // src/Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/PenalityandAdjustmentList.js
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import {
   Menu,
-  Alert,
   Button,
   Dropdown,
   Input,
-  Spin,
   Table,
   Tag,
 } from "antd";
@@ -31,20 +29,16 @@ import {
   SearchOutlined,
   EyeOutlined,
 } from "@ant-design/icons";
-import ExportModal from "../../../Earnings/Components/ExportModal";
+import ExportModalNew from "../../../../../../Components/Common/ExportModalNew";
 import PenaltyAdjustmentTemplate from "../../../../../../Utils/FinanceTemplate/PenaltyAdjustmentTemplate";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
 import { toast } from "react-hot-toast";
-import { setCurrentPage, setReadOnly, setSelectedAdjustment, clearInvoiceFetchSuccess, clearSelectedInvoiceNumber } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
-import SelectInput from "../Components/SelectInput"; // Ensure correct import path
+import { setCurrentPage, setReadOnly, setSelectedAdjustment } from "../../../../../../Store/Slices/Finance/PenalityandAdjustment/adjustment.slice";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import { sendEmail } from "../../../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { downloadPDF } from "../../../../../../Utils/xl";
 import Spinner from "../../../../../../Components/Common/Spinner";
-import ExportModalNew from "../../../../../../Components/Common/ExportModalNew";
 
 const PenalityandAdjustmentList = () => {
   useNavHeading("Finance", "Penalty & Adjustment List");
@@ -71,28 +65,37 @@ const PenalityandAdjustmentList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const pdfRef = useRef(null);
-  // Reference for the popup/modal
   const popupRef = useRef(null);
 
   const computedPageSize =
     totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
 
+  // Extract adjustments array from Redux state.
+  // If adjustmentData contains an `adjustments` property, use that;
+  // otherwise, if adjustmentData is already an array, use it.
+  const adjustmentsArray = useMemo(() => {
+    if (adjustmentData && adjustmentData.adjustments) {
+      return adjustmentData.adjustments;
+    }
+    if (Array.isArray(adjustmentData)) {
+      return adjustmentData;
+    }
+    return [];
+  }, [adjustmentData]);
+
   // Handle search input changes
   const handleSearch = (e) => {
     setSearchText(e.target.value);
-    dispatch(setCurrentPage(1)); 
+    dispatch(setCurrentPage(1));
   };
 
-  // =======================
-  // Updated: Handle canceling a return invoice
-  // Now accepts the entire record and extracts the _id
-  // =======================
+  // Handle canceling a return invoice
   const handleCancleReturnInvoice = (record) => {
     const { _id } = record;
     const params = {
       search: searchText,
-      page: 1, // Always fetch the first page
-      limit: 10, // Limit to 10 records
+      page: 1,
+      limit: 10,
       sortBy: "createdAt",
       sortOrder: "desc",
     };
@@ -118,15 +121,17 @@ const PenalityandAdjustmentList = () => {
 
     console.log("Attempting to send email for adjustment:", record);
 
+    // Map the record to the required email data structure
+    const emailData = mapRecordToEmailData(record);
+
     try {
       const result = await dispatch(
         sendEmail({
           id: record._id,
           type: "adjustment",
+          data: emailData,
         })
       );
-
-      console.log("Send email result:", result);
 
       if (sendEmail.fulfilled.match(result)) {
         toast.success("Email sent successfully!");
@@ -139,24 +144,28 @@ const PenalityandAdjustmentList = () => {
     }
   };
 
+  // Define the action menu for each row
   const actionMenu = (record) => (
     <Menu>
       <Menu.Item key="1" onClick={() => handleReturnPreview(record)}>
         <FilePdfOutlined style={{ marginRight: 8 }} />
         Preview
       </Menu.Item>
-      <Menu.Item key="2" onClick={() => {
-        const selectedAdjustment = adjustmentData.find(
-          (adjustment) => adjustment._id === record.key
-        );
-        if (selectedAdjustment) {
-          dispatch(setSelectedAdjustment(selectedAdjustment));
-          dispatch(setReadOnly(true));
-          navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
-        } else {
-          toast.error("Selected adjustment not found.");
-        }
-      }}>
+      <Menu.Item
+        key="2"
+        onClick={() => {
+          const selectedAdjustment = adjustmentsArray.find(
+            (adjustment) => adjustment._id === record.key
+          );
+          if (selectedAdjustment) {
+            dispatch(setSelectedAdjustment(selectedAdjustment));
+            dispatch(setReadOnly(true));
+            navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
+          } else {
+            toast.error("Selected adjustment not found.");
+          }
+        }}
+      >
         <EyeOutlined style={{ marginRight: 8 }} />
         View (Read-only)
       </Menu.Item>
@@ -172,10 +181,10 @@ const PenalityandAdjustmentList = () => {
         <CloseCircleOutlined style={{ marginRight: 8 }} />
         {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
       </Menu.Item>
-      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
+      {/* <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
         <MailOutlined style={{ marginRight: 8 }} />
         Send Mail
-      </Menu.Item>
+      </Menu.Item> */}
       <Menu.Item
         key="5"
         onClick={() => {
@@ -191,7 +200,6 @@ const PenalityandAdjustmentList = () => {
       </Menu.Item>
     </Menu>
   );
-  
 
   // Debounced function to fetch adjustments
   const debouncedFetch = useCallback(
@@ -201,23 +209,20 @@ const PenalityandAdjustmentList = () => {
     [dispatch]
   );
 
-  // Fetch data on component mount and when dependencies change
+  // Fetch data when component mounts or dependencies change
   useEffect(() => {
-    // Build the parameters including the search query, current page, and computed page size
     const params = {
-      search: searchText,            // Include the search query from the state
-      page: currentPage,             // Use the current page (which resets to 1 on search change)
-      limit: computedPageSize,       // Use the computed page size
-      sortBy: "createdAt",           // Optional: set the sort field if needed
-      sortOrder: "desc",             // Optional: set the sort order if needed
+      search: searchText,
+      page: currentPage,
+      limit: computedPageSize,
+      sortBy: "createdAt",
+      sortOrder: "desc",
     };
-  
-    // Call the debounced fetch function with the updated parameters
+
     debouncedFetch(params);
   }, [debouncedFetch, searchText, currentPage, computedPageSize]);
-  
 
-  // Monitor the loading state to disable the initial render once the API call completes
+  // Monitor loading state to disable initial render when API call completes
   useEffect(() => {
     if (!loading) {
       setInitialLoad(false);
@@ -241,7 +246,7 @@ const PenalityandAdjustmentList = () => {
     };
   }, [isReceiptVisible]);
 
-  // Define table columns with fixed widths and ellipsis
+  // Define table columns
   const columns = [
     {
       title: "Return Invoice No.",
@@ -307,10 +312,7 @@ const PenalityandAdjustmentList = () => {
       dataIndex: "status",
       key: "status",
       render: (text) => (
-        <Tag
-          color={text === "Cancelled" ? "red" : "purple"}
-          className="text-xs"
-        >
+        <Tag color={text === "Cancelled" ? "red" : "purple"} className="text-xs">
           <span className="text-xs">{text || "Active"}</span>
         </Tag>
       ),
@@ -341,9 +343,7 @@ const PenalityandAdjustmentList = () => {
         }
       },
       width: 120,
-      ellipsis: {
-        showTitle: true,
-      },
+      ellipsis: { showTitle: true },
       sorter: (a, b) => {
         const dateA = new Date(a.adjustedAt || 0);
         const dateB = new Date(b.adjustedAt || 0);
@@ -354,167 +354,113 @@ const PenalityandAdjustmentList = () => {
       title: "Action",
       dataIndex: "action",
       key: "action",
-      render: (_, record) => {
-        const menuItems = [
-          {
-            key: "1",
-            label: (
-              <span>
-                <FilePdfOutlined style={{ marginRight: 8 }} />
-                Preview
-              </span>
-            ),
-            onClick: () => {
-              handleReturnPreview(record);
-            },
-          },
-          {
-            key: "2",
-            label: (
-              <span>
-                <EyeOutlined style={{ marginRight: 8 }} />
-                View (Read-only)
-              </span>
-            ),
-            onClick: () => {
-              const selectedAdjustment = adjustmentData.find(
-                (adjustment) => adjustment._id === record.key
-              );
-              if (selectedAdjustment) {
-                dispatch(setSelectedAdjustment(selectedAdjustment));
-                dispatch(setReadOnly(true));
-                navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment");
-              } else {
-                toast.error("Selected adjustment not found.");
-              }
-            },
-          },
-          {
-            key: "3",
-            label: (
-              <ProtectedSection requiredPermission={PERMISSIONS.CANCEL_PENALTY}>
-                <span>
-                  <CloseCircleOutlined style={{ marginRight: 8 }} />
-                  {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
-                </span>
-              </ProtectedSection>
-            ),
-            // Updated: Pass the entire record to the cancellation handler.
-            onClick: () => {
-              if (record?.status !== "Cancelled") handleCancleReturnInvoice(record);
-            },
-            disabled: record?.status === "Cancelled",
-          },
-          {
-            key: "4",
-            label: (
-              <span onClick={() => handleSendEmail(record)}>
-                <MailOutlined style={{ marginRight: 8 }} />
-                Send Mail
-              </span>
-            ),
-          },
-          {
-            key: "5",
-            label: (
-              <span
-                onClick={() => {
-                  console.log("Selected Record for Export:", record);
-                  setSelectedExportRecord(record);
-                  setTimeout(() => {
-                    setIsExportModalVisible(true);
-                  }, 100);
-                }}
-              >
-                <ExportOutlined style={{ marginRight: 8 }} />
-                Export
-              </span>
-            ),
-          },
-
-        ];
-
-        return (
-          <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
-            <MoreOutlined style={{ fontSize: "15px", cursor: "pointer", transform: "rotate(180deg)" }} />
-          </Dropdown>
-
-        );
-      },
+      render: (_, record) => (
+        <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+          <MoreOutlined style={{ fontSize: "15px", cursor: "pointer", transform: "rotate(180deg)" }} />
+        </Dropdown>
+      ),
       width: 100,
       ellipsis: true,
     },
   ];
 
-  // Transform adjustments data to table dataSource
-  const dataSource = Array.isArray(adjustmentData)
-    ? adjustmentData.map((adjustment) => ({
-      key: adjustment?._id,
-      return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
-      invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
-      receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
-      adjustmentAmount: adjustment?.adjustmentAmount || 0,
-      adjustmentTotal: adjustment?.adjustmentTotal || 0,
-      status: adjustment?.isCancel ? "Cancelled" : "Active",
-      adjustedAt: adjustment?.adjustedAt || "N/A",
-      ...adjustment, // Spread other properties safely
-    }))
-    : [];
+  // Map record data for email sending
+  const mapRecordToEmailData = (record) => {
+    return {
+      nameOfSchool: record.schoolName || "N/A",
+      address: record.schoolAddress || "N/A",
+      branchName: record.branchName || "N/A",
+      city: record.city || "N/A",
+      finalReceiver: {
+        name: record.invoiceId?.receiver?.name || "N/A",
+        email: record.invoiceId?.receiver?.email || "N/A",
+        address: record.invoiceId?.receiver?.address || "N/A",
+        phone: record.invoiceId?.receiver?.contact || "N/A",
+      },
+      returnInvoiceNumber: record.returnInvoiceNumber || "N/A",
+      invoiceNumber: record.invoiceId?.invoiceNumber || "N/A",
+      date: record.adjustedAt
+        ? new Date(record.adjustedAt).toLocaleDateString()
+        : "N/A",
+      paymentMethod: record.paymentMethod || "N/A",
+      paymentStatus: record.paymentStatus || "N/A",
+      lineItems: record.lineItems || [],
+      totalAmount: record.adjustmentTotal || 0,
+      tax: record.tax || 0,
+      penalty: record.penalty || 0,
+      discount: record.discount || 0,
+      finalAmount: record.adjustmentAmount || 0,
+      remark: record.remark || "",
+      schoolId: record.schoolId || "",
+      receiver: {
+        email: record.invoiceId?.receiver?.email || "N/A",
+      },
+    };
+  };
 
-  // Transform adjustment data for export (if needed)
-  const transformAdjustmentData = (adjustmentData) =>
-    Array.isArray(adjustmentData)
-      ? adjustmentData.map((adjustment, index) => {
-        const {
-          _id,
-          returnInvoiceNumber = "N/A",
-          invoiceId = {},
-          tax = 0,
-          discount = 0,
-          discountType = "percentage",
-          penalty = 0,
-          adjustmentTotal = 0,
-          adjustmentAmount = 0,
-          adjustedBy = {},
-          adjustedAt = "N/A",
-          academicYear = {},
-          isCancel, // added to determine status
-        } = adjustment || {};
+  // Transform adjustments data for the table using adjustmentsArray
+  const dataSource = adjustmentsArray.map((adjustment) => ({
+    key: adjustment._id,
+    return_invoice_no: adjustment.returnInvoiceNumber || "N/A",
+    invoice_no: adjustment.invoiceId?.invoiceNumber || "N/A",
+    receiver: adjustment.invoiceId?.receiver?.name || "N/A",
+    adjustmentAmount: adjustment.adjustmentAmount || 0,
+    adjustmentTotal: adjustment.adjustmentTotal || 0,
+    status: adjustment.isCancel ? "Cancelled" : "Active",
+    adjustedAt: adjustment.adjustedAt || "N/A",
+    ...adjustment,
+  }));
 
-        return {
-          sNo: index + 1,
-          returnInvoiceNumber,
-          refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
-          receiver: invoiceId.receiver?.name || "N/A",
-          receiverEmail: invoiceId.receiver?.email || "N/A",
-          receiverPhone: invoiceId.receiver?.contact || "N/A",
-          receiverAddress: invoiceId.receiver?.address || "N/A",
-          tax: `${parseFloat(tax)} %`,
-          discount:
-            discountType === "percentage"
-              ? `${parseFloat(discount)} %`
-              : `${parseFloat(discount)} QR`,
-          discountType,
-          penalty: `${parseFloat(penalty)} QR`,
-          totalAmount: `${parseFloat(adjustmentTotal)} QR`,
-          finalAmount: `${parseFloat(adjustmentAmount)} QR`,
-          createdBy: adjustedBy.adminName || "N/A",
-          Date:
-            adjustedAt !== "N/A"
-              ? new Date(adjustedAt).toLocaleString("en-GB", {
+  // Transform adjustment data for export
+  const transformAdjustmentData = (adjustments) =>
+    adjustments.map((adjustment, index) => {
+      const {
+        returnInvoiceNumber = "N/A",
+        invoiceId = {},
+        tax = 0,
+        discount = 0,
+        discountType = "percentage",
+        penalty = 0,
+        adjustmentTotal = 0,
+        adjustmentAmount = 0,
+        adjustedBy = {},
+        adjustedAt = "N/A",
+        academicYear = {},
+        isCancel,
+      } = adjustment || {};
+
+      return {
+        sNo: index + 1,
+        returnInvoiceNumber,
+        refInvoiceNumber: invoiceId.invoiceNumber || "N/A",
+        receiver: invoiceId.receiver?.name || "N/A",
+        receiverEmail: invoiceId.receiver?.email || "N/A",
+        receiverPhone: invoiceId.receiver?.contact || "N/A",
+        receiverAddress: invoiceId.receiver?.address || "N/A",
+        tax: `${parseFloat(tax)} %`,
+        discount:
+          discountType === "percentage"
+            ? `${parseFloat(discount)} %`
+            : `${parseFloat(discount)} QR`,
+        discountType,
+        penalty: `${parseFloat(penalty)} QR`,
+        totalAmount: `${parseFloat(adjustmentTotal)} QR`,
+        finalAmount: `${parseFloat(adjustmentAmount)} QR`,
+        createdBy: adjustedBy.adminName || "N/A",
+        Date:
+          adjustedAt !== "N/A"
+            ? new Date(adjustedAt).toLocaleString("en-GB", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
               })
-              : "N/A",
-          academicYearDetails: academicYear.year || "N/A",
-          status: isCancel ? "Cancelled" : "Active",
-        };
-      })
-      : [];
-
+            : "N/A",
+        academicYearDetails: academicYear.year || "N/A",
+        status: isCancel ? "Cancelled" : "Active",
+      };
+    });
 
   return (
     <Layout title={"Penalty & Adjustment List | Student Diwan"}>
@@ -543,7 +489,6 @@ const PenalityandAdjustmentList = () => {
               >
                 Export
               </Button>
-
               <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_ADJUSTMENT}>
                 <button
                   onClick={() =>
@@ -566,7 +511,6 @@ const PenalityandAdjustmentList = () => {
               <Spinner />
             </div>
           ) : (
-            // Render the table only when not loading and after initial fetch has completed
             !error && (
               <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
                 <Table
@@ -585,7 +529,7 @@ const PenalityandAdjustmentList = () => {
                       dispatch(setCurrentPage(page));
                     },
                     onShowSizeChange: (current, size) => {
-                      dispatch(setCurrentPage(1)); // Reset to first page on size change
+                      dispatch(setCurrentPage(1));
                     },
                   }}
                   className="rounded-lg shadow text-xs"
@@ -602,12 +546,12 @@ const PenalityandAdjustmentList = () => {
             visible={isExportModalVisible}
             onClose={() => {
               setIsExportModalVisible(false);
-              setSelectedExportRecord(null); // Reset selection
+              setSelectedExportRecord(null);
             }}
             dataToExport={
               selectedExportRecord
                 ? transformAdjustmentData([selectedExportRecord])
-                : transformAdjustmentData(adjustmentData)
+                : transformAdjustmentData(adjustmentsArray)
             }
             columns={[
               { header: "S.No", dataKey: "sNo" },
@@ -626,27 +570,22 @@ const PenalityandAdjustmentList = () => {
                 ? `Penalty_Adjustment_${selectedExportRecord.returnInvoiceNumber}`
                 : "Penalty_Adjustments"
             }
-            alwaysRender={true}  // Ensures modal renders even if dataToExport is empty
+            alwaysRender={true}
           />
-
-
 
           {/* Receipt Preview Overlay */}
           {isReceiptVisible && selectedReturnInvoice && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
-              {/* Dim / Blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
                 onClick={() => setReceiptVisible(false)}
               />
-              {/* Centered content */}
               <div
                 ref={popupRef}
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
                     onClick={() => handleDownloadPDF(pdfRef, selectedReturnInvoice)}
@@ -662,8 +601,6 @@ const PenalityandAdjustmentList = () => {
                     ✕
                   </button>
                 </div>
-
-                {/* Receipt content container */}
                 <div>
                   <PenaltyAdjustmentTemplate data={selectedReturnInvoice} ref={pdfRef} />
                 </div>

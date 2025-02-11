@@ -151,8 +151,8 @@ const RecentReceiptsList = () => {
 
   // --- 1) Fetch receipts when component mounts or pagination changes ---
   useEffect(() => {
-    dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit }));
-  }, [dispatch, currentPage, pageLimit]);
+    dispatch(fetchAllReceipts({ page: currentPage, limit: pageLimit, search: searchQuery }));
+  }, [dispatch, currentPage, pageLimit, searchQuery]);
 
   // --- 2) Close receipt preview modal on outside click ---
   useEffect(() => {
@@ -329,24 +329,7 @@ const RecentReceiptsList = () => {
     })) || [];
 
   // --- Filter logic ---
-  const filteredData = receipts.filter((item) => {
-    const q = searchQuery.toLowerCase();
-    const receiptNumber = item.receiptNumber?.toLowerCase() || "";
-    const receiverName =
-      item.reciever?.name?.toLowerCase() ||
-      item.receiver?.name?.toLowerCase() ||
-      "";
-    const paidAmount = item.totalPaidAmount?.toString() || "";
-    const dateString = item.date
-      ? new Date(item.date).toLocaleDateString()
-      : "";
-    return (
-      receiptNumber.includes(q) ||
-      receiverName.includes(q) ||
-      paidAmount.includes(q) ||
-      dateString.includes(q)
-    );
-  });
+  const filteredData = receipts;
 
   // --- Table columns including action-menu export button ---
   const columns = [
@@ -555,24 +538,6 @@ const RecentReceiptsList = () => {
                 rowKey={(record) => record._id}
                 columns={columns}
                 dataSource={filteredData}
-                expandable={{
-                  expandedRowRender: (record) => (
-                    <div>
-                      <strong>Line Items:</strong>
-                      {record.lineItems && record.lineItems.length > 0 ? (
-                        <ul>
-                          {record.lineItems.map((item, index) => (
-                            <li key={index}>
-                              {item.revenueType || item.name || "Item"}: {item.total || 0} QR
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <span>No line items available</span>
-                      )}
-                    </div>
-                  ),
-                }}
                 pagination={{
                   current: currentPage,
                   total: pagination.totalRecords,
@@ -581,9 +546,7 @@ const RecentReceiptsList = () => {
                   pageSizeOptions: ["5", "10", "20", "50"],
                   size: "small",
                   showTotal: (total) =>
-                    `Page ${currentPage} of ${Math.ceil(
-                      pagination.totalRecords / pageLimit
-                    )} | Total ${total} records`,
+                    `Page ${currentPage} of ${Math.ceil(pagination.totalRecords / pageLimit)} | Total ${total} records`,
                   onChange: (page) => setCurrentPage(page),
                   onShowSizeChange: (current, size) => {
                     setPageLimit(size);
@@ -593,6 +556,7 @@ const RecentReceiptsList = () => {
                 size="small"
                 bordered
               />
+
             </ProtectedSection>
           )}
 

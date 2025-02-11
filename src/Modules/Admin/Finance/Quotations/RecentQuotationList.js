@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import {
   fetchAllQuotations,
   updateQuotationStatus,
+  cancelQuotation, // Do not modify this import
 } from "../../../../Store/Slices/Finance/Quotations/quotationThunks";
 import Spinner from "../../../../Components/Common/Spinner";
 import EmailModal from "../../../../Components/Common/EmailModal";
@@ -58,10 +59,15 @@ const RecentQuotationList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const pdfRef = useRef(null);
-  // Local state for preview mode renamed to avoid collision with Redux action
+  // Local state for preview mode (renamed to avoid collision with Redux action)
   const [isQuotationPreviewVisible, setQuotationPreviewVisible] = useState(false);
   const [previewQuotation, setPreviewQuotation] = useState(null);
   const [selectedExportRecord, setSelectedExportRecord] = useState(null);
+
+  // Local flag to ensure we show spinner until API data has arrived
+  const [hasFetched, setHasFetched] = useState(false);
+  // Local state for debounced search to enable real-time search
+  const [debouncedSearch, setDebouncedSearch] = useState(searchText);
 
   const popupRef = useRef(null);
 
@@ -83,42 +89,32 @@ const RecentQuotationList = () => {
   };
 
   const handleSendEmail = async (record) => {
-    // Get the full record from the quotationIdMap using the record's key
     const fullRecord = quotationIdMap[record.key];
     if (!fullRecord) {
       toast.error("Quotation not found.");
       console.error("Error: Full quotation record not found for key", record.key);
       return;
     }
-
     const quotationId = fullRecord._id;
     if (!quotationId) {
       toast.error("Invalid quotation ID.");
       console.error("Error: Missing quotation ID in record", fullRecord);
       return;
     }
-
     try {
-      // Show a loading toast notification
       const toastId = toast.loading("Sending email...");
-
-      // Determine type based on whether the quotation is canceled
       const type = fullRecord.isCancel ? "cancelQuotation" : "quotation";
-
-      // Format dates correctly
-      const formattedDate = formatDate(fullRecord.date, "long"); // e.g., "10 January 2025"
-      const formattedDueDate = formatDate(fullRecord.dueDate, "long"); // e.g., "10 January 2025"
-
-      // Construct the payload ensuring all required fields are present
+      const formattedDate = formatDate(fullRecord.date, "long");
+      const formattedDueDate = formatDate(fullRecord.dueDate, "long");
       const payload = {
         receiver: {
           email: fullRecord.receiver?.email,
           name: fullRecord.receiver?.name || "N/A",
           address: fullRecord.receiver?.address || "N/A",
-          phone: fullRecord.receiver?.phone || "N/A",
+          phoneNumber: fullRecord.receiver?.phone || "N/A",
         },
         schoolId: fullRecord.schoolId?._id || "N/A",
-        nameOfSchool: fullRecord.schoolId?.nameOfSchool || "N/A",
+        schoolName: fullRecord.schoolId?.nameOfSchool || "N/A",
         schoolAddress: fullRecord.schoolId?.address || "N/A",
         branchName: fullRecord.schoolId?.branchName || "N/A",
         city: fullRecord.schoolId?.city || "N/A",
@@ -145,43 +141,44 @@ const RecentQuotationList = () => {
       console.log("Dispatching sendEmail with:", { id: quotationId, type, payload });
       const result = await dispatch(sendEmail({ id: quotationId, type, payload }));
       toast.dismiss(toastId);
-
-      // Remove the additional success toast so that only the thunk's toast appears.
       if (sendEmail.rejected.match(result)) {
         console.error("Failed sendEmail response:", result);
-        // (The thunk already shows an error toast.)
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
-      toast.error(`Error sending email.`);
+      toast.error("Error sending email.");
     }
   };
 
-  // Debounced function to fetch quotations with a fixed limit of 10
-  const debouncedFetch = useCallback(
-    debounce((params) => {
-      dispatch(fetchAllQuotations(params));
-    }, 300),
-    [dispatch]
-  );
-
-  // Fetch data on component mount
+  // --- Real-Time Search: Debounce searchText updates ---
   useEffect(() => {
-    console.log("Fetching data...", { searchText, currentPage, pageSize });
-    const params = {
-      //search: searchText,
-      page: 1, // Always fetch the first page
-      limit: 10, // Limit to 10 records
-      //sortBy: "createdAt",
-      //sortOrder: "desc",
-    };
-    debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage, pageSize, computedPageSize]);
+    const handler = debounce(() => {
+      setDebouncedSearch(searchText);
+    }, 300);
+    handler();
+    return () => handler.cancel();
+  }, [searchText]);
 
-  console.log("after useEffect--", quotations);
+  // --- Fetch data effect ---
+  useEffect(() => {
+    setHasFetched(false);
+    const params = {
+      page: currentPage,
+      limit: computedPageSize,
+      search: debouncedSearch, // Pass search query to the API
+    };
+    dispatch(fetchAllQuotations(params))
+      .unwrap()
+      .finally(() => {
+        setHasFetched(true);
+      });
+  }, [currentPage, computedPageSize, debouncedSearch, dispatch]);
+
   const handleStatusChange = (quotationId, status) => {
     dispatch(updateQuotationStatus({ id: quotationId, status }));
   };
+
+  // --- Action Menu ---
   const actionMenu = (record) => (
     <Menu>
       <Menu.Item
@@ -213,16 +210,55 @@ const RecentQuotationList = () => {
       >
         <EyeOutlined style={{ marginRight: 8 }} /> View (Read-only)
       </Menu.Item>
-      <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
-        <Menu.Item key="3" onClick={() => handleStatusChange(record.key, "accept")}>
-          <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
-        </Menu.Item>
-      </ProtectedAction>
-      <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
-        <Menu.Item key="4" onClick={() => handleStatusChange(record.key, "reject")}>
-          <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
-        </Menu.Item>
-      </ProtectedAction>
+      {record.status === "pending" && !record.isCancel && (
+        <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
+          <Menu.Item
+            key="3"
+            onClick={() => handleStatusChange(record.key, "accept")}
+          >
+            <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
+          </Menu.Item>
+        </ProtectedAction>
+      )}
+      {record.status !== "reject" && (
+        <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
+          <Menu.Item
+            key="4"
+            onClick={async () => {
+              try {
+                // Attempt cancellation
+                await dispatch(cancelQuotation(record.key)).unwrap();
+                toast.success("Quotation cancelled successfully");
+              } catch (err) {
+                // If the error message indicates a successful cancellation, treat it as success
+                if (err && err.message && err.message.includes("cancel successfully")) {
+                  toast.success("Quotation cancelled successfully");
+                } else {
+                  console.log(err.message || "Error cancelling quotation");
+                  return; // Exit if a genuine error occurred
+                }
+              } finally {
+                // Refresh data no matter what happened
+                setHasFetched(false);
+                const params = {
+                  page: currentPage,
+                  limit: computedPageSize,
+                  search: debouncedSearch,
+                };
+                try {
+                  await dispatch(fetchAllQuotations(params)).unwrap();
+                } catch (fetchErr) {
+                  // Optionally handle fetch error here
+                } finally {
+                  setHasFetched(true);
+                }
+              }
+            }}
+          >
+            <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
+          </Menu.Item>
+        </ProtectedAction>
+      )}
       <Menu.Item key="5" onClick={() => handleSendEmail(record)}>
         <MailOutlined style={{ marginRight: 8 }} /> Send Mail
       </Menu.Item>
@@ -241,7 +277,7 @@ const RecentQuotationList = () => {
     </Menu>
   );
 
-  // Define table columns with fixed widths and ellipsis
+  // --- Define table columns ---
   const columns = [
     {
       title: "Quotation No.",
@@ -306,24 +342,31 @@ const RecentQuotationList = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
+      // Modified render function to check isCancel flag and override display if true
+      render: (status, record) => {
+        let displayStatus = status;
         let color = "default";
-        switch (status) {
-          case "accept":
-            color = "green";
-            break;
-          case "pending":
-            color = "yellow";
-            break;
-          case "reject":
-            color = "red";
-            break;
-          default:
-            color = "default";
+        if (record.isCancel) {
+          displayStatus = "reject";
+          color = "red";
+        } else {
+          switch (status) {
+            case "accept":
+              color = "green";
+              break;
+            case "pending":
+              color = "yellow";
+              break;
+            case "reject":
+              color = "red";
+              break;
+            default:
+              color = "default";
+          }
         }
         return (
           <Tag color={color} className="text-xs capitalize">
-            {status || "N/A"}
+            {displayStatus || "N/A"}
           </Tag>
         );
       },
@@ -334,87 +377,23 @@ const RecentQuotationList = () => {
       title: "Action",
       dataIndex: "action",
       key: "action",
-      render: (_, record) => {
-        const menu = (
-          <Menu>
-            <Menu.Item
-              key="1"
-              onClick={() => {
-                const quotationToPreview = quotationIdMap[record.key];
-                if (quotationToPreview) {
-                  setPreviewQuotation(quotationToPreview);
-                  setQuotationPreviewVisible(true);
-                } else {
-                  toast.error("Quotation not found.");
-                }
-              }}
-            >
-              <FilePdfOutlined style={{ marginRight: 8 }} /> Preview
-            </Menu.Item>
-            <Menu.Item
-              key="2"
-              onClick={() => {
-                const quotationToView = quotationIdMap[record.key];
-                if (quotationToView) {
-                  dispatch(setReadOnly(true));
-                  dispatch(setSelectedQuotation(quotationToView));
-                  navigate("/finance/quotations/add-new-quotations");
-                } else {
-                  toast.error("Selected income not found.");
-                }
-              }}
-            >
-              <EyeOutlined style={{ marginRight: 8 }} /> View(Read-only)
-            </Menu.Item>
-            <ProtectedAction requiredPermission={PERMISSIONS.ACCEPT_QUOTATION}>
-              <Menu.Item
-                key="3"
-                onClick={() => handleStatusChange(record.key, "accept")}
-              >
-                <CheckCircleOutlined style={{ marginRight: 8 }} /> Accept
-              </Menu.Item>
-            </ProtectedAction>
-            <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
-              <Menu.Item
-                key="4"
-                onClick={() => handleStatusChange(record.key, "reject")}
-              >
-                <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
-              </Menu.Item>
-            </ProtectedAction>
-            <Menu.Item onClick={() => handleSendEmail(record)}>
-              <MailOutlined style={{ marginRight: 8 }} /> Send Mail
-            </Menu.Item>
-            <Menu.Item
-              key="5"
-              onClick={() => {
-                console.log("Selected Record for Export:", record);
-                setSelectedExportRecord(record);
-                setTimeout(() => {
-                  setIsExportModalVisible(true);
-                }, 100);
-              }}
-            >
-              <ExportOutlined style={{ marginRight: 8 }} />
-              Export
-            </Menu.Item>
-
-          </Menu>
-        );
-
-        return (
-          <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
-            <MoreOutlined style={{ fontSize: "15px", cursor: "pointer", transform: "rotate(180deg)" }} />
-          </Dropdown>
-
-        );
-      },
+      render: (_, record) => (
+        <Dropdown overlay={() => actionMenu(record)} trigger={["click"]}>
+          <MoreOutlined
+            style={{
+              fontSize: "15px",
+              cursor: "pointer",
+              transform: "rotate(180deg)",
+            }}
+          />
+        </Dropdown>
+      ),
       width: 100,
       ellipsis: true,
     },
   ];
 
-  // Transform quotations data for table dataSource
+  // --- Transform quotations data for table dataSource ---
   const dataSource = quotations?.map((quotation) => ({
     key: quotation._id,
     quotationNumber: quotation.quotationNumber || "N/A",
@@ -425,6 +404,7 @@ const RecentQuotationList = () => {
     final_amount: quotation.final_amount || 0,
     total_amount: quotation.total_amount || 0,
     status: quotation.status || "pending",
+    isCancel: quotation.isCancel, // <-- Include the isCancel flag
   }));
 
   const transformQuotationData = (quotations) =>
@@ -442,41 +422,60 @@ const RecentQuotationList = () => {
           ? `${parseFloat(quotation.discount)} %`
           : `${parseFloat(quotation.discount)} QR`,
       discountType: quotation?.discountType || "N/A",
-      totalAmount: quotation?.total_amount ? `${parseFloat(quotation.total_amount)} QR` : "0 QR",
-      finalAmount: quotation?.final_amount ? `${parseFloat(quotation.final_amount)} QR` : "0 QR",
+      totalAmount: quotation?.total_amount
+        ? `${parseFloat(quotation.total_amount)} QR`
+        : "0 QR",
+      finalAmount: quotation?.final_amount
+        ? `${parseFloat(quotation.final_amount)} QR`
+        : "0 QR",
       purpose: quotation?.purpose || "N/A",
       status: quotation?.status || "N/A",
       govtRefNumber: quotation?.govtRefNumber || "N/A",
       remark: quotation?.remark || "N/A",
       cancleQuotation: quotation?.isCancel ? "Yes" : "No",
       date: quotation?.date
-        ? new Date(quotation.date).toLocaleString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }).replace(",", " at")
+        ? new Date(quotation.date)
+            .toLocaleString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+            .replace(",", " at")
         : "N/A",
       dueDate: quotation?.dueDate
-        ? new Date(quotation.dueDate).toLocaleString("en-GB", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        }).replace(",", " at")
+        ? new Date(quotation.dueDate)
+            .toLocaleString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+            .replace(",", " at")
         : "N/A",
-
       academicYear: quotation?.academicYear?.year || "N/A",
     })) || [];
 
-
-  // Handle search input changes
+  // --- Handle search input changes ---
   const handleSearch = (e) => {
     setSearchText(e.target.value);
     dispatch(setCurrentPage(1));
   };
+
+  // --- Render ---
+  if (!hasFetched) {
+    return (
+      <Layout title={"Quotation List | Student Diwan"}>
+        <AdminDashLayout>
+          <div className="flex justify-center items-center h-full">
+            <Spin tip="Loading..." />
+          </div>
+        </AdminDashLayout>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title={"Quotation List | Student Diwan"}>
@@ -514,9 +513,7 @@ const RecentQuotationList = () => {
                   }}
                   className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
                 >
-                  <span className="text-gray-800 font-medium">
-                    Add New Quotation
-                  </span>
+                  <span className="text-gray-800 font-medium">Add New Quotation</span>
                   <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                     <FiPlus size={16} />
                   </div>
@@ -526,14 +523,15 @@ const RecentQuotationList = () => {
           </div>
 
           {/* Data State */}
-          {loading ? (
-            <div className="flex justify-center">
-              <Spin tip="Loading..." />
-            </div>
-          ) : error ? (
-            <div className="text-red-500 text-center">Error: {error}</div>
-          ) : quotations.length === 0 ? (
-            <div className="text-center">No data available.</div>
+          {loading || error ? (
+            <>
+              {loading && (
+                <div className="flex justify-center">
+                  <Spin tip="Loading..." />
+                </div>
+              )}
+              {error && <div className="text-red-500 text-center">Error: {error}</div>}
+            </>
           ) : (
             <ProtectedSection
               requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}
@@ -573,19 +571,16 @@ const RecentQuotationList = () => {
           {/* Quotation Preview Overlay */}
           {isQuotationPreviewVisible && (
             <div className="fixed inset-[-5rem] z-50 flex items-center justify-center">
-              {/* Dim / Blur background */}
               <div
                 className="absolute inset-0 bg-black bg-opacity-60"
                 style={{ backdropFilter: "blur(8px)" }}
                 onClick={() => setQuotationPreviewVisible(false)}
               />
-              {/* Centered content */}
               <div
                 ref={popupRef}
                 className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Close + Download PDF buttons */}
                 <div className="flex justify-end space-x-2 mb-4">
                   <button
                     className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
@@ -601,8 +596,6 @@ const RecentQuotationList = () => {
                     ✕
                   </button>
                 </div>
-
-                {/* Quotation content container */}
                 <div>
                   <QuotationTemplate data={previewQuotation} ref={pdfRef} />
                 </div>
@@ -626,13 +619,13 @@ const RecentQuotationList = () => {
               { header: "Date", dataKey: "date" },
               { header: "Due Date", dataKey: "dueDate" },
             ]}
-            fileName={selectedExportRecord?.quotationNumber 
-              ? `Quotation_${selectedExportRecord.quotationNumber}` 
-              : "Quotations"}
-            
+            fileName={
+              selectedExportRecord?.quotationNumber
+                ? `Quotation_${selectedExportRecord.quotationNumber}`
+                : "Quotations"
+            }
             alwaysRender={true}
           />
-
         </div>
       </AdminDashLayout>
     </Layout>
