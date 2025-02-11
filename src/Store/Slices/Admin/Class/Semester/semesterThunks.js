@@ -81,6 +81,7 @@ export const updateSemester = createAsyncThunk(
           "Content-Type": "application/json",
         }
       );
+      console.log(response, "ddd");
       if (response && response.success) {
         toast.success("Semester updated successfully");
         return response.data;

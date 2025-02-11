@@ -435,7 +435,7 @@ const ManageRolePage = () => {
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm font-semibold">
+                    {/* <span className="text-sm font-semibold">
                       Set alerts to user
                     </span>
                     <div
@@ -452,7 +452,7 @@ const ManageRolePage = () => {
                         className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform ${isAlertEnabled ? "translate-x-4" : ""
                           }`}
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

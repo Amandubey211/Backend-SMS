@@ -58,12 +58,41 @@ const SubjectSideBar = () => {
         <Button
           type="default"
           onClick={() => setSemesterModalVisible(true)}
-          className="w-full border border-pink-400 bg-white text-black rounded-lg font-semibold transition-colors duration-200 hover:bg-pink-400 hover:text-pink-900"
+          className="
+    w-full
+    border border-pink-400
+    bg-white
+    text-black
+    rounded-lg
+    font-semibold
+    text-sm           /* smaller text */
+    whitespace-normal /* allow wrapping */
+    break-words       /* break long words */
+    text-center       /* optionally center-align text */
+    transition-colors
+    duration-200
+    hover:bg-pink-400
+    hover:text-pink-900
+  "
           aria-label="Select Semester"
         >
-          {selectedSemester && selectedSemester.name
-            ? `Semester: ${selectedSemester.name}`
-            : "Select Semester"}
+          {selectedSemester && selectedSemester.name ? (
+            <>
+              {/* Show full label on screens ≥ small */}
+              <span className="hidden sm:inline">
+                Sem: {selectedSemester.name}
+              </span>
+              {/* Short label on smaller screens (< sm) */}
+              <span className="inline sm:hidden">
+                Sem: {selectedSemester.name}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="hidden sm:inline">Select Semester</span>
+              <span className="inline sm:hidden">Sem</span>
+            </>
+          )}
         </Button>
       </div>
 
