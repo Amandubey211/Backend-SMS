@@ -1,11 +1,17 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  createListenerMiddleware,
+  isAnyOf,
+} from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { combineReducers } from "redux";
 
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
-import userReducer from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
+import userReducer, {
+  setSelectedSemester,
+} from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
@@ -102,9 +108,19 @@ const authPersistConfig = {
     "token",
     "selectedLanguage",
     "userRoles",
+    "permissions",
   ], // Fields to persist
 };
+const listenerMiddleware = createListenerMiddleware();
 
+listenerMiddleware.startListening({
+  matcher: isAnyOf(setSelectedSemester),
+  effect: async (action, listenerApi) => {
+    // Wait 500ms to allow state persistence to complete
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    window.location.reload();
+  },
+});
 // Persist configuration for the User slice
 const userPersistConfig = {
   key: "user",
@@ -133,6 +149,10 @@ const stdClassPersistConfig = {
   key: "studentClass",
   storage,
 };
+// const rbacPersistConfig = {
+//   key: "rbac",
+//   storage,
+// };
 
 // Combine the Auth and User reducers under a Common entity
 const commonReducer = combineReducers({
@@ -185,6 +205,7 @@ const AdminReducer = combineReducers({
 
   //RBAC
   rbac: rbacReducer,
+  // rbac: persistReducer(rbacPersistConfig, rbacReducer),
 
   // Finance
   earnings: earnignsReducer,
@@ -247,8 +268,8 @@ const store = configureStore({
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // Disable serializable check due to redux-persist
-    }), // Thunk is automatically included by Redux Toolkit
+      serializableCheck: false,
+    }).concat(listenerMiddleware.middleware), // Thunk is automatically included by Redux Toolkit
 });
 
 const persistor = persistStore(store);

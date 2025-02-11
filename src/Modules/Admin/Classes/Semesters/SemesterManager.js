@@ -212,6 +212,14 @@ const SemesterManagement = ({ classId }) => {
    * can parse them with `new Date(`${date}T00:00:00.000Z`)`
    */
   const onFinish = (values) => {
+    // Debug: Log the selected dates (they should be moment objects)
+    console.log(
+      "startDate:",
+      values.startDate.format("YYYY-MM-DD"),
+      "endDate:",
+      values.endDate.format("YYYY-MM-DD")
+    );
+
     if (!values.startDate || !values.startDate.isValid()) {
       message.error("Invalid Start Date. Please select a valid date.");
       return;
@@ -221,11 +229,15 @@ const SemesterManagement = ({ classId }) => {
       return;
     }
 
+    // For update, we send "DD-MM-YYYY" because the backend update uses parseDate.
+    // For create, we send "YYYY-MM-DD" because new Date("YYYY-MM-DDT00:00:00.000Z") works.
+    const dateFormat = editingSemester ? "DD-MM-YYYY" : "YYYY-MM-DD";
+
     const payload = {
       title: values.title,
       description: values.description,
-      startDate: values.startDate.format("YYYY-MM-DD"),
-      endDate: values.endDate.format("YYYY-MM-DD"),
+      startDate: values.startDate.format(dateFormat),
+      endDate: values.endDate.format(dateFormat),
     };
 
     setFormLoading(true);
