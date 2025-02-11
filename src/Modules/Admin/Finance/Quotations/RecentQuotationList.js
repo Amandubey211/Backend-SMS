@@ -179,9 +179,6 @@ const RecentQuotationList = () => {
   };
 
   // --- Action Menu ---
-  // New logic:
-  // - Show the Accept option only if status is "pending" and not cancelled.
-  // - Always show the Reject option (if not already rejected) regardless of status.
   const actionMenu = (record) => (
     <Menu>
       <Menu.Item
@@ -227,24 +224,35 @@ const RecentQuotationList = () => {
         <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
           <Menu.Item
             key="4"
-            onClick={() => {
-              // Dispatch cancelQuotation and then refresh data
-              dispatch(cancelQuotation(record.key))
-                .unwrap()
-                .then(() => {
-                  setHasFetched(false);
-                  const params = {
-                    page: currentPage,
-                    limit: computedPageSize,
-                    search: debouncedSearch,
-                  };
-                  dispatch(fetchAllQuotations(params))
-                    .unwrap()
-                    .finally(() => setHasFetched(true));
-                })
-                .catch((err) => {
-                  // Error handling is already done in the thunk
-                });
+            onClick={async () => {
+              try {
+                // Attempt cancellation
+                await dispatch(cancelQuotation(record.key)).unwrap();
+                toast.success("Quotation cancelled successfully");
+              } catch (err) {
+                // If the error message indicates a successful cancellation, treat it as success
+                if (err && err.message && err.message.includes("cancel successfully")) {
+                  toast.success("Quotation cancelled successfully");
+                } else {
+                  console.log(err.message || "Error cancelling quotation");
+                  return; // Exit if a genuine error occurred
+                }
+              } finally {
+                // Refresh data no matter what happened
+                setHasFetched(false);
+                const params = {
+                  page: currentPage,
+                  limit: computedPageSize,
+                  search: debouncedSearch,
+                };
+                try {
+                  await dispatch(fetchAllQuotations(params)).unwrap();
+                } catch (fetchErr) {
+                  // Optionally handle fetch error here
+                } finally {
+                  setHasFetched(true);
+                }
+              }
             }}
           >
             <CloseCircleOutlined style={{ marginRight: 8 }} /> Reject
@@ -334,24 +342,31 @@ const RecentQuotationList = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status) => {
+      // Modified render function to check isCancel flag and override display if true
+      render: (status, record) => {
+        let displayStatus = status;
         let color = "default";
-        switch (status) {
-          case "accept":
-            color = "green";
-            break;
-          case "pending":
-            color = "yellow";
-            break;
-          case "reject":
-            color = "red";
-            break;
-          default:
-            color = "default";
+        if (record.isCancel) {
+          displayStatus = "reject";
+          color = "red";
+        } else {
+          switch (status) {
+            case "accept":
+              color = "green";
+              break;
+            case "pending":
+              color = "yellow";
+              break;
+            case "reject":
+              color = "red";
+              break;
+            default:
+              color = "default";
+          }
         }
         return (
           <Tag color={color} className="text-xs capitalize">
-            {status || "N/A"}
+            {displayStatus || "N/A"}
           </Tag>
         );
       },
@@ -379,7 +394,6 @@ const RecentQuotationList = () => {
   ];
 
   // --- Transform quotations data for table dataSource ---
-  // Now include the isCancel flag so that the action menu logic can check it.
   const dataSource = quotations?.map((quotation) => ({
     key: quotation._id,
     quotationNumber: quotation.quotationNumber || "N/A",
@@ -408,30 +422,38 @@ const RecentQuotationList = () => {
           ? `${parseFloat(quotation.discount)} %`
           : `${parseFloat(quotation.discount)} QR`,
       discountType: quotation?.discountType || "N/A",
-      totalAmount: quotation?.total_amount ? `${parseFloat(quotation.total_amount)} QR` : "0 QR",
-      finalAmount: quotation?.final_amount ? `${parseFloat(quotation.final_amount)} QR` : "0 QR",
+      totalAmount: quotation?.total_amount
+        ? `${parseFloat(quotation.total_amount)} QR`
+        : "0 QR",
+      finalAmount: quotation?.final_amount
+        ? `${parseFloat(quotation.final_amount)} QR`
+        : "0 QR",
       purpose: quotation?.purpose || "N/A",
       status: quotation?.status || "N/A",
       govtRefNumber: quotation?.govtRefNumber || "N/A",
       remark: quotation?.remark || "N/A",
       cancleQuotation: quotation?.isCancel ? "Yes" : "No",
       date: quotation?.date
-        ? new Date(quotation.date).toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          }).replace(",", " at")
+        ? new Date(quotation.date)
+            .toLocaleString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+            .replace(",", " at")
         : "N/A",
       dueDate: quotation?.dueDate
-        ? new Date(quotation.dueDate).toLocaleString("en-GB", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          }).replace(",", " at")
+        ? new Date(quotation.dueDate)
+            .toLocaleString("en-GB", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+            .replace(",", " at")
         : "N/A",
       academicYear: quotation?.academicYear?.year || "N/A",
     })) || [];
@@ -443,7 +465,6 @@ const RecentQuotationList = () => {
   };
 
   // --- Render ---
-  // Show a spinner until API data has been fetched.
   if (!hasFetched) {
     return (
       <Layout title={"Quotation List | Student Diwan"}>
