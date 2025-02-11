@@ -17,12 +17,12 @@ export const fetchModules = createAsyncThunk(
     // Mandatory Lines
     const say = getAY();
     dispatch(setShowError(false));
-
+    const semesterId = getState().common.user.classInfo.selectedSemester.id;
     try {
       const getRole = getUserRole(getState);
       // API Call using service function with query parameter
       const response = await getData(
-        `/${getRole}/student/classes/${cid}/modules/${sid}?say=${say}`
+        `/${getRole}/student/classes/${cid}/modules/${sid}?say=${say}&semesterId=${semesterId}`
       );
 
       // Check if response is valid and indicates success
