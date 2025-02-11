@@ -3,9 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 
 const OfflineExamViewCard = ({ student, examType, startDate }) => {
-  const { allStudents, loading } = useSelector(
-    (store) => store.admin.all_students
-  );
+  const { allStudents } = useSelector((store) => store.admin.all_students);
 
   const dispatch = useDispatch();
 
@@ -21,7 +19,6 @@ const OfflineExamViewCard = ({ student, examType, startDate }) => {
 
   return (
     <tr className="border-b ">
-      {/* Student Info */}
       <td className="p-2 flex gap-2 flex-nowrap w-[100%]">
         <img
           className="h-8 w-8 rounded-full border"
@@ -33,20 +30,10 @@ const OfflineExamViewCard = ({ student, examType, startDate }) => {
           {studentDetails?.lastName || ""}
         </span>
       </td>
-
-      {/* Exam Type */}
       <td className="p-2 border  capitalize w-[15%]">{examType || "N/A"}</td>
-
-      {/* Obtained Marks */}
       <td className="p-2 border  w-[15%]">{student?.score ?? "N/A"}</td>
-
-      {/* Max Marks */}
       <td className="p-2 border w-[15%]">{student?.maxMarks ?? "N/A"}</td>
-
-      {/* Exam Date */}
       <td className="p-2 border w-[15%]">{startDate ?? "N/A"}</td>
-
-      {/* Status */}
       <td className="p-2 border w-[15%]">
         <span
           className={`px-2 py-1 capitalize rounded-full text-xs font-semibold ${

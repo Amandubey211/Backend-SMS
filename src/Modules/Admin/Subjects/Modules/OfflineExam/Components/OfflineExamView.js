@@ -13,7 +13,6 @@ const OfflineExamView = () => {
     <div className="flex ">
       <SubjectSideBar />
       <div className="p-2 bg-white w-full pr-4">
-        {/* <h2 className="text-xl ps-2 font-semibold mb-3"></h2> */}
         <h2 className="text-xl ps-2 font-semibold mb-3">
           {examName}
           <span className="border-none rounded-full text-sm p-1 px-2 ml-1 text-purple-600 bg-purple-100">
@@ -21,7 +20,7 @@ const OfflineExamView = () => {
           </span>
         </h2>
         <div className="border border-gray-300 bg-white mt-5">
-          {/* Table Header Wrapper - Static Header */}
+          {/* Table Header Wrapper */}
           <div className="overflow-hidden">
             <table className="w-full text-gray-700 text-sm">
               <thead className="bg-gray-100 sticky top-0 shadow-md">

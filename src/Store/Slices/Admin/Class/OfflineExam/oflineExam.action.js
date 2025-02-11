@@ -22,7 +22,6 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const response = await getData(
         `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}`
       );
-      console.log("fetchAllOfflineExam", response);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -53,7 +52,6 @@ export const createOfflineExam = createAsyncThunk(
 export const UploadOfflineExamSheet = createAsyncThunk(
   "subject/offline_upload_exam_sheet",
   async (formData, { rejectWithValue, dispatch, getState }) => {
-    console.log("payload", formData);
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
@@ -68,11 +66,8 @@ export const UploadOfflineExamSheet = createAsyncThunk(
         }
       );
 
-      console.log("response", response);
-
       return response;
     } catch (error) {
-      console.log("excel Uploaded error", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }

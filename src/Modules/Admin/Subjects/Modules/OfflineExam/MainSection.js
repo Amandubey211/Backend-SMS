@@ -19,7 +19,7 @@ const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
 
-  const { offlineExamData, loading, error } = useSelector(
+  const { offlineExamData, loading } = useSelector(
     (store) => store.admin.offlineExam
   );
 
@@ -30,7 +30,6 @@ const MainSection = () => {
       dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
     }
   }, [cid, sid, dispatch]);
-
 
   return (
     <div className="flex h-full w-full">
@@ -44,9 +43,7 @@ const MainSection = () => {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
-
             <ul className="border-t mt-4 mx-4"></ul>
-
             {/* Offline Exam Card */}
             {loading ? (
               <Spinner />
@@ -91,12 +88,10 @@ const MainSection = () => {
               />
             )}
           </div>
-
           {/* Right Section */}
           <UploadAndFilter />
         </div>
       </ProtectedSection>
-
       {/* Floating Add Exam Button */}
       <CreateButton />
     </div>

@@ -4,7 +4,7 @@ import "handsontable/dist/handsontable.full.css";
 
 const HandsontableComp = (fileData = []) => {
   const hotRef = useRef(null);
-  const hotInstanceRef = useRef(null); // Store Handsontable instance
+  const hotInstanceRef = useRef(null); // Store table instance
   const data = fileData.data;
   console.log("dsad", data);
 
@@ -38,8 +38,8 @@ const HandsontableComp = (fileData = []) => {
         rowHeaders: true,
         width: "100%",
         height: "auto",
-        stretchH: "all", // Auto-adjust column width
-        contextMenu: true, // Enable right-click menu
+        stretchH: "all",
+        contextMenu: true,
         licenseKey: "non-commercial-and-evaluation",
       });
     }
@@ -53,10 +53,10 @@ const HandsontableComp = (fileData = []) => {
   }, [data]);
 
   return (
-    <div className="w-full p-4 bg-white border shadow-md mt-6 ">
+    <div className="w-full p-4 bg-white border shadow-md mt-2 ">
       <div
         ref={hotRef}
-        className="h-full w-full border rounded-sm shadow-sm bg-gray-50 overflow-auto"
+        className="h-full w-[60%] border rounded-sm shadow-sm bg-gray-50 overflow-x-scroll"
       ></div>
     </div>
   );
