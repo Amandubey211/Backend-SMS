@@ -14,14 +14,11 @@ export const getData = async (endpoint, params = {}) => {
 
 // POST request
 export const postData = async (endpoint, data) => {
-  console.log("endpoint", endpoint);
   try {
     const response = await apiService.post(endpoint, data);
-    console.log("asdasas post data", response);
-
     return response.data;
   } catch (error) {
-    console.log("Error posting data:", error);
+    // console.log("Error posting data:", error);
   }
 };
 

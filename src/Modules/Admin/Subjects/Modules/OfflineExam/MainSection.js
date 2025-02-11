@@ -68,7 +68,7 @@ const MainSection = () => {
                       exampType={item.examType}
                       examName={item.examName}
                       mode={item.mode}
-                      semester={item.semester}
+                      semester="Semester I"
                       startDate={formatDate(item.startDate)}
                       endDate={formatDate(item.endDate)}
                       students={item.students}
