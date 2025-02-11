@@ -691,8 +691,18 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // {
+    //   path: "/class/:cid/:sid/offline_exam",
+    //   element: (
+    //     <ProtectRoute
+    //       Component={Discussion}
+    //       allowedRoles={["admin", "teacher"]}
+    //     />
+    //   ),
+    //   errorElement: <Error />,
+    // },
     {
-      path: "/class/:cid/:sid/offline_exam",
+      path: "/class/:cid/:sid/discussions",
       element: (
         <ProtectRoute
           Component={Discussion}
