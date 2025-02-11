@@ -47,7 +47,7 @@ const ButtonGroup = ({
           </Tooltip>
         </ProtectedAction>
       </div>
-      {role === "admin" && (
+    
         <div className="flex justify-between items-center gap-2">
           <ProtectedAction>
             <Tooltip title={t("Add New Subject")}>
@@ -62,8 +62,6 @@ const ButtonGroup = ({
               </button>
             </Tooltip>
           </ProtectedAction>
-          {role === "admin" && (
-            <ProtectedAction>
               <Tooltip title={t("Manage Semester")}>
                 <button
                   onClick={onViewSemester}
@@ -73,10 +71,8 @@ const ButtonGroup = ({
                   {t("Manage Semester")}
                 </button>
               </Tooltip>
-            </ProtectedAction>
-          )}
         </div>
-      )}
+    
     </div>
   );
 };

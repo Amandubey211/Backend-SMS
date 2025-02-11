@@ -13,7 +13,7 @@ export const useForgotPassword = () => {
       toast.success('Check your email to reset your password!');
       return response.data;
     } catch (error) {
-      toast.error(error.message || 'Failed to send reset email.');
+      
       throw error;
     } finally {
       setLoading(false);
