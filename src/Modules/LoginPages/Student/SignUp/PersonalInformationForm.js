@@ -1,12 +1,11 @@
-// PersonalInformationForm.js
 import React, { useEffect } from "react";
 import SelectInput from "./SelectInput";
 import TextInput from "./TextInput";
 import RadioGroup from "./RadioGroup";
 import ImageUpload from "../../../Admin/Addmission/Components/ImageUpload";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import useGetAllSchools from "../../../../Hooks/CommonHooks/useGetAllSchool";
+import useGetClassesBySchool from "../../../../Hooks/CommonHooks/useGetClassesBySchool";
+import { FaExclamationCircle } from "react-icons/fa"; // Importing the icon
 
 const PersonalInformationForm = ({
   studentDetails,
@@ -18,15 +17,36 @@ const PersonalInformationForm = ({
   inputRefs,
 }) => {
   const { fetchSchools, schoolList } = useGetAllSchools();
-  const { classes: classList, error } = useSelector(
-    (store) => store.admin.class
-  );
+  const { classList } = useGetClassesBySchool(studentDetails.schoolId);
+
+  // Prepare options for the class select input.
+  // If no classes are found, show a placeholder with an icon.
+  const classOptions =
+    classList && classList.length > 0
+      ? classList.map((classItem) => ({
+          value: classItem._id,
+          label: classItem.className,
+        }))
+      : [
+          {
+            value: "",
+            label: (
+              <span className="flex items-center">
+                <FaExclamationCircle className="mr-1" />
+                No Class Available
+              </span>
+            ),
+            disabled: true,
+          },
+        ];
+
   const handleClearImage = () => {
     setImagePreview(null);
     handleChange({
       target: { name: "profile", value: null },
     }); // Clear profile in studentDetails
   };
+
   const religionOptions = [
     { value: "Islam", label: "Islam" },
     { value: "Christianity", label: "Christianity" },
@@ -36,26 +56,15 @@ const PersonalInformationForm = ({
     { value: "Sikhism", label: "Sikhism" },
     { value: "Other", label: "Other" },
   ];
-  const dispatch = useDispatch();
+
   useEffect(() => {
     fetchSchools();
   }, []);
-  useEffect(() => {
-    // Only fetch classes when schoolId is defined
-    if (studentDetails.schoolId) {
-      dispatch(fetchAllClasses());
-    }
-  }, [studentDetails.schoolId]);
-  // console.log("Validation Errors:", validationErrors);
 
   return (
     <>
       <div className="flex space-x-7">
-        {" "}
-        {/* Reduces spacing between inputs and image upload */}
         <div className="flex flex-col w-full space-y-2 gap-5">
-          {" "}
-          {/* Full width for stacked SelectInputs */}
           <SelectInput
             ref={(el) => (inputRefs.current["schoolId"] = el)}
             label="School*"
@@ -64,27 +73,25 @@ const PersonalInformationForm = ({
             onChange={handleChange}
             options={schoolList?.map((school) => ({
               value: school._id,
-              label: `${school?.nameOfSchool || "Unknown School"}${
-                school?.branchName ? `, Branch: ${school.branchName}` : ""
-              }${school?.city ? `, City: ${school.city}` : ""}`,
+              label: `School: ${school?.nameOfSchool || "Unknown"} | Branch: ${
+                school?.branchName || "N/A"
+              }`,
             }))}
             error={validationErrors.schoolId}
           />
+
           <SelectInput
             ref={(el) => (inputRefs.current["applyingClass"] = el)}
             label="Applying Class*"
             name="applyingClass"
             value={studentDetails.applyingClass}
             onChange={handleChange}
-            options={classList?.map((classItem) => ({
-              value: classItem._id,
-              label: classItem.className,
-            }))}
+            options={classOptions}
             error={validationErrors.applyingClass}
             disabled={!studentDetails.schoolId}
           />
-        </div>{" "}
-        <div className="w-1/2 flex  flex-col justify-center">
+        </div>
+        <div className="w-1/2 flex flex-col justify-center">
           <ImageUpload
             imagePreview={imagePreview}
             handleImageChange={handleImageChange}

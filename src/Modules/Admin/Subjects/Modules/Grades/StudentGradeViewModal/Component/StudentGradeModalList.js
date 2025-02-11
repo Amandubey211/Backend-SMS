@@ -5,8 +5,6 @@ import { motion } from "framer-motion";
 // ------------------
 // TableSkeleton Component
 // ------------------
-
-// Custom animated row using Framer Motion
 const MotionTr = motion.tr;
 const MotionTableRow = (props) => (
   <MotionTr
@@ -17,8 +15,6 @@ const MotionTableRow = (props) => (
   />
 );
 
-// You can override default row rendering with our animated row if using antd Table.
-// (For this example, we use a custom layout for shimmer rows.)
 const TableSkeleton = () => {
   const skeletonRows = 10;
   const rowStyle = {
@@ -32,7 +28,6 @@ const TableSkeleton = () => {
     <div style={{ padding: 16, background: "#fff" }}>
       {Array.from({ length: skeletonRows }).map((_, index) => (
         <div key={index} style={rowStyle}>
-          {/* Name Column (flex: 2) */}
           <div style={{ flex: 2, display: "flex", alignItems: "center" }}>
             <Skeleton.Avatar
               active
@@ -42,23 +37,18 @@ const TableSkeleton = () => {
             />
             <Skeleton.Input active size="small" style={{ width: 80 }} />
           </div>
-          {/* Module Column (if online) – we assume flex: 1 */}
           <div style={{ flex: 1, padding: "0 8px" }}>
             <Skeleton.Input active size="small" style={{ width: "100%" }} />
           </div>
-          {/* Due Date Column */}
           <div style={{ flex: 1, padding: "0 8px" }}>
             <Skeleton.Input active size="small" style={{ width: "100%" }} />
           </div>
-          {/* Submitted Date Column */}
           <div style={{ flex: 1, padding: "0 8px" }}>
             <Skeleton.Input active size="small" style={{ width: "100%" }} />
           </div>
-          {/* Status Column */}
           <div style={{ flex: 1, padding: "0 8px" }}>
             <Skeleton.Input active size="small" style={{ width: "100%" }} />
           </div>
-          {/* Score Column */}
           <div style={{ flex: 1, padding: "0 8px" }}>
             <Skeleton.Input active size="small" style={{ width: "100%" }} />
           </div>
@@ -117,11 +107,17 @@ const StudentModalGradeList = ({
     return true;
   });
 
-  // Apply grade mode filtering.
+  // Filter based on mode.
   if (filters.gradeMode === "offline") {
-    filteredData = filteredData?.filter((item) => item.type === "offline_exam");
+    filteredData = filteredData?.filter((item) => item.mode === "offline");
+    // Apply search filter for offline mode.
+    if (filters.search) {
+      filteredData = filteredData.filter((item) =>
+        item.Name.toLowerCase().includes(filters.search.toLowerCase())
+      );
+    }
   } else {
-    filteredData = filteredData?.filter((item) => item.type !== "offline_exam");
+    filteredData = filteredData?.filter((item) => item.mode === "online");
   }
 
   // If table is loading, show the TableSkeleton (shimmer UI)
@@ -129,7 +125,7 @@ const StudentModalGradeList = ({
     return <TableSkeleton />;
   }
 
-  // If no data is found, display a polished Empty UI with a Reset Filters button.
+  // If no data is found, display an Empty UI with a Reset Filters button.
   if (!filteredData || filteredData.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-10">
@@ -208,9 +204,7 @@ const StudentModalGradeList = ({
                 {getFormattedStatus(item.status, filters.gradeMode)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {item.type === "offline_exam"
-                  ? `${item.score} / ${item.maxMarks}`
-                  : `${item.score} / N/A`}
+                {item.score} / {item.maxMarks}
               </td>
             </tr>
           ))}

@@ -7,18 +7,17 @@ const useGetAllSchools = () => {
   const fetchSchools = async () => {
     try {
       const response = await getData(`/student_diwan/get_schools`);
-     return setSchoolList(response.schools);
+      return setSchoolList(response.schools);
     } catch (error) {
       console.error("Error fetching schools:", error);
     }
   };
 
   useEffect(() => {
-    
     fetchSchools();
   }, []);
 
-  return { schoolList,fetchSchools };
+  return { schoolList, fetchSchools };
 };
 
 export default useGetAllSchools;

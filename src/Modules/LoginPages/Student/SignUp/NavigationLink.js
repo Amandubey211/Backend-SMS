@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { setStep } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 const Navigation = () => {
-  const step = useSelector((store) => store.common.auth.step);
+  const step = useSelector((store) => store.common.user.step);
   const dispatch = useDispatch();
   return (
     <div className="flex justify-between items-center px-1">

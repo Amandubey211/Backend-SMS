@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { Skeleton, Avatar } from "antd";
 import { useParams } from "react-router-dom";
 import { debounce } from "lodash";
+
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import { fetchStudentGrades } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
@@ -11,11 +12,23 @@ import StudentGradeModalFilterHeader from "./Component/StudentGradeModalFilterHe
 import StudentModalGradeList from "./Component/StudentGradeModalList";
 import StudentGradeSummary from "./Component/StudentGradeSummary";
 
+/**
+ * StudentGradeModal
+ *
+ * This modal displays the detailed grades for a single student.
+ * - `isOpen` controls the visibility of the modal.
+ * - `onClose` is a callback to close the modal.
+ * - `student` is the object of the currently selected student,
+ *   expected to have at least `studentId`.
+ */
 const StudentGradeModal = ({ isOpen, onClose, student }) => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
 
-  // Default filters: online mode is the default.
+  // Keep the selected student's ID in local state so we don't lose it on re-renders
+  const [localStudentId, setLocalStudentId] = useState(null);
+
+  // Default filter values
   const defaultFilters = {
     gradeMode: "online", // "online" or "offline"
     arrangeBy: "",
@@ -23,20 +36,33 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     chapter: "",
     status: "",
     subject: "",
+    search: "",
   };
 
+  // Manage filters
   const [filters, setFilters] = useState(defaultFilters);
 
-  // Track if this is the very first load.
+  // Track the first data load to show a full-screen skeleton
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Function to fetch student grades.
+  // Whenever we get a new `student` prop, store their ID
+  useEffect(() => {
+    if (student?.studentId) {
+      setLocalStudentId(student.studentId);
+    }
+  }, [student]);
+
+  /**
+   * Fetch the student's grades from the backend,
+   * but only if we have a valid localStudentId.
+   */
   const getStudentGrades = async (params) => {
+    if (!localStudentId) return; // skip if we don't have an ID
     try {
-      dispatch(
+      await dispatch(
         fetchStudentGrades({
           params,
-          studentId: student?.studentId || student?._id,
+          studentId: localStudentId,
           studentClassId: cid,
         })
       );
@@ -45,69 +71,99 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     }
   };
 
-  // Create a debounced version of getStudentGrades.
+  /**
+   * Debounce the fetch to avoid calling it too frequently
+   * when users quickly toggle filters.
+   */
   const debouncedGetStudentGrades = useMemo(
     () =>
       debounce((params) => {
         getStudentGrades(params);
       }, 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [localStudentId] // must re-create if student changes
   );
 
-  // Handle filter changes (including gradeMode).
+  /**
+   * Handle changes to filters. If user selects "offline" mode,
+   * reset all online-only filters. Then build the new query params
+   * and trigger the fetch (debounced).
+   */
   const handleFilterChange = (name, value) => {
-    try {
-      let newFilters = { ...filters };
-      if (name === "gradeMode") {
-        newFilters = { ...newFilters, gradeMode: value };
-        // When offline is selected, clear online-specific filters.
-        if (value === "offline") {
-          newFilters = {
-            ...newFilters,
-            arrangeBy: "",
-            module: "",
-            chapter: "",
-            status: "",
-            subject: "",
-          };
-        }
-      } else {
-        newFilters = { ...newFilters, [name]: value };
-      }
-      setFilters(newFilters);
+    let newFilters = { ...filters };
 
-      // Build query parameters.
-      const params = {};
-      if (sid) params.subjectId = sid;
-      if (name === "subject") params.subjectId = value;
-      if (name === "module") params.moduleId = value;
-      if (name === "chapter") params.chapterId = value;
-      if (name === "arrangeBy") params.arrangeBy = value;
-      // IMPORTANT: For offline mode, do not include the status filter in the query.
-      if (name === "status" && newFilters.gradeMode !== "offline") {
-        params.status = value;
+    if (name === "gradeMode") {
+      newFilters.gradeMode = value;
+      // Switching to offline: clear out online-specific filters
+      if (value === "offline") {
+        newFilters.arrangeBy = "";
+        newFilters.module = "";
+        newFilters.chapter = "";
+        newFilters.status = "";
+        newFilters.subject = "";
+        newFilters.search = "";
       }
-      // Set type based on grade mode.
-      params.type =
-        newFilters.gradeMode === "offline" ? "offline_exam" : "online";
+    } else {
+      newFilters[name] = value;
+    }
+    setFilters(newFilters);
 
+    // Construct query params for fetch
+    const params = {};
+
+    // If the route param sid is available, use it (unless user changes subject)
+    if (sid) params.subjectId = sid;
+    // For example, if user changes subject in the filter
+    if (name === "subject") {
+      params.subjectId = value;
+    }
+    if (name === "module") {
+      params.moduleId = value;
+    }
+    if (name === "chapter") {
+      params.chapterId = value;
+    }
+    if (name === "arrangeBy") {
+      params.arrangeBy = value;
+    }
+
+    // If we’re in "online" mode, we can filter by status
+    if (newFilters.gradeMode === "online" && newFilters.status) {
+      params.status = newFilters.status;
+    }
+
+    // If we’re in "offline" mode, we can add a "search" param
+    if (newFilters.gradeMode === "offline" && newFilters.search) {
+      params.search = newFilters.search;
+    }
+
+    // Always set the current mode
+    params.mode = newFilters.gradeMode;
+
+    // Trigger the debounced API call
+    if (localStudentId) {
       debouncedGetStudentGrades(params);
-    } catch (error) {
-      console.error("Error handling filter change:", error);
     }
   };
 
-  // Reset filters to default.
+  /**
+   * Reset all filters to their default values and
+   * fetch fresh data in "online" mode.
+   */
   const handleResetFilters = useCallback(() => {
     setFilters(defaultFilters);
     const params = {};
     if (sid) params.subjectId = sid;
-    params.type = "online"; // default mode is online
-    debouncedGetStudentGrades(params);
-  }, [sid, debouncedGetStudentGrades, defaultFilters]);
+    // default is "online"
+    params.mode = "online";
 
-  // Manage body scroll.
+    if (localStudentId) {
+      debouncedGetStudentGrades(params);
+    }
+  }, [sid, localStudentId, debouncedGetStudentGrades]);
+
+  /**
+   * Lock scroll on the background when the modal is open.
+   */
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("overflow-hidden");
@@ -119,11 +175,11 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     };
   }, [isOpen]);
 
-  // Retrieve grade data from Redux store.
+  // Grab the grades data from Redux
   const { grades, loading } =
     useSelector((store) => store.admin.all_students) || {};
 
-  // Mark initial load complete once data is loaded.
+  // Mark the initial load done once we have fetched data at least once
   useEffect(() => {
     if (!loading && isInitialLoad) {
       setIsInitialLoad(false);
@@ -133,7 +189,10 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
   return (
     <>
       {isInitialLoad ? (
-        // Full-screen skeleton UI on initial load.
+        /**
+         * On the very first load, show a large skeleton screen
+         * so we don't show a half-loaded UI
+         */
         <div
           className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
             isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -144,105 +203,13 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
               isOpen ? "translate-y-0" : "translate-y-full"
             }`}
           >
-            <div className="space-y-6">
-              <div className="flex justify-between items-center border-b pb-2">
-                <Skeleton.Input active style={{ width: "30%", height: 24 }} />
-                <Skeleton.Button
-                  active
-                  style={{ width: 40, height: 40 }}
-                  shape="circle"
-                />
-              </div>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                    <Skeleton.Input
-                      active
-                      style={{ width: "100%", height: 32 }}
-                    />
-                    <Skeleton.Input
-                      active
-                      style={{ width: "100%", height: 32 }}
-                    />
-                    <Skeleton.Input
-                      active
-                      style={{ width: "100%", height: 32 }}
-                    />
-                    <Skeleton.Input
-                      active
-                      style={{ width: "100%", height: 32 }}
-                    />
-                  </div>
-                  <div className="flex justify-between items-center bg-gray-100 px-4 py-2">
-                    {Array.from({ length: 6 }).map((_, idx) => (
-                      <Skeleton.Input
-                        key={idx}
-                        active
-                        style={{
-                          width: "15%",
-                          height: 16,
-                          marginRight: idx < 5 ? 8 : 0,
-                        }}
-                      />
-                    ))}
-                  </div>
-                  <div className="space-y-2">
-                    {Array.from({ length: 5 }).map((_, index) => (
-                      <div
-                        key={index}
-                        className="flex justify-between items-center border-b px-4 py-2"
-                      >
-                        {Array.from({ length: 6 }).map((_, idx) => (
-                          <Skeleton.Input
-                            key={idx}
-                            active
-                            style={{
-                              width: "15%",
-                              height: 16,
-                              marginRight: idx < 5 ? 8 : 0,
-                            }}
-                          />
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="w-full md:w-1/4 border-l pl-4">
-                  <div className="flex flex-col items-center border-b pb-4">
-                    <Avatar size={96} style={{ backgroundColor: "#f0f0f0" }} />
-                    <div className="mt-4">
-                      <Skeleton.Input
-                        active
-                        style={{ width: 120, height: 24 }}
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    {Array.from({ length: 5 }).map((_, idx) => (
-                      <Skeleton.Input
-                        key={idx}
-                        active
-                        style={{ width: "100%", height: 20 }}
-                      />
-                    ))}
-                    <div className="flex justify-between items-center border-t pt-2">
-                      <Skeleton.Input
-                        active
-                        style={{ width: "40%", height: 24 }}
-                      />
-                      <Skeleton.Input
-                        active
-                        style={{ width: "30%", height: 24 }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <SkeletonLoadingUI />
           </div>
         </div>
       ) : (
-        // Normal UI after initial load.
+        /**
+         * After the first load, show the real UI
+         */
         <div
           className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
             isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
@@ -253,6 +220,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
               isOpen ? "translate-y-0" : "translate-y-full"
             }`}
           >
+            {/* Header */}
             <div className="flex justify-between items-center p-1 border-b">
               <h2 className="text-lg font-semibold">Total Grade</h2>
               <button
@@ -262,15 +230,18 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                 &times;
               </button>
             </div>
+
             <ProtectedSection
               requiredPermission={PERMISSIONS.GRADES_OF_ONE_STUDENT}
               title={"Student Grades"}
             >
               <div className="flex w-full">
+                {/* Filter Column */}
                 <div className="flex-1">
                   <StudentGradeModalFilterHeader
                     filters={filters}
                     onFilterChange={handleFilterChange}
+                    onResetFilters={handleResetFilters}
                   />
                   <div className="h-96 overflow-y-scroll no-scrollbar">
                     <StudentModalGradeList
@@ -281,6 +252,8 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                     />
                   </div>
                 </div>
+
+                {/* Summary Column */}
                 <StudentGradeSummary
                   grades={grades}
                   studentData={grades?.student}
@@ -291,6 +264,33 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
         </div>
       )}
     </>
+  );
+};
+
+/**
+ * A simple skeleton placeholder UI used during the initial load.
+ */
+const SkeletonLoadingUI = () => {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center border-b pb-2">
+        <Skeleton.Input active style={{ width: "30%", height: 24 }} />
+        <Skeleton.Button
+          active
+          style={{ width: 40, height: 40 }}
+          shape="circle"
+        />
+      </div>
+      <div className="flex flex-col md:flex-row gap-4 mt-4">
+        <div className="flex-1">
+          <Skeleton paragraph={{ rows: 8 }} active />
+        </div>
+        <div className="w-full md:w-1/4 border-l pl-4">
+          <Skeleton.Avatar active size={96} shape="circle" />
+          <Skeleton paragraph={{ rows: 6 }} active className="mt-4" />
+        </div>
+      </div>
+    </div>
   );
 };
 
