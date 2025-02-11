@@ -3,6 +3,7 @@ import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import {
+  customRequest,
   deleteData,
   getData,
   postData,
@@ -21,7 +22,6 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const response = await getData(
         `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}`
       );
-      console.log(response);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -51,15 +51,19 @@ export const createOfflineExam = createAsyncThunk(
 
 export const UploadOfflineExamSheet = createAsyncThunk(
   "subject/offline_upload_exam_sheet",
-  async ({ payload }, { rejectWithValue, dispatch, getState }) => {
+  async (formData, { rejectWithValue, dispatch, getState }) => {
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
 
-      const response = await postData(
+      const response = await customRequest(
+        "post",
         `${getRole}/exam/uploadExcel?say=${say}`,
-        payload
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
       );
 
       return response;

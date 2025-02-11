@@ -241,7 +241,7 @@ const SideMenubar = () => {
       {/* Menu Items */}
       <div className="flex-grow overflow-y-auto no-scrollbar">
         {isOpen && (
-          <h2 className="text-gray-500 my-2 text-sm uppercase">{t("MEN")}</h2>
+          <h2 className="text-gray-500 my-2 text-sm uppercase">{t("MENU")}</h2>
         )}
 
         <ul className={`space-y-1 ${!isOpen && "mt-2"}`}>

@@ -1,8 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { useState } from "react";
-import data from "../OfflineExam/data.json";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { FaClipboardList } from "react-icons/fa";
 import Spinner from "../../../../../Components/Common/Spinner";
@@ -10,11 +9,27 @@ import OfflineExamCard from "./Components/OfflineExamCard";
 import CreateButton from "./Components/CreateButton";
 import Header from "./Components/Header";
 import UploadAndFilter from "./Components/UploadAndFilter";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllOfflineExam } from "../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
+import { formatDate } from "../../../../../Utils/helperFunctions";
 
 const MainSection = () => {
+  const { sid, cid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-  // const [filters, setFilters] = useState({ examType: "", startDate: "" });
-  const loading = false;
+  const navigate = useNavigate();
+
+  const { offlineExamData, loading } = useSelector(
+    (store) => store.admin.offlineExam
+  );
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!loading && cid && sid) {
+      dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
+    }
+  }, [cid, sid, dispatch]);
 
   return (
     <div className="flex h-full w-full">
@@ -24,38 +39,48 @@ const MainSection = () => {
           {/* Left Section */}
           <div className="w-[65%] border-l">
             <Header
-              data={data}
+              data={offlineExamData.data}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
             />
-
             <ul className="border-t mt-4 mx-4"></ul>
-
             {/* Offline Exam Card */}
             {loading ? (
               <Spinner />
-            ) : data?.length ? (
-              <div>
-                {data?.map((item, index) => (
-                  <OfflineExamCard
-                    key={index}
-                    exampType={item.examType}
-                    examName={item.examName}
-                    mode={item.mode}
-                    semester={item.semester}
-                    startDate={item.startDate}
-                    endDate={item.endDate}
-                    students={item.students}
-                    maxScore={item.students[0]?.maxMarks}
-                  />
+            ) : offlineExamData.data?.length ? (
+              <div className="h-[calc(100vh-150px)] overflow-y-auto">
+                {offlineExamData.data?.map((item, index) => (
+                  <div
+                    style={{ cursor: "pointer" }}
+                    onClick={() =>
+                      navigate(`/class/${cid}/${sid}/offline_exam/view`, {
+                        state: {
+                          examName: item.examName,
+                          students: item.students,
+                          examType: item.examType,
+                          startDate: formatDate(item.startDate),
+                        },
+                      })
+                    }
+                  >
+                    <OfflineExamCard
+                      key={index}
+                      exampType={item.examType}
+                      examName={item.examName}
+                      mode={item.mode}
+                      semester="Semester I"
+                      startDate={formatDate(item.startDate)}
+                      endDate={formatDate(item.endDate)}
+                      students={item.students}
+                      maxScore={item.students[0]?.maxMarks}
+                    />
+                  </div>
                 ))}
               </div>
             ) : (
               <NoDataFound
                 title="Offline Exam"
-                desc={
-                  "Click 'Add New Rubric' to define your evaluation criteria."
-                }
+                desc={"No Offline Exam Found !"}
                 icon={FaClipboardList}
                 iconColor="text-blue-500"
                 textColor="text-gray-700"
@@ -63,12 +88,10 @@ const MainSection = () => {
               />
             )}
           </div>
-
           {/* Right Section */}
           <UploadAndFilter />
         </div>
       </ProtectedSection>
-
       {/* Floating Add Exam Button */}
       <CreateButton />
     </div>
