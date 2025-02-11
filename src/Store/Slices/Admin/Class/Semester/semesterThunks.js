@@ -21,7 +21,7 @@ export const fetchSemestersByClass = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const response = await getData(
-        `/${getRole}/get-semester?classId=${classId}&say=${say}`
+        `/admin/get-semester?classId=${classId}&say=${say}`
       );
       if (response && response.success) {
         return response.data;

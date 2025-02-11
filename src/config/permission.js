@@ -36,6 +36,10 @@ export const PERMISSIONS = {
   //  commom
   GET_ALL_ISSUE_BOOKS: "Get All Issued Books",
   GET_ALL_BOOKS: "Get All Books",
+  //semeseter 
+  ADD_SEMESTER:"Create New Semester",
+  UPDATE_SEMESTER:"Update Semester",
+  DELETE_SEMESTER:"Delete Semester",
 
   // Librarian
   //Books

@@ -30,6 +30,8 @@ import {
 } from "../../../../Store/Slices/Admin/Class/Semester/semesterThunks";
 // Import the setSelectedSemester action from the common user slice
 import { setSelectedSemester } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import { PERMISSIONS } from "../../../../config/permission";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const pinkColor = "#EC407A";
 const purpleColor = "#AB47BC";
@@ -340,6 +342,9 @@ const SemesterManagement = ({ classId }) => {
       key: "actions",
       render: (_, record) => (
         <Space size="middle">
+          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_SEMESTER}>
+
+         
           <Tooltip title="Edit Semester">
             <Button
               type="primary"
@@ -349,6 +354,10 @@ const SemesterManagement = ({ classId }) => {
               aria-label={`Edit semester ${record.title}`}
             />
           </Tooltip>
+          </ProtectedAction>
+          <ProtectedAction requiredPermission={PERMISSIONS.DELETE_SEMESTER}>
+
+
           <Tooltip title="Delete Semester">
             <Button
               danger
@@ -357,6 +366,7 @@ const SemesterManagement = ({ classId }) => {
               aria-label={`Delete semester ${record.title}`}
             />
           </Tooltip>
+          </ProtectedAction>
         </Space>
       ),
     },
@@ -498,6 +508,10 @@ const SemesterManagement = ({ classId }) => {
                       editingSemester ? "Update Semester" : "Create Semester"
                     }
                   >
+                    <ProtectedAction requiredPermission={editingSemester ? PERMISSIONS.ADD_SEMESTER : PERMISSIONS.UPDATE_SEMESTER}>
+
+
+                   
                     <Button
                       type="primary"
                       htmlType="submit"
@@ -509,6 +523,7 @@ const SemesterManagement = ({ classId }) => {
                     >
                       {editingSemester ? "Update Semester" : "Create Semester"}
                     </Button>
+                    </ProtectedAction>
                   </Tooltip>
                 </Space>
               </Form.Item>
