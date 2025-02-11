@@ -3,33 +3,40 @@ import { getData, postData, putData, deleteData } from "../../../../services/api
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 import { getUserRole } from "../../../../Utils/getRoles";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
+import { handleError } from "../../Common/Alerts/errorhandling.action";
 
 
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
-  async ({ page = 1, limit = 10, search = "" }, { rejectWithValue, getState }) => {
+  async ({ page = 1, limit = 10, search = "" }, { dispatch, rejectWithValue, getState }) => {
+    const say = getAY(); // Ensure academic year is retrieved
+    const getRole = getUserRole(getState);
+    dispatch(setShowError(false));
+
     try {
-      const getRole = getUserRole(getState);
-      // Manually construct the query string to match the backend's expectation
+      // Construct query parameters properly
       const query = new URLSearchParams({
         page,
         limit,
         search,
       }).toString();
 
-      const response = await getData(`/${getRole}/revenue/all/receipt?${query}`);
+      const response = await getData(`/${getRole}/revenue/all/receipt?say=${say}&${query}`);
 
       if (response?.data) {
-        const { data, pagination } = response;
-        return { receipts: data, pagination };
+        return { receipts: response.data, pagination: response.pagination }; // Ensure it follows the old format
       } else {
+        toast.error(response?.message || "Failed to fetch receipts.");
         return rejectWithValue(response?.message || "Failed to fetch receipts.");
       }
     } catch (error) {
-      return rejectWithValue(error.message || "Error fetching receipts.");
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
+
 
 
 // Create a receipt

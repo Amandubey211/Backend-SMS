@@ -115,19 +115,21 @@ const PenalityandAdjustmentList = () => {
       toast.error("Invalid adjustment ID.");
       return;
     }
-
+  
     console.log("Attempting to send email for adjustment:", record);
-
+  
+    // Map the record to the required email data structure
+    const emailData = mapRecordToEmailData(record);
+  
     try {
       const result = await dispatch(
         sendEmail({
           id: record._id,
           type: "adjustment",
+          data: emailData, // Pass the mapped data as request body
         })
       );
-
-      console.log("Send email result:", result);
-
+  
       if (sendEmail.fulfilled.match(result)) {
         toast.success("Email sent successfully!");
       } else {
@@ -138,6 +140,7 @@ const PenalityandAdjustmentList = () => {
       toast.error("Error sending email.");
     }
   };
+  
 
   const actionMenu = (record) => (
     <Menu>
@@ -446,6 +449,47 @@ const PenalityandAdjustmentList = () => {
     },
   ];
 
+  const mapRecordToEmailData = (record) => {
+    return {
+      // School details (modify these keys as per your actual record structure)
+      nameOfSchool: record.schoolName || "N/A",
+      address: record.schoolAddress || "N/A",
+      branchName: record.branchName || "N/A",
+      city: record.city || "N/A",
+      // Bill-to details (using invoiceId.receiver from the adjustment record)
+      finalReceiver: {
+        name: record.invoiceId?.receiver?.name || "N/A",
+        email: record.invoiceId?.receiver?.email || "N/A",
+        address: record.invoiceId?.receiver?.address || "N/A",
+        phone: record.invoiceId?.receiver?.contact || "N/A",
+      },
+      // Invoice details
+      returnInvoiceNumber: record.returnInvoiceNumber || "N/A",
+      invoiceNumber: record.invoiceId?.invoiceNumber || "N/A",
+      date: record.adjustedAt
+        ? new Date(record.adjustedAt).toLocaleDateString()
+        : "N/A",
+      // Payment details (set defaults if not available)
+      paymentMethod: record.paymentMethod || "N/A",
+      paymentStatus: record.paymentStatus || "N/A",
+      // Line items for the table in the template
+      lineItems: record.lineItems || [],
+      // Summary amounts (use appropriate fields)
+      totalAmount: record.adjustmentTotal || 0,
+      tax: record.tax || 0,
+      penalty: record.penalty || 0,
+      discount: record.discount || 0,
+      finalAmount: record.adjustmentAmount || 0,
+      // Additional details
+      remark: record.remark || "",
+      schoolId: record.schoolId || "",
+      // This field is used to get the recipient email in the backend
+      receiver: {
+        email: record.invoiceId?.receiver?.email || "N/A",
+      },
+    };
+  };
+  
   // Transform adjustments data to table dataSource
   const dataSource = Array.isArray(adjustmentData)
     ? adjustmentData.map((adjustment) => ({
