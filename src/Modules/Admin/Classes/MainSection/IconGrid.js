@@ -7,7 +7,7 @@ import { deleteIcon } from "../../../../Store/Slices/Admin/Class/actions/iconThu
 
 const IconGrid = ({ activeIconId, onEdit }) => {
   const { icons, selectedIcon } = useSelector(
-    (state) => state.admin.classIcons
+    (state) => state.admin?.classIcons
   );
   const dispatch = useDispatch();
 
@@ -25,7 +25,7 @@ const IconGrid = ({ activeIconId, onEdit }) => {
     <div className="flex justify-start gap-3 flex-wrap px-3">
       {icons?.map((icon) => (
         <motion.div
-          key={icon._id}
+          key={icon?._id}
           className="relative rounded-lg transition-transform duration-300"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -34,15 +34,15 @@ const IconGrid = ({ activeIconId, onEdit }) => {
           <button
             type="button"
             className={`h-16 w-16 rounded-lg overflow-hidden ${
-              activeIconId == icon._id || selectedIcon?._id == icon._id
+              activeIconId == icon?._id || selectedIcon?._id == icon?._id
                 ? "border-2 border-purple-500 scale-125 mx-2"
                 : "border border-gray-300"
             }`}
-            aria-label={`Select icon ${icon.name}`}
+            aria-label={`Select icon ${icon?.name}`}
           >
             <img
-              src={icon.imageLink}
-              alt={`Icon ${icon.name}`}
+              src={icon?.imageLink}
+              alt={`Icon ${icon?.name}`}
               className="w-full h-full object-cover rounded-lg"
             />
           </button>
@@ -58,7 +58,7 @@ const IconGrid = ({ activeIconId, onEdit }) => {
               <FaEdit size={14} />
             </motion.button>
             <motion.button
-              onClick={() => handleDeleteIcon(icon._id)}
+              onClick={() => handleDeleteIcon(icon?._id)}
               className="text-gray-700 hover:text-red-400"
               whileHover={{ scale: 1.2 }}
               aria-label="Delete Icon"
