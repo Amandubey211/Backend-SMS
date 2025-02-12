@@ -67,7 +67,6 @@ const CreateEditIconModal = ({ onClose, type }) => {
         );
       } else {
         await dispatch(createIcon(formData));
-        toast.success("Icon Created Successfully!");
       }
       dispatch(resetIconSelection());
       onClose();

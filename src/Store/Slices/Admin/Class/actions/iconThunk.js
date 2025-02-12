@@ -4,6 +4,7 @@ import {
   postData,
   putData,
   deleteData,
+  customRequest,
 } from "../../../../../services/apiEndpoints"; // Adjust the path as necessary
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
@@ -39,9 +40,10 @@ export const createIcon = createAsyncThunk(
     try {
       const endpoint = `/icons/createIcon?say=${say}`;
     
-      const response = await postData(endpoint, formData);
-
-      if (response && response.success) {
+      const response = await customRequest('POST',endpoint, formData,{
+        "Content-Type": "multipart/form-data",
+      });
+      if ( response.success) {
         toast.success("Icon created successfully!");
         dispatch(fetchAllIcons({ type: formData.get("type") })); // Refresh the icons list based on type
         return response.data; // Assuming 'data' contains the created icon
