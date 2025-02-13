@@ -1,7 +1,7 @@
 import React from "react";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { FaRegEdit } from "react-icons/fa";
-import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs"; // Importing the icons
+import { BsFillPatchCheckFill, BsPatchCheck } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
 import { getAY } from "../../../../Utils/academivYear";
 
@@ -11,8 +11,10 @@ const AcademicYearTable = ({
   handleEdit,
   handleDelete,
 }) => {
-  const { t } = useTranslation("admAcademicYear"); // Use the translation hook
-  const say = getAY()
+  const { t } = useTranslation("admAcademicYear");
+  const say = getAY();
+  // Check if there is only one academic year
+  const isSingle = academicYears?.length === 1;
 
   return (
     <div className="bg-white p-2 rounded-lg w-full">
@@ -35,12 +37,20 @@ const AcademicYearTable = ({
             <tr
               key={year._id}
               className={`${
-                say == year._id ? "bg-green-50 hover:bg-green-100" : "hover:bg-gray-50"
+                say === year._id
+                  ? "bg-green-50 hover:bg-green-100"
+                  : "hover:bg-gray-50"
               } border-b border-gray-200 transition duration-200`}
             >
               <td className="p-3 flex justify-center">
-                <button onClick={() => handleCheckboxChange(year)}>
-                  {say == year._id ? (
+                <button
+                  onClick={() => handleCheckboxChange(year)}
+                  disabled={isSingle} // Disable if only one academic year exists
+                  className={`${
+                    isSingle ? "cursor-not-allowed opacity-50" : ""
+                  }`}
+                >
+                  {say === year._id ? (
                     <BsFillPatchCheckFill className="text-green-500 text-2xl" />
                   ) : (
                     <BsPatchCheck className="text-gray-400 text-2xl" />

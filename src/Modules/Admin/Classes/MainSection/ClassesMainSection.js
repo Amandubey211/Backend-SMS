@@ -6,10 +6,7 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewClass from "./AddNewClass";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
-import {
-  fetchAllClasses,
-  fetchAllClassesDetails,
-} from "../../../../Store/Slices/Admin/Class/actions/classThunk";
+import { fetchAllClassesDetails } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
@@ -24,7 +21,6 @@ const ClassesMainSection = () => {
   const dispatch = useDispatch();
   const { classes, loading } = useSelector((store) => store.admin.class);
   const { role } = useSelector((store) => store.common.auth);
-  const { schoolName } = useSelector((store) => store.common.user.userDetails);
 
   // Handle the sidebar open for adding a new class (clear the form)
   const handleAddNewClass = () => {

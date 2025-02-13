@@ -52,7 +52,7 @@ export const createSemester = createAsyncThunk(
           "Content-Type": "application/json",
         }
       );
-      if (response && response.success) {
+      if (response.success) {
         toast.success("Semester created successfully");
         return response.data;
       }

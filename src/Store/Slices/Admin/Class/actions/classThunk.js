@@ -90,7 +90,7 @@ export const createClass = createAsyncThunk(
 
       if (response && response.success) {
         toast.success("Class created successfully!");
-        dispatch(fetchAllClasses()); // Refresh the classes list
+        dispatch(fetchAllClassesDetails()); // Refresh the classes list
         return response.data; // Assuming 'data' contains the created class
       }
     } catch (error) {
@@ -112,7 +112,7 @@ export const updateClass = createAsyncThunk(
 
       if (response && response.success) {
         toast.success("Class updated successfully!");
-        dispatch(fetchAllClasses()); // Refresh the classes list
+        dispatch(fetchAllClassesDetails()); // Refresh the classes list
         return response.data; // Assuming 'data' contains the updated class
       }
     } catch (error) {
