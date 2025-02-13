@@ -13,27 +13,45 @@ import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/icon
 
 const AddNewClass = ({ classData, isUpdate, onClose }) => {
   const { t } = useTranslation("admClass");
-
   const [newClassName, setNewClassName] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showClassNameError, setShowClassNameError] = useState(false);
+
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
   const { loading } = useSelector((store) => store.admin.class);
   const dispatch = useDispatch();
 
+  // Fetch icons on mount (for type "Class")
   useEffect(() => {
     dispatch(fetchAllIcons({ type: "Class" }));
+  }, [dispatch]);
 
+  // Preload data when editing a class
+  useEffect(() => {
     if (isUpdate && classData) {
       setNewClassName(classData.className);
-      dispatch(selectIcon(classData?.classIcons || null)); // Set initial icon selection if updating
+      if (classData.classIcons) {
+        // Determine the icon ID whether classIcons is stored as an object or a string
+        const classIconId =
+          typeof classData.classIcons === "object"
+            ? classData.classIcons._id
+            : classData.classIcons;
+        if (icons && icons.length > 0) {
+          const matchingIcon = icons.find((icon) => icon._id === classIconId);
+          dispatch(selectIcon(matchingIcon || classData.classIcons));
+        } else {
+          dispatch(selectIcon(classData.classIcons));
+        }
+      } else {
+        dispatch(selectIcon(null));
+      }
     } else {
       setNewClassName("");
       dispatch(selectIcon(null));
     }
-  }, [dispatch, isUpdate, classData]);
+  }, [dispatch, isUpdate, classData, icons]);
 
   const openModal = (icon = null) => {
     dispatch(selectIcon(icon));
@@ -42,23 +60,22 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    dispatch(selectIcon(null));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!newClassName) {
+    if (!newClassName.trim()) {
       setShowClassNameError(true);
       return;
     }
 
-    if (!selectedIcon) {
-      toast.error(t("Please select an icon."));
-      return;
+    // Build classDetails—storing the entire selected icon object (if available)
+    const classDetails = { className: newClassName.trim() };
+    if (selectedIcon) {
+      classDetails.classIcons = selectedIcon;
     }
 
-    const classDetails = { className: newClassName, classIcons: selectedIcon };
     try {
       if (isUpdate) {
         await dispatch(
@@ -105,13 +122,10 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
         </div>
 
         <div className="flex flex-col gap-2 mt-6 flex-grow">
-          <h3 className="font-semibold">{t("Class Icons")}</h3>
+          <h3 className="font-semibold">{t("Class Icons (Optional)")}</h3>
           <IconGrid
             icons={icons}
-            activeIconId={
-              selectedIcon ||
-              (classData?.classIcons && classData?.classIcons._id)
-            }
+            activeIcon={selectIcon?._id}
             onEdit={openModal}
           />
         </div>
@@ -132,7 +146,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
         </div>
       </form>
 
-      {isModalOpen && <CreateEditIconModal onClose={closeModal} />}
+      {isModalOpen && <CreateEditIconModal onClose={closeModal} type="Class" />}
     </div>
   );
 };

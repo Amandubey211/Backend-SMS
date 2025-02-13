@@ -8,73 +8,80 @@ import { DEFAULT_CLASS_ICONS } from "../../../../config/classIcons.config";
 
 const IconGrid = ({ activeIconId, onEdit }) => {
   const { icons, selectedIcon } = useSelector(
-    (state) => state.admin?.classIcons
+    (state) => state.admin.classIcons
   );
   const dispatch = useDispatch();
 
-  // Use default icons if none exist in state
+  // Use backend icons if available; otherwise fall back to defaults
   const effectiveIcons = icons && icons.length ? icons : DEFAULT_CLASS_ICONS;
 
-  // Handle icon selection
   const handleIconClick = (icon) => {
     dispatch(selectIcon(icon));
   };
 
-  // Handle icon deletion
-  const handleDeleteIcon = async (iconId) => {
-    await dispatch(deleteIcon(iconId));
+  const handleDeleteIcon = async (iconId, e) => {
+    e.stopPropagation();
+    await dispatch(deleteIcon({ iconId, type: "Class" }));
   };
 
   return (
     <div className="flex justify-start gap-3 flex-wrap px-3">
-      {effectiveIcons.map((icon) => (
-        <motion.div
-          key={icon?._id || icon.id}
-          className="relative rounded-lg transition-transform duration-300"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => handleIconClick(icon)}
-        >
-          <button
-            type="button"
-            className={`h-16 w-16 rounded-lg overflow-hidden ${
-              activeIconId === (icon?._id || icon.id) ||
-              selectedIcon?._id === (icon?._id || icon.id)
-                ? "border-2 border-purple-500 scale-125 mx-2"
-                : "border border-gray-300"
-            }`}
-            aria-label={`Select icon ${icon?.name}`}
+      {effectiveIcons?.map((icon) => {
+        const iconId = icon._id || icon.id;
+        const isActive =
+          activeIconId === iconId ||
+          (selectedIcon && (selectedIcon._id || selectedIcon.id) === iconId);
+        return (
+          <motion.div
+            key={iconId}
+            className="relative rounded-lg transition-transform duration-300"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => handleIconClick(icon)}
           >
-            <img
-              src={icon?.imageLink}
-              alt={`Icon ${icon?.name}`}
-              className="w-full h-full object-cover rounded-lg"
-            />
-          </button>
-
-          {/* Edit/Delete icons visible on hover */}
-          <div className="absolute top-1 right-1 flex gap-1 rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
-            <motion.button
-              onClick={() => onEdit(icon)}
-              className="text-gray-700 hover:text-green-400"
-              whileHover={{ scale: 1.2 }}
-              aria-label="Edit Icon"
+            <button
+              type="button"
+              className={`h-16 w-16 rounded-lg overflow-hidden ${
+                isActive
+                  ? "border-2 border-purple-500 scale-125 mx-2"
+                  : "border border-gray-300"
+              }`}
+              aria-label={`Select icon ${icon.name}`}
             >
-              <FaEdit size={14} />
-            </motion.button>
-            <motion.button
-              onClick={() => handleDeleteIcon(icon?._id || icon.id)}
-              className="text-gray-700 hover:text-red-400"
-              whileHover={{ scale: 1.2 }}
-              aria-label="Delete Icon"
-            >
-              <FaTrash size={14} />
-            </motion.button>
-          </div>
-        </motion.div>
-      ))}
+              <img
+                src={icon.imageLink}
+                alt={`Icon ${icon.name}`}
+                className="w-full h-full object-cover rounded-lg"
+              />
+            </button>
 
-      {/* Add New Icon Button */}
+            <div className="absolute top-1 right-1 flex gap-1 rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
+              <motion.button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit(icon);
+                }}
+                className="text-gray-700 hover:text-green-400"
+                whileHover={{ scale: 1.2 }}
+                aria-label="Edit Icon"
+              >
+                <FaEdit size={14} />
+              </motion.button>
+              <motion.button
+                type="button"
+                onClick={(e) => handleDeleteIcon(iconId, e)}
+                className="text-gray-700 hover:text-red-400"
+                whileHover={{ scale: 1.2 }}
+                aria-label="Delete Icon"
+              >
+                <FaTrash size={14} />
+              </motion.button>
+            </div>
+          </motion.div>
+        );
+      })}
+
       <motion.div
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
