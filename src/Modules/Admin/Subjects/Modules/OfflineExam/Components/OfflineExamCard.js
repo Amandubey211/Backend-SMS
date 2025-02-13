@@ -1,19 +1,70 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { TbEdit } from "react-icons/tb";
+import { TbCheck, TbEdit } from "react-icons/tb";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteOfflineExamCard,
+  UpdateOfflineExamCard,
+} from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
+import { useNavigate, useParams } from "react-router-dom";
+import { formatDate } from "../../../../../../Utils/helperFunctions";
 
 const OfflineExamCard = ({
-  exampType,
+  examType,
   examName,
   semester,
   startDate,
   endDate,
   maxScore,
+  examId,
+  students,
 }) => {
-  const loading = true;
+  const dispatch = useDispatch();
+  const { loading, error } = useSelector((store) => store.admin.offlineExam);
+  const navigate = useNavigate();
+  const { sid, cid } = useParams();
+  const [isEditing, setIsEditing] = useState(false);
 
-  const handleDeleteClick = () => {};
+  const [editedData, setEditedData] = useState({
+    examName,
+    startDate,
+    endDate,
+    maxScore,
+  });
+
+  const handleDeleteClick = () => {
+    dispatch(deleteOfflineExamCard({ examId }));
+  };
+
+  const handleInputChange = (e) => {
+    setEditedData({
+      ...editedData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const response = await dispatch(
+        UpdateOfflineExamCard({ payload: editedData, examId })
+      ).unwrap();
+
+      // ✅ Ensure UI updates with new data after API success
+      if (response.success) {
+        setEditedData({ ...editedData }); // Update UI with new data
+        setIsEditing(false); // Exit edit mode
+      }
+    } catch (error) {
+      console.log("error", error);
+
+      console.error("Update failed:", error);
+    }
+  };
 
   return (
     <div className={`ps-1 rounded-md bg-green-500 h-auto m-4 hover:shadow-lg`}>
@@ -22,16 +73,51 @@ const OfflineExamCard = ({
       >
         <div className="flex w-full h-auto justify-between items-end">
           <div className="flex w-[70%] h-auto items-end gap-x-2">
-            <h1 className="font-bold text-lg pr-2 truncate">{examName}</h1>
+            {isEditing ? (
+              <input
+                type="text"
+                name="examName"
+                value={editedData.examName}
+                onChange={handleInputChange}
+                className="border px-2 py-1 rounded-md w-full"
+              />
+            ) : (
+              <h1
+                className="font-bold text-lg pr-2 truncate cursor-pointer"
+                onClick={() =>
+                  navigate(`/class/${cid}/${sid}/offline_exam/view`, {
+                    state: {
+                      examName: examName,
+                      students: students,
+                      examType: examType,
+                      startDate: formatDate(startDate),
+                    },
+                  })
+                }
+              >
+                {examName}
+              </h1>
+            )}
           </div>
           <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-            {exampType}
+            {examType}
           </div>
         </div>
         <div>
           <span className="font-medium text-gray-600 text-xs">Max score: </span>
-          <span className=" text-gray-600 text-xs">{maxScore}</span>
+          {isEditing ? (
+            <input
+              type="number"
+              name="maxScore"
+              value={editedData.maxScore}
+              onChange={handleInputChange}
+              className="border px-2 py-1 rounded-md w-20"
+            />
+          ) : (
+            <span className="text-gray-600 text-xs">{maxScore}</span>
+          )}
         </div>
+
         <div>
           <span className="font-medium text-gray-600 text-xs">Semester: </span>
           <span className=" text-gray-600 text-xs">{semester}</span>
@@ -45,22 +131,51 @@ const OfflineExamCard = ({
               <div className="flex items-center gap-1">
                 <IoCalendarOutline className="text-sm" />
                 <span>Start Date:</span>
-                <span>{startDate}</span>
+                {isEditing ? (
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={editedData.startDate}
+                    onChange={handleInputChange}
+                    className="border px-2 py-1 rounded-md"
+                  />
+                ) : (
+                  <span>{startDate}</span>
+                )}
               </div>
               <div className="flex items-center gap-1 pl-2">
                 <IoCalendarOutline className="text-sm" />
                 <span>End Date:</span>
-                <span>{endDate}</span>
+                {isEditing ? (
+                  <input
+                    type="date"
+                    name="endDate"
+                    value={editedData.endDate}
+                    onChange={handleInputChange}
+                    className="border px-2 py-1 rounded-md"
+                  />
+                ) : (
+                  <span>{endDate}</span>
+                )}
               </div>
             </div>
 
-            <div className="flex gap-x-2">
-              <button
-                onClick={() => {}}
-                className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-              >
-                <TbEdit className="w-5 h-5 text-green-500" />
-              </button>
+            <div className="flex gap-x-2 cursor-pointer">
+              {isEditing ? (
+                <button
+                  onClick={handleUpdate}
+                  className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+                >
+                  <TbCheck className="w-5 h-5 text-green-500" />
+                </button>
+              ) : (
+                <button
+                  onClick={handleEditClick}
+                  className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+                >
+                  <TbEdit className="w-5 h-5 text-green-500" />
+                </button>
+              )}
 
               <div className="flex flex-col">
                 <button

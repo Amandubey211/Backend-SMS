@@ -31,6 +31,8 @@ const MainSection = () => {
     }
   }, [cid, sid, dispatch]);
 
+  // console.log("Data", offlineExamData.data);
+
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
@@ -50,29 +52,17 @@ const MainSection = () => {
             ) : offlineExamData.data?.length ? (
               <div className="h-[calc(100vh-150px)] overflow-y-auto">
                 {offlineExamData.data?.map((item, index) => (
-                  <div
-                    style={{ cursor: "pointer" }}
-                    onClick={() =>
-                      navigate(`/class/${cid}/${sid}/offline_exam/view`, {
-                        state: {
-                          examName: item.examName,
-                          students: item.students,
-                          examType: item.examType,
-                          startDate: formatDate(item.startDate),
-                        },
-                      })
-                    }
-                  >
+                  <div>
                     <OfflineExamCard
                       key={index}
-                      exampType={item.examType}
+                      examType={item.examType}
                       examName={item.examName}
-                      mode={item.mode}
-                      semester="Semester I"
+                      semester={item.semesterId?.title ?? "NA"}
                       startDate={formatDate(item.startDate)}
                       endDate={formatDate(item.endDate)}
-                      students={item.students}
                       maxScore={item.students[0]?.maxMarks}
+                      examId={item._id}
+                      students={item.students}
                     />
                   </div>
                 ))}

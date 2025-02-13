@@ -3,16 +3,13 @@ import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedA
 import { RiAddFill } from "react-icons/ri";
 import { Tooltip } from "antd";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-import HandsontableComp from "./HandsontableComp";
-import {
-  MdAddChart,
-  MdFileDownload,
-  MdFileUpload,
-} from "react-icons/md";
+import TableView from "./TableView";
+import { MdAddChart, MdFileDownload, MdFileUpload } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { UploadOfflineExamSheet } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
+import NormalTable from "./NormalTable";
 
 function CreateButton() {
   const { cid, sid } = useParams();
@@ -21,11 +18,11 @@ function CreateButton() {
   const [file, setFile] = useState(null);
   const [fileName, setFileName] = useState("");
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const [tableData, setTableData] = useState([]);
+  const [showManual, setShowManual] = useState(true);
 
   const handleUploadClick = () => {
+    setShowManual(false);
     fileInputRef.current.click();
   };
 
@@ -63,13 +60,14 @@ function CreateButton() {
     formData.append("sheet", file);
     formData.append("classId", cid);
     formData.append("subjectId", sid);
-    formData.append("semesterId", "67a3039135d291aa1f224a89");
 
     dispatch(UploadOfflineExamSheet(formData));
-    navigate(-1);
+    // navigate(-1);
   };
 
-  return (
+  console.log("isopen", isOpen);
+
+  return (  
     <ProtectedAction>
       <Tooltip title="Create Offline Exam" placement="left">
         <button
@@ -88,7 +86,15 @@ function CreateButton() {
         <Sidebar
           isOpen={isOpen}
           title={"Create Offline Exam"}
-          onClose={() => setIsOpen(false)}
+          onClose={(event) => {
+            if (
+              event &&
+              event.target &&
+              !event.target.closest(".handsontable")
+            ) {
+              setIsOpen(false);
+            }
+          }}
           width={"95%"}
         >
           <div>
@@ -96,7 +102,7 @@ function CreateButton() {
               {/* Create Manually Button */}
               <div className="pl-5 pt-1">
                 <button
-                  onClick={() => {}}
+                  onClick={() => setShowManual(true)}
                   className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
                 >
                   <MdAddChart className="text-lg text-gray-600" />
@@ -136,24 +142,21 @@ function CreateButton() {
             </div>
 
             {/* Handsontable Component */}
-            {fileName && (
-              <p className="text-sm text-gray-600 mt-1">{fileName}</p>
+            {!showManual
+              ? fileName && (
+                  <p className="text-sm text-gray-600 mt-1">{fileName}</p>
+                )
+              : ""}
+            {showManual ? (
+              <NormalTable setIsOpen={setIsOpen} isOpen={isOpen} />
+            ) : (
+              <TableView
+                data={tableData}
+                handleData={handleData}
+                isOpen={isOpen}
+                setIsOpen={setIsOpen}
+              />
             )}
-            <HandsontableComp data={tableData} />
-            <div className="flex w-[20%] gap-x-2 mt-5 items-end fixed bottom-5 right-5">
-              <button
-                onClick={() => {}}
-                className="w-[50%] bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-              >
-                Clear
-              </button>
-              <button
-                onClick={handleData}
-                className="w-[50%] bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-              >
-                Create
-              </button>
-            </div>
           </div>
         </Sidebar>
       )}
