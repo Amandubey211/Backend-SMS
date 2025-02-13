@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import {
   createSubject,
- updateSubject,
+  updateSubject,
 } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import { useTranslation } from "react-i18next";
 import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
@@ -34,8 +34,6 @@ const dummyColors = [
   "bg-gray-300",
 ];
 
-
-
 const AddNewSubject = ({ onClose, subject }) => {
   const { t } = useTranslation("admClass"); // Use translation hook
   const [activeTab, setActiveTab] = useState("icon");
@@ -45,13 +43,13 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   const dispatch = useDispatch();
   const { cid } = useParams();
-  const {loading} = useSelector((state) => state.admin.subject);
+  const { loading } = useSelector((state) => state.admin.subject);
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
-  useEffect(()=>{
-    dispatch(fetchAllIcons({type:"Subject"}))
-  },[dispatch])
+  useEffect(() => {
+    dispatch(fetchAllIcons({ type: "Subject" }));
+  }, [dispatch]);
 
   useEffect(() => {
     if (subject) {
@@ -104,8 +102,7 @@ const AddNewSubject = ({ onClose, subject }) => {
       }
       dispatch(updateSubject({ subjectId: subject._id, subjectData }));
     } else {
-      
-    dispatch(createSubject(subjectData));
+      dispatch(createSubject(subjectData));
     }
     onClose();
   };
@@ -119,16 +116,18 @@ const AddNewSubject = ({ onClose, subject }) => {
   const closeModal = () => {
     setIsModalOpen(false);
     setActiveIcon(null);
-  }
+  };
 
   const iconGrid = useMemo(
-    () =>
+    () => (
       <div className="flex flex-col gap-2  flex-grow w-full ">
-      <IconGrid
-    icons={icons}
-    activeIcon={selectIcon?._id}
-    onEdit={openModal}
-  /></div>,
+        <IconGrid
+          icons={icons}
+          activeIcon={selectIcon?._id}
+          onEdit={openModal}
+        />
+      </div>
+    ),
     [selectedIcon, t]
   );
 
@@ -137,7 +136,10 @@ const AddNewSubject = ({ onClose, subject }) => {
       dummyColors?.map((color, index) => (
         <button
           key={index}
-          onClick={() => {console.log (color);setSelectedColor(color)}}
+          onClick={() => {
+            console.log(color);
+            setSelectedColor(color);
+          }}
           className={`w-12 h-12 rounded-full border-2 ${color} focus:outline-none transition duration-300 ease-in-out ${
             selectedColor === color ? "border-black" : "border-transparent"
           }`}
@@ -231,7 +233,9 @@ const AddNewSubject = ({ onClose, subject }) => {
           )}
         </button>
       </div>
-      {isModalOpen && <CreateEditIconModal onClose={closeModal} type={'Subject'} />}
+      {isModalOpen && (
+        <CreateEditIconModal onClose={closeModal} type={"Subject"} />
+      )}
     </div>
   );
 };
