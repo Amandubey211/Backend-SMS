@@ -106,7 +106,7 @@ export const updateBookThunk = createAsyncThunk(
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(
+      const response = await customRequest('PUT',
         `/${getRole}/update/book/${bookId}?say=${say}`,
         formData,
         {
