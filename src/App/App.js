@@ -112,9 +112,7 @@ const Branch = lazy(() => import("../Modules/Admin/Branchs/Branch.js"));
 const commonAcademic = lazy(() =>
   import("../Components/Common/AcademicYear/Academic.js")
 );
-// const CreateAcademicYear = lazy(() =>
-//   import("../Components/Admin/CreateAcademicYear.js")
-// );
+
 const CreateAcademicYear = lazy(() =>
   import("../Components/Admin/CreateAcademicYear.js")
 );

@@ -4,6 +4,7 @@ import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 import { deleteIcon } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
+import { DEFAULT_CLASS_ICONS } from "../../../../config/classIcons.config";
 
 const IconGrid = ({ activeIconId, onEdit }) => {
   const { icons, selectedIcon } = useSelector(
@@ -11,21 +12,24 @@ const IconGrid = ({ activeIconId, onEdit }) => {
   );
   const dispatch = useDispatch();
 
-  // Function to handle icon selection
+  // Use default icons if none exist in state
+  const effectiveIcons = icons && icons.length ? icons : DEFAULT_CLASS_ICONS;
+
+  // Handle icon selection
   const handleIconClick = (icon) => {
     dispatch(selectIcon(icon));
   };
 
-  // Function to handle icon deletion
+  // Handle icon deletion
   const handleDeleteIcon = async (iconId) => {
     await dispatch(deleteIcon(iconId));
   };
 
   return (
     <div className="flex justify-start gap-3 flex-wrap px-3">
-      {icons?.map((icon) => (
+      {effectiveIcons.map((icon) => (
         <motion.div
-          key={icon?._id}
+          key={icon?._id || icon.id}
           className="relative rounded-lg transition-transform duration-300"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -34,7 +38,8 @@ const IconGrid = ({ activeIconId, onEdit }) => {
           <button
             type="button"
             className={`h-16 w-16 rounded-lg overflow-hidden ${
-              activeIconId == icon?._id || selectedIcon?._id == icon?._id
+              activeIconId === (icon?._id || icon.id) ||
+              selectedIcon?._id === (icon?._id || icon.id)
                 ? "border-2 border-purple-500 scale-125 mx-2"
                 : "border border-gray-300"
             }`}
@@ -47,7 +52,7 @@ const IconGrid = ({ activeIconId, onEdit }) => {
             />
           </button>
 
-          {/* Edit/Delete icons only visible on hover */}
+          {/* Edit/Delete icons visible on hover */}
           <div className="absolute top-1 right-1 flex gap-1 rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
             <motion.button
               onClick={() => onEdit(icon)}
@@ -58,7 +63,7 @@ const IconGrid = ({ activeIconId, onEdit }) => {
               <FaEdit size={14} />
             </motion.button>
             <motion.button
-              onClick={() => handleDeleteIcon(icon?._id)}
+              onClick={() => handleDeleteIcon(icon?._id || icon.id)}
               className="text-gray-700 hover:text-red-400"
               whileHover={{ scale: 1.2 }}
               aria-label="Delete Icon"
