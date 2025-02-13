@@ -4,6 +4,7 @@ import CardBanner from "../../../../Assets/AdmissionCard/CardBanner.jpg";
 import Logo from "../../../../Components/Common/Logo";
 import { useSelector } from "react-redux";
 import { useTranslation } from 'react-i18next';
+import { PiStudentDuotone } from "react-icons/pi";
 
 const StudentCard = ({ studentInfo, imagePreview }) => {
   const { t } = useTranslation('admAdmission');
@@ -42,11 +43,15 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
             </div>
           </div>
           <div className="mt-4 bg-white rounded-full flex justify-center items-center">
+          {imagePreview ? (
             <img
-              src={imagePreview || "https://via.placeholder.com/150"}
+              src={imagePreview}
               alt={firstName}
               className="rounded-full w-24 h-24 object-cover"
             />
+          ) : (
+            <PiStudentDuotone className="w-16 h-16 text-gray-800" />
+          )}
           </div>
         </div>
         <div className="mt-4  px-4">
