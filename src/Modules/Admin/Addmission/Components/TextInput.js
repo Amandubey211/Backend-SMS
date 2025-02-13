@@ -1,20 +1,14 @@
 // TextInput.js
 import React from "react";
 import { motion } from "framer-motion";
+import { forwardRef } from "react";
 
-const TextInput = ({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  error,
-  type = "text",
-}) => {
+const TextInput = forwardRef(({ label, name, value, onChange, placeholder, error, type = "text" }, ref) => {
   return (
     <div className="flex flex-col mb-2">
       <label className="text-gray-700">{label}</label>
       <input
+        ref={ref} // Attach ref
         type={type}
         name={name}
         value={value}
@@ -36,6 +30,5 @@ const TextInput = ({
       )}
     </div>
   );
-};
-
+});
 export default TextInput;

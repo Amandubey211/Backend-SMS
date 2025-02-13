@@ -37,13 +37,14 @@ const AddressInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
       <h2 className="text-xl font-semibold mb-2">{t("Contact Info")}</h2>
       <div className="grid grid-cols-2 gap-4">
         <TextInput
+          ref={(el) => (inputRefs["contactNumber"] = { current: el })}
           label={t("Contact Number")}
           name="contactNumber"
           value={studentInfo.contactNumber || ""}
           onChange={handleInputChange}
           placeholder={t("000-000-0000")}
           error={errors.contactNumber}
-          ref={inputRefs.contactNumber}
+          //ref={inputRefs.contactNumber}
         />
         <TextInput
           label={t("Emergency Number")}

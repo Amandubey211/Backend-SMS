@@ -14,12 +14,12 @@ import { getUserRole } from "../../../../../Utils/getRoles";
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
   async (_, { rejectWithValue, dispatch, getState }) => {
-    // const say = getAY();
+    const say = getAY();
     dispatch(setShowError(false));
 
     try {
       // const getRole = getUserRole(getState);
-      const endpoint = `/admin/all/class`;
+      const endpoint = `/admin/all/class?say=${say}`;
 
       const response = await getData(endpoint);
       // console.log(response, "lk");
