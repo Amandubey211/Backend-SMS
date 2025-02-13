@@ -72,7 +72,7 @@ export const addBookThunk = createAsyncThunk(
       // Handle successful response
       toast.success("Book added successfully!");
       dispatch(toggleSidebar());
-      dispatch(fetchBooksThunk()); // Refresh the list of books
+      // dispatch(fetchBooksThunk()); // Refresh the list of books
       return response?.book; // Return the added book data safely
     } catch (error) {
       // Centralized error handling

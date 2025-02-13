@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
-
+import BookIcon from '../../../../Assets/LibraryAsset/book.png'
 const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
   const { t } = useTranslation("admLibrary");
   const [showMenu, setShowMenu] = useState(false);
@@ -68,14 +68,14 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
       <td className="px-5 py-2 border-b border-gray-200">
         <div className="flex items-center bg-pink-50 rounded-lg p-1">
           <img
-            src={item.bookId?.image}
+            src={item.bookId?.image || BookIcon}
             alt={t("Book")}
             className="h-10 w-10 mr-2 rounded-md"
           />
           <div className="flex flex-col">
-            <span>{item?.bookId?.name}</span>
+            <span>{item?.bookId?.name || "N/A"}</span>
             <span className="text-[12px] text-green-600">
-              {item?.bookId?.category}
+              {item?.bookId?.category || "N/A"}
             </span>
           </div>
         </div>
@@ -93,13 +93,12 @@ const BookIssueRow = ({ item, handleSidebarOpen, setEditIssueData, role }) => {
       </td>
       <td className="px-5 py-2 border-b border-gray-200">
         <span
-          className={`inline-block px-3 py-1 text-xs font-semibold rounded-md ${
-            item.status === "Returned"
+          className={`inline-block px-3 py-1 text-xs font-semibold rounded-md ${item.status === "Returned"
               ? "bg-green-200 text-green-800"
               : item.status === "Pending"
-              ? "bg-sky-200 text-green-800"
-              : "bg-red-200 text-red-800"
-          }`}
+                ? "bg-sky-200 text-green-800"
+                : "bg-red-200 text-red-800"
+            }`}
         >
           {t(item.status)}
         </span>
