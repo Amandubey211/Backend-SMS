@@ -40,27 +40,27 @@ const MainSection = () => {
 
   return (
     <>
-    <ProtectedSection requiredPermission={PERMISSIONS.TEACHERS_BY_CLASS}>
-      <NavigationBar />
-      <div className="flex flex-wrap justify-start px-2 items-center">
-        {loading ? (
-          <div className="h-96 w-full flex justify-center items-center">
-            <Spinner />
-          </div>
-        ) : error ? (
-          <div className="h-96 w-full flex justify-center items-center">
-            <NoDataFound />
-          </div>
-        ) : filteredTeachers?.length < 1 ? (
-          <div className="h-96 w-full flex justify-center items-center">
-            <NoDataFound title="Teacher" />
-          </div>
-        ) : (
-          filteredTeachers?.map((teacher) => (
-            <TeacherCard key={teacher._id} teacher={teacher} />
-          ))
-        )}
-      </div>
+      <ProtectedSection requiredPermission={PERMISSIONS.TEACHERS_BY_CLASS}>
+        <NavigationBar />
+        <div className="flex flex-wrap justify-start px-2 items-center">
+          {loading ? (
+            <div className="h-96 w-full flex justify-center items-center">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <div className="h-96 w-full flex justify-center items-center">
+              <NoDataFound />
+            </div>
+          ) : filteredTeachers?.length < 1 ? (
+            <div className="h-96 w-full flex justify-center items-center">
+              <NoDataFound title="Teacher" />
+            </div>
+          ) : (
+            filteredTeachers?.map((teacher) => (
+              <TeacherCard key={teacher._id} teacher={teacher} />
+            ))
+          )}
+        </div>
       </ProtectedSection>
     </>
   );
