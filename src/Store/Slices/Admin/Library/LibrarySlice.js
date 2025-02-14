@@ -15,6 +15,7 @@ const initialState = {
   addbookloading: false,
   bookIssues: [],
   loading: false,
+  addBookSuccess: false,
   error: null,
   filters: {
     class: "",
@@ -44,6 +45,9 @@ const librarySlice = createSlice({
     setEditIssueData(state, action) {
       state.editIssueData = action.payload; // Set edit issue data
     },
+    resetLibraryState(state) { 
+      state.addBookSuccess = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -72,9 +76,11 @@ const librarySlice = createSlice({
 
       .addCase(addBookThunk.pending, (state) => {
         state.addbookloading = true;
+        state.addBookSuccess = false;
       })
       .addCase(addBookThunk.fulfilled, (state) => {
         state.addbookloading = false;
+        state.addBookSuccess = true;
       })
       .addCase(addBookThunk.rejected, (state, action) => {
         state.addbookloading = false;
@@ -131,7 +137,7 @@ const librarySlice = createSlice({
   },
 });
 
-export const { setFilters, setActiveTab, toggleSidebar, setEditIssueData } =
+export const { setFilters, setActiveTab, toggleSidebar, setEditIssueData, resetLibraryState  } =
   librarySlice.actions;
 
 export default librarySlice.reducer;

@@ -32,19 +32,16 @@ const ReceiptTemplate =forwardRef((props, ref) => {
   const subtotal = lineItems.reduce((acc, item) => acc + (item.total || 0), 0);
 
   // Calculate tax as a percentage of subtotal
-  const taxAmount = (subtotal * (tax || 0)) / 100;
+  const taxAmount = (subtotal * tax) / 100;
 
-  // Calculate total before applying penalty and discount
-  const totalBeforeDiscount = subtotal + taxAmount;
-
-  // Correctly apply the discount (only to subtotal + tax)
+  // Correctly apply the discount (only to subtotal)
   const discountAmount =
     discountType === "percentage"
-      ? (totalBeforeDiscount * (discount || 0)) / 100
-      : discount || 0;
+      ? (subtotal * discount) / 100 // FIX: Apply discount only to subtotal
+      : discount;
 
-  // Add penalty after discount
-  const finalAmount = (totalBeforeDiscount - discountAmount + (penalty || 0)).toFixed(2);
+  // Calculate final amount correctly
+  const finalAmount = (subtotal + taxAmount - discountAmount + penalty).toFixed(2);
 
   const { address, branchName, city, code,  nameOfSchool } = schoolId;
 

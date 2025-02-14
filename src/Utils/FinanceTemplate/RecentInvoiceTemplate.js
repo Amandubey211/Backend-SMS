@@ -37,20 +37,22 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
   // Calculate subtotal from line items
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
 
-  // Calculate tax as a percentage of the subtotal
-  const taxAmount = (subtotal * tax) / 100;
+// Calculate tax as a percentage of the subtotal
+const taxAmount = (subtotal * tax) / 100;
 
-  // Calculate total before discount
-  const totalBeforeDiscount = subtotal + taxAmount + penalty;
+// Calculate total before discount
+const totalBeforeDiscount = subtotal + taxAmount + penalty;
 
-  // Calculate discount based on the type (percentage or fixed)
-  const discountAmount =
-    discountType === "percentage"
-      ? (totalBeforeDiscount * discount) / 100
-      : discount;
+// FIX: Apply discount on subtotal, not totalBeforeDiscount
+const discountAmount = discountType === "percentage"
+  ? (subtotal * discount) / 100  // Corrected line
+  : discount;
 
-  // Calculate final amount
-  const finalAmount = (totalBeforeDiscount - discountAmount).toFixed(2);
+// Calculate final amount
+const finalAmount = (totalBeforeDiscount - discountAmount).toFixed(2);
+
+console.log("Final Amount:", finalAmount); // Expected Output: 119.00 QAR
+
 
   const {
     address = "",

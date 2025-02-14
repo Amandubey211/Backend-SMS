@@ -830,7 +830,15 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    { path: "library", element: <Libary />, errorElement: <Error /> },
+    {
+      path: "/library",
+      element:(
+        <ProtectRoute
+          Component={Libary}
+          allowedRoles={["admin", "teacher", "student", "parent"]}
+        />
+      )
+    },
     {
       path: "/timetable/*",
       element: (

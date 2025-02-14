@@ -9,6 +9,8 @@ import {
   fetchBookIssuesThunk,
   fetchBooksDetailsThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
+import { resetLibraryState } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
+
 import LibraryTab from "../Components/LibraryTab";
 import AddIssue from "../Components/AddIssue";
 import AddBook from "../Components/AddBook";
@@ -48,8 +50,14 @@ const LibraryAndBookIssue = () => {
     if (addBookSuccess || addIssueSuccess) {
       setSidebarOpen(false);
       setEditIssueData(null);
+  
+      // Reset success state after closing sidebar
+      setTimeout(() => {
+        dispatch(resetLibraryState());
+      }, 500); // Ensures smooth transition
     }
-  }, [addBookSuccess, addIssueSuccess]);
+  }, [addBookSuccess, addIssueSuccess, dispatch]);
+  
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => {

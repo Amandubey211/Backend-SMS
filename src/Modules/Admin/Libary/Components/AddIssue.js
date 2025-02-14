@@ -20,7 +20,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
-  const studentList = useSelector((state) => state.admin.students.allStudentsList);
+  const studentList = useSelector((state) => state.admin.students.studentsList);
   const classList = useSelector((state) => state.admin.class.classes);
   const { loading } = useSelector((state) => state.admin.students);
 
