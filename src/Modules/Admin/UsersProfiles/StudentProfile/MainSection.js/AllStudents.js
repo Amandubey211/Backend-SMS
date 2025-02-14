@@ -46,7 +46,7 @@ const AllStudents = () => {
     groupId: "",
   });
 
-  
+
   const handleEditSidebarClose = () => setIsEditSidebarOpen(false);
   useEffect(() => {
     dispatch(fetchAllStudents(filters));
@@ -142,7 +142,12 @@ const AllStudents = () => {
                           {student?.firstName}
                         </h2>
                         <p className="text-sm">{student?.email}</p>
-                        <div className="flex items-center mt-2 text-sm">
+                        <div className="flex items-center mt-1 text-sm">
+                          <p>
+                            {t("Class")}: {student?.className}
+                          </p>
+                        </div>
+                        <div className="flex items-center mt-1 text-sm">
                           <p>
                             {t("Contact")}: {student?.contactNumber}
                           </p>
