@@ -13,7 +13,18 @@ import { PERMISSIONS } from "../../../../config/permission";
 
 const BookCard = ({ book }) => {
   const { t } = useTranslation("admLibrary");
-  const { _id, name, author, category, classId, copies, image } = book;
+  // Destructure properties from book. If TotalCopies is missing, we'll fallback later.
+  const {
+    _id,
+    name,
+    author,
+    category,
+    classId,
+    copies,
+    image,
+    issuedCount,
+    TotalCopies, // This is expected from your API (case sensitive)
+  } = book;
   const dispatch = useDispatch();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -37,14 +48,20 @@ const BookCard = ({ book }) => {
         <img
           src={image}
           alt={name}
-          className="w-[70%] h-full object-cover rounded-md"
+          className="w-[65%] h-full object-cover rounded-md"
         />
         <div className="flex flex-col p-2 space-y-1">
           <span className="font-semibold text-[#7F7F7F] text-sm">
-            {t("Class")}: {classId.className}
+            {t("Class")}: {classId?.className}
           </span>
           <span className="text-sm font-semibold text-gray-700">
-            {t("Copies")}: {copies}
+            {t("Total Copies")}: {TotalCopies ?? 0}
+          </span>
+          <span className="text-sm font-semibold text-gray-700">
+            {t("Issued")}: {issuedCount}
+          </span>
+          <span className="text-sm font-semibold text-gray-700">
+            {t("Remaining")}: {copies}
           </span>
         </div>
       </div>
