@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoCalendarOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbCheck, TbEdit } from "react-icons/tb";
@@ -9,6 +9,7 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate } from "../../../../../../Utils/helperFunctions";
+import toast from "react-hot-toast";
 
 const OfflineExamCard = ({
   examType,
@@ -21,20 +22,31 @@ const OfflineExamCard = ({
   students,
 }) => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((store) => store.admin.offlineExam);
+  const { loading, offlineExamData } = useSelector(
+    (store) => store.admin.offlineExam
+  );
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [isEditing, setIsEditing] = useState(false);
-
   const [editedData, setEditedData] = useState({
     examName,
     startDate,
     endDate,
     maxScore,
   });
+  
 
-  const handleDeleteClick = () => {
-    dispatch(deleteOfflineExamCard({ examId }));
+  console.log("offline exam data", offlineExamData);
+
+  const handleDeleteClick = async () => {
+    try {
+      const response = dispatch(deleteOfflineExamCard({ examId }));
+      if (response.success) {
+        toast.success("Exam deleted successfully!");
+      }
+    } catch (error) {
+      toast.error("Failed to delete exam.");
+    }
   };
 
   const handleInputChange = (e) => {
@@ -54,15 +66,21 @@ const OfflineExamCard = ({
         UpdateOfflineExamCard({ payload: editedData, examId })
       ).unwrap();
 
-      // ✅ Ensure UI updates with new data after API success
       if (response.success) {
-        setEditedData({ ...editedData }); // Update UI with new data
-        setIsEditing(false); // Exit edit mode
+        toast.success("Exam updated successfully!");
+
+        setEditedData({
+          examName: response.data.examName,
+          startDate: response.data.startDate,
+          endDate: response.data.endDate,
+          maxScore: response.data.maxScore,
+        });
+
+        setIsEditing(false);
       }
     } catch (error) {
-      console.log("error", error);
-
       console.error("Update failed:", error);
+      toast.error("Failed to update exam.");
     }
   };
 
@@ -180,7 +198,6 @@ const OfflineExamCard = ({
               <div className="flex flex-col">
                 <button
                   disabled={loading}
-                  aria-busy={loading ? "true" : "false"}
                   onClick={handleDeleteClick}
                   className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
                 >

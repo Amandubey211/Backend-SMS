@@ -1,21 +1,20 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.full.css";
 import { Button } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { ImSpinner3 } from "react-icons/im";
 
-const TableView = ({ data = [], handleData, setIsOpen, isOpen }) => {
+const TableView = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
   const hotRef = useRef(null);
-  const hotInstanceRef = useRef(null); // Store table instance
-  const fileData = data;
-  const navigate = useNavigate();
-  const { cid, sid } = useParams();
+  const hotInstanceRef = useRef(null);
+
+  // ✅ Add state to manage table data
+  const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
-    // Default empty table structure
     const headers =
-      fileData.length > 0
-        ? fileData[0]
+      data.length > 0
+        ? data[0]
         : [
             "Name",
             "AdmissionNumber",
@@ -25,18 +24,20 @@ const TableView = ({ data = [], handleData, setIsOpen, isOpen }) => {
             "Exam 2",
             "Project",
           ];
-    const tableData =
-      fileData.length > 1 ? fileData.slice(1) : [["", "", "", "", "", "", ""]];
+
+    const formattedData =
+      data.length > 1 ? data.slice(1) : [["", "", "", "", "", "", ""]];
+    setTableData(formattedData); // ✅ Update state
 
     if (hotInstanceRef.current) {
       hotInstanceRef.current.updateSettings({
-        data: tableData,
+        data: formattedData,
         colHeaders: headers,
         readOnly: true,
       });
     } else {
       hotInstanceRef.current = new Handsontable(hotRef.current, {
-        data: tableData,
+        data: formattedData,
         colHeaders: headers,
         rowHeaders: true,
         width: "100%",
@@ -54,22 +55,41 @@ const TableView = ({ data = [], handleData, setIsOpen, isOpen }) => {
         hotInstanceRef.current = null;
       }
     };
-  }, [fileData]);
+  }, [data]); // ✅ Update when data changes
 
   const handleCancel = () => {
-    navigate(-2);
+    // ✅ Clear table data
+    setTableData([]);
+
+    // ✅ Reset Handsontable manually
+    if (hotInstanceRef.current) {
+      hotInstanceRef.current.loadData([["", "", "", "", "", "", ""]]);
+    }
+
+    setIsOpen(false);
   };
 
   return (
-    <div className="w-full p-4 bg-white border shadow-md mt-2 ">
+    <div className="w-full p-4 bg-white border shadow-md mt-2">
       <div
         ref={hotRef}
         className="h-full w-[60%] border rounded-sm shadow-sm bg-gray-50 overflow-x-scroll"
       ></div>
+
       <div className="flex justify-end space-x-4 items-end w-[20%] fixed bottom-5 right-5">
         <Button onClick={handleCancel}>Cancel</Button>
-        <Button disabled type="primary" htmlType="submit" onClick={handleData}>
-          Create
+        <Button
+          className={`${loading ? "cursor-not-allowed" : ""}`}
+          disabled={loading}
+          type="primary"
+          htmlType="submit"
+          onClick={handleData}
+        >
+          {loading ? (
+            <ImSpinner3 className="w-6 h-6 animate-spin text-white" />
+          ) : (
+            "Create"
+          )}
         </Button>
       </div>
     </div>

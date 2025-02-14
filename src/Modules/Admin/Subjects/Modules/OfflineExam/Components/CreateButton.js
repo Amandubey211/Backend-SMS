@@ -10,6 +10,7 @@ import { UploadOfflineExamSheet } from "../../../../../../Store/Slices/Admin/Cla
 import { useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
 import NormalTable from "./NormalTable";
+import toast from "react-hot-toast";
 
 function CreateButton() {
   const { cid, sid } = useParams();
@@ -20,6 +21,7 @@ function CreateButton() {
   const dispatch = useDispatch();
   const [tableData, setTableData] = useState([]);
   const [showManual, setShowManual] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const handleUploadClick = () => {
     setShowManual(false);
@@ -61,13 +63,27 @@ function CreateButton() {
     formData.append("classId", cid);
     formData.append("subjectId", sid);
 
-    dispatch(UploadOfflineExamSheet(formData));
+    if (formData) {
+      setLoading(true);
+
+      dispatch(UploadOfflineExamSheet(formData))
+        .then(() => {
+          setLoading(false);
+          toast.success("Exam Uploaded Successfully");
+        })
+        .catch((error) => {
+          setLoading(false);
+          toast.error(error.message || "Failed to Upload Exam");
+        });
+    } else {
+      setLoading(false);
+      toast.error("Failed to Upload Exam");
+    }
+
     // navigate(-1);
   };
 
-  console.log("isopen", isOpen);
-
-  return (  
+  return (
     <ProtectedAction>
       <Tooltip title="Create Offline Exam" placement="left">
         <button
@@ -144,15 +160,21 @@ function CreateButton() {
             {/* Handsontable Component */}
             {!showManual
               ? fileName && (
-                  <p className="text-sm text-gray-600 mt-1">{fileName}</p>
+                  <p className="text-sm text-red-600 mt-1">{fileName}</p>
                 )
               : ""}
             {showManual ? (
-              <NormalTable setIsOpen={setIsOpen} isOpen={isOpen} />
+              <NormalTable
+                setIsOpen={setIsOpen}
+                setLoading={setLoading}
+                loading={loading}
+                isOpen={isOpen}
+              />
             ) : (
               <TableView
                 data={tableData}
                 handleData={handleData}
+                loading={loading}
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
               />

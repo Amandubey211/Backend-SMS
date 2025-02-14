@@ -22,6 +22,7 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const response = await getData(
         `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}`
       );
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -33,7 +34,6 @@ export const createOfflineExam = createAsyncThunk(
   "subject/offline_create_exam",
   async ({ payload }, { rejectWithValue, dispatch, getState }) => {
     try {
-      console.log("payload", payload);
       const getRole = getUserRole(getState);
       const schoolId = getState().common.user.userDetails.schoolId;
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
@@ -70,6 +70,8 @@ export const UploadOfflineExamSheet = createAsyncThunk(
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
+
+      console.log("semester id", semesterId);
 
       const response = await customRequest(
         "post",

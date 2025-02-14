@@ -6,8 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { createOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchStudentsByClassAndSectionNames } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import toast from "react-hot-toast";
 
-const NormalTable = ({ setIsOpen, isOpen }) => {
+const NormalTable = ({ setIsOpen, setLoading, loading, isOpen }) => {
   const [headers] = useState([
     "Name",
     "Admission Number",
@@ -28,15 +30,14 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
   ]);
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
-  const [selectedStatus, setSelectedStatus] = useState("Select Status");
   const { studentsList } = useSelector((state) => state.admin.students);
-  const [student, setStudent] = useState("Select Student");
-  const [status, setStatus] = useState("Select Status");
+  const { allStudents } = useSelector((store) => store.admin.all_students);
   const navigate = useNavigate();
 
   const handleCellChange = (rowIdx, colIdx, value) => {
     setTableData((prev) => {
       const newData = [...prev];
+      newData[rowIdx] = [...newData[rowIdx]]; // ✅ Ensure row reference changes
       newData[rowIdx][colIdx] = value;
       return newData;
     });
@@ -53,24 +54,14 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
 
   useEffect(() => {
     dispatch(fetchStudentsByClassAndSectionNames(cid));
-  }, [dispatch, cid]);
+    dispatch(fetchAllStudents());
+  }, []);
 
   console.log("student", studentsList);
-  const isFormValid = () => {
-    if (!selectedExamType || !selectedExamName || !enteredMaxScore) {
-      return false; // ✅ Exam Name, Type, and Max Score must be filled
-    }
+  console.log("all students", allStudents);
 
-    return tableData.every(
-      (row) =>
-        row[0] && // Name
-        row[1] && // Admission Number
-        row[4] && // Obtained Score
-        row[5] && // Max Score
-        row[6] // Status
-    );
-  };
   const handleCreate = () => {
+    if (!validateInputs()) return;
     const payload = {
       examType: selectedExamType,
       examName: selectedExamName,
@@ -82,15 +73,44 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
         );
         return {
           studentId: selectedStudent ? selectedStudent._id : "",
-          score: row[4] || 0,
-          maxMarks: row[5] || 100,
+          score: row[4],
+          maxMarks: row[5],
           status: row[6] || "present",
         };
       }),
     };
-
-    dispatch(createOfflineExam({ payload }));
+    setLoading(true);
+    dispatch(createOfflineExam({ payload }))
+      .then(() => {
+        setLoading(false);
+        toast.success("Exam Created Successfully");
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.message || "Failed to Create Exam");
+      });
     // setIsOpen(false);
+  };
+
+  const validateInputs = () => {
+    if (!selectedExamName.trim()) {
+      toast.error("Exam name cannot be empty.");
+      return false;
+    }
+    if (!selectedExamType) {
+      toast.error("Exam type is required.");
+      return false;
+    }
+    if (!cid) {
+      toast.error("Class ID is missing.");
+      return false;
+    }
+    if (!sid) {
+      toast.error("Subject ID is missing.");
+      return false;
+    }
+
+    return true;
   };
 
   const handleClear = () => {
@@ -119,47 +139,46 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
 
       {/* ✅ Table */}
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border overflow-x-auto">
+        <table className="w-full border-collapse border overflow-x-auto mt-2">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-red-50">
               {headers.map((header, colIdx) => (
                 <th
                   key={colIdx}
-                  className="border px-4 py-1 text-center font-medium text-sm cursor-pointer"
+                  className={`border px-4 py-1 text-center font-medium text-sm cursor-pointer  ${
+                    header === "Name" ? "w-[20%]" : ""
+                  }`}
                 >
-                  {header}
-
-                  {/* ✅ Dropdown in Header for Exam Type */}
-                  {header === "Exam Type" && (
-                    <Select
-                      defaultValue={"Select Exam Type"}
-                      style={{ width: "100%", marginTop: "4px" }}
-                      onChange={setSelectedExamType}
-                      options={[
-                        { value: "Quiz", label: "Quiz" },
-                        { value: "Assignment", label: "Assignment" },
-                        { value: "Practical", label: "Practical" },
-                      ]}
-                    />
-                  )}
-                  {header === "Exam Name" && (
-                    <input
-                      type="text"
-                      placeholder="Enter Exam Name"
-                      value={selectedExamName}
-                      onChange={(e) => setSelectedExamName(e.target.value)}
-                      className="w-full px-2 py-1 focus:outline-none focus:ring focus:border-blue-200 text-sm capitalize"
-                    />
-                  )}
-                  {header === "Max Score" && (
-                    <input
-                      type="text"
-                      placeholder="Enter Max Score"
-                      value={enteredMaxScore}
-                      onChange={(e) => setEnteredMaxScore(e.target.value)}
-                      className="w-full px-2 py-1 focus:outline-none focus:ring focus:border-blue-200 text-sm capitalize"
-                    />
-                  )}
+                  <div className="flex flex-col justify-center items-center w-full">
+                    <span className="mb-1">{header}</span>
+                    {header === "Exam Type" && (
+                      <input
+                        type="text"
+                        placeholder="Enter Type"
+                        value={selectedExamType}
+                        onChange={(e) => setSelectedExamType(e.target.value)}
+                        className="w-full align-middle focus:outline-none focus:ring focus:border-blue-200  p-1  border border-gray-200 rounded-md m-2 text-xs font-medium capitalize placeholder: text-center"
+                      />
+                    )}
+                    {header === "Exam Name" && (
+                      <input
+                        type="text"
+                        placeholder="Enter Exam"
+                        value={selectedExamName}
+                        onChange={(e) => setSelectedExamName(e.target.value)}
+                        className="w-full p-1  border border-gray-200 rounded-md m-2 font-medium  focus:outline-none focus:ring focus:border-blue-200 text-xs capitalize placeholder: text-center"
+                      />
+                    )}
+                    {header === "Max Score" && (
+                      <input
+                        type="number"
+                        placeholder="Enter Max Score"
+                        value={enteredMaxScore}
+                        onChange={(e) => setEnteredMaxScore(e.target.value)}
+                        className="w-full p-1  border border-gray-200 rounded-md m-2 font-medium  focus:outline-none focus:ring focus:border-blue-100 text-xs capitalize placeholder: text-center"
+                      />
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
@@ -182,6 +201,12 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
                           {selectedExamName}
                         </div>
                       </div>
+                    ) : headers[colIdx] === "Max Score" ? (
+                      <div className="flex items-center gap-2">
+                        <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+                          {enteredMaxScore}
+                        </div>
+                      </div>
                     ) : headers[colIdx] === "Actions" ? (
                       <RiDeleteBin6Line
                         onClick={() => removeRow(rowIdx)}
@@ -196,6 +221,7 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
                           display: "flex",
                           alignSelf: "start",
                           paddingRight: "5px",
+                          overflowX: "auto",
                         }}
                         value={tableData[rowIdx][0] || "Select Student"}
                         onChange={(value) => {
@@ -205,15 +231,25 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
                               value
                           );
                           if (selectedStudent) {
+                            const matchedStudent = allStudents.find(
+                              (s) =>
+                                s.firstName === selectedStudent.firstName &&
+                                s.lastName === selectedStudent.lastName
+                            );
                             handleCellChange(rowIdx, 0, value);
                             handleCellChange(
                               rowIdx,
                               1,
-                              selectedStudent.admissionNumber
+                              matchedStudent?.admissionNumber || ""
                             );
                           }
                         }}
                         options={studentsList?.map((student) => {
+                          const matchedStudent = allStudents.find(
+                            (s) =>
+                              s.firstName === student.firstName &&
+                              s.lastName === student.lastName
+                          );
                           return {
                             value: `${student.firstName} ${student.lastName}`,
                             label: (
@@ -227,28 +263,58 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
                                   {student.firstName} {student.lastName}
                                 </span>
                                 <span className="pr-2 text-xs text-gray-500">
-                                  (2345)
+                                  {matchedStudent?.admissionNumber || "NA"}
                                 </span>
                               </div>
                             ),
                           };
                         })}
                       />
-                    ) : headers[colIdx] === "Max Score" ? (
-                      <div className="flex items-center gap-2">
-                        <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                          {enteredMaxScore}
-                        </div>
-                      </div>
                     ) : headers[colIdx] === "Status" ? (
                       <Select
-                        defaultValue="Present"
-                        style={{ width: "100%", marginTop: "4px" }}
-                        value={row[6] || "Present"}
+                        defaultValue="present"
+                        // className={`w-full px-2 py-1 rounded-md focus:outline-none focus:ring focus:border-blue-100 text-sm capitalize
+                        //   ${
+                        //     row[6] === "present"
+                        //       ? "bg-green-100 text-green-700"
+                        //       : ""
+                        //   }
+                        //   ${
+                        //     row[6] === "absent" ? "bg-red-100 text-red-700" : ""
+                        //   }
+                        //   ${
+                        //     row[6] === "excused"
+                        //       ? "bg-orange-100 text-orange-700"
+                        //       : ""
+                        //   }
+                        // `}
+                        value={row[6] || "present"}
                         onChange={(value) => handleCellChange(rowIdx, 6, value)}
                         options={[
-                          { value: "Present", label: "Present" },
-                          { value: "Absent", label: "Absent" },
+                          {
+                            value: "present",
+                            label: (
+                              <span className="text-green-600 font-medium">
+                                Present
+                              </span>
+                            ),
+                          },
+                          {
+                            value: "absent",
+                            label: (
+                              <span className="text-red-600 font-medium">
+                                Absent
+                              </span>
+                            ),
+                          },
+                          {
+                            value: "excused",
+                            label: (
+                              <span className="text-orange-600 font-medium">
+                                Excused
+                              </span>
+                            ),
+                          },
                         ]}
                       />
                     ) : (
@@ -272,7 +338,7 @@ const NormalTable = ({ setIsOpen, isOpen }) => {
       {/* ✅ Submit Buttons */}
       <div className="flex justify-end space-x-4 items-end w-[20%] fixed bottom-5 right-5">
         <Button onClick={handleClear}>Cancel</Button>
-        <Button type="primary" onClick={handleCreate} disabled={!isFormValid()}>
+        <Button type="primary" disabled={loading} onClick={handleCreate}>
           Create
         </Button>
       </div>
