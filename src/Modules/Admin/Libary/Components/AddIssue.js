@@ -5,7 +5,6 @@ import {
   issueBookThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import {
-  fetchSectionsByClass,
   fetchSectionsNamesByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
@@ -20,7 +19,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
-  const studentList = useSelector((state) => state.admin.students.studentsList);
+  const studentList = useSelector(
+    (state) => state.admin.students.studentsList
+  );
   const classList = useSelector((state) => state.admin.class.classes);
   const { loading } = useSelector((state) => state.admin.students);
 
@@ -35,32 +36,33 @@ const AddIssue = ({ onClose, editIssueData }) => {
     status: "Pending",
   });
 
-  // Reset form when switching between add and edit modes
+  // When editIssueData is available, pre-populate the form
   useEffect(() => {
     if (editIssueData) {
-      // Populate the form with the data for editing
       setIssueData({
-        class: editIssueData.classId?._id || "",
-        section: editIssueData.sectionId?._id || "",
-        student: editIssueData.studentId?._id || "",
-        book: editIssueData.bookId?._id || "",
+        class: editIssueData.classId ? editIssueData.classId._id : "",
+        section: editIssueData.sectionId ? editIssueData.sectionId._id : "",
+        student: editIssueData.studentId ? editIssueData.studentId._id : "",
+        book: editIssueData.bookId ? editIssueData.bookId._id : "",
         authorName: editIssueData.author || "",
-        issueDate: editIssueData.issueDate?.slice(0, 10) || "",
-        returnDate: editIssueData.returnDate?.slice(0, 10) || "",
+        issueDate: editIssueData.issueDate
+          ? editIssueData.issueDate.slice(0, 10)
+          : "",
+        returnDate: editIssueData.returnDate
+          ? editIssueData.returnDate.slice(0, 10)
+          : "",
         status: editIssueData.status || "",
       });
 
-      // Fetch sections for the selected class
-      if (editIssueData.classId?._id) {
+      // Dispatch actions to load the correct dropdown options
+      if (editIssueData.classId && editIssueData.classId._id) {
         dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
       }
-
-      // Fetch students for the selected section
-      if (editIssueData.sectionId?._id) {
+      if (editIssueData.sectionId && editIssueData.sectionId._id) {
         dispatch(fetchStudentsByClassAndSection(editIssueData.sectionId._id));
       }
     } else {
-      // Reset form for adding a new issue
+      // Reset the form for adding a new issue
       setIssueData({
         class: "",
         section: "",
@@ -76,6 +78,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    // In add mode, dispatch API calls on change if needed
     if (name === "class") {
       dispatch(fetchSectionsNamesByClass(value));
       dispatch(fetchStudentsByClassAndSection(value));
@@ -101,7 +104,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const submissionData = {
-      id: editIssueData?._id || null,
+      id: editIssueData ? editIssueData._id : null,
       status: issueData.status,
       returnDate: issueData.returnDate,
       issueDate: issueData.issueDate,
@@ -118,11 +121,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
   return (
     <form className="flex flex-col h-full space-y-6" onSubmit={handleSubmit}>
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
+        {/* Class Field */}
         <div>
-          <label
-            htmlFor="class"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="class" className="block text-sm font-medium text-gray-700">
             {t("Class")}
           </label>
           <select
@@ -141,11 +142,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </select>
         </div>
+        {/* Section Field */}
         <div>
-          <label
-            htmlFor="section"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="section" className="block text-sm font-medium text-gray-700">
             {t("Section")}
           </label>
           <select
@@ -164,12 +163,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </select>
         </div>
-
+        {/* Student Field */}
         <div>
-          <label
-            htmlFor="student"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="student" className="block text-sm font-medium text-gray-700">
             {t("Student")}
           </label>
           <select
@@ -189,12 +185,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </select>
         </div>
-
+        {/* Book Field */}
         <div>
-          <label
-            htmlFor="book"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="book" className="block text-sm font-medium text-gray-700">
             {t("Book")}
           </label>
           <select
@@ -212,7 +205,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </select>
         </div>
-
         <FormInput
           id="authorName"
           name="authorName"
@@ -238,12 +230,8 @@ const AddIssue = ({ onClose, editIssueData }) => {
           onChange={handleInputChange}
           required
         />
-
         <div className="pb-8">
-          <label
-            htmlFor="status"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="status" className="block text-sm font-medium text-gray-700">
             {t("Status")}
           </label>
           <select
