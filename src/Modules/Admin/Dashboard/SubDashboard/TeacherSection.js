@@ -15,14 +15,14 @@ const TeacherSection = () => {
       <div className="flex flex-wrap justify-between items-start border-y h-auto relative max-w-screen">
         {/* Middle Vertical Divider */}
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300 "></div>
-        <div className="w-full md:w-[30%] p-2 h-full flex items-center justify-center ">
+        <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center ">
           <div className="w-full h-full">
            
               <TotalAttendanceGraph />
 
           </div>
         </div>
-        <div className="w-full md:w-[65%] p-2 h-full flex items-center justify-center">
+        <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
 
               <TopRankingStudents />

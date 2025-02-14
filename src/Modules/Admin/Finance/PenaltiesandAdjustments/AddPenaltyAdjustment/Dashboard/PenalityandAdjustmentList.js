@@ -400,14 +400,14 @@ const PenalityandAdjustmentList = () => {
 
   // Transform adjustments data for the table using adjustmentsArray
   const dataSource = adjustmentsArray.map((adjustment) => ({
-    key: adjustment._id,
-    return_invoice_no: adjustment.returnInvoiceNumber || "N/A",
-    invoice_no: adjustment.invoiceId?.invoiceNumber || "N/A",
-    receiver: adjustment.invoiceId?.receiver?.name || "N/A",
-    adjustmentAmount: adjustment.adjustmentAmount || 0,
-    adjustmentTotal: adjustment.adjustmentTotal || 0,
-    status: adjustment.isCancel ? "Cancelled" : "Active",
-    adjustedAt: adjustment.adjustedAt || "N/A",
+    key: adjustment?._id,
+    return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
+    invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
+    receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
+    adjustmentAmount: adjustment?.adjustmentAmount || 0,
+    adjustmentTotal: adjustment?.adjustmentTotal || 0,
+    status: adjustment?.isCancel ? "Cancelled" : "Active",
+    adjustedAt: adjustment?.adjustedAt || "N/A",
     ...adjustment,
   }));
 

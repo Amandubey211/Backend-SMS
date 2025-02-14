@@ -7,6 +7,7 @@ import Spinner from "../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
 import { fetchIncomesGraph } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 
+
 ChartJS.register(...registerables);
 
 const TotalEarningsGraph = () => {
@@ -35,6 +36,7 @@ const TotalEarningsGraph = () => {
 
   const chartData = {
     labels: Object.keys(groupedData),
+    fill:true,
     datasets: [
       {
         label: t("Earnings"),

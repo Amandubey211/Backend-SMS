@@ -93,12 +93,6 @@ const TotalStudentsGraphjs = () => {
             <PiStudentBold className="text-6xl mb-4" />
             <p className="text-xl">Error: {error}</p>
           </div>
-        ) : !dashboardData ||
-          (classData.maleStudents === 0 && classData.femaleStudents === 0) ? (
-          <div className="flex flex-col items-center justify-center text-gray-400">
-            <PiStudentBold className="text-6xl mb-4" />
-            <p className="text-xl">{t("No student data found")}</p>
-          </div>
         ) : (
           <>
          
@@ -113,8 +107,8 @@ const TotalStudentsGraphjs = () => {
                   datasets: [
                     {
                       data: [
-                        classData.maleStudents || 0,
-                        classData.femaleStudents || 0,
+                        classData?.maleStudents || 0,
+                        classData?.femaleStudents || 0,
                       ],
                       backgroundColor: ["#23C55E", "#8F77F3"],
                       borderWidth: 0,
@@ -175,7 +169,7 @@ const TotalStudentsGraphjs = () => {
           <div className="text-left">
             <span className="text-gray-700">{t("Female Students")}</span>
             <div className="font-bold text-gray-700">
-              {classData.femaleStudents}
+              {classData?.femaleStudents ||0}
             </div>
           </div>
         </div>
@@ -184,7 +178,7 @@ const TotalStudentsGraphjs = () => {
           <div className="text-left">
             <span className="text-gray-700">{t("Male Students")}</span>
             <div className="font-bold text-gray-700">
-              {classData.maleStudents}
+              {classData?.maleStudents || 0}
             </div>
           </div>
         </div>

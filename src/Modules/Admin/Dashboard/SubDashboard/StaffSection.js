@@ -12,14 +12,14 @@ const StaffSection = () => {
       <div className="flex flex-wrap items-start justify-between border-y relative max-w-screen">
         {/* Middle Vertical Divider */}
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-full md:w-[50%] p-4 h-full flex items-center justify-center">
+        <div className="w-full md:w-1/2 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
         
               <NoticeBoard descriptionLength={58} />
           
           </div>
         </div>
-        <div className="w-full md:w-[50%] p-4 h-full flex items-center justify-center">
+        <div className="w-full md:w-1/2 p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
  
               <Events />
