@@ -23,7 +23,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
   const { loading } = useSelector((store) => store.admin.class);
   const dispatch = useDispatch();
 
-  // Fetch icons on mount (for type "Class")
+  // Fetch icons on mount for type "Class"
   useEffect(() => {
     dispatch(fetchAllIcons({ type: "Class" }));
   }, [dispatch]);
@@ -33,16 +33,28 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
     if (isUpdate && classData) {
       setNewClassName(classData.className);
       if (classData.classIcons) {
-        // Determine the icon ID whether classIcons is stored as an object or a string
-        const classIconId =
-          typeof classData.classIcons === "object"
-            ? classData.classIcons._id
-            : classData.classIcons;
-        if (icons && icons.length > 0) {
-          const matchingIcon = icons.find((icon) => icon._id === classIconId);
-          dispatch(selectIcon(matchingIcon || classData.classIcons));
+        // If the stored classIcons is an object, get its id; if it's a string (URL), use it to find a match
+        if (typeof classData.classIcons === "object") {
+          const classIconId =
+            classData.classIcons._id || classData.classIcons.id;
+          if (icons && icons.length > 0) {
+            const matchingIcon = icons.find(
+              (icon) => (icon._id || icon.id) === classIconId
+            );
+            dispatch(selectIcon(matchingIcon || classData.classIcons));
+          } else {
+            dispatch(selectIcon(classData.classIcons));
+          }
         } else {
-          dispatch(selectIcon(classData.classIcons));
+          // classIcons is a string URL – try to match it with an icon's imageLink
+          if (icons && icons.length > 0) {
+            const matchingIcon = icons.find(
+              (icon) => icon.imageLink === classData.classIcons
+            );
+            dispatch(selectIcon(matchingIcon || classData.classIcons));
+          } else {
+            dispatch(selectIcon(classData.classIcons));
+          }
         }
       } else {
         dispatch(selectIcon(null));
@@ -64,7 +76,6 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!newClassName.trim()) {
       setShowClassNameError(true);
       return;
@@ -125,8 +136,13 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
           <h3 className="font-semibold">{t("Class Icons (Optional)")}</h3>
           <IconGrid
             icons={icons}
-            activeIcon={selectIcon?._id}
+            activeIconId={
+              selectedIcon
+                ? selectedIcon._id || selectedIcon.id || selectedIcon
+                : null
+            }
             onEdit={openModal}
+            type="Class"
           />
         </div>
 
