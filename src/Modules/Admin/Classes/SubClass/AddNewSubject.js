@@ -35,10 +35,9 @@ const dummyColors = [
 ];
 
 const AddNewSubject = ({ onClose, subject }) => {
-  const { t } = useTranslation("admClass"); // Use translation hook
+  const { t } = useTranslation("admClass");
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
-  const [activeIcon, setActiveIcon] = useState(null);
   const [subjectTitle, setSubjectTitle] = useState("");
 
   const dispatch = useDispatch();
@@ -47,6 +46,7 @@ const AddNewSubject = ({ onClose, subject }) => {
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
+
   useEffect(() => {
     dispatch(fetchAllIcons({ type: "Subject" }));
   }, [dispatch]);
@@ -54,18 +54,39 @@ const AddNewSubject = ({ onClose, subject }) => {
   useEffect(() => {
     if (subject) {
       setSelectedColor(subject?.color || "");
-      setActiveIcon(subject?.icon || null);
+      // Pre-select the subject icon – if it's an object use its id; if it's a string, try to match via imageLink
+      if (subject?.icon) {
+        if (typeof subject.icon === "object") {
+          const subjectIconId = subject.icon._id || subject.icon.id;
+          if (icons && icons.length > 0) {
+            const matchingIcon = icons.find(
+              (icon) => (icon._id || icon.id) === subjectIconId
+            );
+            dispatch(selectIcon(matchingIcon || subject.icon));
+          } else {
+            dispatch(selectIcon(subject.icon));
+          }
+        } else {
+          // subject.icon is a URL string
+          if (icons && icons.length > 0) {
+            const matchingIcon = icons.find(
+              (icon) => icon.imageLink === subject.icon
+            );
+            dispatch(selectIcon(matchingIcon || subject.icon));
+          } else {
+            dispatch(selectIcon(subject.icon));
+          }
+        }
+      } else {
+        dispatch(selectIcon(null));
+      }
       setSubjectTitle(subject?.name || "");
     } else {
-      resetForm();
+      setSelectedColor("");
+      setSubjectTitle("");
+      dispatch(selectIcon(null));
     }
-  }, [subject]);
-
-  const resetForm = useCallback(() => {
-    setSelectedColor("");
-    setActiveIcon(null);
-    setSubjectTitle("");
-  }, []);
+  }, [subject, dispatch, icons]);
 
   const validateInputs = useCallback(() => {
     if (!subjectTitle.trim()) {
@@ -76,11 +97,11 @@ const AddNewSubject = ({ onClose, subject }) => {
   }, [subjectTitle, t]);
 
   const hasChanges = () => {
-    if (!subject) return false;
+    if (!subject) return true;
     return (
       subjectTitle !== subject.name ||
       selectedColor !== subject.color ||
-      activeIcon !== subject.icon
+      (selectedIcon?.imageLink || null) !== (subject.icon?.imageLink || null)
     );
   };
 
@@ -95,7 +116,6 @@ const AddNewSubject = ({ onClose, subject }) => {
     };
 
     if (subject) {
-      // Dispatch update only if there are changes
       if (!hasChanges()) {
         toast(t("No changes detected."));
         return;
@@ -115,31 +135,32 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setActiveIcon(null);
   };
 
   const iconGrid = useMemo(
     () => (
-      <div className="flex flex-col gap-2  flex-grow w-full ">
+      <div className="flex flex-col gap-2 flex-grow w-full">
         <IconGrid
           icons={icons}
-          activeIcon={selectIcon?._id}
+          activeIconId={
+            selectedIcon
+              ? selectedIcon._id || selectedIcon.id || selectedIcon
+              : null
+          }
           onEdit={openModal}
+          type="Subject"
         />
       </div>
     ),
-    [selectedIcon, t]
+    [icons, selectedIcon, openModal]
   );
 
   const colorGrid = useMemo(
     () =>
-      dummyColors?.map((color, index) => (
+      dummyColors.map((color, index) => (
         <button
           key={index}
-          onClick={() => {
-            console.log(color);
-            setSelectedColor(color);
-          }}
+          onClick={() => setSelectedColor(color)}
           className={`w-12 h-12 rounded-full border-2 ${color} focus:outline-none transition duration-300 ease-in-out ${
             selectedColor === color ? "border-black" : "border-transparent"
           }`}
@@ -234,7 +255,7 @@ const AddNewSubject = ({ onClose, subject }) => {
         </button>
       </div>
       {isModalOpen && (
-        <CreateEditIconModal onClose={closeModal} type={"Subject"} />
+        <CreateEditIconModal onClose={closeModal} type="Subject" />
       )}
     </div>
   );

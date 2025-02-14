@@ -1,3 +1,4 @@
+// iconSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchAllIcons,
@@ -42,7 +43,6 @@ const iconSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       // Create icon lifecycle
       .addCase(createIcon.pending, (state) => {
         state.loading = true;
@@ -56,7 +56,6 @@ const iconSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       // Update icon lifecycle
       .addCase(updateIcon.pending, (state) => {
         state.loading = true;
@@ -64,18 +63,17 @@ const iconSlice = createSlice({
       })
       .addCase(updateIcon.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.icons.findIndex(
-          (icon) => icon._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.icons[index] = action.payload;
-        }
+        // const index = state.icons.findIndex(
+        //   (icon) => icon._id === action.payload._id
+        // );
+        // if (index !== -1) {
+        //   state.icons[index] = action.payload;
+        // }
       })
       .addCase(updateIcon.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
       // Delete icon lifecycle
       .addCase(deleteIcon.pending, (state) => {
         state.loading = true;
