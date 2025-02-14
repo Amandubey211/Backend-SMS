@@ -394,7 +394,7 @@ const EditorComponent = ({
         "undo",
         "redo",
         "spellcheck",
-        "table",
+        // "table",
         {
           name: "image",
           tooltip: "Upload Image",

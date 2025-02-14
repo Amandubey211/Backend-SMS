@@ -91,3 +91,31 @@ export const unassignTeacher = createAsyncThunk(
     }
   }
 );
+
+// Edit teacher details
+export const editTeacher = createAsyncThunk(
+  "teacher/editTeacher",
+  async (editData, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const say = getAY();
+
+      // Send the update request using PUT
+      const response = await putData(
+        `/${getRole}/teacher/${editData.id}?say=${say}`,
+        {
+          subjects: editData.subjects,
+          classIds: editData.classIds,
+          sectionIds: editData.sectionIds,
+        }
+      );
+
+      // Optionally, you can refresh the teacher list to reflect the changes
+      dispatch(fetchAllTeachers());
+      return response.data;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);

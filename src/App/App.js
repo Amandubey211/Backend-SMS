@@ -465,8 +465,8 @@ function App() {
           Component={RoleSelector}
           allowedRoles={[
             "admin",
-            "parent",
-            "student",
+            //"parent",
+            //"student",
             "teacher",
             "finance",
             "librarian",
