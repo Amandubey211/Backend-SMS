@@ -1,16 +1,16 @@
-// Header.js
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { FiLock, FiUserPlus } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import { useTranslation } from "react-i18next";
-import SortFilterModal from "./SortFilterModal"; // Ensure the path is correct based on your project structure
+import SortFilterModal from "./SortFilterModal";
 import { useSelector } from "react-redux";
 import { CiFilter } from "react-icons/ci";
 import { MdOutlineSort } from "react-icons/md";
 import { Button } from "antd";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+
 const Header = ({
   title,
   count,
@@ -18,11 +18,11 @@ const Header = ({
   filterOptions,
   department,
   onSortFilterApply,
-  navigateToManageRoles,
+  navigateToManageRoles, // function from AllTeachers
   handleCreateRole,
   isAdmin,
-  currentSort, // New prop
-  currentFilters, // New prop
+  currentSort,
+  currentFilters,
 }) => {
   const { t } = useTranslation("admAccounts");
   const [isSortModalOpen, setSortModalOpen] = useState(false);
@@ -30,13 +30,11 @@ const Header = ({
 
   return (
     <>
-      {/* Header Container */}
       <div className="flex justify-between items-center mb-4 border-b-2 h-20">
         {/* Left Section: Title and Count */}
         <div className="flex items-center gap-4">
           <h2 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
             {title}
-            {/* Gradient Circle Badge */}
             <span className="inline-flex items-center justify-center">
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 p-[2px]">
                 <span className="flex items-center justify-center w-full h-full bg-pink-50 rounded-full text-sm font-medium text-pink-600">
@@ -54,9 +52,9 @@ const Header = ({
               onApply={onSortFilterApply}
               sortOptions={sortOptions}
               filterOptions={filterOptions}
-              department={department} // Optional: Customize modal title
-              initialSort={currentSort} // Pass current sort
-              initialFilters={currentFilters} // Pass current filters
+              department={department}
+              initialSort={currentSort}
+              initialFilters={currentFilters}
             />
           )}
         </div>
@@ -72,7 +70,7 @@ const Header = ({
                   onClick={() => setSortModalOpen(true)}
                   aria-label="Open Sort and Filter Modal"
                   style={{
-                    background: "linear-gradient(to right, #ec4899, #9333ea)", // Pink to purple gradient
+                    background: "linear-gradient(to right, #ec4899, #9333ea)",
                     color: "#ffffff",
                     border: "none",
                     display: "flex",
@@ -91,17 +89,20 @@ const Header = ({
 
             <ProtectedAction requiredPermission={PERMISSIONS.GET_ALL_ROLE}>
               <button
-                onClick={navigateToManageRoles}
+                onClick={() => navigateToManageRoles(department)}
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md inline-flex items-center gap-2 hover:opacity-90 transition duration-200"
+                aria-label="Manage Roles"
               >
                 <FiLock className="text-white" />
                 {t("Manage Roles")}
               </button>
             </ProtectedAction>
+
             <ProtectedAction requiredPermission={PERMISSIONS.CREATE_ROLE}>
               <button
                 onClick={handleCreateRole}
-                className="inline-flex items-center border border-gray-300 rounded-full ps-4   bg-white hover:shadow-lg transition duration-200 gap-2"
+                className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                aria-label="Create New Role"
               >
                 <span className="text-gray-800 font-medium">
                   {t("Create Role")}
@@ -114,13 +115,10 @@ const Header = ({
           </div>
         )}
       </div>
-
-      {/* Sort & Filter Modal Trigger */}
     </>
   );
 };
 
-// Update PropTypes to include new props
 Header.propTypes = {
   title: PropTypes.string.isRequired,
   count: PropTypes.number.isRequired,
@@ -131,8 +129,8 @@ Header.propTypes = {
   navigateToManageRoles: PropTypes.func.isRequired,
   handleCreateRole: PropTypes.func.isRequired,
   isAdmin: PropTypes.bool.isRequired,
-  currentSort: PropTypes.string, // New PropType
-  currentFilters: PropTypes.array, // New PropType
+  currentSort: PropTypes.string,
+  currentFilters: PropTypes.array,
 };
 
 Header.defaultProps = {
