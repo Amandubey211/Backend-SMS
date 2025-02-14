@@ -47,36 +47,36 @@ const AddNewSubject = ({ onClose, subject }) => {
     (state) => state.admin.classIcons
   );
 
+  // Fetch icons for subjects on mount
   useEffect(() => {
     dispatch(fetchAllIcons({ type: "Subject" }));
   }, [dispatch]);
 
+  // When editing a subject, pre-select its icon using subjectIcon field
   useEffect(() => {
     if (subject) {
       setSelectedColor(subject?.color || "");
-      // Pre-select the subject icon – if it's an object use its id; if it's a string, try to match via imageLink
-      if (subject?.icon) {
-        if (typeof subject.icon === "object") {
-          const subjectIconId = subject.icon._id || subject.icon.id;
+      if (subject?.subjectIcon) {
+        let matchingIcon = null;
+        if (typeof subject.subjectIcon === "object") {
+          // If subjectIcon is an object, use its _id or id
+          const subjectIconId =
+            subject.subjectIcon._id || subject.subjectIcon.id;
           if (icons && icons.length > 0) {
-            const matchingIcon = icons.find(
+            matchingIcon = icons.find(
               (icon) => (icon._id || icon.id) === subjectIconId
             );
-            dispatch(selectIcon(matchingIcon || subject.icon));
-          } else {
-            dispatch(selectIcon(subject.icon));
           }
         } else {
-          // subject.icon is a URL string
+          // subjectIcon is a string URL—attempt to match by imageLink
           if (icons && icons.length > 0) {
-            const matchingIcon = icons.find(
-              (icon) => icon.imageLink === subject.icon
+            matchingIcon = icons.find(
+              (icon) => icon.imageLink === subject.subjectIcon
             );
-            dispatch(selectIcon(matchingIcon || subject.icon));
-          } else {
-            dispatch(selectIcon(subject.icon));
           }
         }
+        // Dispatch the matching icon object if found; otherwise, fall back to the raw value
+        dispatch(selectIcon(matchingIcon ? matchingIcon : subject.subjectIcon));
       } else {
         dispatch(selectIcon(null));
       }
@@ -101,7 +101,8 @@ const AddNewSubject = ({ onClose, subject }) => {
     return (
       subjectTitle !== subject.name ||
       selectedColor !== subject.color ||
-      (selectedIcon?.imageLink || null) !== (subject.icon?.imageLink || null)
+      (selectedIcon?.imageLink || null) !==
+        (subject.subjectIcon?.imageLink || subject.subjectIcon || null)
     );
   };
 

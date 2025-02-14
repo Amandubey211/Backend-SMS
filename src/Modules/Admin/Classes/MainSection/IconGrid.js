@@ -5,22 +5,16 @@ import { motion } from "framer-motion";
 import { Tooltip, Spin } from "antd";
 import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 import { deleteIcon } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
-import { DEFAULT_CLASS_ICONS } from "../../../../config/classIcons.config";
 
 const IconGrid = ({ activeIconId, onEdit, type, icons: propIcons }) => {
   const dispatch = useDispatch();
   const [deletingIconId, setDeletingIconId] = useState(null);
-  // Use icons from props if available; otherwise fallback to Redux state
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
 
-  const effectiveIcons =
-    propIcons && propIcons.length
-      ? propIcons
-      : icons && icons.length
-      ? icons
-      : DEFAULT_CLASS_ICONS;
+  // Use icons from props if available; otherwise use icons from Redux (backend is the single source)
+  const effectiveIcons = propIcons && propIcons.length ? propIcons : icons;
 
   const handleIconClick = (icon) => {
     dispatch(selectIcon(icon));
@@ -38,13 +32,12 @@ const IconGrid = ({ activeIconId, onEdit, type, icons: propIcons }) => {
 
   return (
     <div className="flex justify-start gap-3 flex-wrap px-3">
-      {effectiveIcons.map((icon) => {
-        // Get unique identifier from either _id or id
+      {effectiveIcons?.map((icon) => {
         const iconId = icon._id || icon.id;
-        // Check if icon is a default icon (assume default icons have IDs starting with "default-")
-        const isDefault = iconId.startsWith("default-");
-        // Determine active status: check if the passed activeIconId matches the icon's id
-        // or if the selectedIcon (from Redux) is an object matching by id or if it's a string matching the imageLink
+        // Identify a default icon by checking if its name starts with "default" (case-insensitive)
+        const isDefault =
+          icon.name && icon.name.toLowerCase().startsWith("default");
+        // Determine active state by comparing IDs or image links
         const isActive =
           activeIconId === iconId ||
           (selectedIcon &&
@@ -52,7 +45,10 @@ const IconGrid = ({ activeIconId, onEdit, type, icons: propIcons }) => {
             (selectedIcon._id || selectedIcon.id) === iconId) ||
           (selectedIcon &&
             typeof selectedIcon !== "object" &&
-            selectedIcon === icon.imageLink);
+            selectedIcon === icon.imageLink) ||
+          (selectedIcon &&
+            typeof selectedIcon === "object" &&
+            selectedIcon.imageLink === icon.imageLink);
         return (
           <motion.div
             key={iconId}
@@ -77,7 +73,7 @@ const IconGrid = ({ activeIconId, onEdit, type, icons: propIcons }) => {
               />
             </button>
 
-            {/* Only show edit and delete if icon is NOT default */}
+            {/* If not a default icon, show edit & delete options */}
             {!isDefault && (
               <div className="absolute top-1 right-1 flex gap-1 rounded-full opacity-0 transition-opacity duration-200 hover:opacity-100">
                 <Tooltip title="Edit Icon">
