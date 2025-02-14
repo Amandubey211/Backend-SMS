@@ -33,7 +33,6 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
     if (isUpdate && classData) {
       setNewClassName(classData.className);
       if (classData.classIcons) {
-        // If the stored classIcons is an object, get its id; if it's a string (URL), use it to find a match
         if (typeof classData.classIcons === "object") {
           const classIconId =
             classData.classIcons._id || classData.classIcons.id;
@@ -46,7 +45,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
             dispatch(selectIcon(classData.classIcons));
           }
         } else {
-          // classIcons is a string URL – try to match it with an icon's imageLink
+          // classIcons is a string (URL) – try to match it via imageLink
           if (icons && icons.length > 0) {
             const matchingIcon = icons.find(
               (icon) => icon.imageLink === classData.classIcons
@@ -81,7 +80,7 @@ const AddNewClass = ({ classData, isUpdate, onClose }) => {
       return;
     }
 
-    // Build classDetails—storing the entire selected icon object (if available)
+    // Build classDetails—store the selected icon if available
     const classDetails = { className: newClassName.trim() };
     if (selectedIcon) {
       classDetails.classIcons = selectedIcon;
