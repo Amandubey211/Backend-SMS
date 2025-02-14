@@ -195,9 +195,7 @@ const AllLibrarian = () => {
                       key={lib._id} // Use a unique identifier
                       profile={lib}
                       onClick={() => handleLibrarianClick(lib)}
-                      editUser={
-                        role === "admin" ? (event) => editUser(event, lib) : null
-                      }
+                      editUser={(event) => editUser(event, lib)}
                     />
                   ))
                 ) : (
@@ -206,6 +204,7 @@ const AllLibrarian = () => {
                   </div>
                 )}
               </div>
+
 
               {/* Floating Action Button */}
               <ProtectedAction requiredPermission={PERMISSIONS.ADD_LIBRARIAN}>
@@ -217,7 +216,8 @@ const AllLibrarian = () => {
                   <GoPlus className="text-2xl" />
                 </button>
               </ProtectedAction>
-            </div></ProtectedSection>
+            </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 
