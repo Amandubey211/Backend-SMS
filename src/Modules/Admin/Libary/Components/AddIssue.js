@@ -51,14 +51,14 @@ const AddIssue = ({ onClose, editIssueData }) => {
       });
 
       // Fetch sections for the selected class
-      if (editIssueData.classId?._id) {
-        dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
-      }
+      // if (editIssueData.classId?._id) {
+      //   dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
+      // }
 
-      // Fetch students for the selected section
-      if (editIssueData.sectionId?._id) {
-        dispatch(fetchStudentsByClassAndSection(editIssueData.sectionId._id));
-      }
+      // // Fetch students for the selected section
+      // if (editIssueData.sectionId?._id) {
+      //   dispatch(fetchStudentsByClassAndSection(editIssueData.sectionId._id));
+      // }
     } else {
       // Reset form for adding a new issue
       setIssueData({
