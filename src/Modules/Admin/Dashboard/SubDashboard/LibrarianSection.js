@@ -14,7 +14,7 @@ const LibrarianSection = () => {
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
 
         {/* Notice Board Section */}
-        <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
+        <div className="w-full md:w-[50%] p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
               <NoticeBoard descriptionLength={140} />
          
@@ -22,7 +22,7 @@ const LibrarianSection = () => {
         </div>
 
         {/* Events Section */}
-        <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
+        <div className="w-full md:w-[50%] p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
               <Events />
           </div>

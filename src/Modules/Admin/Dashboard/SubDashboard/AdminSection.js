@@ -14,14 +14,14 @@ const AdminSection = () => {
       {/* First Row: Attendance and Earnings */}
       <div className="flex flex-wrap justify-between items-start border-y h-full relative max-w-screen">
         <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
+        <div className="w-full md:w-[50%] p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
             
             <TotalAttendanceGraph />
              
           </div>
         </div>
-        <div className="w-full md:w-1/2 p-2 h-full flex items-center justify-center">
+        <div className="w-full md:w-[50%] p-2 h-full flex items-center justify-center">
           <div className="w-full h-full">
             
             <TotalEarningsGraph />
@@ -33,14 +33,14 @@ const AdminSection = () => {
       {/* Second Row: Top Ranking and Total Students with Middle Divider */}
       <div className="flex flex-wrap justify-between items-start border-y h-full relative max-w-screen">
         <div className="absolute left-2/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-full md:w-2/3 h-full p-2 flex items-center justify-center">
+        <div className="w-full  md:w-[65%] h-full p-2 flex items-center justify-center">
           <div className="w-full h-full">
           
             <TopRankingStudents />
              
           </div>
         </div>
-        <div className="w-full md:w-1/3 h-full p-2 flex items-center justify-center">
+        <div className="w-full  md:w-[30%] h-full p-2 flex items-center justify-center">
           <div className="w-full h-full">
             
             <TotalStudentsGraphjs />

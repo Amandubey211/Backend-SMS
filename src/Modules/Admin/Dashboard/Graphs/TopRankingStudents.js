@@ -68,7 +68,7 @@ const TopRankingStudents = () => {
               {topStudents?.slice(0, 3)?.map((student, index) => (
                 <div
                   key={index}
-                  className="text-center p-4 border rounded-lg relative w-[35%]"
+                  className="text-center p-4 border rounded-lg relative w-[30%]"
                 >
                   {index === 0 && (
                     <div
@@ -91,9 +91,9 @@ const TopRankingStudents = () => {
                     )}
                   </div>
                   <p>{student?.studentName || t("N/A")}</p>
-                  <p className="mb-2">
+                  <p className="mb-2 text-sm">
                     {t("Adm")}:{" "}
-                    <span className="text-gray-600">
+                    <span className = "text-gray-600 text-sm">
                       {student?.admissionNumber || t("N/A")}
                     </span>
                   </p>
