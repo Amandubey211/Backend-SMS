@@ -1,7 +1,7 @@
 import React from "react";
 import { CiSearch } from "react-icons/ci";
 
-function Header({ data, searchQuery, setSearchQuery }) {
+function Header({ data, searchQuery, setSearchQuery, loading }) {
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -11,7 +11,7 @@ function Header({ data, searchQuery, setSearchQuery }) {
         <h2 className="text-xl font-semibold text-gradient">
           Offline Exams
           <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {data?.length}
+            {loading ? 0 : data?.length}
           </span>
         </h2>
         <div className="relative flex items-center max-w-xs w-full mr-4">

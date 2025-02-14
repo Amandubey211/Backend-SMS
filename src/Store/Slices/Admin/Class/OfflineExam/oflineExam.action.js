@@ -22,6 +22,7 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const response = await getData(
         `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}`
       );
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -34,13 +35,24 @@ export const createOfflineExam = createAsyncThunk(
   async ({ payload }, { rejectWithValue, dispatch, getState }) => {
     try {
       const getRole = getUserRole(getState);
+      const schoolId = getState().common.user.userDetails.schoolId;
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
+      const updatedPayload = {
+        ...payload,
+        schoolId,
+        semesterId,
+        academicYearId: say,
+      };
+
+      console.log("semester id", semesterId);
       dispatch(setShowError(false));
 
       const response = await postData(
         `${getRole}/exam/create?say=${say}`,
-        payload
+        updatedPayload
       );
+      console.log("response", response);
 
       return response;
     } catch (error) {
@@ -53,10 +65,11 @@ export const UploadOfflineExamSheet = createAsyncThunk(
   "subject/offline_upload_exam_sheet",
   async (formData, { rejectWithValue, dispatch, getState }) => {
     try {
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
+      formData.append("semesterId", semesterId);
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-
       const response = await customRequest(
         "post",
         `${getRole}/exam/uploadExcel?say=${say}`,
@@ -80,12 +93,10 @@ export const UpdateOfflineExamCard = createAsyncThunk(
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-
       const response = await putData(
         `${getRole}/update/offlineExam/${examId}?say=${say}`,
         payload
       );
-
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
