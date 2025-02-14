@@ -33,7 +33,7 @@ const StationeryItemsSection = () => {
       label: "Item Name",
       name: "itemName",
       type: "text",
-      span: 12,
+      span: 6,
       tooltip: "Enter the name of the item",
     },
     {
@@ -90,7 +90,7 @@ const StationeryItemsSection = () => {
               value={fieldValue}
               onChange={(value) => setFieldValue(currentFieldName, value)}
               onBlur={handleBlur}
-              style={{ width: "100%" }}
+              style={{ width: "80%" }}
               min={0}
             />
           ) : (

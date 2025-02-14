@@ -195,7 +195,8 @@ const AllLibrarian = () => {
                       key={lib._id} // Use a unique identifier
                       profile={lib}
                       onClick={() => handleLibrarianClick(lib)}
-                      editUser={(event) => editUser(event, lib)}
+                      editUser={editUser}
+
                     />
                   ))
                 ) : (

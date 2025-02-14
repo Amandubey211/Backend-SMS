@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import {
   createSubject,
- updateSubject,
+  updateSubject,
 } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import { useTranslation } from "react-i18next";
 import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
@@ -34,40 +34,59 @@ const dummyColors = [
   "bg-gray-300",
 ];
 
-
-
 const AddNewSubject = ({ onClose, subject }) => {
-  const { t } = useTranslation("admClass"); // Use translation hook
+  const { t } = useTranslation("admClass");
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
-  const [activeIcon, setActiveIcon] = useState(null);
   const [subjectTitle, setSubjectTitle] = useState("");
 
   const dispatch = useDispatch();
   const { cid } = useParams();
-  const {loading} = useSelector((state) => state.admin.subject);
+  const { loading } = useSelector((state) => state.admin.subject);
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
-  useEffect(()=>{
-    dispatch(fetchAllIcons({type:"Subject"}))
-  },[dispatch])
 
+  // Fetch icons for subjects on mount
+  useEffect(() => {
+    dispatch(fetchAllIcons({ type: "Subject" }));
+  }, [dispatch]);
+
+  // When editing a subject, pre-select its icon using subjectIcon field
   useEffect(() => {
     if (subject) {
       setSelectedColor(subject?.color || "");
-      setActiveIcon(subject?.icon || null);
+      if (subject?.subjectIcon) {
+        let matchingIcon = null;
+        if (typeof subject.subjectIcon === "object") {
+          // If subjectIcon is an object, use its _id or id
+          const subjectIconId =
+            subject.subjectIcon._id || subject.subjectIcon.id;
+          if (icons && icons.length > 0) {
+            matchingIcon = icons.find(
+              (icon) => (icon._id || icon.id) === subjectIconId
+            );
+          }
+        } else {
+          // subjectIcon is a string URL—attempt to match by imageLink
+          if (icons && icons.length > 0) {
+            matchingIcon = icons.find(
+              (icon) => icon.imageLink === subject.subjectIcon
+            );
+          }
+        }
+        // Dispatch the matching icon object if found; otherwise, fall back to the raw value
+        dispatch(selectIcon(matchingIcon ? matchingIcon : subject.subjectIcon));
+      } else {
+        dispatch(selectIcon(null));
+      }
       setSubjectTitle(subject?.name || "");
     } else {
-      resetForm();
+      setSelectedColor("");
+      setSubjectTitle("");
+      dispatch(selectIcon(null));
     }
-  }, [subject]);
-
-  const resetForm = useCallback(() => {
-    setSelectedColor("");
-    setActiveIcon(null);
-    setSubjectTitle("");
-  }, []);
+  }, [subject, dispatch, icons]);
 
   const validateInputs = useCallback(() => {
     if (!subjectTitle.trim()) {
@@ -78,11 +97,12 @@ const AddNewSubject = ({ onClose, subject }) => {
   }, [subjectTitle, t]);
 
   const hasChanges = () => {
-    if (!subject) return false;
+    if (!subject) return true;
     return (
       subjectTitle !== subject.name ||
       selectedColor !== subject.color ||
-      activeIcon !== subject.icon
+      (selectedIcon?.imageLink || null) !==
+        (subject.subjectIcon?.imageLink || subject.subjectIcon || null)
     );
   };
 
@@ -97,15 +117,13 @@ const AddNewSubject = ({ onClose, subject }) => {
     };
 
     if (subject) {
-      // Dispatch update only if there are changes
       if (!hasChanges()) {
         toast(t("No changes detected."));
         return;
       }
       dispatch(updateSubject({ subjectId: subject._id, subjectData }));
     } else {
-      
-    dispatch(createSubject(subjectData));
+      dispatch(createSubject(subjectData));
     }
     onClose();
   };
@@ -118,26 +136,32 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setActiveIcon(null);
-  }
+  };
 
   const iconGrid = useMemo(
-    () =>
-      <div className="flex flex-col gap-2  flex-grow w-full ">
-      <IconGrid
-    icons={icons}
-    activeIcon={selectIcon?._id}
-    onEdit={openModal}
-  /></div>,
-    [selectedIcon, t]
+    () => (
+      <div className="flex flex-col gap-2 flex-grow w-full">
+        <IconGrid
+          icons={icons}
+          activeIconId={
+            selectedIcon
+              ? selectedIcon._id || selectedIcon.id || selectedIcon
+              : null
+          }
+          onEdit={openModal}
+          type="Subject"
+        />
+      </div>
+    ),
+    [icons, selectedIcon, openModal]
   );
 
   const colorGrid = useMemo(
     () =>
-      dummyColors?.map((color, index) => (
+      dummyColors.map((color, index) => (
         <button
           key={index}
-          onClick={() => {console.log (color);setSelectedColor(color)}}
+          onClick={() => setSelectedColor(color)}
           className={`w-12 h-12 rounded-full border-2 ${color} focus:outline-none transition duration-300 ease-in-out ${
             selectedColor === color ? "border-black" : "border-transparent"
           }`}
@@ -231,7 +255,9 @@ const AddNewSubject = ({ onClose, subject }) => {
           )}
         </button>
       </div>
-      {isModalOpen && <CreateEditIconModal onClose={closeModal} type={'Subject'} />}
+      {isModalOpen && (
+        <CreateEditIconModal onClose={closeModal} type="Subject" />
+      )}
     </div>
   );
 };

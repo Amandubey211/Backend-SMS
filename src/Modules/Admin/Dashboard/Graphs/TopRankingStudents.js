@@ -9,7 +9,7 @@ import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
-
+import { IoPeople } from "react-icons/io5";
 const TopRankingStudents = () => {
   const { t } = useTranslation("admTopRanking");
   const dispatch = useDispatch();
@@ -55,8 +55,9 @@ const TopRankingStudents = () => {
         </div>
 
         {errorTopStudents || topStudents?.length === 0 ? (
-          <div className="flex items-center justify-center py-20">
-            <NoDataFound title={"Student"} />
+          <div className="flex items-center justify-center flex-col gap-2 h-full mt-10 text-2xl text-gray-400 py-20">
+             <IoPeople size={40} className="" />
+             <h1>No Data Found</h1>
           </div>
         ) : loadingTopStudents || loading ? (
           <div className="py-20">
@@ -68,7 +69,7 @@ const TopRankingStudents = () => {
               {topStudents?.slice(0, 3)?.map((student, index) => (
                 <div
                   key={index}
-                  className="text-center p-4 border rounded-lg relative w-[35%]"
+                  className="text-center p-4 border rounded-lg relative w-[30%]"
                 >
                   {index === 0 && (
                     <div
@@ -91,9 +92,9 @@ const TopRankingStudents = () => {
                     )}
                   </div>
                   <p>{student?.studentName || t("N/A")}</p>
-                  <p className="mb-2">
+                  <p className="mb-2 text-sm">
                     {t("Adm")}:{" "}
-                    <span className="text-gray-600">
+                    <span className = "text-gray-600 text-sm">
                       {student?.admissionNumber || t("N/A")}
                     </span>
                   </p>

@@ -32,10 +32,9 @@ const CreateAcademicYear = () => {
     dispatch(createAcademicYear(yearData))
       .unwrap()
       .then(() => {
-        navigate("/dashboard"); // Redirect to dashboard on success
+        navigate("/select_branch"); // Redirect to dashboard on success
       })
       .catch((error) => {
-        // Handle error
         toast.error(error);
       });
   };
