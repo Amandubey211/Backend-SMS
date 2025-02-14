@@ -118,7 +118,7 @@ const AnnouncementCommentSection = () => {
       <ProtectedAction
         requiredPermission={PERMISSIONS.CREATE_COMMENT_ON_ANNOUNCEMENT}
       >
-        <div className="flex-none h-[15%]">
+        <div className="flex-none h-[15%] mb-3">
           <AnnouncementInputComment addComment={handleAddComment} />
         </div>
       </ProtectedAction>

@@ -1,13 +1,14 @@
 import React, { useState, useCallback } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
-import { Tooltip } from "antd"; // Import Tooltip from antd
+import { FiEdit } from "react-icons/fi"; // Edit icon
+import { Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import DeleteModal from "../../../Components/Common/DeleteModal";
 import { unassignTeacher } from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 import { useParams } from "react-router-dom";
 
-const TeacherCard = ({ teacher }) => {
+const TeacherCard = ({ teacher, onEditTeacher }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const role = useSelector((state) => state.common.auth.role);
@@ -22,18 +23,32 @@ const TeacherCard = ({ teacher }) => {
 
   const handleCloseModal = () => setIsModalOpen(false);
 
+  const handleEditClick = () => {
+    if (onEditTeacher) {
+      onEditTeacher(teacher);
+    }
+  };
+
   return (
     <div className="relative w-64 h-80 rounded-md overflow-hidden hover:shadow-lg border border-gray-200 p-4 m-4 flex flex-col items-center transform transition-transform duration-300 hover:scale-105 group">
-      {role === "admin" && (
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            className="bg-white rounded-full p-2 border"
-            onClick={handleDeleteClick}
-          >
-            <RiDeleteBinLine className="text-red-500 w-4 h-4" />
-          </button>
-        </div>
-      )}
+      <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+        {role === "admin" && (
+          <>
+            <button
+              className="bg-white rounded-full p-2 border"
+              onClick={handleEditClick}
+            >
+              <FiEdit className="text-blue-500 w-4 h-4" />
+            </button>
+            <button
+              className="bg-white rounded-full p-2 border"
+              onClick={handleDeleteClick}
+            >
+              <RiDeleteBinLine className="text-red-500 w-4 h-4" />
+            </button>
+          </>
+        )}
+      </div>
       <div className="flex justify-center">
         {teacher.profile ? (
           <img
@@ -50,7 +65,7 @@ const TeacherCard = ({ teacher }) => {
           <div
             className="font-bold capitalize text-xl mb-1 truncate"
             style={{
-              maxWidth: "150px", // Limit width to create the truncate effect
+              maxWidth: "150px",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -59,7 +74,7 @@ const TeacherCard = ({ teacher }) => {
             {teacher.firstName} {teacher.lastName}
           </div>
         </Tooltip>
-        <p className="text-gray-700 text-sm ">Instructor</p>
+        <p className="text-gray-700 text-sm">Instructor</p>
       </div>
       <div className="text-center mt-4 border-t pt-2 w-full">
         <p className="text-gray-500 text-xs uppercase">Phone</p>

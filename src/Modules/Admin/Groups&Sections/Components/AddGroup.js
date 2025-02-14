@@ -367,14 +367,14 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
                 {/* Show up to 5 badges + “+X” for more */}
                 {renderSelectedStudentsPreview()}
                 {/* Optional "View All" button if more than 5 selected */}
-                {selectedStudents?.length > 1 && (
+                {/* {selectedStudents?.length > 1 && (
                   <Button
                     size="middle"
                     onClick={() => setIsFullScreenModalOpen(true)}
                   >
                     {t("View All")}
                   </Button>
-                )}
+                )} */}
               </div>
             </div>
           </div>

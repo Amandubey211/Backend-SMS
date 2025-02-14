@@ -4,19 +4,28 @@ import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   assignTeacher,
+  editTeacher,
   fetchAllTeachers,
 } from "../../../Store/Slices/Admin/Class/Teachers/teacherThunks";
 import { fetchSubjects } from "../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 
-const AssignTeacher = () => {
+const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const { t } = useTranslation("admClass");
-  const [teacherId, setTeacherId] = useState("");
-  const [subjectId, setSubjectId] = useState("");
-  const [sectionId, setSectionId] = useState("");
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Extracting required data from Redux store
+  // Local state for form fields—prefilled when editingTeacher exists
+  const [teacherId, setTeacherId] = useState(
+    editingTeacher ? editingTeacher._id : ""
+  );
+  const [subjectId, setSubjectId] = useState(
+    (editingTeacher && editingTeacher.subjects?.[0]?._id) || ""
+  );
+  const [sectionId, setSectionId] = useState(
+    (editingTeacher && editingTeacher.sectionId?.[0]?._id) || ""
+  );
+
+  // Data from Redux store
   const allTeachers = useSelector((state) => state.admin.teacher.allTeachers);
   const allSubjects = useSelector((state) => state.admin.subject.subjects);
   const allSections = useSelector(
@@ -24,24 +33,48 @@ const AssignTeacher = () => {
   );
   const loading = useSelector((state) => state.admin.teacher.loading);
 
-  // Fetch teachers, subjects, and sections on component mount
+  // Fetch teachers and subjects on mount
   useEffect(() => {
     dispatch(fetchAllTeachers());
     dispatch(fetchSubjects(cid));
   }, [dispatch, cid]);
 
+  // Update local state when editingTeacher changes
+  useEffect(() => {
+    if (editingTeacher) {
+      setTeacherId(editingTeacher._id);
+      setSubjectId(editingTeacher.subjects?.[0]?._id || "");
+      setSectionId(editingTeacher.sectionId?.[0]?._id || "");
+    } else {
+      setTeacherId("");
+      setSubjectId("");
+      setSectionId("");
+    }
+  }, [editingTeacher]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    const assignData = {
-      classId: cid,
-      teacherId,
-      sectionId,
-      subjectId,
-    };
-    dispatch(assignTeacher(assignData));
+    if (editingTeacher) {
+      // Data structure based on your backend controller expectations
+      const editData = {
+        id: editingTeacher._id,
+        subjects: [{ _id: subjectId }],
+        classIds: [{ _id: cid }],
+        sectionIds: [{ _id: sectionId }],
+      };
+      dispatch(editTeacher(editData));
+    } else {
+      const assignData = {
+        classId: cid,
+        teacherId,
+        sectionId,
+        subjectId,
+      };
+      dispatch(assignTeacher(assignData));
+    }
+    closeSidebar();
   };
 
-  // Unified styles for the select boxes
   const selectBoxClasses =
     "block w-full p-3 border border-gray-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition ease-in-out duration-150 text-gray-800";
 
@@ -56,7 +89,7 @@ const AssignTeacher = () => {
             value={teacherId}
             onChange={(e) => setTeacherId(e.target.value)}
             className={selectBoxClasses}
-            disabled={loading}
+            disabled={loading || Boolean(editingTeacher)}
           >
             <option value="">{t("Choose")}</option>
             {allTeachers?.map((teacher) => (
@@ -115,7 +148,13 @@ const AssignTeacher = () => {
           }`}
           disabled={loading}
         >
-          {loading ? t("Assigning...") : t("Add New Instructor")}
+          {loading
+            ? editingTeacher
+              ? t("Updating...")
+              : t("Processing...")
+            : editingTeacher
+            ? t("Update Instructor")
+            : t("Add New Instructor")}
         </button>
       </div>
     </form>
