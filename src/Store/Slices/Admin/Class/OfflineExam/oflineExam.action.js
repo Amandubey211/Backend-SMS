@@ -70,9 +70,6 @@ export const UploadOfflineExamSheet = createAsyncThunk(
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-
-      console.log("semester id", semesterId);
-
       const response = await customRequest(
         "post",
         `${getRole}/exam/uploadExcel?say=${say}`,
@@ -142,11 +139,8 @@ export const deleteOfflineExamCard = createAsyncThunk(
         `${getRole}/delete/offlineExam/${examId}?say=${say}`
       );
 
-      console.log("deleted succcess", response);
-
       return response;
     } catch (error) {
-      console.log("deleted succcess", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }

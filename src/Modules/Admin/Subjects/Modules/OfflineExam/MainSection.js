@@ -55,7 +55,6 @@ const MainSection = () => {
     }
   }, []);
 
-  console.log("main section data", offlineExamData);
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />

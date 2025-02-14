@@ -35,9 +35,6 @@ const OfflineExamCard = ({
     maxScore,
   });
   
-
-  console.log("offline exam data", offlineExamData);
-
   const handleDeleteClick = async () => {
     try {
       const response = dispatch(deleteOfflineExamCard({ examId }));
