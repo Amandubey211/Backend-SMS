@@ -162,13 +162,6 @@ const RecentQuotation = () => {
                 />
             );
         }
-        if (!quotations || quotations.length === 0) {
-            return (
-                <div className="text-center text-gray-500 text-xs py-4">
-                    No records found.
-                </div>
-            );
-        }
         return (
             <Table
                 dataSource={dataSource}

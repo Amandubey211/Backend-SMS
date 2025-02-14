@@ -506,12 +506,11 @@ const PenalityandAdjustmentList = () => {
           </div>
 
           {/* Render Spinner until initial API call is complete */}
-          {(initialLoad || loading) ? (
+          {(loading) ? (
             <div className="flex justify-center">
               <Spinner />
             </div>
           ) : (
-            !error && (
               <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
                 <Table
                   dataSource={dataSource}
@@ -538,7 +537,7 @@ const PenalityandAdjustmentList = () => {
                   tableLayout="fixed"
                 />
               </ProtectedSection>
-            )
+            
           )}
 
           {/* Export Modal */}

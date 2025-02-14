@@ -94,9 +94,9 @@ export const OnePaymentDetail = ({ category }) => {
       finalAmount > paidAmount ? finalAmount - paidAmount : 0;
   
     // Set calculated values
-    setFieldValue(`advanceAmount_${category}`, advanceAmount.toFixed(2));
-    setFieldValue(`remainingAmount_${category}`, remainingAmount.toFixed(2));
-    setFieldValue(`finalAmount_${category}`, finalAmount.toFixed(2));
+    setFieldValue(`advanceAmount_${category}`, advanceAmount?.toFixed(2));
+    setFieldValue(`remainingAmount_${category}`, remainingAmount?.toFixed(2));
+    setFieldValue(`finalAmount_${category}`, finalAmount?.toFixed(2));
   }, [
     values[`totalAmount_${category}`],
     values[`paidAmount_${category}`],

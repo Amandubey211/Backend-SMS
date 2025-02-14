@@ -170,13 +170,6 @@ const SummaryPenalityandAdjustment = () => {
         />
       );
     }
-    if (!adjustmentData || adjustmentData.length === 0) {
-      return (
-        <div className="text-center text-gray-500 text-xs py-4">
-          No records found.
-        </div>
-      );
-    }
     return (
       <ProtectedSection
         requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}
