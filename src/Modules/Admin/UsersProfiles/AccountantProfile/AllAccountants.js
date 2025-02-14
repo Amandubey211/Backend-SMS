@@ -193,9 +193,7 @@ const AllAccountants = () => {
                       key={acc._id} // Use a unique identifier
                       profile={acc}
                       onClick={() => handleAccountantClick(acc)}
-                      editUser={
-                        role === "admin" ? (event) => editUser(event, acc) : null
-                      }
+                      editUser={editUser}
                     />
                   ))
                 ) : (

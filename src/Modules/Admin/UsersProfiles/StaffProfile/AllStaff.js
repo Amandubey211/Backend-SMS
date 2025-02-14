@@ -198,11 +198,7 @@ const AllStaff = () => {
                       key={member._id} // Use a unique identifier
                       profile={member}
                       onClick={() => handleStaffClick(member)}
-                      editUser={
-                        role === "admin"
-                          ? (event) => editUser(event, member)
-                          : null
-                      }
+                      editUser={editUser}
                     />
                   ))
                 ) : (
