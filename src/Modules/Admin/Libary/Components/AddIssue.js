@@ -55,12 +55,12 @@ const AddIssue = ({ onClose, editIssueData }) => {
       });
 
       // Dispatch actions to load the correct dropdown options
-      // if (editIssueData.classId && editIssueData.classId._id) {
-      //   dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
-      // }
-      // if (editIssueData.sectionId && editIssueData.sectionId._id) {
-      //   dispatch(fetchStudentsByClassAndSection(editIssueData.sectionId._id));
-      // }
+      if (editIssueData.classId && editIssueData.classId._id) {
+        dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
+      }
+      if (editIssueData.sectionId && editIssueData.sectionId._id) {
+        dispatch(fetchStudentsByClassAndSection(editIssueData.sectionId._id));
+      }
     } else {
       // Reset the form for adding a new issue
       setIssueData({

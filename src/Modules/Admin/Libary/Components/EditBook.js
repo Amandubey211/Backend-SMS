@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import FormInput from "../../Accounting/subClass/component/FormInput";
@@ -23,13 +23,19 @@ const EditBook = ({ book, onClose }) => {
   });
   const [errors, setErrors] = useState({});
 
-  // Preload book data when the component mounts
+  // Preload book data when the component mounts or when book/classList change
   useEffect(() => {
     if (book) {
+      // Attempt to get the class ID from book.classId; if missing, try to find it by matching className
+      let selectedClassId = book?.classId?._id || "";
+      if (!selectedClassId && book.className && classList?.length > 0) {
+        const foundClass = classList.find((cls) => cls.className === book.className);
+        selectedClassId = foundClass ? foundClass._id : "";
+      }
       setBookData({
         bookName: book?.name || "",
         authorName: book?.author || "",
-        class: book?.classId?._id || "", // Preselect the class from bookId.classId
+        class: selectedClassId,
         category: book?.category || "",
         copies: book?.copies || 0,
         bookImage: null,
@@ -39,7 +45,7 @@ const EditBook = ({ book, onClose }) => {
         setImagePreview(book.image);
       }
     }
-  }, [book]);
+  }, [book, classList]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -85,7 +91,7 @@ const EditBook = ({ book, onClose }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
-    if (Object.keys(validationErrors)?.length > 0) {
+    if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
@@ -142,7 +148,7 @@ const EditBook = ({ book, onClose }) => {
               value: cls._id,
               label: cls.className,
             }))}
-            value={bookData.class} // Prefill with the selected class
+            value={bookData.class || ""} // Always controlled value
             onChange={handleInputChange}
             error={errors.class}
           />
