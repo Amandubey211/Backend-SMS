@@ -6,7 +6,7 @@ import { IoCloudUploadOutline } from "react-icons/io5";
 import { MdDoneOutline, MdOutlineDocumentScanner } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { setStep } from "../../../../Store/Slices/Common/User/reducers/userSlice";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const DocumentUploadForm = ({
   studentDocuments,
@@ -23,7 +23,7 @@ const DocumentUploadForm = ({
   validationErrors,
   type = "Student",
 }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
   const dispatch = useDispatch();
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPreview, setSelectedPreview] = useState("");
@@ -104,7 +104,9 @@ const DocumentUploadForm = ({
     <form onSubmit={handleDocumentSubmit}>
       <h3 className="text-lg font-semibold mb-4">{t("Document Upload")}</h3>
       {validationErrors?.documents && (
-        <div className="text-red-500 mb-4">{t(validationErrors?.documents)}</div>
+        <div className="text-red-500 mb-4">
+          {t(validationErrors?.documents)}
+        </div>
       )}
       <div className="grid grid-cols-1 gap-4">
         {studentDocuments.documents &&
@@ -127,7 +129,9 @@ const DocumentUploadForm = ({
                       {t("Select Document Type")}
                     </option>
                     <option value="Passport">{t("Passport")}</option>
-                    <option value="Birth Certificate">{t("Birth Certificate")}</option>
+                    <option value="Birth Certificate">
+                      {t("Birth Certificate")}
+                    </option>
                     <option value="Other">{t("Other")}</option>
                   </select>
                   <div className="flex space-x-2 ml-4">
@@ -209,7 +213,9 @@ const DocumentUploadForm = ({
               className="mr-2"
               required
             />
-            <label className="text-sm">{t("I acknowledge that the above information is correct.")}</label>
+            <label className="text-sm">
+              {t("I acknowledge that the above information is correct.")}
+            </label>
           </div>
 
           {/* Add Back Button Here */}
