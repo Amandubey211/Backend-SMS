@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback } from "react";
-import { Table, Button, Tag, Alert } from "antd";
+import { Table, Button, Tag, Alert, Spin } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
@@ -144,24 +144,6 @@ const RecentQuotation = () => {
 
     // Helper function to render content based on state
     const renderContent = () => {
-        if (loading) {
-            return (
-                <div className="flex justify-center">
-                    <Spinner tip="Loading..." />
-                </div>
-            );
-        }
-        if (error) {
-            return (
-                <Alert
-                    message="Error"
-                    description={error}
-                    type="error"
-                    showIcon
-                    className="my-4"
-                />
-            );
-        }
         return (
             <Table
                 dataSource={dataSource}
@@ -170,7 +152,13 @@ const RecentQuotation = () => {
                 className="rounded-lg shadow text-xs"
                 bordered
                 size="small"
-                tableLayout="fixed" // Fixed table layout
+                tableLayout="fixed"
+                loading={{
+                    spinning: loading,
+                    indicator: <Spin size="large" />,
+                    tip: "Loading...",
+                  }}
+                 // Fixed table layout
             />
         );
     };

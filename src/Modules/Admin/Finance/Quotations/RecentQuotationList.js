@@ -552,6 +552,11 @@ const RecentQuotationList = () => {
                 bordered
                 size="small"
                 tableLayout="fixed"
+                loading={{
+                  spinning: loading,
+                  indicator: <Spin size="large" />,
+                  tip: "Loading...",
+                }}
               />
             </ProtectedSection>
         

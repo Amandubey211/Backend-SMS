@@ -151,25 +151,8 @@ const SummaryPenalityandAdjustment = () => {
 
   // Helper function to render content based on the current state
   const renderContent = () => {
-    if (loading) {
-      return (
-        <div className="flex justify-center">
-          <Spinner />
-        </div>
-      );
-    }
-    if (error) {
-      return (
-        <Alert
-          message="Error"
-          description={error}
-          type="error"
-          showIcon
-          closable
-          className="my-4"
-        />
-      );
-    }
+  
+    
     return (
       <ProtectedSection
         requiredPermission={PERMISSIONS.SHOWS_CARD_DATA_OF_PENALTY_AND_ADJUSTMENT}
@@ -183,6 +166,11 @@ const SummaryPenalityandAdjustment = () => {
           bordered
           size="small"
           tableLayout="fixed" // Fixed table layout
+          loading={{
+            spinning: loading,
+            indicator: <Spin size="large" />,
+            tip: "Loading...",
+          }}
         />
       </ProtectedSection>
     );

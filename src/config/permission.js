@@ -501,6 +501,17 @@ export const PERMISSIONS = {
   // ====================
   // GRADES_OF_ONE_STUDENT_GRADE: "Get Grades of One Student",
   STUDENT_SUBJECTS_GRADE: "Get Student Subjects",
+
+  //            offline exams  ///////////////
+
+  UPLOAD_EXCEL_OFFLINE :"Upload Excel of Offline Exam",
+    ADD_OFFLINE_EXAM: "Add Offline Exam",
+    UPDATE_OFFLINE_STUDENT_EXAM: "Update Student Exam",
+   GET_OFFLINE_EXAM: "Get offline Exam",
+  SHOW_ALL_EXAMS: "Show All Exams",
+   DELETE_OFFLINE_STUDENT_EXAM: "Delete Exam of Student",
+    UPDATE_OFFLINE_EXAM:"Update Offline Exam",
+    DELETE_OFFLINE_STUDENT_EXAM:"Delete Offline Exam",
   //------------------------------------------------End of Class Variables ---------------------------------------------------------
 
   //-------------------------------------------------------------------------//
