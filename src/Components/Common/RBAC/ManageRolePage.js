@@ -1,8 +1,14 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import ReactDOM from "react-dom";
-import { FiEdit2, FiTrash2, FiMaximize, FiMinimize } from "react-icons/fi";
+import {
+  FiEdit2,
+  FiTrash2,
+  FiMaximize,
+  FiMinimize,
+  FiEye,
+} from "react-icons/fi";
 import { useLocation } from "react-router-dom";
-import { Tooltip, Input } from "antd";
+import { Tooltip, Input, Modal } from "antd";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
@@ -65,6 +71,8 @@ const ManageRolePage = () => {
   const [isDeletingRole, setIsDeletingRole] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  // State to highlight edit mode button if needed (optional)
+  const [highlightEditButton, setHighlightEditButton] = useState(false);
 
   // Use debounced search query for performance
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
@@ -171,14 +179,52 @@ const ManageRolePage = () => {
     }
   }, [selectedPermissions, allDisplayedRouteIds]);
 
-  // Handlers using useCallback to prevent unnecessary re-renders
+  // Determine checkbox color based on mode:
+  // In edit mode, use blue; in view mode, use green.
+  const checkboxColor = isEditMode ? "text-blue-500" : "text-green-500";
+
+  // ----------------- Updated Confirmation Modals -----------------
+  // Modal for switching to Edit Mode when a permission checkbox is clicked in view mode.
+  const triggerEditHighlight = useCallback(() => {
+    Modal.confirm({
+      title: (
+        <div className="flex items-center">
+          <FiEdit2 className="text-purple-500 mr-3" size={30} />
+          <span className="text-2xl font-bold">Switch to Edit Mode</span>
+        </div>
+      ),
+      content: (
+        <div className="text-xl">
+          You are currently in{" "}
+          <span className="text-green-500 font-semibold">View Mode</span>. To
+          modify permissions, please switch to{" "}
+          <span className="text-blue-500 font-semibold">Edit Mode</span>.
+        </div>
+      ),
+      okText: "Switch",
+      cancelText: "Cancel",
+      centered: true,
+      width: 600,
+      okButtonProps: {
+        className: "bg-gradient-to-r from-pink-500 to-purple-500 text-white",
+      },
+      onOk: () => {
+        setIsEditMode(true);
+      },
+    });
+  }, []);
+
+  // ----------------- Handlers -----------------
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
 
   const handleGlobalChange = useCallback(
     (isChecked) => {
-      if (!isEditMode) return;
+      if (!isEditMode) {
+        triggerEditHighlight();
+        return;
+      }
       if (isChecked) {
         setSelectedPermissions((prev) =>
           Array.from(new Set([...prev, ...allDisplayedRouteIds]))
@@ -189,12 +235,15 @@ const ManageRolePage = () => {
         );
       }
     },
-    [isEditMode, allDisplayedRouteIds]
+    [isEditMode, allDisplayedRouteIds, triggerEditHighlight]
   );
 
   const handleGroupChange = useCallback(
     (groupRoutes, isChecked) => {
-      if (!isEditMode) return;
+      if (!isEditMode) {
+        triggerEditHighlight();
+        return;
+      }
       const groupRouteIds = groupRoutes.map((r) => r._id);
       setSelectedPermissions((prev) => {
         const prevSet = new Set(prev);
@@ -204,19 +253,22 @@ const ManageRolePage = () => {
         return Array.from(prevSet);
       });
     },
-    [isEditMode]
+    [isEditMode, triggerEditHighlight]
   );
 
   const handleRouteChange = useCallback(
     (routeId, isChecked) => {
-      if (!isEditMode) return;
+      if (!isEditMode) {
+        triggerEditHighlight();
+        return;
+      }
       setSelectedPermissions((prev) => {
         const prevSet = new Set(prev);
         isChecked ? prevSet.add(routeId) : prevSet.delete(routeId);
         return Array.from(prevSet);
       });
     },
-    [isEditMode]
+    [isEditMode, triggerEditHighlight]
   );
 
   const handleSetPermissions = async () => {
@@ -278,15 +330,34 @@ const ManageRolePage = () => {
         description !== (selectedRoleObj?.description || "");
 
       if (changesUnsaved) {
-        const confirmLeave = window.confirm(
-          "You have unsaved changes. Discard changes and exit edit mode?"
-        );
-        if (!confirmLeave) {
-          return;
-        } else {
-          setSelectedPermissions(originalPermissions);
-          setDescription(selectedRoleObj?.description || "");
-        }
+        Modal.confirm({
+          title: (
+            <div className="flex items-center">
+              <FiEdit2 className="text-purple-500 mr-3" size={30} />
+              <span className="text-2xl font-bold">Discard Changes?</span>
+            </div>
+          ),
+          content: (
+            <div className="text-xl">
+              You have unsaved changes. Do you want to discard these changes and
+              exit edit mode?
+            </div>
+          ),
+          okText: "Discard",
+          cancelText: "Cancel",
+          centered: true,
+          width: 600,
+          okButtonProps: {
+            className:
+              "bg-gradient-to-r from-pink-500 to-purple-500 text-white",
+          },
+          onOk: () => {
+            setSelectedPermissions(originalPermissions);
+            setDescription(selectedRoleObj?.description || "");
+            setIsEditMode(false);
+          },
+        });
+        return;
       }
       setIsEditMode(false);
     } else {
@@ -382,7 +453,7 @@ const ManageRolePage = () => {
                             >
                               <input
                                 type="checkbox"
-                                className="form-checkbox text-purple-500"
+                                className={`form-checkbox ${checkboxColor}`}
                                 onChange={(e) =>
                                   handleGroupChange(
                                     filteredRoutes,
@@ -420,7 +491,7 @@ const ManageRolePage = () => {
                                   <Tooltip title={`Permission: ${route.name}`}>
                                     <input
                                       type="checkbox"
-                                      className="form-checkbox text-purple-500"
+                                      className={`form-checkbox ${checkboxColor}`}
                                       checked={selectedPermissions.includes(
                                         route._id
                                       )}
@@ -457,6 +528,7 @@ const ManageRolePage = () => {
       selectedPermissions,
       handleGroupChange,
       handleRouteChange,
+      checkboxColor,
     ]
   );
 
@@ -476,22 +548,28 @@ const ManageRolePage = () => {
               <div className="flex items-center gap-4">
                 <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ROLE}>
                   <Tooltip title="Toggle Edit Mode">
-                    <button
-                      className="hover:text-gray-500 relative"
+                    <motion.button
                       onClick={handleEditClick}
                       aria-label="Toggle edit mode"
+                      className={`flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                        highlightEditButton
+                          ? "ring-2 ring-red-500"
+                          : "hover:bg-gray-100"
+                      } ${isEditMode ? "text-blue-500" : "text-green-500"}`}
+                      whileTap={{ scale: 0.95 }}
                     >
-                      <FiEdit2
-                        size={20}
-                        className={isEditMode ? "text-green-300" : ""}
-                      />
-                      {isEditMode && (
-                        <span
-                          className="absolute bottom-0 right-0 w-2 h-2 bg-green-300 rounded-full"
-                          aria-hidden="true"
-                        ></span>
+                      {isEditMode ? (
+                        <>
+                          <FiEdit2 size={20} />
+                          <span>Edit Mode</span>
+                        </>
+                      ) : (
+                        <>
+                          <FiEye size={20} />
+                          <span>View Mode</span>
+                        </>
                       )}
-                    </button>
+                    </motion.button>
                   </Tooltip>
                 </ProtectedAction>
                 <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_ROLE}>
@@ -549,7 +627,7 @@ const ManageRolePage = () => {
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    disabled={!isEditMode}
+                    disabled={false} // Role selection is always enabled
                     aria-label="Select Role"
                   >
                     <option value="">Select a role</option>
@@ -594,7 +672,7 @@ const ManageRolePage = () => {
                         <input
                           type="checkbox"
                           id="select-all-checkbox"
-                          className="form-checkbox text-purple-500"
+                          className={`form-checkbox ${checkboxColor}`}
                           disabled={!isEditMode}
                           onChange={(e) => handleGlobalChange(e.target.checked)}
                         />
@@ -689,7 +767,7 @@ const ManageRolePage = () => {
                       <input
                         type="checkbox"
                         id="select-all-checkbox"
-                        className="form-checkbox text-purple-500"
+                        className={`form-checkbox ${checkboxColor}`}
                         disabled={!isEditMode}
                         onChange={(e) => handleGlobalChange(e.target.checked)}
                       />
