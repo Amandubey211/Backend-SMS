@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 import { AiFillFileExcel } from "react-icons/ai";
 import { FiRefreshCw } from "react-icons/fi";
 import DatePicker from "../../../../../Utils/calendar";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
@@ -58,7 +59,7 @@ const MainSection = () => {
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
-      <ProtectedSection title="All Offline Exams">
+      <ProtectedSection title="All Offline Exams" requiredPermission={PERMISSIONS.GET_OFFLINE_EXAM}>
         <div className="flex pt-4">
           {/* Left Section */}
           <div className="w-[65%] border-l">

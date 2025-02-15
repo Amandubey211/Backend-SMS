@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Table, Input, Dropdown, Tag } from "antd";
+import { Table, Input, Dropdown, Tag, Spin } from "antd";
 import {
   SearchOutlined,
   MoreOutlined,
@@ -318,11 +318,7 @@ const RecentReceipts = () => {
       </div>
       <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS} title={"Recent Receipts"}>
         {/* Loading Indicator */}
-        {fetching || loading ? (
-          <div style={{ textAlign: "center", padding: "16px" }}>
-            <Spinner />
-          </div>
-        )  : (
+        
 
           <Table
             rowKey={(record) => record._id}
@@ -348,11 +344,15 @@ const RecentReceipts = () => {
             }}
             size="small"
             pagination={false} // Disable Ant Design pagination
-
+            loading={{
+              spinning: loading,
+              indicator: <Spin size="large" />,
+              tip: "Loading...",
+            }}
           />
 
 
-        )}
+       
       </ProtectedSection>
       {/* Cancel Receipt Confirmation Modal */}
       <DeleteConfirmationModal

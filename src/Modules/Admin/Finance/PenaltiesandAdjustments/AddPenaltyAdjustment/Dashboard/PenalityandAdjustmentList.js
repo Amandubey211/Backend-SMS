@@ -11,6 +11,7 @@ import {
   Input,
   Table,
   Tag,
+  Spin,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
@@ -506,11 +507,7 @@ const PenalityandAdjustmentList = () => {
           </div>
 
           {/* Render Spinner until initial API call is complete */}
-          {(loading) ? (
-            <div className="flex justify-center">
-              <Spinner />
-            </div>
-          ) : (
+          
               <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
                 <Table
                   dataSource={dataSource}
@@ -535,10 +532,15 @@ const PenalityandAdjustmentList = () => {
                   bordered
                   size="small"
                   tableLayout="fixed"
+                  loading={{
+                    spinning: loading,
+                    indicator: <Spin size="large" />,
+                    tip: "Loading...",
+                  }}
                 />
               </ProtectedSection>
             
-          )}
+         
 
           {/* Export Modal */}
           <ExportModalNew
