@@ -417,6 +417,7 @@ function App() {
     { path: "/stafflogin", element: <StaffLogin />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
+    { path: "/verify_qid", element: <QIDLogin />, errorElement: <Error /> },
     {
       path: "/privacy-policy",
       element: <PrivacyPolicy />,
@@ -832,12 +833,12 @@ function App() {
     },
     {
       path: "/library",
-      element:(
+      element: (
         <ProtectRoute
           Component={Libary}
           allowedRoles={["admin", "teacher", "student", "parent"]}
         />
-      )
+      ),
     },
     {
       path: "/timetable/*",
@@ -1629,42 +1630,3 @@ function App() {
 }
 
 export default App;
-
-// import React, { useEffect, useState } from "react";
-// import Offline from "../Components/Common/Offline.js";
-// import AllRoutes from "../Route/AllRoute.js";
-// import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
-// import i18next from "i18next";
-// import { useSelector } from "react-redux";
-
-// function App() {
-//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
-//   useFirebaseMessaging();
-
-//   useEffect(() => {
-//     const handleOnline = () => setIsOnline(true);
-//     const handleOffline = () => setIsOnline(false);
-
-//     window.addEventListener("online", handleOnline);
-//     window.addEventListener("offline", handleOffline);
-
-//     return () => {
-//       window.removeEventListener("online", handleOnline);
-//       window.removeEventListener("offline", handleOffline);
-//     };
-//   }, []);
-
-//   const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
-//   useEffect(() => {
-//     i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
-//   }, [selectedLanguage]);
-
-//   return (
-//     <>
-//       {!isOnline && <Offline />}
-//       <AllRoutes />
-//     </>
-//   );
-// }
-
-// export default App;

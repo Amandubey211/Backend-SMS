@@ -175,32 +175,18 @@ const StudentSignUpForm = () => {
     }
   };
 
-  // Helper function to get the first error field
-  function getFirstErrorField(errors) {
+  // Recursive helper to build the ref key for the first error field.
+  const getFirstErrorField = (errors, prefix = "") => {
     for (const key in errors) {
       if (typeof errors[key] === "object" && errors[key] !== null) {
-        const nestedKey = getFirstErrorField(errors[key]);
-        return `${key}_${nestedKey}`;
+        const nestedField = getFirstErrorField(errors[key], `${prefix}${key}_`);
+        if (nestedField) return nestedField;
       } else {
-        return key;
+        return `${prefix}${key}`;
       }
     }
-  }
-
-  // Helper function to set only the first error in validationErrors
-  function setFirstError(obj, errors, pathArray) {
-    const key = pathArray[0];
-
-    // Check if the key exists in errors to avoid undefined access
-    if (!errors || !errors[key]) return;
-
-    if (pathArray?.length === 1) {
-      obj[key] = errors[key];
-    } else {
-      obj[key] = obj[key] || {};
-      setFirstError(obj[key], errors[key], pathArray?.slice(1));
-    }
-  }
+    return "";
+  };
 
   const handleNext = async (e) => {
     e.preventDefault();
@@ -208,112 +194,37 @@ const StudentSignUpForm = () => {
     const errors = validateStudentDetails(studentDetails, "student");
 
     if (Object.keys(errors)?.length > 0) {
-      // Set the entire errors object to validationErrors state
       setValidationErrors(errors);
 
-      // Focus on the first error field
       const firstErrorField = getFirstErrorField(errors);
-      if (inputRefs.current[firstErrorField]) {
-        inputRefs.current[firstErrorField].focus();
-      }
+
+      // Delay to allow the error state to update and then scroll smoothly into view
+      setTimeout(() => {
+        if (firstErrorField && inputRefs.current[firstErrorField]) {
+          inputRefs.current[firstErrorField].scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          inputRefs.current[firstErrorField].focus();
+        }
+      }, 0);
       return;
     } else {
-      // Clear validation errors if no errors found
       setValidationErrors({});
     }
 
     dispatch(setStep(2));
   };
 
-  // const handleDocumentSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const formData = new FormData();
-
-  //     // Exclude the age field before appending other fields
-  //     const { age, ...detailsWithoutAge } = studentDetails;
-
-  //     for (const key in detailsWithoutAge) {
-  //       if (detailsWithoutAge.hasOwnProperty(key)) {
-  //         if (key === "permanentAddress" || key === "residentialAddress") {
-  //           const address = detailsWithoutAge[key];
-  //           for (const field in address) {
-  //             if (address.hasOwnProperty(field)) {
-  //               formData.append(`${key}.${field}`, address[field]);
-  //             }
-  //           }
-  //         } else if (key === "profile") {
-  //           formData.append("profile", detailsWithoutAge.profile);
-  //         } else {
-  //           formData.append(key, detailsWithoutAge[key]);
-  //         }
-  //       }
-  //     }
-
-  //     // Dispatch the registerStudentDetails Thunk
-  //     const resultAction = await dispatch(registerStudentDetails(formData));
-
-  //     if (registerStudentDetails.fulfilled.match(resultAction)) {
-  //       // If there are no documents, stop here
-  //       if (studentDocuments.documents?.length === 0) {
-  //         toast.success(
-  //           "Registration Successful! Please wait for verification."
-  //         );
-  //         dispatch(setStep(1));
-  //         navigate("/studentlogin");
-  //         return;
-  //       }
-
-  //       // If there are documents, proceed with uploading them
-  //       const docUploadData = {
-  //         email: studentDetails.email,
-  //         schoolId: studentDetails.schoolId,
-  //         studentDocuments,
-  //       };
-
-  //       const docResultAction = await dispatch(
-  //         uploadStudentDocuments(docUploadData)
-  //       );
-
-  //       if (uploadStudentDocuments.fulfilled.match(docResultAction)) {
-  //         // Documents uploaded successfully
-  //         toast.success(
-  //           "Registration Successful! Please wait for verification."
-  //         );
-  //         dispatch(setStep(1));
-  //         navigate("/studentlogin");
-  //       } else {
-  //         // Handle document upload error
-  //         const errorMessage =
-  //           docResultAction.payload ||
-  //           "Document upload failed. Please try again.";
-  //         toast.error(errorMessage);
-  //       }
-  //     } else {
-  //       // Handle student details save error
-  //       const errorMessage =
-  //         resultAction.payload || "Registration failed. Please try again.";
-  //       toast.error(errorMessage);
-  //     }
-  //   } catch (error) {
-  //     // Network error or unexpected error
-  //     console.error("Error in submitting documents:", error);
-  //     toast.error(
-  //       "Network error occurred. Please check your connection and try again."
-  //     );
-  //   }
-  // };
-
   const handleDocumentSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const formData = new FormData();
-  
+
       // Remove age from details before adding to formData, as it's calculated
       const { age, ...detailsWithoutAge } = studentDetails;
-  
+
       // Append student details with bracket notation for nested fields
       for (const [key, value] of Object.entries(detailsWithoutAge)) {
         if (typeof value === "object" && value !== null) {
@@ -324,15 +235,15 @@ const StudentSignUpForm = () => {
           formData.append(key, value);
         }
       }
-  
+
       // Append profile image if it exists
       if (detailsWithoutAge.profile) {
         formData.append("profile", detailsWithoutAge.profile);
       }
-  
+
       // Dispatch the registerStudentDetails Thunk
       const resultAction = await dispatch(registerStudentDetails(formData));
-  
+
       if (registerStudentDetails.fulfilled.match(resultAction)) {
         // If there are no documents, skip document upload
         if (studentDocuments.documents?.length === 0) {
@@ -343,42 +254,43 @@ const StudentSignUpForm = () => {
           navigate("/studentlogin");
           return;
         }
-  
+
         // If there are documents, proceed with uploading them
         const docUploadData = {
           email: studentDetails.email,
           schoolId: studentDetails.schoolId,
           studentDocuments,
         };
-  
-        const docResultAction = await dispatch(uploadStudentDocuments(docUploadData));
-  
+
+        const docResultAction = await dispatch(
+          uploadStudentDocuments(docUploadData)
+        );
+
         if (uploadStudentDocuments.fulfilled.match(docResultAction)) {
-          // Documents uploaded successfully
-          toast.success("Registration Successful! Please wait for verification.");
+          toast.success(
+            "Registration Successful! Please wait for verification."
+          );
           dispatch(setStep(1));
           navigate("/studentlogin");
         } else {
-          // Handle document upload error
           const errorMessage =
-            docResultAction.payload || "Document upload failed. Please try again.";
+            docResultAction.payload ||
+            "Document upload failed. Please try again.";
           toast.error(errorMessage);
         }
       } else {
-        // Handle student details save error
         const errorMessage =
           resultAction.payload || "Registration failed. Please try again.";
         toast.error(errorMessage);
       }
     } catch (error) {
-      // Network error or unexpected error
       console.error("Error in submitting documents:", error);
       toast.error(
         "Network error occurred. Please check your connection and try again."
       );
     }
   };
-  
+
   const handleFileUploadIconClick = () => {
     fileInputRef.current.click();
   };
@@ -409,7 +321,6 @@ const StudentSignUpForm = () => {
       reader.readAsDataURL(file);
     });
 
-    // Remove validation error for documents if any
     if (validationErrors.documents) {
       setValidationErrors({});
     }
@@ -486,7 +397,7 @@ const StudentSignUpForm = () => {
               <div className="flex items-center justify-center mt-4">
                 <button
                   type="submit"
-                  className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center`}
+                  className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
                   disabled={loading}
                 >
                   {loading ? "Saving Please Wait..." : "Next"}
