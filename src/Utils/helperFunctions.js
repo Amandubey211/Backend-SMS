@@ -27,3 +27,51 @@ export const formatDate = (isoDate, type = "long") => {
             return `${day} ${monthLong} ${year}`;
     }
 };
+
+
+export const calculateFinalAmount = ({
+    lineItems = [],
+    tax = 0,
+    discount = 0,
+    discountType = "fixed",
+    penalty = 0,
+    penaltyType = "fixed",
+    adjustmentPenalty = 0,
+    totalPaidAmount = 0,
+    final_amount,
+  }) => {
+    // Ensure all numeric values are correctly parsed
+    tax = parseFloat(tax) || 0;
+    discount = parseFloat(discount) || 0;
+    penalty = parseFloat(penalty) || 0;
+    adjustmentPenalty = parseFloat(adjustmentPenalty) || 0;
+    totalPaidAmount = parseFloat(totalPaidAmount) || 0;
+    
+    // Calculate subtotal from line items
+    const subtotal = lineItems.reduce((acc, item) => acc + (parseFloat(item.amount || item.total || 0)), 0);
+  
+    // Calculate tax amount
+    const taxAmount = (subtotal * tax) / 100;
+  
+    // Calculate penalty amount based on type
+    const penaltyAmount = penaltyType === "percentage"
+      ? (subtotal * penalty) / 100
+      : penalty;
+  
+    // Calculate discount amount based on type
+    const discountAmount = discountType === "percentage"
+      ? (subtotal * discount) / 100
+      : discount;
+  
+    // Final amount calculation
+    let calculatedFinalAmount = subtotal + taxAmount + penaltyAmount - discountAmount;
+  
+    // If final_amount is passed (Quotation template), use it directly
+    if (final_amount) {
+      calculatedFinalAmount = parseFloat(final_amount);
+    }
+  
+    // Round to 2 decimal places
+    return calculatedFinalAmount.toFixed(2);
+  };
+  

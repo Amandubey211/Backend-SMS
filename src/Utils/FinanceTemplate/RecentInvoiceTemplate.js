@@ -2,9 +2,13 @@ import React, { forwardRef } from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 import Cookies from "js-cookie";
+// Step 1: Import the helper function
+import { calculateFinalAmount } from "../../Utils/helperFunctions";
+
+
 const RecentInvoiceTemplate = forwardRef((props, ref) => {
   const { data } = props;
-   const logo = Cookies.get('logo')
+  const logo = Cookies.get('logo')
   if (!data) return null;
 
   // Destructure necessary fields from the response data
@@ -34,25 +38,17 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
     ? new Date(dueDate).toLocaleDateString()
     : "N/A";
 
-  // Calculate subtotal from line items
+  // For display purposes, recalc subtotal if needed
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
 
-// Calculate tax as a percentage of the subtotal
-const taxAmount = (subtotal * tax) / 100;
-
-// Calculate total before discount
-const totalBeforeDiscount = subtotal + taxAmount + penalty;
-
-// FIX: Apply discount on subtotal, not totalBeforeDiscount
-const discountAmount = discountType === "percentage"
-  ? (subtotal * discount) / 100  // Corrected line
-  : discount;
-
-// Calculate final amount
-const finalAmount = (totalBeforeDiscount - discountAmount).toFixed(2);
-
-console.log("Final Amount:", finalAmount); // Expected Output: 119.00 QAR
-
+  // Step 3: Calculate final amount using the helper function
+  const finalAmount = calculateFinalAmount({
+    lineItems,
+    tax,
+    discount,
+    discountType,
+    penalty,
+  });
 
   const {
     address = "",
@@ -75,9 +71,11 @@ console.log("Final Amount:", finalAmount); // Expected Output: 119.00 QAR
             <h1 className="font-bold text-lg">{nameOfSchool}</h1>
             <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
           </div>
-          {logo && <div>
-         <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
-          </div>}
+          {logo && (
+            <div>
+              <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+            </div>
+          )}
         </div>
         <div
           className="w-full text-center text-white font-bold py-2"

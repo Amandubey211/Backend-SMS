@@ -1,13 +1,16 @@
 // src/Utils/FinanceTemplate/PenaltyAdjustmentTemplate.js
 
-import React,{forwardRef} from "react";
+import React, { forwardRef } from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 import Cookies from "js-cookie";
-const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
+// Import the common calculation helper function
+import { calculateFinalAmount } from "../../Utils/helperFunctions";
+
+const PenaltyAdjustmentTemplate = forwardRef((props, ref) => {
   const { data } = props;
   if (!data) return null;
-  const logo = Cookies.get('logo')
+  const logo = Cookies.get('logo');
   // Destructure necessary fields from the response data
   const {
     returnInvoiceNumber,
@@ -56,8 +59,18 @@ const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
       ? (subtotal * (discount || 0)) / 100
       : discount || 0;
 
-  // Calculate final amount using your formula: subtotal * taxMultiplier + penalty - discount
-  const finalAmount = (subtotal * taxMultiplier + penaltyAmount - discountAmount).toFixed(2);
+  // Manual final amount calculation (retained for reference)
+  // const finalAmount = (subtotal * taxMultiplier + penaltyAmount - discountAmount).toFixed(2);
+
+  // Calculate final amount using the helper function
+  const finalAmount = calculateFinalAmount({
+    lineItems: items,
+    tax,
+    discount,
+    discountType,
+    penalty: adjustmentPenalty,
+    penaltyType,
+  });
 
   const { address, branchName, city, code, nameOfSchool } = schoolId;
 
@@ -77,9 +90,11 @@ const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
             <h1 className="font-bold text-lg">{nameOfSchool || 'N/A'}</h1>
             <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
           </div>
-        {logo && <div>
-        <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
-        </div>}
+          {logo && (
+            <div>
+              <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+            </div>
+          )}
         </div>
         <div
           className="w-full text-center text-white font-bold py-2"
@@ -101,7 +116,6 @@ const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
           <p>Phone no: {receiver?.contact || "N/A"}</p>
         </div>
         <div>
-       
           <p>
             <strong>Return Invoice No:</strong>{" "}
             {returnInvoiceNumber || "RTA0001-202412-0001"}
@@ -162,8 +176,8 @@ const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
                 <td className="p-2 border border-gray-300">
                   {item.revenueType
                     ? item.revenueType
-                      .replace(/_/g, ' ') // Replace underscores with spaces
-                      .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
+                        .replace(/_/g, ' ') // Replace underscores with spaces
+                        .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
                     : "N/A"}
                 </td>
 
@@ -225,7 +239,6 @@ const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
                 ? `${discountAmount.toFixed(2)}%`
                 : `${discountAmount.toFixed(2)} QAR`}
             </td>
-
           </tr>
           {/* Final Total Row */}
           <tr className="font-bold text-pink-600">
@@ -255,15 +268,13 @@ const PenaltyAdjustmentTemplate =forwardRef((props, ref) => {
               "Thank you for your attention to this adjustment.",
               "Please retain this document for your records.",
               "Contact support for any queries regarding this adjustment.",
-               `${isCancel && "This Return Invoice is cancelled"}`
+              `${isCancel && "This Return Invoice is cancelled"}`
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}
             {reason && <li>{reason}</li>}
           </ul>
         </div>
-
-    
       </div>
     </div>
   );
