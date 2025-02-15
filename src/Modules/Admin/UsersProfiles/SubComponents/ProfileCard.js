@@ -26,7 +26,8 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
   const [isNameTooltipVisible, setIsNameTooltipVisible] = useState(false);
   const [isPositionTooltipVisible, setIsPositionTooltipVisible] =
     useState(false);
-
+    
+  const adminStaffRole = role === "admin" || profile?.role === role
   // Handlers for Modal
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -139,13 +140,13 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
         onClick={() => onClick(profile)}
         className="block p-6 bg-white rounded-lg hover:shadow-lg transition cursor-pointer border"
       >
-        {!profile?.active && profile?.role === role && (
+        {!profile?.active && adminStaffRole && (
           <span className="flex my-[-.5rem] text-red-600 font-bold text-sm">
             Deactivated
           </span>
         )}
 
-        {profile?.role === role && <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
+        {adminStaffRole && <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
           {
             MYId == profile._id ? <div className="bg-purple-200 text-purple-800 px-2 rounded-md">My Profile</div> : <>
               {profile?.active && (
@@ -224,7 +225,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
       </div>
 
       {/* Deactivation Confirmation Modal */}
-      {!loading && profile?.role === role && (
+      {!loading && adminStaffRole && (
         <DeleteConfirmatiomModal
           isOpen={isModalOpen}
           onClose={closeModal}
