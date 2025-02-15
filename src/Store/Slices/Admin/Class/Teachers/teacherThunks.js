@@ -111,8 +111,11 @@ export const editTeacher = createAsyncThunk(
         }
       );
 
-      // Optionally, you can refresh the teacher list to reflect the changes
-      dispatch(fetchAllTeachers());
+      // Extract class id from editData (assuming the first class in the array is used)
+      const classId = editData.classIds?.[0]?._id;
+      if (classId) {
+        dispatch(fetchTeachersByClass(classId));
+      }
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
