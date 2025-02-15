@@ -19,7 +19,7 @@ const BookCard = ({ book }) => {
     name,
     author,
     category,
-    classId,
+    className,
     copies,
     image,
     issuedCount,
@@ -52,7 +52,7 @@ const BookCard = ({ book }) => {
         />
         <div className="flex flex-col p-2 space-y-1">
           <span className="font-semibold text-[#7F7F7F] text-sm">
-            {t("Class")}: {classId?.className}
+            {t("Class")}: {className}
           </span>
           <span className="text-sm font-semibold text-gray-700">
             {t("Total Copies")}: {TotalCopies ?? 0}
