@@ -165,7 +165,7 @@ const SummaryTotalRevenue = () => {
         final_amount: income.final_amount || 0,
         paid_amount: income.paid_amount || 0,
         remaining_amount: income.remaining_amount || 0,
-        paidDate: income.paidDate || "N/A",
+        paidDate: income.paidDate || income.createdAt || "N/A",
       })),
     [incomes]
   );

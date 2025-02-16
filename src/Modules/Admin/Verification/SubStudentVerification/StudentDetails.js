@@ -3,7 +3,7 @@ import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineEye } from "react-icons/ai";
 import Details from "./Details";
-import { useTranslation } from 'react-i18next'; // Import useTranslation hook
+import { useTranslation } from "react-i18next"; // Import useTranslation hook
 
 const colors = [
   "bg-yellow-300",
@@ -17,7 +17,7 @@ const colors = [
 const getColor = (index) => colors[index % colors?.length];
 
 const StudentDetail = () => {
-  const { t } = useTranslation('admVerification'); // Initialize useTranslation hook
+  const { t } = useTranslation("admVerification"); // Initialize useTranslation hook
   const { sid } = useParams();
   const navigate = useNavigate();
   const { unVerifiedStudents, rejectedStudents } = useSelector(
@@ -45,7 +45,7 @@ const StudentDetail = () => {
   };
 
   if (!student) {
-    return <p className="text-center text-red-500">{t('Student not found')}</p>;
+    return <p className="text-center text-red-500">{t("Student not found")}</p>;
   }
 
   return (
@@ -57,7 +57,7 @@ const StudentDetail = () => {
         <div className="w-6 h-6 flex justify-center items-center border rounded-full text-xl">
           &larr;
         </div>
-        <span>{t('Back')}</span>
+        <span>{t("Back")}</span>
       </NavLink>
 
       <div className="bg-white p-2">
@@ -65,7 +65,7 @@ const StudentDetail = () => {
 
         <div className="p-2 rounded-lg mb-3">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
-            {t('Document Previews')}
+            {t("Document Previews")}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {student?.documentId?.documents?.map((doc, index) => (
@@ -75,10 +75,10 @@ const StudentDetail = () => {
                   index
                 )} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
               >
-                {doc.documentType.startsWith("image/") ? (
+                {doc?.documentType?.startsWith("image/") ? (
                   <img
                     src={doc?.documentUrl}
-                    alt={`${t('Document')} ${index + 1}`}
+                    alt={`${t("Document")} ${index + 1}`}
                     className="w-full h-40 object-cover mb-2 rounded-md"
                   />
                 ) : (
@@ -90,11 +90,13 @@ const StudentDetail = () => {
                 )}
                 <div className="flex justify-between items-center">
                   <p className="text-white">
-                    <span className="font-medium">{t('Document')} {index + 1}:</span>{" "}
+                    <span className="font-medium">
+                      {t("Document")} {index + 1}:
+                    </span>{" "}
                     {doc?.documentLabel}
                   </p>
                   <button
-                    title={t('Open Modal')}
+                    title={t("Open Modal")}
                     className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
                     onClick={() =>
                       handlePreviewClick(doc?.documentUrl, doc.documentType)
@@ -123,7 +125,7 @@ const StudentDetail = () => {
                 previewType.startsWith("image/") ? (
                   <img
                     src={preview}
-                    alt={t('Preview')}
+                    alt={t("Preview")}
                     className="max-h-[80vh] object-contain"
                   />
                 ) : (
@@ -135,7 +137,7 @@ const StudentDetail = () => {
                 )
               ) : (
                 <p className="text-center text-gray-500">
-                  {t('No preview available')}
+                  {t("No preview available")}
                 </p>
               )}
             </div>
