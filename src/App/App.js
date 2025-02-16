@@ -817,7 +817,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Libary}
-          allowedRoles={["admin", "teacher", "student", "parent"]}
+          allowedRoles={["admin", "teacher", "student", "parent", "librarian"]}
         />
       ),
     },
