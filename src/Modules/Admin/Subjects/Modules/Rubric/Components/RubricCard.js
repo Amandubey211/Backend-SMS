@@ -1,6 +1,5 @@
-// src/components/Components/RubricCard.js
-
 import React, { useState } from "react";
+import { Tooltip } from "antd";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
@@ -10,12 +9,19 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 const RubricCard = ({ rubric, onDelete, onEdit }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Helper function to truncate text and append ellipsis
+  const truncateText = (text, maxLength = 20) => {
+    if (text && text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  };
+
   const handleDeleteClick = () => {
     setIsModalOpen(true);
   };
 
   const handleConfirmDelete = () => {
-    // const { id } = getAssociatedId();
     onDelete(rubric._id);
     setIsModalOpen(false);
   };
@@ -48,7 +54,12 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
       <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4">
         <div className="flex flex-col items-start justify-start">
           <div className="flex justify-between items-center">
-            <h2 className="text-base font-semibold">{rubric.name}</h2>
+            {/* Wrap the truncated title in a Tooltip */}
+            <Tooltip title={rubric.name}>
+              <h2 className="text-base font-semibold">
+                {truncateText(rubric.name, 20)}
+              </h2>
+            </Tooltip>
             <span
               className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
                 rubricType === "Assignment"
@@ -80,7 +91,6 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
               <RiDeleteBin2Line />
             </button>
           </ProtectedAction>
-
           <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_RUBRIC}>
             <button className="text-green-600" onClick={handleEditClick}>
               <MdOutlineModeEditOutline />

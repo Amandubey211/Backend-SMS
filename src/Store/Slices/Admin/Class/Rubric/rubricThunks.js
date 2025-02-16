@@ -89,7 +89,7 @@ export const createAssignmentRubricThunk = createAsyncThunk(
       );
 
       toast.success("Assignment Rubric created successfully");
-      dispatch(fetchRubricsBySubjectId({ sid }));
+      dispatch(fetchRubricsBySubjectId(sid));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -112,15 +112,13 @@ export const createQuizRubricThunk = createAsyncThunk(
       );
 
       toast.success("Quiz Rubric created successfully");
-      dispatch(fetchRubricsBySubjectId({ sid }));
+      dispatch(fetchRubricsBySubjectId(sid));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
-
-// rubricThunks.js
 
 export const getRubricByIdThunk = createAsyncThunk(
   "rubric/getRubricById",
