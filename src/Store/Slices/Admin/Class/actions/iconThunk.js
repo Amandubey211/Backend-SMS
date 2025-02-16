@@ -46,6 +46,7 @@ export const createIcon = createAsyncThunk(
         return response.data; // Assuming 'data' contains the created icon
       }
     } catch (error) {
+      toast.error("Icon creation unsuccessfull");
       return handleError(error, dispatch, rejectWithValue);
     }
   }
