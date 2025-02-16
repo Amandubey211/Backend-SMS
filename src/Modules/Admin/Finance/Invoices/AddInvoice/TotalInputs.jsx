@@ -35,7 +35,7 @@ export const TotalInputs = () => {
       discountedSubtotal + taxAmount + (Number(values.penalty) || 0);
 
     // Update the fields in Formik
-    setFieldValue("finalAmount", finalAmount.toFixed(2));
+    setFieldValue("finalAmount", finalAmount?.toFixed(2));
   }, [
     values.lineItems,
     values.discount,

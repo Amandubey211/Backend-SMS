@@ -11,6 +11,7 @@ import {
   Input,
   Table,
   Tag,
+  Spin,
 } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import debounce from "lodash.debounce";
@@ -400,14 +401,14 @@ const PenalityandAdjustmentList = () => {
 
   // Transform adjustments data for the table using adjustmentsArray
   const dataSource = adjustmentsArray.map((adjustment) => ({
-    key: adjustment._id,
-    return_invoice_no: adjustment.returnInvoiceNumber || "N/A",
-    invoice_no: adjustment.invoiceId?.invoiceNumber || "N/A",
-    receiver: adjustment.invoiceId?.receiver?.name || "N/A",
-    adjustmentAmount: adjustment.adjustmentAmount || 0,
-    adjustmentTotal: adjustment.adjustmentTotal || 0,
-    status: adjustment.isCancel ? "Cancelled" : "Active",
-    adjustedAt: adjustment.adjustedAt || "N/A",
+    key: adjustment?._id,
+    return_invoice_no: adjustment?.returnInvoiceNumber || "N/A",
+    invoice_no: adjustment?.invoiceId?.invoiceNumber || "N/A",
+    receiver: adjustment?.invoiceId?.receiver?.name || "N/A",
+    adjustmentAmount: adjustment?.adjustmentAmount || 0,
+    adjustmentTotal: adjustment?.adjustmentTotal || 0,
+    status: adjustment?.isCancel ? "Cancelled" : "Active",
+    adjustedAt: adjustment?.adjustedAt || "N/A",
     ...adjustment,
   }));
 
@@ -506,12 +507,7 @@ const PenalityandAdjustmentList = () => {
           </div>
 
           {/* Render Spinner until initial API call is complete */}
-          {(initialLoad || loading) ? (
-            <div className="flex justify-center">
-              <Spinner />
-            </div>
-          ) : (
-            !error && (
+          
               <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
                 <Table
                   dataSource={dataSource}
@@ -536,10 +532,15 @@ const PenalityandAdjustmentList = () => {
                   bordered
                   size="small"
                   tableLayout="fixed"
+                  loading={{
+                    spinning: loading,
+                    indicator: <Spin size="large" />,
+                    tip: "Loading...",
+                  }}
                 />
               </ProtectedSection>
-            )
-          )}
+            
+         
 
           {/* Export Modal */}
           <ExportModalNew

@@ -1,6 +1,5 @@
-// AllTeachers.js
 import React, { useEffect, useState } from "react";
-import { FiUserPlus } from "react-icons/fi"; // Removed unused FiLoader, FiLock as they are in Header
+import { FiUserPlus } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -33,8 +32,8 @@ const AllTeachers = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [teacherData, setTeacherData] = useState(null);
   const [sidebarContent, setSidebarContent] = useState(null);
-  const [sortOption, setSortOption] = useState(null); // "date_newest" or "date_oldest"
-  const [filterRoles, setFilterRoles] = useState([]); // Array of role names
+  const [sortOption, setSortOption] = useState(null);
+  const [filterRoles, setFilterRoles] = useState([]);
   const [sortedTeachers, setSortedTeachers] = useState([]);
 
   // Redux Selectors
@@ -44,8 +43,6 @@ const AllTeachers = () => {
   const { loading } = useSelector((store) => store.admin.all_staff);
   const role = useSelector((store) => store.common.auth.role);
   const { roles: AllRoles } = useSelector((state) => state.admin.rbac);
-
-  console.log(AllRoles, "All Roles");
 
   // Fetch Teachers and Roles on Mount
   useEffect(() => {
@@ -62,14 +59,14 @@ const AllTeachers = () => {
   useEffect(() => {
     let filtered = [...allTeachers];
 
-    // Apply Role Filtering
+    // Role Filtering
     if (filterRoles.length > 0) {
       filtered = filtered.filter((teacher) =>
         teacher.position.some((pos) => filterRoles.includes(pos))
       );
     }
 
-    // Apply Sorting
+    // Sorting
     if (sortOption) {
       switch (sortOption) {
         case "date_newest":
@@ -113,7 +110,7 @@ const AllTeachers = () => {
       case "viewTeacher":
         return <ViewTeacher staff={teacherData} />;
       case "addTeacher":
-        return <AddUser role="teacher" />;
+        return <AddUser role="teacher" data={null} />;
       case "editTeacher":
         return <AddUser role="teacher" data={teacherData} />;
       case "createRole":
@@ -142,18 +139,21 @@ const AllTeachers = () => {
     value: roleItem.name,
   }));
 
-  // Handler for applying sort and filter
   const handleSortFilterApply = ({ sortOption, filterOptions }) => {
     setSortOption(sortOption);
     setFilterRoles(filterOptions);
   };
 
-  // Handler for navigating to manage roles
-  const navigateToManageRoles = () => {
-    navigate("/users/manage-roles");
+  /**
+   * Pass the department to the `navigate()` call via `state`.
+   * This ensures `ManageRolePage` can pick it up from `location.state.department`.
+   */
+  const navigateToManageRoles = (dept) => {
+    navigate("/users/manage-roles", {
+      state: { department: dept },
+    });
   };
 
-  // Handler for creating a new role
   const handleCreateRole = () => {
     handleSidebarOpen("createRole");
   };
@@ -171,19 +171,18 @@ const AllTeachers = () => {
             title={"Teacher"}
           >
             <div className="p-4 relative">
-              {/* Reusable Header Component */}
               <Header
                 title={t("All Teachers")}
                 count={allTeachers?.length || 0}
                 sortOptions={sortOptions}
                 filterOptions={filterOptions}
-                department="Teachers"
+                department="Teachers" // <--- Pass the department name here
                 onSortFilterApply={handleSortFilterApply}
-                navigateToManageRoles={navigateToManageRoles}
+                navigateToManageRoles={() => navigateToManageRoles("teacher")}
                 handleCreateRole={handleCreateRole}
                 isAdmin={role === "admin"}
-                currentSort={sortOption} // Pass current sort
-                currentFilters={filterRoles} // Pass current filters
+                currentSort={sortOption}
+                currentFilters={filterRoles}
               />
 
               {/* Teachers List */}
@@ -219,8 +218,7 @@ const AllTeachers = () => {
         )}
       </DashLayout>
 
-      {/* Sidebar */}
-
+      {/* Sidebar Slide */}
       <SidebarSlide
         key={sidebarContent}
         isOpen={isSidebarOpen}

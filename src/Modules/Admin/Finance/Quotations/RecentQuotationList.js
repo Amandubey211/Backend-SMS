@@ -521,18 +521,6 @@ const RecentQuotationList = () => {
               </ProtectedAction>
             </div>
           </div>
-
-          {/* Data State */}
-          {loading || error ? (
-            <>
-              {loading && (
-                <div className="flex justify-center">
-                  <Spin tip="Loading..." />
-                </div>
-              )}
-              {error && <div className="text-red-500 text-center">Error: {error}</div>}
-            </>
-          ) : (
             <ProtectedSection
               requiredPermission={PERMISSIONS.LIST_ALL_QUOTATION}
               title={"Quotation List"}
@@ -564,9 +552,14 @@ const RecentQuotationList = () => {
                 bordered
                 size="small"
                 tableLayout="fixed"
+                loading={{
+                  spinning: loading,
+                  indicator: <Spin size="large" />,
+                  tip: "Loading...",
+                }}
               />
             </ProtectedSection>
-          )}
+        
 
           {/* Quotation Preview Overlay */}
           {isQuotationPreviewVisible && (

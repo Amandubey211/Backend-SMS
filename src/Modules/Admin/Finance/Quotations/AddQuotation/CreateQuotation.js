@@ -25,7 +25,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
     const subAmount = values.lineItems?.reduce((acc, item) => {
       const quantity = parseFloat(item.quantity) || 0;
       const amount = parseFloat(item.amount) || 0;
-      return acc + quantity * amount;
+      return acc +  amount;
     }, 0);
 
     // Convert tax and discount to number

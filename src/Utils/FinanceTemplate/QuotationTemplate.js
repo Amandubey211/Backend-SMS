@@ -2,6 +2,9 @@ import React, { forwardRef } from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 import Cookies from "js-cookie";
+// Import the common calculation helper function
+import { calculateFinalAmount } from "../../Utils/helperFunctions";
+
 const QuotationTemplate = forwardRef((props, ref) => {
   const { data } = props;
   if (!data) return null;
@@ -33,7 +36,6 @@ const QuotationTemplate = forwardRef((props, ref) => {
     ? new Date(dueDate).toLocaleDateString()
     : "N/A";
 
-
   // Calculate subtotal from line items
   const subtotal = lineItems.reduce((acc, item) => acc + (item.amount || 0), 0);
 
@@ -52,15 +54,22 @@ const QuotationTemplate = forwardRef((props, ref) => {
   // Calculate displayed discount percentage
   const displayedDiscountPercentage = ((discountAmount / totalBeforeDiscount) * 100).toFixed(2);
 
+  const { address, branchName, city, code, nameOfSchool } = schoolId;
+  const logo = Cookies.get("logo");
 
-  const { address, branchName, city, code,  nameOfSchool } = schoolId;
+  // Compute final amount using the helper function
+  const finalAmount = calculateFinalAmount({
+    lineItems,
+    tax,
+    discount,
+    discountType,
+    penalty: 0, // No penalty for quotations
+    final_amount,
+  });
 
-
-  // Calculate final amount
-  const finalAmount = final_amount
-  console.log(isCancel)
+  console.log(isCancel);
   console.log(data);
-  const logo = Cookies.get('logo')
+
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
       {/* Show "Cancelled" label if isCancel is true */}
@@ -69,14 +78,14 @@ const QuotationTemplate = forwardRef((props, ref) => {
       <div className="flex flex-col items-center mb-6">
         <div className="w-full bg-pink-100 flex-row px-4 py-2 flex justify-between items-center rounded-t-lg">
           <div>
-            <h1 className="font-bold text-lg">{nameOfSchool || 'N/A'}</h1>
+            <h1 className="font-bold text-lg">{nameOfSchool || "N/A"}</h1>
             <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
           </div>
-
-          {/* School Logo */}
-         {logo && <div>
-         <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
-          </div>}
+          {logo && (
+            <div>
+              <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
+            </div>
+          )}
         </div>
 
         <div
@@ -99,7 +108,6 @@ const QuotationTemplate = forwardRef((props, ref) => {
           <p>Phone no: {receiver?.phone || "N/A"}</p>
         </div>
         <div>
-       
           <p>
             <strong>Quotation No:</strong> {quotationNumber || "QN0001-202412-0001"}
           </p>
@@ -144,40 +152,26 @@ const QuotationTemplate = forwardRef((props, ref) => {
         <tbody>
           {lineItems.length > 0 ? (
             lineItems.map((item, index) => (
-              <tr
-                key={item._id || index}
-                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-              >
-                <td className="p-2 border border-gray-300 text-center">
-                  {index + 1}
-                </td>
-                <td className="p-2 border border-gray-300">
-                  {item.revenueType || "N/A"}
-                </td>
-                <td className="p-2 border border-gray-300 text-center">
-                  {item.quantity || 1}
-                </td>
+              <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <td className="p-2 border border-gray-300 text-center">{index + 1}</td>
+                <td className="p-2 border border-gray-300">{item.revenueType || "N/A"}</td>
+                <td className="p-2 border border-gray-300 text-center">{item.quantity || 1}</td>
                 <td className="p-2 border border-gray-300 text-right">
                   {item.amount && item.quantity
                     ? (item.amount / item.quantity).toFixed(2)
                     : item.amount
-                      ? item.amount.toFixed(2)
-                      : "0.00"}{" "}
+                    ? item.amount.toFixed(2)
+                    : "0.00"}{" "}
                   QAR
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
-                  {item.amount
-                    ? parseFloat(item.amount).toLocaleString() + " QAR"
-                    : "0 QAR"}
+                  {item.amount ? parseFloat(item.amount).toLocaleString() + " QAR" : "0 QAR"}
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td
-                className="p-2 border border-gray-300 text-center"
-                colSpan="5"
-              >
+              <td className="p-2 border border-gray-300 text-center" colSpan="5">
                 No items found.
               </td>
             </tr>
@@ -208,7 +202,6 @@ const QuotationTemplate = forwardRef((props, ref) => {
             <td className="p-2 border border-gray-300 text-right">
               {discountType === "percentage" ? `${displayedDiscountPercentage}%` : `${discountAmount.toFixed(2)} QAR`}
             </td>
-
           </tr>
           {/* Final Total Row */}
           <tr className="font-bold text-pink-600">
@@ -224,7 +217,6 @@ const QuotationTemplate = forwardRef((props, ref) => {
 
       {/* Remarks and Summary */}
       <div className="w-full flex flex-col gap-y-4">
-        {/* Remarks on the left */}
         <div className="text-sm text-gray-700">
           <p>
             <strong>Remarks:</strong>
@@ -234,15 +226,13 @@ const QuotationTemplate = forwardRef((props, ref) => {
               "Thank you for doing business with us. If you have any questions, please contact us.",
               "Ensure to retain this document for future reference.",
               "For further details, reach out to our support team.",
-               `${isCancel && "This Quotation is cancelled"}`
+              `${isCancel && "This Quotation is cancelled"}`,
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}
             {remark && <li>{remark}</li>}
           </ul>
         </div>
-
-      
       </div>
     </div>
   );

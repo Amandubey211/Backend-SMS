@@ -1,27 +1,40 @@
 import React, { useState } from "react";
-import Logo from "../../../../Components/Common/Logo";
-import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
 import toast from "react-hot-toast";
 import { LuLoader } from "react-icons/lu";
 import { qidVerification } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
-import { useDispatch, useSelector } from "react-redux";
+import Logo from "../../../../Components/Common/Logo";
 
 const QIDLogin = () => {
   const [StudentID, setStudentID] = useState({
     Q_Id: "",
     addmissionNumber: "",
   });
-  //const { loading, verify } = useQidVerification();
-  const  {loading} = useSelector((store)=>store.common.auth)
+  const { loading } = useSelector((store) => store.common.auth);
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useDispatch()
-  const HandleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!StudentID) return toast.error("please add the required details");
-    dispatch(qidVerification(StudentID));
+    if (!StudentID.addmissionNumber || !StudentID.Q_Id) {
+      return toast.error("Please add the required details");
+    }
+    // Dispatch the thunk and use unwrap() to handle the promise outcome
+    dispatch(qidVerification(StudentID))
+      .unwrap()
+      .then((res) => {
+        // Redirect on successful verification
+        navigate("/student_dash");
+      })
+      .catch((error) => {
+        toast.error(error || "Verification failed");
+      });
   };
+
   return (
     <div className="relative h-screen bg-gray-100 w-full">
       <div className="absolute top-0 right-0 p-6">
@@ -38,10 +51,10 @@ const QIDLogin = () => {
             </div>
             <span>LMS Home</span>
           </NavLink>
-          <div className="flex justify-between items-center  mb-6">
+          <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-semibold">QID Verification</h2>
           </div>
-          <form onSubmit={HandleSubmit}>
+          <form onSubmit={handleSubmit}>
             <h6>Verify using:</h6>
             <div className="mb-4">
               <input
@@ -97,7 +110,7 @@ const QIDLogin = () => {
               className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
             >
               {loading ? (
-                <div className="flex justify-center  ">
+                <div className="flex justify-center">
                   <LuLoader className="animate-spin text-2xl" />
                 </div>
               ) : (

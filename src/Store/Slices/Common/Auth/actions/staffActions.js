@@ -35,8 +35,9 @@ export const staffLogin = createAsyncThunk(
 
       // Send login request
       const data = await postData("/auth/staff/login", userDetail);
+      console.log(data, "dd");
 
-      if (data && data.success) {
+      if (data?.success) {
         // Dispatch user details to userSlice
         dispatch(
           setUserDetails({
@@ -46,18 +47,18 @@ export const staffLogin = createAsyncThunk(
             fullName: data.fullName,
             email: data.email,
             mobileNumber: data.mobileNumber,
-            position: data.position,
-            employeeID: data.employeeID,
-            role: data.role, // Primary role
-            monthlySalary: data.monthlySalary,
-            active: data.active,
-            dateOfBirth: data.dateOfBirth,
-            schoolName: data.schoolName,
+            position: data.position || "na",
+            employeeID: data.employeeID || "dd",
+            role: data.role,
+            monthlySalary: data.monthlySalary || 0,
+            active: data.active ?? false,
+            dateOfBirth: data?.dateOfBirth || "N/A",
+            schoolName: data?.schoolName,
           })
         );
 
         // Reset any existing role
-        dispatch(setRole(null));
+        dispatch(setRole(data.role));
 
         if (data.academicYear) {
           const formattedAcademicYear = formatAcademicYear(
@@ -73,18 +74,9 @@ export const staffLogin = createAsyncThunk(
               },
             ])
           );
-          // await dispatch(fetchAcademicYear());
-          // const activeAcademicYear =
-          //   getState().common?.academicYear?.academicYears?.find(
-          //     (i) => i.isActive === true
-          //   );
+
           if (data.isAcademicYearActive) {
-            // console.log(
-            //   "activeAcademicYear",
-            //   activeAcademicYear,
-            //   activeAcademicYear._id
-            // );
-            setLocalCookies("say", data.academicYear._id);
+            setLocalCookies("say", data?.academicYear._id);
           }
         }
 
@@ -131,7 +123,8 @@ export const staffLogin = createAsyncThunk(
 
         return { redirect: "/dashboard" };
       } else {
-        const errorMessage = data?.msg || "Incorrect email or password.";
+        const errorMessage =
+          data?.msg || "Something went Wrong pls Try again later.";
         toast.error(errorMessage);
         return rejectWithValue(errorMessage);
       }

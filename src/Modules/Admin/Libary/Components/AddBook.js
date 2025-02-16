@@ -1,17 +1,15 @@
-// src/Modules/Admin/Libary/Components/AddBook.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import ImageUpload from "./ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import FormSelect from "../../Accounting/subClass/component/FormSelect";
 
-const AddBook = () => {
+const AddBook = ({ onClose }) => { // Ensure onClose is received as a prop
   const dispatch = useDispatch();
   const classList = useSelector((state) => state.admin.class.classes);
-  const addbookLoading = useSelector(
-    (state) => state.admin.library.addbookloading
-  );
+  const addbookLoading = useSelector((state) => state.admin.library.addbookloading);
+  const addBookSuccess = useSelector((state) => state.admin.library.addBookSuccess);
 
   const [bookData, setBookData] = useState({
     bookName: "",
@@ -23,6 +21,25 @@ const AddBook = () => {
   });
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
+
+  // ✅ Auto-reset form and close sidebar after successful book addition
+  useEffect(() => {
+    if (addBookSuccess) {
+      // Reset form fields
+      setBookData({
+        bookName: "",
+        authorName: "",
+        class: "",
+        category: "",
+        copies: "",
+        bookImage: null,
+      });
+      setImagePreview(null);
+
+      // ✅ Close the sidebar automatically
+      onClose();
+    }
+  }, [addBookSuccess, onClose]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

@@ -1,8 +1,11 @@
-import React,{forwardRef} from "react";
+import React, { forwardRef } from "react";
 import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
 import IconLogo from "../../Assets/RBAC/Icon.svg";
 import Cookies from "js-cookie";
-const ReceiptTemplate =forwardRef((props, ref) => {
+// Step 1: Import the helper function
+import { calculateFinalAmount } from "../../Utils/helperFunctions";
+
+const ReceiptTemplate = forwardRef((props, ref) => {
   const { data } = props;
   if (!data) return null;
   const logo = Cookies.get('logo')
@@ -28,26 +31,23 @@ const ReceiptTemplate =forwardRef((props, ref) => {
   const finalReceiver = reciever?.name ? reciever : receiver;
   const formattedDate = date ? new Date(date).toLocaleDateString() : "N/A";
 
-  // Calculate subtotal
+  // Step 3: Calculate final amount using the helper function
+  const finalAmount = calculateFinalAmount({
+    lineItems,
+    tax,
+    discount,
+    discountType,
+    penalty,
+  });
+
+  // For display purposes, we keep subtotal calculation.
   const subtotal = lineItems.reduce((acc, item) => acc + (item.total || 0), 0);
-
-  // Calculate tax as a percentage of subtotal
-  const taxAmount = (subtotal * (tax || 0)) / 100;
-
-  // Calculate total before applying penalty and discount
-  const totalBeforeDiscount = subtotal + taxAmount;
-
-  // Correctly apply the discount (only to subtotal + tax)
   const discountAmount =
     discountType === "percentage"
-      ? (totalBeforeDiscount * (discount || 0)) / 100
-      : discount || 0;
+      ? (subtotal * discount) / 100
+      : discount;
 
-  // Add penalty after discount
-  const finalAmount = (totalBeforeDiscount - discountAmount + (penalty || 0)).toFixed(2);
-
-  const { address, branchName, city, code,  nameOfSchool } = schoolId;
-
+  const { address, branchName, city, code, nameOfSchool } = schoolId;
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
@@ -222,7 +222,7 @@ const ReceiptTemplate =forwardRef((props, ref) => {
               "Thank you for doing business with us. If you have any questions, please contact us.",
               "Ensure to retain this document for future reference.",
               "For further details, reach out to our support team.",
-               `${isCancel && "This Receipt is cancelled"}`
+              `${isCancel && "This Receipt is cancelled"}`
             ].map((defaultRemark, index) => (
               <li key={index}>{defaultRemark}</li>
             ))}

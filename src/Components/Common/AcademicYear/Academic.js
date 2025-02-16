@@ -12,16 +12,19 @@ const Academic = () => {
   useNavHeading(role, `Academic`);
   return (
     <Layout title={` Academics  | Student Diwan`}>
-      {
-        role == "parent"?<ParentDashLayout hideAvatarList={true}>
-        <MainSection />
-      </ParentDashLayout>:role == "student"?<StudentDashLayout >
-        <MainSection />
-      </StudentDashLayout>:<DashLayout >
-        <MainSection />
-      </DashLayout>
-      }
-   
+      {role == "parent" ? (
+        <ParentDashLayout hideAvatarList={true}>
+          <MainSection />
+        </ParentDashLayout>
+      ) : role == "student" ? (
+        <StudentDashLayout>
+          <MainSection />
+        </StudentDashLayout>
+      ) : (
+        <DashLayout>
+          <MainSection />
+        </DashLayout>
+      )}
     </Layout>
   );
 };

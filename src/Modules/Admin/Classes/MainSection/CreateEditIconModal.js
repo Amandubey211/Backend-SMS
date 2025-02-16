@@ -5,6 +5,7 @@ import { FaTimes } from "react-icons/fa";
 import {
   createIcon,
   updateIcon,
+  fetchAllIcons,
 } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
 import {
   selectIcon,
@@ -16,8 +17,6 @@ const CreateEditIconModal = ({ onClose, type }) => {
   const { selectedIcon, loading } = useSelector(
     (state) => state.admin.classIcons
   );
-
-  // State and refs
   const [iconName, setIconName] = useState("");
   const [iconImage, setIconImage] = useState(null);
   const [iconPreview, setIconPreview] = useState(null);
@@ -37,15 +36,19 @@ const CreateEditIconModal = ({ onClose, type }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      toast.success("Image added");
       setIconImage(file);
       setIconPreview(URL.createObjectURL(file));
-      setError(false); // Clear error on valid file selection
+      setError(false);
     }
   };
 
   const handleRemoveImage = () => {
     setIconImage(null);
     setIconPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleIconSubmit = async () => {
@@ -57,8 +60,10 @@ const CreateEditIconModal = ({ onClose, type }) => {
 
     const formData = new FormData();
     formData.append("name", iconName);
-    formData.append("type", type ? type : "Class");
-    if (iconImage) formData.append("image", iconImage);
+    formData.append("type", type || "Class");
+    if (iconImage) {
+      formData.append("image", iconImage);
+    }
 
     try {
       if (selectedIcon) {
@@ -67,9 +72,9 @@ const CreateEditIconModal = ({ onClose, type }) => {
         );
       } else {
         await dispatch(createIcon(formData));
-        toast.success("Icon Created Successfully!");
       }
       dispatch(resetIconSelection());
+      dispatch(fetchAllIcons({ type: type || "Class" }));
       onClose();
     } catch (error) {
       toast.error(error.message || "Failed to submit icon");
@@ -77,20 +82,19 @@ const CreateEditIconModal = ({ onClose, type }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-80">
         <h2 className="text-lg font-semibold mb-4">
           {selectedIcon ? "Edit Icon" : "Create New Icon"}
         </h2>
 
-        {/* Icon Name Input */}
         <input
           type="text"
           placeholder="Icon Name"
           value={iconName}
           onChange={(e) => {
             setIconName(e.target.value);
-            if (error) setError(false); // Reset error on valid input
+            if (error) setError(false);
           }}
           className={`border p-2 w-full mb-3 rounded-md ${
             error && !iconName ? "border-red-500" : "border-gray-300"
@@ -100,7 +104,6 @@ const CreateEditIconModal = ({ onClose, type }) => {
           <span className="text-red-500 text-xs">Icon name is required.</span>
         )}
 
-        {/* Image Upload Section */}
         <div
           className={`flex flex-col items-center justify-center border-2 p-1 rounded-lg relative w-full h-40 border-dashed ${
             error && !iconImage && !iconPreview
@@ -196,14 +199,12 @@ const CreateEditIconModal = ({ onClose, type }) => {
           />
         </div>
 
-        {/* Error message for image upload if required */}
         {error && !iconImage && !iconPreview && (
           <span className="text-red-500 text-center text-xs mt-1">
             Icon image is required.
           </span>
         )}
 
-        {/* Action Buttons */}
         <div className="flex justify-end gap-4 mt-4">
           <button
             onClick={onClose}

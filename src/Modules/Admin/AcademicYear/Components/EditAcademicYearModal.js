@@ -1,20 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaSpinner } from "react-icons/fa";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateAcademicYear } from "../../../../Store/Slices/Common/AcademicYear/academicYear.action";
-import { useTranslation } from "react-i18next"; // Import translation hook
+import { useTranslation } from "react-i18next";
 
 // Helper function to format the date to YYYY-MM-DD
 const formatDateForInput = (dateString) => {
   const date = new Date(dateString);
   const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const month = String(date.getMonth() + 1).padStart(2, "0");
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
 const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
-  const { t } = useTranslation("admAcademicYear"); // Use translation hook
+  const { t } = useTranslation("admAcademicYear");
+  const dispatch = useDispatch();
+
+  const academicYears = useSelector(
+    (store) => store.common.academicYear.academicYears
+  );
+  // Determine if only one academic year exists
+  const isSingle = academicYears?.length === 1;
+
   const [formData, setFormData] = useState({
     year: "",
     startDate: "",
@@ -26,12 +34,11 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
   const modalRef = useRef(null);
 
   useEffect(() => {
-    // Preload data when the modal is opened
     if (year && show) {
       setFormData({
         year: year?.year,
-        startDate: formatDateForInput(year.startDate), // Format start date for input
-        endDate: formatDateForInput(year.endDate), // Format end date for input
+        startDate: formatDateForInput(year.startDate),
+        endDate: formatDateForInput(year.endDate),
         isActive: year.isActive,
       });
     }
@@ -56,7 +63,6 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
   // Validate the form
   const validateForm = () => {
     let formErrors = {};
-
     if (!formData.year) {
       formErrors.year = t("Academic Year is required.");
     }
@@ -66,19 +72,14 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
     if (!formData.endDate) {
       formErrors.endDate = t("End Date is required.");
     }
-
     setErrors(formErrors);
-    return Object.keys(formErrors)?.length === 0;
+    return Object.keys(formErrors).length === 0;
   };
-
-  const dispatch = useDispatch();
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
     dispatch(updateAcademicYear({ data: formData, id: year?._id }));
   };
 
@@ -103,7 +104,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
         </div>
         <div className="bg-white p-5">
           <form onSubmit={handleSubmit}>
-            {/* Academic Year */}
+            {/* Academic Year Field */}
             <div className="mb-3">
               <label className="block text-sm font-semibold text-gray-700">
                 {t("Academic Year (YYYY-YYYY)")}
@@ -125,7 +126,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
               )}
             </div>
 
-            {/* Start Date */}
+            {/* Start Date Field */}
             <div className="mb-3">
               <label className="block text-sm font-semibold text-gray-700">
                 {t("Start Date")}
@@ -146,7 +147,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
               )}
             </div>
 
-            {/* End Date */}
+            {/* End Date Field */}
             <div className="mb-3">
               <label className="block text-sm font-semibold text-gray-700">
                 {t("End Date")}
@@ -175,12 +176,13 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
                 onChange={(e) =>
                   setFormData({ ...formData, isActive: e.target.checked })
                 }
+                disabled={isSingle} // Disable if only one academic year exists
                 className="mr-2 ms-1 w-4 h-4"
               />
               <label className="text-gray-700">{t("Set as Active Year")}</label>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit & Cancel Buttons */}
             <div className="flex justify-end mt-4">
               <button
                 type="button"
@@ -198,7 +200,7 @@ const EditAcademicYearModal = ({ show, onClose, year, refreshData }) => {
               >
                 {loading ? (
                   <>
-                    <FaSpinner className="animate-spin mr-2" />{" "}
+                    <FaSpinner className="animate-spin mr-2" />
                     {t("Updating...")}
                   </>
                 ) : (

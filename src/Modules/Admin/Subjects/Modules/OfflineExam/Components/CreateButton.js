@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
 import NormalTable from "./NormalTable";
 import toast from "react-hot-toast";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 function CreateButton() {
   const { cid, sid } = useParams();
@@ -84,7 +85,7 @@ function CreateButton() {
   };
 
   return (
-    <ProtectedAction>
+    <ProtectedAction requiredPermission={PERMISSIONS.ADD_OFFLINE_EXAM}>
       <Tooltip title="Create Offline Exam" placement="left">
         <button
           className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
@@ -97,7 +98,7 @@ function CreateButton() {
           </span>
         </button>
       </Tooltip>
-
+    
       {isOpen && (
         <Sidebar
           isOpen={isOpen}
@@ -125,7 +126,9 @@ function CreateButton() {
                   <span className="text-gradient">Create Manually</span>
                 </button>
               </div>
+              <ProtectedAction requiredPermission={PERMISSIONS.UPLOAD_EXCEL_OFFLINE}>
 
+              
               {/* Upload Excel Button */}
               <div className="pl-5 pt-1">
                 <button
@@ -155,6 +158,7 @@ function CreateButton() {
                   <span className="text-gradient">Sample Excel</span>
                 </a>
               </div>
+              </ProtectedAction>
             </div>
 
             {/* Handsontable Component */}
@@ -182,7 +186,7 @@ function CreateButton() {
           </div>
         </Sidebar>
       )}
-    </ProtectedAction>
+     </ProtectedAction>
   );
 }
 export default CreateButton;

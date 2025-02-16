@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
-import { Menu, Dropdown, Input, Table, Tag, Tooltip, Modal, Button } from "antd";
+import { Menu, Dropdown, Input, Table, Tag, Tooltip, Modal, Button, Spin } from "antd";
 import {
   MoreOutlined,
   ExclamationCircleOutlined,
@@ -525,11 +525,7 @@ const RecentReceiptsList = () => {
             </div>
           </div>
 
-          {loading ? (
-            <div style={{ textAlign: "center", padding: "16px" }}>
-              <Spinner />
-            </div>
-          ) : (
+          {
             <ProtectedSection
               requiredPermission={PERMISSIONS.VIEW_RECENT_RECEIPTS}
               title={"Receipts List"}
@@ -555,10 +551,15 @@ const RecentReceiptsList = () => {
                 }}
                 size="small"
                 bordered
+                loading={{
+                  spinning: loading,
+                  indicator: <Spin size="large" />,
+                  tip: "Loading...",
+                }}
               />
 
             </ProtectedSection>
-          )}
+          }
 
           {/* Cancel Confirmation Modal */}
           <DeleteConfirmationModal

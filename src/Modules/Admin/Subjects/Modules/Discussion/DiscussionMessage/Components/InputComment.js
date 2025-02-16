@@ -48,14 +48,14 @@ const InputComment = ({
           onChange={(e) => setText(e.target.value)}
           className="w-full py-2 pl-4 pr-20 text-sm border-none rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <div
+        {/* <div
           className="absolute inset-y-0 right-0 flex items-center pr-3"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           <FaRegSmile className="text-gray-500 text-lg cursor-pointer mx-1" />
           <FaPaperclip className="text-gray-500 text-lg cursor-pointer mx-1" />
-        </div>
+        </div> */}
         {showEmojis && (
           <div
             className="absolute right-10 bottom-full mb-2 flex space-x-2 bg-white p-2 rounded shadow-md"

@@ -3,6 +3,8 @@ import SubjectSideBar from "../../../Component/SubjectSideBar";
 import { useLocation } from "react-router-dom";
 import OfflineExamViewCard from "./OfflineExamViewCard";
 import { CiSearch } from "react-icons/ci";
+import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../../config/permission";
 
 const OfflineExamView = () => {
   const location = useLocation();
@@ -19,6 +21,7 @@ const OfflineExamView = () => {
     <div className="flex ">
       <SubjectSideBar />
       <div className="p-4  w-full pr-4">
+      <ProtectedSection title={'Exam View'} requiredPermission={PERMISSIONS.SHOW_ALL_EXAMS}>
         <div className="flex gap-7 items-center">
           <h2 className="text-xl font-semibold">
             {examName}
@@ -73,6 +76,7 @@ const OfflineExamView = () => {
             </table>
           </div>
         </div>
+        </ProtectedSection>
       </div>
     </div>
   );

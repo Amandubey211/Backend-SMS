@@ -9,6 +9,8 @@ import {
   fetchBookIssuesThunk,
   fetchBooksDetailsThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
+import { resetLibraryState } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
+
 import LibraryTab from "../Components/LibraryTab";
 import AddIssue from "../Components/AddIssue";
 import AddBook from "../Components/AddBook";
@@ -31,26 +33,47 @@ const LibraryAndBookIssue = () => {
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
 
+  // Fetch initial data on mount
   useEffect(() => {
-    if (!books?.length) dispatch(fetchBooksDetailsThunk());
-    if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
-    if (!classList?.length) dispatch(fetchAllClasses());
-   // if (!StudentList?.length) dispatch(fetchAllStudents());
-  }, [
-    dispatch,
-    books?.length,
-    bookIssues?.length,
-    classList?.length,
-    StudentList?.length,
-  ]);
+    dispatch(fetchAllClasses());
+    // dispatch(fetchAllStudents()); // Uncomment if needed
+  }, [dispatch]);
+
+  // Re-fetch data when switching tabs
+  useEffect(() => {
+    if (activeTab === "Library") {
+      dispatch(fetchBooksDetailsThunk());
+    } else if (activeTab === "BookIssue") {
+      dispatch(fetchBookIssuesThunk());
+    }
+  }, [activeTab, dispatch]);
+
+  // Existing effect that prevents duplicate fetching if data exists; you may remove if always re-fetching
+  // useEffect(() => {
+  //   if (!books?.length) dispatch(fetchBooksDetailsThunk());
+  //   if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
+  //   if (!classList?.length) dispatch(fetchAllClasses());
+  //  // if (!StudentList?.length) dispatch(fetchAllStudents());
+  // }, [
+  //   dispatch,
+  //   books?.length,
+  //   bookIssues?.length,
+  //   classList?.length,
+  //   StudentList?.length,
+  // ]);
 
   useEffect(() => {
     if (addBookSuccess || addIssueSuccess) {
       setSidebarOpen(false);
       setEditIssueData(null);
+  
+      // Reset success state after closing sidebar
+      setTimeout(() => {
+        dispatch(resetLibraryState());
+      }, 500); // Ensures smooth transition
     }
-  }, [addBookSuccess, addIssueSuccess]);
-
+  }, [addBookSuccess, addIssueSuccess, dispatch]);
+  
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => {
     setSidebarOpen(false);

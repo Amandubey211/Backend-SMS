@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense, useCallback } from "react";
+import React, { useEffect, lazy, Suspense, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { fetchSectionsByClass } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
@@ -12,10 +12,13 @@ import { PERMISSIONS } from "../../../config/permission";
 
 const AssignTeacher = lazy(() => import("./AssignTeacher"));
 
-const NavigationBar = () => {
+const NavigationBar = ({
+  isSidebarOpen,
+  openSidebarForAdd,
+  closeSidebar,
+  editingTeacher,
+}) => {
   const { t } = useTranslation("admClass");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const { cid } = useParams();
   const sections = useSelector(
@@ -41,12 +44,9 @@ const NavigationBar = () => {
     dispatch(fetchSectionsByClass(cid));
   }, [dispatch, cid]);
 
-  const handleSidebarOpen = () => setIsSidebarOpen(true);
-  const handleSidebarClose = () => setIsSidebarOpen(false);
-
   const handleSectionChange = (section) => {
-    dispatch(setSelectedSection(section)); // Set the selected section
-    dispatch(filterTeachersBySection()); // Trigger filtering based on the section
+    dispatch(setSelectedSection(section)); // Set selected section
+    dispatch(filterTeachersBySection()); // Trigger filtering
   };
 
   return (
@@ -59,36 +59,41 @@ const NavigationBar = () => {
           </span>
         </div>
 
-        {/* Conditionally render the Assign Instructor button */}
-        {role == "admin" && (
-          <button
-            onClick={handleSidebarOpen}
-            className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
-          >
-            <span className="mr-2">{t("Assign Instructor")}</span>
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-              <span className="text-3xl -mt-2">+</span>
-            </div>
-          </button>
-        )}
+        {/* Button displays "Assign Instructor" for add mode or "Edit Instructor" when editing */}
+        <button
+          onClick={openSidebarForAdd}
+          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+        >
+          <span className="mr-2">
+            {editingTeacher ? t("Edit Instructor") : t("Assign Instructor")}
+          </span>
+          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+            <span className="text-3xl -mt-2">{editingTeacher ? "✎" : "+"}</span>
+          </div>
+        </button>
       </div>
 
       <Sidebar
         isOpen={isSidebarOpen}
-        onClose={handleSidebarClose}
-        title={t("Assign new Instructor")}
+        onClose={closeSidebar}
+        title={
+          editingTeacher ? t("Edit Instructor") : t("Assign new Instructor")
+        }
       >
         <Suspense fallback={<div>{t("Loading...")}</div>}>
-          <AssignTeacher />
+          <AssignTeacher
+            editingTeacher={editingTeacher}
+            closeSidebar={closeSidebar}
+          />
         </Suspense>
       </Sidebar>
-      
+
       <div className="flex space-x-2 px-5">
         <button
           className={getButtonClass("Everyone")}
           onClick={() => handleSectionChange("Everyone")}
         >
-          {t("Everyone")} {selectedSection === "Everyone"}
+          {t("Everyone")}
         </button>
         {sections?.map((item) => (
           <button
@@ -100,7 +105,6 @@ const NavigationBar = () => {
           </button>
         ))}
       </div>
-     
     </>
   );
 };

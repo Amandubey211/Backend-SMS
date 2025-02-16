@@ -133,10 +133,11 @@ const AllLibrarian = () => {
   };
 
   // Handler for navigating to manage roles
-  const navigateToManageRoles = () => {
-    navigate("/users/manage-roles");
+  const navigateToManageRoles = (dept) => {
+    navigate("/users/manage-roles", {
+      state: { department: dept },
+    });
   };
-
   // Handler for creating a new role
   const handleCreateRole = () => {
     handleSidebarOpen("createRole");
@@ -170,7 +171,10 @@ const AllLibrarian = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_LIBRARIAN} title={"All Librarians"}>
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_LIBRARIAN}
+            title={"All Librarians"}
+          >
             <div className="p-4 relative">
               {/* Reusable Header Component with currentSort and currentFilters */}
               <Header
@@ -180,7 +184,7 @@ const AllLibrarian = () => {
                 filterOptions={filterOptionsList}
                 department="Librarians"
                 onSortFilterApply={handleSortFilterApply}
-                navigateToManageRoles={navigateToManageRoles}
+                navigateToManageRoles={() => navigateToManageRoles("librarian")}
                 handleCreateRole={handleCreateRole}
                 isAdmin={role === "admin"}
                 currentSort={sortOption} // Pass current sort
@@ -195,9 +199,7 @@ const AllLibrarian = () => {
                       key={lib._id} // Use a unique identifier
                       profile={lib}
                       onClick={() => handleLibrarianClick(lib)}
-                      editUser={
-                        role === "admin" ? (event) => editUser(event, lib) : null
-                      }
+                      editUser={editUser}
                     />
                   ))
                 ) : (
@@ -217,7 +219,8 @@ const AllLibrarian = () => {
                   <GoPlus className="text-2xl" />
                 </button>
               </ProtectedAction>
-            </div></ProtectedSection>
+            </div>
+          </ProtectedSection>
         )}
       </DashLayout>
 
@@ -231,16 +234,18 @@ const AllLibrarian = () => {
             {sidebarContent === "viewLibrarian"
               ? t("Quick View of Librarian")
               : sidebarContent === "createRole"
-                ? t("Create New Role")
-                : librarianData ? t("Edit Librarian") : t("Add Librarian")}
+              ? t("Create New Role")
+              : librarianData
+              ? t("Edit Librarian")
+              : t("Add Librarian")}
           </span>
         }
         width={
           sidebarContent === "viewLibrarian"
             ? "30%"
             : sidebarContent === "createRole"
-              ? "60%"
-              : "75%"
+            ? "60%"
+            : "75%"
         }
         height="100%"
       >

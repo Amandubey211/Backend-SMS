@@ -89,12 +89,34 @@ const GraduationMainSection = () => {
     setModalLoading(true);
     const studentIds = demoteFromSidebar ? [selectedGraduate._id] : selectedStudents;
 
-    dispatch(demoteStudents({ studentIds }))
+    /**
+     dispatch(demoteStudents({ studentIds }))
       .then(() => {
         toast.success(`${studentIds?.length} student(s) have been demoted`);
         if (demoteFromSidebar) closeSidebar();
         else setSelectedStudents([]); // Clear selection after bulk demotion
         dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Refresh list
+      })
+      .finally(() => {
+        setModalLoading(false);
+        setModalOpen(false);
+      });
+     */
+    dispatch(demoteStudents({ studentIds }))
+      .then(() => {
+        toast.success(`${studentIds?.length} student(s) have been demoted`);
+
+        if (demoteFromSidebar) {
+          closeSidebar();
+        }
+
+        // Fetch updated graduate list first
+        return dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 }));
+      })
+      .then(() => {
+        if (!demoteFromSidebar) {
+          setSelectedStudents([]); // Clear selection AFTER list refreshes
+        }
       })
       .finally(() => {
         setModalLoading(false);

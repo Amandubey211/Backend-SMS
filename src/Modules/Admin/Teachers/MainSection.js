@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import TeacherCard from "./TeacherCard";
@@ -13,54 +13,81 @@ const MainSection = () => {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  const { assignedTeachers, loading, error } = useSelector(
+  const { assignedTeachers, loading, error, selectedSection } = useSelector(
     (state) => state.admin.teacher
   );
 
-  const selectedSection = useSelector(
-    (state) => state.admin.teacher.selectedSection
-  );
+  // Local state to control sidebar and track the teacher being edited
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [editingTeacher, setEditingTeacher] = useState(null);
 
-  // Fetch teachers when the component is mounted
+  // Fetch teachers when the component mounts
   useEffect(() => {
     dispatch(fetchTeachersByClass(cid));
   }, [cid, dispatch]);
 
-  // Filter assigned teachers by selected section
+  // Filter teachers by selected section
   const filteredTeachers =
     selectedSection === "Everyone"
       ? assignedTeachers
       : assignedTeachers?.filter(
           (teacher) =>
             teacher?.sectionId &&
-            teacher.sectionId.some(
+            teacher.sectionId?.some(
               (section) => section?.sectionName === selectedSection
             )
         );
 
+  // Handler to open sidebar for adding a new teacher assignment
+  const openSidebarForAdd = () => {
+    setEditingTeacher(null); // Clear any editing teacher
+    setIsSidebarOpen(true);
+  };
+
+  // Handler to open sidebar for editing an existing teacher
+  const openSidebarForEdit = (teacher) => {
+    setEditingTeacher(teacher);
+    setIsSidebarOpen(true);
+  };
+
+  // Close sidebar and clear editing teacher
+  const closeSidebar = () => {
+    setIsSidebarOpen(false);
+    setEditingTeacher(null);
+  };
+
   return (
     <>
-    <ProtectedSection requiredPermission={PERMISSIONS.TEACHERS_BY_CLASS}>
-      <NavigationBar />
-      <div className="flex flex-wrap justify-start px-2 items-center">
-        {loading ? (
-          <div className="h-96 w-full flex justify-center items-center">
-            <Spinner />
-          </div>
-        ) : error ? (
-          <div className="h-96 w-full flex justify-center items-center">
-            <NoDataFound />
-          </div>
-        ) : filteredTeachers?.length < 1 ? (
-          <div className="h-96 w-full flex justify-center items-center">
-            <NoDataFound title="Teacher" />
-          </div>
-        ) : (
-          filteredTeachers?.map((teacher) => (
-            <TeacherCard key={teacher._id} teacher={teacher} />
-          ))
-        )}
-      </div>
+      <ProtectedSection requiredPermission={PERMISSIONS.TEACHERS_BY_CLASS}>
+        <NavigationBar
+          isSidebarOpen={isSidebarOpen}
+          openSidebarForAdd={openSidebarForAdd}
+          closeSidebar={closeSidebar}
+          editingTeacher={editingTeacher}
+        />
+        <div className="flex flex-wrap justify-start px-2 items-center">
+          {loading ? (
+            <div className="h-96 w-full flex justify-center items-center">
+              <Spinner />
+            </div>
+          ) : error ? (
+            <div className="h-96 w-full flex justify-center items-center">
+              <NoDataFound />
+            </div>
+          ) : filteredTeachers?.length < 1 ? (
+            <div className="h-96 w-full flex justify-center items-center">
+              <NoDataFound title="Teacher" />
+            </div>
+          ) : (
+            filteredTeachers?.map((teacher) => (
+              <TeacherCard
+                key={teacher._id}
+                teacher={teacher}
+                onEditTeacher={openSidebarForEdit}
+              />
+            ))
+          )}
+        </div>
       </ProtectedSection>
     </>
   );

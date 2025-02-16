@@ -178,27 +178,57 @@ const StudentInfo = () => {
     } else {
       setImageError("");
     }
+    /** 
+        // Identify the first field with an error to scroll into view
+        for (const errorKey in validationErrors) {
+          const refKey = errorKey.includes(".")
+            ? errorKey.split(".").join("")
+            : errorKey;
+    
+          const ref = inputRefs[refKey]?.current;
+    
+          if (ref) {
+            ref.scrollIntoView({ behavior: "smooth", block: "center" });
+            ref.focus();
+            break;
+          }
+        }
+    
+        if (Object.keys(validationErrors)?.length > 0) {
+          toast.error(t("Please correct the errors in the form."));
+        }
+    
+        return Object.keys(validationErrors)?.length === 0 && profile;
+    */
+    let firstInvalidField = null;
+    let firstInvalidPosition = Number.MAX_VALUE; // Track the top-most field
 
-    // Identify the first field with an error to scroll into view
+    // Loop through validation errors and find the top-most invalid field
     for (const errorKey in validationErrors) {
-      const refKey = errorKey.includes(".")
-        ? errorKey.split(".").join("")
-        : errorKey;
-
-      const ref = inputRefs[refKey]?.current;
-
+      let ref = inputRefs[errorKey]?.current;
       if (ref) {
-        ref.scrollIntoView({ behavior: "smooth", block: "center" });
-        ref.focus();
-        break;
+        const rect = ref.getBoundingClientRect();
+        if (rect.top < firstInvalidPosition) {
+          firstInvalidField = ref;
+          firstInvalidPosition = rect.top;
+        }
       }
     }
 
-    if (Object.keys(validationErrors)?.length > 0) {
+    if (firstInvalidField) {
+      // Ensure smooth scrolling and visibility
+      firstInvalidField.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      setTimeout(() => {
+        firstInvalidField.focus();
+      }, 300);
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
       toast.error(t("Please correct the errors in the form."));
     }
 
-    return Object.keys(validationErrors)?.length === 0 && profile;
+    return Object.keys(validationErrors).length === 0 && profile;
   };
 
   const handleDocumentSubmit = async (e) => {

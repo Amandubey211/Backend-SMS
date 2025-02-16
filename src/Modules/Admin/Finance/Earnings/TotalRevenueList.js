@@ -1,35 +1,19 @@
 // src/Components/Admin/Finance/Earnings/TotalRevenueList.jsx
 
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import {
-  Table,
-  Input,
-  Button,
-  Spin,
-  Alert,
-  Tooltip,
-  Tag,
-  Checkbox,
-  Descriptions,
-} from "antd";
+import { Table, Input, Button, Spin, Tooltip, Tag, Checkbox } from "antd";
 import {
   SearchOutlined,
   ExportOutlined,
   FilterOutlined,
-  UploadOutlined,
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
   DollarCircleOutlined,
-  PieChartOutlined,
-  ExclamationCircleOutlined,
   DollarOutlined,
   CloudOutlined,
   CreditCardOutlined,
-  CheckCircleOutlined,
-  BlockOutlined,
 } from "@ant-design/icons";
-import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -444,7 +428,7 @@ const TotalRevenueList = () => {
         remainingAmount: income.remaining_amount || 0,
         penalty: income.penalty || 0,
         paymentStatus: income.paymentStatus || "N/A",
-        earnedDate: income.paidDate || income.generateDate || null,
+        earnedDate: income.paidDate || income.createdAt || null,
         totalAmount: income.total_amount || 0,
         email: income?.email,
         ...income,

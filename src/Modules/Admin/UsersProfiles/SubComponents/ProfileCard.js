@@ -26,7 +26,8 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
   const [isNameTooltipVisible, setIsNameTooltipVisible] = useState(false);
   const [isPositionTooltipVisible, setIsPositionTooltipVisible] =
     useState(false);
-
+    
+  const adminStaffRole = role === "admin" || profile?.role === role
   // Handlers for Modal
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -139,66 +140,68 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
         onClick={() => onClick(profile)}
         className="block p-6 bg-white rounded-lg hover:shadow-lg transition cursor-pointer border"
       >
-        {!profile?.active && (
+        {!profile?.active && adminStaffRole && (
           <span className="flex my-[-.5rem] text-red-600 font-bold text-sm">
             Deactivated
           </span>
         )}
 
-        <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
-         {
-          MYId == profile._id ?<div className="bg-purple-200 text-purple-800 px-2 rounded-md">My Profile</div>:<>
-           {profile?.active && (
-            <ProtectedAction
-              requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}
-            >
-              <button
-                className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
-                onClick={(event) => editUser(event, profile)}
-                aria-label="Edit User"
-              >
-                {loading ? (
-                  <FiLoader className="animate-spin w-[1rem] h-[1rem]" />
-                ) : (
-                  <CiEdit className="text-sm text-green-500" />
-                )}
-              </button>
-            </ProtectedAction>
-          )}
+        {adminStaffRole && <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
+          {
+            MYId == profile._id ? <div className="bg-purple-200 text-purple-800 px-2 rounded-md">My Profile</div> : <>
+              {profile?.active && (
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}
+                >
+                  <button
+                    className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
+                    onClick={(event) => editUser(event, profile)}
+                    aria-label="Edit User"
+                  >
+                    {loading ? (
+                      <FiLoader className="animate-spin w-[1rem] h-[1rem]" />
+                    ) : (
+                      <CiEdit className="text-sm text-green-500" />
+                    )}
+                  </button>
+                </ProtectedAction>
+              )}
 
-          {profile?.active ? (
+              {profile?.active ? (
 
-            <ProtectedAction requiredPermission={PERMISSIONS[`DEACTIVE_${role.toUpperCase()}`]}>
+                <ProtectedAction requiredPermission={PERMISSIONS[`DEACTIVE_${role.toUpperCase()}`]}>
 
-              <button
-                className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
-                title="Deactivate"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openModal();
-                }}
-                aria-label="Deactivate User"
-              >
-                <MdBlock className="text-sm text-red-500" />
-              </button>
-            </ProtectedAction>
-          ) : (
-            <ProtectedAction
-              requiredPermission={PERMISSIONS[`ACTIVE_${role.toUpperCase()}`]}
-            >
-              <button
-                className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
-                title="Activate"
-                onClick={(e) => activateUser(e, profile._id, profile.role)}
-                aria-label="Activate User"
-              >
-                <MdOutlinePublishedWithChanges className="text-sm text-green-500" />
-              </button>
-            </ProtectedAction>
-          )}
-          </>
-         }
-        </div>
+                  <button
+                    className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
+                    title="Deactivate"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      openModal();
+                    }}
+                    aria-label="Deactivate User"
+                  >
+                    <MdBlock className="text-sm text-red-500" />
+                  </button>
+                </ProtectedAction>
+              ) : (
+
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS[`ACTIVE_${role.toUpperCase()}`]}
+                >
+                  <button
+                    className="bg-transparent p-2 rounded-full border hover:bg-gray-200 transition"
+                    title="Activate"
+                    onClick={(e) => activateUser(e, profile._id, profile.role)}
+                    aria-label="Activate User"
+                  >
+                    <MdOutlinePublishedWithChanges className="text-sm text-green-500" />
+                  </button>
+                </ProtectedAction>
+
+              )}
+            </>
+          }
+        </div>}
 
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
           <img
@@ -222,7 +225,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
       </div>
 
       {/* Deactivation Confirmation Modal */}
-      {!loading && (
+      {!loading && adminStaffRole && (
         <DeleteConfirmatiomModal
           isOpen={isModalOpen}
           onClose={closeModal}

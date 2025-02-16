@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
-import { useState } from "react";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { FaClipboardList } from "react-icons/fa";
 import Spinner from "../../../../../Components/Common/Spinner";
@@ -13,10 +12,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOfflineExam } from "../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { formatDate } from "../../../../../Utils/helperFunctions";
 import { useTranslation } from "react-i18next";
-
 import { AiFillFileExcel } from "react-icons/ai";
 import { FiRefreshCw } from "react-icons/fi";
 import DatePicker from "../../../../../Utils/calendar";
+import { PERMISSIONS } from "../../../../../config/permission";
+import { Modal } from "antd";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
@@ -27,8 +27,8 @@ const MainSection = () => {
   );
 
   const dispatch = useDispatch();
-
   const { t } = useTranslation("admModule");
+
   const [examType, setExamType] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [semester, setSemester] = useState("");
@@ -70,7 +70,10 @@ const MainSection = () => {
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
-      <ProtectedSection title="All Offline Exams">
+      <ProtectedSection
+        title="All Offline Exams"
+        requiredPermission={PERMISSIONS.GET_OFFLINE_EXAM}
+      >
         <div className="flex pt-4">
           {/* Left Section */}
           <div className="w-[65%] border-l">
@@ -91,13 +94,12 @@ const MainSection = () => {
                 {filteredData?.map((item, index) => (
                   <div>
                     <OfflineExamCard
-                      key={index}
                       examType={item.examType}
                       examName={item.examName}
                       semester={item.semesterId?.title ?? "NA"}
                       startDate={formatDate(item.startDate)}
                       endDate={formatDate(item.endDate)}
-                      maxScore={item.students[0]?.maxMarks}
+                      maxScore={item.students?.[0]?.maxMarks}
                       examId={item._id}
                       students={item.students}
                     />
@@ -107,7 +109,7 @@ const MainSection = () => {
             ) : (
               <NoDataFound
                 title="Offline Exam"
-                desc={"No Offline Exam Found !"}
+                desc="No Offline Exam Found !"
                 icon={FaClipboardList}
                 iconColor="text-blue-500"
                 textColor="text-gray-700"
@@ -144,11 +146,11 @@ const MainSection = () => {
                 </label>
                 <select
                   className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  value={examType}
+                  value={semester}
                   onChange={(e) => setSemester(e.target.value)}
                 >
                   <option value="">{t("Select")}</option>
-                  {SemesterList?.map((name, index) => (
+                  {SemesterList.map((name, index) => (
                     <option key={index} value={name}>
                       {name}
                     </option>

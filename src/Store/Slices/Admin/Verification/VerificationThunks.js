@@ -69,7 +69,7 @@ export const verifyStudent = createAsyncThunk(
         verificationDetails
       );
 
-      if (!verifyResponse.success) {
+      if (!verifyResponse?.success) {
         return rejectWithValue(
           verifyResponse.data.msg || "Failed to verify student"
         );
@@ -88,7 +88,7 @@ export const verifyStudent = createAsyncThunk(
           assignClassDetails
         );
 
-        if (!assignResponse.success) {
+        if (!assignResponse?.success) {
           return rejectWithValue(
             assignResponse.data.msg || "Failed to assign class"
           );

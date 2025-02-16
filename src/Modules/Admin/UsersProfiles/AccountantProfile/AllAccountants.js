@@ -133,8 +133,10 @@ const AllAccountants = () => {
   };
 
   // Handler for navigating to manage roles
-  const navigateToManageRoles = () => {
-    navigate("/users/manage-roles");
+  const navigateToManageRoles = (dept) => {
+    navigate("/users/manage-roles", {
+      state: { department: dept },
+    });
   };
 
   // Handler for creating a new role
@@ -168,7 +170,10 @@ const AllAccountants = () => {
             <Spinner />
           </div>
         ) : (
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_FINANCE_USER} title={"All Finance"}>
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_FINANCE_USER}
+            title={"All Finance"}
+          >
             <div className="p-4 relative">
               {/* Reusable Header Component with currentSort and currentFilters */}
               <Header
@@ -178,7 +183,7 @@ const AllAccountants = () => {
                 filterOptions={filterOptionsList}
                 department="Finance"
                 onSortFilterApply={handleSortFilterApply}
-                navigateToManageRoles={navigateToManageRoles}
+                navigateToManageRoles={() => navigateToManageRoles("finance")}
                 handleCreateRole={handleCreateRole}
                 isAdmin={role === "admin"}
                 currentSort={sortOption} // Pass current sort
@@ -193,9 +198,7 @@ const AllAccountants = () => {
                       key={acc._id} // Use a unique identifier
                       profile={acc}
                       onClick={() => handleAccountantClick(acc)}
-                      editUser={
-                        role === "admin" ? (event) => editUser(event, acc) : null
-                      }
+                      editUser={editUser}
                     />
                   ))
                 ) : (
@@ -230,16 +233,18 @@ const AllAccountants = () => {
             {sidebarContent === "viewAccountant"
               ? t("Quick View of Accountant")
               : sidebarContent === "createRole"
-                ? t("Create New Role")
-                : accountantData ? t("Edit Finance User") : t("Add Finance User")}
+              ? t("Create New Role")
+              : accountantData
+              ? t("Edit Finance User")
+              : t("Add Finance User")}
           </span>
         }
         width={
           sidebarContent === "viewAccountant"
             ? "30%"
             : sidebarContent === "createRole"
-              ? "60%"
-              : "75%"
+            ? "60%"
+            : "75%"
         }
         height="100%"
       >

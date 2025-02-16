@@ -1,24 +1,57 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { FaTimes } from "react-icons/fa"; // Importing the Font Awesome remove icon
 import { useTranslation } from "react-i18next";
 
-const ImageUpload = ({
-  imagePreview,
-  handleImageChange,
-  handleRemoveImage,
-}) => {
+const ImageUpload = ({ imagePreview, handleImageChange, handleRemoveImage }) => {
   const { t } = useTranslation("admLibrary");
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleImageChange({ target: { files: e.dataTransfer.files } });
+      e.dataTransfer.clearData();
+    }
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 p-1 rounded-lg relative h-40 w-full">
+    <div
+      className={`flex flex-col items-center justify-center border-2 border-dashed ${
+        isDragging ? "border-purple-500 bg-purple-100" : "border-gray-300"
+      } p-1 rounded-lg relative h-40 w-full transition-colors`}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
       {imagePreview ? (
         <div className="relative w-36 h-36">
           <img
             src={imagePreview}
             alt={t("Image Preview")}
             className="w-full h-full object-cover rounded-lg"
-            style={{ objectFit: "cover" }} // Ensures image covers the container without stretching
           />
           <button
             type="button"
@@ -44,12 +77,7 @@ const ImageUpload = ({
             xmlns="http://www.w3.org/2000/svg"
           >
             <g clipPath="url(#clip0_2_203153)">
-              <path
-                d="M37.5 20H37.52"
-                stroke="#7F7F7F"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path d="M37.5 20H37.52" stroke="#7F7F7F" strokeLinecap="round" strokeLinejoin="round" />
               <path
                 d="M31.25 52.5H15C13.0109 52.5 11.1032 51.7098 9.6967 50.3033C8.29018 48.8968 7.5 46.9891 7.5 45V15C7.5 13.0109 8.29018 11.1032 9.6967 9.6967C11.1032 8.29018 13.0109 7.5 15 7.5H45C46.9891 7.5 48.8968 8.29018 50.3033 9.6967C51.7098 11.1032 52.5 13.0109 52.5 15V31.25"
                 stroke="#7F7F7F"
@@ -68,21 +96,11 @@ const ImageUpload = ({
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <path
-                d="M40 47.5H55"
-                stroke="#7F7F7F"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M47.5 40V55"
-                stroke="#7F7F7F"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path d="M40 47.5H55" stroke="#7F7F7F" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M47.5 40V55" stroke="#7F7F7F" strokeLinecap="round" strokeLinejoin="round" />
             </g>
             <defs>
-              <clipPath id="clip0_2_203153)">
+              <clipPath id="clip0_2_203153">
                 <rect width="60" height="60" fill="white" />
               </clipPath>
             </defs>

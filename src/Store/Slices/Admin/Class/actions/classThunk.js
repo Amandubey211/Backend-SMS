@@ -14,12 +14,12 @@ import { getUserRole } from "../../../../../Utils/getRoles";
 export const fetchAllClasses = createAsyncThunk(
   "class/fetchAllClasses",
   async (_, { rejectWithValue, dispatch, getState }) => {
-    // const say = getAY();
+    const say = getAY();
     dispatch(setShowError(false));
 
     try {
       // const getRole = getUserRole(getState);
-      const endpoint = `/admin/all/class`;
+      const endpoint = `/admin/all/class?say=${say}`;
 
       const response = await getData(endpoint);
       // console.log(response, "lk");
@@ -90,7 +90,7 @@ export const createClass = createAsyncThunk(
 
       if (response && response.success) {
         toast.success("Class created successfully!");
-        dispatch(fetchAllClasses()); // Refresh the classes list
+        dispatch(fetchAllClassesDetails()); // Refresh the classes list
         return response.data; // Assuming 'data' contains the created class
       }
     } catch (error) {
@@ -112,7 +112,7 @@ export const updateClass = createAsyncThunk(
 
       if (response && response.success) {
         toast.success("Class updated successfully!");
-        dispatch(fetchAllClasses()); // Refresh the classes list
+        dispatch(fetchAllClassesDetails()); // Refresh the classes list
         return response.data; // Assuming 'data' contains the updated class
       }
     } catch (error) {

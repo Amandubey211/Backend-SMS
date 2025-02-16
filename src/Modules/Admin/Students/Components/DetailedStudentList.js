@@ -7,7 +7,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
     activeSection === "Everyone"
       ? students
-      : students?.filter((student) => student.sectionName === activeSection);
+      : students?.filter((student) => student?.sectionName === activeSection);
 
   return (
     <div className="w-full p-4 bg-white">
@@ -20,7 +20,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
         <ul>
           {filteredStudents?.map((student, index) => (
             <li
-              key={student._id}
+              key={student?._id}
               className="relative flex items-center justify-between py-4 border-b"
             >
               <StudentInfo
@@ -30,7 +30,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
               />
               <StudentMenuOptions
                 studentName={`${student?.firstName} ${student?.lastName}`}
-                studentId={student._id}
+                studentId={student?._id}
                 student={student}
               />
             </li>

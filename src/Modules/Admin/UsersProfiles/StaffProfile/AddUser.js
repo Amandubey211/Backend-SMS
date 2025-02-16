@@ -367,7 +367,7 @@ const AddUser = ({ role, data }) => {
         ).unwrap();
 
         if (addResult) {
-          toast.success("User added successfully!");
+          //toast.success("User added successfully!");
           resetForm();
         } else {
           toast.error("Failed to add user.");

@@ -133,8 +133,10 @@ const AllStaff = () => {
   };
 
   // Handler for navigating to manage roles
-  const navigateToManageRoles = () => {
-    navigate("/users/manage-roles");
+  const navigateToManageRoles = (dept) => {
+    navigate("/users/manage-roles", {
+      state: { department: dept },
+    });
   };
 
   // Handler for creating a new role
@@ -183,7 +185,9 @@ const AllStaff = () => {
                 filterOptions={filterOptionsList}
                 department="Staff"
                 onSortFilterApply={handleSortFilterApply}
-                navigateToManageRoles={navigateToManageRoles}
+                navigateToManageRoles={() =>
+                  navigateToManageRoles("otherStaff")
+                }
                 handleCreateRole={handleCreateRole}
                 isAdmin={role === "admin"}
                 currentSort={sortOption} // Pass current sort
@@ -198,11 +202,7 @@ const AllStaff = () => {
                       key={member._id} // Use a unique identifier
                       profile={member}
                       onClick={() => handleStaffClick(member)}
-                      editUser={
-                        role === "admin"
-                          ? (event) => editUser(event, member)
-                          : null
-                      }
+                      editUser={editUser}
                     />
                   ))
                 ) : (
