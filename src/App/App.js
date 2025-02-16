@@ -505,13 +505,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "/create_academicYear",
-    //   element: (
-    //     <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
-    //   ),
-    //   errorElement: <Error />,
-    // },
+
     {
       path: "/class",
       element: (
