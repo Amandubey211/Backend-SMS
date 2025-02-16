@@ -35,8 +35,9 @@ export const staffLogin = createAsyncThunk(
 
       // Send login request
       const data = await postData("/auth/staff/login", userDetail);
+      console.log(data, "dd");
 
-      if (data.success) {
+      if (data?.success) {
         // Dispatch user details to userSlice
         dispatch(
           setUserDetails({
@@ -48,11 +49,11 @@ export const staffLogin = createAsyncThunk(
             mobileNumber: data.mobileNumber,
             position: data.position || "na",
             employeeID: data.employeeID || "dd",
-            role: data.role, // Primary role
+            role: data.role,
             monthlySalary: data.monthlySalary || 0,
             active: data.active ?? false,
-            dateOfBirth: data.dateOfBirth || "N/A",
-            schoolName: data.schoolName,
+            dateOfBirth: data?.dateOfBirth || "N/A",
+            schoolName: data?.schoolName,
           })
         );
 
