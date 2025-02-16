@@ -1,7 +1,7 @@
 // UpdateTimeTable.jsx
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Table,
   Input,
@@ -11,38 +11,32 @@ import {
   Button,
   Popconfirm,
   message,
-} from 'antd';
-import {
-  PlusOutlined,
-  DeleteOutlined,
-  UndoOutlined,
-} from '@ant-design/icons';
-import moment from 'moment';
-import {
-  updateTimetable,
-} from '../../../../Store/Slices/Admin/TimeTable/timetable.action';
-import { fetchSubjects } from '../../../../Store/Slices/Admin/Class/Subject/subjectThunks';
+} from "antd";
+import { PlusOutlined, DeleteOutlined, UndoOutlined } from "@ant-design/icons";
+import moment from "moment";
+import { updateTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action";
+import { fetchSubjects } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import {
   fetchSectionsByClass,
   fetchGroupsByClass,
-} from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import {
   clearSectionsList,
   clearGroupsList,
-} from '../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice';
-import { useNavigate, useParams } from 'react-router-dom';
+} from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionSlice";
+import { useNavigate, useParams } from "react-router-dom";
 
 const { Option } = Select;
 
 // Days of the week for the dropdown
 const daysOfWeek = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
 ];
 
 const UpdateTimeTable = () => {
@@ -69,18 +63,18 @@ const UpdateTimeTable = () => {
   );
 
   const [formData, setFormData] = useState({
-    name: timetable?.name || '',
-    classId: timetable?.classId?._id || timetable?.classId || '',
-    sectionId: timetable?.sectionId?._id || timetable?.sectionId || '',
-    groupId: timetable?.groupId?._id || timetable?.groupId || '',
+    name: timetable?.name || "",
+    classId: timetable?.classId?._id || timetable?.classId || "",
+    sectionId: timetable?.sectionId?._id || timetable?.sectionId || "",
+    groupId: timetable?.groupId?._id || timetable?.groupId || "",
     startDate: timetable?.validity?.startDate
-      ? moment(timetable.validity.startDate).format('YYYY-MM-DD')
-      : '',
+      ? moment(timetable.validity.startDate).format("YYYY-MM-DD")
+      : "",
     endDate: timetable?.validity?.endDate
-      ? moment(timetable.validity.endDate).format('YYYY-MM-DD')
-      : '',
-    type: timetable?.type || 'weekly',
-    status: timetable?.status === 'active' ? 'Publish' : 'Draft',
+      ? moment(timetable.validity.endDate).format("YYYY-MM-DD")
+      : "",
+    type: timetable?.type || "weekly",
+    status: timetable?.status === "active" ? "Publish" : "Draft",
   });
 
   // Remove isActive state as per previous instructions
@@ -101,7 +95,7 @@ const UpdateTimeTable = () => {
     if (timetable && timetable.academicYear && timetable.academicYear._id) {
       setAcademicYear(timetable.academicYear._id);
     } else {
-      console.warn('Academic Year is not available in the timetable.');
+      console.warn("Academic Year is not available in the timetable.");
       // Optionally, fetch it from another source or handle accordingly
     }
   }, [timetable]);
@@ -120,8 +114,8 @@ const UpdateTimeTable = () => {
       dispatch(clearGroupsList());
       setFormData((prev) => ({
         ...prev,
-        sectionId: '',
-        groupId: '',
+        sectionId: "",
+        groupId: "",
       }));
     }
   }, [formData.classId, dispatch]);
@@ -135,35 +129,34 @@ const UpdateTimeTable = () => {
         // console.log(`Processing day ${dayIndex + 1}:`, day); // Debugging
         day.slots.forEach((slot, slotIndex) => {
           // console.log(`Processing slot ${slotIndex + 1}:`, slot); // Debugging
-          const newRow = { key: idCounterRef.current, id: idCounterRef.current };
-          if (timetable.type === 'others') {
-            newRow.heading = slot.heading || ''; // Extract heading from slot.heading
-            newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
-            newRow.startTime = slot.startTime || '';
-            newRow.endTime = slot.endTime || '';
-            newRow.description = slot.description || '';
-          } else if (timetable.type === 'weekly') {
-            newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
-            newRow.day = day.day || '';
-            newRow.startTime = slot.startTime || '';
-            newRow.endTime = slot.endTime || '';
-            newRow.description = slot.description || '';
-          } else if (timetable.type === 'exam') {
-            newRow.subjectId = slot.subjectId?._id || slot.subjectId || '';
-            newRow.date = day.date
-              ? moment(day.date).format('YYYY-MM-DD')
-              : '';
-            newRow.startTime = slot.startTime || '';
-            newRow.endTime = slot.endTime || '';
-            newRow.description = slot.description || '';
-          } else if (timetable.type === 'event') {
-            newRow.eventName = slot.eventName || ''; // Extract event name from slot.eventName
-            newRow.date = day.date
-              ? moment(day.date).format('YYYY-MM-DD')
-              : '';
-            newRow.startTime = slot.startTime || '';
-            newRow.endTime = slot.endTime || '';
-            newRow.description = slot.description || '';
+          const newRow = {
+            key: idCounterRef.current,
+            id: idCounterRef.current,
+          };
+          if (timetable.type === "others") {
+            newRow.heading = slot.heading || ""; // Extract heading from slot.heading
+            newRow.subjectId = slot.subjectId?._id || slot.subjectId || "";
+            newRow.startTime = slot.startTime || "";
+            newRow.endTime = slot.endTime || "";
+            newRow.description = slot.description || "";
+          } else if (timetable.type === "weekly") {
+            newRow.subjectId = slot.subjectId?._id || slot.subjectId || "";
+            newRow.day = day.day || "";
+            newRow.startTime = slot.startTime || "";
+            newRow.endTime = slot.endTime || "";
+            newRow.description = slot.description || "";
+          } else if (timetable.type === "exam") {
+            newRow.subjectId = slot.subjectId?._id || slot.subjectId || "";
+            newRow.date = day.date ? moment(day.date).format("YYYY-MM-DD") : "";
+            newRow.startTime = slot.startTime || "";
+            newRow.endTime = slot.endTime || "";
+            newRow.description = slot.description || "";
+          } else if (timetable.type === "event") {
+            newRow.eventName = slot.eventName || ""; // Extract event name from slot.eventName
+            newRow.date = day.date ? moment(day.date).format("YYYY-MM-DD") : "";
+            newRow.startTime = slot.startTime || "";
+            newRow.endTime = slot.endTime || "";
+            newRow.description = slot.description || "";
           }
           newDataSource.push(newRow);
           idCounterRef.current += 1;
@@ -172,7 +165,7 @@ const UpdateTimeTable = () => {
       // console.log('Pre-filled dataSource:', newDataSource); // Debugging
       setDataSource(newDataSource);
     } else {
-      console.warn('Timetable data is incomplete or missing days.'); // Debugging
+      console.warn("Timetable data is incomplete or missing days."); // Debugging
     }
   }, [timetable]);
 
@@ -202,7 +195,7 @@ const UpdateTimeTable = () => {
     <Select
       value={text || undefined}
       onChange={(value) => handleCellChange(value, record.key, dataIndex)}
-      style={{ width: '100%' }}
+      style={{ width: "100%" }}
       placeholder="Select Day"
     >
       {daysOfWeek?.map((day) => (
@@ -215,7 +208,7 @@ const UpdateTimeTable = () => {
 
   const renderTimePicker = (text, record, dataIndex) => (
     <TimePicker
-      value={text ? moment(text, 'HH:mm') : null}
+      value={text ? moment(text, "HH:mm") : null}
       format="HH:mm"
       onChange={(time, timeString) =>
         handleCellChange(timeString, record.key, dataIndex)
@@ -225,7 +218,7 @@ const UpdateTimeTable = () => {
 
   const renderDatePicker = (text, record, dataIndex) => (
     <DatePicker
-      value={text ? moment(text, 'YYYY-MM-DD') : null}
+      value={text ? moment(text, "YYYY-MM-DD") : null}
       format="YYYY-MM-DD"
       onChange={(date, dateString) =>
         handleCellChange(dateString, record.key, dataIndex)
@@ -240,14 +233,13 @@ const UpdateTimeTable = () => {
       <Select
         value={text || undefined}
         onChange={(value) => handleCellChange(value, record.key, dataIndex)}
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
         placeholder="Select Subject"
         disabled={isDisabled}
       >
         {subjects && subjects?.length > 0 ? (
           subjects?.map((subject, index) => {
-            const subjectId =
-              subject._id || subject.id || subject.subjectId;
+            const subjectId = subject._id || subject.id || subject.subjectId;
             if (!subjectId) {
               console.warn(`Subject at index ${index} is missing an ID.`);
               return null;
@@ -280,164 +272,155 @@ const UpdateTimeTable = () => {
   const getColumnsByType = () => {
     const commonColumns = [
       {
-        title: 'ID',
-        dataIndex: 'id',
+        title: "ID",
+        dataIndex: "id",
         width: 70,
-        fixed: 'left',
+        fixed: "left",
       },
     ];
 
-    if (formData.type === 'weekly') {
+    if (formData.type === "weekly") {
       return [
         ...commonColumns,
         {
-          title: 'Subject',
-          dataIndex: 'subjectId',
+          title: "Subject",
+          dataIndex: "subjectId",
           width: 200,
           render: (text, record) =>
-            renderSubjectDropdown(text, record, 'subjectId'),
+            renderSubjectDropdown(text, record, "subjectId"),
         },
         {
-          title: 'Day',
-          dataIndex: 'day',
+          title: "Day",
+          dataIndex: "day",
           width: 150,
-          render: (text, record) => renderDayDropdown(text, record, 'day'),
+          render: (text, record) => renderDayDropdown(text, record, "day"),
         },
         {
-          title: 'Start Time',
-          dataIndex: 'startTime',
+          title: "Start Time",
+          dataIndex: "startTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'startTime'),
+          render: (text, record) => renderTimePicker(text, record, "startTime"),
         },
         {
-          title: 'End Time',
-          dataIndex: 'endTime',
+          title: "End Time",
+          dataIndex: "endTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'endTime'),
+          render: (text, record) => renderTimePicker(text, record, "endTime"),
         },
         {
-          title: 'Description',
-          dataIndex: 'description',
+          title: "Description",
+          dataIndex: "description",
           width: 250,
           render: (text, record) =>
-            renderDescription(text, record, 'description'),
+            renderDescription(text, record, "description"),
         },
       ];
-    } else if (formData.type === 'exam') {
+    } else if (formData.type === "exam") {
       return [
         ...commonColumns,
         {
-          title: 'Subject',
-          dataIndex: 'subjectId',
+          title: "Subject",
+          dataIndex: "subjectId",
           width: 200,
           render: (text, record) =>
-            renderSubjectDropdown(text, record, 'subjectId'),
+            renderSubjectDropdown(text, record, "subjectId"),
         },
         {
-          title: 'Start Time',
-          dataIndex: 'startTime',
+          title: "Start Time",
+          dataIndex: "startTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'startTime'),
+          render: (text, record) => renderTimePicker(text, record, "startTime"),
         },
         {
-          title: 'End Time',
-          dataIndex: 'endTime',
+          title: "End Time",
+          dataIndex: "endTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'endTime'),
+          render: (text, record) => renderTimePicker(text, record, "endTime"),
         },
         {
-          title: 'Date',
-          dataIndex: 'date',
+          title: "Date",
+          dataIndex: "date",
           width: 150,
-          render: (text, record) => renderDatePicker(text, record, 'date'),
+          render: (text, record) => renderDatePicker(text, record, "date"),
         },
         {
-          title: 'Description',
-          dataIndex: 'description',
+          title: "Description",
+          dataIndex: "description",
           width: 250,
           render: (text, record) =>
-            renderDescription(text, record, 'description'),
+            renderDescription(text, record, "description"),
         },
       ];
-    } else if (formData.type === 'event') {
+    } else if (formData.type === "event") {
       return [
         ...commonColumns,
         {
-          title: 'Event Name',
-          dataIndex: 'eventName',
+          title: "Event Name",
+          dataIndex: "eventName",
           width: 200,
           render: (text, record) =>
-            renderEditableCell(text, record, 'eventName'),
+            renderEditableCell(text, record, "eventName"),
         },
         {
-          title: 'Start Time',
-          dataIndex: 'startTime',
+          title: "Start Time",
+          dataIndex: "startTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'startTime'),
+          render: (text, record) => renderTimePicker(text, record, "startTime"),
         },
         {
-          title: 'End Time',
-          dataIndex: 'endTime',
+          title: "End Time",
+          dataIndex: "endTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'endTime'),
+          render: (text, record) => renderTimePicker(text, record, "endTime"),
         },
         {
-          title: 'Date',
-          dataIndex: 'date',
+          title: "Date",
+          dataIndex: "date",
           width: 150,
-          render: (text, record) => renderDatePicker(text, record, 'date'),
+          render: (text, record) => renderDatePicker(text, record, "date"),
         },
         {
-          title: 'Description',
-          dataIndex: 'description',
+          title: "Description",
+          dataIndex: "description",
           width: 250,
           render: (text, record) =>
-            renderDescription(text, record, 'description'),
+            renderDescription(text, record, "description"),
         },
       ];
-    } else if (formData.type === 'others') {
+    } else if (formData.type === "others") {
       return [
         ...commonColumns,
         {
-          title: 'Heading',
-          dataIndex: 'heading',
+          title: "Heading",
+          dataIndex: "heading",
+          width: 200,
+          render: (text, record) => renderEditableCell(text, record, "heading"),
+        },
+        {
+          title: "Subject",
+          dataIndex: "subjectId",
           width: 200,
           render: (text, record) =>
-            renderEditableCell(text, record, 'heading'),
+            renderSubjectDropdown(text, record, "subjectId"),
         },
         {
-          title: 'Subject',
-          dataIndex: 'subjectId',
-          width: 200,
-          render: (text, record) =>
-            renderSubjectDropdown(text, record, 'subjectId'),
-        },
-        {
-          title: 'Start Time',
-          dataIndex: 'startTime',
+          title: "Start Time",
+          dataIndex: "startTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'startTime'),
+          render: (text, record) => renderTimePicker(text, record, "startTime"),
         },
         {
-          title: 'End Time',
-          dataIndex: 'endTime',
+          title: "End Time",
+          dataIndex: "endTime",
           width: 150,
-          render: (text, record) =>
-            renderTimePicker(text, record, 'endTime'),
+          render: (text, record) => renderTimePicker(text, record, "endTime"),
         },
         {
-          title: 'Description',
-          dataIndex: 'description',
+          title: "Description",
+          dataIndex: "description",
           width: 250,
           render: (text, record) =>
-            renderDescription(text, record, 'description'),
+            renderDescription(text, record, "description"),
         },
       ];
     } else {
@@ -467,30 +450,30 @@ const UpdateTimeTable = () => {
       const newId = idCounterRef.current;
       const newRow = { key: newId, id: newId };
 
-      if (formData.type === 'weekly') {
-        newRow.subjectId = '';
-        newRow.day = '';
-        newRow.startTime = '';
-        newRow.endTime = '';
-        newRow.description = '';
-      } else if (formData.type === 'exam') {
-        newRow.subjectId = '';
-        newRow.startTime = '';
-        newRow.endTime = '';
-        newRow.date = '';
-        newRow.description = '';
-      } else if (formData.type === 'event') {
-        newRow.eventName = '';
-        newRow.startTime = '';
-        newRow.endTime = '';
-        newRow.date = '';
-        newRow.description = '';
-      } else if (formData.type === 'others') {
-        newRow.heading = '';
-        newRow.subjectId = '';
-        newRow.startTime = '';
-        newRow.endTime = '';
-        newRow.description = '';
+      if (formData.type === "weekly") {
+        newRow.subjectId = "";
+        newRow.day = "";
+        newRow.startTime = "";
+        newRow.endTime = "";
+        newRow.description = "";
+      } else if (formData.type === "exam") {
+        newRow.subjectId = "";
+        newRow.startTime = "";
+        newRow.endTime = "";
+        newRow.date = "";
+        newRow.description = "";
+      } else if (formData.type === "event") {
+        newRow.eventName = "";
+        newRow.startTime = "";
+        newRow.endTime = "";
+        newRow.date = "";
+        newRow.description = "";
+      } else if (formData.type === "others") {
+        newRow.heading = "";
+        newRow.subjectId = "";
+        newRow.startTime = "";
+        newRow.endTime = "";
+        newRow.description = "";
       }
 
       idCounterRef.current += 1;
@@ -547,7 +530,7 @@ const UpdateTimeTable = () => {
   // Handle Ctrl+Z for undo
   const handleKeyDown = useCallback(
     (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+      if ((e.ctrlKey || e.metaKey) && e.key === "z") {
         e.preventDefault();
         handleUndoDelete();
       }
@@ -556,9 +539,9 @@ const UpdateTimeTable = () => {
   );
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [handleKeyDown]);
 
@@ -571,87 +554,87 @@ const UpdateTimeTable = () => {
 
     // Basic validation checks
     if (!formData.name) {
-      errors.push('Name is required.');
+      errors.push("Name is required.");
     }
 
     if (!formData.classId) {
-      errors.push('Class is required.');
+      errors.push("Class is required.");
     }
 
     if (!formData.startDate) {
-      errors.push('Start date is required.');
+      errors.push("Start date is required.");
     }
 
     if (
-      (formData.type === 'exam' || formData.type === 'event') &&
+      (formData.type === "exam" || formData.type === "event") &&
       !formData.endDate
     ) {
-      errors.push('End date is required for exam or event.');
+      errors.push("End date is required for exam or event.");
     }
 
     if (dataSource?.length === 0) {
-      errors.push('At least one row must be added to the timetable.');
+      errors.push("At least one row must be added to the timetable.");
     }
 
     // Specific validation based on timetable type
     dataSource.forEach((row, index) => {
-      if (formData.type === 'weekly') {
-        if (!row.subjectId || row.subjectId.trim() === '') {
+      if (formData.type === "weekly") {
+        if (!row.subjectId || row.subjectId.trim() === "") {
           errors.push(`Subject is required for row ${index + 1}.`);
         }
-        if (!row.day || row.day.trim() === '') {
+        if (!row.day || row.day.trim() === "") {
           errors.push(`Day is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.description || row.description.trim() === '') {
+        if (!row.description || row.description.trim() === "") {
           errors.push(`Description is required for row ${index + 1}.`);
         }
-      } else if (formData.type === 'exam') {
-        if (!row.subjectId || row.subjectId.trim() === '') {
+      } else if (formData.type === "exam") {
+        if (!row.subjectId || row.subjectId.trim() === "") {
           errors.push(`Subject is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.date || row.date.trim() === '') {
+        if (!row.date || row.date.trim() === "") {
           errors.push(`Date is required for row ${index + 1}.`);
         }
-        if (!row.description || row.description.trim() === '') {
+        if (!row.description || row.description.trim() === "") {
           errors.push(`Description is required for row ${index + 1}.`);
         }
-      } else if (formData.type === 'event') {
-        if (!row.eventName || row.eventName.trim() === '') {
+      } else if (formData.type === "event") {
+        if (!row.eventName || row.eventName.trim() === "") {
           errors.push(`Event name is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.date || row.date.trim() === '') {
+        if (!row.date || row.date.trim() === "") {
           errors.push(`Date is required for row ${index + 1}.`);
         }
-        if (!row.description || row.description.trim() === '') {
+        if (!row.description || row.description.trim() === "") {
           errors.push(`Description is required for row ${index + 1}.`);
         }
-      } else if (formData.type === 'others') {
-        if (!row.heading || row.heading.trim() === '') {
+      } else if (formData.type === "others") {
+        if (!row.heading || row.heading.trim() === "") {
           errors.push(`Heading is required for row ${index + 1}.`);
         }
-        if (!row.subjectId || row.subjectId.trim() === '') {
+        if (!row.subjectId || row.subjectId.trim() === "") {
           errors.push(`Subject is required for row ${index + 1}.`);
         }
         if (!row.startTime || !row.endTime) {
           errors.push(`Start and end time are required for row ${index + 1}.`);
         }
-        if (!row.description || row.description.trim() === '') {
+        if (!row.description || row.description.trim() === "") {
           errors.push(`Description is required for row ${index + 1}.`);
         }
       }
     });
 
     if (errors?.length > 0) {
-      message.error(errors.join('\n'));
+      message.error(errors.join("\n"));
       return;
     }
 
@@ -664,15 +647,17 @@ const UpdateTimeTable = () => {
       type: formData.type,
       validity: {
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
+        endDate: formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : undefined,
       },
-      status: formData.status === 'Publish' ? 'active' : 'inactive', // Updated status mapping
+      status: formData.status === "Publish" ? "active" : "inactive", // Updated status mapping
       academicYear: academicYear, // Include academicYear as ObjectId
       days: [], // To be populated based on type
     };
 
     // Organize dataSource into days and slots based on type
-    if (formData.type === 'weekly') {
+    if (formData.type === "weekly") {
       const dayMap = {};
       dataSource.forEach((row) => {
         if (!dayMap[row.day]) {
@@ -689,10 +674,10 @@ const UpdateTimeTable = () => {
         day,
         slots: dayMap[day],
       }));
-    } else if (formData.type === 'exam') {
+    } else if (formData.type === "exam") {
       const dateMap = {};
       dataSource.forEach((row) => {
-        const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
+        const formattedDate = moment(row.date, "YYYY-MM-DD").toISOString();
         if (!dateMap[formattedDate]) {
           dateMap[formattedDate] = [];
         }
@@ -708,10 +693,10 @@ const UpdateTimeTable = () => {
         date,
         slots: dateMap[date],
       }));
-    } else if (formData.type === 'event') {
+    } else if (formData.type === "event") {
       const dateMap = {};
       dataSource.forEach((row) => {
-        const formattedDate = moment(row.date, 'YYYY-MM-DD').toISOString();
+        const formattedDate = moment(row.date, "YYYY-MM-DD").toISOString();
         if (!dateMap[formattedDate]) {
           dateMap[formattedDate] = [];
         }
@@ -727,7 +712,7 @@ const UpdateTimeTable = () => {
         date,
         slots: dateMap[date],
       }));
-    } else if (formData.type === 'others') {
+    } else if (formData.type === "others") {
       // Since heading is in slots, we can group all slots under a single day
       const day = {
         slots: dataSource?.map((row) => ({
@@ -747,17 +732,16 @@ const UpdateTimeTable = () => {
     dispatch(updateTimetable({ id: timetable._id, data: timetableData }))
       .unwrap()
       .then(() => {
-        message.success('Timetable updated successfully!');
+        message.success("Timetable updated successfully!");
         // Redirect after a short delay
         setTimeout(() => {
-          navigate('/timetable');
+          navigate("/timetable");
         }, 1500);
       })
       .catch((error) => {
-        message.error(error || 'Failed to update timetable.');
+        message.error(error || "Failed to update timetable.");
       });
   };
-
 
   // Row Selection
   const rowSelection = {
@@ -814,9 +798,9 @@ const UpdateTimeTable = () => {
               onChange={(e) =>
                 setFormData({ ...formData, endDate: e.target.value })
               }
-              required={formData.type === 'exam' || formData.type === 'event'}
+              required={formData.type === "exam" || formData.type === "event"}
               disabled={
-                !(formData.type === 'exam' || formData.type === 'event')
+                !(formData.type === "exam" || formData.type === "event")
               }
             />
           </div>
@@ -824,16 +808,16 @@ const UpdateTimeTable = () => {
           <div className="w-full md:w-1/5 px-2 mb-4">
             <label className="block mb-1">Select Class</label>
             <Select
-              value={formData.classId || ''}
+              value={formData.classId || ""}
               onChange={(value) => {
                 setFormData({
                   ...formData,
                   classId: value,
-                  sectionId: '',
-                  groupId: '',
+                  sectionId: "",
+                  groupId: "",
                 });
               }}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               required
               placeholder="Select Class"
             >
@@ -849,11 +833,11 @@ const UpdateTimeTable = () => {
           <div className="w-full md:w-1/5 px-2 mb-4">
             <label className="block mb-1">Select Section</label>
             <Select
-              value={formData.sectionId || ''}
+              value={formData.sectionId || ""}
               onChange={(value) =>
                 setFormData({ ...formData, sectionId: value })
               }
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               placeholder="Select Section"
               disabled={!formData.classId || sectionsList?.length === 0}
             >
@@ -875,11 +859,9 @@ const UpdateTimeTable = () => {
           <div className="w-full md:w-1/5 px-2 mb-4">
             <label className="block mb-1">Select Group</label>
             <Select
-              value={formData.groupId || ''}
-              onChange={(value) =>
-                setFormData({ ...formData, groupId: value })
-              }
-              style={{ width: '100%' }}
+              value={formData.groupId || ""}
+              onChange={(value) => setFormData({ ...formData, groupId: value })}
+              style={{ width: "100%" }}
               placeholder="Select Group"
               disabled={!formData.classId || groupsList?.length === 0}
             >
@@ -903,7 +885,7 @@ const UpdateTimeTable = () => {
             <Select
               value={formData.type}
               onChange={(value) => setFormData({ ...formData, type: value })}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               required
             >
               <Option value="weekly">Weekly</Option>
@@ -918,7 +900,7 @@ const UpdateTimeTable = () => {
             <Select
               value={formData.status}
               onChange={(value) => setFormData({ ...formData, status: value })}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
               required
               placeholder="Select Status"
             >
@@ -967,16 +949,14 @@ const UpdateTimeTable = () => {
             dataSource={dataSource}
             rowSelection={rowSelection}
             pagination={false}
-            scroll={{ x: 'max-content' }}
-            style={{ width: '100%' }}
+            scroll={{ x: "max-content" }}
+            style={{ width: "100%" }}
           />
         </div>
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-4">
-          <Button onClick={() => navigate('/timetable')}>
-            Cancel
-          </Button>
+          <Button onClick={() => navigate("/timetable")}>Cancel</Button>
           <Button type="primary" htmlType="submit">
             Update
           </Button>
