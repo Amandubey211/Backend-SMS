@@ -26,8 +26,6 @@ import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
 import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
 import "../Utils/translator/i18n.js";
-import i18next from "i18next";
-import { useSelector } from "react-redux";
 import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
@@ -38,7 +36,7 @@ import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
 import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
 import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
-import { updateTimetable } from "../Store/Slices/Admin/TimeTable/timetable.action.js";
+import UpdateTimeTable from "../Modules/Admin/TimeTable/Components/UpdateTimeTable.js";
 
 // Student
 import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
@@ -65,7 +63,6 @@ import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
 import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
 import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
 import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
-import AddInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
 import AddReturnInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
 import CreateNewInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/CreateNewInvoice.js";
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
@@ -416,7 +413,7 @@ function App() {
     { path: "/parentlogin", element: <ParentLogin />, errorElement: <Error /> },
     { path: "/stafflogin", element: <StaffLogin />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
-    { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
+    { path: "/verify_qid", element: <QIDLogin />, errorElement: <Error /> },
     {
       path: "/privacy-policy",
       element: <PrivacyPolicy />,
@@ -504,13 +501,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "/create_academicYear",
-    //   element: (
-    //     <ProtectRoute Component={CreateAcademicYear} allowedRoles={["admin"]} />
-    //   ),
-    //   errorElement: <Error />,
-    // },
+
     {
       path: "/class",
       element: (
@@ -689,16 +680,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "/class/:cid/:sid/offline_exam",
-    //   element: (
-    //     <ProtectRoute
-    //       Component={Discussion}
-    //       allowedRoles={["admin", "teacher"]}
-    //     />
-    //   ),
-    //   errorElement: <Error />,
-    // },
+
     {
       path: "/class/:cid/:sid/discussions",
       element: (
@@ -832,12 +814,12 @@ function App() {
     },
     {
       path: "/library",
-      element:(
+      element: (
         <ProtectRoute
           Component={Libary}
-          allowedRoles={["admin", "teacher", "student", "parent"]}
+          allowedRoles={["admin", "teacher", "student", "parent", "librarian"]}
         />
-      )
+      ),
     },
     {
       path: "/timetable/*",
@@ -863,7 +845,7 @@ function App() {
           path: "edit/:id", // New child route
           element: (
             <ProtectRoute
-              Component={updateTimetable}
+              Component={UpdateTimeTable}
               allowedRoles={["admin", "teacher"]}
             />
           ),
@@ -916,26 +898,6 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "/accounting/earning",
-    //   element: (
-    //     <ProtectRoute
-    //       Component={Earning}
-    //       allowedRoles={["admin", "finance"]}
-    //     />
-    //   ),
-    //   errorElement: <Error />,
-    // },
-    // {
-    //   path: "/accounting/expenses",
-    //   element: (
-    //     <ProtectRoute
-    //       Component={Expenses}
-    //       allowedRoles={["admin", "finance"]}
-    //     />
-    //   ),
-    //   errorElement: <Error />,
-    // },
 
     {
       path: "/finance/earning",
@@ -1078,16 +1040,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    // {
-    //   path: "/finance/invoices/dashboard/return-invoices",
-    //   element: (
-    //     <ProtectRoute
-    //       Component={ReturnInvoiceList}
-    //       allowedRoles={["admin", "finance"]}
-    //     />
-    //   ),
-    //   errorElement: <Error />,
-    // },
+
     {
       path: "/finance/receipts",
       element: (
@@ -1238,13 +1191,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StaffMyProfile}
-          allowedRoles={[
-            "teacher",
-            "finance",
-            "librarian",
-            "staff",
-            "librarian",
-          ]}
+          allowedRoles={["teacher", "finance", "librarian", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -1629,42 +1576,3 @@ function App() {
 }
 
 export default App;
-
-// import React, { useEffect, useState } from "react";
-// import Offline from "../Components/Common/Offline.js";
-// import AllRoutes from "../Route/AllRoute.js";
-// import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
-// import i18next from "i18next";
-// import { useSelector } from "react-redux";
-
-// function App() {
-//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
-//   useFirebaseMessaging();
-
-//   useEffect(() => {
-//     const handleOnline = () => setIsOnline(true);
-//     const handleOffline = () => setIsOnline(false);
-
-//     window.addEventListener("online", handleOnline);
-//     window.addEventListener("offline", handleOffline);
-
-//     return () => {
-//       window.removeEventListener("online", handleOnline);
-//       window.removeEventListener("offline", handleOffline);
-//     };
-//   }, []);
-
-//   const selectedLanguage = useSelector((state) => state.Auth.selectedLanguage);
-//   useEffect(() => {
-//     i18next.changeLanguage(selectedLanguage); // Set the initial language from Redux
-//   }, [selectedLanguage]);
-
-//   return (
-//     <>
-//       {!isOnline && <Offline />}
-//       <AllRoutes />
-//     </>
-//   );
-// }
-
-// export default App;

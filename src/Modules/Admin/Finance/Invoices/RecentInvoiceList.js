@@ -57,6 +57,8 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import { PERMISSIONS } from "../../../../config/permission";
 import { downloadPDF } from "../../../../Utils/xl";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { sendEmail } from "../../../../Store/Slices/Common/SendPDFEmail/sendEmailThunk";
+import { formatDate } from "../../../../Utils/helperFunctions";
 const RecentInvoiceList = () => {
   const [isInvoiceVisible, setInvoiceVisible] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -90,7 +92,68 @@ const RecentInvoiceList = () => {
         ?.includes(searchQuery.toLowerCase()) ||
       item?.finalAmount?.toString()?.includes(searchQuery.toLowerCase())
   );
-
+  // --- Handle Send Email ---
+  const handleSendEmail = async (record) => {
+    if (!record._id) {
+      toast.error("Invalid receipt ID.");
+      console.error("Error: Missing _id in record", record);
+      return;
+    }
+    try {
+      const toastId = toast.loading("Sending email...");
+      const type = record?.isCancel ? "cancelInvoice" : "invoice";
+      const formattedDate = formatDate(record.date, "long");
+      const payload = {
+        receiver: {
+          email: record?.receiver?.email,
+          name: record?.receiver?.name || "N/A",
+          address: record?.receiver?.address || "N/A",
+          phone: record?.receiver?.phone || "N/A",
+        },
+        schoolId: record?.schoolId?._id || "N/A",
+        nameOfSchool: record?.schoolId?.nameOfSchool || "N/A",
+        address: record?.schoolId?.address || "N/A",
+        branchName: record?.schoolId?.branchName || "N/A",
+        city: record?.schoolId?.city || "N/A",
+        schoolLogo: record?.schoolId?.logo || "",
+        receiptNumber: record?.receiptNumber || "N/A",
+        invoiceNumber:
+          typeof record?.invoiceNumber === "object"
+            ? record?.invoiceNumber.invoiceNumber
+            : record?.invoiceNumber || "N/A",
+        date: formattedDate,
+        govtRefNumber: record?.govtRefNumber || "",
+        paymentMethod: record?.paymentMethod || "N/A",
+        paymentStatus: record?.paymentStatus || "N/A",
+        lineItems: record?.lineItems.map((item) => ({
+          revenueType: item?.revenueType || "N/A",
+          quantity: item?.quantity || 1,
+          rate: item?.total / (item.quantity || 1),
+          total: item?.total || 0,
+        })),
+        totalAmount: record?.totalAmount || 0,
+        tax: record?.tax || 0,
+        penalty: record?.penalty || 0,
+        discount: record?.discount || 0,
+        discountType: record?.discountType || "fixed",
+        finalAmount: record?.finalAmount || 0,
+      };
+      console.log("Dispatching sendEmail with:", { id: record._id, type, payload });
+      const result = await dispatch(sendEmail({ id: record._id, type, payload }));
+      toast.dismiss(toastId);
+      if (sendEmail.fulfilled.match(result)) {
+        toast.success(
+          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
+        );
+      } else {
+        console.error("Failed sendEmail response:", result);
+        toast.error(result.payload || `Failed to send ${type} email.`);
+      }
+    } catch (err) {
+      console.error("Error in handleSendEmail:", err);
+      toast.error("Error sending email.");
+    }
+  };
   useEffect(() => {
     const filters = {
       page: 1,
@@ -208,6 +271,7 @@ const RecentInvoiceList = () => {
                     dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
                     navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
                   }}
+                
                 >
                   Return
                 </Menu.Item>
@@ -244,7 +308,7 @@ const RecentInvoiceList = () => {
                 </ProtectedAction>
               )}
               <ProtectedAction requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
-              {!record.isCancel && !record.isReturn && !record.isCompleted ?
+              {!record.isCancel && !record.isReturn && !record.isCompleted && !record.paymentStatus == "paid" ?
 
                 <Menu.Item
                   icon={<MdOutlineDone />}
@@ -262,10 +326,12 @@ const RecentInvoiceList = () => {
                   Completed
                 </Menu.Item> : null
               }
+
               {!record.isCancel && !record.isReturn ?
                 <Menu.Item
                   icon={<MailOutlined />}
                   onClick={() => {
+                    handleSendEmail(record)
                   }}
                 >
                   Send Mail

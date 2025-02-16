@@ -80,7 +80,7 @@ export const createAssignmentRubricThunk = createAsyncThunk(
   async (rubricData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
-
+    const sid = getState().common.user.subjectInfo.selectedSubjectId;
     try {
       const getRole = getUserRole(getState);
       const response = await postData(
@@ -89,7 +89,7 @@ export const createAssignmentRubricThunk = createAsyncThunk(
       );
 
       toast.success("Assignment Rubric created successfully");
-      // dispatch(fetchRubricsBySubjectId({sid}))
+      dispatch(fetchRubricsBySubjectId({ sid }));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -103,7 +103,7 @@ export const createQuizRubricThunk = createAsyncThunk(
   async (rubricData, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
-
+    const sid = getState().common.user.subjectInfo.selectedSubjectId;
     try {
       const getRole = getUserRole(getState);
       const response = await postData(
@@ -112,7 +112,7 @@ export const createQuizRubricThunk = createAsyncThunk(
       );
 
       toast.success("Quiz Rubric created successfully");
-      // dispatch(fetchRubricsBySubjectId({sid}))
+      dispatch(fetchRubricsBySubjectId({ sid }));
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
