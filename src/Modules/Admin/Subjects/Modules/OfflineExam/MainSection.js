@@ -32,28 +32,40 @@ const MainSection = () => {
   const [examType, setExamType] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [semester, setSemester] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState(offlineExamData);
 
   const SemesterList = ["Semester I", "Semester II", "Semester III"];
 
-  const handleApplyFilters = () => {
-    const data = offlineExamData.filter(
-      (i) => i.data?.semesterId?.title === semester
-    );
-    setFilteredData(data);
-  };
+  // const handleApplyFilters = () => {
+  //   const data = offlineExamData.filter(
+  //     (i) => i.data?.semesterId?.title === semester
+  //   );
+  //   setFilteredData(data);
+  // };
 
-  const handleResetFilters = () => {
-    setSemester("");
-    setStartDate(new Date());
-    setFilteredData(offlineExamData);
-  };
+  // const handleResetFilters = () => {
+  //   setSemester("");
+  //   setStartDate(new Date());
+  //   setFilteredData(offlineExamData);
+  // };
 
   useEffect(() => {
-    if (!loading && cid && sid) {
-      dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
-    }
-  }, []);
+    dispatch(
+      fetchAllOfflineExam({ classId: cid, subjectId: sid, query: searchQuery })
+    );
+  }, [dispatch]);
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const searchedData = offlineExamData?.filter((exam) => {
+    const matchedSearch = exam.examName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return matchedSearch;
+  });
+  console.log("data", filteredData, searchQuery);
 
   return (
     <div className="flex h-full w-full">
@@ -64,17 +76,19 @@ const MainSection = () => {
           <div className="w-[65%] border-l">
             <Header
               loading={loading}
-              data={offlineExamData.data}
+              data={filteredData}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              handleSearch={handleSearch}
+              searchedData={searchedData}
             />
             <ul className="border-t mt-4 mx-4"></ul>
             {/* Offline Exam Card */}
             {loading ? (
               <Spinner />
-            ) : offlineExamData.data?.length ? (
+            ) : filteredData?.length ? (
               <div className="h-[calc(100vh-150px)] overflow-y-auto">
-                {offlineExamData.data?.map((item, index) => (
+                {filteredData?.map((item, index) => (
                   <div>
                     <OfflineExamCard
                       key={index}
@@ -116,7 +130,7 @@ const MainSection = () => {
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md w-80 relative">
               <button
-                onClick={handleResetFilters}
+                // onClick={handleResetFilters}
                 className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
                 aria-label={t("Reset filters")}
               >
@@ -147,7 +161,7 @@ const MainSection = () => {
               </div>
 
               <button
-                onClick={handleApplyFilters}
+                // onClick={handleApplyFilters}
                 className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-full focus:outline-none transform transition-transform duration-300 hover:scale-105"
                 aria-label={t("Apply filters")}
               >

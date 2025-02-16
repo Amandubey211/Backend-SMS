@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
+import { useParams } from "react-router-dom";
 
-function Header({ data, searchQuery, setSearchQuery, loading }) {
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
-  };
+function Header({
+  data,
+  searchQuery,
+  setSearchQuery,
+  loading,
+  searchedData,
+  handleSearch,
+}) {
   return (
     <div className="bg-white pl-5 w-full">
       <div className="flex justify-between items-center mb-4">
@@ -19,7 +26,7 @@ function Header({ data, searchQuery, setSearchQuery, loading }) {
             type="text"
             placeholder="Search here"
             value={searchQuery}
-            onChange={handleSearchChange}
+            onChange={handleSearch}
             className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
           />
           <button className="absolute right-3">

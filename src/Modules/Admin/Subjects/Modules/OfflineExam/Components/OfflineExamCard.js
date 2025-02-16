@@ -22,22 +22,40 @@ const OfflineExamCard = ({
   students,
 }) => {
   const dispatch = useDispatch();
-  const { loading, offlineExamData } = useSelector(
+  const { offlineExamData, loading } = useSelector(
     (store) => store.admin.offlineExam
   );
   const navigate = useNavigate();
   const { sid, cid } = useParams();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedData, setEditedData] = useState({
+
+  // ✅ Local state for edited exam data
+  const [examDetails, setExamDetails] = useState({
     examName,
     startDate,
     endDate,
     maxScore,
   });
-  
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  // ✅ Update state when Redux state changes
+  useEffect(() => {
+    const updatedExam = offlineExamData?.find((exam) => exam._id === examId);
+    if (updatedExam) {
+      setExamDetails({
+        examName: updatedExam.examName,
+        startDate: updatedExam.startDate,
+        endDate: updatedExam.endDate,
+        maxScore: updatedExam.maxScore,
+      });
+    }
+  }, [offlineExamData, examId]);
+
   const handleDeleteClick = async () => {
     try {
-      const response = dispatch(deleteOfflineExamCard({ examId }));
+      const response = await dispatch(
+        deleteOfflineExamCard({ examId: examId })
+      ).unwrap();
       if (response.success) {
         toast.success("Exam deleted successfully!");
       }
@@ -47,8 +65,8 @@ const OfflineExamCard = ({
   };
 
   const handleInputChange = (e) => {
-    setEditedData({
-      ...editedData,
+    setExamDetails({
+      ...examDetails,
       [e.target.name]: e.target.value,
     });
   };
@@ -60,20 +78,12 @@ const OfflineExamCard = ({
   const handleUpdate = async () => {
     try {
       const response = await dispatch(
-        UpdateOfflineExamCard({ payload: editedData, examId })
+        UpdateOfflineExamCard({ payload: examDetails, examId, cid, sid })
       ).unwrap();
 
       if (response.success) {
         toast.success("Exam updated successfully!");
-
-        setEditedData({
-          examName: response.data.examName,
-          startDate: response.data.startDate,
-          endDate: response.data.endDate,
-          maxScore: response.data.maxScore,
-        });
-
-        setIsEditing(false);
+        setIsEditing(false); // ✅ Close edit mode
       }
     } catch (error) {
       console.error("Update failed:", error);
@@ -82,17 +92,15 @@ const OfflineExamCard = ({
   };
 
   return (
-    <div className={`ps-1 rounded-md bg-green-500 h-auto m-4 hover:shadow-lg`}>
-      <div
-        className={`border rounded-md  px-5 py-5 bg-white shadow-sm relative h-auto`}
-      >
+    <div className="ps-1 rounded-md bg-green-500 h-auto m-4 hover:shadow-lg">
+      <div className="border rounded-md px-5 py-5 bg-white shadow-sm relative h-auto">
         <div className="flex w-full h-auto justify-between items-end">
           <div className="flex w-[70%] h-auto items-end gap-x-2">
             {isEditing ? (
               <input
                 type="text"
                 name="examName"
-                value={editedData.examName}
+                value={examDetails.examName}
                 onChange={handleInputChange}
                 className="border px-2 py-1 rounded-md w-full"
               />
@@ -102,15 +110,15 @@ const OfflineExamCard = ({
                 onClick={() =>
                   navigate(`/class/${cid}/${sid}/offline_exam/view`, {
                     state: {
-                      examName: examName,
+                      examName: examDetails.examName,
                       students: students,
                       examType: examType,
-                      startDate: formatDate(startDate),
+                      startDate: formatDate(examDetails.startDate),
                     },
                   })
                 }
               >
-                {examName}
+                {examDetails.examName}
               </h1>
             )}
           </div>
@@ -124,12 +132,14 @@ const OfflineExamCard = ({
             <input
               type="number"
               name="maxScore"
-              value={editedData.maxScore}
+              value={examDetails.maxScore}
               onChange={handleInputChange}
               className="border px-2 py-1 rounded-md w-20"
             />
           ) : (
-            <span className="text-gray-600 text-xs">{maxScore}</span>
+            <span className="text-gray-600 text-xs">
+              {examDetails.maxScore}
+            </span>
           )}
         </div>
 
@@ -138,6 +148,7 @@ const OfflineExamCard = ({
           <span className=" text-gray-600 text-xs">{semester}</span>
         </div>
         <ul className="border-t px-8 mt-2 mb-1"></ul>
+
         {/* Dates Section */}
         <div className="flex flex-col text-gray-500 text-xs">
           {/* row-1 */}
@@ -150,12 +161,12 @@ const OfflineExamCard = ({
                   <input
                     type="date"
                     name="startDate"
-                    value={editedData.startDate}
+                    value={examDetails.startDate}
                     onChange={handleInputChange}
                     className="border px-2 py-1 rounded-md"
                   />
                 ) : (
-                  <span>{startDate}</span>
+                  <span>{formatDate(examDetails.startDate)}</span>
                 )}
               </div>
               <div className="flex items-center gap-1 pl-2">
@@ -165,12 +176,12 @@ const OfflineExamCard = ({
                   <input
                     type="date"
                     name="endDate"
-                    value={editedData.endDate}
+                    value={examDetails.endDate}
                     onChange={handleInputChange}
                     className="border px-2 py-1 rounded-md"
                   />
                 ) : (
-                  <span>{endDate}</span>
+                  <span>{formatDate(examDetails.endDate)}</span>
                 )}
               </div>
             </div>
