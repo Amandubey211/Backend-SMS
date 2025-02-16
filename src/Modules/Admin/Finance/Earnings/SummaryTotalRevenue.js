@@ -1,7 +1,7 @@
 // src/Modules/Admin/Finance/Components/SummaryTotalRevenue.jsx
 
-import React, { useEffect, useMemo, useState, useCallback } from "react";
-import { Table, Spin, Button, Tooltip, Tag, Empty } from "antd";
+import React, { useEffect, useMemo, useCallback } from "react";
+import { Table, Button, Tooltip, Tag } from "antd";
 import {
   DollarOutlined,
   CloudOutlined,
@@ -11,9 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllIncomes } from "../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import debounce from "lodash.debounce";
-import { setCurrentPage } from "../../../../Store/Slices/Finance/Earnings/earningsSlice";
-import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
-import { PERMISSIONS } from "../../../../config/permission";
 
 // Mapping payment types to corresponding icons
 const paymentTypeIcons = {
