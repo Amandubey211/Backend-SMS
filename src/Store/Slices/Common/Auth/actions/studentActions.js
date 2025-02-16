@@ -8,7 +8,7 @@ import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { customRequest, postData } from "../../../../../services/apiEndpoints";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { setShowError } from "../../Alerts/alertsSlice";
-import Cookies from 'js-cookie'
+import Cookies from "js-cookie";
 import { setLocalCookies } from "../../../../../Utils/academivYear";
 // Student login action
 export const studentLogin = createAsyncThunk(
@@ -25,8 +25,8 @@ export const studentLogin = createAsyncThunk(
       const data = await postData(`/auth/student/login`, studentDetails);
 
       if (data.success) {
-      //  localStorage.setItem("classId", `${data.classId}`);
-     //   dispatch(setToken(data?.token)); // Store token in state
+        //  localStorage.setItem("classId", `${data.classId}`);
+        //   dispatch(setToken(data?.token)); // Store token in state
         dispatch(setRole(data?.role)); // Set role
         dispatch(
           setUserDetails({
@@ -76,11 +76,11 @@ export const studentLogout = createAsyncThunk(
   async (_, { dispatch }) => {
     dispatch(resetState()); // Reset auth state
     localStorage.clear();
-    Cookies.remove('userToken');
-    Cookies.remove('say');
-    Cookies.remove('isAcademicYearActive');
-    Cookies.remove('schoolId');
-    Cookies.remove('SelectedschoolId');
+    Cookies.remove("userToken");
+    Cookies.remove("say");
+    Cookies.remove("isAcademicYearActive");
+    Cookies.remove("schoolId");
+    Cookies.remove("SelectedschoolId");
     toast.success("Logged out successfully", {
       position: "bottom-left",
     });
@@ -98,6 +98,7 @@ export const qidVerification = createAsyncThunk(
 
       if (data.success) {
         dispatch(setRole("student"));
+
         return { role: "student" };
       } else {
         return rejectWithValue(data.msg || "Verification failed.");
@@ -111,14 +112,16 @@ export const qidVerification = createAsyncThunk(
 // / Thunk for registering student details
 export const registerStudentDetails = createAsyncThunk(
   "auth/registerStudentDetails",
-  async (formData, { rejectWithValue,dispatch }) => {
+  async (formData, { rejectWithValue, dispatch }) => {
     try {
-      const response = await customRequest('post',
+      const response = await customRequest(
+        "post",
         `/student/student_register`,
-        formData,   {
+        formData,
+        {
           "Content-Type": "multipart/form-data",
         }
-);
+      );
       if (response.success) {
         toast.success("Registered Successfully");
         return response;
@@ -128,14 +131,18 @@ export const registerStudentDetails = createAsyncThunk(
         );
       }
     } catch (error) {
-     return handleError(error, dispatch, rejectWithValue);
-  }}
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
 );
 
 // Thunk for uploading student documents
 export const uploadStudentDocuments = createAsyncThunk(
   "auth/uploadStudentDocuments",
-  async ({ email, schoolId, studentDocuments }, { rejectWithValue,dispatch }) => {
+  async (
+    { email, schoolId, studentDocuments },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
       if (!email) {
         return rejectWithValue("Email is required");
@@ -151,12 +158,13 @@ export const uploadStudentDocuments = createAsyncThunk(
         formData.append(`documents`, file);
         formData.append(`documentLabels`, label);
       });
-      const response = await customRequest('post',
+      const response = await customRequest(
+        "post",
         `/student/upload_documents`,
-        formData,   {
+        formData,
+        {
           "Content-Type": "multipart/form-data",
         }
-    
       );
       if (response.success) {
         return response;
@@ -166,7 +174,7 @@ export const uploadStudentDocuments = createAsyncThunk(
         );
       }
     } catch (error) {
-     return handleError(error, dispatch, rejectWithValue);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );

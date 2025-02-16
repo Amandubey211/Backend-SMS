@@ -238,12 +238,18 @@ const CreateRole = ({ onClose, department }) => {
     // Clear previous errors
     setErrors({ roleName: "", description: "" });
 
+    // Update department: if department (lowercase) is "otherstaff", send "otherStaff", otherwise lowercase
+    const departmentPayload =
+      department.toLowerCase() === "otherstaff"
+        ? "otherStaff"
+        : department.toLowerCase();
+
     try {
       await dispatch(
         createRoleThunk({
           name: trimmedName,
           description: trimmedDesc,
-          department: department.toLowerCase(),
+          department: departmentPayload,
           permission: selectedPermissions,
         })
       ).unwrap();

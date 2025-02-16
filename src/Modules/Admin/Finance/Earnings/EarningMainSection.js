@@ -25,14 +25,25 @@ const EarningMainSection = () => {
     <Layout title="Earning Dashboard | Student Diwan">
       <AdminDashLayout>
         <div className="w-[100%] p-2">
-          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD}title={"Cards"}>
+          <ProtectedSection
+            requiredPermission={
+              PERMISSIONS.SHOWS_REVENUE_CARD_DATA_IN_DASHBOARD
+            }
+            title={"Cards"}
+          >
             <CardSection />
           </ProtectedSection>
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_REVENUE_GRAPH} title={"Revenue Graph"}>
-          <TotalEarningGraph  />
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_REVENUE_GRAPH}
+            title={"Revenue Graph"}
+          >
+            <TotalEarningGraph />
           </ProtectedSection>
-          <ProtectedSection requiredPermission={PERMISSIONS.VIEW_ALL_INCOMES} title={"Revenue Graph"}>
-          <SummaryTotalRevenue />
+          <ProtectedSection
+            requiredPermission={PERMISSIONS.VIEW_ALL_INCOMES}
+            title={"View Summary"}
+          >
+            <SummaryTotalRevenue />
           </ProtectedSection>
         </div>
       </AdminDashLayout>
