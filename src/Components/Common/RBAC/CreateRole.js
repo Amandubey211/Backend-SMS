@@ -240,9 +240,7 @@ const CreateRole = ({ onClose, department }) => {
 
     // Update department: if department (lowercase) is "otherstaff", send "otherStaff", otherwise lowercase
     const departmentPayload =
-      department.toLowerCase() === "otherstaff"
-        ? "otherStaff"
-        : department.toLowerCase();
+      department.toLowerCase() === "staff" ? "staff" : department.toLowerCase();
 
     try {
       await dispatch(
@@ -277,7 +275,7 @@ const CreateRole = ({ onClose, department }) => {
    * Renders the permission selection UI (reused in main and modal).
    */
   const renderPermissionsSection = (filteredDeps, handleGroupChangeFn) => {
-    if (filteredDeps.length === 0) {
+    if (filteredDeps?.length === 0) {
       return (
         <div className="text-sm text-gray-500 mt-4">
           No Permissions Found for this Department.
@@ -294,7 +292,7 @@ const CreateRole = ({ onClose, department }) => {
           transition={{ duration: 0.2 }}
           className="space-y-4"
         >
-          {filteredDeps.map((deptObj) => (
+          {filteredDeps?.map((deptObj) => (
             <div key={deptObj.department}>
               <h4 className="text-sm font-semibold  uppercase">
                 {deptObj.department}

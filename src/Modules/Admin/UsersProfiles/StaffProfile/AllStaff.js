@@ -156,9 +156,7 @@ const AllStaff = () => {
       case "editStaff":
         return <AddUser role="staff" data={staffData} />;
       case "createRole":
-        return (
-          <CreateRole onClose={handleSidebarClose} department="otherStaff" />
-        );
+        return <CreateRole onClose={handleSidebarClose} department="staff" />;
       default:
         return <div>{t("Select an action")}</div>;
     }
@@ -185,9 +183,7 @@ const AllStaff = () => {
                 filterOptions={filterOptionsList}
                 department="Staff"
                 onSortFilterApply={handleSortFilterApply}
-                navigateToManageRoles={() =>
-                  navigateToManageRoles("otherStaff")
-                }
+                navigateToManageRoles={() => navigateToManageRoles("staff")}
                 handleCreateRole={handleCreateRole}
                 isAdmin={role === "admin"}
                 currentSort={sortOption} // Pass current sort

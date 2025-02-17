@@ -91,7 +91,7 @@ const RoleSelector = () => {
           role="list"
           aria-label="Available Roles"
         >
-          {rolesWithIcons.map((role) => (
+          {rolesWithIcons?.map((role) => (
             <motion.div
               key={role.department}
               onClick={() => setSelectedRole(role.department)} // Set active role on click
@@ -123,7 +123,7 @@ const RoleSelector = () => {
                 {role.department}
               </span>
               <ul className="text-sm text-gray-500 capitalize">
-                {role.role.map((r, idx) => (
+                {role?.role?.map((r, idx) => (
                   <li key={idx}>{r}</li>
                 ))}
               </ul>

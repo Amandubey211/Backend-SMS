@@ -17,7 +17,7 @@ import {
 const initialState = {
   isLoggedIn: false,
   role: null,
-  token: null, // Store the token in the state
+  token: null,
   AcademicYear: [],
   loading: false,
   error: null,
