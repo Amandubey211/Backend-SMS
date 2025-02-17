@@ -100,13 +100,13 @@ const RecentInvoiceList = () => {
       return;
     }
     try {
-      // Show real-time loading notification
+      // Show a loading toast notification in real time
       const toastId = toast.loading("Sending email...");
 
-      // Determine the email type based on cancellation status
-      const type = record?.isCancel ? "cancelInvoice" : "invoice";
+      // For invoices, use "cancelReturnInvoice" if cancelled; otherwise "invoice"
+      const type = record?.isCancel ? "cancelReturnInvoice" : "invoice";
 
-      // Format date using your helper function
+      // Format the date using your helper function
       const formattedDate = formatDate(record.date, "long");
 
       // Build the payload with all required fields
@@ -147,15 +147,15 @@ const RecentInvoiceList = () => {
       };
 
       console.log("Dispatching sendEmail with:", {
-        id: record.isCancel && record.invoiceId ? record.invoiceId : record._id,
+        id: record._id,
         type,
-        payload
+        payload,
       });
 
-      // Use invoiceId if the invoice is cancelled, otherwise use _id
+      // Dispatch the email sending action using the correct type and record._id
       const result = await dispatch(
         sendEmail({
-          id: record.isReturn && record._id ? record._id : record._id,
+          id: record._id,
           type,
           payload,
         })
@@ -164,19 +164,27 @@ const RecentInvoiceList = () => {
       // Dismiss the loading toast notification
       toast.dismiss(toastId);
 
+      // Determine the proper display message for notifications:
+      let displayMessage = "Invoice";
+      if (record.isReturn) {
+        displayMessage = "Return Invoice";
+      } else if (record.isCancel) {
+        displayMessage = "Cancel Invoice";
+      }
+
       if (sendEmail.fulfilled.match(result)) {
-        toast.success(
-          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
-        );
+        toast.success(`${displayMessage} email sent successfully!`);
       } else {
         console.error("Failed sendEmail response:", result);
-        toast.error(result.payload || `Failed to send ${type} email.`);
+        toast.error(result.payload || `Failed to send ${displayMessage} email.`);
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
       toast.error("Error sending email.");
     }
   };
+
+
 
   useEffect(() => {
     const filters = {
