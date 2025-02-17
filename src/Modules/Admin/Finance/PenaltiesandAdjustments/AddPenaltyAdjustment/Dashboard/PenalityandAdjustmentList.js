@@ -114,6 +114,8 @@ const PenalityandAdjustmentList = () => {
     await downloadPDF(pdfRef, selectedReturnInvoice, "ReturnInvoice");
   };
 
+  // Inside PenalityandAdjustmentList.js
+
   const handleSendEmail = async (record) => {
     if (!record._id) {
       toast.error("Invalid adjustment ID.");
@@ -122,17 +124,25 @@ const PenalityandAdjustmentList = () => {
 
     console.log("Attempting to send email for adjustment:", record);
 
+    const emailType = record.isCancel ? "cancelReturnInvoice" : "adjustment";
+
     // Map the record to the required email data structure
     const emailData = mapRecordToEmailData(record);
+
+    // Show a loading toast notification in real time
+    const toastId = toast.loading("Sending email...");
 
     try {
       const result = await dispatch(
         sendEmail({
           id: record._id,
-          type: "adjustment",
-          data: emailData,
+          type: emailType,
+          payload: emailData,
         })
       );
+
+      // Dismiss the loading toast notification
+      toast.dismiss(toastId);
 
       if (sendEmail.fulfilled.match(result)) {
         toast.success("Email sent successfully!");
@@ -141,9 +151,11 @@ const PenalityandAdjustmentList = () => {
       }
     } catch (err) {
       console.error("Error sending email:", err);
+      toast.dismiss(toastId);
       toast.error("Error sending email.");
     }
   };
+
 
   // Define the action menu for each row
   const actionMenu = (record) => (
@@ -182,10 +194,10 @@ const PenalityandAdjustmentList = () => {
         <CloseCircleOutlined style={{ marginRight: 8 }} />
         {record?.status === "Cancelled" ? "Cancelled" : "Cancel"}
       </Menu.Item>
-      {/* <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
+      <Menu.Item key="4" onClick={() => handleSendEmail(record)}>
         <MailOutlined style={{ marginRight: 8 }} />
         Send Mail
-      </Menu.Item> */}
+      </Menu.Item>
       <Menu.Item
         key="5"
         onClick={() => {
@@ -451,12 +463,12 @@ const PenalityandAdjustmentList = () => {
         Date:
           adjustedAt !== "N/A"
             ? new Date(adjustedAt).toLocaleString("en-GB", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
             : "N/A",
         academicYearDetails: academicYear.year || "N/A",
         status: isCancel ? "Cancelled" : "Active",
@@ -507,40 +519,40 @@ const PenalityandAdjustmentList = () => {
           </div>
 
           {/* Render Spinner until initial API call is complete */}
-          
-              <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
-                <Table
-                  dataSource={dataSource}
-                  columns={columns}
-                  pagination={{
-                    current: currentPage,
-                    total: totalRecords,
-                    pageSize: computedPageSize,
-                    showSizeChanger: true,
-                    pageSizeOptions: ["5", "10", "20", "50"],
-                    size: "small",
-                    showTotal: () =>
-                      `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                    onChange: (page, pageSize) => {
-                      dispatch(setCurrentPage(page));
-                    },
-                    onShowSizeChange: (current, size) => {
-                      dispatch(setCurrentPage(1));
-                    },
-                  }}
-                  className="rounded-lg shadow text-xs"
-                  bordered
-                  size="small"
-                  tableLayout="fixed"
-                  loading={{
-                    spinning: loading,
-                    indicator: <Spin size="large" />,
-                    tip: "Loading...",
-                  }}
-                />
-              </ProtectedSection>
-            
-         
+
+          <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_ADJUSTMENTS} title={"Penalty & Adjustment List"}>
+            <Table
+              dataSource={dataSource}
+              columns={columns}
+              pagination={{
+                current: currentPage,
+                total: totalRecords,
+                pageSize: computedPageSize,
+                showSizeChanger: true,
+                pageSizeOptions: ["5", "10", "20", "50"],
+                size: "small",
+                showTotal: () =>
+                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                onChange: (page, pageSize) => {
+                  dispatch(setCurrentPage(page));
+                },
+                onShowSizeChange: (current, size) => {
+                  dispatch(setCurrentPage(1));
+                },
+              }}
+              className="rounded-lg shadow text-xs"
+              bordered
+              size="small"
+              tableLayout="fixed"
+              loading={{
+                spinning: loading,
+                indicator: <Spin size="large" />,
+                tip: "Loading...",
+              }}
+            />
+          </ProtectedSection>
+
+
 
           {/* Export Modal */}
           <ExportModalNew
