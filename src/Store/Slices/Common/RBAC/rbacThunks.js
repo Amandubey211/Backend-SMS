@@ -121,7 +121,6 @@ export const getPermissionsThunk = createAsyncThunk(
       dispatch(setShowError(false));
       const response = await getData(`/admin/permission?say=${say}`);
 
-      console.log(response, "ddddd");
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

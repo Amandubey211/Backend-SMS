@@ -47,8 +47,8 @@ export const staffLogin = createAsyncThunk(
             fullName: data.fullName,
             email: data.email,
             mobileNumber: data.mobileNumber,
-            position: data.position || "na",
-            employeeID: data.employeeID || "dd",
+            position: data.position || "N/A",
+            employeeID: data.employeeID || "N/A",
             role: data.role,
             monthlySalary: data.monthlySalary || 0,
             active: data.active ?? false,
@@ -102,6 +102,8 @@ export const staffLogin = createAsyncThunk(
 
         // Handle staff roles with multiple grouped roles
         if (data.groupedRoles && data.groupedRoles.length > 1) {
+          toast.success("sdfsdf");
+          console.log("sdfsdfsdf", data.groupedRoles.length);
           return { redirect: "/select_role" };
         }
 
@@ -123,6 +125,7 @@ export const staffLogin = createAsyncThunk(
 
         return { redirect: "/dashboard" };
       } else {
+        console.log(data);
         const errorMessage =
           data?.msg || "Something went Wrong pls Try again later.";
         toast.error(errorMessage);
