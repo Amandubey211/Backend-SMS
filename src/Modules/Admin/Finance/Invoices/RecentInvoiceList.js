@@ -164,19 +164,26 @@ const RecentInvoiceList = () => {
       // Dismiss the loading toast notification
       toast.dismiss(toastId);
 
+      // Determine the proper display message for notifications:
+      let displayMessage = "Invoice";
+      if (record.isReturn) {
+        displayMessage = "Return Invoice";
+      } else if (record.isCancel) {
+        displayMessage = "Cancel Invoice";
+      }
+
       if (sendEmail.fulfilled.match(result)) {
-        toast.success(
-          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
-        );
+        toast.success(`${displayMessage} email sent successfully!`);
       } else {
         console.error("Failed sendEmail response:", result);
-        toast.error(result.payload || `Failed to send ${type} email.`);
+        toast.error(result.payload || `Failed to send ${displayMessage} email.`);
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
       toast.error("Error sending email.");
     }
   };
+
 
 
   useEffect(() => {

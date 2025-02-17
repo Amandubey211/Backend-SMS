@@ -121,33 +121,49 @@ const PenalityandAdjustmentList = () => {
       toast.error("Invalid adjustment ID.");
       return;
     }
-
+  
     console.log("Attempting to send email for adjustment:", record);
-
+  
+    // Determine email type: use "cancelReturnInvoice" if cancelled; otherwise "adjustment"
     const emailType = record.isCancel ? "cancelReturnInvoice" : "adjustment";
-
+  
     // Map the record to the required email data structure
     const emailData = mapRecordToEmailData(record);
-
+  
     // Show a loading toast notification in real time
     const toastId = toast.loading("Sending email...");
-
+  
     try {
+      // For canceled adjustments, use the linked invoice's _id (if available)
+      const idToSend =
+        record.isCancel && record.invoiceId && record.invoiceId._id
+          ? record.invoiceId._id
+          : record._id;
+  
       const result = await dispatch(
         sendEmail({
-          id: record._id,
+          id: idToSend,
           type: emailType,
           payload: emailData,
         })
       );
-
+  
       // Dismiss the loading toast notification
       toast.dismiss(toastId);
-
+  
+      // Determine the proper display message for notifications:
+      let displayMessage = "Adjustment";
+      if (record.isReturn) {
+        displayMessage = "Return Adjustment";
+      } else if (record.isCancel) {
+        displayMessage = "Cancelled Adjustment";
+      }
+  
       if (sendEmail.fulfilled.match(result)) {
-        toast.success("Email sent successfully!");
+        toast.success(`${displayMessage} email sent successfully!`);
       } else {
-        toast.error(result.payload || "Failed to send email.");
+        console.error("Failed sendEmail response:", result);
+        toast.error(result.payload || `Failed to send ${displayMessage} email.`);
       }
     } catch (err) {
       console.error("Error sending email:", err);
@@ -155,6 +171,8 @@ const PenalityandAdjustmentList = () => {
       toast.error("Error sending email.");
     }
   };
+  
+  
 
 
   // Define the action menu for each row
