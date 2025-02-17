@@ -185,7 +185,16 @@ const RecentInvoiceList = () => {
   };
 
 
-
+  const categoryLabels = {
+    studentFee: "Student Fee",
+    FacilityRevenue: "Facility Revenue",
+    service_based_revenue: "Service-Based Revenue",
+    community_externalaffair_revenue: "Community & External Affairs",
+    financial_investment_revenue: "Financial Investment Revenue",
+    Penalties: "Penalties",
+    Other: "Other Revenue",
+  };
+  
   useEffect(() => {
     const filters = {
       page: 1,
@@ -215,9 +224,15 @@ const RecentInvoiceList = () => {
       key: "lineItems",
       render: (lineItems) =>
         lineItems?.length ? (
-          <div className="flex flex-col">
-            <span>{lineItems[0]?.revenueType} </span>
-          </div>
+          <>
+            {categoryLabels[lineItems[0]?.revenueType] || lineItems[0]?.revenueType}
+            {lineItems[1]?.revenueType && (
+              <span>
+                <br />
+                {categoryLabels[lineItems[1]?.revenueType] || lineItems[1]?.revenueType}
+              </span>
+            )}
+          </>
         ) : (
           "N/A"
         ),
