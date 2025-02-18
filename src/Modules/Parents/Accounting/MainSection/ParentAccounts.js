@@ -7,6 +7,7 @@ import { FaExclamationCircle, FaMoneyBillWave } from "react-icons/fa"; // Icons 
 import { IoArrowBackCircleOutline, IoArrowForwardCircleOutline } from "react-icons/io5"; // Icons for pagination arrows
 import Spinner from "../../../../Components/Common/Spinner"; // Spinner component
 import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
+import { Skeleton } from "antd";
 
 // Utility function to get unique filter options from the data (with optional chaining)
 const uniqueFilterOptions = (data, key) => {
@@ -31,7 +32,7 @@ const AccountingSection = () => {
   });
 
   // Redux state for accounting data
-  const {
+  var {
     accountingData = {
       fees: [],
       totalUnpaidFees: 0,
@@ -51,7 +52,7 @@ const AccountingSection = () => {
       hasFetched.current = true;
     }
   }, [dispatch]);
-
+ 
   // Extracting data with safe defaults
   const fees = useMemo(() => accountingData?.fees ?? [], [accountingData]);
   const totalUnpaidFees = accountingData?.totalUnpaidFees ?? 0;
@@ -61,6 +62,45 @@ const AccountingSection = () => {
   const classes = useMemo(() => uniqueFilterOptions(fees, "class"), [fees]);
   const sections = useMemo(() => uniqueFilterOptions(fees, "section"), [fees]);
   const feesTypes = useMemo(() => uniqueFilterOptions(fees, "feeType"), [fees]);
+
+  // Skeleton Component for Finance Table
+  const FinanceTableSkeleton = () => (
+    <div className="p-4 w-full">
+
+  
+      {/* Table Skeleton */}
+      <div className="rounded-lg w-full border border-gray-200">
+        <table className="w-full table-fixed leading-normal">
+          <thead>
+            <tr className="bg-[#F9FAFC] text-gray-700">
+              {["Fee Type", "Paid By", "Due Date", "Amount", "Status", "Action"].map((col, index) => (
+                <th key={index} className="px-5 py-3 border-b border-gray-200 font-normal w-1/6">
+                  <Skeleton.Input active size="small" style={{ width: "80%" }} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(3)].map((_, rowIndex) => (
+              <tr key={rowIndex} className="text-gray-700 bg-white shadow-sm">
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "70%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "60%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "50%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "40%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200">
+                  <Skeleton.Button active size="small" shape="round" style={{ width: 90, height: 28, borderRadius: 16 }} />
+                </td>
+                <td className="px-5 py-4 border-b border-gray-200">
+                  <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 36, borderRadius: 20 }} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+  
 
   // Apply filters to the fees data, useMemo to optimize the filtered data calculation
   const filteredData = useMemo(() => {
@@ -143,18 +183,14 @@ const AccountingSection = () => {
 
         <div className="p-4 flex items-center justify-center w-full ">
           {/* Adjusting the table layout to show rows based on pagination */}
-          <div className="rounded-lg w-full overflow-x-auto">
+          <div className="rounded-lg w-full overflow-x-hidden">
             {loading ? (
-              // Show spinner when loading
-              <div className="flex flex-col items-center justify-center p-10">
-                <Spinner />
-                <p className="text-gray-600">{t("Loading...")}</p>
-              </div>
+              <FinanceTableSkeleton />
             ) : error ? (
               // Show error message when error occurs
               <div className="flex flex-col items-center p-10">
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
-                <p className="text-gray-600 text-lg"> 
+                <p className="text-gray-600 text-lg">
                   {error ? `${error}: ` : ""}
                   {t("Unable to fetch Fees")}
                 </p>
