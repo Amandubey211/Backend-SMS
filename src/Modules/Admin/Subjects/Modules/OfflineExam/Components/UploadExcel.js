@@ -4,7 +4,7 @@ import "handsontable/dist/handsontable.full.css";
 import { Button } from "antd";
 import { ImSpinner3 } from "react-icons/im";
 
-const TableView = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
+const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
   const hotRef = useRef(null);
   const hotInstanceRef = useRef(null);
 
@@ -96,4 +96,4 @@ const TableView = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
   );
 };
 
-export default TableView;
+export default UploadExcel;

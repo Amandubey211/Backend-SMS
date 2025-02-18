@@ -24,7 +24,6 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const response = await getData(
         `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}&search=${query}`
       );
-      console.log("data offline exam", response);
 
       return response;
     } catch (error) {
@@ -48,7 +47,7 @@ export const createOfflineExam = createAsyncThunk(
         academicYearId: say,
       };
 
-      console.log("semester id", semesterId);
+      console.log("Payload", payload);
       dispatch(setShowError(false));
 
       const response = await postData(
@@ -66,7 +65,7 @@ export const createOfflineExam = createAsyncThunk(
 
 export const UploadOfflineExamSheet = createAsyncThunk(
   "subject/offline_upload_exam_sheet",
-  async (formData, { rejectWithValue, dispatch, getState }) => {
+  async ({ formData, cid, sid }, { rejectWithValue, dispatch, getState }) => {
     try {
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       formData.append("semesterId", semesterId);
@@ -81,6 +80,7 @@ export const UploadOfflineExamSheet = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         }
       );
+      dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
 
       return response;
     } catch (error) {
@@ -96,6 +96,8 @@ export const UpdateOfflineExamCard = createAsyncThunk(
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
+      console.log("update exam Payload", payload);
+
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
@@ -104,6 +106,8 @@ export const UpdateOfflineExamCard = createAsyncThunk(
         payload
       );
       dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
+      console.log("response", response);
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -136,7 +140,7 @@ export const UpdateOfflineExamStudentSheet = createAsyncThunk(
 
 export const deleteOfflineExamCard = createAsyncThunk(
   "subject/offline_delete_exam_card",
-  async ({ examId }, { rejectWithValue, dispatch, getState }) => {
+  async ({ examId, cid, sid }, { rejectWithValue, dispatch, getState }) => {
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
@@ -145,7 +149,7 @@ export const deleteOfflineExamCard = createAsyncThunk(
       const response = await deleteData(
         `${getRole}/delete/offlineExam/${examId}?say=${say}`
       );
-      // dispatch(fetchAllOfflineExam());
+      dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

@@ -1,24 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { CiSearch } from "react-icons/ci";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
-import { useParams } from "react-router-dom";
 
-function Header({
-  data,
-  searchQuery,
-  setSearchQuery,
-  loading,
-  searchedData,
-  handleSearch,
-}) {
+function Header({ searchQuery, loading, searchedData, handleSearch }) {
   return (
-    <div className="bg-white pl-5 w-full">
-      <div className="flex justify-between items-center mb-4">
+    <div className=" pl-5 w-full">
+      <div className="flex justify-between items-center mb-4 mr-2">
         <h2 className="text-xl font-semibold text-gradient">
           Offline Exams
           <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {loading ? 0 : data?.length}
+            {loading ? 0 : searchedData?.length}
           </span>
         </h2>
         <div className="relative flex items-center max-w-xs w-full mr-4">
