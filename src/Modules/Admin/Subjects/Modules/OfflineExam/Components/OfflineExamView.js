@@ -123,16 +123,3 @@ const OfflineExamView = () => {
 };
 
 export default OfflineExamView;
-
-// { searchedData?.length ? (
-
-// ) : (
-//   <NoDataFound
-//     title="Students Data"
-//     desc="No Students Found !"
-//     icon={FaClipboardUser}
-//     iconColor="text-blue-500"
-//     textColor="text-gray-700"
-//     bgColor="bg-gray-100"
-//   />
-// )}
