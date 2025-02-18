@@ -21,12 +21,10 @@ import { setLocalCookies } from "../../../../../Utils/academivYear";
 import { getMyRolePermissionsThunk } from "../../RBAC/rbacThunks";
 
 // **Staff Login Action**
-
 export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
   async (staffDetails, { rejectWithValue, dispatch }) => {
     try {
-      // Hide any previous errors
       dispatch(setShowError(false));
 
       // Get device token for notifications
@@ -49,7 +47,7 @@ export const staffLogin = createAsyncThunk(
             mobileNumber: data.mobileNumber,
             position: data.position || "N/A",
             employeeID: data.employeeID || "N/A",
-            role: data.role, // e.g., "admin" or "staff"
+            role: data.role,
             monthlySalary: data.monthlySalary || 0,
             active: data.active ?? false,
             dateOfBirth: data?.dateOfBirth || "N/A",
@@ -73,7 +71,6 @@ export const staffLogin = createAsyncThunk(
             ])
           );
 
-          // If academic year is active, store the academic year ID and flag as "true"
           if (
             data.isAcademicYearActive === true ||
             data.isAcademicYearActive === "active"
@@ -85,19 +82,18 @@ export const staffLogin = createAsyncThunk(
           }
         }
 
-        // Admin logic: bypass role selection if academic year is active
+        // Updated Admin logic: always set the admin role
         if (data.role === "admin") {
+          // Always dispatch the admin role
+          dispatch(setRole(data.role));
           const academicYearActive =
             data.isAcademicYearActive === true ||
             data.isAcademicYearActive === "active";
           if (!academicYearActive) {
             toast.success("Please create an academic year");
-            setLocalCookies("isAcademicYearActive", "false");
+            // Redirect admin to create academic year if inactive
             return { redirect: "/create_academicYear" };
           }
-          // For active academic year, ensure the cookie is set to "true"
-          setLocalCookies("isAcademicYearActive", "true");
-          dispatch(setRole(data.role)); // Set admin role automatically
           return { redirect: "/select_branch" };
         }
 
@@ -122,7 +118,6 @@ export const staffLogin = createAsyncThunk(
         }
         return { redirect: "/dashboard" };
       } else {
-        // Use the backend message if available
         const errorMessage =
           data?.msg || "Something went wrong. Please try again later.";
         toast.error(errorMessage);
@@ -130,7 +125,6 @@ export const staffLogin = createAsyncThunk(
       }
     } catch (error) {
       console.error("Error in staff login:", error);
-      // Check if the error contains a response with a message from the backend
       const errorMessage =
         error?.response?.data?.msg || error.message || "Login failed.";
       toast.error(errorMessage);
