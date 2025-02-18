@@ -70,8 +70,8 @@ export const updateAdminProfile = createAsyncThunk ("User/updateAdmin",
         {"Content-Type": "multipart/form-data"}
       );
       toast.success('Profile update successfully');
-      if(response.success){
-        dispatch(setUserDetails(response.data))
+      if(response?.success){
+        dispatch(setUserDetails(response?.data))
       } 
       return response;
     } catch (error) {

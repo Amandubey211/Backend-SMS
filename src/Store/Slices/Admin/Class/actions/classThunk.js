@@ -23,8 +23,8 @@ export const fetchAllClasses = createAsyncThunk(
 
       const response = await getData(endpoint);
       // console.log(response, "lk");
-      if (response && response.status) {
-        return response.data; // Assuming 'data' contains the list of classes
+      if (response && response?.status) {
+        return response?.data; // Assuming 'data' contains the list of classes
       }
     } catch (error) {
       // console.log(error);
@@ -45,8 +45,8 @@ export const fetchAllClassesDetails = createAsyncThunk(
 
       const response = await getData(endpoint);
       // console.log(response, "lk");
-      if (response && response.status) {
-        return response.data; // Assuming 'data' contains the list of classes
+      if (response && response?.status) {
+        return response?.data; // Assuming 'data' contains the list of classes
       }
     } catch (error) {
       // console.log(error);
@@ -67,8 +67,8 @@ export const fetchClassDetails = createAsyncThunk(
 
       const response = await getData(endpoint);
 
-      if (response && response.status) {
-        return response.data; // Assuming 'data' contains class details
+      if (response && response?.status) {
+        return response?.data; // Assuming 'data' contains class details
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -88,10 +88,10 @@ export const createClass = createAsyncThunk(
 
       const response = await postData(endpoint, classData);
 
-      if (response && response.success) {
+      if (response && response?.success) {
         toast.success("Class created successfully!");
         dispatch(fetchAllClassesDetails()); // Refresh the classes list
-        return response.data; // Assuming 'data' contains the created class
+        return response?.data; // Assuming 'data' contains the created class
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -110,10 +110,10 @@ export const updateClass = createAsyncThunk(
       const endpoint = `/${getRole}/update_class/${classId}?say=${say}`;
       const response = await putData(endpoint, classData);
 
-      if (response && response.success) {
+      if (response && response?.success) {
         toast.success("Class updated successfully!");
         dispatch(fetchAllClassesDetails()); // Refresh the classes list
-        return response.data; // Assuming 'data' contains the updated class
+        return response?.data; // Assuming 'data' contains the updated class
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -132,7 +132,7 @@ export const deleteClass = createAsyncThunk(
       const endpoint = `/${getRole}/delete_class/${classId}?say=${say}`;
       const response = await deleteData(endpoint);
 
-      if (response && response.success) {
+      if (response && response?.success) {
         toast.success("Class deleted successfully!");
         dispatch(fetchAllClasses()); // Refresh the classes list
         return classId;
