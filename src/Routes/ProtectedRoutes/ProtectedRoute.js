@@ -18,7 +18,6 @@ const ProtectRoute = ({ Component, allowedRoles }) => {
 
   // Check allowed roles if defined
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
-    toast.error("You do not have permission to access this page.");
     return <Navigate to="/" replace />;
   }
 
@@ -37,19 +36,16 @@ const ProtectRoute = ({ Component, allowedRoles }) => {
   // Handling /select_role for non-admin users
   if (location.pathname === "/select_role") {
     if (userRole === "admin") {
-      toast.error("Admins do not need to select roles.");
       return <Navigate to="/select_branch" replace />;
     }
     if (groupedRoles && groupedRoles.length > 1 && !userRole) {
       return <Component />;
     }
-    toast.error("Invalid access to select role page.");
     return <Navigate to="/dashboard" replace />;
   }
 
   // For users with multiple roles and no selected role, force role selection
   if (groupedRoles && groupedRoles.length > 1 && !userRole) {
-    toast.error("Please select a role to continue.");
     return <Navigate to="/select_role" replace />;
   }
 
