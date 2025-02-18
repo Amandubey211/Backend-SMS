@@ -91,7 +91,8 @@ const TopRankingStudents = () => {
                       </h3>
                     )}
                   </div>
-                  <p>{student?.studentName || t("N/A")}</p>
+                  {student?.studentName?.slice(0, 10) || t("0")}
+                        <span title={student?.studentName} >{student?.studentName?.length > 10 && "..."}</span>
                   <p className="mb-2 text-sm">
                     {t("Adm")}:{" "}
                     <span className = "text-gray-600 text-sm">
@@ -110,9 +111,10 @@ const TopRankingStudents = () => {
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                       }}
+
                     >
                       {t("Score")}:{" "}
-                      {student?.score ? `${student.score} %` : t("N/A")}
+                      {student?.score ? `${student.score} %` : t("0")}
                     </span>
                   </span>
                 </div>
@@ -135,8 +137,8 @@ const TopRankingStudents = () => {
                         alt={student?.studentName || t("N/A")}
                       />
                       <span>
-                        {student?.studentName?.slice(0, 15) || t("N/A")}
-                        {student?.studentName?.length > 15 && "..."}
+                        {student?.studentName?.slice(0, 15) || t("0")}
+                        <span title={student?.studentName} >{student?.studentName?.length > 15 && "..."}</span>
                       </span>
                     </div>
                     <div
