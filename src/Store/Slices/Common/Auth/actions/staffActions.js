@@ -24,7 +24,7 @@ import { getMyRolePermissionsThunk } from "../../RBAC/rbacThunks";
 
 export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
-  async (staffDetails, { rejectWithValue, dispatch, getState }) => {
+  async (staffDetails, { rejectWithValue, dispatch }) => {
     try {
       // Hide any previous errors
       dispatch(setShowError(false));
@@ -35,10 +35,10 @@ export const staffLogin = createAsyncThunk(
 
       // Send login request
       const data = await postData("/auth/staff/login", userDetail);
-      console.log(data, "dd");
+      console.log(data, "Login response data");
 
       if (data?.success) {
-        // Dispatch user details to userSlice
+        // Dispatch user details to the store
         dispatch(
           setUserDetails({
             schoolId: data.schoolId,
@@ -49,7 +49,7 @@ export const staffLogin = createAsyncThunk(
             mobileNumber: data.mobileNumber,
             position: data.position || "N/A",
             employeeID: data.employeeID || "N/A",
-            role: data.role,
+            role: data.role, // e.g., "admin" or "staff"
             monthlySalary: data.monthlySalary || 0,
             active: data.active ?? false,
             dateOfBirth: data?.dateOfBirth || "N/A",
@@ -57,9 +57,7 @@ export const staffLogin = createAsyncThunk(
           })
         );
 
-        // Reset any existing role
-        dispatch(setRole(data.role));
-
+        // Process academic year data if available
         if (data.academicYear) {
           const formattedAcademicYear = formatAcademicYear(
             data.academicYear.year,
@@ -75,67 +73,68 @@ export const staffLogin = createAsyncThunk(
             ])
           );
 
-          if (data.isAcademicYearActive) {
-            setLocalCookies("say", data?.academicYear._id);
+          // If academic year is active, store the academic year ID and flag as "true"
+          if (
+            data.isAcademicYearActive === true ||
+            data.isAcademicYearActive === "active"
+          ) {
+            setLocalCookies("say", data.academicYear._id);
+            setLocalCookies("isAcademicYearActive", "true");
+          } else {
+            setLocalCookies("isAcademicYearActive", "false");
           }
         }
 
-        // Store grouped roles in the state
-        if (data.groupedRoles && data.groupedRoles.length > 0) {
-          dispatch(setUserRoles(data.groupedRoles));
-        }
-
-        // Handle admin role redirection
+        // Admin logic: bypass role selection if academic year is active
         if (data.role === "admin") {
-          if (!data.isAcademicYearActive) {
+          const academicYearActive =
+            data.isAcademicYearActive === true ||
+            data.isAcademicYearActive === "active";
+          if (!academicYearActive) {
             toast.success("Please create an academic year");
-            setLocalCookies("isAcademicYearActive", data.isAcademicYearActive);
+            setLocalCookies("isAcademicYearActive", "false");
             return { redirect: "/create_academicYear" };
           }
-          dispatch(setRole(data.role));
-
-          // Fetch permissions after setting role
-          // await dispatch(getMyRolePermissionsThunk());
-
+          // For active academic year, ensure the cookie is set to "true"
+          setLocalCookies("isAcademicYearActive", "true");
+          dispatch(setRole(data.role)); // Set admin role automatically
           return { redirect: "/select_branch" };
         }
 
-        // Handle staff roles with multiple grouped roles
+        // For staff with multiple roles, force role selection
         if (data.groupedRoles && data.groupedRoles.length > 1) {
-          toast.success("sdfsdf");
-          console.log("sdfsdfsdf", data.groupedRoles.length);
+          dispatch(setUserRoles(data.groupedRoles));
+          dispatch(setRole(null)); // Clear any auto-assigned role
           return { redirect: "/select_role" };
         }
 
-        // If the user has exactly one grouped role, set it directly
+        // If exactly one grouped role exists, auto-set it and proceed
         if (data.groupedRoles && data.groupedRoles.length === 1) {
           const userRole = data.groupedRoles[0].department;
           dispatch(setRole(userRole));
-
-          // Fetch permissions after setting role
           await dispatch(getMyRolePermissionsThunk());
-
           return { redirect: "/dashboard" };
         }
 
-        // For non-admin users without grouped roles, set academic year and redirect to dashboard
+        // For non-admin users without grouped roles, fetch permissions and redirect
         if (data.role) {
           await dispatch(getMyRolePermissionsThunk());
         }
-
         return { redirect: "/dashboard" };
       } else {
-        console.log(data);
+        // Use the backend message if available
         const errorMessage =
-          data?.msg || "Something went Wrong pls Try again later.";
+          data?.msg || "Something went wrong. Please try again later.";
         toast.error(errorMessage);
         return rejectWithValue(errorMessage);
       }
     } catch (error) {
       console.error("Error in staff login:", error);
-      const err = ErrorMsg(error);
-      toast.error(err.message || "Login failed.");
-      return rejectWithValue(err.message || "Login failed.");
+      // Check if the error contains a response with a message from the backend
+      const errorMessage =
+        error?.response?.data?.msg || error.message || "Login failed.";
+      toast.error(errorMessage);
+      return rejectWithValue(errorMessage);
     }
   }
 );
