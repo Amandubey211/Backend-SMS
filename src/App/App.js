@@ -1490,7 +1490,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/parent_timetable/*",
+      path: "/parent_timetable",
       element: (
         <ProtectRoute
           Component={ParentTimeTablePage}
