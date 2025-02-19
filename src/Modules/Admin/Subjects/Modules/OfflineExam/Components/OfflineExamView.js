@@ -23,8 +23,6 @@ const OfflineExamView = () => {
     []
   );
 
-  console.log("students in card view", students);
-
   useEffect(() => {
     debouncedSearch(searchQuery);
     return () => {
@@ -90,7 +88,6 @@ const OfflineExamView = () => {
               </div>
 
               {/* Scrollable Body Wrapper */}
-
               <div className="max-h-[400px]">
                 <table className="w-full text-gray-700 text-sm">
                   <tbody>

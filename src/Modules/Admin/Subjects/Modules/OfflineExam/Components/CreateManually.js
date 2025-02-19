@@ -1,7 +1,6 @@
-import { Button, DatePicker, Select } from "antd";
+import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import { PlusOutlined } from "@ant-design/icons";
-import { RiDeleteBin6Line } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux";
 import { createOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,6 +8,7 @@ import { fetchStudentsByClassAndSectionNames } from "../../../../../../Store/Sli
 import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import toast from "react-hot-toast";
 import { formatDate } from "../../../../../../Utils/helperFunctions";
+import CreateTable from "./CreateTable";
 
 const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   const [headers] = useState([
@@ -43,20 +43,38 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   const purpleColor = "#AB47BC";
   const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
-  const handleCellChange = (rowIdx, colIdx, value) => {
+  const handleCellChange = (rowIdx, colIdx, value, updateAll = false) => {
     setTableData((prev) => {
       const newData = [...prev];
-      newData[rowIdx] = [...newData[rowIdx]];
-      newData[rowIdx][colIdx] = value;
-      return newData;
+
+      if (updateAll) {
+        // Update the entire column for all rows
+        return newData.map((row) => {
+          row[colIdx] = value.trim();
+          return row;
+        });
+      } else {
+        // Update only the specific row
+        newData[rowIdx] = [...newData[rowIdx]];
+        newData[rowIdx][colIdx] = value.trim();
+        return newData;
+      }
     });
   };
 
+  // const isRowFilled = (row) => row.every((cell) => cell.trim() !== "");
+
   const addRow = () => {
-    if (!isRowFilled(tableData[tableData.length - 1])) {
-      toast.error("Please fill the current row before adding a new one.");
+    if (tableData.length >= 5) {
+      toast.error("You can only add up to 5 rows. Please upload via Excel.");
       return;
     }
+
+    // if (!isRowFilled(tableData[tableData.length - 1])) {
+    //   toast.error("Please fill the current row before adding a new one.");
+    //   return;
+    // }
+
     const newRow = new Array(headers.length).fill("");
     setTableData((prev) => [...prev, newRow]);
   };
@@ -64,24 +82,56 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   const removeRow = (rowIdx) => {
     setTableData((prev) => prev.filter((_, idx) => idx !== rowIdx));
   };
+  useEffect(() => {
+    // Update Exam Type for all rows
+    setTableData((prev) =>
+      prev.map((row) => {
+        row[3] = selectedExamType || ""; // 3rd index is "Exam Type"
+        return row;
+      })
+    );
+  }, [selectedExamType]);
+
+  useEffect(() => {
+    // Update Exam Name for all rows
+    setTableData((prev) =>
+      prev.map((row) => {
+        row[2] = selectedExamName || ""; // 2nd index is "Exam Name"
+        return row;
+      })
+    );
+  }, [selectedExamName]);
+
+  useEffect(() => {
+    // Update Max Score for all rows
+    setTableData((prev) =>
+      prev.map((row) => {
+        row[5] = enteredMaxScore || ""; // 5th index is "Max Score"
+        return row;
+      })
+    );
+  }, [enteredMaxScore]);
 
   useEffect(() => {
     dispatch(fetchStudentsByClassAndSectionNames(cid));
     dispatch(fetchAllStudents());
   }, []);
 
-  const isRowFilled = (row) =>
-    row.every((cell) => (cell || "").toString().trim() !== "");
-
-  const isTableValid = tableData.every(isRowFilled);
-
   const handleCreate = () => {
-    if (!tableData.every(isRowFilled)) {
-      toast.error("All fields must be filled before submitting.");
-      return;
-    }
+    // if (!tableData.every(isRowFilled)) {
+    //   toast.error("All fields must be filled before submitting.");
+    //   return;
+    // }
+    // for (let row of tableData) {
+    //   const obtainedScore = parseFloat(row[4]);
+    //   const maxScore = parseFloat(row[5]);
 
-    if (!validateInputs()) return;
+    //   if (isNaN(obtainedScore) || isNaN(maxScore) || obtainedScore > maxScore) {
+    //     toast.error("Obtained Score must be less than or equal to Max Score.");
+    //     return;
+    //   }
+    // }
+
     const payload = {
       examType: selectedExamType,
       examName: selectedExamName,
@@ -93,7 +143,6 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
         const selectedStudent = studentsList.find(
           (student) => `${student.firstName} ${student.lastName}` === row[0]
         );
-        console.log("max marks", row[5]);
 
         return {
           studentId: selectedStudent?._id || "",
@@ -116,7 +165,7 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
         toast.error(error.message || "Failed to Create Exam");
       });
   };
-  // Function to reset form values
+
   const resetForm = () => {
     setSelectedExamType("");
     setSelectedExamName("");
@@ -125,33 +174,12 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
     setTableData([["", "", "", "", "", "", "", "", "", ""]]);
   };
 
-  const validateInputs = () => {
-    if (!selectedExamName.trim()) {
-      toast.error("Exam name cannot be empty.");
-      return false;
-    }
-    if (!selectedExamType) {
-      toast.error("Exam type is required.");
-      return false;
-    }
-    if (!cid) {
-      toast.error("Class ID is missing.");
-      return false;
-    }
-    if (!sid) {
-      toast.error("Subject ID is missing.");
-      return false;
-    }
-
-    return true;
-  };
-
   const handleClear = () => {
-    navigate(-1);
+    setIsOpen(false);
   };
 
   console.log("entered Max Score", enteredMaxScore);
-
+  console.log("Table data", tableData);
   return (
     <div className="px-4  w-full -mb-9 min-h-[500px]">
       {/* Buttons to Add Row */}
@@ -170,254 +198,25 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
       </div>
 
       {/* Table */}
-      <div className="flex flex-col justify-between">
-        <div
-          className="overflow-x-auto overflow-y-auto max-h-[1000px] mb-7 scroll-smooth scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-gray-400"
-          style={{ scrollbarWidth: "thin", scrollbarHeight: "3px" }}
-        >
-          <table className="w-full border-collapse border table-auto mb-5">
-            <thead>
-              <tr className="bg-gray-100">
-                {headers.map((header, colIdx) => (
-                  <th
-                    key={colIdx}
-                    className={`border px-4 pt-2 text-center font-medium text-sm cursor-pointer align-top`}
-                    style={{
-                      minWidth: header === "Actions" ? "50px" : "150px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    <div className="flex flex-col items-center w-full">
-                      <span>{header}</span>
-                      {header === "Exam Type" && (
-                        <input
-                          type="text"
-                          placeholder="Enter Type"
-                          value={selectedExamType}
-                          onChange={(e) => setSelectedExamType(e.target.value)}
-                          className="w-full  text-pink-700 align-middle focus:outline-none focus:ring focus:border-blue-200  p-1  border border-gray-200 rounded-md m-2 text-xs font-medium capitalize placeholder: text-center"
-                        />
-                      )}
-                      {header === "Exam Name" && (
-                        <input
-                          type="text"
-                          placeholder="Enter Exam"
-                          value={selectedExamName}
-                          onChange={(e) => setSelectedExamName(e.target.value)}
-                          className="w-full p-1 text-pink-700  border border-gray-200 rounded-md m-2 font-medium  focus:outline-none focus:ring focus:border-blue-200 text-xs capitalize placeholder: text-center"
-                        />
-                      )}
-                      {header === "Max Score" && (
-                        <input
-                          type="number"
-                          placeholder="Enter Max Score"
-                          value={enteredMaxScore}
-                          onChange={(e) => setEnteredMaxScore(e.target.value)}
-                          className="w-full p-1  text-pink-700  border border-gray-200 rounded-md m-2 font-medium  focus:outline-none focus:ring focus:border-blue-100 text-xs capitalize placeholder: text-center"
-                        />
-                      )}
-                      {header === "Start Date" && (
-                        <DatePicker
-                          selected={selectedStartDate}
-                          onChange={(date) =>
-                            setSelectedStartDate(date ? new Date(date) : null)
-                          }
-                          className="w-full  text-pink-700 p-1 border border-gray-200 rounded-md m-2 font-medium text-xs text-center"
-                          placeholderText="Select Start Date"
-                        />
-                      )}
-
-                      {header === "End Date" && (
-                        <DatePicker
-                          selected={selectedEndDate}
-                          onChange={(date) =>
-                            setSelectedEndDate(date ? new Date(date) : null)
-                          }
-                          className="w-full  text-pink-700 p-1 border border-gray-200 rounded-md m-2 font-medium text-xs text-center"
-                          placeholderText="Select End Date"
-                        />
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {tableData.map((row, rowIdx) => (
-                <tr key={rowIdx} className="border">
-                  {row.map((cell, colIdx) => (
-                    <td
-                      key={colIdx}
-                      className="border px-4 py-2 text-center"
-                      style={{
-                        minWidth: "150px",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {headers[colIdx] === "Exam Type" ? (
-                        <div className="items-center gap-2 flex justify-center">
-                          <div className="bg-gray-100  text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedExamType}
-                          </div>
-                        </div>
-                      ) : headers[colIdx] === "Exam Name" ? (
-                        <div className="flex items-center gap-2 justify-center">
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedExamName}
-                          </div>
-                        </div>
-                      ) : headers[colIdx] === "Max Score" ? (
-                        <div className="flex items-center gap-2 justify-center">
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {enteredMaxScore}
-                          </div>
-                        </div>
-                      ) : headers[colIdx] === "Actions" ? (
-                        <div className="w-full flex justify-center">
-                          <RiDeleteBin6Line
-                            onClick={() => removeRow(rowIdx)}
-                            className="w-5 h-5 text-red-500 cursor-pointer"
-                          />
-                        </div>
-                      ) : headers[colIdx] === "Start Date" ? (
-                        <div className="flex items-center gap-2 justify-center">
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedStartDate
-                              ? formatDate(selectedStartDate)
-                              : ""}
-                          </div>
-                        </div>
-                      ) : headers[colIdx] === "End Date" ? (
-                        <div className="flex items-center gap-2 justify-center">
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedEndDate ? formatDate(selectedEndDate) : ""}
-                          </div>
-                        </div>
-                      ) : headers[colIdx] === "Name" ? (
-                        <Select
-                          showSearch
-                          allowClear
-                          defaultValue="Select Student"
-                          style={{
-                            width: "auto",
-                            mode: "single",
-                            marginTop: "4px",
-                            display: "flex",
-                            alignSelf: "start",
-                            paddingRight: "5px",
-                            overflowX: "auto",
-                          }}
-                          value={tableData[rowIdx][0] || "Select Student"}
-                          onChange={(value) => {
-                            const selectedStudent = studentsList.find(
-                              (student) =>
-                                `${student.firstName} ${student.lastName}` ===
-                                value
-                            );
-
-                            if (selectedStudent) {
-                              const matchedStudent = allStudents.find(
-                                (s) =>
-                                  s.firstName === selectedStudent.firstName &&
-                                  s.lastName === selectedStudent.lastName
-                              );
-                              handleCellChange(rowIdx, 0, value);
-                              handleCellChange(
-                                rowIdx,
-                                1,
-                                matchedStudent?.admissionNumber || ""
-                              );
-                            }
-                          }}
-                          onClear={() => handleCellChange(rowIdx, 0, null)}
-                          filterOption={(input, option) =>
-                            option?.value
-                              ?.toLowerCase()
-                              .includes(input.toLowerCase())
-                          }
-                          options={studentsList?.map((student) => {
-                            const matchedStudent = allStudents.find(
-                              (s) =>
-                                s.firstName === student.firstName &&
-                                s.lastName === student.lastName
-                            );
-                            const isSelected =
-                              tableData[rowIdx][0] ===
-                              `${student.firstName} ${student.lastName}`;
-                            return {
-                              value: `${student.firstName} ${student.lastName}`,
-                              label: (
-                                <div className="flex items-center gap-2 min-w-[200px] whitespace-nowrap overflow-x-auto">
-                                  <img
-                                    src={student.profile}
-                                    alt={student.firstName}
-                                    className="w-6 h-6 rounded-full object-cover"
-                                  />
-                                  <span>
-                                    {student.firstName} {student.lastName}
-                                  </span>
-                                  {!isSelected && (
-                                    <span className="pr-2 text-xs text-gray-500">
-                                      {matchedStudent?.admissionNumber || "NA"}
-                                    </span>
-                                  )}
-                                </div>
-                              ),
-                            };
-                          })}
-                        />
-                      ) : headers[colIdx] === "Status" ? (
-                        <Select
-                          defaultValue="present"
-                          value={row[8] || "present"}
-                          onChange={(value) =>
-                            handleCellChange(rowIdx, 8, value)
-                          }
-                          options={[
-                            {
-                              value: "present",
-                              label: (
-                                <span className="text-green-600 text-xs font-medium bg-green-100 px-3 py-1 border border-none rounded-3xl">
-                                  Present
-                                </span>
-                              ),
-                            },
-                            {
-                              value: "absent",
-                              label: (
-                                <span className="text-red-600 font-medium text-xs bg-red-100 px-3 py-1 border border-none rounded-3xl">
-                                  Absent
-                                </span>
-                              ),
-                            },
-                            {
-                              value: "excused",
-                              label: (
-                                <span className="text-orange-600 font-medium text-xs bg-orange-100 px-3 py-1 border border-none rounded-3xl">
-                                  Excused
-                                </span>
-                              ),
-                            },
-                          ]}
-                        />
-                      ) : (
-                        <input
-                          type="text"
-                          value={cell}
-                          onChange={(e) =>
-                            handleCellChange(rowIdx, colIdx, e.target.value)
-                          }
-                          className="w-full px-2 py-1 text-center flex items-center justify-center focus:outline-none focus:ring focus:border-blue-100 text-sm capitalize"
-                        />
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <CreateTable
+        headers={headers}
+        selectedExamType={selectedExamType}
+        setSelectedExamType={setSelectedExamType}
+        selectedExamName={selectedExamName}
+        setSelectedExamName={setSelectedExamName}
+        enteredMaxScore={enteredMaxScore}
+        setEnteredMaxScore={setEnteredMaxScore}
+        selectedStartDate={selectedStartDate}
+        setSelectedStartDate={setSelectedStartDate}
+        selectedEndDate={selectedEndDate}
+        setSelectedEndDate={setSelectedEndDate}
+        tableData={tableData}
+        removeRow={removeRow}
+        formatDate={formatDate}
+        studentsList={studentsList}
+        allStudents={allStudents}
+        handleCellChange={handleCellChange}
+      />
 
       {/* Submit Buttons */}
       <div className="fixed bottom-5 right-5 flex space-x-4 ">

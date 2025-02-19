@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { RiAddFill } from "react-icons/ri";
-import { Button, Modal, Tooltip, Typography } from "antd";
+import { Tooltip } from "antd";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-import { MdAddChart, MdFileDownload, MdFileUpload } from "react-icons/md";
+import { MdAddChart, MdFileUpload } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { UploadOfflineExamSheet } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { useParams } from "react-router-dom";
@@ -12,9 +12,8 @@ import toast from "react-hot-toast";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import CreateManually from "./CreateManually";
 import UploadExcel from "./UploadExcel";
-import { FiCheck, FiInfo } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTranslation } from "react-i18next";
+import { FiInfo } from "react-icons/fi";
+import GuidelinesModel from "./GuidelinesModel";
 
 function CreateExam() {
   const { cid, sid } = useParams();
@@ -28,8 +27,6 @@ function CreateExam() {
   const [loading, setLoading] = useState(false);
   const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
 
-  const { t } = useTranslation("admClass");
-  const { Title } = Typography;
   const pinkColor = "#EC407A";
   const purpleColor = "#AB47BC";
   const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
@@ -39,7 +36,6 @@ function CreateExam() {
     fileInputRef.current.click();
   };
 
-  // Handle file selection and read Excel
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
@@ -92,8 +88,6 @@ function CreateExam() {
       setLoading(false);
       toast.error("Failed to Upload Exam");
     }
-
-    // navigate(-1);
   };
 
   return (
@@ -124,7 +118,7 @@ function CreateExam() {
               setIsOpen(false);
             }
           }}
-          width={"95%"}
+          width={"100%"}
         >
           <div>
             <div className="flex justify-end mr-5">
@@ -183,78 +177,10 @@ function CreateExam() {
             </div>
 
             {/* Guidelines Modal */}
-            <Modal
-              visible={guidelinesModalVisible}
-              onCancel={() => setGuidelinesModalVisible(false)}
-              footer={null}
-              width={550}
-              className="rounded-xl shadow-lg"
-            >
-              <AnimatePresence>
-                {guidelinesModalVisible && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3 }}
-                    className="flex flex-col p-6"
-                  >
-                    {/* Header with Icon */}
-                    <div className="flex items-center space-x-4 mb-4">
-                      <div className="bg-purple-100 p-3 rounded-full">
-                        <FiInfo className="text-purple-600 text-4xl" />
-                      </div>
-                      <Title level={3} className="text-purple-800">
-                        Sample Upload Instructions
-                      </Title>
-                    </div>
-
-                    {/* Left-Aligned Guidelines */}
-                    <ul className="list-none text-gray-700 pl-6 space-y-2">
-                      <li className="flex items-center space-x-2">
-                        <FiCheck className="text-green-500" />
-                        <span>Only .xlsx or .xls files are supported.</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <FiCheck className="text-green-500" />
-                        <span>Maximum file size allowed: 5MB.</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <FiCheck className="text-green-500" />
-                        <span>
-                          Download Template – Use the Sample Excel format.
-                        </span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <FiCheck className="text-green-500" />
-                        <span>Edit the Sample Excel and Save.</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <FiCheck className="text-green-500" />
-                        <span>
-                          Click on Upload Excel and select the file to upload.
-                        </span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <FiCheck className="text-green-500" />
-                        <span>Ready to upload? Click the "Create" button.</span>
-                      </li>
-                    </ul>
-
-                    <div className="flex justify-end mt-6">
-                      <a
-                        href="/createOfflineExamSample.xlsx"
-                        download="createOfflineExamSample.xlsx"
-                        className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
-                      >
-                        <MdFileDownload className="text-lg text-gray-600" />
-                        <span className="text-gradient">Sample Excel</span>
-                      </a>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </Modal>
+            <GuidelinesModel
+              guidelinesModalVisible={guidelinesModalVisible}
+              setGuidelinesModalVisible={setGuidelinesModalVisible}
+            />
 
             {/* Handsontable Component */}
             {!showManual

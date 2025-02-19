@@ -15,8 +15,6 @@ const OfflineExamViewCard = ({ student, examType, startDate }) => {
     (s) => s?._id === student?.studentId?._id
   );
 
-  console.log("view", student);
-
   return (
     <tr className="border-b ">
       <td className="p-2 flex gap-2 flex-nowrap w-[100%]">
