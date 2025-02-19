@@ -11,7 +11,6 @@ import { setUserDetails, resetUserState } from "../../User/reducers/userSlice"; 
 import { requestPermissionAndGetToken } from "../../../../../Hooks/NotificationHooks/NotificationHooks";
 import toast from "react-hot-toast";
 import { formatAcademicYear } from "../utils/authUtils";
-import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { setSeletedAcademicYear } from "../../AcademicYear/academicYear.slice";
 import Cookies from "js-cookie";
 import { setErrorMsg, setShowError } from "../../Alerts/alertsSlice";
@@ -54,13 +53,14 @@ export const staffLogin = createAsyncThunk(
             schoolName: data?.schoolName,
           })
         );
+        dispatch(setRole(data.role));
 
         // Process academic year data if available
         if (data.academicYear) {
           const formattedAcademicYear = formatAcademicYear(
-            data.academicYear.year,
-            data.academicYear.startDate,
-            data.academicYear.endDate
+            data.academicYear?.year,
+            data.academicYear?.startDate,
+            data.academicYear?.endDate
           );
           dispatch(
             setAcademicYear([
@@ -84,7 +84,6 @@ export const staffLogin = createAsyncThunk(
 
         // Updated Admin logic: always set the admin role
         if (data.role === "admin") {
-          // Always dispatch the admin role
           dispatch(setRole(data.role));
           const academicYearActive =
             data.isAcademicYearActive === true ||
