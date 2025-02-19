@@ -128,17 +128,22 @@ const StudentParentCard = () => {
           {t("My Children")} {students?.length || 0} {/* Optional chaining */}
         </h2>
         {!loadingChildren && !errorChildren && students?.length > 0 && ( // Optional chaining
-          <button
-            className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-            onClick={handleNavigate}
-          >
-            {t("See All")}
-          </button>
+          <div className="inline-block">
+            <button
+              className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+                       text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
+                       hover:bg-gray-100 hover:shadow-md"
+              onClick={handleNavigate}
+            >
+              {t("See All")}
+            </button>
+          </div>
+
         )}
       </div>
 
       {/* Content area with conditional rendering */}
-      <div className={`rounded-lg p-4 m-3 bg-transparent ${loadingChildren || errorChildren || students?.length === 0 ? 'h-auto' : ''}`}>
+      <div className={`rounded-lg p-4 m-3 mb-7 bg-transparent ${loadingChildren || errorChildren || students?.length === 0 ? 'h-auto' : ''}`}>
 
         {/* Skeleton during loading */}
         {loadingChildren && (

@@ -8,6 +8,33 @@ import { RiSignalWifiErrorFill } from "react-icons/ri";
 import dayjs from 'dayjs'; // For formatting dates
 import { useTranslation } from 'react-i18next'; // Import i18next hook
 
+// 1. NEW: Skeleton for table rows (rectangle boxes)
+const LibraryRowSkeleton = ({ rows = 3 }) => {
+  return (
+    <>
+      {/* Single <tr> so antd Table can display it via `locale.emptyText` */}
+      <tr>
+        <td colSpan={6} style={{ width: '88rem' }}>
+          <div className="flex flex-col space-y-2">
+            {/* Render multiple skeleton rows */}
+            {Array(rows).fill("").map((_, rowIndex) => (
+              <div key={rowIndex} className="border-b p-3 flex space-x-3">
+                {/* 6 columns => 6 rectangle placeholders */}
+                {Array(6).fill("").map((__, colIndex) => (
+                  <div key={colIndex} className="flex-1">
+                    <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </td>
+      </tr>
+    </>
+  );
+};
+
+// 2. Your ORIGINAL `LibraryTable` component, unchanged except referencing the new skeleton in `renderLoading`.
 const LibraryTable = () => {
   const { t } = useTranslation('prtLibrary'); // Initialize i18next hook
   const dispatch = useDispatch();
@@ -79,7 +106,11 @@ const LibraryTable = () => {
       key: 'status',
       render: (status) => (
         <span
-          className={`inline-block px-3 py-1 rounded-full text-sm ${status?.toLowerCase() === 'returned' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}
+          className={`inline-block px-3 py-1 rounded-full text-sm ${
+            status?.toLowerCase() === 'returned'
+              ? 'bg-green-100 text-green-800'
+              : 'bg-yellow-100 text-yellow-800'
+          }`}
         >
           {status}
         </span>
@@ -94,7 +125,9 @@ const LibraryTable = () => {
         <td colSpan={columns?.length} style={{ width: '88rem' }}>
           <div className="w-full flex flex-col items-center justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
             <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
-            <p className="text-gray-600 text-lg text-center mt-2">{t('Error')}: {error} - {t('Unable to fetch Library data')}</p> {/* Translated error message */}
+            <p className="text-gray-600 text-lg text-center mt-2">
+              {t('Error')}: {error} - {t('Unable to fetch Library data')}
+            </p>
           </div>
         </td>
       </tr>
@@ -108,23 +141,19 @@ const LibraryTable = () => {
         <td colSpan={columns?.length} style={{ width: '88rem' }}>
           <div className="w-full flex flex-col items-center justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
             <FaBookOpen className="text-gray-400 text-8xl mb-6" />
-            <p className="text-gray-600 text-lg text-center mt-2">{t('No data available')}</p> {/* Translated no data message */}
+            <p className="text-gray-600 text-lg text-center mt-2">
+              {t('No data available')}
+            </p>
           </div>
         </td>
       </tr>
     );
   };
 
-  // Render Loading Spinner
+  // 3. Replacing Spinner with LibraryRowSkeleton => shows row placeholders
   const renderLoading = () => {
     return (
-      <tr>
-        <td colSpan={columns?.length} style={{ width: '88rem' }}>
-          <div className="w-full flex justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
-            <Spinner />
-          </div>
-        </td>
-      </tr>
+      <LibraryRowSkeleton rows={3} />
     );
   };
 
@@ -255,7 +284,6 @@ const LibraryTable = () => {
             </span>
           </label>
         </div>
-
       </div>
 
       {/* Render Table or Loading/Error/No Data */}

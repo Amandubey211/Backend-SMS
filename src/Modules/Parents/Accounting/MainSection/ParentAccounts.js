@@ -52,7 +52,7 @@ const AccountingSection = () => {
       hasFetched.current = true;
     }
   }, [dispatch]);
- 
+
   // Extracting data with safe defaults
   const fees = useMemo(() => accountingData?.fees ?? [], [accountingData]);
   const totalUnpaidFees = accountingData?.totalUnpaidFees ?? 0;
@@ -67,12 +67,12 @@ const AccountingSection = () => {
   const FinanceTableSkeleton = () => (
     <div className="p-4 w-full">
 
-  
+
       {/* Table Skeleton */}
       <div className="rounded-lg w-full border border-gray-200">
         <table className="w-full table-fixed leading-normal">
           <thead>
-            <tr className="bg-[#F9FAFC] text-gray-700">
+            <tr className="bg-[#e5e5e5] text-gray-700">
               {["Fee Type", "Paid By", "Due Date", "Amount", "Status", "Action"].map((col, index) => (
                 <th key={index} className="px-5 py-3 border-b border-gray-200 font-normal w-1/6">
                   <Skeleton.Input active size="small" style={{ width: "80%" }} />
@@ -82,7 +82,7 @@ const AccountingSection = () => {
           </thead>
           <tbody>
             {[...Array(3)].map((_, rowIndex) => (
-              <tr key={rowIndex} className="text-gray-700 bg-white shadow-sm">
+              <tr key={rowIndex} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
                 <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "70%" }} /></td>
                 <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "60%" }} /></td>
                 <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "50%" }} /></td>
@@ -100,7 +100,7 @@ const AccountingSection = () => {
       </div>
     </div>
   );
-  
+
 
   // Apply filters to the fees data, useMemo to optimize the filtered data calculation
   const filteredData = useMemo(() => {
@@ -171,12 +171,18 @@ const AccountingSection = () => {
               >
                 <IoArrowForwardCircleOutline className="inline-block text-2xl" />
               </button>
-              <button
-                className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-                onClick={handleNavigate}
-              >
-                {t("See All")}
-              </button>
+              <div className="inline-block">
+                <button
+                  className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+               text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
+               hover:bg-gradient-to-r hover:from-[#7F35CD] hover:to-[#C83B62]  
+               hover:shadow-md"
+                  onClick={handleNavigate}
+                >
+                  {t("See All")}
+                </button>
+              </div>
+
             </div>
           )}
         </div>
@@ -205,7 +211,7 @@ const AccountingSection = () => {
               // Display paginated data in table
               <table className="w-full table-fixed leading-normal">
                 <thead>
-                  <tr className="text-left text-gray-700 bg-[#F9FAFC]">
+                  <tr className="text-left text-gray-700 bg-[#e5e5e5]">
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Fee Type")}</th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Paid By")}</th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Due Date")}</th>
@@ -216,7 +222,7 @@ const AccountingSection = () => {
                 </thead>
                 <tbody className="space-y-2">
                   {paginatedData?.map((item) => (
-                    <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm">
+                    <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
                       <td className="px-5 py-4 border-b border-gray-200 truncate">{item?.feeType ?? t("No Fee Type")}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy ?? "N/A"}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.dueDate ?? "N/A"}</td>
