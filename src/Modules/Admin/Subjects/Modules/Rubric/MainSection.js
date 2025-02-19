@@ -15,7 +15,7 @@ import {
 import RubricHeader from "./Components/RubricHeader";
 import RubricCard from "./Components/RubricCard";
 import SubjectSideBar from "../../Component/SubjectSideBar";
-import Spinner from "../../../../../Components/Common/Spinner";
+// import Spinner from "../../../../../Components/Common/Spinner"; // We won't need the spinner anymore
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import AddRubricModal from "./Components/AddRubricModal";
 import { useTranslation } from "react-i18next";
@@ -23,12 +23,15 @@ import { FaClipboardList } from "react-icons/fa";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../config/permission";
 
+// Import the new shimmer
+import RubricMainSectionShimmer from "./Components/RubricMainSectionShimmer";
+
 const MainSection = () => {
   const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const { sid } = useParams();
 
-  // Pull rubrics, loading state, modal status, and readonlyMode flag from the store
+  // Pull rubrics, loading state, modal status, and readonlyMode from the store
   const { rubrics, loading, isModalOpen, readonlyMode } = useSelector(
     (state) => state.admin.rubrics
   );
@@ -44,13 +47,11 @@ const MainSection = () => {
   const handleEditRubric = (id) => {
     dispatch(resetRubricState());
     dispatch(setRubricField({ field: "editMode", value: true }));
-    // When editing, we want full access so set readonlyMode to false
     dispatch(setRubricField({ field: "readonlyMode", value: false }));
     dispatch(setRubricField({ field: "isModalOpen", value: true }));
     dispatch(getRubricByIdThunk(id));
   };
 
-  // Handle view in read-only mode
   const handleViewRubric = (id) => {
     dispatch(resetRubricState());
     dispatch(setRubricField({ field: "readonlyMode", value: true }));
@@ -58,10 +59,9 @@ const MainSection = () => {
     dispatch(getRubricByIdThunk(id));
   };
 
-  // When adding a new rubric, make sure read-only mode is disabled
   const handleAddRubric = () => {
     dispatch(resetRubricState());
-    dispatch(setRubricField({ field: "readonlyMode", value: false })); // <-- FIX: disable read-only mode
+    dispatch(setRubricField({ field: "readonlyMode", value: false }));
     dispatch(setRubricField({ field: "isModalOpen", value: true }));
   };
 
@@ -75,7 +75,8 @@ const MainSection = () => {
         <div className="w-full p-3 border-l">
           <RubricHeader onAddRubric={handleAddRubric} />
           {loading ? (
-            <Spinner />
+            // Show shimmer instead of Spinner
+            <RubricMainSectionShimmer />
           ) : rubrics?.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
               {rubrics?.map((rubric) => (
@@ -84,7 +85,7 @@ const MainSection = () => {
                   rubric={rubric}
                   onDelete={handleDeleteRubric}
                   onEdit={handleEditRubric}
-                  onView={handleViewRubric} // Pass our new view handler
+                  onView={handleViewRubric}
                 />
               ))}
             </div>
@@ -100,7 +101,6 @@ const MainSection = () => {
               bgColor="bg-gray-100"
             />
           )}
-          {/* Pass the readonly prop so that the modal disables inputs when needed */}
           {isModalOpen && <AddRubricModal readonly={readonlyMode} />}
         </div>
       </ProtectedSection>
