@@ -1,5 +1,5 @@
 import { DatePicker, Select } from "antd";
-import React, { useState } from "react";
+import React from "react";
 import { AiFillFileExcel } from "react-icons/ai";
 import { useSelector } from "react-redux";
 
@@ -15,7 +15,6 @@ function ExportExcel({
   setStartDate,
   handleCancel,
 }) {
-  // const [isExportModelOpen, setIsExportModelOpen] = useState(false);
   const { offlineExamData } = useSelector((store) => store.admin.offlineExam);
   return (
     <div>
