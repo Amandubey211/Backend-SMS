@@ -2,29 +2,29 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
-import toast from "react-hot-toast";
 import { getAY } from "../../../../../Utils/academivYear";
 import {
   customRequest,
   deleteData,
   getData,
-  putData,
 } from "../../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../../Utils/getRoles";
 
-// Fetch semesters for a specific class
+// Fetch semesters for the selected class (classId derived from state)
 export const fetchSemestersByClass = createAsyncThunk(
   "semesters/fetchSemestersByClass",
-  async ({ classId }, { rejectWithValue, dispatch, getState }) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    const cid = getState().common.user.classInfo.selectedClassId;
     const say = getAY();
     dispatch(setShowError(false));
     try {
-      const getRole = getUserRole(getState);
       const response = await getData(
-        `/admin/get-semester?classId=${classId}&say=${say}`
+        `/admin/get-semester?classId=${cid}&say=${say}`
       );
       if (response && response.success) {
         return response.data;
+      } else {
+        return rejectWithValue(response.message || "Failed to fetch semesters");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -32,29 +32,28 @@ export const fetchSemestersByClass = createAsyncThunk(
   }
 );
 
-// Create a new semester
+// Create a new semester and then refresh the semester list
 export const createSemester = createAsyncThunk(
   "semesters/createSemester",
-  async (
-    { semesterData, classId },
-    { rejectWithValue, dispatch, getState }
-  ) => {
+  async ({ semesterData }, { rejectWithValue, dispatch, getState }) => {
+    const cid = getState().common.user.classInfo.selectedClassId;
     const say = getAY();
     dispatch(setShowError(false));
     try {
       const getRole = getUserRole(getState);
-      // Merge classId into the payload as expected by the backend
       const response = await customRequest(
         "post",
         `/${getRole}/create-semester?say=${say}`,
-        { ...semesterData, classId },
-        {
-          "Content-Type": "application/json",
-        }
+        { ...semesterData, classId: cid },
+        { "Content-Type": "application/json" }
       );
-      if (response.success) {
-        toast.success("Semester created successfully");
+      if (response && response.success) {
+        // Removed toast.success here to avoid duplicate notifications.
+        // Re-fetch semesters after creation
+        await dispatch(fetchSemestersByClass());
         return response.data;
+      } else {
+        return rejectWithValue(response.message || "Failed to create semester");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -62,7 +61,7 @@ export const createSemester = createAsyncThunk(
   }
 );
 
-// Update an existing semester
+// Update an existing semester and then refresh the semester list
 export const updateSemester = createAsyncThunk(
   "semesters/updateSemester",
   async (
@@ -77,14 +76,15 @@ export const updateSemester = createAsyncThunk(
         "put",
         `/${getRole}/update-semester/${semesterId}?say=${say}`,
         semesterData,
-        {
-          "Content-Type": "application/json",
-        }
+        { "Content-Type": "application/json" }
       );
-      console.log(response, "ddd");
       if (response && response.success) {
-        toast.success("Semester updated successfully");
+        // Removed toast.success here to avoid duplicate notifications.
+        // Re-fetch semesters after update
+        await dispatch(fetchSemestersByClass());
         return response.data;
+      } else {
+        return rejectWithValue(response.message || "Failed to update semester");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -92,7 +92,7 @@ export const updateSemester = createAsyncThunk(
   }
 );
 
-// Delete a semester
+// Delete a semester and then refresh the semester list
 export const deleteSemester = createAsyncThunk(
   "semesters/deleteSemester",
   async ({ semesterId }, { rejectWithValue, dispatch, getState }) => {
@@ -104,8 +104,12 @@ export const deleteSemester = createAsyncThunk(
         `/${getRole}/delete-semester/${semesterId}?say=${say}`
       );
       if (response && response.success) {
-        toast.success("Semester deleted successfully");
+        // Removed toast.success here to avoid duplicate notifications.
+        // Re-fetch semesters after deletion
+        await dispatch(fetchSemestersByClass());
         return semesterId;
+      } else {
+        return rejectWithValue(response.message || "Failed to delete semester");
       }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
