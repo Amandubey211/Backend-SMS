@@ -61,7 +61,7 @@ const StudentProfile = ({ student }) => {
             {studentDocument?.map((doc, index) => (
               <div
                 key={index}
-                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105`}
+                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 w-[15rem] ml-2`}
               >
                 {doc?.documentType?.startsWith("image/") ? (
                   <img

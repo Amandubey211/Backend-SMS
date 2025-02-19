@@ -16,9 +16,9 @@ const Quizzes = () => {
   useNavHeading(className, subjectName);
   return (
     <Layout title="Quiz | student diwan">
-      <ProtectedSection requiredPermission={''}>
+   
       <DashLayout children={<MainSection />} hideSearchbar={true} />
-      </ProtectedSection>
+      
     </Layout>
   );
 };
