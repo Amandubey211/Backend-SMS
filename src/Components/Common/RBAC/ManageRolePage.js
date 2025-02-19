@@ -6,9 +6,10 @@ import {
   FiMaximize,
   FiMinimize,
   FiEye,
+  FiEdit,
 } from "react-icons/fi";
 import { useLocation } from "react-router-dom";
-import { Tooltip, Input, Modal, Select, Tag, Skeleton, Divider } from "antd";
+import { Tooltip, Input, Modal, Select, Tag, Skeleton, Button } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-hot-toast";
@@ -26,11 +27,11 @@ import {
 } from "../../../Store/Slices/Common/RBAC/rbacThunks";
 import { PERMISSIONS } from "../../../config/permission";
 
-const { Search } = Input;
+const { Search, TextArea } = Input;
 const { Option } = Select;
 
 /**
- * Debounced value hook
+ * Hook: Debounced value
  */
 const useDebouncedValue = (value, delay) => {
   const [debounced, setDebounced] = useState(value);
@@ -42,10 +43,9 @@ const useDebouncedValue = (value, delay) => {
 };
 
 /**
- * Custom skeleton to mimic the final PermissionList layout.
+ * Custom skeleton to mimic the final PermissionList layout
  */
 const PermissionSkeleton = () => {
-  // Adjust rows/groups and checkboxes as needed to match your typical layout
   return (
     <div className="space-y-4">
       {Array.from({ length: 3 }).map((_, idx) => (
@@ -79,9 +79,7 @@ const PermissionSkeleton = () => {
 };
 
 /**
- * PermissionList
- * - Uses a custom Skeleton if loading
- * - `inModal` prop controls height (normal vs full-screen)
+ * PermissionList Component
  */
 const PermissionList = ({
   loading,
@@ -93,13 +91,15 @@ const PermissionList = ({
   handleGroupChange,
   handleRouteChange,
   checkboxColor,
-  inModal = false, // determines height usage
+  inModal = false,
+  hasRoleSelected,
 }) => {
   if (loading) {
     return <PermissionSkeleton />;
   }
 
-  if (!filteredPermissionDepartments.length && department) {
+  // If user selected a department that doesn't exist, or there's no data
+  if (!filteredPermissionDepartments?.length && department) {
     return (
       <div className="text-sm text-gray-500">
         No Permission Or Department Found.
@@ -107,10 +107,10 @@ const PermissionList = ({
     );
   }
 
-  // Use full height in modal, limited height otherwise
+  // In normal mode, limit to 70% of viewport height; in full-screen, fill height
   const containerClasses = inModal
     ? "overflow-y-auto pr-2 h-full"
-    : "overflow-y-auto pr-2 max-h-64";
+    : "overflow-y-auto pr-2 max-h-[70vh]";
 
   return (
     <div className={containerClasses}>
@@ -123,7 +123,7 @@ const PermissionList = ({
           className="space-y-4"
         >
           {filteredPermissionDepartments
-            .filter(
+            ?.filter(
               (deptObj) => !department || deptObj.department === department
             )
             .map((deptObj) => (
@@ -132,21 +132,21 @@ const PermissionList = ({
                   {deptObj.department.charAt(0).toUpperCase() +
                     deptObj.department.slice(1)}
                 </h4>
-                {deptObj.groups.map((groupObj) => {
-                  const filteredRoutes = groupObj.routes.filter((route) =>
+                {deptObj.groups?.map((groupObj) => {
+                  const filteredRoutes = groupObj.routes?.filter((route) =>
                     route.name
                       .toLowerCase()
                       .includes(debouncedSearchQuery.toLowerCase())
                   );
 
                   const allGroupSelected =
-                    filteredRoutes.length > 0 &&
+                    filteredRoutes?.length > 0 &&
                     filteredRoutes.every((r) =>
                       selectedPermissions.includes(r._id)
                     );
                   const someSelected =
                     !allGroupSelected &&
-                    filteredRoutes.some((r) =>
+                    filteredRoutes?.some((r) =>
                       selectedPermissions.includes(r._id)
                     );
 
@@ -172,9 +172,13 @@ const PermissionList = ({
                               )
                             }
                             checked={
-                              filteredRoutes.length > 0 && allGroupSelected
+                              filteredRoutes?.length > 0 && allGroupSelected
                             }
-                            disabled={!isEditMode || filteredRoutes.length < 1}
+                            disabled={
+                              !isEditMode ||
+                              !hasRoleSelected ||
+                              (filteredRoutes?.length || 0) < 1
+                            }
                             aria-label={`Select all routes in ${groupObj.groupName}`}
                             ref={(el) => {
                               if (el) el.indeterminate = someSelected;
@@ -185,13 +189,13 @@ const PermissionList = ({
                           {groupObj.groupName}
                         </span>
                       </div>
-                      {filteredRoutes.length === 0 ? (
+                      {filteredRoutes?.length === 0 ? (
                         <div className="text-xs text-gray-500">
                           No routes match your search.
                         </div>
                       ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                          {filteredRoutes.map((route) => (
+                          {filteredRoutes?.map((route) => (
                             <label
                               key={route._id}
                               className="inline-flex items-center space-x-2"
@@ -210,7 +214,7 @@ const PermissionList = ({
                                       e.target.checked
                                     )
                                   }
-                                  disabled={!isEditMode}
+                                  disabled={!isEditMode || !hasRoleSelected}
                                 />
                               </Tooltip>
                               <span className="text-sm">{route.name}</span>
@@ -237,7 +241,7 @@ const RoleSelect = ({ roles, value, onChange, groupRoleNames, error }) => (
     value={value}
     onChange={onChange}
     placeholder="Select a role"
-    style={{ width: "100%" }}
+    style={{ width: "100%", minHeight: "40px" }}
     showSearch
     optionFilterProp="children"
     filterOption={(input, option) =>
@@ -245,7 +249,7 @@ const RoleSelect = ({ roles, value, onChange, groupRoleNames, error }) => (
     }
   >
     {error && <Option disabled>{error}</Option>}
-    {roles.map((roleObj) => {
+    {roles?.map((roleObj) => {
       const isGroupRole = groupRoleNames.includes(roleObj.name);
       return (
         <Option key={roleObj.id} value={roleObj.name} disabled={isGroupRole}>
@@ -285,11 +289,11 @@ const DepartmentSelect = ({
     value={department}
     onChange={onChange}
     placeholder="Select Department"
-    style={{ width: "100%" }}
+    style={{ width: "100%", minHeight: "40px" }}
     disabled={disabled}
   >
     <Option value="">All Departments</Option>
-    {departmentNames.map((dept) => (
+    {departmentNames?.map((dept) => (
       <Option key={dept} value={dept}>
         {dept.charAt(0).toUpperCase() + dept.slice(1)}
       </Option>
@@ -374,8 +378,6 @@ const HeaderActions = ({
 
 /**
  * FullScreenModal
- * - Renders children in full-screen with a close button
- * - We'll also show "Set Permissions" button here so user can save from within the modal
  */
 const FullScreenModal = ({
   isOpen,
@@ -397,64 +399,57 @@ const FullScreenModal = ({
       aria-label="Full Screen Permissions Modal"
     >
       <div className="p-4 h-full flex flex-col">
-        {/* Header */}
+        {/* Single top bar with "Set Permissions" + Close */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold">Permissions (Full Screen)</h2>
-          <Tooltip title="Close Full Screen">
-            <button
-              onClick={onClose}
-              aria-label="Exit full screen"
-              className="p-1 hover:text-gray-600"
-            >
-              <FiMinimize size={20} />
-            </button>
-          </Tooltip>
+          <div />
+          <div className="flex items-center gap-2">
+            <Tooltip title="Save Permissions for This Role">
+              <Button
+                type="primary"
+                onClick={onSetPermissions}
+                disabled={disableSetPermissions}
+                loading={isSettingPermissions}
+              >
+                {isSettingPermissions ? "Saving..." : "Set Permissions"}
+              </Button>
+            </Tooltip>
+            <Tooltip title="Close Full Screen">
+              <button
+                onClick={onClose}
+                aria-label="Exit full screen"
+                className="p-1 hover:text-gray-600"
+              >
+                <FiMinimize size={20} />
+              </button>
+            </Tooltip>
+          </div>
         </div>
-
-        {/* Main Content (permissions) */}
         <div className="flex-1">{children}</div>
-
-        <Divider />
-        {/* "Set Permissions" button at the bottom */}
-        <div className="flex justify-end">
-          <Tooltip title="Save Permissions for This Role">
-            <button
-              onClick={onSetPermissions}
-              className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-500 text-white rounded-lg hover:opacity-90 disabled:cursor-not-allowed"
-              disabled={disableSetPermissions}
-            >
-              {isSettingPermissions ? "Saving..." : "Set Permissions"}
-            </button>
-          </Tooltip>
-        </div>
       </div>
     </motion.div>,
     document.body
   );
 };
 
-/**
- * Main ManageRolePage
- */
 const ManageRolePage = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   useNavHeading("User", "Manage Role");
 
   // Global state
-  const userType = useSelector((state) => state.common.auth.role);
-  const userRoles = useSelector((state) => state.common.auth.userRoles);
+  const userType = useSelector((state) => state.common.auth?.role);
+  const userRoles = useSelector((state) => state.common.auth?.userRoles);
   const { roles, permissions, loading, error } = useSelector(
     (state) => state.admin.rbac
   );
   const userTypeNormalized = userType?.toLowerCase() || "";
 
-  // Pre-fill from location.state
+  // Pre-fill from location.state (with optional chaining for safety)
   const initialDepartment = location.state?.department || "";
   const initialRole = location.state?.role || "";
   const initialEditMode = location.state?.editMode || false;
 
-  // Local state
+  // Local states
   const [department, setDepartment] = useState(
     initialDepartment ? initialDepartment.toLowerCase() : ""
   );
@@ -470,14 +465,18 @@ const ManageRolePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [highlightEditButton, setHighlightEditButton] = useState(false);
 
+  // For the "Add Description" modal
+  const [descModalOpen, setDescModalOpen] = useState(false);
+  const [descModalValue, setDescModalValue] = useState("");
+
   // Debounced search
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 300);
 
   // Compute group role names
   const groupRoleNames = useMemo(() => {
-    if (!userRoles || !Array.isArray(userRoles)) return [];
+    if (!Array.isArray(userRoles)) return [];
     return userRoles.reduce((acc, curr) => {
-      if (curr.role && Array.isArray(curr.role)) {
+      if (Array.isArray(curr.role)) {
         return [...acc, ...curr.role];
       }
       return acc;
@@ -486,6 +485,8 @@ const ManageRolePage = () => {
 
   // Load roles/permissions
   useEffect(() => {
+    // Attempt to fetch roles & permissions
+    // If an error occurs, it will be handled in the thunks or by the error state
     dispatch(getAllRolesThunk());
     dispatch(getPermissionsThunk());
   }, [dispatch]);
@@ -499,27 +500,28 @@ const ManageRolePage = () => {
 
   // Flatten roles
   const availableRoles = useMemo(() => {
-    if (!roles || !Array.isArray(roles)) return [];
-    return roles.flatMap((deptObj) =>
-      deptObj.roles.map((r) => ({
-        ...r,
-        department: deptObj.department ? deptObj.department.toLowerCase() : "",
-      }))
+    if (!Array.isArray(roles)) return [];
+    return roles.flatMap(
+      (deptObj) =>
+        deptObj.roles?.map((r) => ({
+          ...r,
+          department: deptObj.department?.toLowerCase() || "",
+        })) || []
     );
   }, [roles]);
 
   // Normalize permission departments
   const permissionDepartments = useMemo(() => {
-    if (!permissions || !Array.isArray(permissions)) return [];
+    if (!Array.isArray(permissions)) return [];
     return permissions.map((dept) => ({
       ...dept,
-      department: dept.department.toLowerCase(),
+      department: dept.department?.toLowerCase() || "",
     }));
   }, [permissions]);
 
   // Filter permissions by user type
   const filteredPermissionDepartments = useMemo(() => {
-    if (!permissionDepartments.length) return [];
+    if (!permissionDepartments?.length) return [];
     return userTypeNormalized === "admin"
       ? permissionDepartments
       : permissionDepartments.filter(
@@ -527,8 +529,9 @@ const ManageRolePage = () => {
         );
   }, [permissionDepartments, userTypeNormalized]);
 
+  // Department names
   const departmentNames = useMemo(
-    () => permissionDepartments.map((d) => d.department),
+    () => (permissionDepartments || []).map((d) => d.department),
     [permissionDepartments]
   );
 
@@ -540,7 +543,7 @@ const ManageRolePage = () => {
 
   // Selected role object
   const computedSelectedRoleObj = useMemo(() => {
-    return filteredRoles.find((r) => r.name === role);
+    return filteredRoles?.find((r) => r.name === role);
   }, [filteredRoles, role]);
 
   // Check if selected role is group role
@@ -564,16 +567,25 @@ const ManageRolePage = () => {
   // All route IDs for "Select All"
   const allDisplayedRouteIds = useMemo(() => {
     return filteredPermissionDepartments
-      .filter((deptObj) => !department || deptObj.department === department)
-      .flatMap((deptObj) =>
-        deptObj.groups.flatMap((groupObj) => groupObj.routes.map((r) => r._id))
+      ?.filter((deptObj) => !department || deptObj.department === department)
+      .flatMap(
+        (deptObj) =>
+          deptObj.groups?.flatMap((groupObj) =>
+            groupObj.routes?.map((r) => r._id)
+          ) || []
       );
   }, [filteredPermissionDepartments, department]);
+
+  // Whether a role is currently selected
+  const hasRoleSelected = !!computedSelectedRoleObj;
 
   // Checkbox color
   const checkboxColor = isEditMode ? "text-blue-500" : "text-green-500";
 
-  // Handlers
+  /**
+   * Handlers
+   */
+
   const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
@@ -612,11 +624,11 @@ const ManageRolePage = () => {
       }
       if (isChecked) {
         setSelectedPermissions((prev) =>
-          Array.from(new Set([...prev, ...allDisplayedRouteIds]))
+          Array.from(new Set([...prev, ...(allDisplayedRouteIds || [])]))
         );
       } else {
         setSelectedPermissions((prev) =>
-          prev.filter((id) => !allDisplayedRouteIds.includes(id))
+          prev.filter((id) => !(allDisplayedRouteIds || []).includes(id))
         );
       }
     },
@@ -653,7 +665,7 @@ const ManageRolePage = () => {
         });
         return;
       }
-      const groupRouteIds = groupRoutes.map((r) => r._id);
+      const groupRouteIds = (groupRoutes || []).map((r) => r._id);
       setSelectedPermissions((prev) => {
         const prevSet = new Set(prev);
         groupRouteIds.forEach((id) => {
@@ -754,10 +766,8 @@ const ManageRolePage = () => {
   };
 
   const handleToggleEdit = () => {
-    if (
-      computedSelectedRoleObj &&
-      groupRoleNames.includes(computedSelectedRoleObj.name)
-    ) {
+    if (isGroupRoleSelected) {
+      // No toggling if group role
       return;
     }
     if (isEditMode) {
@@ -805,19 +815,36 @@ const ManageRolePage = () => {
   };
 
   const handleDepartmentChange = (value) => {
-    setDepartment(value.toLowerCase());
+    setDepartment(value?.toLowerCase() || "");
     setRole("");
     setSelectedPermissions([]);
     setOriginalPermissions([]);
     setDescription("");
   };
 
+  const openDescModal = () => {
+    setDescModalValue(description || "");
+    setDescModalOpen(true);
+  };
+
+  const handleDescModalOk = () => {
+    setDescription(descModalValue);
+    setDescModalOpen(false);
+  };
+
+  // Word count for the description modal
+  const maxWords = 100;
+  const splitted = descModalValue?.trim().split(/\s+/) || [];
+  const wordCount = splitted[0] === "" ? 0 : splitted.length;
+  const wordsLeft = Math.max(0, maxWords - wordCount);
+
   return (
     <Layout title="Manage Roles | Student Diwan">
       <DashLayout>
-        <div className="p-4">
+        {/* Use min-h-screen so content can scroll, and button is fixed */}
+        <div className="min-h-screen relative">
           <motion.div
-            className="bg-white rounded-lg w-full"
+            className="bg-white rounded-lg w-full p-4"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
@@ -827,16 +854,12 @@ const ManageRolePage = () => {
               isEditMode={isEditMode}
               onToggleEdit={handleToggleEdit}
               onDelete={handleDeleteClick}
-              disableEdit={
-                computedSelectedRoleObj &&
-                groupRoleNames.includes(computedSelectedRoleObj.name)
-              }
+              disableEdit={isGroupRoleSelected}
               disableDelete={
                 !computedSelectedRoleObj ||
                 loading ||
                 isDeletingRole ||
-                (computedSelectedRoleObj &&
-                  groupRoleNames.includes(computedSelectedRoleObj.name))
+                isGroupRoleSelected
               }
               computedSelectedRoleObj={computedSelectedRoleObj}
               groupRoleNames={groupRoleNames}
@@ -847,8 +870,9 @@ const ManageRolePage = () => {
               requiredPermission={PERMISSIONS.GET_ALL_ROLE}
               title="Select Permission"
             >
-              {/* Department / Role / Description */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              {/* Align the top fields in a row */}
+              <div className="grid grid-cols-3 gap-4 items-center mb-4">
+                {/* Department */}
                 <div>
                   <label className="block text-sm font-semibold mb-1">
                     Department
@@ -860,6 +884,8 @@ const ManageRolePage = () => {
                     disabled={userTypeNormalized !== "admin"}
                   />
                 </div>
+
+                {/* Role */}
                 <div>
                   <label className="block text-sm font-semibold mb-1">
                     Role
@@ -872,28 +898,41 @@ const ManageRolePage = () => {
                     error={error}
                   />
                 </div>
+
+                {/* Add Description */}
                 <div>
-                  <label className="block text-sm font-semibold mb-1">
-                    Description
+                  <label className="block text-sm font-semibold mb-1 flex items-center gap-2">
+                    Add Description
+                    {/* Show edit icon only in edit mode + role selected */}
+                    {isEditMode && hasRoleSelected && !isGroupRoleSelected && (
+                      <Tooltip title="Add / Edit Description">
+                        <button
+                          onClick={openDescModal}
+                          className="p-1 hover:text-gray-600"
+                        >
+                          <FiEdit size={16} />
+                        </button>
+                      </Tooltip>
+                    )}
                   </label>
                   <input
                     type="text"
                     placeholder="Write here"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none px-3"
+                    style={{ minHeight: "40px" }}
                     disabled={
                       !isEditMode ||
                       !computedSelectedRoleObj ||
-                      (computedSelectedRoleObj &&
-                        groupRoleNames.includes(computedSelectedRoleObj.name))
+                      isGroupRoleSelected
                     }
-                    aria-label="Role description"
+                    aria-label="Description"
                   />
                 </div>
               </div>
 
-              {/* Permissions list */}
+              {/* Permission Section */}
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-4">
                   <div className="flex items-center gap-2">
@@ -904,7 +943,7 @@ const ManageRolePage = () => {
                           type="checkbox"
                           id="select-all-checkbox"
                           className={`form-checkbox ${checkboxColor}`}
-                          disabled={!isEditMode}
+                          disabled={!isEditMode || !hasRoleSelected}
                           onChange={(e) => handleGlobalChange(e.target.checked)}
                         />
                         <span className="text-sm font-medium">Select All</span>
@@ -919,6 +958,7 @@ const ManageRolePage = () => {
                         style={{ width: 200 }}
                         allowClear
                         aria-label="Search Permissions"
+                        disabled={!hasRoleSelected}
                       />
                     </Tooltip>
                     <Tooltip title="Expand to Full Screen">
@@ -926,6 +966,7 @@ const ManageRolePage = () => {
                         onClick={() => setIsFullScreen(true)}
                         aria-label="Expand permissions to full screen"
                         className="p-1 hover:text-gray-600"
+                        disabled={!hasRoleSelected}
                       >
                         <FiMaximize size={20} />
                       </button>
@@ -943,29 +984,33 @@ const ManageRolePage = () => {
                   handleRouteChange={handleRouteChange}
                   checkboxColor={checkboxColor}
                   inModal={false}
+                  hasRoleSelected={hasRoleSelected}
                 />
-              </div>
-
-              {/* "Set Permissions" button (normal view) */}
-              <div className="flex justify-end">
-                <Tooltip title="Save Permissions for This Role">
-                  <button
-                    onClick={handleSetPermissions}
-                    className="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-500 text-white rounded-lg hover:opacity-90 disabled:cursor-not-allowed"
-                    disabled={
-                      !isEditMode ||
-                      isSettingPermissions ||
-                      !computedSelectedRoleObj ||
-                      (computedSelectedRoleObj &&
-                        groupRoleNames.includes(computedSelectedRoleObj.name))
-                    }
-                  >
-                    {isSettingPermissions ? "Saving..." : "Set Permissions"}
-                  </button>
-                </Tooltip>
               </div>
             </ProtectedSection>
           </motion.div>
+
+          {/* 
+            Fixed "Set Permissions" button at bottom-right of the page. 
+            Always visible, even if content is long and scrolls.
+          */}
+          <div className="fixed bottom-4 right-4 z-50">
+            <Tooltip title="Save Permissions for This Role">
+              <Button
+                type="primary"
+                onClick={handleSetPermissions}
+                disabled={
+                  !isEditMode ||
+                  isSettingPermissions ||
+                  !computedSelectedRoleObj ||
+                  isGroupRoleSelected
+                }
+                loading={isSettingPermissions}
+              >
+                {isSettingPermissions ? "Saving..." : "Set Permissions"}
+              </Button>
+            </Tooltip>
+          </div>
         </div>
       </DashLayout>
 
@@ -988,12 +1033,10 @@ const ManageRolePage = () => {
           !isEditMode ||
           isSettingPermissions ||
           !computedSelectedRoleObj ||
-          (computedSelectedRoleObj &&
-            groupRoleNames.includes(computedSelectedRoleObj.name))
+          isGroupRoleSelected
         }
         isSettingPermissions={isSettingPermissions}
       >
-        {/* The same "Select All" + Search + PermissionList but in full screen */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">
             <Tooltip title="Select or Deselect All Permissions">
@@ -1002,7 +1045,7 @@ const ManageRolePage = () => {
                   type="checkbox"
                   id="select-all-checkbox"
                   className={`form-checkbox ${checkboxColor}`}
-                  disabled={!isEditMode}
+                  disabled={!isEditMode || !hasRoleSelected}
                   onChange={(e) => handleGlobalChange(e.target.checked)}
                 />
                 <span className="text-sm font-medium">Select All</span>
@@ -1016,6 +1059,7 @@ const ManageRolePage = () => {
               style={{ width: 200 }}
               allowClear
               aria-label="Search Permissions in Full Screen"
+              disabled={!hasRoleSelected}
             />
           </Tooltip>
         </div>
@@ -1029,9 +1073,31 @@ const ManageRolePage = () => {
           handleGroupChange={handleGroupChange}
           handleRouteChange={handleRouteChange}
           checkboxColor={checkboxColor}
-          inModal={true} // full height
+          inModal={true}
+          hasRoleSelected={hasRoleSelected}
         />
       </FullScreenModal>
+
+      {/* Add Description Modal */}
+      <Modal
+        title="Add Description"
+        visible={descModalOpen}
+        centered
+        onOk={handleDescModalOk}
+        onCancel={() => setDescModalOpen(false)}
+        okText="Save"
+        cancelText="Cancel"
+      >
+        <TextArea
+          value={descModalValue}
+          onChange={(e) => setDescModalValue(e.target.value)}
+          rows={5}
+          placeholder="Write a detailed description..."
+        />
+        <div className="mt-2 text-right text-gray-500">
+          Words left: {wordsLeft}
+        </div>
+      </Modal>
     </Layout>
   );
 };
