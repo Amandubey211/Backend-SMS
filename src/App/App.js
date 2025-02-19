@@ -832,7 +832,7 @@ function App() {
       errorElement: <Error />,
       children: [
         {
-          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          path: "viewtable/:tablename",
           element: (
             <ProtectRoute
               Component={TableView}
@@ -1500,7 +1500,7 @@ function App() {
       errorElement: <Error />,
       children: [
         {
-          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+          path: "viewtable/:tablename",
           element: (
             <ProtectRoute
               Component={ParentTableView}
