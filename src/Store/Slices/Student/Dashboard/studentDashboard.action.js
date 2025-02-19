@@ -5,7 +5,6 @@ import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
 
-
 // Helper function to format dashboard data
 const formatDashboardData = (dashboardData) => {
   return [
@@ -44,7 +43,6 @@ const formatDashboardData = (dashboardData) => {
   ];
 };
 
-
 // Fetch Card Details
 export const fetchDashboardDetails = createAsyncThunk(
   "studentDashboard/fetchDashboardDetails",
@@ -52,9 +50,8 @@ export const fetchDashboardDetails = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(
-        `/api/studentDashboard/dashboard/student?say=${say}`
-      );
+      const data = await getData(`/admin/dashboard/student?say=${say}`);
+
       const { attendanceSummary } = data?.data;
       // const { student } = await getState();
       // // console.log("std----?>>>>",student)
@@ -79,17 +76,18 @@ export const fetchSubjects = createAsyncThunk(
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject?.userDetails);
     const userId = userDetails?.userId;
-    if (!userId ) {
+    if (!userId) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Invalid student or class ID."));
       return rejectWithValue("Invalid student or class ID.");
     }
- 
+
     try {
-    
       const say = getAY();
       dispatch(setShowError(false));
-      const data =  await getData(`/admin/students/subjects/${userId}?say=${say}`);
+      const data = await getData(
+        `/admin/students/subjects/${userId}?say=${say}`
+      );
       // console.log("escsasa->",data)
       return data?.subjects;
     } catch (error) {
@@ -105,15 +103,14 @@ export const fetchTasks = createAsyncThunk(
     const persistUserString = localStorage.getItem("persist:user");
     const persistUserObject = JSON.parse(persistUserString);
     const userDetails = JSON.parse(persistUserObject?.userDetails);
-    const userId = await  userDetails?.userId;
-    if (!userId ) {
+    const userId = await userDetails?.userId;
+    if (!userId) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Invalid student or class ID."));
       return rejectWithValue("Invalid student or class ID.");
     }
-   
+
     try {
-    
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/admin/task/student/${userId}?say=${say}`);
@@ -124,18 +121,18 @@ export const fetchTasks = createAsyncThunk(
   }
 );
 
-// Fetch Student Grades 
+// Fetch Student Grades
 export const fetchStudentGrades = createAsyncThunk(
   "studentDashboard/fetchStudentGrades",
-  async (_, { rejectWithValue, dispatch ,getState}) => {
+  async (_, { rejectWithValue, dispatch, getState }) => {
     // const persistUserString = localStorage.getItem("persist:user");
     // const persistUserObject = JSON.parse(persistUserString);
     // const userDetails = JSON.parse(persistUserObject?.userDetails);
     // const userId = userDetails?.userId;
-    const {userDetails} = getState((store) => store.common.user);
-      const classId = userDetails?.classId;
-      const userId = userDetails?.userId;
-    
+    const { userDetails } = getState((store) => store.common.user);
+    const classId = userDetails?.classId;
+    const userId = userDetails?.userId;
+
     if (!userId || !classId) {
       dispatch(setShowError(true));
       dispatch(setErrorMsg("Invalid student or class ID."));
@@ -169,13 +166,17 @@ export const fetchExamResults = createAsyncThunk(
 
       if (!studentId || !schoolId || !say) {
         dispatch(setShowError(true));
-        dispatch(setErrorMsg("Missing required parameters for fetching exam results."));
-        return rejectWithValue("Invalid studentId, schoolId, or academic year.");
+        dispatch(
+          setErrorMsg("Missing required parameters for fetching exam results.")
+        );
+        return rejectWithValue(
+          "Invalid studentId, schoolId, or academic year."
+        );
       }
 
       // Construct the API endpoint with query parameters
-      const apiEndpoint = `/api/studentDashboard/getQuizResult?say=${say}&studentId=${studentId}&schoolId=${schoolId}`;
-      
+      const apiEndpoint = `/admin/getQuizResult?say=${say}&studentId=${studentId}&schoolId=${schoolId}`;
+
       // Fetch data from the API
       const data = await getData(apiEndpoint);
       return data?.data; // Assuming the response contains a "data" field
