@@ -77,13 +77,13 @@ const SemesterManagement = () => {
   }, [dispatch]);
 
   // Display errors if any
-  useEffect(() => {
-    if (error) {
-      message.error(
-        error.message || "An error occurred while fetching semesters"
-      );
-    }
-  }, [error]);
+  // useEffect(() => {
+  //   if (error) {
+  //     message.error(
+  //       error.message || "An error occurred while fetching semesters"
+  //     );
+  //   }
+  // }, [error]);
 
   /**
    * Auto-select a semester if none is selected or if the current selection is invalid.
