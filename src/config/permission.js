@@ -512,6 +512,8 @@ export const PERMISSIONS = {
    DELETE_OFFLINE_STUDENT_EXAM: "Delete Exam of Student",
     UPDATE_OFFLINE_EXAM:"Update Offline Exam",
     DELETE_OFFLINE_STUDENT_EXAM:"Delete Offline Exam",
+    // spedd grades//////////
+          ASSIGN_SPEED_GRADES:"Assign Grade to a Student",
   //------------------------------------------------End of Class Variables ---------------------------------------------------------
 
   //-------------------------------------------------------------------------//
