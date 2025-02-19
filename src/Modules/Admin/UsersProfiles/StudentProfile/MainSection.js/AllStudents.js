@@ -139,7 +139,7 @@ const AllStudents = () => {
                     <NavLink to={`/users/students/${student?._id}`}>
                       <div className="mb-4">
                         <h2 className="text-lg font-semibold">
-                          {student?.firstName}
+                          {student?.firstName} {student?.lastName}
                         </h2>
                         <p className="text-sm">{student?.email}</p>
                         <div className="flex items-center mt-1 text-sm">

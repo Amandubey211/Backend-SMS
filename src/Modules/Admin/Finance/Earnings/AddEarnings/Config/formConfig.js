@@ -29,7 +29,7 @@ export const initialValuesMap = {
     tax: 0,
     discount_type: "percentage",
     discount: 0,
-    penalty: 10,
+    penalty: 0,
     frequencyOfPayment: "Monthly",
     dateTime: "",
     total_amount: 0,

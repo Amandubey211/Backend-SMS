@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAY } from "../../../../Utils/academivYear";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
-import { getData, putData, postData } from "../../../../services/apiEndpoints";
+import { getData, putData, postData, customRequest } from "../../../../services/apiEndpoints";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { toast } from "react-hot-toast"
 import { getUserRole } from "../../../../Utils/getRoles";
@@ -48,9 +48,9 @@ export const createAdjustment = createAsyncThunk(
       // }
 
       // 4) Make API request
-      const response = await postData(`/${getRole}/penaltyAdjustment/add`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await customRequest('POST',`/${getRole}/penaltyAdjustment/add`, formData, 
+      { "Content-Type": "multipart/form-data" },
+      );
 
       // Handle response
       if (response?.status === 201) {
