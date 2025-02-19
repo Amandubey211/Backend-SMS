@@ -98,7 +98,7 @@ function CreateButton() {
           </span>
         </button>
       </Tooltip>
-    
+
       {isOpen && (
         <Sidebar
           isOpen={isOpen}
@@ -126,38 +126,38 @@ function CreateButton() {
                   <span className="text-gradient">Create Manually</span>
                 </button>
               </div>
-              <ProtectedAction requiredPermission={PERMISSIONS.UPLOAD_EXCEL_OFFLINE}>
+              <ProtectedAction
+                requiredPermission={PERMISSIONS.UPLOAD_EXCEL_OFFLINE}
+              >
+                {/* Upload Excel Button */}
+                <div className="pl-5 pt-1">
+                  <button
+                    onClick={handleUploadClick}
+                    className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                  >
+                    <MdFileUpload className="text-lg text-gray-600" />
+                    <span className="text-gradient">Upload Excel</span>
+                  </button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept=".xls,.xlsx"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
+                </div>
 
-              
-              {/* Upload Excel Button */}
-              <div className="pl-5 pt-1">
-                <button
-                  onClick={handleUploadClick}
-                  className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
-                >
-                  <MdFileUpload className="text-lg text-gray-600" />
-                  <span className="text-gradient">Upload Excel</span>
-                </button>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  accept=".xls,.xlsx"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-              </div>
-
-              {/* Sample Excel Download Button */}
-              <div className="pl-5 pt-1">
-                <a
-                  href="/createOfflineExamSample.xlsx"
-                  download="createOfflineExamSample.xlsx"
-                  className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
-                >
-                  <MdFileDownload className="text-lg text-gray-600" />
-                  <span className="text-gradient">Sample Excel</span>
-                </a>
-              </div>
+                {/* Sample Excel Download Button */}
+                <div className="pl-5 pt-1">
+                  <a
+                    href="/createOfflineExamSample.xlsx"
+                    download="createOfflineExamSample.xlsx"
+                    className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                  >
+                    <MdFileDownload className="text-lg text-gray-600" />
+                    <span className="text-gradient">Sample Excel</span>
+                  </a>
+                </div>
               </ProtectedAction>
             </div>
 
@@ -186,7 +186,7 @@ function CreateButton() {
           </div>
         </Sidebar>
       )}
-     </ProtectedAction>
+    </ProtectedAction>
   );
 }
 export default CreateButton;

@@ -1,3 +1,5 @@
+// src/pages/MainSection.js
+
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -26,7 +28,8 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const { sid } = useParams();
 
-  const { rubrics, loading, isModalOpen } = useSelector(
+  // Pull rubrics, loading state, modal status, and readonlyMode flag from the store
+  const { rubrics, loading, isModalOpen, readonlyMode } = useSelector(
     (state) => state.admin.rubrics
   );
 
@@ -41,12 +44,24 @@ const MainSection = () => {
   const handleEditRubric = (id) => {
     dispatch(resetRubricState());
     dispatch(setRubricField({ field: "editMode", value: true }));
+    // When editing, we want full access so set readonlyMode to false
+    dispatch(setRubricField({ field: "readonlyMode", value: false }));
     dispatch(setRubricField({ field: "isModalOpen", value: true }));
     dispatch(getRubricByIdThunk(id));
   };
 
+  // Handle view in read-only mode
+  const handleViewRubric = (id) => {
+    dispatch(resetRubricState());
+    dispatch(setRubricField({ field: "readonlyMode", value: true }));
+    dispatch(setRubricField({ field: "isModalOpen", value: true }));
+    dispatch(getRubricByIdThunk(id));
+  };
+
+  // When adding a new rubric, make sure read-only mode is disabled
   const handleAddRubric = () => {
     dispatch(resetRubricState());
+    dispatch(setRubricField({ field: "readonlyMode", value: false })); // <-- FIX: disable read-only mode
     dispatch(setRubricField({ field: "isModalOpen", value: true }));
   };
 
@@ -69,6 +84,7 @@ const MainSection = () => {
                   rubric={rubric}
                   onDelete={handleDeleteRubric}
                   onEdit={handleEditRubric}
+                  onView={handleViewRubric} // Pass our new view handler
                 />
               ))}
             </div>
@@ -84,7 +100,8 @@ const MainSection = () => {
               bgColor="bg-gray-100"
             />
           )}
-          {isModalOpen && <AddRubricModal />}
+          {/* Pass the readonly prop so that the modal disables inputs when needed */}
+          {isModalOpen && <AddRubricModal readonly={readonlyMode} />}
         </div>
       </ProtectedSection>
     </div>
