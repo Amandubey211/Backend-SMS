@@ -2,12 +2,10 @@ import React from "react";
 import { MdAccessTime } from "react-icons/md";
 
 const StudentDashFeeCard = ({ title, amount, unpaidFees, buttonText }) => {
-  
-
   return (
-    <div className="py-4 flex flex-1 flex-col justify-around items-center gap-5">
-      <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
-        <MdAccessTime className="text-2xl text-red-400" />
+    <div className=" flex flex-1 flex-col justify-around items-center gap-2">
+      <div className="">
+        <MdAccessTime className="text-3xl text-red-400" />
       </div>
       <span className="text-xl">{title}</span>
       <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">

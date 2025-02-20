@@ -55,10 +55,12 @@ const StudentMainSection = () => {
     dispatch(fetchExamResults());
   }, [dispatch]);
 
+  console.log("exam Resuts", results);
+
   return (
     <div className="flex flex-col border-b border-gray-200">
       {/* Cards Section */}
-      <div className="border-b border-gray-200 flex flex-wrap justify-center gap-3 py-4  px-4">
+      <div className="border-b border-gray-200 flex flex-wrap justify-center gap-3 py-4  px-7">
         {(cardData?.length
           ? cardData
           : [
@@ -103,18 +105,20 @@ const StudentMainSection = () => {
       {/* Subjects and Attendance Section */}
       <div className="flex flex-1 w-full h-full relative">
         <div className="absolute left-1/3 transform -translate-x-1/2 top-0 bottom-0 border-l border-gray-300"></div>
-        <div className="w-[32%] flex items-center justify-center p-4">
+        <div className="w-[32%] flex items-center justify-center pl-4 pt-4 pb-4">
           <div className="w-full h-full">
-            <div className="pt-2  bg-red-600">
-              <div className="flex justify-between items-center mb-2 ">
-                <h2 className="text-xl font-semibold text-black">My Subject</h2>
+            <div className="pl-4 py-4 pr-4 ">
+              <div className="flex justify-between items-center mb-2">
+                <h2 className="text-xl font-semibold text-gray-600">
+                  My Subject
+                </h2>
 
-                <button
-                  className="text-black border border-gray-300px-2 py-1 rounded-md hover:shadow-md transition duration-300 ease-in-out"
+                <span
+                  className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent font-normal cursor-pointer"
                   onClick={() => navigate("/student_class")}
                 >
-                  View All
-                </button>
+                  See All
+                </span>
               </div>
               {loading ? (
                 <div className="flex justify-center items-center py-5">
@@ -158,60 +162,60 @@ const StudentMainSection = () => {
       {/* Parent Wrapper for Left and Right Sections */}
       <div className="flex flex-row w-full h-full border-t border-gray-300">
         {/* Left Column: Notice Board and Recent Exam Results */}
-        <div className="w-[100%] flex flex-col border-r border-gray-300">
+        <div className="w-[70%] flex flex-col border-r border-gray-300">
           {/* Notice Board */}
-          <div className="flex items-center justify-center p-4">
+          <div className="flex items-center justify-center px-4">
             <div className="w-full h-full">
               <DashboardNoticeBoard descriptionLength={58} />
             </div>
           </div>
 
           {/* Recent Exam Results */}
+          {results?.length > 0 ? (
+            <div className="flex items-center justify-center p-4 border-t border-gray-300">
+              <div className="w-full h-full">
+                <div className="flex justify-between items-center px-4">
+                  <h4 className="text-xl font-semibold text-gray-600">
+                    Recent Exam Results
+                  </h4>
 
-          <div className="flex items-center justify-center p-4 border-t border-gray-300">
-            <div className="w-full h-full">
-              <div className="flex justify-between items-center">
-                <h4 className="text-xl font-semibold text-gray-600">
-                  Recent Exam Results
-                </h4>
-                <button
-                  className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
-                  onClick={() => {
-                    if (selectedClass && selectedSection) {
-                      navigate(
-                        `/student_class/${selectedClass}/${selectedSection}/grades`
-                      );
-                    } else {
-                      console.error(
-                        "Unable to navigate to grades. Class or Section is missing."
-                      );
-                    }
-                  }}
-                >
-                  View All
-                </button>
-              </div>
-              {/* Conditionally Render ExamResults or Placeholder */}
-              {results?.length > 0 ? (
-                <ExamResults />
-              ) : (
-                <div className="text-gray-500 flex flex-col items-center mt-36">
-                  <IoNewspaperOutline size={70} />
-                  <span className="mt-4 text-lg font-semibold text-center">
-                    No Exam Results for Now
+                  <span
+                    className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent font-normal cursor-pointer"
+                    onClick={() => {
+                      if (selectedClass && selectedSection) {
+                        navigate(
+                          `/student_class/${selectedClass}/${selectedSection}/grades`
+                        );
+                      } else {
+                        console.error(
+                          "Unable to navigate to grades. Class or Section is missing."
+                        );
+                      }
+                    }}
+                  >
+                    See All
                   </span>
                 </div>
-              )}
+                <ExamResults />
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-gray-500 flex flex-col justify-center items-center m-7 ">
+              <IoNewspaperOutline size={50} />
+              <span className=" text-lg font-semibold text-center">
+                No Exam Results for Now
+              </span>
+            </div>
+            // <></>
+          )}
         </div>
 
         {/* Right Column: Task Completion and Fees Section */}
         <div className="w-[40%] flex flex-col">
           {/* Task Completion */}
-          <div className="flex items-center justify-center p-4 mb-[20.6%]">
-            <div className="w-full h-full">
-              <h1 className="text-xl font-semibold text-gray-600 mb-2">Task</h1>
+          <div className="flex items-center justify-center pt-4">
+            <div className="w-full h-full m-4">
+              <h1 className="text-xl font-semibold text-gray-600 mb-4">Task</h1>
               <TaskCompletionChart />
             </div>
           </div>

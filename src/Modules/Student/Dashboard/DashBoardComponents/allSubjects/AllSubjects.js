@@ -1,6 +1,6 @@
 import React from "react";
 import { GoAlertFill } from "react-icons/go";
-import subjectIcon from '../../../../../Assets/DashboardAssets/subject.webp'
+import subjectIcon from "../../../../../Assets/DashboardAssets/subject.webp";
 const AllSubjects = ({ subjects }) => {
   // Colors to cycle through for the progress bars
   const progressBarColors = [
@@ -12,7 +12,7 @@ const AllSubjects = ({ subjects }) => {
   ];
 
   return (
-    <div className="px-1">
+    <div>
       <div className="mt-1">
         {subjects && subjects?.length > 0 ? (
           <div className="mt-4">
@@ -22,7 +22,7 @@ const AllSubjects = ({ subjects }) => {
               return (
                 <div
                   key={subject._id}
-                  className="subject-card mb-1 p-4 shadow-md rounded-lg"
+                  className=" subject-card mb-1 p-4 shadow-md rounded-lg border border-t"
                   style={{
                     transition: "transform 0.3s ease, box-shadow 0.3s ease",
                     boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
@@ -40,7 +40,8 @@ const AllSubjects = ({ subjects }) => {
                 >
                   <div className="flex items-center mb-2">
                     <img
-                      src={subjectIcon||
+                      src={
+                        subjectIcon ||
                         "https://foundr.com/wp-content/uploads/2023/04/How-to-create-an-online-course.jpg.webp"
                       }
                       alt={"subject"}

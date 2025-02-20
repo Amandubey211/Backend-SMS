@@ -1,91 +1,130 @@
-import { Line } from 'react-chartjs-2';
-import React from 'react';
+import React from "react";
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler, // ✅ Import Filler for smooth curves with background fill
+} from "chart.js";
 
-// Helper function to get the number of days in a month
-const getDaysInMonth = (month, year) => {
-  // Create a new date object for the given year and month, and return the number of days in that month
-  return new Date(year, month + 1, 0).getDate();
-};
+// ✅ Register required Chart.js components
+ChartJS.register(
+  LineElement,
+  PointElement,
+  LinearScale,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
+
+// Helper function to get the number of days in a month dynamically
+const getDaysInMonth = (month, year) => new Date(year, month + 1, 0).getDate();
 
 const AttendanceChart = ({ data }) => {
-  // Get the current year
   const currentYear = new Date().getFullYear();
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
-  // Array of month names to be used as labels on the x-axis
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  // Calculate the number of days in each month for the current year
-  const daysInMonths = months?.map((_, index) => getDaysInMonth(index, currentYear));
-
-  // Find the maximum attendance value from the API data to dynamically adjust y-axis
-  const maxAttendance = Math.max(
-    ...data.flatMap((month) => [month.present || 0, month.absent || 0, month.leave || 0])
+  // Calculate days in each month dynamically
+  const daysInMonths = months.map((_, index) =>
+    getDaysInMonth(index, currentYear)
   );
 
-  // Determine the suggested maximum value for y-axis, ensuring it's slightly above the maximum attendance value
+  // Determine max attendance dynamically
+  const maxAttendance = Math.max(
+    ...data.flatMap((month) => [
+      month.present || 0,
+      month.absent || 0,
+      month.leave || 0,
+    ])
+  );
+
+  // Set suggested max based on attendance
   const suggestedMax = maxAttendance <= 5 ? 5 : maxAttendance + 2;
 
-  // Prepare the data for the chart
+  // Prepare chart data
   const chartData = {
-    labels: months, // Labels for each month of the year
+    labels: months,
     datasets: [
       {
-        label: 'Present',
-        data: data?.map((month) => month.present || 0), // Get the 'present' value for each month, default to 0 if not available
-        backgroundColor: 'rgba(75, 192, 75, 0.6)', // Green color for the 'Present' line (symbolizing success or good status)
-        borderColor: 'rgba(75, 192, 75, 1)',
+        label: "Present",
+        data: data.map((month) => month.present || 0),
+        backgroundColor: "rgba(75, 192, 75, 0.2)", // ✅ Light green fill
+        borderColor: "rgba(75, 192, 75, 1)",
         borderWidth: 2,
-        fill: false, // No area fill under the line
+        pointRadius: 4,
+        pointBackgroundColor: "rgba(75, 192, 75, 1)",
+        tension: 0.4, // ✅ Smooth curve
+        fill: true,
       },
       {
-        label: 'Absent',
-        data: data?.map((month) => month.absent || 0), // Get the 'absent' value for each month, default to 0 if not available
-        backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red color for the 'Absent' line (commonly used for errors or warnings)
-        borderColor: 'rgba(255, 99, 132, 1)',
+        label: "Absent",
+        data: data.map((month) => month.absent || 0),
+        backgroundColor: "rgba(255, 99, 132, 0.2)", // ✅ Light red fill
+        borderColor: "rgba(255, 99, 132, 1)",
         borderWidth: 2,
-        fill: false, // No area fill under the line
+        pointRadius: 4,
+        pointBackgroundColor: "rgba(255, 99, 132, 1)",
+        tension: 0.4,
+        fill: true,
       },
       {
-        label: 'Leave',
-        data: data?.map((month) => month.leave || 0), // Get the 'leave' value for each month, default to 0 if not available
-        backgroundColor: 'rgba(255, 159, 64, 0.6)', // Orange color for the 'Leave' line (representing a neutral status)
-        borderColor: 'rgba(255, 159, 64, 1)',
+        label: "Leave",
+        data: data.map((month) => month.leave || 0),
+        backgroundColor: "rgba(255, 159, 64, 0.2)", // ✅ Light orange fill
+        borderColor: "rgba(255, 159, 64, 1)",
         borderWidth: 2,
-        fill: false, // No area fill under the line
+        pointRadius: 4,
+        pointBackgroundColor: "rgba(255, 159, 64, 1)",
+        tension: 0.4,
+        fill: true,
       },
     ],
   };
 
-  // Configuration options for the chart
+  // Chart options
   const options = {
-    responsive: true, // Make the chart responsive to screen size
+    responsive: true,
     plugins: {
       legend: {
-        position: 'top', // Position the legend at the top of the chart
+        position: "top",
       },
       title: {
-        display: true, // Display the chart title
-        text: 'Monthly Attendance', // Title text for the chart
+        display: true,
+        text: "Monthly Attendance",
       },
     },
     scales: {
       y: {
-        beginAtZero: true, // Start the y-axis at zero
-        suggestedMax: suggestedMax, // Set a suggested maximum value slightly above the maximum attendance value
+        beginAtZero: true,
+        suggestedMax: suggestedMax, // ✅ Set max dynamically
         ticks: {
-          stepSize: 1, // Set the step size for the y-axis ticks to better reflect smaller data ranges
-          callback: function (value) {
-            // Format the tick labels to show 'Days'
-            return value + ' Days';
-          },
+          stepSize: 1,
+          callback: (value) => `${value} Days`, // ✅ Show "Days" label
         },
       },
     },
   };
 
   return (
-    <div className="attendance-chart">
-      {/* Render the Line chart with the provided data and options */}
+    <div className="w-full max-w-3xl mx-auto p-5 bg-white shadow-md rounded-lg">
       <Line data={chartData} options={options} />
     </div>
   );

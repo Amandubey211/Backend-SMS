@@ -21,58 +21,61 @@ const TaskCompletionChart = () => {
     datasets: [
       {
         data: [completedTask, inCompletedTask],
-        backgroundColor: ["pink", "rgba(150, 150, 150, 1)"],
-        borderColor: ["rgba(255, 99, 132, 1)", "rgba(200, 200, 200, 1)"],
-        borderWidth: 1,
-        cutout: "70%", // Keeps the inner circle cut out
+        backgroundColor: ["#FAECF0", "#FF7AA5"], // 🔹 Updated with better contrast
+        // borderColor: ["#FAECF0", "#C83B62"], // 🔹 Slightly darker border for depth
+
+        cutout: "70%", // 🔹 Keeps the inner circle cut out for a modern look
       },
     ],
   };
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: false,
-      },
-      tooltip: {
-        callbacks: {
-          label: function (tooltipItem) {
-            return `${tooltipItem.label}: ${tooltipItem.raw}%`;
+        display: true,
+        position: "bottom", // 🔹 Move legend below the chart
+        labels: {
+          color: "#ffffff", // 🔹 Light text for contrast
+          font: {
+            size: 14,
+            weight: "bold",
           },
         },
       },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)", // 🔹 Dark tooltip for better visibility
+        bodyFont: {
+          size: 14,
+        },
+      },
     },
-    maintainAspectRatio: false, // Ensures it stretches to fill container
   };
-
   return (
-    <div className="flex flex-col items-center p-5">
-      {/* Title */}
-      <div className="w-full flex justify-start mb-4">
-        {/* <h2 className="text-xl font-bold text-gray-700">Task</h2> */}
-      </div>
-
+    <div className="flex flex-col items-center w-full">
       {/* Chart and Summary */}
-      <div className="flex flex-col items-center justify-center h-[18rem] w-[18rem]">
+      <div className="flex flex-col items-center justify-center ">
         {/* Task Summary */}
-        <div className="flex flex-row justify-between w-full mb-5 text-lg">
-          <p className="text-gray-500 text-left">
+        <div className="flex flex-row justify-between gap-4 w-full mb-5  text-sm">
+          <p className="text-gray-500  text-left w-[40%]">
             Completed{" "}
-            <span className="text-pink-600 font-bold text-lg">
+            <span className="text-pink-600 font-bold">
               {Number(completedTask).toFixed(2)}%
             </span>
           </p>
-          <p className="text-gray-500 text-right">
+          <p className="text-gray-500 text-right w-[35%]">
             Remaining{" "}
-            <span className="text-gray-700 font-bold text-lg">
+            <span className="text-gray-700 font-bold ">
               {Number(inCompletedTask).toFixed(2)}%
             </span>
           </p>
         </div>
 
         {/* Chart */}
-        <Doughnut data={data} options={options} />
+        <div className="h-[150px]">
+          <Doughnut data={data} options={options} />
+        </div>
       </div>
     </div>
   );

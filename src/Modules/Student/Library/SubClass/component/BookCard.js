@@ -1,6 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { BiBook, BiUser, BiCategoryAlt } from "react-icons/bi";
+import { HiOutlineClipboardList } from "react-icons/hi";
+import { IoLibraryOutline } from "react-icons/io5";
 import { gt } from "../../../../../Utils/translator/translation";
 
 const BookCard = ({
@@ -11,51 +14,66 @@ const BookCard = ({
   copies,
   available,
   coverImageUrl,
+  name,
+  totalCopies,
+  issuedCount,
 }) => {
-
   const { t } = useTranslation();
-
+  const availableCopies = totalCopies - issuedCount;
   return (
-    <div className="relative border p-2 bg-white rounded-lg shadow-sm  overflow-hidden capitalize">
-      <div className="flex border-b pb-2">
-        {/* Book Cover */}
+    <div className="relative  shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 ">
+      {/* Book Cover */}
+      <div className="relative ">
         <img
           src={coverImageUrl}
           alt={title}
-          className="w-40 h-36 object-cover rounded-md"
+          className="w-full h-48 object-cover"
         />
-
-        {/* Book Info */}
-        <div className="ml-5 ">
-          <div className="flex flex-col">
-            <span className=" text-gray-500">{t('Class',gt.stdLibrary)}</span>
-            <span className=" font-bold text-gradient mb-1">{classLevel}</span>
-            {/* <span className="text-lg  font-bold text-gradient mb-1">10</span> */}
-
-            <span className=" text-gray-500">{t('Copies',gt.stdLibrary)}</span>
-            <span className=" text-lg font-bold text-gradient mb-1">
-              {copies}
-            </span>
-            <span className=" text-gray-500">{t('Available',gt.stdLibrary)}</span>
-            <span className="text-lg  font-bold text-gradient">
-              {available}
-            </span>
-          </div>
+        <div className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md cursor-pointer hover:bg-gray-100">
+          <BsThreeDotsVertical className="text-gray-600" />
         </div>
       </div>
 
-      {/* Book Details */}
-      <div className="mt-3 ps-2 pb-2">
-        <h3 className="text-lg font-bold  text-gray-800">{title}</h3>
-        <p className="text-sm font-medium text-gradient">{category}</p>
-        <p className="text-sm text-gray-500 mt-3">{t('Author',gt.stdLibrary)}</p>
-        <p className="text-base text-gray-700">{author}</p>
-      </div>
+      {/* Book Info */}
+      <div className="p-4">
+        <h3 className="text-xl font-semibold text-gray-800">{title}</h3>
+        <h2 className="capitalize text-md text-black flex items-center gap-1 mt-1 font-medium w-full truncate group relative">
+          {name}
 
-      {/* Three Dots Icon in Bottom-Right */}
-      {/* <div className="absolute right-4 bottom-4 p-1 border rounded-full">
-        <BsThreeDotsVertical className="text-gray-700 cursor-pointer" />
-      </div> */}
+          {/* ✅ Full Book Name Tooltip on Hover */}
+          <span className="absolute left-0 top-full hidden group-hover:block bg-black text-white text-xs p-2 rounded shadow-md w-max max-w-xs">
+            {name}
+          </span>
+        </h2>
+        <p className="capitalize text-sm font-medium text-pink-700 flex items-center gap-1 mt-1">
+          <BiUser className="text-gray-500" size={15} /> {author}
+        </p>
+
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <BiCategoryAlt className="text-gray-500" />
+          <span>
+            {t("Category", gt.stdLibrary)}:{" "}
+            <span className="font-semibold text-gray-800 capitalize">
+              {category}
+            </span>
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 text-sm text-gray-600">
+          <BiBook className="text-gray-500" />
+          <span>
+            {t("Available", gt.stdLibrary)}:{" "}
+            <span
+              className={`font-semibold ${
+                availableCopies > 0 ? "text-green-600" : "text-red-600"
+              }`}
+            >
+              {availableCopies > 0 ? availableCopies : "Out of Stock"}
+            </span>
+          </span>
+        </div>
+        {/* </div> */}
+      </div>
     </div>
   );
 };
