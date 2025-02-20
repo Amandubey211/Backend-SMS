@@ -7,53 +7,7 @@ import { FaChild } from "react-icons/fa";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
-
-// Child Card Skeleton (Dynamically rendered based on child count)
-const ChildCardSkeleton = ({ count }) => {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      {[...Array(count)].map((_, index) => (
-        <div
-          key={index}
-          className="p-6 bg-white rounded-xl shadow-md flex flex-col items-center"
-          style={{
-            minHeight: "270px", // Adjusted to match real card
-            maxWidth: "100%",
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          {/* Profile Image */}
-          <Skeleton.Avatar active size={90} shape="circle" />
-
-          {/* Name */}
-          <Skeleton.Input active size="small" style={{ width: "55%", marginTop: "12px" }} />
-
-          {/* Class, ID, Section, Group */}
-          <div className="flex justify-center mt-2 space-x-3">
-            <Skeleton.Input active size="small" style={{ width: "20%" }} />
-            <Skeleton.Input active size="small" style={{ width: "15%" }} />
-            <Skeleton.Input active size="small" style={{ width: "20%" }} />
-            <Skeleton.Input active size="small" style={{ width: "20%" }} />
-          </div>
-
-          {/* Buttons (INSTRUCTORS, GRADES, ATTENDANCE) */}
-          <div className="flex justify-center mt-4 space-x-4">
-            <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 40, borderRadius: "8px" }} />
-            <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 40, borderRadius: "8px" }} />
-            <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 40, borderRadius: "8px" }} />
-          </div>
-
-          {/* Big Button (CHECK SUBJECT PROGRESS) */}
-          <div className="flex justify-center mt-5">
-            <Skeleton.Button active size="large" shape="round" style={{ width: "85%", height: 48, borderRadius: "12px" }} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-
+import { ChildCardSkeleton } from "../Skeletons";
 
 
 const MyChildren = () => {

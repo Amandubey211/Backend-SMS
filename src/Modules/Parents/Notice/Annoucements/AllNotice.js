@@ -10,37 +10,10 @@ import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.p
 import { CiSearch } from "react-icons/ci";
 import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
 import { useTranslation } from "react-i18next"; // Import useTranslation
-import { Skeleton } from "antd";
+import { NoticeSkeleton } from "../../Skeletons.js";
 
 // Skeleton for Notices (Rectangle Boxes)
-const NoticeSkeleton = ({ count = 3 }) => {
-  return (
-    <div className="mt-5 rounded-lg overflow-auto">
-      {[...Array(count)].map((_, i) => (
-        <div key={i} className="border mb-4 bg-white p-2 rounded-md shadow-sm">
-          <div className="flex gap-6 px-3 py-2">
-            {/* Left Icon Skeleton */}
-            <Skeleton.Avatar active size={60} shape="square" />
 
-            {/* Middle Content Skeleton */}
-            <div className="flex flex-col flex-1 gap-2">
-              {/* Title line */}
-              <Skeleton.Input active size="small" style={{ width: "60%" }} />
-              {/* Date & Priority row */}
-              <div className="flex items-center gap-3">
-                <Skeleton.Button active size="small" shape="round" style={{ width: 120 }} />
-                <Skeleton.Button active size="small" shape="round" style={{ width: 80 }} />
-              </div>
-            </div>
-
-            {/* Expand Icon Skeleton */}
-            <Skeleton.Button active size="small" shape="circle" style={{ width: 32, height: 32 }} />
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
 
 const AllNotice = () => {
   const { t } = useTranslation('prtNotices'); // Initialize translation hook
