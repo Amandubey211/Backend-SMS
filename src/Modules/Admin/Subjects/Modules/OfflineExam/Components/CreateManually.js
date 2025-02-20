@@ -1,131 +1,240 @@
-// import React, { useRef, useState } from "react";
-// import Handsontable from "handsontable";
-// import { HotTable, HotColumn } from "@handsontable/react";
-// import "handsontable/dist/handsontable.full.css";
+import { Button } from "antd";
+import React, { useEffect, useState } from "react";
+import { PlusOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { createOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
+import { useNavigate, useParams } from "react-router-dom";
+import { fetchStudentsByClassAndSectionNames } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import toast from "react-hot-toast";
+import { formatDate } from "../../../../../../Utils/helperFunctions";
+import CreateTable from "./CreateTable";
 
-// const CreateManually = () => {
-//   const hotRef = useRef(null);
-//   const [tableData, setTableData] = useState([
-//     ["", "", "", "", "", "", "", ""],
-//   ]);
+const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
+  const [headers] = useState([
+    "Name",
+    "Admission Number",
+    "Exam Name",
+    "Exam Type",
+    "Obtained Score",
+    "Max Score",
+    "Start Date",
+    "End Date",
+    "Status",
+    "Actions",
+  ]);
 
-//   const [headers, setHeaders] = useState([
-//     "Name",
-//     "Admission Number",
-//     "Quiz 1",
-//     "Exam 1",
-//     "Quiz 2",
-//     "Exam 2",
-//     "Project",
-//     "Actions", // Delete button column
-//   ]);
+  const [selectedExamType, setSelectedExamType] = useState("");
+  const [selectedExamName, setSelectedExamName] = useState("");
+  const [enteredMaxScore, setEnteredMaxScore] = useState("");
 
-//   // ✅ Handle table updates
-//   const handleAfterChange = (changes, source) => {
-//     if (!changes || source === "loadData") return;
-//     const updatedData = [...tableData];
-//     changes.forEach(([row, prop, oldValue, newValue]) => {
-//       updatedData[row][prop] = newValue;
-//     });
-//     setTableData(updatedData);
-//   };
+  const [tableData, setTableData] = useState([
+    ["", "", "", "", "", "", "", "", "", ""],
+  ]);
+  const dispatch = useDispatch();
+  const { cid, sid } = useParams();
+  const { studentsList } = useSelector((state) => state.admin.students);
+  const { allStudents } = useSelector((store) => store.admin.all_students);
+  const navigate = useNavigate();
+  const [selectedStartDate, setSelectedStartDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
 
-//   // ✅ Add a new row
-//   const addRow = () => {
-//     const newRow = new Array(headers.length).fill(""); // Empty row
-//     setTableData((prev) => [...prev, newRow]);
-//   };
+  const pinkColor = "#EC407A";
+  const purpleColor = "#AB47BC";
+  const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
-//   // ✅ Add a new column
-//   const addColumn = () => {
-//     const newColumnName = `Column ${headers.length}`;
-//     setHeaders((prev) => [...prev.slice(0, -1), newColumnName, "Actions"]); // Insert before "Actions"
+  const handleCellChange = (rowIdx, colIdx, value, updateAll = false) => {
+    setTableData((prev) => {
+      const newData = [...prev];
 
-//     setTableData(
-//       (prev) =>
-//         prev.map((row) => [...row.slice(0, -1), "", row[row.length - 1]]) // Insert before "Actions"
-//     );
-//   };
+      if (updateAll) {
+        // Update the entire column for all rows
+        return newData.map((row) => {
+          row[colIdx] = value.trim();
+          return row;
+        });
+      } else {
+        // Update only the specific row
+        newData[rowIdx] = [...newData[rowIdx]];
+        newData[rowIdx][colIdx] = value.trim();
+        return newData;
+      }
+    });
+  };
 
-//   // ✅ Remove a column when clicking the header
-//   const handleColumnClick = (colIndex) => {
-//     if (headers[colIndex] === "Actions") return; // Prevent deleting the last column
-//     setHeaders(headers.filter((_, index) => index !== colIndex));
+  // const isRowFilled = (row) => row.every((cell) => cell.trim() !== "");
 
-//     setTableData((prev) =>
-//       prev.map((row) => row.filter((_, index) => index !== colIndex))
-//     );
-//   };
+  const addRow = () => {
+    if (tableData.length >= 5) {
+      toast.error("You can only add up to 5 rows. Please upload via Excel.");
+      return;
+    }
 
-//   // ✅ Remove row properly
-//   const removeRow = (rowIndex) => {
-//     setTableData((prev) => prev.filter((_, index) => index !== rowIndex));
-//   };
+    // if (!isRowFilled(tableData[tableData.length - 1])) {
+    //   toast.error("Please fill the current row before adding a new one.");
+    //   return;
+    // }
 
-//   return (
-//     <div className="w-full p-4 bg-white border shadow-md mt-2 rounded-md">
-//       <h2 className="text-lg font-semibold text-gray-700 mb-2">
-//         📋 Edit Exam Data
-//       </h2>
+    const newRow = new Array(headers.length).fill("");
+    setTableData((prev) => [...prev, newRow]);
+  };
 
-//       {/* ✅ Buttons to Add Row & Column */}
-//       <div className="flex gap-3 mb-3">
-//         <button
-//           onClick={addRow}
-//           className="bg-blue-500 text-white px-4 py-2 rounded shadow-md hover:bg-blue-600"
-//         >
-//           ➕ Add Row
-//         </button>
-//         <button
-//           onClick={addColumn}
-//           className="bg-green-500 text-white px-4 py-2 rounded shadow-md hover:bg-green-600"
-//         >
-//           ➕ Add Column
-//         </button>
-//       </div>
+  const removeRow = (rowIdx) => {
+    setTableData((prev) => prev.filter((_, idx) => idx !== rowIdx));
+  };
+  useEffect(() => {
+    // Update Exam Type for all rows
+    setTableData((prev) =>
+      prev.map((row) => {
+        row[3] = selectedExamType || ""; // 3rd index is "Exam Type"
+        return row;
+      })
+    );
+  }, [selectedExamType]);
 
-//       {/* Handsontable Component */}
-//       <HotTable
-//         ref={hotRef}
-//         data={tableData}
-//         colHeaders={headers}
-//         rowHeaders={true}
-//         height={450}
-//         stretchH="all"
-//         manualRowMove={true}
-//         manualColumnMove={true}
-//         contextMenu={true}
-//         afterChange={handleAfterChange}
-//         licenseKey="non-commercial-and-evaluation"
-//       >
-//         {headers.slice(0, -1).map((_, index) => (
-//           <HotColumn key={index} data={index} />
-//         ))}
+  useEffect(() => {
+    // Update Exam Name for all rows
+    setTableData((prev) =>
+      prev.map((row) => {
+        row[2] = selectedExamName || ""; // 2nd index is "Exam Name"
+        return row;
+      })
+    );
+  }, [selectedExamName]);
 
-//         {/* ✅ Fix: Remove Row Without Redirecting */}
-//         <HotColumn
-//           data={null}
-//           readOnly={true}
-//           renderer={(instance, td, row) => {
-//             const button = document.createElement("button");
-//             button.innerText = "❌ Delete";
-//             button.className =
-//               "text-red-500 bg-gray-100 border rounded px-2 py-1 cursor-pointer";
-//             button.type = "button";
-//             button.onclick = (event) => {
-//               event.preventDefault();
-//               event.stopPropagation();
-//               event.stopImmediatePropagation();
+  useEffect(() => {
+    // Update Max Score for all rows
+    setTableData((prev) =>
+      prev.map((row) => {
+        row[5] = enteredMaxScore || ""; // 5th index is "Max Score"
+        return row;
+      })
+    );
+  }, [enteredMaxScore]);
 
-//               removeRow(row);
-//             };
-//             td.innerHTML = "";
-//             td.appendChild(button);
-//           }}
-//         />
-//       </HotTable>
-//     </div>
-//   );
-// };
+  useEffect(() => {
+    dispatch(fetchStudentsByClassAndSectionNames(cid));
+    dispatch(fetchAllStudents());
+  }, []);
 
-// export default CreateManually;
+  const handleCreate = () => {
+    // if (!tableData.every(isRowFilled)) {
+    //   toast.error("All fields must be filled before submitting.");
+    //   return;
+    // }
+    // for (let row of tableData) {
+    //   const obtainedScore = parseFloat(row[4]);
+    //   const maxScore = parseFloat(row[5]);
+
+    //   if (isNaN(obtainedScore) || isNaN(maxScore) || obtainedScore > maxScore) {
+    //     toast.error("Obtained Score must be less than or equal to Max Score.");
+    //     return;
+    //   }
+    // }
+
+    const payload = {
+      examType: selectedExamType,
+      examName: selectedExamName,
+      classId: cid,
+      subjectId: sid,
+      startDate: selectedStartDate ? selectedStartDate.toISOString() : null,
+      endDate: selectedEndDate ? selectedEndDate.toISOString() : null,
+      students: tableData.map((row) => {
+        const selectedStudent = studentsList.find(
+          (student) => `${student.firstName} ${student.lastName}` === row[0]
+        );
+
+        return {
+          studentId: selectedStudent?._id || "",
+          score: row[4],
+          maxMarks: enteredMaxScore || 0,
+          status: row[6] || "present",
+        };
+      }),
+    };
+    setLoading(true);
+    dispatch(createOfflineExam({ payload }))
+      .then(() => {
+        setLoading(false);
+        toast.success("Exam Created Successfully");
+        resetForm();
+        navigate(-1);
+      })
+      .catch((error) => {
+        setLoading(false);
+        toast.error(error.message || "Failed to Create Exam");
+      });
+  };
+
+  const resetForm = () => {
+    setSelectedExamType("");
+    setSelectedExamName("");
+    setSelectedStartDate(null);
+    setSelectedEndDate(null);
+    setTableData([["", "", "", "", "", "", "", "", "", ""]]);
+  };
+
+  const handleClear = () => {
+    setIsOpen(false);
+  };
+
+  console.log("entered Max Score", enteredMaxScore);
+  console.log("Table data", tableData);
+  return (
+    <div className="px-4  w-full -mb-9 min-h-[500px]">
+      {/* Buttons to Add Row */}
+      <div className="flex gap-3 mb-3">
+        <Button
+          icon={<PlusOutlined />}
+          onClick={addRow}
+          style={{
+            borderRadius: "6px",
+            border: "none",
+          }}
+          className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200 flex items-center gap-2"
+        >
+          Add Row
+        </Button>
+      </div>
+
+      {/* Table */}
+      <CreateTable
+        headers={headers}
+        selectedExamType={selectedExamType}
+        setSelectedExamType={setSelectedExamType}
+        selectedExamName={selectedExamName}
+        setSelectedExamName={setSelectedExamName}
+        enteredMaxScore={enteredMaxScore}
+        setEnteredMaxScore={setEnteredMaxScore}
+        selectedStartDate={selectedStartDate}
+        setSelectedStartDate={setSelectedStartDate}
+        selectedEndDate={selectedEndDate}
+        setSelectedEndDate={setSelectedEndDate}
+        tableData={tableData}
+        removeRow={removeRow}
+        formatDate={formatDate}
+        studentsList={studentsList}
+        allStudents={allStudents}
+        handleCellChange={handleCellChange}
+      />
+
+      {/* Submit Buttons */}
+      <div className="fixed bottom-5 right-5 flex space-x-4 ">
+        <Button onClick={handleClear}>Cancel</Button>
+        <Button
+          style={{
+            background: primaryGradient,
+            border: "none",
+            color: "white",
+          }}
+          disabled={loading}
+          onClick={handleCreate}
+        >
+          Create
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default CreateManually;

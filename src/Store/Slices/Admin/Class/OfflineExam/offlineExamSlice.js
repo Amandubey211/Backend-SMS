@@ -28,7 +28,8 @@ const offlineExamSlice = createSlice({
       })
       .addCase(fetchAllOfflineExam.fulfilled, (state, action) => {
         state.loading = false;
-        state.offlineExamData = action?.payload;
+        state.offlineExamData = action?.payload?.data;
+        console.log("action data", action?.payload?.data);
       })
       .addCase(fetchAllOfflineExam.rejected, (state) => {
         state.loading = false;
