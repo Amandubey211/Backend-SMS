@@ -40,7 +40,7 @@ const MainSection = () => {
 
 
   return (
-    <div className="flex min-h-screen my-2">
+    <div className="flex min-h-screen">
       <div className="w-[65%] bg-white p-2">
         <div className="bg-white p-2 rounded-lg">
           {loading ? (
