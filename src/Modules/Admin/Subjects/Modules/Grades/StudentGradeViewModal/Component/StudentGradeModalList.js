@@ -180,31 +180,31 @@ const StudentModalGradeList = ({
           {filteredData.map((item, index) => (
             <tr key={index} className={getBoldClass(item)}>
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm text-gray-900">{item.Name}</div>
-                <div className="text-sm">{item.type}</div>
+                <div className="text-sm text-gray-900">{item?.Name}</div>
+                <div className="text-sm">{item?.type}</div>
               </td>
               {filters.gradeMode === "online" && (
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{item.moduleName}</div>
+                  <div className="text-sm text-gray-900">{item?.moduleName}</div>
                 </td>
               )}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {item.dueDate?.slice(0, 10)}
+                {item?.dueDate?.slice(0, 10) || '-'}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {item.submittedDate
-                  ? item.submittedDate.slice(0, 10)
-                  : item.createAt?.slice(0, 10)}
+                  ? item?.submittedDate.slice(0, 10)
+                  : '-'}
               </td>
               <td
                 className={`px-6 py-4 whitespace-nowrap text-sm ${getStatusClass(
-                  getFormattedStatus(item.status, filters.gradeMode)
+                  getFormattedStatus(item?.status, filters.gradeMode)
                 )}`}
               >
-                {getFormattedStatus(item.status, filters.gradeMode)}
+                {getFormattedStatus(item?.status, filters.gradeMode)}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {item.score} / {item.maxMarks}
+                {item?.score} / {item?.maxMarks}
               </td>
             </tr>
           ))}
