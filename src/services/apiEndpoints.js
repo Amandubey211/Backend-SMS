@@ -18,6 +18,9 @@ export const postData = async (endpoint, data) => {
     const response = await apiService.post(endpoint, data);
     return response?.data;
   } catch (error) {
+    if (error.response && error.response.data) {
+      return error.response.data;
+    }
     // console.log("Error posting data:", error);
   }
 };

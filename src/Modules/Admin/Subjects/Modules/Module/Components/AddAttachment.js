@@ -19,11 +19,13 @@ const AddAttachment = ({ chapterData, onClose }) => {
   const fileInputRef = useRef(null);
 
   const dispatch = useDispatch();
-  const loading = useSelector((state) => state.admin.module.loading);
+  // Use the dedicated attachmentLoading state to track upload progress
+  const loading = useSelector((state) => state.admin.module.attachmentLoading);
 
-  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB in bytes
+  const FILE_SIZE_LIMIT = 10 * 1024 * 1024; // 10MB
 
   const handleFileChange = (e) => {
+    if (loading) return; // Prevent changes during upload
     const selectedFiles = Array.from(e.target.files);
     const validFiles = selectedFiles.filter(
       (file) => file.size <= FILE_SIZE_LIMIT
@@ -32,16 +34,16 @@ const AddAttachment = ({ chapterData, onClose }) => {
       (file) => file.size > FILE_SIZE_LIMIT
     );
 
-    if (validFiles?.length > 0) {
+    if (validFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles?.map((file) => URL.createObjectURL(file)),
+        ...validFiles.map((file) => URL.createObjectURL(file)),
       ]);
-      setLabels((prevLabels) => [...prevLabels, ...validFiles?.map(() => "")]);
+      setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
     }
 
-    if (invalidFiles?.length > 0) {
+    if (invalidFiles.length > 0) {
       toast.error("Some files exceed the 10MB limit and were not added.");
     }
   };
@@ -52,22 +54,24 @@ const AddAttachment = ({ chapterData, onClose }) => {
 
   const handleDrop = (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent file drop during upload
     const droppedFiles = Array.from(e.dataTransfer.files);
     const validFiles = droppedFiles.filter(
       (file) => file.size <= FILE_SIZE_LIMIT
     );
 
-    if (validFiles?.length > 0) {
+    if (validFiles.length > 0) {
       setFiles((prevFiles) => [...prevFiles, ...validFiles]);
       setPreviews((prevPreviews) => [
         ...prevPreviews,
-        ...validFiles?.map((file) => URL.createObjectURL(file)),
+        ...validFiles.map((file) => URL.createObjectURL(file)),
       ]);
-      setLabels((prevLabels) => [...prevLabels, ...validFiles?.map(() => "")]);
+      setLabels((prevLabels) => [...prevLabels, ...validFiles.map(() => "")]);
     }
   };
 
   const handleRemoveFile = (index) => {
+    if (loading) return; // Prevent removal during upload
     const updatedFiles = [...files];
     const updatedPreviews = [...previews];
     const updatedLabels = [...labels];
@@ -80,6 +84,7 @@ const AddAttachment = ({ chapterData, onClose }) => {
   };
 
   const handlePreviewFile = (index) => {
+    if (loading) return; // Prevent preview during upload
     setSelectedPreview(previews[index]);
     setModalOpen(true);
   };
@@ -94,12 +99,12 @@ const AddAttachment = ({ chapterData, onClose }) => {
     setLabels(updatedLabels);
   };
 
-  // console.log(chapterData, "ddd");
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return; // Prevent multiple submissions
     const validFiles = files.filter((file) => file.size <= FILE_SIZE_LIMIT);
 
-    if (validFiles?.length > 0) {
+    if (validFiles.length > 0) {
       await dispatch(
         addAttachment({
           chapterId: chapterData.chapterId,
@@ -108,7 +113,7 @@ const AddAttachment = ({ chapterData, onClose }) => {
           documentLabels: labels,
         })
       );
-      // onClose(); // Close the attachment modal after successful upload
+      // onClose(); // Optionally close the modal after upload
     } else {
       toast.error("Please select at least one valid file.");
     }
@@ -146,10 +151,16 @@ const AddAttachment = ({ chapterData, onClose }) => {
           className="flex flex-col justify-between h-full p-2"
         >
           <div
-            className="flex flex-col px-6 items-center justify-center py-2 h-40 border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-indigo-500 hover:bg-gray-100 transition duration-500 ease-in-out"
+            className={`flex flex-col px-6 items-center justify-center py-2 h-40 border-2 border-dashed rounded-md transition duration-500 ease-in-out ${
+              loading
+                ? "bg-gray-200 cursor-not-allowed"
+                : "border-gray-300 hover:border-indigo-500 hover:bg-gray-100"
+            }`}
             onDragOver={handleDragOver}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current.click()}
+            onClick={() => {
+              if (!loading) fileInputRef.current.click();
+            }}
           >
             <IoCloudUploadOutline
               size={50}
@@ -165,13 +176,14 @@ const AddAttachment = ({ chapterData, onClose }) => {
               onChange={handleFileChange}
               className="hidden"
               ref={fileInputRef}
+              disabled={loading}
             />
           </div>
 
-          {files?.length > 0 && (
+          {files.length > 0 && (
             <div className="flex-grow overflow-y-auto mt-4 px-3 no-scrollbar">
               <div className="grid grid-cols-1 gap-2">
-                {files?.map((file, index) => (
+                {files.map((file, index) => (
                   <div
                     key={index}
                     className={`flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md ${
@@ -200,6 +212,7 @@ const AddAttachment = ({ chapterData, onClose }) => {
                       <div className="flex items-center space-x-2">
                         <button
                           type="button"
+                          disabled={loading}
                           className="text-blue-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
                           onClick={() => handlePreviewFile(index)}
                         >
@@ -207,6 +220,7 @@ const AddAttachment = ({ chapterData, onClose }) => {
                         </button>
                         <button
                           type="button"
+                          disabled={loading}
                           className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
                           onClick={() => handleRemoveFile(index)}
                         >
@@ -222,7 +236,7 @@ const AddAttachment = ({ chapterData, onClose }) => {
                         value={labels[index] || ""}
                         onChange={(e) => handleLabelChange(e, index)}
                         className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-500 ease-in-out"
-                        disabled={file.size > FILE_SIZE_LIMIT}
+                        disabled={loading || file.size > FILE_SIZE_LIMIT}
                       />
                     </div>
                   </div>
@@ -234,13 +248,15 @@ const AddAttachment = ({ chapterData, onClose }) => {
           <div className="mt-4 mb-8">
             <button
               type="submit"
-              className={`w-full bg-gradient-to-r from-purple-400 to-pink-400 text-white py-2 px-4 rounded-md hover:from-purple-500 hover:to-pink-500 transition duration-500 ease-in-out transform ${
-                loading ? "cursor-wait" : ""
-              }`}
               disabled={loading}
+              className={`w-full bg-gradient-to-r from-purple-400 to-pink-400 text-white py-2 px-4 rounded-md transition duration-500 ease-in-out transform ${
+                loading
+                  ? "cursor-wait"
+                  : "hover:from-purple-500 hover:to-pink-500"
+              }`}
             >
               {loading ? (
-                <div className="flex justify-center ">
+                <div className="flex justify-center">
                   <ImSpinner3
                     size={20}
                     className="animate-spin text-gray-700"

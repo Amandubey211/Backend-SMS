@@ -47,7 +47,9 @@ export const editRoleThunk = createAsyncThunk(
         `/admin/role/edit/${roleId}?say=${say}`,
         updates
       );
-      dispatch(getAllRolesThunk());
+      if (response.success) {
+        dispatch(getAllRolesThunk());
+      }
 
       // Validate and return the updated role data
       return {
@@ -69,7 +71,7 @@ export const getAllRolesThunk = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/role/all?say=${say}`);
-      console.log("roles", response);
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

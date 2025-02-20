@@ -7,9 +7,40 @@ import { RiSignalWifiErrorFill } from "react-icons/ri"; // Imported network erro
 import CalendarIcon from '../../../../Assets/ParentAssets/svg/calender.svg';
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import announcementIcon from "../../../../Assets/DashboardAssets/Images/image1.png";
-import Spinner from "../../../../Components/Common/Spinner";
+import { CiSearch } from "react-icons/ci";
 import { fetchAllNotices } from "../../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
 import { useTranslation } from "react-i18next"; // Import useTranslation
+import { Skeleton } from "antd";
+
+// Skeleton for Notices (Rectangle Boxes)
+const NoticeSkeleton = ({ count = 3 }) => {
+  return (
+    <div className="mt-5 rounded-lg overflow-auto">
+      {[...Array(count)].map((_, i) => (
+        <div key={i} className="border mb-4 bg-white p-2 rounded-md shadow-sm">
+          <div className="flex gap-6 px-3 py-2">
+            {/* Left Icon Skeleton */}
+            <Skeleton.Avatar active size={60} shape="square" />
+
+            {/* Middle Content Skeleton */}
+            <div className="flex flex-col flex-1 gap-2">
+              {/* Title line */}
+              <Skeleton.Input active size="small" style={{ width: "60%" }} />
+              {/* Date & Priority row */}
+              <div className="flex items-center gap-3">
+                <Skeleton.Button active size="small" shape="round" style={{ width: 120 }} />
+                <Skeleton.Button active size="small" shape="round" style={{ width: 80 }} />
+              </div>
+            </div>
+
+            {/* Expand Icon Skeleton */}
+            <Skeleton.Button active size="small" shape="circle" style={{ width: 32, height: 32 }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const AllNotice = () => {
   const { t } = useTranslation('prtNotices'); // Initialize translation hook
@@ -64,13 +95,16 @@ const AllNotice = () => {
   // Error message rendering for notices
   const renderErrorMessage = () => {
     const isNetworkError = error?.toLowerCase().includes("network error");
-
     return (
       <div className="flex flex-col items-center justify-center mt-6">
         {isNetworkError ? (
           <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
         ) : (
-          <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
+          <img
+            src={CalendarIcon}
+            style={{ width: '40px', height: '40px', marginBottom: '10px' }}
+            alt="calendar"
+          />
         )}
         <p className="text-gray-600 text-lg text-center mt-2">
           {error}: {t("Failed to fetch notices")}
@@ -80,108 +114,131 @@ const AllNotice = () => {
   };
 
   return (
-    <>
-      <Layout title={t("Noticeboard")}>
-        <ParentDashLayout hideAvatarList={true}>
-          <div className="p-4">
-            <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-              {t("Child Notice Board")}
-            </h1>
-            <div className="flex p-[10px] justify-between">
-              <div className="flex gap-4">
-                <input
-                  type="text"
-                  placeholder={t("Search by Notice")}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="p-2 border rounded w-[250px]"
-                />
-                <button className="border w-[100px] rounded bg-pink-100 text-center flex justify-center items-center">
-                  <span className="font-semibold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-                    {t("Search")}
-                  </span>
-                </button>
-              </div>
+    <Layout title={t("Noticeboard")}>
+      <ParentDashLayout hideAvatarList={true}>
+        <div className="p-4">
+          <div className="flex p-[10px] justify-between">
+            
+            <div className="relative flex items-center max-w-xs w-full mr-4">
+              <input
+                type="text"
+                placeholder="Search here"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+              />
+              <button className="absolute right-3">
+                <CiSearch className="w-5 h-5 text-gray-500" />
+              </button>
             </div>
 
-            {/* Show loading spinner, error message, or notices */}
-            <div className="mt-5 rounded-lg overflow-auto">
-              {loading ? (
-                <div className="flex justify-center items-center h-full">
-                  <Spinner />
-                </div>
-              ) : error ? (
-                renderErrorMessage() // Error message with icon below search bar
-              ) : filteredNotices?.length > 0 ? (
-                filteredNotices?.map((notice, index) => (
-                  <div key={notice?.id || index} className="border mb-4">
-                    <div
-                      className={`cursor-pointer p-2 flex flex-col bg-white`}
-                      onClick={() => toggleAccordion(index)}
-                    >
-                      <div className="flex gap-6 px-3 py-2">
-                        <div className={`border ${backgroundColors[index % backgroundColors?.length]} rounded-[10%] flex items-center justify-center`} style={{ height: '70px', width: '70px' }}>
-                          <img
-                            className="h-[80%] w-[80%] rounded-[10%]"
-                            src={announcementIcon}
-                            alt="announcement-image"
-                          />
-                        </div>
-                        <div className="flex flex-col gap-3 mt-[-5px] flex-1">
-                          <h2 className="font-[500] text-[#4D4D4D]" style={{ fontStyle: "inter" }}>
-                            {notice?.title || t("Untitled")} <span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{notice?.authorName || '-'}</span>)</span>
-                          </h2>
-                          <div className="flex flex-row gap-[50px] text-xs">
-                            <div className="flex flex-wrap justify-center items-center">
-                              <img src={CalendarIcon} alt="calendar" style={{ width: '25px', height: '25px', marginRight: '5px' }} />
-                              <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
-                                {formatDate(notice?.startDate)}
-                              </span>
-                            </div>
-                            <div
-                              className={`px-3 text-xs text-center flex justify-center items-center rounded-full ${notice?.priority === t("High Priority")
-                                ? "bg-[#FAECF0]"
-                                : "bg-[#F2F5FB] border border-[#F2F5FB]"
+          </div>
+
+
+          {/* Show skeleton if loading, error message, or notices */}
+          <div className="mt-5 overflow-auto">
+            {loading ? (
+              // Render Skeleton instead of Spinner
+              <NoticeSkeleton count={3} />
+            ) : error ? (
+              renderErrorMessage()
+            ) : filteredNotices?.length > 0 ? (
+              filteredNotices?.map((notice, index) => (
+                <div key={notice?.id || index}
+                  className={`border rounded-md mb-4 transition-colors duration-300 cursor-pointer ${activeIndex === index ? 'bg-gray-50' : 'hover:bg-gray-50'
+                    }`}
+                >
+                  <div
+                    className={`cursor-pointer p-2 flex flex-col`}
+                    onClick={() => toggleAccordion(index)}
+                  >
+                    <div className="flex gap-6 px-3 py-2">
+                      <div
+                        className={`border ${backgroundColors[index % backgroundColors?.length]
+                          } rounded-[10%] flex items-center justify-center`}
+                        style={{ height: '70px', width: '70px' }}
+                      >
+                        <img
+                          className="h-[80%] w-[80%] rounded-[10%]"
+                          src={announcementIcon}
+                          alt="announcement-image"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-3 mt-[-5px] flex-1">
+                        <h2
+                          className="font-[500] text-[#4D4D4D]"
+                          style={{ fontStyle: "inter" }}
+                        >
+                          {notice?.title || t("Untitled")}{" "}
+                          <span className="ml-4 text-sm text-gray-500">
+                            (Posted by{" "}
+                            <span className="text-sm text-gray-700">
+                              {notice?.authorName || '-'}
+                            </span>)
+                          </span>
+                        </h2>
+                        <div className="flex flex-row gap-[50px] text-xs">
+                          <div className="flex flex-wrap justify-center items-center">
+                            <img
+                              src={CalendarIcon}
+                              alt="calendar"
+                              style={{ width: '25px', height: '25px', marginRight: '5px' }}
+                            />
+                            <span className="text-sm p-1 font-[400] text-[#7F7F7F]">
+                              {formatDate(notice?.startDate)}
+                            </span>
+                          </div>
+                          <div
+                            className={`px-3 text-xs text-center flex justify-center items-center rounded-full ${notice?.priority === t("High Priority")
+                              ? "bg-[#FAECF0]"
+                              : "bg-[#F2F5FB] border border-[#F2F5FB]"
+                              }`}
+                          >
+                            <span
+                              className={`${notice?.priority === t("High Priority")
+                                ? "font-semibold bg-gradient-to-r from-[#C83B62] to-[#7F35CD] inline-block text-transparent bg-clip-text"
+                                : "text-gray-500"
                                 }`}
                             >
-                              <span
-                                className={`${notice?.priority === t("High Priority")
-                                  ? "font-semibold bg-gradient-to-r from-[#C83B62] to-[#7F35CD] inline-block text-transparent bg-clip-text"
-                                  : "text-gray-500"
-                                  }`}
-                              >
-                                {notice?.priority || t("Low Priority")}
-                              </span>
-                            </div>
+                              {notice?.priority || t("Low Priority")}
+                            </span>
                           </div>
                         </div>
-                        <div className="flex items-center justify-center w-[40px] h-[40px] rounded-full border border-gray-300">
-                          {activeIndex === index ? (
-                            <MdExpandLess className="text-xl text-gray-700" />
-                          ) : (
-                            <MdExpandMore className="text-xl text-gray-700" />
-                          )}
-                        </div>
                       </div>
+                      <div
+                        className={`flex items-center justify-center w-[40px] h-[40px] rounded-full border border-gray-300 transition-transform duration-300 ease-in-out ${activeIndex === index ? 'rotate-180' : 'rotate-0'
+                          }`}
+                      >
+                        <MdExpandMore className="text-xl text-gray-700" />
+                      </div>
+
+
                     </div>
-                    {activeIndex === index && (
-                      <div className="p-2 pl-6 text-[#4D4D4D]">
-                        <p>{notice?.description || t("No description available")}</p>
-                      </div>
-                    )}
                   </div>
-                ))
-              ) : (
-                <div className="flex flex-col items-center justify-center h-full">
-                  <img src={CalendarIcon} style={{ width: '40px', height: '40px', marginBottom: '10px' }} alt="calendar" />
-                  <p className="text-gray-600 text-lg">{t("No Notices are available")}</p>
+                  {activeIndex === index && (
+                    <div className="border rounded-full bg-white p-3 pl-6 text-[#4D4D4D] shadow-sm mx-3 mb-3 transition-all duration-300 ease-in-out">
+                      <p>{notice?.description || t("No description available")}</p>
+                    </div>
+                  )}
+
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full">
+                <img
+                  src={CalendarIcon}
+                  style={{ width: '40px', height: '40px', marginBottom: '10px' }}
+                  alt="calendar"
+                />
+                <p className="text-gray-600 text-lg">
+                  {t("No Notices are available")}
+                </p>
+              </div>
+            )}
           </div>
-        </ParentDashLayout>
-      </Layout>
-    </>
+        </div>
+      </ParentDashLayout>
+    </Layout>
   );
 };
 

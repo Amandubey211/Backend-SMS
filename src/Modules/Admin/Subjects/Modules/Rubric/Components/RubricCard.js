@@ -1,12 +1,15 @@
+// src/components/Components/RubricCard.js
+
 import React, { useState } from "react";
 import { Tooltip } from "antd";
 import { MdOutlineModeEditOutline } from "react-icons/md";
 import { RiDeleteBin2Line } from "react-icons/ri";
+import { AiOutlineEye } from "react-icons/ai"; // NEW IMPORT
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../../config/permission";
 
-const RubricCard = ({ rubric, onDelete, onEdit }) => {
+const RubricCard = ({ rubric, onDelete, onEdit, onView }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Helper function to truncate text and append ellipsis
@@ -31,18 +34,24 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
     onEdit(id);
   };
 
+  // NEW: handle view in read-only mode
+  const handleViewClick = () => {
+    const { id } = getAssociatedId();
+    onView(id);
+  };
+
+  // Return the associated assignment/quiz ID or fallback to the rubric's own ID
   const getAssociatedId = () => {
     if (rubric.assignmentId && rubric.assignmentId._id) {
       return { id: rubric.assignmentId._id };
     } else if (rubric.quizId && rubric.quizId._id) {
       return { id: rubric.quizId._id };
     } else {
-      // If the rubric is general and not associated with an assignment or quiz
       return { id: rubric._id };
     }
   };
 
-  // Determine the type of the rubric
+  // Determine the rubric type for display
   const rubricType = rubric.assignmentId
     ? "Assignment"
     : rubric.quizId
@@ -54,7 +63,6 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
       <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4">
         <div className="flex flex-col items-start justify-start">
           <div className="flex justify-between items-center">
-            {/* Wrap the truncated title in a Tooltip */}
             <Tooltip title={rubric.name}>
               <h2 className="text-base font-semibold">
                 {truncateText(rubric.name, 20)}
@@ -86,6 +94,10 @@ const RubricCard = ({ rubric, onDelete, onEdit }) => {
           </div>
         </div>
         <div className="flex flex-col gap-2 text-xl">
+          {/* NEW: Eye icon for view-only mode */}
+          <button className="text-blue-600" onClick={handleViewClick}>
+            <AiOutlineEye />
+          </button>
           <ProtectedAction requiredPermission={PERMISSIONS.DELETE_RUBRIC}>
             <button className="text-red-600" onClick={handleDeleteClick}>
               <RiDeleteBin2Line />

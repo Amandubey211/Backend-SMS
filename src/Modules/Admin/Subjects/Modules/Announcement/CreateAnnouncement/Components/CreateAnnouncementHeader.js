@@ -3,6 +3,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
         >
           <span>{t("Cancel")}</span>
         </button>
-        <ProtectedAction requiredPermission="add/edit announcement">
+        <ProtectedAction requiredPermission= {PERMISSIONS.ADD_NEW_ANNOUNCEMENT || PERMISSIONS.EDIT_ANNOUNCEMENT}>
           <button
             onClick={onSave}
             className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"

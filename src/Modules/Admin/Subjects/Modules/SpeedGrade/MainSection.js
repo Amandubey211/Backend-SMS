@@ -16,6 +16,8 @@ import {
   fetchStudentQuiz,
 } from "../../../../../Store/Slices/Admin/Class/SpeedGrade/QuizSpeedGradeThunks";
 import ShimmerLoader from "../../../../../Components/Common/ShimmerLoader";
+import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { PERMISSIONS } from "../../../../../config/permission";
 
 const MainSection = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -76,6 +78,10 @@ const MainSection = () => {
   };
 
   return (
+     <ProtectedSection
+            title="Speed Grades"
+            requiredPermission={PERMISSIONS.ASSIGN_SPEED_GRADES}
+          >
     <div className="flex h-screen">
       {/* Student List Section */}
       <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
@@ -172,6 +178,7 @@ const MainSection = () => {
         />
       </div>
     </div>
+    </ProtectedSection>
   );
 };
 

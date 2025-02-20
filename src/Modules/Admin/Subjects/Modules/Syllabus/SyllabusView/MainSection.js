@@ -48,7 +48,7 @@ const MainSection = () => {
     }
 
     if (error) {
-      return <NoDataFound title={t("Syllabus")} />;
+      return <div className="mt-10"><NoDataFound title={t("Syllabus")}  /></div>;
     }
 
     if (syllabi && syllabi?.length > 0) {
@@ -93,7 +93,7 @@ const MainSection = () => {
         <div className="border-l w-full p-4 relative">
           {renderContent()}
           {syllabi && syllabi?.length === 0 && (
-            <ProtectedAction requiredPermission="AddSyllabus">
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_SYLLABUS}>
               <NavLink
                 to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
                 className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"

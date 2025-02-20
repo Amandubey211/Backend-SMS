@@ -37,19 +37,17 @@ const pinkColor = "#EC407A";
 const purpleColor = "#AB47BC";
 const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
-const SemesterManagement = ({ classId }) => {
+const SemesterManagement = () => {
   const dispatch = useDispatch();
   const {
     semesters: reduxSemesters,
     loading,
     error,
   } = useSelector((state) => state.admin.semesters);
-
   // Persisted selected semester from common user slice
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
-
   const { t } = useTranslation("admClass");
   const { Title } = Typography;
 
@@ -62,41 +60,33 @@ const SemesterManagement = ({ classId }) => {
   const [formLoading, setFormLoading] = useState(false);
   const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
 
-  /**
-   * Reset the form and clear editing state
-   * whenever the form itself is reset
-   */
+  // Reset form and clear editing state when the form resets
   useEffect(() => {
     form.resetFields();
     setEditingSemester(null);
   }, [form]);
 
-  // Keep local copy of semesters in sync with Redux
+  // Sync local semesters with Redux state
   useEffect(() => {
     setLocalSemesters(reduxSemesters);
   }, [reduxSemesters]);
 
-  // Fetch semesters whenever classId changes
+  // Fetch semesters on component mount
   useEffect(() => {
-    if (classId) {
-      dispatch(fetchSemestersByClass({ classId }));
-    }
-  }, [dispatch, classId]);
+    dispatch(fetchSemestersByClass());
+  }, [dispatch]);
 
-  // Show errors if any
-  useEffect(() => {
-    if (error) {
-      message.error(
-        error.message || "An error occurred while fetching semesters"
-      );
-    }
-  }, [error]);
+  // Display errors if any
+  // useEffect(() => {
+  //   if (error) {
+  //     message.error(
+  //       error.message || "An error occurred while fetching semesters"
+  //     );
+  //   }
+  // }, [error]);
 
   /**
-   * Auto-select a semester if no valid one is selected:
-   * 1) Look for an active semester whose date range includes today's date.
-   * 2) If none found, select the first semester in the list.
-   * 3) If no semesters exist, clear any persisted selection.
+   * Auto-select a semester if none is selected or if the current selection is invalid.
    */
   useEffect(() => {
     if (reduxSemesters && reduxSemesters.length > 0) {
@@ -144,7 +134,7 @@ const SemesterManagement = ({ classId }) => {
     message.success(`Semester "${semester.title}" selected`);
   };
 
-  // Select column icon logic
+  // Render select column icon
   const renderSelectColumn = (semester) => {
     if (!semester) return null;
     return (
@@ -170,13 +160,12 @@ const SemesterManagement = ({ classId }) => {
     form.setFieldsValue({
       title: semester.title,
       description: semester.description,
-      // Convert from ISO string to moment for form fields
       startDate: moment(semester.startDate),
       endDate: moment(semester.endDate),
     });
   };
 
-  // Confirm deletion
+  // Confirm deletion of a semester
   const handleDelete = (semesterId) => {
     Modal.confirm({
       title: "Delete Semester",
@@ -195,7 +184,6 @@ const SemesterManagement = ({ classId }) => {
           .unwrap()
           .then(() => {
             message.success("Semester deleted successfully");
-            dispatch(fetchSemestersByClass({ classId }));
           })
           .catch(() => {
             message.error("Deletion failed, reverting changes");
@@ -208,18 +196,8 @@ const SemesterManagement = ({ classId }) => {
 
   /**
    * Handle form submission for CREATE or UPDATE.
-   * NOTE: We send dates in "YYYY-MM-DD" so the backend
-   * can parse them with `new Date(`${date}T00:00:00.000Z`)`
    */
   const onFinish = (values) => {
-    // Debug: Log the selected dates (they should be moment objects)
-    console.log(
-      "startDate:",
-      values.startDate.format("YYYY-MM-DD"),
-      "endDate:",
-      values.endDate.format("YYYY-MM-DD")
-    );
-
     if (!values.startDate || !values.startDate.isValid()) {
       message.error("Invalid Start Date. Please select a valid date.");
       return;
@@ -229,10 +207,8 @@ const SemesterManagement = ({ classId }) => {
       return;
     }
 
-    // For update, we send "DD-MM-YYYY" because the backend update uses parseDate.
-    // For create, we send "YYYY-MM-DD" because new Date("YYYY-MM-DDT00:00:00.000Z") works.
+    // Determine date format based on the action
     const dateFormat = editingSemester ? "DD-MM-YYYY" : "YYYY-MM-DD";
-
     const payload = {
       title: values.title,
       description: values.description,
@@ -243,7 +219,7 @@ const SemesterManagement = ({ classId }) => {
     setFormLoading(true);
 
     if (editingSemester) {
-      // Update an existing semester
+      // Update existing semester
       dispatch(
         updateSemester({
           semesterId: editingSemester._id,
@@ -255,23 +231,22 @@ const SemesterManagement = ({ classId }) => {
           message.success("Semester updated successfully");
           setEditingSemester(null);
           form.resetFields();
-          dispatch(fetchSemestersByClass({ classId }));
+        })
+        .catch((error) => {
+          message.error(
+            error || "An error occurred while updating the semester."
+          );
         })
         .finally(() => {
           setFormLoading(false);
         });
     } else {
-      // Create a new semester
-      dispatch(createSemester({ semesterData: payload, classId }))
+      // Create new semester
+      dispatch(createSemester({ semesterData: payload }))
         .unwrap()
         .then((newSemester) => {
           message.success("Semester created successfully");
           form.resetFields();
-
-          // Refresh the list
-          dispatch(fetchSemestersByClass({ classId }));
-
-          // Auto-select the newly created semester
           if (newSemester?.data) {
             dispatch(
               setSelectedSemester({
@@ -281,13 +256,17 @@ const SemesterManagement = ({ classId }) => {
             );
           }
         })
+        .catch((error) => {
+          message.error(
+            error || "An error occurred while creating the semester."
+          );
+        })
         .finally(() => {
           setFormLoading(false);
         });
     }
   };
 
-  // Table columns
   const columns = [
     {
       title: "Select",
@@ -343,7 +322,6 @@ const SemesterManagement = ({ classId }) => {
       title: "Dates",
       key: "dates",
       render: (_, record) => {
-        // record.startDate & record.endDate are likely stored in ISO format
         const start = moment(record.startDate).format("DD MMM YYYY");
         const end = moment(record.endDate).format("DD MMM YYYY");
         return <span>{`${start} - ${end}`}</span>;
@@ -355,29 +333,25 @@ const SemesterManagement = ({ classId }) => {
       render: (_, record) => (
         <Space size="middle">
           <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_SEMESTER}>
-
-         
-          <Tooltip title="Edit Semester">
-            <Button
-              type="primary"
-              onClick={() => handleEdit(record)}
-              style={{ background: primaryGradient, border: "none" }}
-              icon={<FaRegEdit />}
-              aria-label={`Edit semester ${record.title}`}
-            />
-          </Tooltip>
+            <Tooltip title="Edit Semester">
+              <Button
+                type="primary"
+                onClick={() => handleEdit(record)}
+                style={{ background: primaryGradient, border: "none" }}
+                icon={<FaRegEdit />}
+                aria-label={`Edit semester ${record.title}`}
+              />
+            </Tooltip>
           </ProtectedAction>
           <ProtectedAction requiredPermission={PERMISSIONS.DELETE_SEMESTER}>
-
-
-          <Tooltip title="Delete Semester">
-            <Button
-              danger
-              onClick={() => handleDelete(record._id)}
-              icon={<RiDeleteBin5Line />}
-              aria-label={`Delete semester ${record.title}`}
-            />
-          </Tooltip>
+            <Tooltip title="Delete Semester">
+              <Button
+                danger
+                onClick={() => handleDelete(record._id)}
+                icon={<RiDeleteBin5Line />}
+                aria-label={`Delete semester ${record.title}`}
+              />
+            </Tooltip>
           </ProtectedAction>
         </Space>
       ),
@@ -477,8 +451,6 @@ const SemesterManagement = ({ classId }) => {
                 ]}
                 hasFeedback
               >
-                {/* Format "DD-MM-YYYY" for display if you like, 
-                    but the `onFinish` will submit "YYYY-MM-DD" */}
                 <DatePicker
                   style={{ width: "100%" }}
                   format="DD-MM-YYYY"
@@ -520,21 +492,28 @@ const SemesterManagement = ({ classId }) => {
                       editingSemester ? "Update Semester" : "Create Semester"
                     }
                   >
-                    <ProtectedAction requiredPermission={editingSemester ? PERMISSIONS.ADD_SEMESTER : PERMISSIONS.UPDATE_SEMESTER}>
-
-
-                   
-                    <Button
-                      type="primary"
-                      htmlType="submit"
-                      style={{ background: primaryGradient, border: "none" }}
-                      aria-label={
-                        editingSemester ? "Update Semester" : "Create Semester"
+                    <ProtectedAction
+                      requiredPermission={
+                        editingSemester
+                          ? PERMISSIONS.ADD_SEMESTER
+                          : PERMISSIONS.UPDATE_SEMESTER
                       }
-                      loading={formLoading}
                     >
-                      {editingSemester ? "Update Semester" : "Create Semester"}
-                    </Button>
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        style={{ background: primaryGradient, border: "none" }}
+                        aria-label={
+                          editingSemester
+                            ? "Update Semester"
+                            : "Create Semester"
+                        }
+                        loading={formLoading}
+                      >
+                        {editingSemester
+                          ? "Update Semester"
+                          : "Create Semester"}
+                      </Button>
                     </ProtectedAction>
                   </Tooltip>
                 </Space>
@@ -576,7 +555,6 @@ const SemesterManagement = ({ classId }) => {
               transition={{ duration: 0.3 }}
               className="flex flex-col p-6"
             >
-              {/* Header with Icon */}
               <div className="flex items-center space-x-4 mb-4">
                 <div className="bg-purple-100 p-3 rounded-full">
                   <FiInfo className="text-purple-600 text-4xl" />
@@ -585,8 +563,6 @@ const SemesterManagement = ({ classId }) => {
                   {t("Semester Creation Guidelines")}
                 </Title>
               </div>
-
-              {/* Left-Aligned Guidelines */}
               <ul className="list-none text-gray-700 pl-6 space-y-2">
                 <li className="flex items-center space-x-2">
                   <FiCheck className="text-green-500" />
@@ -615,8 +591,6 @@ const SemesterManagement = ({ classId }) => {
                   </span>
                 </li>
               </ul>
-
-              {/* Close Button (Right-Aligned) */}
               <div className="flex justify-end mt-6">
                 <Button
                   onClick={() => setGuidelinesModalVisible(false)}

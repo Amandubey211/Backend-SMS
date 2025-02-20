@@ -16,9 +16,9 @@ const Assignment = () => {
   useNavHeading(className, subjectName);
   return (
     <Layout title="Assignment View | student diwan">
-      <ProtectedSection requiredPermission={''}>
+    
       <DashLayout hideSearchbar={true} children={<MainSection />} />
-      </ProtectedSection>
+    
     </Layout>
   );
 };

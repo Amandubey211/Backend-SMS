@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
-
+import { Skeleton } from "antd";
 import { format } from 'date-fns';
 import { FaBell } from "react-icons/fa"; // Keeping the bell icon for consistency
 import Spinner from "../../../../Components/Common/Spinner";
@@ -66,6 +66,37 @@ const NoticeBoard = ({ textTrimCount }) => {
     });
   }, [notices]);
 
+
+  const NoticeSkeleton = () => (
+    <div className="p-4 w-full">
+      {/* Notice Item */}
+      <div className="flex items-start gap-4 p-4 border-b w-full">
+        {/* Notice Icon (Increased Size & Rounded Corners) */}
+        <Skeleton.Avatar active size={60} shape="square" style={{ borderRadius: 12 }} />
+
+        {/* Notice Content */}
+        <div className="flex-1 space-y-3">
+          {/* Title + Author (Aligned Horizontally) */}
+          <div className="flex items-center justify-between">
+            <Skeleton.Input active size="small" style={{ width: "50%" }} />
+            <Skeleton.Input active size="small" style={{ width: "30%" }} />
+          </div>
+
+          {/* Date & Priority (Aligned Inline) */}
+          <div className="flex items-center gap-3">
+            <Skeleton.Input active size="small" style={{ width: "40%" }} />
+            <Skeleton.Button active size="small" shape="round" style={{ width: 100 }} />
+          </div>
+
+          {/* Notice Description */}
+          <Skeleton paragraph={{ rows: 1, width: ["70%"] }} active />
+        </div>
+      </div>
+    </div>
+  );
+
+
+
   // Get the number of notices to show based on the number of children
   const numberOfNoticesToShow = 2
 
@@ -89,8 +120,8 @@ const NoticeBoard = ({ textTrimCount }) => {
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
         </div>
-        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4">
-          <Spinner /> {/* Spinner centered during loading */}
+        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-hidden shadow rounded-lg p-4">
+          <NoticeSkeleton />
         </div>
       </div>
     );
@@ -130,12 +161,17 @@ const NoticeBoard = ({ textTrimCount }) => {
     <div className="p-2 ">
       <div className="flex justify-between p-4 items-center px-6 pt-0">
         <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
-        <button
-          className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
-          onClick={handleNavigate}
-        >
-          {t("See All")}
-        </button>
+        <div className="inline-block">
+          <button
+            className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+               text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]
+               hover:bg-gray-100 hover:shadow-md"
+            onClick={handleNavigate}
+          >
+            {t("See All")}
+          </button>
+        </div>
+
       </div>
       {latestNotices?.map((notice, index) => (
         <Notice

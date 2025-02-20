@@ -31,7 +31,6 @@ const CreateQuizzes = () => {
           : "Create Quiz | Student Diwan"
       }
     >
-      <ProtectedSection requiredPermission={''}>
       <div className="flex w-full min-h-screen">
         <SideMenubar />
         <div
@@ -43,7 +42,6 @@ const CreateQuizzes = () => {
           <MainSection setIsEditing={setIsEditing} isEditing={isEditing} />
         </div>
       </div>
-      </ProtectedSection>
     </Layout>
   );
 };
