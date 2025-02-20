@@ -3,17 +3,19 @@ import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedA
 import { RiAddFill } from "react-icons/ri";
 import { Tooltip } from "antd";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
-import TableView from "./TableView";
-import { MdAddChart, MdFileDownload, MdFileUpload } from "react-icons/md";
+import { MdAddChart, MdFileUpload } from "react-icons/md";
 import { useDispatch } from "react-redux";
 import { UploadOfflineExamSheet } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
-import NormalTable from "./NormalTable";
 import toast from "react-hot-toast";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import CreateManually from "./CreateManually";
+import UploadExcel from "./UploadExcel";
+import { FiInfo } from "react-icons/fi";
+import GuidelinesModel from "./GuidelinesModel";
 
-function CreateButton() {
+function CreateExam() {
   const { cid, sid } = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const fileInputRef = useRef(null);
@@ -23,13 +25,17 @@ function CreateButton() {
   const [tableData, setTableData] = useState([]);
   const [showManual, setShowManual] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
+
+  const pinkColor = "#EC407A";
+  const purpleColor = "#AB47BC";
+  const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
   const handleUploadClick = () => {
     setShowManual(false);
     fileInputRef.current.click();
   };
 
-  // Handle file selection and read Excel
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
@@ -67,7 +73,9 @@ function CreateButton() {
     if (formData) {
       setLoading(true);
 
-      dispatch(UploadOfflineExamSheet(formData))
+      dispatch(
+        UploadOfflineExamSheet({ formData: formData, cid: cid, sid: sid })
+      )
         .then(() => {
           setLoading(false);
           toast.success("Exam Uploaded Successfully");
@@ -80,8 +88,6 @@ function CreateButton() {
       setLoading(false);
       toast.error("Failed to Upload Exam");
     }
-
-    // navigate(-1);
   };
 
   return (
@@ -112,18 +118,23 @@ function CreateButton() {
               setIsOpen(false);
             }
           }}
-          width={"95%"}
+          width={"100%"}
         >
           <div>
             <div className="flex justify-end mr-5">
               {/* Create Manually Button */}
               <div className="pl-5 pt-1">
                 <button
+                  style={{
+                    background: primaryGradient,
+                    border: "none",
+                    color: "white",
+                  }}
                   onClick={() => setShowManual(true)}
-                  className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                  className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md"
                 >
-                  <MdAddChart className="text-lg text-gray-600" />
-                  <span className="text-gradient">Create Manually</span>
+                  <MdAddChart className="text-lg text-white" />
+                  <span className="text-white">Create Manually</span>
                 </button>
               </div>
               <ProtectedAction
@@ -132,11 +143,16 @@ function CreateButton() {
                 {/* Upload Excel Button */}
                 <div className="pl-5 pt-1">
                   <button
+                    style={{
+                      background: primaryGradient,
+                      border: "none",
+                      color: "white",
+                    }}
                     onClick={handleUploadClick}
-                    className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                    className="flex justify-center  items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md "
                   >
-                    <MdFileUpload className="text-lg text-gray-600" />
-                    <span className="text-gradient">Upload Excel</span>
+                    <MdFileUpload className="text-lg text-white" />
+                    <span className="text-white">Upload Excel</span>
                   </button>
                   <input
                     type="file"
@@ -148,18 +164,23 @@ function CreateButton() {
                 </div>
 
                 {/* Sample Excel Download Button */}
-                <div className="pl-5 pt-1">
-                  <a
-                    href="/createOfflineExamSample.xlsx"
-                    download="createOfflineExamSample.xlsx"
-                    className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                <Tooltip title="View Upload Excel Guidelines">
+                  <button
+                    onClick={() => setGuidelinesModalVisible(true)}
+                    className="ml-2 focus:outline-none mt-2"
+                    aria-label="Upload Excel Guidelines"
                   >
-                    <MdFileDownload className="text-lg text-gray-600" />
-                    <span className="text-gradient">Sample Excel</span>
-                  </a>
-                </div>
+                    <FiInfo className="text-blue-500 text-2xl" />
+                  </button>
+                </Tooltip>
               </ProtectedAction>
             </div>
+
+            {/* Guidelines Modal */}
+            <GuidelinesModel
+              guidelinesModalVisible={guidelinesModalVisible}
+              setGuidelinesModalVisible={setGuidelinesModalVisible}
+            />
 
             {/* Handsontable Component */}
             {!showManual
@@ -168,14 +189,14 @@ function CreateButton() {
                 )
               : ""}
             {showManual ? (
-              <NormalTable
+              <CreateManually
                 setIsOpen={setIsOpen}
                 setLoading={setLoading}
                 loading={loading}
                 isOpen={isOpen}
               />
             ) : (
-              <TableView
+              <UploadExcel
                 data={tableData}
                 handleData={handleData}
                 loading={loading}
@@ -189,4 +210,4 @@ function CreateButton() {
     </ProtectedAction>
   );
 }
-export default CreateButton;
+export default CreateExam;

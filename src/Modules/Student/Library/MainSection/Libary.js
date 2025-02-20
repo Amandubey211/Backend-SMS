@@ -19,8 +19,14 @@ import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice
 
 const Library = () => {
   const dispatch = useDispatch();
-  const { loading: libraryLoading, error: libraryError, libararyBooks, filters, activeTab } = useSelector((store) => store.student.studentLibraryBooks);
-  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+  const {
+    loading: libraryLoading,
+    error: libraryError,
+    libararyBooks,
+    filters,
+    activeTab,
+  } = useSelector((store) => store.student.studentLibraryBooks);
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
   const { t } = useTranslation();
 
   useNavHeading("Library");
@@ -37,7 +43,7 @@ const Library = () => {
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
-  }
+  };
 
   useEffect(() => {
     if (activeTab === "Library") {
@@ -45,7 +51,7 @@ const Library = () => {
     } else if (activeTab === "BookIssue") {
       dispatch(studentIssueBooks());
     }
-  }, [dispatch,libraryBooksStudent,studentIssueBooks, activeTab]);
+  }, [dispatch, libraryBooksStudent, studentIssueBooks, activeTab]);
 
   const libraryContent = () => {
     if (libraryLoading) {
@@ -65,7 +71,11 @@ const Library = () => {
     //   );
     // }
 
-    if (!libraryLoading  && filteredBooks?.length === 0 && activeTab === "Library") {
+    if (
+      !libraryLoading &&
+      filteredBooks?.length === 0 &&
+      activeTab === "Library"
+    ) {
       return (
         <div className="text-center py-20">
           <NoDataFound />
@@ -85,6 +95,9 @@ const Library = () => {
             copies={book?.copies}
             available={book?.available}
             coverImageUrl={book?.image}
+            name={book?.name}
+            totalCopies={book?.TotalCopies}
+            issuedCount={book?.issuedCount}
           />
         ))}
       </div>
@@ -105,22 +118,22 @@ const Library = () => {
               onClick={() => handleSwitchTab("Library")}
               aria-label="Library tab"
             >
-              {t('Library', gt.stdLibrary)}
+              {t("Library", gt.stdLibrary)}
             </TabButton>
             <TabButton
               isActive={activeTab === "BookIssue"}
               onClick={() => handleSwitchTab("BookIssue")}
               aria-label="Book Issue tab"
             >
-              {t('Book Issue', gt.stdLibrary)}
+              {t("Book Issue", gt.stdLibrary)}
             </TabButton>
           </div>
 
           {activeTab === "Library" ? libraryContent() : bookIssueContent()}
         </div>
         {!libraryLoading && showError && (
-            <OfflineModal error={libraryError} onDismiss={handleDismiss} />
-          )}
+          <OfflineModal error={libraryError} onDismiss={handleDismiss} />
+        )}
       </StudentDashLayout>
     </Layout>
   );

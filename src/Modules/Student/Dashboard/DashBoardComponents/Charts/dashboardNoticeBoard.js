@@ -3,7 +3,7 @@ import Fallback from "../../../../../Components/Common/Fallback";
 import { useNavigate } from "react-router-dom"; // Updated import
 import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
 import { fetchNotices } from "../../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import Redux action
-import icon1 from "../../../../../Assets/DashboardAssets/Images/image1.png"; 
+import icon1 from "../../../../../Assets/DashboardAssets/Images/image1.png";
 import icon2 from "../../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
 import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
 import Notice from "../../../../Admin/Dashboard/NoticeModule/Notice";
@@ -27,7 +27,9 @@ const DashboardNoticeBoard = (descriptionLength) => {
   const navigate = useNavigate(); // Use useNavigate for navigation
 
   // Get notices data from Redux state
-  const { loading, error, notices } = useSelector((state) => state.admin.adminDashboard);
+  const { loading, error, notices } = useSelector(
+    (state) => state.admin.adminDashboard
+  );
 
   useEffect(() => {
     dispatch(fetchNotices()); // Dispatch the action to fetch notices when component mounts
@@ -41,25 +43,27 @@ const DashboardNoticeBoard = (descriptionLength) => {
     return <p>Error: {error}</p>;
   }
 
-  
   const topNotices = notices?.slice(0, 3);
 
   return (
-    <div className="p-2">
-      <div className="flex justify-between p-4 items-center px-6 pr-7 pl-2">
+    <div className="mt-4 pl-4">
+      <div className="flex justify-between  items-center pr-5">
         <h2 className="text-xl font-semibold text-gray-600">Notice Board</h2>
-        <button
+        {/* <button
           className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
           onClick={() => navigate('/student/noticeboard/announcements')}
         >
           View All
-        </button>
-
-
-
+        </button> */}
+        <span
+          className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent font-normal cursor-pointer"
+          onClick={() => navigate("/student/noticeboard/announcements")}
+        >
+          See All
+        </span>
       </div>
       {topNotices?.length == 0 ? (
-        <div className="flex flex-col items-center justify-center my-10">
+        <div className="flex  flex-col items-center justify-center my-10">
           <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
           <p className="text-gray-500 text-xl">No noticeboard data found</p>
         </div>

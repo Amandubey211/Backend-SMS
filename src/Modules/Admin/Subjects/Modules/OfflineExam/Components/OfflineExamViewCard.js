@@ -11,8 +11,6 @@ const OfflineExamViewCard = ({ student, examType, startDate }) => {
     dispatch(fetchAllStudents());
   }, [dispatch]);
 
-  console.log("stu_id", student);
-
   const studentDetails = allStudents.find(
     (s) => s?._id === student?.studentId?._id
   );
