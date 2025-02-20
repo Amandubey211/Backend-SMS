@@ -5,7 +5,8 @@ import { fetchChildren } from '../../../../Store/Slices/Parent/Dashboard/dashboa
 import { FaChild } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png';
-import { Skeleton } from "antd";
+import { DashMyChildrenSkeleton } from '../../Skeletons';
+
 
 // Memoized StudentCard to prevent unnecessary re-renders
 const StudentCard = React.memo(({ student, index }) => {
@@ -89,35 +90,7 @@ const StudentParentCard = () => {
     </div>
   ), [errorChildren]);
 
-  const StudentSkeleton = () => (
-    <div className="relative p-4 pb-4 pt-6 text-center border border-gray-200 rounded-lg w-full max-w-md mx-auto bg-white">
 
-      {/* Child Label Skeleton */}
-      <div className="absolute top-2 left-2">
-        <Skeleton.Input active size="small" style={{ width: 60, height: 20, borderRadius: 4 }} />
-      </div>
-
-      {/* Profile Picture Skeleton */}
-      <div className="flex justify-center mt-4">
-        <Skeleton.Avatar active size={80} shape="circle" />
-      </div>
-
-      {/* Name Skeleton */}
-      <div className="mt-4">
-        <Skeleton.Input active size="small" style={{ width: 120, height: 20, borderRadius: 4 }} />
-      </div>
-
-      {/* Class, ID, Section Skeleton */}
-      <div className="mt-2">
-        <Skeleton.Input active size="small" style={{ width: 220, height: 15, borderRadius: 4 }} />
-      </div>
-
-      {/* Group Skeleton */}
-      <div className="mt-2">
-        <Skeleton.Input active size="small" style={{ width: 100, height: 15, borderRadius: 4 }} />
-      </div>
-    </div>
-  );
 
 
 
@@ -148,7 +121,7 @@ const StudentParentCard = () => {
         {/* Skeleton during loading */}
         {loadingChildren && (
           <div className="flex justify-center items-center h-48">
-            <StudentSkeleton />
+            <DashMyChildrenSkeleton />
           </div>
         )}
 

@@ -3,30 +3,16 @@ import { Calendar as AntdCalendar } from 'antd';
 import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard.js';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAttendance } from '../../../Store/Slices/Parent/Children/children.action.js';
-import { FaExclamationTriangle } from 'react-icons/fa'; // Error icon
+import { FaExclamationTriangle } from 'react-icons/fa';
 import presentIcon from '../../../Assets/ParentAssets/svg/present.svg';
 import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 import './ChildrenAttendance.css';
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
-import CustomSpinner from '../../../Components/Common/Spinner.js'; // Original spinner import (not used anymore)
-import { useTranslation } from "react-i18next"; // Import useTranslation
+import CustomSpinner from '../../../Components/Common/Spinner.js';
+import { useTranslation } from "react-i18next";
+import { ThreeRectCardSkeleton } from '../../../Modules/Parents/Skeletons.js';
 
-// 1. NEW: Skeleton component for the 3 attendance cards
-import { Skeleton } from 'antd';
-const ThreeRectCardSkeleton = () => {
-  return (
-    <div className="attendance-card-wrapper">
-      <div className="flex gap-4">
-        {[...Array(3)].map((_, index) => (
-          <div key={index} className="bg-white rounded shadow p-4 flex-1">
-            <Skeleton active paragraph={{ rows: 1 }} />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-};
 
 const MyChildAttendance = () => {
   const { t } = useTranslation('prtChildrens'); // Initialize translation hook
@@ -34,7 +20,7 @@ const MyChildAttendance = () => {
   var { attendance, loading, error, children } = useSelector((state) => state.Parent.children); // Access Redux state
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
-  
+
   // Fetch the student ID from the Redux state
   const studentId = children?.[0]?.id || null;
 
@@ -60,7 +46,7 @@ const MyChildAttendance = () => {
 
   // dateCellRender function to show attendance icons
   const dateCellRender = useCallback((value) => {
-    const listData = attendance?.filter(entry => 
+    const listData = attendance?.filter(entry =>
       new Date(entry.date).toDateString() === value.toDate().toDateString()
     );
 
@@ -90,7 +76,7 @@ const MyChildAttendance = () => {
       </ul>
     );
   }, [attendance]);
-  
+
   // Memoize the content rendering to avoid unnecessary re-renders
   const renderContent = useCallback(() => {
     if (loading) {
@@ -122,7 +108,7 @@ const MyChildAttendance = () => {
         <div className="attendance-card-wrapper">
           <AttendanceCard attendanceData={attendance} />
         </div>
-        <AntdCalendar 
+        <AntdCalendar
           onPanelChange={handlePanelChange}
           onSelect={handleSelect}   // Prevents unintended month jump
           dateCellRender={dateCellRender}
