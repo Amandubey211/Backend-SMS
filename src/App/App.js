@@ -519,7 +519,10 @@ function App() {
     {
       path: "/verify_students",
       element: (
-        <ProtectRoute Component={VerificationPage} allowedRoles={["admin"]} />
+        <ProtectRoute
+          Component={VerificationPage}
+          allowedRoles={["admin", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -528,14 +531,19 @@ function App() {
       element: (
         <ProtectRoute
           Component={UnVerifiedStudentDetails}
-          allowedRoles={["admin"]}
+          allowedRoles={["admin", "staff"]}
         />
       ),
       errorElement: <Error />,
     },
     {
       path: "/admissions",
-      element: <ProtectRoute Component={Addmission} allowedRoles={["admin"]} />,
+      element: (
+        <ProtectRoute
+          Component={Addmission}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
@@ -543,7 +551,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Teachers}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -817,7 +825,14 @@ function App() {
       element: (
         <ProtectRoute
           Component={Libary}
-          allowedRoles={["admin", "teacher", "student", "parent", "librarian"]}
+          allowedRoles={[
+            "admin",
+            "teacher",
+            "student",
+            "parent",
+            "librarian",
+            "staff",
+          ]}
         />
       ),
     },
@@ -826,7 +841,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={TimeTablePage}
-          allowedRoles={["admin", "teacher", "student", "parent"]}
+          allowedRoles={["admin", "teacher", "student", "parent", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -836,7 +851,7 @@ function App() {
           element: (
             <ProtectRoute
               Component={TableView}
-              allowedRoles={["admin", "teacher", "student", "parent"]}
+              allowedRoles={["admin", "teacher", "student", "parent", "staff"]}
             />
           ),
           errorElement: <Error />,
@@ -846,7 +861,7 @@ function App() {
           element: (
             <ProtectRoute
               Component={UpdateTimeTable}
-              allowedRoles={["admin", "teacher"]}
+              allowedRoles={["admin", "teacher", "staff"]}
             />
           ),
           errorElement: <Error />,
@@ -859,7 +874,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateTimeTable}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -1164,7 +1179,10 @@ function App() {
     {
       path: "/graduates",
       element: (
-        <ProtectRoute Component={GraduationPage} allowedRoles={["admin"]} />
+        <ProtectRoute
+          Component={GraduationPage}
+          allowedRoles={["admin", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
