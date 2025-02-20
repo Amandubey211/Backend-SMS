@@ -338,44 +338,77 @@ export const ChapterSkeleton = ({ count = 3 }) => {
                 .map((_, i) => (
                     <div
                         key={i}
-                        className="flex items-center gap-4 p-4 bg-gray-200 rounded-lg"
+                        className="w-full h-[70px] bg-white rounded-lg shadow-md p-3 flex items-center gap-3"
                     >
+                        {/* Left: Square image placeholder */}
                         <Skeleton.Avatar active size="large" shape="square" />
-                        <div className="flex flex-col w-full">
-                            <Skeleton.Input active style={{ width: "50%" }} />
-                            <Skeleton.Input active style={{ width: "30%", marginTop: 6 }} />
+
+                        {/* Middle: Two stacked lines */}
+                        <div className="flex flex-col flex-1">
+                            <Skeleton.Input
+                                active
+                                size="small"
+                                style={{ width: "50%" }}
+                            />
+                            <Skeleton.Input
+                                active
+                                size="small"
+                                style={{ width: "100%", marginTop: "5px" }}
+                            />
                         </div>
-                        <Skeleton.Button active shape="circle" />
+
+                        {/* Right: Circle placeholder */}
+                        <Skeleton.Avatar active shape="circle" size="small" />
                     </div>
                 ))}
         </div>
+
     );
 };
 
 export const ModuleSkeleton = ({ count = 3 }) => {
     return (
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-4">
             {Array(count)
                 .fill("")
                 .map((_, i) => (
                     <div
                         key={i}
-                        className="cursor-pointer p-2 rounded-lg shadow-md transition-all duration-200 bg-gray-200"
+                        className="cursor-pointer bg-white rounded-lg shadow-md transition-all duration-200"
                     >
-                        <Skeleton.Image
-                            active
-                            style={{ width: "100%", height: "150px", borderRadius: "8px" }}
-                        />
-                        <div className="p-2">
-                            <Skeleton.Input active style={{ width: "70%", height: "20px" }} />
+                        {/* Top image placeholder */}
+                        <div className="px-3 pt-3">
+                            <Skeleton.Image
+                                active
+                                className="w-full h-[100px] rounded-lg"
+                            />
+                        </div>
+
+                        {/* Text lines below image */}
+                        <div className="flex flex-col gap-2 p-3">
                             <Skeleton.Input
                                 active
-                                style={{ width: "40%", height: "20px", marginTop: 8 }}
+                                size="small"
+                                style={{
+                                    width: "50%",
+                                    height: "8px",
+                                    borderRadius: "4px"
+                                }}
+                            />
+                            <Skeleton.Input
+                                active
+                                size="default"
+                                style={{
+                                    width: "90%",
+                                    height: "8px",
+                                    borderRadius: "4px"
+                                }}
                             />
                         </div>
                     </div>
                 ))}
         </div>
+
     );
 };
 
