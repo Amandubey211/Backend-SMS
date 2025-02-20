@@ -180,7 +180,7 @@ const ParentTimeTableList = React.memo(({ timetables, loading, onDelete }) => {
    * Handle card click to navigate to a detailed timetable view.
    */
   const handleCardClick = (timetable) => {
-    navigate(`/viewtable/${timetable._id}`, { state: { timetable } });
+    navigate(`timetable/viewtable/${timetable._id}`, { state: { timetable } });
   };
 
   // If no timetables available at all

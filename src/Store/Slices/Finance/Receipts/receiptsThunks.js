@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getData, postData, putData, deleteData } from "../../../../services/apiEndpoints";
+import { getData, postData, putData, deleteData, customRequest } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
 import { getUserRole } from "../../../../Utils/getRoles";
@@ -90,9 +90,9 @@ export const createReceipt = createAsyncThunk(
       // }
       const getRole = getUserRole(getState);
       // 5) POST
-      const response = await postData(`/${getRole}/revenue/create/receipt`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await customRequest('POST',`/${getRole}/revenue/create/receipt`, formData, 
+         { "Content-Type": "multipart/form-data" },
+      );
 
       // Success response handling
       if (response?.status === 201) {
@@ -167,9 +167,9 @@ export const updateReceipt = createAsyncThunk(
       }
 
       // Now PUT the FormData
-      const response = await putData(`/${getRole}/revenue/update/receipt/${id}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const response = await customRequest('PUT',`/${getRole}/revenue/update/receipt/${id}`, formData, 
+        { "Content-Type": "multipart/form-data" },
+);
 
       if (response?.message === "Receipt updated successfully") {
         toast.success("Receipt updated successfully!");

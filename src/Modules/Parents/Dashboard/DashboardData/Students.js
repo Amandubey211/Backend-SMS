@@ -2,10 +2,10 @@ import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchChildren } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action';
-import Spinner from "../../../../Components/Common/Spinner";
 import { FaChild } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 import profileIcon from '../../../../Assets/DashboardAssets/profileIcon.png';
+import { Skeleton } from "antd";
 
 // Memoized StudentCard to prevent unnecessary re-renders
 const StudentCard = React.memo(({ student, index }) => {
@@ -89,6 +89,38 @@ const StudentParentCard = () => {
     </div>
   ), [errorChildren]);
 
+  const StudentSkeleton = () => (
+    <div className="relative p-4 pb-4 pt-6 text-center border border-gray-200 rounded-lg w-full max-w-md mx-auto bg-white">
+
+      {/* Child Label Skeleton */}
+      <div className="absolute top-2 left-2">
+        <Skeleton.Input active size="small" style={{ width: 60, height: 20, borderRadius: 4 }} />
+      </div>
+
+      {/* Profile Picture Skeleton */}
+      <div className="flex justify-center mt-4">
+        <Skeleton.Avatar active size={80} shape="circle" />
+      </div>
+
+      {/* Name Skeleton */}
+      <div className="mt-4">
+        <Skeleton.Input active size="small" style={{ width: 120, height: 20, borderRadius: 4 }} />
+      </div>
+
+      {/* Class, ID, Section Skeleton */}
+      <div className="mt-2">
+        <Skeleton.Input active size="small" style={{ width: 220, height: 15, borderRadius: 4 }} />
+      </div>
+
+      {/* Group Skeleton */}
+      <div className="mt-2">
+        <Skeleton.Input active size="small" style={{ width: 100, height: 15, borderRadius: 4 }} />
+      </div>
+    </div>
+  );
+
+
+
   return (
     <div className="relative h-3/5">
       <div className="flex justify-between p-4 pb-3 items-center px-2 pt-2">
@@ -96,21 +128,27 @@ const StudentParentCard = () => {
           {t("My Children")} {students?.length || 0} {/* Optional chaining */}
         </h2>
         {!loadingChildren && !errorChildren && students?.length > 0 && ( // Optional chaining
-          <button
-            className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-            onClick={handleNavigate}
-          >
-            {t("See All")}
-          </button>
+          <div className="inline-block">
+            <button
+              className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+                       text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
+                       hover:bg-gray-100 hover:shadow-md"
+              onClick={handleNavigate}
+            >
+              {t("See All")}
+            </button>
+          </div>
+
         )}
       </div>
 
       {/* Content area with conditional rendering */}
-      <div className={`${(loadingChildren || errorChildren || students?.length === 0) ? 'overflow-x-auto shadow rounded-lg p-4 m-3' : ''}`}>
-        {/* Spinner during loading */}
+      <div className={`rounded-lg p-4 m-3 mb-7 bg-transparent ${loadingChildren || errorChildren || students?.length === 0 ? 'h-auto' : ''}`}>
+
+        {/* Skeleton during loading */}
         {loadingChildren && (
           <div className="flex justify-center items-center h-48">
-            <Spinner />
+            <StudentSkeleton />
           </div>
         )}
 

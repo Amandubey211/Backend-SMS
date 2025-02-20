@@ -77,10 +77,10 @@ const RecentInvoiceList = () => {
 
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
 
-  const handleDownloadPDF=async (pdfRef,selectedInvoice)=>{
-    await downloadPDF(pdfRef,selectedInvoice,"Invoice")
+  const handleDownloadPDF = async (pdfRef, selectedInvoice) => {
+    await downloadPDF(pdfRef, selectedInvoice, "Invoice")
   }
-  
+
 
 
   // Filtered data based on search query
@@ -100,9 +100,16 @@ const RecentInvoiceList = () => {
       return;
     }
     try {
+      // Show a loading toast notification in real time
       const toastId = toast.loading("Sending email...");
-      const type = record?.isCancel ? "cancelInvoice" : "invoice";
+
+      // For invoices, use "cancelReturnInvoice" if cancelled; otherwise "invoice"
+      const type = record?.isCancel ? "cancelReturnInvoice" : "invoice";
+
+      // Format the date using your helper function
       const formattedDate = formatDate(record.date, "long");
+
+      // Build the payload with all required fields
       const payload = {
         receiver: {
           email: record?.receiver?.email,
@@ -138,22 +145,56 @@ const RecentInvoiceList = () => {
         discountType: record?.discountType || "fixed",
         finalAmount: record?.finalAmount || 0,
       };
-      console.log("Dispatching sendEmail with:", { id: record._id, type, payload });
-      const result = await dispatch(sendEmail({ id: record._id, type, payload }));
+
+      console.log("Dispatching sendEmail with:", {
+        id: record._id,
+        type,
+        payload,
+      });
+
+      // Dispatch the email sending action using the correct type and record._id
+      const result = await dispatch(
+        sendEmail({
+          id: record._id,
+          type,
+          payload,
+        })
+      );
+
+      // Dismiss the loading toast notification
       toast.dismiss(toastId);
+
+      // Determine the proper display message for notifications:
+      let displayMessage = "Invoice";
+      if (record.isReturn) {
+        displayMessage = "Return Invoice";
+      } else if (record.isCancel) {
+        displayMessage = "Cancel Invoice";
+      }
+
       if (sendEmail.fulfilled.match(result)) {
-        toast.success(
-          `${type.charAt(0).toUpperCase() + type.slice(1)} email sent successfully!`
-        );
+        toast.success(`${displayMessage} email sent successfully!`);
       } else {
         console.error("Failed sendEmail response:", result);
-        toast.error(result.payload || `Failed to send ${type} email.`);
+        toast.error(result.payload || `Failed to send ${displayMessage} email.`);
       }
     } catch (err) {
       console.error("Error in handleSendEmail:", err);
       toast.error("Error sending email.");
     }
   };
+
+
+  const categoryLabels = {
+    studentFee: "Student Fee",
+    FacilityRevenue: "Facility Revenue",
+    service_based_revenue: "Service-Based Revenue",
+    community_externalaffair_revenue: "Community & External Affairs",
+    financial_investment_revenue: "Financial Investment Revenue",
+    Penalties: "Penalties",
+    Other: "Other Revenue",
+  };
+  
   useEffect(() => {
     const filters = {
       page: 1,
@@ -183,9 +224,15 @@ const RecentInvoiceList = () => {
       key: "lineItems",
       render: (lineItems) =>
         lineItems?.length ? (
-          <div className="flex flex-col">
-            <span>{lineItems[0]?.revenueType} </span>
-          </div>
+          <>
+            {categoryLabels[lineItems[0]?.revenueType] || lineItems[0]?.revenueType}
+            {lineItems[1]?.revenueType && (
+              <span>
+                <br />
+                {categoryLabels[lineItems[1]?.revenueType] || lineItems[1]?.revenueType}
+              </span>
+            )}
+          </>
         ) : (
           "N/A"
         ),
@@ -264,18 +311,18 @@ const RecentInvoiceList = () => {
 
               {/* Return */}
               <ProtectedAction requiredPermission={PERMISSIONS.RETURN_INVOICE}>
-              {!record.isCancel && !record.isReturn && (
-                <Menu.Item
-                  icon={<RedoOutlined />}
-                  onClick={() => {
-                    dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
-                    navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
-                  }}
-                
-                >
-                  Return
-                </Menu.Item>
-              )}
+                {!record.isCancel && !record.isReturn && (
+                  <Menu.Item
+                    icon={<RedoOutlined />}
+                    onClick={() => {
+                      dispatch(setSelectedInvoiceNumber(record.invoiceNumber)); // Store invoice number
+                      navigate("/finance/penaltyAdjustment/add-new-penalty-adjustment"); // Redirect
+                    }}
+
+                  >
+                    Return
+                  </Menu.Item>
+                )}
               </ProtectedAction>
               {record.isReturn && (
                 <Menu.Item icon={<RedoOutlined />} disabled>
@@ -290,33 +337,33 @@ const RecentInvoiceList = () => {
                 </Menu.Item>
               ) : (
                 <ProtectedAction requiredPermission={PERMISSIONS.CANCEL_INVOICE}>
-                <Menu.Item
-                  icon={<CloseCircleOutlined />}
-                  onClick={() => {
-                    dispatch(cancelInvoice(record._id)).then(() =>
-                      dispatch(
-                        fetchInvoice({
-                          page: 1,
-                          limit: pageSize,
-                        })
-                      )
-                    );
-                  }}
-                >
-                  Cancel
-                </Menu.Item>
+                  <Menu.Item
+                    icon={<CloseCircleOutlined />}
+                    onClick={() => {
+                      dispatch(cancelInvoice(record._id)).then(() =>
+                        dispatch(
+                          fetchInvoice({
+                            page: 1,
+                            limit: pageSize,
+                          })
+                        )
+                      );
+                    }}
+                  >
+                    Cancel
+                  </Menu.Item>
                 </ProtectedAction>
               )}
               <ProtectedAction requiredPermission={PERMISSIONS.COMPLETE_INVOICE}>
-              {!record.isCancel && !record.isReturn && !record.isCompleted && !record.paymentStatus == "paid" ?
+                {!record.isCancel && !record.isReturn && !record.isCompleted && !record.paymentStatus == "paid" ?
 
-                <Menu.Item
-                  icon={<MdOutlineDone />}
-                  onClick={() => dispatch(completeInvoice(record._id))}
-                >
-                  Complete
-                </Menu.Item> : null
-              }
+                  <Menu.Item
+                    icon={<MdOutlineDone />}
+                    onClick={() => dispatch(completeInvoice(record._id))}
+                  >
+                    Complete
+                  </Menu.Item> : null
+                }
               </ProtectedAction>
               {!record.isCancel && !record.isReturn && record.isCompleted ?
                 <Menu.Item
@@ -327,16 +374,16 @@ const RecentInvoiceList = () => {
                 </Menu.Item> : null
               }
 
-              {!record.isCancel && !record.isReturn ?
-                <Menu.Item
-                  icon={<MailOutlined />}
-                  onClick={() => {
-                    handleSendEmail(record)
-                  }}
-                >
-                  Send Mail
-                </Menu.Item> : null
-              }
+
+              <Menu.Item
+                icon={<MailOutlined />}
+                onClick={() => {
+                  handleSendEmail(record)
+                }}
+              >
+                Send Mail
+              </Menu.Item>
+
               {/* View (Read Only) */}
 
 
@@ -460,9 +507,9 @@ const RecentInvoiceList = () => {
 
 
                   {/* Add New Fee Button */}
-                 <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
+                  <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_INVOICE}>
 
-                 
+
                     <button
                       onClick={() => {
 
@@ -479,7 +526,7 @@ const RecentInvoiceList = () => {
                         <FiPlus size={16} />
                       </div>
                     </button>
-               </ProtectedAction>
+                  </ProtectedAction>
                 </div>
               </div>
             </div>
@@ -547,7 +594,7 @@ const RecentInvoiceList = () => {
                   {/* Close Button */}
                   <div className="flex justify-end space-x-2 mb-4">
                     <button
-                      onClick={()=>handleDownloadPDF(pdfRef,selectedInvoice)}
+                      onClick={() => handleDownloadPDF(pdfRef, selectedInvoice)}
                       className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
                     >
                       Download PDF

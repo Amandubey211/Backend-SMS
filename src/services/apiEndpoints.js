@@ -6,7 +6,7 @@ export const getData = async (endpoint, params = {}) => {
   try {
     const response = await apiService.get(endpoint, { params });
 
-    return response.data;
+    return response?.data;
   } catch (error) {
     // console.log("Error fetching data:", error);
   }
@@ -16,8 +16,11 @@ export const getData = async (endpoint, params = {}) => {
 export const postData = async (endpoint, data) => {
   try {
     const response = await apiService.post(endpoint, data);
-    return response.data;
+    return response?.data;
   } catch (error) {
+    if (error.response && error.response.data) {
+      return error.response.data;
+    }
     // console.log("Error posting data:", error);
   }
 };
@@ -26,7 +29,7 @@ export const postData = async (endpoint, data) => {
 export const putData = async (endpoint, data) => {
   try {
     const response = await apiService.put(endpoint, data);
-    return response.data;
+    return response?.data;
   } catch (error) {
     // console.log("Error updating data:", error);
   }
@@ -36,7 +39,7 @@ export const putData = async (endpoint, data) => {
 export const deleteData = async (endpoint) => {
   try {
     const response = await apiService.delete(endpoint);
-    return response.data;
+    return response?.data;
   } catch (error) {
     // console.log("Error deleting data:", error);
   }
@@ -46,7 +49,7 @@ export const deleteData = async (endpoint) => {
 export const patchData = async (endpoint, data) => {
   try {
     const response = await apiService.patch(endpoint, data);
-    return response.data;
+    return response?.data;
   } catch (error) {
     // console.log("Error patching data:", error);
   }
@@ -69,7 +72,7 @@ export const customRequest = async (
       headers,
       ...config, // Spread additional configurations like params and headers
     });
-    return response.data;
+    return response?.data;
   } catch (error) {
     // console.log("Error with custom request:", error);
     throw error; // Re-throw the error for the thunk to handle

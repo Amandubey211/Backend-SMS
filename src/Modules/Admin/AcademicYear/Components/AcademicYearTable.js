@@ -13,7 +13,7 @@ const AcademicYearTable = ({
 }) => {
   const { t } = useTranslation("admAcademicYear");
   const say = getAY();
-  // Check if there is only one academic year
+  // Check if only one academic year exists
   const isSingle = academicYears?.length === 1;
 
   return (
@@ -45,7 +45,7 @@ const AcademicYearTable = ({
               <td className="p-3 flex justify-center">
                 <button
                   onClick={() => handleCheckboxChange(year)}
-                  disabled={isSingle} // Disable if only one academic year exists
+                  disabled={isSingle} // Disable selection change if only one exists
                   className={`${
                     isSingle ? "cursor-not-allowed opacity-50" : ""
                   }`}
@@ -78,17 +78,17 @@ const AcademicYearTable = ({
                 >
                   <FaRegEdit />
                 </button>
-                <button
+                {/* <button
                   onClick={() => handleDelete(year)}
+                  disabled={year.isActive || isSingle} // Prevent deletion if active or if it's the only one
                   className={`${
-                    year.isActive
+                    year.isActive || isSingle
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-red-500 hover:text-red-700 transition duration-150"
                   }`}
-                  disabled={year.isActive}
                 >
                   <RiDeleteBin5Line />
-                </button>
+                </button> */}
               </td>
             </tr>
           ))}

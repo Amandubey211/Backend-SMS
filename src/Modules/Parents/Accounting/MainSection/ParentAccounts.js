@@ -7,6 +7,7 @@ import { FaExclamationCircle, FaMoneyBillWave } from "react-icons/fa"; // Icons 
 import { IoArrowBackCircleOutline, IoArrowForwardCircleOutline } from "react-icons/io5"; // Icons for pagination arrows
 import Spinner from "../../../../Components/Common/Spinner"; // Spinner component
 import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
+import { Skeleton } from "antd";
 
 // Utility function to get unique filter options from the data (with optional chaining)
 const uniqueFilterOptions = (data, key) => {
@@ -31,7 +32,7 @@ const AccountingSection = () => {
   });
 
   // Redux state for accounting data
-  const {
+  var {
     accountingData = {
       fees: [],
       totalUnpaidFees: 0,
@@ -61,6 +62,45 @@ const AccountingSection = () => {
   const classes = useMemo(() => uniqueFilterOptions(fees, "class"), [fees]);
   const sections = useMemo(() => uniqueFilterOptions(fees, "section"), [fees]);
   const feesTypes = useMemo(() => uniqueFilterOptions(fees, "feeType"), [fees]);
+
+  // Skeleton Component for Finance Table
+  const FinanceTableSkeleton = () => (
+    <div className="p-4 w-full">
+
+
+      {/* Table Skeleton */}
+      <div className="rounded-lg w-full border border-gray-200">
+        <table className="w-full table-fixed leading-normal">
+          <thead>
+            <tr className="bg-[#e5e5e5] text-gray-700">
+              {["Fee Type", "Paid By", "Due Date", "Amount", "Status", "Action"].map((col, index) => (
+                <th key={index} className="px-5 py-3 border-b border-gray-200 font-normal w-1/6">
+                  <Skeleton.Input active size="small" style={{ width: "80%" }} />
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[...Array(3)].map((_, rowIndex) => (
+              <tr key={rowIndex} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "70%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "60%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "50%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "40%" }} /></td>
+                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200">
+                  <Skeleton.Button active size="small" shape="round" style={{ width: 90, height: 28, borderRadius: 16 }} />
+                </td>
+                <td className="px-5 py-4 border-b border-gray-200">
+                  <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 36, borderRadius: 20 }} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
 
   // Apply filters to the fees data, useMemo to optimize the filtered data calculation
   const filteredData = useMemo(() => {
@@ -131,30 +171,32 @@ const AccountingSection = () => {
               >
                 <IoArrowForwardCircleOutline className="inline-block text-2xl" />
               </button>
-              <button
-                className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal"
-                onClick={handleNavigate}
-              >
-                {t("See All")}
-              </button>
+              <div className="inline-block">
+                <button
+                  className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+               text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
+               hover:bg-gradient-to-r hover:from-[#7F35CD] hover:to-[#C83B62]  
+               hover:shadow-md"
+                  onClick={handleNavigate}
+                >
+                  {t("See All")}
+                </button>
+              </div>
+
             </div>
           )}
         </div>
 
         <div className="p-4 flex items-center justify-center w-full ">
           {/* Adjusting the table layout to show rows based on pagination */}
-          <div className="rounded-lg w-full overflow-x-auto">
+          <div className="rounded-lg w-full overflow-x-hidden">
             {loading ? (
-              // Show spinner when loading
-              <div className="flex flex-col items-center justify-center p-10">
-                <Spinner />
-                <p className="text-gray-600">{t("Loading...")}</p>
-              </div>
+              <FinanceTableSkeleton />
             ) : error ? (
               // Show error message when error occurs
               <div className="flex flex-col items-center p-10">
                 <FaExclamationCircle className="text-gray-400 text-4xl mb-4" />
-                <p className="text-gray-600 text-lg"> 
+                <p className="text-gray-600 text-lg">
                   {error ? `${error}: ` : ""}
                   {t("Unable to fetch Fees")}
                 </p>
@@ -169,7 +211,7 @@ const AccountingSection = () => {
               // Display paginated data in table
               <table className="w-full table-fixed leading-normal">
                 <thead>
-                  <tr className="text-left text-gray-700 bg-[#F9FAFC]">
+                  <tr className="text-left text-gray-700 bg-[#e5e5e5]">
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Fee Type")}</th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Paid By")}</th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 font-normal w-1/5">{t("Due Date")}</th>
@@ -180,7 +222,7 @@ const AccountingSection = () => {
                 </thead>
                 <tbody className="space-y-2">
                   {paginatedData?.map((item) => (
-                    <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm">
+                    <tr key={item.id} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
                       <td className="px-5 py-4 border-b border-gray-200 truncate">{item?.feeType ?? t("No Fee Type")}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.paidBy ?? "N/A"}</td>
                       <td className="px-5 py-4 border-b border-gray-200">{item?.dueDate ?? "N/A"}</td>

@@ -10,19 +10,14 @@ import {
   deleteAcademicYear,
   fetchAcademicYear,
 } from "../../../Store/Slices/Common/AcademicYear/academicYear.action";
-import Cookies from "js-cookie";
 import { setLocalCookies } from "../../../Utils/academivYear";
 import { useNavigate } from "react-router-dom";
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = date.getFullYear();
-  return `${day}-${month}-${year}`;
-};
+import toast from "react-hot-toast";
 
 const MainSection = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [newYear, setNewYear] = useState({
     year: "",
     startDate: "",
@@ -33,8 +28,12 @@ const MainSection = () => {
   const [deletingYear, setDeletingYear] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const role = useSelector((store) => store.common.auth.role);
-  const navigate = useNavigate();
+
+  const { academicYears, loading } = useSelector(
+    (store) => store.common.academicYear
+  );
+  const isSingle = academicYears?.length === 1;
+
   const handleCheckboxChange = async (selectedYear) => {
     setLocalCookies("say", selectedYear._id);
     dispatch(setSeletedAcademicYear(selectedYear));
@@ -42,6 +41,10 @@ const MainSection = () => {
   };
 
   const handleCreate = async () => {
+    // If there are no academic years, force the new year to be active.
+    if (academicYears.length === 0) {
+      setNewYear((prev) => ({ ...prev, isActive: true }));
+    }
     dispatch(addAcademicYear(newYear));
   };
 
@@ -51,22 +54,28 @@ const MainSection = () => {
   };
 
   const handleDelete = (year) => {
+    if (isSingle) {
+      toast.error("At least one Academic Year must remain.");
+      return;
+    }
     setDeletingYear(year);
     setShowDeleteModal(true);
   };
 
   const handleDeleteConfirm = async () => {
+    if (isSingle) {
+      toast.error("At least one Academic Year must remain.");
+      return;
+    }
     dispatch(deleteAcademicYear(deletingYear._id));
   };
-  const { academicYears, loading } = useSelector(
-    (store) => store.common.academicYear
-  );
+
   useEffect(() => {
     dispatch(fetchAcademicYear());
   }, [dispatch]);
 
   return (
-    <div className=" min-h-screen flex w-full">
+    <div className="min-h-screen flex w-full">
       <div className="w-2/3 p-2">
         <AcademicYearTable
           academicYears={academicYears}
@@ -85,12 +94,12 @@ const MainSection = () => {
         />
       </div>
 
-      {showEditModal && (
+      {showEditModal && editingYear && (
         <EditAcademicYearModal
           show={showEditModal}
           onClose={() => setShowEditModal(false)}
           year={editingYear}
-          refreshData={fetchAcademicYear}
+          academicYears={academicYears} // Pass for single-check inside modal
         />
       )}
 

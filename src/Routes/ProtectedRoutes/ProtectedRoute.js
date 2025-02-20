@@ -1,4 +1,3 @@
-// Components/ProtectedRoute.js
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, useLocation } from "react-router-dom";
@@ -8,68 +7,45 @@ import { toast } from "react-hot-toast";
 const ProtectRoute = ({ Component, allowedRoles }) => {
   const isSignedIn = useSelector((store) => store.common.auth.isLoggedIn);
   const userRole = useSelector((store) => store.common.auth.role);
-  const groupedRoles = useSelector((store) => store.common.auth.userRoles); // Access grouped roles from Redux
-  const isAcademicYearActive = getIsAYA();
-
+  const groupedRoles = useSelector((store) => store.common.auth.userRoles);
+  const isAcademicYearActive = getIsAYA(); // This now returns a boolean value
   const location = useLocation();
 
-  // If user is not signed in, redirect to login page
+  // Redirect to login if not signed in
   if (!isSignedIn) {
     return <Navigate to="/" replace />;
   }
 
-  // If role is not allowed, redirect to login page
+  // Check allowed roles if defined
   if (allowedRoles && userRole && !allowedRoles.includes(userRole)) {
-    toast.error("You do not have permission to access this page.");
     return <Navigate to="/" replace />;
   }
 
-  // Admin-specific redirections
+  // Admin-specific redirections:
+  // - Force to /create_academicYear if academic year is inactive.
+  // - If already on /create_academicYear but academic year is active, redirect away.
   if (userRole === "admin") {
-    if (
-      isAcademicYearActive === true &&
-      location.pathname === "/create_academicYear"
-    ) {
-      return <Navigate to="/dashboard" replace />;
-    }
-
-    if (
-      isAcademicYearActive === false &&
-      location.pathname !== "/create_academicYear"
-    ) {
+    if (!isAcademicYearActive && location.pathname !== "/create_academicYear") {
       return <Navigate to="/create_academicYear" replace />;
+    }
+    if (isAcademicYearActive && location.pathname === "/create_academicYear") {
+      return <Navigate to="/select_branch" replace />;
     }
   }
 
-  // If accessing /select_role
+  // Handling /select_role for non-admin users
   if (location.pathname === "/select_role") {
     if (userRole === "admin") {
-      toast.error("Admins do not need to select roles.");
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/select_branch" replace />;
     }
     if (groupedRoles && groupedRoles.length > 1 && !userRole) {
       return <Component />;
     }
-
-    // if (!groupedRoles || groupedRoles.length === 0) {
-    //   toast.error("No roles available to select.");
-    //   return <Navigate to="/dashboard" replace />;
-    // }
-    // Redirect users with no groupedRoles or a selected role
-    if (!groupedRoles || groupedRoles.length === 0 || userRole) {
-      toast.error("Invalid access to select role page.");
-      return <Navigate to="/dashboard" replace />;
-    }
+    return <Navigate to="/dashboard" replace />;
   }
 
-  // For users with multiple roles and no selected role, redirect to /select_role
-  if (
-    groupedRoles &&
-    groupedRoles.length > 1 &&
-    !userRole &&
-    location.pathname !== "/select_role"
-  ) {
-    toast.error("Please select a role to continue.");
+  // For users with multiple roles and no selected role, force role selection
+  if (groupedRoles && groupedRoles.length > 1 && !userRole) {
     return <Navigate to="/select_role" replace />;
   }
 

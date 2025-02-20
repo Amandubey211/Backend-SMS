@@ -122,12 +122,12 @@ export const registerStudentDetails = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         }
       );
-      if (response.success) {
+      if (response?.success) {
         toast.success("Registered Successfully");
         return response;
       } else {
         return rejectWithValue(
-          response.msg || "Failed to save student details."
+          response?.msg || "Failed to save student details."
         );
       }
     } catch (error) {
@@ -166,11 +166,11 @@ export const uploadStudentDocuments = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         }
       );
-      if (response.success) {
+      if (response?.success) {
         return response;
       } else {
         return rejectWithValue(
-          response.data.msg || "Failed to upload the document"
+          response?.data.msg || "Failed to upload the document"
         );
       }
     } catch (error) {

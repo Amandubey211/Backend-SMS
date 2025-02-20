@@ -5,7 +5,7 @@ export const getAY = () => {
   return Cookies.get("say");
 };
 export const getIsAYA = () => {
-  return Cookies.get("isAcademicYearActive");
+  return Cookies.get("isAcademicYearActive") === "true";
 };
 
 export const setLocalCookies = (name, id) => {

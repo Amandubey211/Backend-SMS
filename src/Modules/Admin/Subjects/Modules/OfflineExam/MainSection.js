@@ -1,92 +1,189 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { FaClipboardList } from "react-icons/fa";
 import Spinner from "../../../../../Components/Common/Spinner";
 import OfflineExamCard from "./Components/OfflineExamCard";
-import CreateButton from "./Components/CreateButton";
 import Header from "./Components/Header";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOfflineExam } from "../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { formatDate } from "../../../../../Utils/helperFunctions";
-import { useTranslation } from "react-i18next";
-import { AiFillFileExcel } from "react-icons/ai";
-import { FiRefreshCw } from "react-icons/fi";
-import DatePicker from "../../../../../Utils/calendar";
+
 import { PERMISSIONS } from "../../../../../config/permission";
-import { Modal } from "antd";
+import { debounce } from "lodash";
+import * as XLSX from "xlsx";
+import CreateExam from "./Components/CreateExam";
+import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action";
+import ExportExcel from "./Components/ExportExcel";
+import FilterExam from "./Components/FilterExam";
 
 const MainSection = () => {
   const { sid, cid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-
   const { offlineExamData, loading } = useSelector(
     (store) => store.admin.offlineExam
   );
-
   const dispatch = useDispatch();
-  const { t } = useTranslation("admModule");
-
-  const [examType, setExamType] = useState("");
-  const [startDate, setStartDate] = useState(new Date());
   const [semester, setSemester] = useState("");
-  // Use filteredData state to hold the exam list that matches filters.
-  const [filteredData, setFilteredData] = useState([]);
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const [isExportModelOpen, setIsExportModelOpen] = useState(false);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const { allStudents } = useSelector((store) => store.admin.all_students);
+  const [selectedExportExamTypes, setSelectedExportExamTypes] = useState([]);
 
-  const SemesterList = ["Semester I", "Semester II", "Semester III"];
-
-  // When offlineExamData loads, initialize filteredData.
-  useEffect(() => {
-    if (offlineExamData?.data) {
-      setFilteredData(offlineExamData.data);
+  const handleExportExcel = (e) => {
+    e.preventDefault();
+    if (!startDate || !endDate) {
+      alert("Please select both start and end dates!");
+      return;
     }
-  }, [offlineExamData]);
 
-  // Fetch offline exam data only once when cid and sid are available.
+    const formattedStartDate = formatDate(startDate);
+    const formattedEndDate = formatDate(endDate);
+
+    // Convert start & end dates to proper comparison format
+    const start = new Date(startDate).setHours(0, 0, 0, 0);
+    const end = new Date(endDate).setHours(23, 59, 59, 999);
+
+    const filteredExams = offlineExamData.filter((exam) => {
+      const examDate = new Date(exam.startDate);
+      const isWithinDateRange = examDate >= start && examDate <= end;
+      const isMatchingExamType =
+        selectedExportExamTypes.length === 0 ||
+        selectedExportExamTypes.includes(exam.examType);
+      return isWithinDateRange && isMatchingExamType;
+    });
+
+    if (filteredExams.length === 0) {
+      alert("No exams found for the selected date range!");
+      return;
+    }
+
+    const examNames = new Set(filteredExams.map((exam) => exam.examName));
+
+    const studentData = {};
+
+    filteredExams.forEach((exam) => {
+      examNames.add(exam.examName);
+      exam.students.forEach((student) => {
+        const studentId = student.studentId._id;
+        const matchedStudent = allStudents.find((i) => i._id === studentId);
+        if (!studentData[studentId]) {
+          studentData[studentId] = {
+            Name: `${student.studentId.firstName} ${student.studentId.lastName}`,
+            AdmissionNumber: matchedStudent
+              ? matchedStudent.admissionNumber
+              : "N/A",
+          };
+        }
+        studentData[studentId][exam.examName] =
+          student.status === "absent" || student.status === "excused"
+            ? `${student.status}/${student.maxMarks}`
+            : `${student.score}/${student.maxMarks}`;
+      });
+    });
+    const studentList = Object.values(studentData).map((student) => {
+      examNames.forEach((exam) => {
+        if (!student[exam]) {
+          student[exam] = "NA";
+        }
+      });
+      return student;
+    });
+
+    generateExcel(
+      studentList,
+      `Offline_Exams_${formattedStartDate}_to_${formattedEndDate}.xlsx`
+    );
+  };
+  const generateExcel = (data, filename) => {
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Offline Exams");
+
+    XLSX.writeFile(workbook, filename);
+  };
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((searchQuery) => {
+        setDebouncedQuery(searchQuery);
+      }, 300),
+    []
+  );
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await dispatch(
-          fetchAllOfflineExam({ classId: cid, subjectId: sid })
-        ).unwrap();
-      } catch (error) {
-        console.error("Error fetching offline exam data:", error);
-        Modal.error({
-          title: "Error",
-          content: "Failed to load offline exam data. Please try again later.",
-          centered: true,
-        });
-      }
+    debouncedSearch(searchQuery);
+    return () => {
+      debouncedSearch.cancel();
     };
+  }, [searchQuery, cid, sid, dispatch, debouncedSearch]);
 
-    if (cid && sid) {
-      fetchData();
+  useEffect(() => {
+    debouncedSearch(searchQuery);
+
+    dispatch(
+      fetchAllOfflineExam({ classId: cid, subjectId: sid, query: searchQuery })
+    );
+    dispatch(fetchAllStudents());
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchQuery, cid, sid, dispatch, debouncedSearch]);
+
+  const filteredData = useMemo(() => {
+    let data = offlineExamData;
+    if (debouncedQuery.trim()) {
+      data = data.filter((exam) =>
+        exam.examName.toLowerCase().includes(debouncedQuery.toLowerCase())
+      );
     }
-  }, [dispatch, cid, sid]);
+    if (semester) {
+      data = data.filter((exam) => exam.semesterId?.title === semester);
+    }
+    const startISO = startDate ? new Date(startDate).toISOString() : null;
+    const endISO = endDate ? new Date(endDate).toISOString() : null;
+    if (startISO) {
+      data = data.filter((exam) => exam.startDate >= startISO);
+    }
+    if (endISO) {
+      data = data.filter((exam) => exam.endDate <= endISO);
+    }
+    return data;
+  }, [offlineExamData, debouncedQuery, semester, startDate, endDate]);
+
+  const handleSearch = (event) => {
+    setSearchQuery(event.target.value);
+  };
 
   const handleApplyFilters = () => {
-    try {
-      const data =
-        offlineExamData?.data?.filter(
-          (i) => i?.semesterId?.title === semester
-        ) || [];
-      setFilteredData(data);
-    } catch (error) {
-      console.error("Error applying filters:", error);
-      Modal.error({
-        title: "Filter Error",
-        content: "An error occurred while applying filters.",
-        centered: true,
-      });
+    setSearchQuery("");
+    setSemester("");
+    setStartDate(null);
+    setEndDate(null);
+  };
+
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+    if (endDate && date > endDate) {
+      setEndDate(null);
     }
   };
 
-  const handleResetFilters = () => {
-    setSemester("");
-    setStartDate(new Date());
-    setFilteredData(offlineExamData?.data || []);
+  const handleEndDateChange = (date) => {
+    if (!startDate) {
+      alert("Please select a start date first.");
+      return;
+    }
+    setEndDate(date);
+  };
+
+  const handleCancel = () => {
+    setIsExportModelOpen(false);
+    setSelectedExportExamTypes([]);
   };
 
   return (
@@ -98,28 +195,30 @@ const MainSection = () => {
       >
         <div className="flex pt-4">
           {/* Left Section */}
-          <div className="w-[65%] border-l">
+          <div className="w-[62%] border-l">
             <Header
               loading={loading}
-              data={offlineExamData?.data}
+              data={offlineExamData}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              handleSearch={handleSearch}
+              searchedData={filteredData}
             />
-            <ul className="border-t mt-4 mx-4"></ul>
+            <ul className="border-t mt-4 ml-4 mr-6"></ul>
             {/* Offline Exam Card */}
             {loading ? (
               <Spinner />
             ) : filteredData?.length ? (
               <div className="h-[calc(100vh-150px)] overflow-y-auto">
-                {filteredData.map((item, index) => (
-                  <div key={item._id || index}>
+                {filteredData?.map((item, index) => (
+                  <div>
                     <OfflineExamCard
                       examType={item.examType}
                       examName={item.examName}
                       semester={item.semesterId?.title ?? "NA"}
                       startDate={formatDate(item.startDate)}
                       endDate={formatDate(item.endDate)}
-                      maxScore={item.students?.[0]?.maxMarks}
+                      maxMarks={item.students?.[0].maxMarks}
                       examId={item._id}
                       students={item.students}
                     />
@@ -138,63 +237,35 @@ const MainSection = () => {
             )}
           </div>
           {/* Right Section */}
-          <div className="w-[30%] p-2">
-            <div className="pl-5 pt-1">
-              <button
-                onClick={() => {}}
-                className="flex justify-center items-center mt-2 gap-x-2 px-4 py-2 w-full rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
-              >
-                <span>
-                  <AiFillFileExcel className="text-lg text-red-600" />
-                </span>
-                <span className="text-gradient">Export Excel</span>
-              </button>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-md w-80 relative">
-              <button
-                onClick={handleResetFilters}
-                className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-                aria-label={t("Reset filters")}
-              >
-                <FiRefreshCw size={24} />
-              </button>
+          <div className="w-[33%] px-2">
+            <ExportExcel
+              isExportModelOpen={isExportModelOpen}
+              setIsExportModelOpen={setIsExportModelOpen}
+              handleExportExcel={handleExportExcel}
+              selectedExportExamTypes={selectedExportExamTypes}
+              setSelectedExportExamTypes={setSelectedExportExamTypes}
+              startDate={startDate}
+              setEndDate={setEndDate}
+              endDate={endDate}
+              setStartDate={setStartDate}
+              handleCancel={handleCancel}
+            />
 
-              <h2 className="text-lg font-semibold mb-4">{t("Filter")}</h2>
-              <div className="mb-4">
-                <label className="block text-gray-700" htmlFor="module-select">
-                  Semester
-                </label>
-                <select
-                  className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  value={semester}
-                  onChange={(e) => setSemester(e.target.value)}
-                >
-                  <option value="">{t("Select")}</option>
-                  {SemesterList.map((name, index) => (
-                    <option key={index} value={name}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <DatePicker startDate={startDate} setStartDate={setStartDate} />
-              </div>
-
-              <button
-                onClick={handleApplyFilters}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-full focus:outline-none transform transition-transform duration-300 hover:scale-105"
-                aria-label={t("Apply filters")}
-              >
-                {t("Apply")}
-              </button>
-            </div>
+            {/* Filter */}
+            <FilterExam
+              handleApplyFilters={handleApplyFilters}
+              semester={semester}
+              setSemester={setSemester}
+              startDate={startDate}
+              handleStartDateChange={handleStartDateChange}
+              endDate={endDate}
+              handleEndDateChange={handleEndDateChange}
+            />
           </div>
         </div>
       </ProtectedSection>
       {/* Floating Add Exam Button */}
-      <CreateButton />
+      <CreateExam />
     </div>
   );
 };

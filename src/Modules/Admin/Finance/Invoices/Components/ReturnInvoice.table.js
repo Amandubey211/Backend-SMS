@@ -18,6 +18,17 @@ const ReturnInvoice = () => {
       item?.finalAmount?.toString()?.includes(searchQuery.toLowerCase())
   );
 
+  const categoryLabels = {
+    studentFee: "Student Fee",
+    FacilityRevenue: "Facility Revenue",
+    service_based_revenue: "Service-Based Revenue",
+    community_externalaffair_revenue: "Community & External Affairs",
+    financial_investment_revenue: "Financial Investment Revenue",
+    Penalties: "Penalties",
+    Other: "Other Revenue",
+  };
+  
+
   // Define Ant Design columns
   const columns = [
     {
@@ -39,8 +50,13 @@ const ReturnInvoice = () => {
       render: (lineItems) =>
         lineItems?.length ? (
           <>
-            {lineItems[0]?.revenueType}{" "}
-            {lineItems[1]?.revenueType && <span><br/>{lineItems[1]?.revenueType}</span>}
+            {categoryLabels[lineItems[0]?.revenueType] || lineItems[0]?.revenueType}
+            {lineItems[1]?.revenueType && (
+              <span>
+                <br />
+                {categoryLabels[lineItems[1]?.revenueType] || lineItems[1]?.revenueType}
+              </span>
+            )}
           </>
         ) : (
           "N/A"
