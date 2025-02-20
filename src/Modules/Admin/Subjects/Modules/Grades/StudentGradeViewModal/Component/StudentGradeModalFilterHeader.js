@@ -71,10 +71,7 @@ const StudentGradeModalFilterHeader = ({
             <option value="online">Online</option>
             <option value="offline">Offline</option>
           </select>
-          <FiChevronDown
-            className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-            size={16}
-          />
+         
         </div>
       </div>
 
@@ -101,10 +98,7 @@ const StudentGradeModalFilterHeader = ({
                 <option value="group quiz">Group Quiz</option>
                 <option value="offline_exam">Offline Exam</option>
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
+            
             </div>
           </div>
 
@@ -130,10 +124,7 @@ const StudentGradeModalFilterHeader = ({
                     </option>
                   ))}
                 </select>
-                <FiChevronDown
-                  className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                  size={16}
-                />
+             
               </div>
             </div>
           )}
@@ -157,10 +148,7 @@ const StudentGradeModalFilterHeader = ({
                   </option>
                 ))}
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
+          
             </div>
           </div>
 
@@ -190,10 +178,7 @@ const StudentGradeModalFilterHeader = ({
                   </>
                 )}
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
+         
             </div>
           </div>
 
@@ -214,10 +199,7 @@ const StudentGradeModalFilterHeader = ({
                 <option value="Excused">Excused</option>
                 <option value="Missing">Missing</option>
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
+         
             </div>
           </div>
         </>
@@ -238,10 +220,7 @@ const StudentGradeModalFilterHeader = ({
                          rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
                          focus:border-indigo-500 sm:text-sm"
             />
-            <FiChevronDown
-              className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-              size={16}
-            />
+          
           </div>
         </div>
       )}

@@ -35,7 +35,7 @@ const GradeAccordionItem = ({  getData }) => {
   // };
 
   const getColorForStatus = (status) => {
-    return status === "Submit" ? "text-green-500" : "text-red-500";
+    return status === "Submit" || status === "present" ? "text-green-500" : "text-red-500";
   };
 
   const { cid } = useParams();
@@ -76,8 +76,8 @@ dispatch(fetchStudentSubjects(cid))
                 <thead className="border-b">
                   <tr className="text-left">
                     <th className="px-5 py-2">Name</th>
-                    <th className="px-5 py-2">Due</th>
-                    <th className="px-5 py-2">Submit</th>
+                    <th className="px-5 py-2">Mode</th>
+                    {/* <th className="px-5 py-2">Submit</th> */}
                     <th className="px-5 py-2">Status</th>
                     <th className="px-5 py-2">Score</th>
                   </tr>
@@ -99,8 +99,8 @@ dispatch(fetchStudentSubjects(cid))
                           <td className="px-5 py-2 flex items-center w-[10rem]">
                             <span>{i?.Name}</span>
                           </td>
-                          <td className="px-5 py-2">{i?.dueDate?.slice(0, 10)}</td>
-                          <td className="px-5 py-2">{i?.submittedDate?.slice(0, 10)}</td>
+                          <td className="px-5 py-2">{i?.mode || "Online"}</td>
+                          {/* <td className="px-5 py-2">{i?.submittedDate?.slice(0, 10) || '-'}</td> */}
                           <td className="px-5 py-2">
                             <span
                               className={`${getColorForStatus(
@@ -110,7 +110,7 @@ dispatch(fetchStudentSubjects(cid))
                               {i?.status}
                             </span>
                           </td>
-                          <td className="px-5 py-2 text-center">{i?.score}</td>
+                          <td className="py-2 px-5">{i?.score}</td>
                         </tr>
                       ))
                     ) : (
