@@ -65,10 +65,10 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   // const isRowFilled = (row) => row.every((cell) => cell.trim() !== "");
 
   const addRow = () => {
-    if (tableData.length >= 5) {
-      toast.error("You can only add up to 5 rows. Please upload via Excel.");
-      return;
-    }
+    // if (tableData.length >= 5) {
+    //   toast.error("You can only add up to 5 rows. Please upload via Excel.");
+    //   return;
+    // }
 
     // if (!isRowFilled(tableData[tableData.length - 1])) {
     //   toast.error("Please fill the current row before adding a new one.");
