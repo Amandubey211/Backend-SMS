@@ -4,20 +4,32 @@ import { GoAlertFill } from "react-icons/go";
 import SubjectCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentCourseProgress/allSubjects/SubjectCard";
 import MainSection from "./MainSection.js";
 import { SubjectCardSkeleton } from "../Skeletons.js";
-import { fetchCourseProgress, fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action.js";
+import {
+  fetchCourseProgress,
+  fetchStudentSubjectProgress,
+} from "../../../Store/Slices/Admin/Users/Students/student.action.js";
 import { useParams } from "react-router-dom";
 
 const AllSubject = () => {
   const { studentId } = useParams();
-  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
-  const [subjectsFetched, setSubjectsFetched] = useState(false);
-
-  var { studentSubjectProgress, courseProgress, loading, error } = useSelector(
-    (store) => store.admin.all_students
-  );
-
   const dispatch = useDispatch();
 
+  // Local state to track if subjects are loaded
+  const [subjectsFetched, setSubjectsFetched] = useState(false);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+
+  // Separate local state for module loading
+  const [moduleLoading, setModuleLoading] = useState(false);
+
+  // Redux store data
+  const {
+    studentSubjectProgress, // array of subjects
+    // courseProgress, // not needed here if only used in MainSection
+    loading, // this is the global loading - we won't rely on it for subject cards
+    error,
+  } = useSelector((store) => store.admin.all_students);
+
+  // Fetch all subjects once
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(studentId))
       .unwrap()
@@ -26,20 +38,33 @@ const AllSubject = () => {
       });
   }, [studentId, dispatch]);
 
+  // Automatically fetch modules for the first subject
   useEffect(() => {
     if (studentSubjectProgress && studentSubjectProgress.length > 0) {
       const firstSubjectId = studentSubjectProgress[0].subjectId;
       setSelectedSubjectId(firstSubjectId);
-      dispatch(fetchCourseProgress({ studentId, subjectId: firstSubjectId }));
+
+      // fetch modules for the first subject
+      setModuleLoading(true);
+      dispatch(fetchCourseProgress({ studentId, subjectId: firstSubjectId }))
+        .unwrap()
+        .finally(() => setModuleLoading(false));
     }
   }, [studentSubjectProgress, studentId, dispatch]);
 
-  const fetchModule = (id) => {
-    setSelectedSubjectId(id);
-    dispatch(fetchCourseProgress({ studentId, subjectId: id }));
+  // Handler when user selects a subject card
+  const handleSubjectClick = (subjectId) => {
+    setSelectedSubjectId(subjectId);
+    setModuleLoading(true);
+
+    // fetch modules for the selected subject
+    dispatch(fetchCourseProgress({ studentId, subjectId }))
+      .unwrap()
+      .finally(() => setModuleLoading(false));
   };
 
-  if (!subjectsFetched || loading) {
+  // Show skeleton only while subjects are being fetched
+  if (!subjectsFetched) {
     return (
       <div className="w-full h-[50vh] flex items-center justify-center">
         <SubjectCardSkeleton />
@@ -47,6 +72,7 @@ const AllSubject = () => {
     );
   }
 
+  // Show error if subject fetch failed
   if (error) {
     const errorMessage =
       typeof error === "object"
@@ -60,10 +86,11 @@ const AllSubject = () => {
     );
   }
 
-  loading = true;
+  // Render the layout
   return (
     <div className="w-full">
       <div className="pb-2 flex w-full flex-row">
+        {/* Left side: subject cards */}
         <div className="flex flex-col gap-2 p-4 w-[25%] border-gray-300 border-r">
           {studentSubjectProgress?.length > 0 ? (
             studentSubjectProgress.map((subject) => (
@@ -74,7 +101,7 @@ const AllSubject = () => {
                     ? "scale-105"
                     : "bg-white shadow-md rounded-lg"
                 }`}
-                onClick={() => fetchModule(subject.subjectId)}
+                onClick={() => handleSubjectClick(subject.subjectId)}
               >
                 <SubjectCard subject={subject} />
               </div>
@@ -86,10 +113,13 @@ const AllSubject = () => {
             </div>
           )}
         </div>
+
+        {/* Right side: modules and chapters */}
         <div className="w-[75%]">
           <MainSection
             selectedSubjectId={selectedSubjectId}
             studentId={studentId}
+            moduleLoading={moduleLoading}
           />
         </div>
       </div>
