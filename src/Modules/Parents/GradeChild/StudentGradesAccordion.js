@@ -6,10 +6,11 @@ import GradeAccordionItem from "./GradeAccordionItem";
 
 const StudentGradesAccordion = () => {
   const { grades } = useSelector((store) => store.admin.all_students);
+  const role = useSelector((state) => state.common.auth.role);
   const { children } = useSelector((state) => state?.Parent?.children || {});
   const { studentId } = useParams();
   const dispatch = useDispatch();
-
+  console.log("role",role);
   // Filter the child whose id matches the URL param
   const Child = children?.filter((child) => child.id === studentId);
 
