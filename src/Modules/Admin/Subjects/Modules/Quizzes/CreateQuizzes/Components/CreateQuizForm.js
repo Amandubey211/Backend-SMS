@@ -11,7 +11,7 @@ import { format } from "date-fns"; // Import date-fns for formatting
 import { useTranslation } from "react-i18next";
 
 const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
-  const { t } = useTranslation('quiz');
+  const { t } = useTranslation("quiz");
   return (
     <div className="mb-4">
       <label className="block text-gray-700">{t("Allowed Attempts")}</label>
@@ -59,13 +59,11 @@ const CreateQuizForm = ({
   const [chapters, setChapters] = useState([]);
   const { modules } = useSelector((state) => state.admin.module);
   const { cid, sid } = useParams();
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
 
   useEffect(() => {
     // Fetch modules if not already present
-    if (!modules || modules?.length === 0) {
-      dispatch(fetchModules({ cid, sid }));
-    }
+    dispatch(fetchModules({ cid, sid }));
   }, [dispatch, modules]);
 
   // Populate chapters based on selected module
@@ -174,7 +172,9 @@ const CreateQuizForm = ({
 
         {/* See Answer Option */}
         <div className="p-2">
-          <h3 className="text-gray-700 mb-1">{t("Students See the Correct Answer")}</h3>
+          <h3 className="text-gray-700 mb-1">
+            {t("Students See the Correct Answer")}
+          </h3>
           <div className="flex items-center mb-2">
             <input
               type="radio"

@@ -3,7 +3,6 @@ import SubjectSideBar from "../../../Component/SubjectSideBar";
 import List from "../../Assignments/Component/List";
 import { RiAddFill, RiFileUnknowLine } from "react-icons/ri";
 import { NavLink, useParams } from "react-router-dom";
-import QuizFilterCard from "../Components/QuizFilterCard";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchFilteredQuizzesThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks"; // Import the thunk
 import FilterCard from "../../Assignments/Component/FilterCard";
@@ -59,7 +58,7 @@ const MainSection = () => {
           <div className="w-[65%] border-l">
             <List
               title={t("All Quizzes")}
-              data={quizzes}
+              data={quizzes || []}
               icon={<RiFileUnknowLine />}
               type={t("Quiz")}
               loading={loading}
