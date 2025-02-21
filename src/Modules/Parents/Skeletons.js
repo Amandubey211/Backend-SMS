@@ -16,41 +16,62 @@ export const EventCardSkeleton = ({ count = 0 }) => {
         </div>
     );
 };
-
 export const FinanceTableSkeleton = () => (
     <div className="p-4 w-full">
-        {/* Table Skeleton */}
-        <div className="rounded-lg w-full border border-gray-200">
-            <table className="w-full table-fixed leading-normal">
-                <thead>
-                    <tr className="bg-[#e5e5e5] text-gray-700">
-                        {["Fee Type", "Paid By", "Due Date", "Amount", "Status", "Action"].map((col, index) => (
-                            <th key={index} className="px-5 py-3 border-b border-gray-200 font-normal w-1/6">
-                                <Skeleton.Input active size="small" style={{ width: "80%" }} />
-                            </th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {[...Array(3)].map((_, rowIndex) => (
-                        <tr key={rowIndex} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
-                            <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "70%" }} /></td>
-                            <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "60%" }} /></td>
-                            <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "50%" }} /></td>
-                            <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "40%" }} /></td>
-                            <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200">
-                                <Skeleton.Button active size="small" shape="round" style={{ width: 90, height: 28, borderRadius: 16 }} />
-                            </td>
-                            <td className="px-5 py-4 border-b border-gray-200">
-                                <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 36, borderRadius: 20 }} />
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+      {/* Table Skeleton */}
+      <div className="rounded-lg w-full border border-gray-200">
+        <table className="w-full table-fixed leading-normal">
+          {/* Table Header */}
+          <thead>
+            <tr className="bg-[#e5e5e5] text-gray-700">
+              {["Fee Type", "Paid By", "Due Date", "Amount", "Status", "Action"].map((col, index) => (
+                <th key={index} className="px-5 py-3 border-b border-gray-200 font-normal w-1/6 text-center">
+                  {col}
+                </th>
+              ))}
+            </tr>
+          </thead>
+  
+          {/* Table Body Skeleton Rows */}
+          <tbody>
+            {[...Array(5)].map((_, rowIndex) => (
+              <tr key={rowIndex} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
+                {/* Fee Type */}
+                <td className="px-5 py-4 border-b border-gray-200 text-center">
+                  <Skeleton.Input active size="small" style={{ width: "70%", height: "16px" }} />
+                </td>
+  
+                {/* Paid By */}
+                <td className="px-5 py-4 border-b border-gray-200 text-center">
+                  <Skeleton.Input active size="small" style={{ width: "60%", height: "16px" }} />
+                </td>
+  
+                {/* Due Date */}
+                <td className="px-5 py-4 border-b border-gray-200 text-center">
+                  <Skeleton.Input active size="small" style={{ width: "50%", height: "16px" }} />
+                </td>
+  
+                {/* Amount */}
+                <td className="px-5 py-4 border-b border-gray-200 text-center">
+                  <Skeleton.Input active size="small" style={{ width: "40%", height: "16px" }} />
+                </td>
+  
+                {/* Status (Small Rounded Tag) */}
+                <td className="px-5 py-4 border-b border-gray-200 text-center">
+                  <Skeleton.Button active size="small" shape="round" style={{ width: 80, height: 24, borderRadius: 16 }} />
+                </td>
+  
+                {/* Action (Rounded Button) */}
+                <td className="px-5 py-4 border-b border-gray-200 text-center">
+                  <Skeleton.Button active size="small" shape="round" style={{ width: 100, height: 32, borderRadius: 20 }} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-);
+  );
 
 export const ThreeRectCardSkeleton = () => {
     return (

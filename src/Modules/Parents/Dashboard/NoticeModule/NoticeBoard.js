@@ -23,7 +23,7 @@ const NoticeBoard = ({ textTrimCount }) => {
   const { t } = useTranslation('prtNotices'); // Use i18n translation hook with namespace 'prtNotices'
 
   // Get the notices, loading, and error states from Redux
-  const { notices, loadingNotices, errorNotices } = useSelector((state) => state?.Parent?.dashboard);
+  var { notices, loadingNotices, errorNotices } = useSelector((state) => state?.Parent?.dashboard);
 
 
   useEffect(() => {
@@ -112,17 +112,19 @@ const NoticeBoard = ({ textTrimCount }) => {
       </div>
     );
   }
-
+  notices = [];
   // No data available state
   if (!notices?.length) {
     return (
-      <div className="p-4 border-l border-gray-300">
+      <div className="p-4 border-gray-300">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
+          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2>
         </div>
-        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
-          <FaBell className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">{t("No Notices Available")}</p>
+        <div className="border border-gray-300 rounded-lg bg-white shadow-sm">
+          <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
+            <FaBell className="text-gray-400 text-6xl mb-4" />
+            <p className="text-gray-600 text-lg">No Notices Available</p>
+          </div>
         </div>
       </div>
     );
