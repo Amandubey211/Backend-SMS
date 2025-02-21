@@ -90,7 +90,7 @@ const StudentMainSection = () => {
               },
               {
                 label: "Notice",
-                value: 0,
+                value: 3,
                 icon: "🔔",
                 bgColor: "bg-yellow-100",
                 textColor: "text-yellow-600",

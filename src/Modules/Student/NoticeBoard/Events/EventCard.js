@@ -16,19 +16,19 @@ const EventCard = ({ event, onClick }) => {
   // Function to format date
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { day: '2-digit', month: 'short', year: 'numeric' };
-    return date.toLocaleDateString('en-GB', options).replace(/ /g, '-');
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    return date.toLocaleDateString("en-GB", options).replace(/ /g, "-");
   };
 
   // Function to format time
   const formatTime = (timeString) => {
-    const [hour, minute] = timeString.split(':');
+    const [hour, minute] = timeString.split(":");
     const date = new Date();
     date.setHours(hour);
     date.setMinutes(minute);
     const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? "PM" : "AM";
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
     return `${formattedHours}:${minutes} ${ampm}`;
   };
@@ -40,13 +40,15 @@ const EventCard = ({ event, onClick }) => {
   };
 
   const truncateText = (text, maxLength) => {
-    return text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    return text?.length > maxLength
+      ? `${text.substring(0, maxLength)}...`
+      : text;
   };
 
   return (
     <div
       className="flex flex-col justify-between rounded-xl p-4 text-white shadow-lg m-2 cursor-pointer transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
-      style={{ width: '220px', height: '180px', backgroundColor: bgColor }}
+      style={{ width: "220px", height: "180px", backgroundColor: bgColor }}
       onClick={handleClick}
     >
       <div className="flex items-start">
@@ -54,7 +56,9 @@ const EventCard = ({ event, onClick }) => {
           {new Date(event.startDate).getDate()}
         </div>
         <div className="flex flex-col ml-2">
-          <span className="text-lg font-semibold">{truncateText(event?.title, 11)}</span>
+          <span className="text-lg font-semibold">
+            {truncateText(event?.title, 11)}
+          </span>
           <div className="flex items-center">
             <MdAccessTime className="mr-2 text-white text-lg" />
             <span>{event?.time}</span>

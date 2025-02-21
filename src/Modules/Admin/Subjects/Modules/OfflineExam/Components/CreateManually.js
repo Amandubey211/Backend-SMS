@@ -219,10 +219,11 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
       />
 
       {/* Submit Buttons */}
-      <div className="fixed bottom-5 right-5 flex space-x-4 ">
+      <div className=" bottom-5 right-5 fixed flex justify-end space-x-4">
         <Button onClick={handleClear}>Cancel</Button>
         <Button
           style={{
+            marginBottom: "20px",
             background: primaryGradient,
             border: "none",
             color: "white",

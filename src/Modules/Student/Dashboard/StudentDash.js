@@ -8,13 +8,13 @@ import { useDispatch } from "react-redux";
 import { studentNotice } from "../../../Store/Slices/Student/Noticeboard/notice.action";
 const StudentDash = () => {
   useNavHeading("Students");
-  const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(studentNotice())
-  }, [dispatch]);
+  // const dispatch = useDispatch()
+  // useEffect(() => {
+  //   dispatch(studentNotice())
+  // }, [dispatch]);
   return (
     <Layout title="Student Dashboard">
-      <DashLayout children={<StudentMainSection/>} />
+      <DashLayout children={<StudentMainSection />} />
     </Layout>
   );
 };
