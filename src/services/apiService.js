@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 // Create an instance of axios with default configurations
 const apiService = axios.create({
   baseURL: baseUrl, // Replace with your API base URL
-  timeout: 10000, // Timeout after 10 seconds
+  timeout: 10000, // Timeout after 20 seconds
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,6 +17,14 @@ const apiService = axios.create({
 apiService.interceptors.request.use(
   (config) => {
     config.withCredentials = true
+       // 🔹 Check if the request contains file upload
+       if (config.data instanceof FormData) {
+        config.headers["Content-Type"] = "multipart/form-data"; // Set correct header
+        config.timeout = 60000; // Increase timeout to 120 sec (for file upload)
+      } else {
+        config.headers["Content-Type"] = "application/json"; // Default JSON request
+        config.timeout = 10000; // Keep standard request timeout at 20 sec
+      }
     return config;
   },
   (error) => {
