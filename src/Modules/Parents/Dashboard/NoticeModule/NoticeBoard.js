@@ -23,7 +23,7 @@ const NoticeBoard = ({ textTrimCount }) => {
   const { t } = useTranslation('prtNotices'); // Use i18n translation hook with namespace 'prtNotices'
 
   // Get the notices, loading, and error states from Redux
-  var { notices, loadingNotices, errorNotices } = useSelector((state) => state?.Parent?.dashboard);
+  const { notices, loadingNotices, errorNotices } = useSelector((state) => state?.Parent?.dashboard);
 
 
   useEffect(() => {
@@ -112,7 +112,7 @@ const NoticeBoard = ({ textTrimCount }) => {
       </div>
     );
   }
-  notices = [];
+
   // No data available state
   if (!notices?.length) {
     return (
