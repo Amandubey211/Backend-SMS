@@ -65,6 +65,7 @@ const UserProfile = () => {
   const handleSidebarClose = () => setSidebarOpen(false);
   const [showPaasword, setShowPassword] = useState(false);
   const [logo, setLogo] = useState(null);
+  const [disabledlogo, setDisabledlogo] = useState(true);
   const handleImageChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -73,7 +74,9 @@ const UserProfile = () => {
         setLogo(reader.result);
       };
       reader.readAsDataURL(file);
+      setDisabledlogo(false)
     }
+    
   };
   
   const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
@@ -114,7 +117,7 @@ const UserProfile = () => {
                   onClick={handleSidebarOpen}
                   className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
-                  {t("edit")}
+                  {t("Update Profile")}
                 </button>
               </div>
             </div>
@@ -150,17 +153,17 @@ const UserProfile = () => {
               </div>
 
               <div className="flex item-center justify-center flex-col  ">
-                <p>Logo</p>
+                <p className="flex item-center justify-center">School Logo</p>
                 <ImageUpload
                   imagePreview={logo}
                   handleImageChange={handleImageChange}
                   handleRemoveImage={() => setLogo(null)}
 
                 />
-                {logo && <button
+                {!disabledlogo ?<button
                   onClick={handleUploadLogo}
                   className="flex items-center mt-2 justify-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
-                >Update</button>}
+                >Update logo</button>:null}
               </div>
 
             </div>
