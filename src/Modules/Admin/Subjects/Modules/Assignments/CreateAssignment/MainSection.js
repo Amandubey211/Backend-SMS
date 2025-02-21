@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import CreateAssignmentHeader from "./Component/CreateAssignmentHeader";
 import EditorComponent from "../../../Component/AdminEditor";
 import CreateAssignmentForm from "./Component/CreateAssignmentForm";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import {
   createAssignmentThunk,
   updateAssignmentThunk,
@@ -11,7 +11,6 @@ import {
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 
-// Memoized initial form state to avoid re-initialization
 const initialFormState = {
   points: "",
   displayGrade: false,
@@ -32,19 +31,27 @@ const initialFormState = {
 const MainSection = ({ setIsEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   // State management
   const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
-  const [isEditing, setLocalIsEditing] = useState(false);
+  const [isEditingLocal, setLocalIsEditing] = useState(false);
   const [assignmentId, setAssignmentId] = useState("");
   const [criteriaList, setCriteriaList] = useState([]);
   const [existingRubricId, setExistingRubricId] = useState(null);
-
   const [saveLoading, setSaveLoading] = useState(false);
   const [publishLoading, setPublishLoading] = useState(false);
+
+  // Error states for validation
+  const [nameError, setNameError] = useState("");
+  const [moduleError, setModuleError] = useState("");
+
+  // Refs for input fields
+  const nameInputRef = useRef(null);
+  const moduleSelectRef = useRef(null);
 
   // Preload the assignment if editing
   useEffect(() => {
@@ -78,34 +85,62 @@ const MainSection = ({ setIsEditing }) => {
     }
   }, [location.state, setIsEditing]);
 
-  // Memoized handler functions to avoid unnecessary re-creation
-  const handleNameChange = useCallback((name) => setAssignmentName(name), []);
+  // Memoized handler functions
+  const handleNameChange = useCallback(
+    (name) => {
+      if (name.trim() && nameError) setNameError("");
+      setAssignmentName(name);
+    },
+    [nameError]
+  );
+
   const handleEditorChange = useCallback(
     (content) => setEditorContent(content),
     []
   );
 
-  const handleFormChange = useCallback((e) => {
-    const { name, value } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }, []);
+  const handleFormChange = useCallback(
+    (e) => {
+      const { name, value } = e.target;
+      if (name === "moduleId" && value && moduleError) {
+        setModuleError("");
+      }
+      setFormState((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    },
+    [moduleError]
+  );
 
-  // Optimized save function using useCallback
+  // Optimized save function with validation
   const handleSave = useCallback(
     async (publish) => {
+      // Validate that assignment name is provided
+      if (!assignmentName.trim()) {
+        setNameError("Assignment name is required");
+        nameInputRef.current?.focus();
+        return;
+      } else {
+        setNameError("");
+      }
+
+      // If publishing, validate that a module is selected
+      if (publish && !formState.moduleId) {
+        setModuleError("Module selection is required when publishing");
+        moduleSelectRef.current?.focus();
+        return;
+      } else {
+        setModuleError("");
+      }
+
       try {
         setSaveLoading(!publish);
         setPublishLoading(publish);
 
-        // Ensure allowedAttempts is properly set as a boolean
         const allowedAttempts = formState.allowedAttempts === true;
-
         let allowNumberOfAttempts = null;
 
-        // Check if allowedAttempts is true, then set allowNumberOfAttempts
         if (allowedAttempts) {
           allowNumberOfAttempts = formState.numberOfAttempts
             ? Number(formState.numberOfAttempts)
@@ -119,7 +154,7 @@ const MainSection = ({ setIsEditing }) => {
           grade: formState.displayGrade,
           submissionType: formState.submissionType,
           allowedAttempts,
-          allowNumberOfAttempts, // Send this if allowedAttempts is true
+          allowNumberOfAttempts,
           assignTo: formState.assignTo,
           dueDate: formState.dueDate,
           availableFrom: formState.availableFrom,
@@ -138,7 +173,7 @@ const MainSection = ({ setIsEditing }) => {
           assignmentData.groupId = formState.groupId || null;
         }
 
-        if (isEditing) {
+        if (isEditingLocal) {
           await dispatch(
             updateAssignmentThunk({ assignmentId, assignmentData })
           );
@@ -148,6 +183,7 @@ const MainSection = ({ setIsEditing }) => {
           );
           setAssignmentId(response?.data?._id);
         }
+        navigate(-1);
       } catch (error) {
         console.error(error);
       } finally {
@@ -159,11 +195,12 @@ const MainSection = ({ setIsEditing }) => {
       assignmentName,
       editorContent,
       formState,
-      isEditing,
+      isEditingLocal,
       cid,
       sid,
       assignmentId,
       dispatch,
+      navigate,
     ]
   );
 
@@ -172,7 +209,7 @@ const MainSection = ({ setIsEditing }) => {
       <CreateAssignmentHeader
         onSave={handleSave}
         id={assignmentId}
-        isEditing={isEditing}
+        isEditing={isEditingLocal}
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         existingRubricId={existingRubricId}
@@ -187,7 +224,6 @@ const MainSection = ({ setIsEditing }) => {
         }
       >
         <div className="w-full flex h-full">
-          {/* Prevent unnecessary re-renders by memoizing */}
           <div className="w-[70%]">
             <EditorComponent
               assignmentLabel="Assignment Name"
@@ -195,6 +231,8 @@ const MainSection = ({ setIsEditing }) => {
               editorContent={editorContent}
               onNameChange={handleNameChange}
               onEditorChange={handleEditorChange}
+              inputRef={nameInputRef}
+              nameError={nameError}
             />
           </div>
           <div className="w-[30%]">
@@ -204,6 +242,8 @@ const MainSection = ({ setIsEditing }) => {
                 setFormState((prev) => ({ ...prev, displayGrade: grade }))
               }
               handleChange={handleFormChange}
+              moduleRef={moduleSelectRef}
+              moduleError={moduleError}
             />
           </div>
         </div>

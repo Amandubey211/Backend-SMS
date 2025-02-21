@@ -75,7 +75,7 @@ const Library = () => {
               category={book?.category || t("Uncategorized")}
               copies={book?.copies || 0}
               author={book?.author || t("Unknown")}
-              className={book?.classId?.className || t("Unknown Class")}
+              className={book?.className || t("Unknown Class")}
               role={role}
             />
           ))

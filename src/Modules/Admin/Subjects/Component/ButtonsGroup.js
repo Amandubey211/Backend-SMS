@@ -1,10 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
-import { MdOutlineBlock } from "react-icons/md";
-import { BsPatchCheckFill } from "react-icons/bs";
+import React, { useState } from "react";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
-import { HiOutlineDotsVertical } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router-dom";
-import { ImSpinner3 } from "react-icons/im";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import { useDispatch } from "react-redux";
 import {
@@ -20,32 +16,16 @@ import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction"
 const ButtonsGroup = ({ type, data, loading, requiredPermission }) => {
   const navigate = useNavigate();
   const { sid, cid } = useParams();
-  const [showMenu, setShowMenu] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const menuRef = useRef();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   const handleEdit = () => {
-    if (!data) return; // Prevent action if data is null
+    if (!data) return;
     if (type === "Quiz") {
       navigate(`/class/${cid}/${sid}/create_quiz`, {
         state: { quizId: data._id },
       });
-    }
-    if (type === "Assignment") {
+    } else if (type === "Assignment") {
       navigate(`/class/${cid}/${sid}/createassignment`, {
         state: { assignment: data },
       });
@@ -53,27 +33,25 @@ const ButtonsGroup = ({ type, data, loading, requiredPermission }) => {
   };
 
   const handleDelete = async () => {
-    setShowMenu(false);
     setIsModalOpen(true);
   };
 
   const confirmDelete = async () => {
-    if (!data) return; // Prevent action if data is null
+    if (!data) return;
     if (type === "Quiz") {
-      dispatch(deleteQuizThunk(data._id));
+      await dispatch(deleteQuizThunk(data._id));
+    } else if (type === "Assignment") {
+      await dispatch(deleteAssignmentThunk(data._id));
     }
-    if (type === "Assignment") {
-      dispatch(deleteAssignmentThunk(data._id));
-    }
-
-    // navigate(-1);
+    setIsModalOpen(false);
+    navigate(-1);
   };
 
   const handlePublishToggle = async () => {
-    if (!data) return; // Prevent action if data is null
+    if (!data) return;
     const updatedData = {
       ...data,
-      publish: !data?.publish, // Toggle publish status safely with optional chaining
+      publish: !data?.publish,
       allowNumberOfAttempts: data.allowNumberOfAttempts || null,
       points: data.points ?? 0,
     };
@@ -89,82 +67,59 @@ const ButtonsGroup = ({ type, data, loading, requiredPermission }) => {
     }
   };
 
-  // Use a default value if publish is not present or data is null
   const isPublished = data?.publish ?? true;
-  const isUpdating = loading;
 
   return (
-    <div className="relative flex justify-center gap-2 items-center w-full p-2 text-gray-700">
+    <div className="flex justify-center items-center gap-3 w-full p-1 text-gray-700">
+      {/* Publish/Unpublish Button */}
       <ProtectedAction requiredPermission={requiredPermission[0]}>
-        <button
-          className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-          aria-label={data?.publish ? "Unpublish" : "Publish"}
+        {/* <button
+          className="flex items-center space-x-2 px-6 py-2 border rounded-md border-gray-300 text-gray-600 hover:bg-gray-100 transition"
           onClick={handlePublishToggle}
           disabled={loading || !data}
         >
           {loading ? (
             <>
-              <span className="flex items-center justify-center w-5 h-5">
-                <ImSpinner3 className="animate-spin text-gray-500" />
-              </span>
+              <ImSpinner3 className="animate-spin text-gray-500" />
               <span>Loading</span>
             </>
-          ) : data?.publish ? (
+          ) : isPublished ? (
             <>
-              <span className="flex items-center justify-center w-5 h-5">
-                <BsPatchCheckFill
-                  aria-hidden="true"
-                  className="text-green-600"
-                />
-              </span>
+              <BsPatchCheckFill className="text-green-600" />
               <span>Publish</span>
             </>
           ) : (
             <>
-              <span className="flex items-center justify-center w-5 h-5">
-                <MdOutlineBlock aria-hidden="true" />
-              </span>
+              <MdOutlineBlock />
               <span>Unpublish</span>
             </>
           )}
-        </button>
+        </button> */}
       </ProtectedAction>
 
+      {/* Edit Button - Wider */}
       <ProtectedAction requiredPermission={requiredPermission[1]}>
         <button
           onClick={handleEdit}
-          className="flex items-center space-x-1 px-4 py-1 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
-          aria-label="Edit Assignment"
+          className="flex items-center justify-center space-x-2 w-32 py-2 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
+          aria-label="Edit"
           disabled={!data}
         >
-          <AiOutlineEdit aria-hidden="true" />
+          <AiOutlineEdit />
           <span>Edit</span>
         </button>
       </ProtectedAction>
 
+      {/* Delete Button - Wider */}
       <ProtectedAction requiredPermission={requiredPermission[2]}>
         <button
-          className="flex items-center space-x-1 border rounded-full w-8 h-8 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition relative"
-          aria-label="More Options"
-          onClick={() => setShowMenu(!showMenu)}
+          onClick={handleDelete}
+          className="flex items-center justify-center space-x-2 w-32 py-2 border rounded-md border-gray-300 text-red-600 hover:bg-red-100 transition"
+          aria-label="Delete"
           disabled={!data}
         >
-          <HiOutlineDotsVertical aria-hidden="true" />
-          {showMenu && (
-            <div
-              ref={menuRef}
-              className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
-            >
-              <button
-                onClick={handleDelete}
-                className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
-                aria-label={`Delete ${type}`}
-              >
-                <AiOutlineDelete aria-hidden="true" className="text-red-600" />
-                <span>Delete</span>
-              </button>
-            </div>
-          )}
+          <AiOutlineDelete />
+          <span>Delete</span>
         </button>
       </ProtectedAction>
 

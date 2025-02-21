@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import JoditEditor from "jodit-react";
 import toast, { Toaster } from "react-hot-toast";
+import { motion } from "framer-motion";
 import useCloudinaryMediaUpload from "../../../../Hooks/CommonHooks/useCloudinaryMediaUpload";
 import useCloudinaryDeleteByPublicId from "../../../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
 
@@ -62,11 +63,14 @@ const EditorComponent = ({
   onEditorChange,
   inputPlaceHolder,
   isCreateQuestion,
+  nameError, // For validation error message
+  inputRef, // Ref to the input for focusing on validation
 }) => {
   const editor = useRef(null);
   const containerRef = useRef(null); // Holds the editor container for global events
   const [scrollPosition, setScrollPosition] = useState(0);
-  // Set to track public_ids that have been processed for deletion (to avoid duplicate deletion calls)
+
+  // Keep track of public_ids already processed for deletion
   const processedDeletions = useRef(new Set());
   // Flag to indicate if an upload is in progress
   const uploadInProgress = useRef(false);
@@ -75,7 +79,6 @@ const EditorComponent = ({
   const { deleteMediaByPublicId } = useCloudinaryDeleteByPublicId();
 
   // ---------- Progress Bar Helpers ----------
-  // Creates a progress bar in the specified parent element (displayed above the editor toolbar)
   const showProgressBar = useCallback((parentElement) => {
     const progressBarContainer = document.createElement("div");
     progressBarContainer.style.position = "relative";
@@ -84,13 +87,16 @@ const EditorComponent = ({
     progressBarContainer.style.width = "100%";
     progressBarContainer.style.height = "5px";
     progressBarContainer.style.backgroundColor = "#f0f0f0";
+
     const progressBar = document.createElement("div");
     progressBar.style.width = "0%";
     progressBar.style.height = "100%";
     progressBar.style.backgroundColor = "#C71585";
     progressBar.style.transition = "width 0.3s";
+
     progressBarContainer.appendChild(progressBar);
     parentElement.appendChild(progressBarContainer);
+
     return { progressBar, progressBarContainer };
   }, []);
 
@@ -114,26 +120,24 @@ const EditorComponent = ({
       let progressBarObj;
       setScrollPosition(window.scrollY);
       uploadInProgress.current = true;
-      if (
-        editorInstance &&
-        editorInstance.toolbar &&
-        editorInstance.toolbar.container
-      ) {
-        // Show upload progress bar above the editor
+
+      if (editorInstance?.toolbar?.container) {
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
       }
+
       try {
         const response = await uploadImage(file, (progressEvent) => {
           const percentage = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
           );
-          if (progressBarObj)
+          if (progressBarObj) {
             updateProgressBar(progressBarObj.progressBar, percentage);
+          }
         });
+
         if (response.secure_url && response.public_id) {
-          // Insert asset wrapper with a timestamp
           const imgHTML = createImageWrapper(
             response.secure_url,
             response.public_id
@@ -146,8 +150,9 @@ const EditorComponent = ({
       } catch (error) {
         toast.error("Error uploading image. Please try again.");
       } finally {
-        if (progressBarObj)
+        if (progressBarObj) {
           removeProgressBar(progressBarObj.progressBarContainer);
+        }
         window.scrollTo(0, scrollPosition);
         uploadInProgress.current = false;
       }
@@ -168,23 +173,23 @@ const EditorComponent = ({
       let progressBarObj;
       setScrollPosition(window.scrollY);
       uploadInProgress.current = true;
-      if (
-        editorInstance &&
-        editorInstance.toolbar &&
-        editorInstance.toolbar.container
-      ) {
+
+      if (editorInstance?.toolbar?.container) {
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
       }
+
       try {
         const response = await uploadFile(file, (progressEvent) => {
           const percentage = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total
           );
-          if (progressBarObj)
+          if (progressBarObj) {
             updateProgressBar(progressBarObj.progressBar, percentage);
+          }
         });
+
         if (response.secure_url && response.public_id) {
           const fileHTML = createFileWrapper(
             response.secure_url,
@@ -198,8 +203,9 @@ const EditorComponent = ({
       } catch (error) {
         toast.error("Error uploading file. Please try again.");
       } finally {
-        if (progressBarObj)
+        if (progressBarObj) {
           removeProgressBar(progressBarObj.progressBarContainer);
+        }
         window.scrollTo(0, scrollPosition);
         uploadInProgress.current = false;
       }
@@ -236,7 +242,6 @@ const EditorComponent = ({
   }, [handleFileUpload]);
 
   // ---------- Deletion Handler Using Public ID ----------
-  // When the delete button is clicked, display a deletion progress bar above the editor and delete the asset using its public_id.
   const handleDeleteClick = useCallback(
     async (e) => {
       if (e.target.classList.contains("delete-btn")) {
@@ -244,51 +249,55 @@ const EditorComponent = ({
         const wrapper =
           e.target.closest(".uploaded-image-wrapper") ||
           e.target.closest(".uploaded-file-wrapper");
+
         if (wrapper) {
           const publicId = wrapper.getAttribute("data-public-id");
-          // If no public_id or already processed, do nothing.
           if (!publicId || processedDeletions.current.has(publicId)) {
             return;
           }
+
           let progressBarObj;
           const editorInstance = editor.current;
-          if (
-            editorInstance &&
-            editorInstance.toolbar &&
-            editorInstance.toolbar.container
-          ) {
-            // Show deletion progress bar above the editor
+
+          if (editorInstance?.toolbar?.container) {
             progressBarObj = showProgressBar(
               editorInstance.toolbar.container.parentNode
             );
           }
+
           try {
             const data = await deleteMediaByPublicId(publicId);
             if (data.result === "ok") {
-              if (progressBarObj)
+              if (progressBarObj) {
                 updateProgressBar(progressBarObj.progressBar, 100);
+              }
               processedDeletions.current.add(publicId);
               setTimeout(() => {
-                if (progressBarObj)
+                if (progressBarObj) {
                   removeProgressBar(progressBarObj.progressBarContainer);
+                }
                 wrapper.remove();
               }, 500);
               toast.success("Asset deleted successfully");
             } else {
-              if (progressBarObj)
+              if (progressBarObj) {
                 updateProgressBar(progressBarObj.progressBar, 100);
+              }
               setTimeout(() => {
-                if (progressBarObj)
+                if (progressBarObj) {
                   removeProgressBar(progressBarObj.progressBarContainer);
+                }
               }, 500);
               toast.error("Failed to delete asset");
             }
           } catch (error) {
-            if (progressBarObj)
+            if (progressBarObj) {
               updateProgressBar(progressBarObj.progressBar, 100);
+            }
             setTimeout(() => {
-              if (progressBarObj)
+              if (progressBarObj) {
                 removeProgressBar(progressBarObj.progressBarContainer);
+              }
             }, 500);
             toast.error("Error deleting asset. Please try again.");
           }
@@ -304,11 +313,9 @@ const EditorComponent = ({
   );
 
   // ---------- MutationObserver for Manual Removal ----------
-  // If an asset wrapper is manually removed (e.g. by the user editing the content), trigger deletion if it’s older than 3 seconds.
   useEffect(() => {
     if (containerRef.current) {
       const observer = new MutationObserver((mutationsList) => {
-        // Skip processing if an upload is in progress.
         if (uploadInProgress.current) return;
         mutationsList.forEach((mutation) => {
           mutation.removedNodes.forEach((node) => {
@@ -322,10 +329,10 @@ const EditorComponent = ({
                   node.getAttribute("data-uploaded-at"),
                   10
                 );
-                // Only trigger deletion if the asset is older than 3 seconds.
                 if (publicId && !processedDeletions.current.has(publicId)) {
                   const age = Date.now() - uploadedAt;
                   if (age > 3000) {
+                    // If the user manually removed it after 3s, attempt a deletion
                     deleteMediaByPublicId(publicId)
                       .then((data) => {
                         if (data.result === "ok") {
@@ -360,7 +367,7 @@ const EditorComponent = ({
     }
   }, [deleteMediaByPublicId]);
 
-  // ---------- Jodit Editor Configuration ----------
+  // ---------- Editor Configuration ----------
   const config = useMemo(
     () => ({
       readonly: false,
@@ -373,7 +380,17 @@ const EditorComponent = ({
       showXPathInStatusbar: false,
       askBeforePasteHTML: false,
       askBeforePasteFromWord: false,
-      removeButtons: ["powered-by-jodit"],
+
+      // Remove "Powered by Jodit"
+      showPoweredByJodit: false,
+      disablePlugins: ["about"], // ensures the 'about' plugin is disabled
+      removeButtons: ["about", "source"],
+
+      // Force text to wrap instead of extending editor width
+      contentStyle:
+        "white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;",
+
+      // Editor toolbar
       buttons: [
         "font",
         "fontsize",
@@ -394,7 +411,6 @@ const EditorComponent = ({
         "undo",
         "redo",
         "spellcheck",
-        // "table",
         {
           name: "image",
           tooltip: "Upload Image",
@@ -412,7 +428,7 @@ const EditorComponent = ({
         "print",
       ],
       events: {
-        change: (newContent) => onEditorChange(newContent),
+        // We only use afterInit here to bind the delete-click logic
         afterInit: (editorInstance) => {
           editor.current = editorInstance;
           containerRef.current = editorInstance.container;
@@ -422,13 +438,7 @@ const EditorComponent = ({
         },
       },
     }),
-    [
-      isCreateQuestion,
-      onEditorChange,
-      triggerImageUpload,
-      triggerFileUpload,
-      handleDeleteClick,
-    ]
+    [isCreateQuestion, triggerImageUpload, triggerFileUpload, handleDeleteClick]
   );
 
   useEffect(() => {
@@ -453,17 +463,38 @@ const EditorComponent = ({
               placeholder={inputPlaceHolder}
               value={assignmentName}
               onChange={(e) => onNameChange(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              ref={inputRef}
+              className={`w-full p-2 border rounded-sm shadow-sm focus:outline-none focus:ring-1 ${
+                nameError
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
               spellCheck="true"
             />
+            {nameError && (
+              <motion.p
+                className="text-red-500 text-sm mt-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {nameError}
+              </motion.p>
+            )}
           </div>
         </div>
       )}
+
+      {/* 
+        Use defaultValue so Jodit is "uncontrolled," 
+        preventing cursor jump on repeated keystrokes.
+      */}
       <JoditEditor
         ref={editor}
-        value={editorContent}
+        defaultValue={editorContent}
         config={config}
         tabIndex={1}
+        onChange={(newContent) => onEditorChange(newContent)}
       />
     </div>
   );
