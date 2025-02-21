@@ -9,11 +9,11 @@ import { CiSearch } from "react-icons/ci";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/finance.action.js";
 import Spinner from "../../Components/Common/Spinner";
-import useNavHeading from "../../Hooks/CommonHooks/useNavHeading .js";
 import { useTranslation } from "react-i18next";
+import useNavHeading from "../../Hooks/CommonHooks/useNavHeading ";
 
 // ---- antd imports ----
-import { Table, Skeleton, Tag  } from "antd";
+import { Table, Skeleton, Tag } from "antd";
 
 const ParentFinanceTable = () => {
   const { t } = useTranslation("prtFinance");
@@ -31,8 +31,28 @@ const ParentFinanceTable = () => {
   // For searching table rows in real-time
   const [searchTerm, setSearchTerm] = useState("");
 
-  useNavHeading(t("Finance"));
+  useNavHeading(t("Child Fees"));
+
+  // Color array for random tags
   const tagColors = ["purple", "red", "blue", "green", "orange", "cyan", "magenta", "gold", "lime"];
+
+  // Function to return a colorful tag based on status
+  const getStatusTag = (status) => {
+    const statusColorMap = {
+      Unpaid: "red",
+      Paid: "green",
+      Partial: "gold",
+    };
+
+    // Use predefined color or random from tagColors array
+    const color = statusColorMap[status] || tagColors[Math.floor(Math.random() * tagColors.length)];
+
+    return (
+      <Tag color={color} style={{ fontWeight: 500, borderRadius: "12px", padding: "4px 10px" }}>
+        {status}
+      </Tag>
+    );
+  };
 
   useEffect(() => {
     dispatch(fetchParentFinanceData());
@@ -131,13 +151,7 @@ const ParentFinanceTable = () => {
         record.skeleton ? (
           <Skeleton.Input active size="small" style={{ width: 60 }} />
         ) : (
-          <span
-            className={`inline-block px-3 py-1 font-semibold rounded-full ${
-              text === "Paid" ? "text-[#0D9755]" : "text-red-500"
-            }`}
-          >
-            {text || "No Status"}
-          </span>
+          getStatusTag(text || "No Status") // Updated to use colorful tags
         ),
     },
     {
@@ -203,7 +217,7 @@ const ParentFinanceTable = () => {
   }
 
   return (
-    <Layout title={t("Finance")}>
+    <Layout title={t("Child Fees | Parents")}>
       <ParentDashLayout hideAvatarList={true}>
         <div className="flex flex-col w-full">
 
