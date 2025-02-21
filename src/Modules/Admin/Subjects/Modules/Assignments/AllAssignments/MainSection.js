@@ -49,7 +49,7 @@ const MainSection = () => {
             <List
               type={t("Assignment")}
               title={t("All Assignments")}
-              data={assignments}
+              data={assignments || []}
               icon={<RiListCheck3 />}
               loading={loading}
               error={error}

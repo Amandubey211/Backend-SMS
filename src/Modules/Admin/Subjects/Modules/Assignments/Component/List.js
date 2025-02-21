@@ -77,8 +77,8 @@ const List = ({
     setIsModalOpen(false);
   };
 
-  const filteredData = data.filter((item) =>
-    item.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredData = data?.filter((item) =>
+    item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Close menu on outside click

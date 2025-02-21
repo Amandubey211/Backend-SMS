@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import MainSection from "./MainSection";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
@@ -12,7 +12,7 @@ const CreateAssignment = () => {
   );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = React.useState(false);
 
   return (
     <Layout
@@ -26,10 +26,8 @@ const CreateAssignment = () => {
         {/* Sidebar is fixed on the left */}
         <SideMenubar />
         <div
-          className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
-          style={{
-            marginLeft: sidebarWidth,
-          }}
+          className={`transition-all duration-500 flex-1 h-full`}
+          style={{ marginLeft: sidebarWidth }}
         >
           <div className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar ">
             <MainSection setIsEditing={setIsEditing} />

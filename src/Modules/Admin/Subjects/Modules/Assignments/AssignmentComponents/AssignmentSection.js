@@ -3,19 +3,49 @@ import { FaPlayCircle } from "react-icons/fa";
 import Spinner from "../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useSelector } from "react-redux";
+import { motion } from "framer-motion";
+import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 
 const AssignmentSection = () => {
   const { assignmentDetails, loading, error } = useSelector(
     (store) => store.admin.assignments
   );
+  console.log(assignmentDetails);
   if (loading) return <Spinner />;
   if (error || !assignmentDetails) return <NoDataFound />;
 
-  const { name, content, videoThumbnailUrl } = assignmentDetails;
+  const { name, content, videoThumbnailUrl, publish } = assignmentDetails;
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white">
-      <h2 className="text-2xl font-semibold mb-2">{name}</h2>
+      <div className="flex items-center space-x-3 mb-2">
+        <h2 className="text-2xl font-semibold">{name}</h2>
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <span
+            className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
+              publish
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            }`}
+          >
+            {publish ? (
+              <>
+                <CheckCircleOutlined className="mr-1" />
+                Published
+              </>
+            ) : (
+              <>
+                <CloseCircleOutlined className="mr-1" />
+                Unpublished
+              </>
+            )}
+          </span>
+        </motion.div>
+      </div>
       <p className="text-sm text-green-600 mb-4">Assignment</p>
       <div
         dangerouslySetInnerHTML={{ __html: content }}
