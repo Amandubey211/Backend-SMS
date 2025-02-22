@@ -13,14 +13,13 @@ import DocumentUploadForm from "../../LoginPages/Student/SignUp/DocumentUploadFo
 import ImageUpload from "./Components/ImageUpload";
 import StudentCard from "./Components/StudentCard";
 import validateStudentDetails from "../../../Validataions/Student/validateStudentDetails";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../config/permission";
 
-
 const StudentInfo = () => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
   const dispatch = useDispatch();
   const schoolId = useSelector(
     (store) => store.common.user.userDetails?.schoolId || ""
@@ -269,94 +268,106 @@ const StudentInfo = () => {
   };
 
   return (
-    <div className="flex gap-4 h-screen ">
-      {/* Form Section - 77% Width */}
-      <div
-        style={{ width: "75%" }}
-        className="p-3 bg-white rounded-lg overflow-y-auto no-scrollbar"
-      >
-        <ProtectedSection requiredPermission={"PERMISSIONS.CREATE_ADMISSION"} title={t("Create Admission")}>
-          <h2 className="text-2xl font-semibold mb-6">{t("Student Information")}</h2>
-          <form ref={formRef} onSubmit={handleDocumentSubmit}>
-            <div className="grid grid-cols-12 gap-4">
-              <div className="col-span-4">
-                <ImageUpload
-                  width="w-56"
-                  height="h-56"
-                  imagePreview={imagePreview}
-                  handleImageChange={(e) => {
-                    setProfile(e.target.files[0]);
-                    setImageError(""); // Clear the error when image is selected
-                    const reader = new FileReader();
-                    reader.onload = () => setImagePreview(reader.result);
-                    reader.readAsDataURL(e.target.files[0]);
-                  }}
-                  handleRemoveImage={() => {
-                    setProfile(null);
-                    setImagePreview(null);
-                    setImageError(t("Profile image is required")); // Set error if image is removed
-                  }}
-                  error={imageError} // Pass error state to ImageUpload component
-                  inputRef={fileInputRef}
-                />
-              </div>
-              <div className="col-span-8">
-                <PersonalInfo
+    <div className="h-full w-full ">
+      <ProtectedSection requiredPermission={PERMISSIONS.ADMISSION} aman={true}>
+        <div className="flex gap-4 h-screen ">
+          {/* Form Section - 77% Width */}
+          <div
+            style={{ width: "75%" }}
+            className="p-3 bg-white rounded-lg overflow-y-auto no-scrollbar"
+          >
+            <ProtectedSection
+              requiredPermission={"PERMISSIONS.CREATE_ADMISSION"}
+              title={t("Create Admission")}
+            >
+              <h2 className="text-2xl font-semibold mb-6">
+                {t("Student Information")}
+              </h2>
+              <form ref={formRef} onSubmit={handleDocumentSubmit}>
+                <div className="grid grid-cols-12 gap-4">
+                  <div className="col-span-4">
+                    <ImageUpload
+                      width="w-56"
+                      height="h-56"
+                      imagePreview={imagePreview}
+                      handleImageChange={(e) => {
+                        setProfile(e.target.files[0]);
+                        setImageError(""); // Clear the error when image is selected
+                        const reader = new FileReader();
+                        reader.onload = () => setImagePreview(reader.result);
+                        reader.readAsDataURL(e.target.files[0]);
+                      }}
+                      handleRemoveImage={() => {
+                        setProfile(null);
+                        setImagePreview(null);
+                        setImageError(t("Profile image is required")); // Set error if image is removed
+                      }}
+                      error={imageError} // Pass error state to ImageUpload component
+                      inputRef={fileInputRef}
+                    />
+                  </div>
+                  <div className="col-span-8">
+                    <PersonalInfo
+                      studentInfo={studentInfo}
+                      handleInputChange={handleInputChange}
+                      errors={errors}
+                      inputRefs={inputRefs}
+                    />
+                  </div>
+                </div>
+                <AddressInfo
                   studentInfo={studentInfo}
                   handleInputChange={handleInputChange}
                   errors={errors}
                   inputRefs={inputRefs}
                 />
-              </div>
-            </div>
-            <AddressInfo
-              studentInfo={studentInfo}
-              handleInputChange={handleInputChange}
-              errors={errors}
-              inputRefs={inputRefs}
-            />
-            <AdmissionInfo
-              studentInfo={studentInfo}
-              handleInputChange={handleInputChange}
-              errors={errors}
-              inputRefs={inputRefs}
-            />
-            <ParentInfo
-              studentInfo={studentInfo}
-              handleInputChange={handleInputChange}
-              errors={errors}
-              inputRefs={inputRefs}
-            />
-            <DocumentUploadForm
-              type="Admin"
-              studentDocuments={studentDocuments}
-              handleChange={handleInputChange}
-              handleFileUploadIconClick={() => fileInputRef.current.click()}
-              handlePhotoChange={handlePhotoChange}
-              handleClearPhoto={handleClearPhoto}
-              preview={preview}
-              setPreview={setPreview}
-              setStudentDocuments={setStudentDocuments}
-              fileInputRef={fileInputRef}
-            />
-            <div className="mt-6">
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
-                disabled={loading}
-              >
-                {loading ? t("Registering...") : t("Add Student")}
-              </button>
-            </div>
-          </form>
-        </ProtectedSection>
-      </div>
+                <AdmissionInfo
+                  studentInfo={studentInfo}
+                  handleInputChange={handleInputChange}
+                  errors={errors}
+                  inputRefs={inputRefs}
+                />
+                <ParentInfo
+                  studentInfo={studentInfo}
+                  handleInputChange={handleInputChange}
+                  errors={errors}
+                  inputRefs={inputRefs}
+                />
+                <DocumentUploadForm
+                  type="Admin"
+                  studentDocuments={studentDocuments}
+                  handleChange={handleInputChange}
+                  handleFileUploadIconClick={() => fileInputRef.current.click()}
+                  handlePhotoChange={handlePhotoChange}
+                  handleClearPhoto={handleClearPhoto}
+                  preview={preview}
+                  setPreview={setPreview}
+                  setStudentDocuments={setStudentDocuments}
+                  fileInputRef={fileInputRef}
+                />
+                <div className="mt-6">
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600 text-center"
+                    disabled={loading}
+                  >
+                    {loading ? t("Registering...") : t("Add Student")}
+                  </button>
+                </div>
+              </form>
+            </ProtectedSection>
+          </div>
 
-      {/* Student Card Section - 23% Width */}
-      <div style={{ width: "25%" }} className="sticky top-4 ">
-        <StudentCard studentInfo={studentInfo} imagePreview={imagePreview} />
-      </div>
-    </div >
+          {/* Student Card Section - 23% Width */}
+          <div style={{ width: "25%" }} className="sticky top-4 ">
+            <StudentCard
+              studentInfo={studentInfo}
+              imagePreview={imagePreview}
+            />
+          </div>
+        </div>
+      </ProtectedSection>
+    </div>
   );
 };
 

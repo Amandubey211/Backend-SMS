@@ -36,10 +36,10 @@ export const PERMISSIONS = {
   //  commom
   GET_ALL_ISSUE_BOOKS: "Get All Issued Books",
   GET_ALL_BOOKS: "Get All Books",
-  //semeseter 
-  ADD_SEMESTER:"Create New Semester",
-  UPDATE_SEMESTER:"Update Semester",
-  DELETE_SEMESTER:"Delete Semester",
+  //semeseter
+  ADD_SEMESTER: "Create New Semester",
+  UPDATE_SEMESTER: "Update Semester",
+  DELETE_SEMESTER: "Delete Semester",
 
   // Librarian
   //Books
@@ -255,7 +255,7 @@ export const PERMISSIONS = {
   EDIT_FINANCE: "Edit Finance",
   ACTIVE_FINANCE: "activate Finance",
   DEACTIVE_FINANCE: "deactivate Finance",
-  
+
   // ---------------------------------------------------------------
   // ROLE MANAGEMENT PERMISSIONS (NEW) 8
   // ---------------------------------------------------------------
@@ -485,17 +485,17 @@ export const PERMISSIONS = {
   // ======================
   SECTION_BY_CLASS_STUDENT: "Get Section by Class",
   STUDENTS_BY_CLASS_AND_SECTION_STUDENT: "Get Students by Class and Section",
- //student management
+  //student management
 
- STUDENT_BOOKISSUE_RECORD: "Get Book Issue Records",
- GET_STUDENT_ATTENDENCE: "Get Student Attendance",
- GET_STUDENT_SUBJECTS: "Get Student Subjects",
- GET_STUDENT_GRADES: "Get Student Grades",
- GET_STUDENT_INFO: "Get Student Information",
- GET_COURSE_PROGRESS: "Get Course Progress",
- GET_PROGRESS_OF_SUBJECT: "Get Course Progress by Subject",
- GET_STUDENT_TASK: "Get Student Tasks",
- GET_YEARLY_ATTENDEC: "Get Yearly Attendance",
+  STUDENT_BOOKISSUE_RECORD: "Get Book Issue Records",
+  GET_STUDENT_ATTENDENCE: "Get Student Attendance",
+  GET_STUDENT_SUBJECTS: "Get Student Subjects",
+  GET_STUDENT_GRADES: "Get Student Grades",
+  GET_STUDENT_INFO: "Get Student Information",
+  GET_COURSE_PROGRESS: "Get Course Progress",
+  GET_PROGRESS_OF_SUBJECT: "Get Course Progress by Subject",
+  GET_STUDENT_TASK: "Get Student Tasks",
+  GET_YEARLY_ATTENDEC: "Get Yearly Attendance",
   // ====================
   // Grade Management
   // ====================
@@ -504,18 +504,21 @@ export const PERMISSIONS = {
 
   //            offline exams  ///////////////
 
-  UPLOAD_EXCEL_OFFLINE :"Upload Excel of Offline Exam",
-    ADD_OFFLINE_EXAM: "Add Offline Exam",
-    UPDATE_OFFLINE_STUDENT_EXAM: "Update Student Exam",
-   GET_OFFLINE_EXAM: "Get offline Exam",
+  UPLOAD_EXCEL_OFFLINE: "Upload Excel of Offline Exam",
+  ADD_OFFLINE_EXAM: "Add Offline Exam",
+  UPDATE_OFFLINE_STUDENT_EXAM: "Update Student Exam",
+  GET_OFFLINE_EXAM: "Get offline Exam",
   SHOW_ALL_EXAMS: "Show All Exams",
-   DELETE_OFFLINE_STUDENT_EXAM: "Delete Exam of Student",
-    UPDATE_OFFLINE_EXAM:"Update Offline Exam",
-    DELETE_OFFLINE_STUDENT_EXAM:"Delete Offline Exam",
-    // spedd grades//////////
-          ASSIGN_SPEED_GRADES:"Assign Grade to a Student",
+  DELETE_OFFLINE_STUDENT_EXAM: "Delete Exam of Student",
+  UPDATE_OFFLINE_EXAM: "Update Offline Exam",
+  DELETE_OFFLINE_STUDENT_EXAM: "Delete Offline Exam",
+  // spedd grades//////////
+  ASSIGN_SPEED_GRADES: "Assign Grade to a Student",
   //------------------------------------------------End of Class Variables ---------------------------------------------------------
 
   //-------------------------------------------------------------------------//
-
+  ADMISSION: "addmission to student",
+  VIEW_Verification: "view verification dashboard",
+  VERIFY_STUDENT: "Verifiy student ",
+  ViewGraduateStudent: "view Graduate student",
 };
