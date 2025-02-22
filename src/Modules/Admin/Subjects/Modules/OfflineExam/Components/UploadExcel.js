@@ -4,7 +4,14 @@ import "handsontable/dist/handsontable.full.css";
 import { Button } from "antd";
 import { ImSpinner3 } from "react-icons/im";
 
-const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
+const UploadExcel = ({
+  data = [],
+  handleCreateExam,
+  loading,
+  setIsOpen,
+  setIsLoading,
+  isOpen,
+}) => {
   const hotRef = useRef(null);
   const hotInstanceRef = useRef(null);
 
@@ -65,12 +72,13 @@ const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
     if (hotInstanceRef.current) {
       hotInstanceRef.current.loadData([["", "", "", "", "", "", ""]]);
     }
-
     setIsOpen(false);
   };
 
+  console.log("asdasd", loading);
+
   return (
-    <div className="w-full p-4 bg-white border shadow-md mt-2">
+    <div className="w-full p-4 bg-white border shadow-md mt-2 ">
       <div
         ref={hotRef}
         className="h-full w-[60%] border rounded-sm shadow-sm bg-gray-50 overflow-x-scroll"
@@ -79,17 +87,13 @@ const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
       <div className="flex justify-end space-x-4 items-end w-[20%] fixed bottom-5 right-5">
         <Button onClick={handleCancel}>Cancel</Button>
         <Button
-          className={`${loading ? "cursor-not-allowed" : ""}`}
-          disabled={loading}
+          disabled={tableData.length === 0 || loading}
+          loading={loading}
           type="primary"
           htmlType="submit"
-          onClick={handleData}
+          onClick={handleCreateExam}
         >
-          {loading ? (
-            <ImSpinner3 className="w-6 h-6 animate-spin text-white" />
-          ) : (
-            "Create"
-          )}
+          Create
         </Button>
       </div>
     </div>

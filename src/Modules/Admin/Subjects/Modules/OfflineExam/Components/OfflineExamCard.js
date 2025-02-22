@@ -1,7 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { IoCalendarOutline } from "react-icons/io5";
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { TbCheck, TbEdit } from "react-icons/tb";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteOfflineExamCard,
@@ -21,6 +18,7 @@ const OfflineExamCard = ({
   maxMarks,
   examId,
   students,
+  semesterId
 }) => {
   const dispatch = useDispatch();
   const { offlineExamData, loading } = useSelector(
@@ -28,6 +26,7 @@ const OfflineExamCard = ({
   );
   const navigate = useNavigate();
   const { sid, cid } = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [examDetails, setExamDetails] = useState({
     examName,
@@ -54,7 +53,7 @@ const OfflineExamCard = ({
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // ✅ Update state when Redux state changes
+  //  Update state when Redux state changes
   useEffect(() => {
     const updatedExam = offlineExamData?.find((exam) => exam._id === examId);
     if (updatedExam) {
@@ -91,6 +90,7 @@ const OfflineExamCard = ({
         deleteOfflineExamCard({ examId: examId, cid: cid, sid: sid })
       ).unwrap();
       if (response.success) {
+        setIsModalOpen(false);
         toast.success("Exam deleted successfully!");
       }
     } catch (error) {
@@ -147,6 +147,8 @@ const OfflineExamCard = ({
     }
   };
 
+  console.log("semetsert", semester);
+
   return (
     <div className="ps-1 rounded-md bg-green-500 h-auto m-4 hover:shadow-lg">
       <div className="border rounded-md px-5 py-5 shadow-sm relative h-auto  bg-white">
@@ -160,6 +162,8 @@ const OfflineExamCard = ({
                   students: examDetails.students,
                   examType: examType,
                   startDate: formatDate(examDetails.startDate),
+                  examId: examId,
+                  semesterId: semesterId
                 },
               });
             }
@@ -176,17 +180,17 @@ const OfflineExamCard = ({
                   className="border px-2 py-1 rounded-md w-full"
                 />
               ) : (
-                <h1 className="font-bold text-lg pr-2 truncate">
+                <h1 className="font-bold text-lg pr-2 truncate capitalize">
                   {examDetails.examName}
                 </h1>
               )}
             </div>
-            <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+            <div className="bg-gray-100 text-gray-600 text-sm font-semibold rounded-full px-2 py-1 capitalize">
               {examType}
             </div>
           </div>
           <div>
-            <span className="font-medium text-gray-600 text-xs">
+            <span className="font-medium text-gray-600 text-sm">
               Max score:{" "}
             </span>
             {isEditing ? (
@@ -198,18 +202,18 @@ const OfflineExamCard = ({
                 className="border px-2 py-1 rounded-md w-20"
               />
             ) : (
-              <span className="text-gray-600 text-xs">
+              <span className="text-purple-600 text-sm font-medium">
                 {examDetails.maxMarks || 0}
               </span>
             )}
           </div>
 
           <div>
-            <span className="font-medium text-gray-600 text-xs">
+            <span className="font-medium text-gray-600 text-sm">
               Semester:{" "}
             </span>
 
-            <span className=" text-gray-600 text-xs">{semester}</span>
+            <span className=" text-gray-600 text-sm">{semester}</span>
           </div>
         </div>
         <ul className="border-t px-8 mt-2 mb-1"></ul>
@@ -223,6 +227,8 @@ const OfflineExamCard = ({
           handleEditClick={handleEditClick}
           loading={loading}
           handleDeleteClick={handleDeleteClick}
+          isModalOpen={isModalOpen}
+          setIsModalOpen={setIsModalOpen}
         />
       </div>
     </div>

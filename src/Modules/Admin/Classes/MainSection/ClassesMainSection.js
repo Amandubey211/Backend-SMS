@@ -131,7 +131,7 @@ const ClassesMainSection = () => {
           <NoDataFound title={t("Classes")} />
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {classes.map((cls) => (
+            {classes?.map((cls) => (
               <ClassCard
                 role={role}
                 key={cls._id}
