@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/finance.action.js";
 import { fetchChildren } from "../../Store/Slices/Parent/Children/children.action";
@@ -11,109 +10,90 @@ import { GiExpense } from "react-icons/gi";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { FaMoneyBillWave } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
-import { Select, Avatar, Table, Skeleton, Tag } from "antd";
-import Spinner from "../../Components/Common/Spinner";
+import { Select, Avatar, Table, Skeleton, Tag, Empty } from "antd";
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading ";
 
+// Destructure Option from Select
 const { Option } = Select;
 
-/** Helper to avoid duplicates in filters (existing logic) */
-const uniqueFilterOptions = (data, key) => {
-  return [...new Set(data?.map((item) => item?.[key])?.filter(Boolean))].sort();
-};
+// A helper to unify the filtering + searching logic
+function filterAndSearchData(data, filters, searchTerm, isChildBreakdown) {
+  if (!data) return [];
 
-/** Render network error in the table if something fails */
-const renderError = () => {
-  return (
-    <div className="flex flex-col items-center justify-center my-8">
-      <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
-      <p className="text-gray-600 text-lg">Failed to fetch finance data</p>
-    </div>
-  );
-};
+  // 1) Filter by status: Everyone, Paid, Unpaid, Partial
+  let result = data;
+  if (filters.status !== "Everyone") {
+    result = result.filter((item) => item.status === filters.status);
+  }
+
+  // 2) Filter by searchTerm
+  if (searchTerm.trim()) {
+    const lower = searchTerm.toLowerCase();
+    // For child breakdown, fields: category, paidBy, dueDate, amount, status
+    // For finance data, fields: feeType, paidBy, dueDate, amount, status
+    // We'll unify by checking isChildBreakdown
+    result = result.filter((item) => {
+      // unify the text fields
+      const feeTypeOrCategory = isChildBreakdown
+        ? (item.category || "").toLowerCase()
+        : (item.feeType || "").toLowerCase();
+
+      const paidBy = (item.paidBy || "").toLowerCase();
+      const dueDate = (item.dueDate || "").toLowerCase();
+      const amount = String(item.amount || "").toLowerCase();
+      const status = (item.status || "").toLowerCase();
+
+      return (
+        feeTypeOrCategory.includes(lower) ||
+        paidBy.includes(lower) ||
+        dueDate.includes(lower) ||
+        amount.includes(lower) ||
+        status.includes(lower)
+      );
+    });
+  }
+
+  return result;
+}
 
 const ParentFinanceTable = () => {
   const { t } = useTranslation("prtFinance");
   const dispatch = useDispatch();
 
-  // ---------- Existing Finance Data (default) ----------
+  // -----------------------------
+  // 1. FETCH DEFAULT FINANCE DATA
+  // -----------------------------
   const { financeData, totalUnpaidFees, totalPaidFees, loading, error } =
     useSelector((state) => state?.Parent?.finance || {});
 
+  // For the default table filters (radio + search)
   const [filters, setFilters] = useState({
     feesType: "",
+    // ADDED "Partial" as an option => see radio group below
     status: "Everyone",
   });
   const [searchTerm, setSearchTerm] = useState("");
 
-  useNavHeading(t("Child Fees"));
-
-  // Tag colors for status
-  const tagColors = ["purple", "red", "blue", "green", "orange", "cyan", "magenta", "gold", "lime"];
-
-  // Convert "Paid", "Unpaid", "Partial" -> color; else random
-  const getStatusTag = (status) => {
-    const statusColorMap = {
-      Unpaid: "red",
-      Paid: "green",
-      Partial: "gold",
-    };
-    const color = statusColorMap[status] || tagColors[Math.floor(Math.random() * tagColors.length)];
-    return (
-      <Tag color={color} style={{ fontWeight: 500, borderRadius: "12px", padding: "4px 10px" }}>
-        {status}
-      </Tag>
-    );
-  };
-
-  // Fetch overall finance data on mount
+  // On mount, fetch the default finance data
   useEffect(() => {
     dispatch(fetchParentFinanceData());
   }, [dispatch]);
 
-  // ---------- Filtering & Searching for the existing financeData ----------
-  const filteredFeesDetails = useMemo(() => {
-    if (!financeData) return [];
-    let data = financeData.filter(
-      (item) =>
-        (filters.status === "Everyone" || item?.status === filters.status) &&
-        (!filters.feesType || item?.feeType === filters.feesType)
-    );
-    if (searchTerm.trim()) {
-      const lowerSearch = searchTerm.toLowerCase();
-      data = data.filter(
-        (item) =>
-          item?.feeType?.toLowerCase().includes(lowerSearch) ||
-          item?.paidBy?.toLowerCase().includes(lowerSearch) ||
-          item?.dueDate?.toLowerCase().includes(lowerSearch) ||
-          String(item?.amount)?.toLowerCase().includes(lowerSearch) ||
-          item?.status?.toLowerCase().includes(lowerSearch)
-      );
-    }
-    return data;
-  }, [financeData, filters, searchTerm]);
+  // 2) We'll keep the raw financeData in store, but we filter it here
+  //    if user hasn't selected a child
+  //    (the child selection logic is separate)
+  // ------------------------------------------------------
 
-  // "No Data" message if the existing data is empty
-  const noDataMessage = useMemo(() => {
-    if (filters.status === "Paid") return t("No Paid Entries Available");
-    if (filters.status === "Unpaid") return t("No Unpaid Entries Available");
-    return t("No Finance Data Available for Now");
-  }, [filters.status, t]);
-
-  // Handler for radio filters
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // ---------- CHILDREN DROPDOWN & FEE BREAKDOWN ----------
+  // -----------------------------
+  // 2. FETCH CHILDREN
+  // -----------------------------
   const { children: childList = [], loading: childLoading } = useSelector(
     (state) => state?.Parent?.children || {}
   );
   const currentUserId = useSelector((state) => state?.Auth?.user?.id);
-
   const hasFetchedChildren = useRef(false);
+
   useEffect(() => {
     if (currentUserId && !hasFetchedChildren.current) {
       dispatch(fetchChildren(currentUserId));
@@ -121,48 +101,40 @@ const ParentFinanceTable = () => {
     }
   }, [currentUserId, dispatch]);
 
-  // The child selected in the dropdown
+  // -----------------------------
+  // 3. CHILD BREAKDOWN LOGIC
+  // -----------------------------
   const [selectedChildId, setSelectedChildId] = useState("");
-  // The child's fee breakdown data (if any)
   const [childFeeBreakdown, setChildFeeBreakdown] = useState(null);
-  // Loading & error states for the breakdown request
   const [breakdownLoading, setBreakdownLoading] = useState(false);
   const [breakdownError, setBreakdownError] = useState(null);
 
-  /**
-   * On child selection, fetch fee breakdown & adapt it to a data format
-   * that can be displayed in the existing table with expand rows.
-   */
+  // On child selection => fetch the child's fee breakdown
   const handleChildSelect = async (childId) => {
     setSelectedChildId(childId);
-    setBreakdownLoading(true);
     setBreakdownError(null);
     setChildFeeBreakdown(null);
 
     if (!childId) {
-      // If user clears the dropdown, revert to default table
+      // user cleared the dropdown => revert to default
       setBreakdownLoading(false);
       return;
     }
 
+    setBreakdownLoading(true);
     try {
       const resultAction = await dispatch(fetchParentFeeBreakdown({ studentId: childId }));
       const payload = resultAction?.payload;
 
       if (payload?.success) {
-        // Usually payload.feeBreakdown is an array of 1 or more children
-        // Each child has feeCategories: { "Tuition Fees": {...}, "Transport Fees": {...} }
-        // We'll convert them into rows for the table.
-
-        // For now, assume only 1 child object if a single studentId is used:
+        // Usually only one child object if a single studentId is used
         const childData = payload.feeBreakdown[0];
         if (!childData) {
-          // e.g. if no fees for that child
+          // No fees => empty => triggers <Empty />
           setChildFeeBreakdown([]);
         } else {
-          // Convert each feeCategories key into a row
+          // Convert each feeCategory into a row
           const rows = Object.entries(childData.feeCategories).map(([catName, catVal]) => {
-            // Determine status: if remainingAmount > 0 -> "Unpaid"/"Partial" or "Paid"
             let rowStatus = "Paid";
             if (catVal.remainingAmount > 0 && catVal.paidAmount > 0) {
               rowStatus = "Partial";
@@ -170,7 +142,6 @@ const ParentFinanceTable = () => {
               rowStatus = "Unpaid";
             }
 
-            // For the main columns:
             return {
               key: catName,
               category: catName,
@@ -188,9 +159,7 @@ const ParentFinanceTable = () => {
           setChildFeeBreakdown(rows);
         }
       } else {
-        // e.g. Invalid studentId or some server error message
-        // If there's a message in payload, show it; else fallback
-        setBreakdownError(payload?.message || "No Fees Data available. Please check later.");
+        setBreakdownError(payload?.message || "No Fees at the Moment for this Child, Please Check later.");
       }
     } catch (err) {
       setBreakdownError(err.message || "Error fetching fee breakdown.");
@@ -199,7 +168,7 @@ const ParentFinanceTable = () => {
     }
   };
 
-  // Renders each child in the dropdown with a small avatar + name
+  // Renders child in dropdown with avatar + name
   const renderChildOption = (child) => (
     <div className="flex items-center gap-2">
       <Avatar src={child.profile} size="small" />
@@ -207,64 +176,84 @@ const ParentFinanceTable = () => {
     </div>
   );
 
-  // ---------- Table Data Handling ----------
-  // If no child is selected, we show existing finance data
-  // If a child is selected & we have breakdown data, we show that instead
-  const isChildSelected = Boolean(selectedChildId);
-  const isUsingBreakdown = isChildSelected && childFeeBreakdown && !breakdownError;
-  const finalTableData = useMemo(() => {
-    if (isUsingBreakdown) {
-      // Return the child's breakdown data
-      return childFeeBreakdown;
-    }
-    // Otherwise, fallback to existing finance data or skeleton/error
-    if (loading) {
-      return Array.from({ length: 5 }, (_, i) => ({ key: `skeleton-${i}`, skeleton: true }));
-    }
-    if (error) {
-      return []; // no rows if there's an error
-    }
-    // show filtered fees details
-    return filteredFeesDetails.map((item, index) => ({
-      ...item,
-      key: `fee-${index}`,
-    }));
-  }, [isUsingBreakdown, childFeeBreakdown, breakdownError, loading, error, filteredFeesDetails]);
+  // True if child is selected + we have data (or empty array) + no error
+  const isUsingBreakdown = Boolean(selectedChildId) && childFeeBreakdown && !breakdownError;
 
-  // ---------- Expandable Row: show extra details for breakdown categories ----------
-  // Only used if isUsingBreakdown = true
-  const expandedRowRender = (record) => {
-    // record = { category, cycle, totalAmount, paidAmount, remainingAmount, allDueDates, ... }
+  // A helper to color the status
+  const tagColors = ["purple", "red", "blue", "green", "orange", "cyan", "magenta", "gold", "lime"];
+  const getStatusTag = (status) => {
+    const map = { Unpaid: "red", Paid: "green", Partial: "gold" };
+    const color = map[status] || tagColors[Math.floor(Math.random() * tagColors.length)];
     return (
-      <div className="p-2 bg-gray-50 rounded-md">
-        <p className="text-sm">
-          <strong>Cycle:</strong> {record.cycle}
-        </p>
-        <p className="text-sm">
-          <strong>Total Amount:</strong> {record.totalAmount}
-        </p>
-        <p className="text-sm">
-          <strong>Paid Amount:</strong> {record.paidAmount}
-        </p>
-        <p className="text-sm">
-          <strong>Remaining Amount:</strong> {record.remainingAmount}
-        </p>
-        <p className="text-sm">
-          <strong>All Due Dates:</strong>{" "}
-          {record.allDueDates.length > 0
-            ? record.allDueDates.map((d) => d.slice(0, 10)).join(", ")
-            : "N/A"}
-        </p>
-      </div>
+      <Tag color={color} style={{ fontWeight: 500, borderRadius: "12px", padding: "4px 10px" }}>
+        {status}
+      </Tag>
     );
   };
 
-  // ---------- Define columns for final usage in <Table> ----------
-  // We can reuse the existing columns, but override some dataIndex if using breakdown
-  // Because breakdown data uses different field names:
+  // We define final data either from child breakdown or the default finance
+  // Then we apply the same filterAndSearchData for radio + search
+  // This ensures "Partial" filter also works for child data
+  let rawData;
+  let isChildData = false;
+
+  if (isUsingBreakdown) {
+    rawData = childFeeBreakdown; // array or []
+    isChildData = true;
+  } else {
+    // default finance data
+    if (error) {
+      // if top-level error => no rows
+      rawData = [];
+    } else if (loading) {
+      // show skeleton rows
+      rawData = Array.from({ length: 5 }, (_, i) => ({ key: `skeleton-${i}`, skeleton: true }));
+    } else {
+      rawData = financeData || [];
+    }
+  }
+
+  // Apply the same radio + search filtering to rawData
+  const finalTableData = useMemo(() => {
+    // If we have skeleton rows, just return them
+    if (rawData.some((item) => item.skeleton)) {
+      return rawData;
+    }
+    // Otherwise, do actual filter + search
+    return filterAndSearchData(rawData, filters, searchTerm, isChildData);
+  }, [rawData, filters, searchTerm, isChildData]);
+
+  // Expand row for child breakdown
+  const expandedRowRender = (record) => (
+    <div className="bg-white rounded-lg p-4 border border-gray-200">
+      <div className="flex flex-col gap-2">
+        <RowItem label="Cycle" value={record.cycle} />
+        <RowItem label="Total Amount" value={record.totalAmount} />
+        <RowItem label="Paid Amount" value={record.paidAmount} />
+        <RowItem label="Remaining Amount" value={record.remainingAmount} />
+        <RowItem
+          label="All Due Dates"
+          value={
+            record.allDueDates.length
+              ? record.allDueDates.map((d) => d.slice(0, 10)).join(", ")
+              : "N/A"
+          }
+        />
+      </div>
+    </div>
+  );
+
+  const RowItem = ({ label, value }) => (
+    <div className="flex items-center justify-between">
+      <span className="font-medium text-gray-700">{label}</span>
+      <span className="text-gray-800">{value}</span>
+    </div>
+  );
+
+  // Build columns differently if child breakdown is in use
   const mainColumns = useMemo(() => {
-    if (!isUsingBreakdown) {
-      // Original columns for financeData
+    if (!isChildData) {
+      // Original columns for finance data
       return [
         {
           title: t("Fee Type"),
@@ -344,12 +333,11 @@ const ParentFinanceTable = () => {
       ];
     }
 
-    // If we are using breakdown data, adapt the columns
-    // (some fields differ: category, paidBy, dueDate, amount, status)
+    // If we are using the child's breakdown columns
     return [
       {
         title: t("Fee Type"),
-        dataIndex: "category", // instead of "feeType"
+        dataIndex: "category",
         key: "category",
         render: (text, record) =>
           record.skeleton ? (
@@ -410,7 +398,6 @@ const ParentFinanceTable = () => {
           if (record.skeleton) {
             return <Skeleton.Button active size="small" shape="round" />;
           }
-          // If status is "Paid" => Completed, else Pay Now
           if (record.status === "Paid") {
             return (
               <button
@@ -429,13 +416,16 @@ const ParentFinanceTable = () => {
         },
       },
     ];
-  }, [isUsingBreakdown, childFeeBreakdown, loading, error, t]);
+  }, [isChildData, t]);
+
+  useNavHeading(t("Child Fees | Parents"));
 
   return (
     <Layout title={t("Child Fees | Parents")}>
       <ParentDashLayout hideAvatarList={true}>
         <div className="flex flex-col w-full">
-          {/* ---- TOP CARDS (like dashboard) ---- */}
+
+          {/* ---- TOP CARDS ---- */}
           <div className="grid grid-cols-2 gap-4 w-full px-4 py-4">
             {/* Card 1: Total Unpaid Fees */}
             <div className="flex flex-col p-4 border border-gray-300 rounded-lg transition-transform hover:scale-105">
@@ -450,7 +440,6 @@ const ParentFinanceTable = () => {
                 {t("Pay Now")}
               </button>
             </div>
-
             {/* Card 2: Total Paid Fees */}
             <div className="flex flex-col p-4 border border-gray-300 rounded-lg transition-transform hover:scale-105">
               <div className="flex items-center justify-center mb-2">
@@ -463,11 +452,11 @@ const ParentFinanceTable = () => {
             </div>
           </div>
 
-          {/* ---- FILTERS, CHILD DROPDOWN & SEARCH BAR ROW ---- */}
+          {/* ---- FILTERS, CHILD DROPDOWN & SEARCH BAR ---- */}
           <div className="flex p-[10px] justify-between items-center">
-            {/* Left: Radio filters (Everyone, Paid, Unpaid) */}
+            {/* Left: Radio filters => ADDED PARTIAL */}
             <div className="flex gap-4">
-              {["Everyone", "Paid", "Unpaid"].map((status) => (
+              {["Everyone", "Paid", "Unpaid", "Partial"].map((status) => (
                 <div key={status}>
                   <label className="flex items-center cursor-pointer">
                     <input
@@ -475,14 +464,17 @@ const ParentFinanceTable = () => {
                       name="status"
                       value={status}
                       checked={filters.status === status}
-                      onChange={handleFilterChange}
+                      onChange={(e) =>
+                        setFilters((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+                      }
                       className="hidden"
                     />
                     <div
-                      className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
+                      className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
+                        filters.status === status
                           ? "border-green-500 bg-white"
                           : "border-gray-300 bg-white"
-                        }`}
+                      }`}
                       style={{ position: "relative" }}
                     >
                       {filters.status === status && (
@@ -499,8 +491,9 @@ const ParentFinanceTable = () => {
                       )}
                     </div>
                     <span
-                      className={`transition-colors duration-200 ${filters.status === status ? "text-green-700" : "text-gray-700"
-                        }`}
+                      className={`transition-colors duration-200 ${
+                        filters.status === status ? "text-green-700" : "text-gray-700"
+                      }`}
                       style={{ paddingLeft: "2px" }}
                     >
                       {t(status)}
@@ -524,7 +517,10 @@ const ParentFinanceTable = () => {
                 >
                   {childList.map((child) => (
                     <Option key={child.id} value={child.id}>
-                      {renderChildOption(child)}
+                      <div className="flex items-center gap-2">
+                        <Avatar src={child.profile} size="small" />
+                        <span>{child.name}</span>
+                      </div>
                     </Option>
                   ))}
                 </Select>
@@ -548,43 +544,34 @@ const ParentFinanceTable = () => {
 
           {/* ---- TABLE SECTION ---- */}
           <div className="px-4 pb-4">
-            {/* Show an error if there's a top-level error from fetchParentFinanceData */}
+            {/* If there's a top-level error from fetchParentFinanceData => show no table */}
             {error ? (
-              renderError()
+              <div className="flex flex-col items-center justify-center my-8">
+                <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
+                <p className="text-gray-600 text-lg">Failed to fetch finance data</p>
+              </div>
             ) : (
               <>
-                {/* Show a red error if the breakdown fails (like "Invalid studentId") */}
-                {breakdownError && (
-                  <p className="text-red-500 mb-2">{breakdownError}</p>
-                )}
+                {/* If the child breakdown fails => show red error once */}
+                {breakdownError && <p className="text-red-500 mb-2">{breakdownError}</p>}
 
                 <Table
                   columns={mainColumns}
                   dataSource={finalTableData}
                   pagination={{ pageSize: 5 }}
-                  loading={false}
-                  // Only use expand if we're using the breakdown data
+                  loading={false} // We handle skeleton rows ourselves
+                  // Expand rows only if child data is in use
                   expandable={
                     isUsingBreakdown
                       ? {
-                        expandedRowRender,
-                        rowExpandable: (record) => !record.skeleton, // no expand for skeleton rows
-                      }
+                          expandedRowRender,
+                          rowExpandable: (record) => !record.skeleton,
+                        }
                       : undefined
                   }
                   locale={{
-                    emptyText: loading
-                      ? null
-                      : (
-                        <div className="flex flex-col items-center justify-center mt-8">
-                          <FaMoneyBillWave className="text-gray-400 text-6xl mb-4" />
-                          <p className="text-gray-600 text-lg">
-                            {isUsingBreakdown
-                              ? "No Breakdown Data"
-                              : noDataMessage}
-                          </p>
-                        </div>
-                      ),
+                    // If finalTableData is empty => show default "No Data" icon
+                    emptyText: <Empty />,
                   }}
                 />
               </>
