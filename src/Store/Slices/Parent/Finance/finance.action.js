@@ -23,3 +23,24 @@ export const fetchParentFinanceData = createAsyncThunk(
     }
   }
 );
+
+export const fetchParentFeeBreakdown = createAsyncThunk(
+  "dashboard/fetchParentFeeBreakdown",
+  async ({ subCategory, feeCycle, startDate, endDate, studentId }, { rejectWithValue, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const queryParams = new URLSearchParams({ say });
+      if (subCategory) queryParams.append("subCategory", subCategory);
+      if (feeCycle) queryParams.append("feeCycle", feeCycle);
+      if (startDate) queryParams.append("startDate", startDate);
+      if (endDate) queryParams.append("endDate", endDate);
+      if (studentId) queryParams.append("studentId", studentId);
+
+      const data = await getData(`${baseUrl}/parent/api/breakdown/fees?${queryParams}`);
+      return data;
+    } catch (error) {
+      handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
