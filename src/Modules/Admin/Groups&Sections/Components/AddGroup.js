@@ -96,7 +96,10 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
   // Validate & submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (seatLimit <= 0) {
+
+    // Ensure seatLimit is a number and greater than 0
+    const numericSeatLimit = Number(seatLimit);
+    if (numericSeatLimit <= 0) {
       setSeatLimitError(t("Seat limit must be a positive number"));
       return;
     } else {
@@ -106,16 +109,16 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
     const formData = {
       classId: cid,
       groupName,
-      seatLimit,
+      seatLimit: numericSeatLimit, // Ensure it's sent as a number
       students: selectedStudents?.map((student) => student._id),
       leader: leader ? leader._id : null,
     };
 
     try {
       if (isUpdate) {
-        await dispatch(updateGroup({ groupId, formData }));
+        dispatch(updateGroup({ groupId, formData }));
       } else {
-        await dispatch(createGroup(formData));
+        dispatch(createGroup(formData));
         setGroupName("");
         setSeatLimit(5);
         setSelectedStudents([]);
@@ -346,9 +349,9 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
                             <p className="text-sm font-semibold">
                               {student.firstName} {student.lastName}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            {/* <p className="text-xs text-gray-500">
                               {student.presentSectionId || t("No Section")}
-                            </p>
+                            </p> */}
                           </div>
                         </div>
                       </button>

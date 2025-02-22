@@ -41,7 +41,7 @@ const AnnouncementHeader = ({ onSearch }) => {
           <input
             type="text"
             placeholder={t("Search here")}
-            className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-300 w-80 transition-all duration-300 ease-in-out"
+            className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-80 transition-all duration-300 ease-in-out"
             onChange={handleSearchChange}
             aria-label={t("Search")}
           />

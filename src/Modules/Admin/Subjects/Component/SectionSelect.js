@@ -17,14 +17,12 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  // Fetch sections and groups from the Redux store
   const AllSections = useSelector(selectSections);
   const groupsList = useSelector(
     (store) => store.admin.group_section.groupsList
   );
   const loading = useSelector((store) => store.admin.group_section.loading);
 
-  // Fetch sections and groups when the component mounts or when `cid` changes
   useEffect(() => {
     if (cid) {
       dispatch(fetchSectionsByClass(cid));

@@ -18,10 +18,12 @@ export const postData = async (endpoint, data) => {
     const response = await apiService.post(endpoint, data);
     return response?.data;
   } catch (error) {
-    console.log(error, "sdf");
     if (error.response && error.response.data) {
+      console.log(error.response.data, "sdf");
+
       return error.response.data;
     }
+
     // console.log("Error posting data:", error);
   }
 };

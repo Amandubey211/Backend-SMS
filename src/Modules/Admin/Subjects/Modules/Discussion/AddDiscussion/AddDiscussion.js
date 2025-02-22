@@ -110,7 +110,7 @@ const AddDiscussion = () => {
         publish,
       };
 
-      // Collect errors for both fields instead of returning immediately
+      // Validate required fields and set error messages
       let hasError = false;
       if (!discussionData.assignTo) {
         setAssignError("Please assign the discussion");
@@ -120,7 +120,6 @@ const AddDiscussion = () => {
       }
       if (!discussionData.title.trim()) {
         setTitleError("Please provide a title for the discussion");
-        // Focus on the title input if missing
         titleInputRef.current?.focus();
         hasError = true;
       } else {
@@ -145,7 +144,7 @@ const AddDiscussion = () => {
           navigate(`/class/${cid}/${sid}/discussions`);
         }
       } catch (err) {
-        // Backend errors can still trigger a toast, if desired.
+        // Handle backend errors appropriately
       }
     },
     [

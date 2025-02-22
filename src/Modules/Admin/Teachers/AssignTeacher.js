@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,7 +14,7 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Local state for form fields—prefilled when editingTeacher exists
+  // Local state for form fields
   const [teacherId, setTeacherId] = useState(
     editingTeacher ? editingTeacher._id : ""
   );
@@ -24,6 +24,16 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const [sectionId, setSectionId] = useState(
     (editingTeacher && editingTeacher.sectionId?.[0]?._id) || ""
   );
+
+  // Error states for validation
+  const [teacherError, setTeacherError] = useState("");
+  const [subjectError, setSubjectError] = useState("");
+  const [sectionError, setSectionError] = useState("");
+
+  // Refs for select fields
+  const teacherRef = useRef(null);
+  const subjectRef = useRef(null);
+  const sectionRef = useRef(null);
 
   // Data from Redux store
   const allTeachers = useSelector((state) => state.admin.teacher.allTeachers);
@@ -52,43 +62,88 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
     }
   }, [editingTeacher]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingTeacher) {
-      // Data structure based on your backend controller expectations
-      const editData = {
-        id: editingTeacher._id,
-        subjects: [{ _id: subjectId }],
-        classIds: [{ _id: cid }],
-        sectionIds: [{ _id: sectionId }],
-      };
-      dispatch(editTeacher(editData));
-    } else {
-      const assignData = {
-        classId: cid,
-        teacherId,
-        sectionId,
-        subjectId,
-      };
-      dispatch(assignTeacher(assignData));
+
+    // Reset errors
+    setTeacherError("");
+    setSubjectError("");
+    setSectionError("");
+
+    // Validate required fields
+    let isValid = true;
+    if (!teacherId) {
+      setTeacherError(t("Teacher is required"));
+      teacherRef.current.focus();
+      isValid = false;
     }
-    closeSidebar();
+    if (!subjectId) {
+      setSubjectError(t("Subject is required"));
+      if (isValid) {
+        subjectRef.current.focus();
+      }
+      isValid = false;
+    }
+    if (!sectionId) {
+      setSectionError(t("Section is required"));
+      if (isValid) {
+        sectionRef.current.focus();
+      }
+      isValid = false;
+    }
+    if (!isValid) {
+      return; // Do not make the API call
+    }
+
+    try {
+      if (editingTeacher) {
+        // Data structure based on backend expectations for editing
+        const editData = {
+          id: editingTeacher._id,
+          subjects: [{ _id: subjectId }],
+          classIds: [{ _id: cid }],
+          sectionIds: [{ _id: sectionId }],
+        };
+        await dispatch(editTeacher(editData)).unwrap();
+      } else {
+        const assignData = {
+          classId: cid,
+          teacherId,
+          sectionId,
+          subjectId,
+        };
+        await dispatch(assignTeacher(assignData)).unwrap();
+      }
+      // Only close sidebar on success
+      closeSidebar();
+    } catch (error) {
+      // If there is an error, do not close the sidebar.
+      // Optionally, you can set a general error message here.
+    }
   };
 
+  // Common select box classes with conditional red outline
   const selectBoxClasses =
-    "block w-full p-3 border border-gray-300 rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition ease-in-out duration-150 text-gray-800";
+    "block w-full p-3 border rounded-md bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition ease-in-out duration-150 text-gray-800";
 
   return (
     <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
+        {/* Teacher Select */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Teacher Name")}
+            {t("Teacher Name")} <span className="text-red-500">*</span>
           </label>
           <select
+            ref={teacherRef}
             value={teacherId}
-            onChange={(e) => setTeacherId(e.target.value)}
-            className={selectBoxClasses}
+            onChange={(e) => {
+              setTeacherId(e.target.value);
+              if (e.target.value) setTeacherError("");
+            }}
+            className={`${selectBoxClasses} ${
+              teacherError ? "border-red-500" : "border-gray-300"
+            }`}
             disabled={loading || Boolean(editingTeacher)}
           >
             <option value="">{t("Choose")}</option>
@@ -98,16 +153,26 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
               </option>
             ))}
           </select>
+          {teacherError && (
+            <p className="text-red-500 text-sm mt-1">{teacherError}</p>
+          )}
         </div>
 
+        {/* Subject Select */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Subject")}
+            {t("Subject")} <span className="text-red-500">*</span>
           </label>
           <select
+            ref={subjectRef}
             value={subjectId}
-            onChange={(e) => setSubjectId(e.target.value)}
-            className={selectBoxClasses}
+            onChange={(e) => {
+              setSubjectId(e.target.value);
+              if (e.target.value) setSubjectError("");
+            }}
+            className={`${selectBoxClasses} ${
+              subjectError ? "border-red-500" : "border-gray-300"
+            }`}
             disabled={loading}
           >
             <option value="">{t("Choose a subject")}</option>
@@ -118,16 +183,26 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
               </option>
             ))}
           </select>
+          {subjectError && (
+            <p className="text-red-500 text-sm mt-1">{subjectError}</p>
+          )}
         </div>
 
+        {/* Section Select */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t("Section")}
+            {t("Section")} <span className="text-red-500">*</span>
           </label>
           <select
+            ref={sectionRef}
             value={sectionId}
-            onChange={(e) => setSectionId(e.target.value)}
-            className={selectBoxClasses}
+            onChange={(e) => {
+              setSectionId(e.target.value);
+              if (e.target.value) setSectionError("");
+            }}
+            className={`${selectBoxClasses} ${
+              sectionError ? "border-red-500" : "border-gray-300"
+            }`}
             disabled={loading}
           >
             <option value="">{t("Choose")}</option>
@@ -137,6 +212,9 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
               </option>
             ))}
           </select>
+          {sectionError && (
+            <p className="text-red-500 text-sm mt-1">{sectionError}</p>
+          )}
         </div>
       </div>
 

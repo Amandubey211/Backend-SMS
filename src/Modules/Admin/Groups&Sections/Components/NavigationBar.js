@@ -18,7 +18,6 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
   const role = useSelector((store) => store.common.auth.role);
-
   const dispatch = useDispatch();
   const { cid } = useParams();
 
@@ -26,21 +25,32 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     (store) => store.admin.group_section.sectionsList
   );
 
+  // Compare active section by _id if available, otherwise by sectionName.
+  const getButtonClass = (sectionItem) => {
+    const isActive =
+      selectedSection === "Everyone"
+        ? sectionItem === "Everyone"
+        : selectedSection === sectionItem._id ||
+          selectedSection === sectionItem.sectionName;
+    return isActive
+      ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+      : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
+  };
+
   const openAddGroupSidebar = useCallback(() => setSidebarType("addGroup"), []);
   const openAddSectionSidebar = useCallback(() => {
     setSidebarType("addSection");
     setEditingSection(null);
   }, []);
-
   const closeSidebar = useCallback(() => {
     setSidebarType(null);
     setEditingSection(null);
-  }, [dispatch]);
+  }, []);
 
   const handleDeleteConfirm = async () => {
     await dispatch(deleteSection(sectionToDelete._id));
     setDeleteModalOpen(false);
-    dispatch(fetchSectionsByClass(cid)); // Fetch sections after deletion
+    dispatch(fetchSectionsByClass(cid)); // Refetch sections after deletion
   };
 
   const handleEditSection = useCallback((section) => {
@@ -53,17 +63,16 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     setDeleteModalOpen(true);
   };
 
-  const getButtonClass = (section) =>
-    selectedSection === section
-      ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
-
   return (
     <>
       <div className="flex justify-between items-center border-b p-4">
         <div className="flex space-x-2 px-5">
           <button
-            className={getButtonClass("Everyone")}
+            className={
+              selectedSection === "Everyone"
+                ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+                : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100"
+            }
             onClick={() => onSectionChange("Everyone", null)}
           >
             Everyone
@@ -71,7 +80,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           {sections?.map((item) => (
             <button
               key={item._id}
-              className={getButtonClass(item.sectionName)}
+              className={getButtonClass(item)}
               onClick={() => onSectionChange(item.sectionName, item._id)}
               onMouseEnter={() => setHoveredSection(item.sectionName)}
               onMouseLeave={() => setHoveredSection(null)}
@@ -96,8 +105,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
               )}
             </button>
           ))}
-          {/* Conditionally render the Add Section button only if the role is not "teacher" */}
-          {role == "admin" && (
+          {role === "admin" && (
             <button
               onClick={openAddSectionSidebar}
               className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
@@ -106,8 +114,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
             </button>
           )}
         </div>
-        {/* Conditionally render the Group button only if the role is not "teacher" */}
-        {role == "admin" && (
+        {role === "admin" && (
           <button
             onClick={openAddGroupSidebar}
             className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
@@ -120,7 +127,6 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         )}
       </div>
 
-      {/* Sidebars for adding/editing sections and groups */}
       <Sidebar
         isOpen={sidebarType === "addSection"}
         onClose={closeSidebar}

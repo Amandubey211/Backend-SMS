@@ -1,6 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { AiOutlineEdit } from "react-icons/ai";
-import { HiOutlineDotsVertical } from "react-icons/hi";
+import React, { useState } from "react";
+import { AiOutlineEdit, AiOutlineUser } from "react-icons/ai";
 import { BsChat } from "react-icons/bs";
 import { RiDeleteBin5Line } from "react-icons/ri";
 import { useParams, useNavigate } from "react-router-dom";
@@ -9,15 +8,13 @@ import Sidebar from "../../../../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../../../../Components/Common/DeleteModal";
 import AnnouncementCommentSection from "../AnnouncementMessage/AnnouncementCommentSection";
 import { deleteAnnouncement } from "../../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
-import { FaUserCircle } from "react-icons/fa";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const AnnouncementViewHeader = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
-  const { cid, sid, did: announcementId } = useParams();
+  const { cid, sid } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -25,34 +22,8 @@ const AnnouncementViewHeader = () => {
     (state) => state.admin.announcements
   );
 
-  const menuButtonRef = useRef(null);
-  const menuRef = useRef(null);
-
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
-  const toggleMenu = () => setMenuOpen(!menuOpen);
-
-  const handleClickOutside = (event) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(event.target) &&
-      !menuButtonRef.current.contains(event.target)
-    ) {
-      setMenuOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    if (menuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [menuOpen]);
 
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
@@ -77,19 +48,10 @@ const AnnouncementViewHeader = () => {
   return (
     <div className="flex items-center justify-between p-2 px-4 border-b">
       <div className="flex items-center">
-        {/* {announcement?.authorUrl ? (
-          <img
-            src={announcement.authorUrl}
-            alt={`${announcement.authorName || "Author"}'s Profile`}
-            className="w-12 h-12 rounded-full object-cover"
-          />
-        ) : (
-          <FaUserCircle
-            className="w-12 h-12 text-gray-400"
-            aria-label="Default Profile Icon"
-          />
-        )} */}
-
+        <AiOutlineUser
+          className="w-8 h-8 text-gray-500"
+          aria-label="Author Icon"
+        />
         <div className="ml-3">
           <h1 className="text-lg font-semibold">
             {announcement?.title || "Announcement Title"}
@@ -99,7 +61,7 @@ const AnnouncementViewHeader = () => {
           </p>
         </div>
       </div>
-      <div className="flex flex-col gap-2 justify-center relative">
+      <div className="flex flex-col gap-2 justify-center">
         <div className="flex gap-2 items-center">
           <div className="text-sm flex items-center gap-1 pr-2 border-r">
             <span className="bg-gradient-to-r from-purple-100 to-pink-100 rounded-full h-6 w-6 flex items-center justify-center text-white">
@@ -109,7 +71,6 @@ const AnnouncementViewHeader = () => {
             </span>
             <span>Comments</span>
           </div>
-
           <span className="text-sm pr-2 border-r">
             For: {announcement?.postTo || "Everyone"}
           </span>
@@ -117,7 +78,7 @@ const AnnouncementViewHeader = () => {
             Posted on: {formatDate(announcement?.createdAt) || "Date"}
           </span>
         </div>
-        <div className="flex items-center gap-2 justify-end relative">
+        <div className="flex items-center gap-2 justify-end">
           <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ANNOUNCEMENT}>
             <button
               className="flex items-center space-x-1 px-4 py-2 border rounded-md border-gray-300 text-green-600 hover:bg-gray-100 transition"
@@ -129,53 +90,27 @@ const AnnouncementViewHeader = () => {
             </button>
           </ProtectedAction>
           <ProtectedAction requiredPermission={PERMISSIONS.DELETE_ANNOUNCEMENT}>
-            <div className="relative">
-              <button
-                className="flex items-center space-x-1 border rounded-md p-2 justify-center border-gray-300 text-gray-600 hover:bg-gray-100 transition"
-                aria-label="More Options"
-                onClick={toggleMenu}
-                ref={menuButtonRef}
-                aria-expanded={menuOpen}
-                aria-haspopup="menu"
-              >
-                <HiOutlineDotsVertical
-                  aria-hidden="true"
-                  className="text-2xl"
-                />
-              </button>
-              {menuOpen && (
-                <div
-                  ref={menuRef}
-                  className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-md z-10"
-                  style={{ top: "100%", right: "0" }}
-                  role="menu"
-                  aria-label="Options"
-                >
-                  <button
-                    className="w-full flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100 transition"
-                    onClick={handleDeleteClick}
-                    disabled={deleteLoading}
-                    role="menuitem"
-                  >
-                    <RiDeleteBin5Line className="mr-2 text-red-700" />
-                    <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
-                  </button>
-                </div>
-              )}
-            </div>
+            <button
+              className="flex items-center space-x-1 px-4 py-2 border rounded-md border-gray-300 text-red-600 hover:bg-gray-100 transition"
+              aria-label="Delete Announcement"
+              onClick={handleDeleteClick}
+              disabled={deleteLoading}
+            >
+              <RiDeleteBin5Line aria-hidden="true" />
+              <span>{deleteLoading ? "Deleting..." : "Delete"}</span>
+            </button>
           </ProtectedAction>
-
           <ProtectedAction
             requiredPermission={PERMISSIONS.COMMENTS_BY_ANNOUNCEMENT}
           >
             <button
               onClick={handleSidebarOpen}
-              className="px-4 py-2 bg-gradient-to-r w-full from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
+              className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white items-center rounded-md flex gap-2"
             >
-              <BsChat /> <span> View Comments</span>
+              <BsChat />
+              <span>View Comments</span>
             </button>
           </ProtectedAction>
-
           <Sidebar
             width="70%"
             title="Announcement"
@@ -186,7 +121,6 @@ const AnnouncementViewHeader = () => {
           </Sidebar>
         </div>
       </div>
-
       <DeleteModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}

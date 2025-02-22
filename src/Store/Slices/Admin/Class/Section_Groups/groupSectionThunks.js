@@ -1,10 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
-import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-import {
-  ErrorMsg,
-  handleError,
-} from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../Utils/academivYear";
 import {
   deleteData,
@@ -23,7 +20,12 @@ export const fetchGroupsByClass = createAsyncThunk(
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(`/${getRole}/group/${classId}?say=${say}`);
-      return response.data;
+
+      if (response.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -41,8 +43,11 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
       const response = await getData(
         `/${getRole}/group/class/${classId}/section/${sectionId}?say=${say}`
       );
-      console.log(response.data, "dddd");
-      return response.data;
+      if (response.success) {
+        return response.data;
+      } else {
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -60,12 +65,19 @@ export const fetchSectionsByClass = createAsyncThunk(
       const response = await getData(
         `/${getRole}/getSectionByclass/${classId}?say=${say}`
       );
-      return response.data;
+
+      if (response.status) {
+        return response.data;
+      } else {
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
+// Fetch Sections Names by Class
 export const fetchSectionsNamesByClass = createAsyncThunk(
   "group/fetchSectionsNamesByClass",
   async (classId, { rejectWithValue, dispatch, getState }) => {
@@ -76,7 +88,12 @@ export const fetchSectionsNamesByClass = createAsyncThunk(
       const response = await getData(
         `/admin/all/getSectionByclass/${classId}?say=${say}`
       );
-      return response.data;
+
+      if (response.status) {
+        return response.data;
+      } else {
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -94,7 +111,10 @@ export const fetchUnassignedStudents = createAsyncThunk(
       const response = await getData(
         `/${getRole}/unassignedStudent/${classId}?say=${say}`
       );
-      return response.data;
+
+      if (response.status) {
+        return response.data;
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -113,8 +133,14 @@ export const createGroup = createAsyncThunk(
         `/${getRole}/group?say=${say}`,
         groupData
       );
-      toast.success("Group added successfully!");
-      return response.data;
+
+      if (response.status) {
+        toast.success("Group added successfully!");
+        return response.data;
+      } else {
+        toast.error(response.message || "Failed to add group.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -133,8 +159,14 @@ export const updateGroup = createAsyncThunk(
         `/${getRole}/group/${groupId}?say=${say}`,
         formData
       );
-      toast.success("Group updated successfully!");
-      return response.data;
+
+      if (response.message == "Group updated successfully") {
+        toast.success("Group updated successfully!");
+        return response.data;
+      } else {
+        toast.error(response.message || "Failed to update group.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -149,15 +181,26 @@ export const deleteGroup = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      await deleteData(`/${getRole}/group/${groupId}?say=${say}`);
-      toast.success("Group deleted successfully!");
-      return groupId;
+      const cid = getState().common.user.classInfo.selectedClassId;
+      const response = await deleteData(
+        `/${getRole}/group/${groupId}?say=${say}`
+      );
+
+      if (response.status) {
+        toast.success("Group deleted successfully!");
+        dispatch(fetchGroupsByClass(cid));
+        return groupId;
+      } else {
+        toast.error(response.message || "Failed to delete group.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
+// Create Section
 export const createSection = createAsyncThunk(
   "section/createSection",
   async (sectionData, { rejectWithValue, dispatch, getState }) => {
@@ -169,8 +212,14 @@ export const createSection = createAsyncThunk(
         `/${getRole}/section?say=${say}`,
         sectionData
       );
-      toast.success("Section created successfully!");
-      return response.data;
+
+      if (response.status) {
+        toast.success("Section created successfully!");
+        return response.data;
+      } else {
+        toast.error(response.message || "Failed to create section.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -192,8 +241,15 @@ export const updateSection = createAsyncThunk(
         `/${getRole}/editSection/${sectionId}?say=${say}`,
         sectionData
       );
-      toast.success("Section updated successfully!");
-      return response.section;
+
+      if (response.success) {
+        toast.success("Section updated successfully!");
+
+        return response.section || response.data || sectionId;
+      } else {
+        toast.error(response.message || "Failed to update section.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -208,9 +264,17 @@ export const deleteSection = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
-      await deleteData(`/${getRole}/section/${sectionId}?say=${say}`);
-      toast.success("Section deleted successfully!");
-      return sectionId;
+      const response = await deleteData(
+        `/${getRole}/section/${sectionId}?say=${say}`
+      );
+
+      if (response.status) {
+        toast.success("Section deleted successfully!");
+        return sectionId;
+      } else {
+        toast.error(response.message || "Failed to delete section.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -229,8 +293,14 @@ export const assignStudentToSection = createAsyncThunk(
         `/${getRole}/assignStudentToSection?say=${say}`,
         { studentId, sectionId }
       );
-      toast.success("Student assigned successfully!");
-      return response.data;
+
+      if (response.success) {
+        toast.success("Student assigned successfully!");
+        return response.data;
+      } else {
+        toast.error(response.message || "Failed to assign student.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -249,8 +319,14 @@ export const removeStudentFromGroup = createAsyncThunk(
         `/${getRole}/delStudentFrmGroup?say=${say}`,
         { studentId, groupId }
       );
-      toast.success("Student removed from group successfully!");
-      return response.data;
+
+      if (response.status) {
+        toast.success("Student removed from group successfully!");
+        return response.data;
+      } else {
+        toast.error(response.message || "Failed to remove student.");
+        return rejectWithValue(response);
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

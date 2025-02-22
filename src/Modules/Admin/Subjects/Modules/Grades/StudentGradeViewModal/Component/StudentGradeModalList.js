@@ -81,7 +81,11 @@ const capitalizeText = (text) => {
 
 const getFormattedStatus = (status, gradeMode) => {
   if (gradeMode === "offline") {
-    if (status === "present" || status === "submitted" || status === "absent") {
+    if (status === "submitted") {
+      return "Submit";
+    } else if (status === "present") {
+      return "Present";
+    } else if (status === "absent") {
       return "Missing";
     } else if (status === "excused") {
       return "Excused";
@@ -177,7 +181,7 @@ const StudentModalGradeList = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {filteredData.map((item, index) => (
+          {filteredData?.map((item, index) => (
             <tr key={index} className={getBoldClass(item)}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{item?.Name}</div>
