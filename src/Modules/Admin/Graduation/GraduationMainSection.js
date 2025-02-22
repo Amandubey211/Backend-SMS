@@ -150,7 +150,7 @@ const GraduationMainSection = () => {
       <ProtectedSection
         requiredPermission={PERMISSIONS.ViewGraduateStudent}
         title={"Graduates"}
-        aman={true}
+       
       >
         <GraduateList
           students={filteredStudents}

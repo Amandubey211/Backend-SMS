@@ -269,7 +269,7 @@ const StudentInfo = () => {
 
   return (
     <div className="h-full w-full ">
-      <ProtectedSection requiredPermission={PERMISSIONS.ADMISSION} aman={true}>
+      <ProtectedSection requiredPermission={PERMISSIONS.ADMISSION} >
         <div className="flex gap-4 h-screen ">
           {/* Form Section - 77% Width */}
           <div
