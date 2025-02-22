@@ -117,8 +117,8 @@ const StudentGradeModalFilterHeader = ({
                 >
                   <option value="">All</option>
                   {studentSubjectProgress?.map((s) => (
-                    <option key={s.subjectId} value={s.subjectId}>
-                      {s.subjectName}
+                    <option key={s?.subjectId} value={s?.subjectId}>
+                      {s?.subjectName}
                     </option>
                   ))}
                 </select>
