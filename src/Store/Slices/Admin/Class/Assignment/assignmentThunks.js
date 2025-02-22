@@ -132,7 +132,7 @@ export const fetchFilteredAssignments = createAsyncThunk(
       const response = await getData(endpoint, params);
 
       // if (response.success) {
-      return response.assignments;
+      return response?.assignments || [];
       // }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

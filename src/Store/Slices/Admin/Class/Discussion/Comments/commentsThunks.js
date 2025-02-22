@@ -74,7 +74,6 @@ export const addReply = createAsyncThunk(
       );
 
       if (response && response.status) {
-        toast.success("Reply added successfully");
         return { parentId, reply: response.data };
       }
     } catch (error) {

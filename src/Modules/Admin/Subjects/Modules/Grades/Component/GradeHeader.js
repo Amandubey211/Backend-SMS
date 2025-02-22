@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const GradeHeader = ({ onSearch, onFilterChange }) => {
@@ -12,10 +11,19 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
   const { modules: moduleList } = useSelector((state) => state.admin.module);
   const { assignments } = useSelector((state) => state.admin.assignments);
   const { quizzes } = useSelector((state) => state.admin.quizzes);
-  // New: Get the semester list from the semesters slice
   const { semesters: semesterList } = useSelector(
     (state) => state.admin.semesters
   );
+
+  // Get the selected semester from the user's class info (with fallback)
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
+
+  // On mount or when selectedSemester changes, update parent's semester filter
+  useEffect(() => {
+    onFilterChange("semesterId", selectedSemester || "");
+  }, [selectedSemester, onFilterChange]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -29,7 +37,6 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
   return (
     <div className="p-2 bg-white">
       <h2 className="text-xl ps-2 font-semibold mb-3">{t("Select Grades")}</h2>
-      {/* Container for Select fields in one row with horizontal scrolling on smSelect screens */}
       <div className="flex flex-nowrap items-end gap-4 px-4 overflow-x-auto pb-1">
         {/* Search Field */}
         <div className="relative flex flex-col flex-shrink-0">
@@ -54,7 +61,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">{t("Module")}</label>
           <select
             name="moduleId"
-            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("moduleId", e.target.value)}
             aria-label={t("Select Module")}
           >
@@ -72,7 +79,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">{t("Assignment")}</label>
           <select
             name="assignmentId"
-            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("assignmentId", e.target.value)}
             aria-label={t("Select Assignment")}
           >
@@ -90,7 +97,7 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">{t("Quizzes")}</label>
           <select
             name="quizId"
-            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={(e) => handleFilterChange("quizId", e.target.value)}
             aria-label={t("Select Quiz")}
           >
@@ -108,7 +115,8 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <label className="text-gray-600 mb-1">{t("Semester")}</label>
           <select
             name="semesterId"
-            className="px-4 py-2 border  w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            className="px-4 py-2 border w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+            defaultValue={selectedSemester || ""}
             onChange={(e) => handleFilterChange("semesterId", e.target.value)}
             aria-label={t("Select Semester")}
           >

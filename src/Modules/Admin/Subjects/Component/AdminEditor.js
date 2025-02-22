@@ -67,18 +67,14 @@ const EditorComponent = ({
   inputRef, // Ref to the input for focusing on validation
 }) => {
   const editor = useRef(null);
-  const containerRef = useRef(null); // Holds the editor container for global events
+  const containerRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-
-  // Keep track of public_ids already processed for deletion
   const processedDeletions = useRef(new Set());
-  // Flag to indicate if an upload is in progress
   const uploadInProgress = useRef(false);
 
   const { uploadImage, uploadFile } = useCloudinaryMediaUpload();
   const { deleteMediaByPublicId } = useCloudinaryDeleteByPublicId();
 
-  // ---------- Progress Bar Helpers ----------
   const showProgressBar = useCallback((parentElement) => {
     const progressBarContainer = document.createElement("div");
     progressBarContainer.style.position = "relative";
@@ -87,16 +83,13 @@ const EditorComponent = ({
     progressBarContainer.style.width = "100%";
     progressBarContainer.style.height = "5px";
     progressBarContainer.style.backgroundColor = "#f0f0f0";
-
     const progressBar = document.createElement("div");
     progressBar.style.width = "0%";
     progressBar.style.height = "100%";
     progressBar.style.backgroundColor = "#C71585";
     progressBar.style.transition = "width 0.3s";
-
     progressBarContainer.appendChild(progressBar);
     parentElement.appendChild(progressBarContainer);
-
     return { progressBar, progressBarContainer };
   }, []);
 
@@ -112,7 +105,6 @@ const EditorComponent = ({
     }
   }, []);
 
-  // ---------- Upload Handlers ----------
   const handleImageUpload = useCallback(
     async (file) => {
       if (!file) return;
@@ -120,13 +112,11 @@ const EditorComponent = ({
       let progressBarObj;
       setScrollPosition(window.scrollY);
       uploadInProgress.current = true;
-
       if (editorInstance?.toolbar?.container) {
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
       }
-
       try {
         const response = await uploadImage(file, (progressEvent) => {
           const percentage = Math.round(
@@ -136,7 +126,6 @@ const EditorComponent = ({
             updateProgressBar(progressBarObj.progressBar, percentage);
           }
         });
-
         if (response.secure_url && response.public_id) {
           const imgHTML = createImageWrapper(
             response.secure_url,
@@ -173,13 +162,11 @@ const EditorComponent = ({
       let progressBarObj;
       setScrollPosition(window.scrollY);
       uploadInProgress.current = true;
-
       if (editorInstance?.toolbar?.container) {
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
       }
-
       try {
         const response = await uploadFile(file, (progressEvent) => {
           const percentage = Math.round(
@@ -189,7 +176,6 @@ const EditorComponent = ({
             updateProgressBar(progressBarObj.progressBar, percentage);
           }
         });
-
         if (response.secure_url && response.public_id) {
           const fileHTML = createFileWrapper(
             response.secure_url,
@@ -241,7 +227,6 @@ const EditorComponent = ({
     input.click();
   }, [handleFileUpload]);
 
-  // ---------- Deletion Handler Using Public ID ----------
   const handleDeleteClick = useCallback(
     async (e) => {
       if (e.target.classList.contains("delete-btn")) {
@@ -249,22 +234,18 @@ const EditorComponent = ({
         const wrapper =
           e.target.closest(".uploaded-image-wrapper") ||
           e.target.closest(".uploaded-file-wrapper");
-
         if (wrapper) {
           const publicId = wrapper.getAttribute("data-public-id");
           if (!publicId || processedDeletions.current.has(publicId)) {
             return;
           }
-
           let progressBarObj;
           const editorInstance = editor.current;
-
           if (editorInstance?.toolbar?.container) {
             progressBarObj = showProgressBar(
               editorInstance.toolbar.container.parentNode
             );
           }
-
           try {
             const data = await deleteMediaByPublicId(publicId);
             if (data.result === "ok") {
@@ -312,7 +293,6 @@ const EditorComponent = ({
     ]
   );
 
-  // ---------- MutationObserver for Manual Removal ----------
   useEffect(() => {
     if (containerRef.current) {
       const observer = new MutationObserver((mutationsList) => {
@@ -332,7 +312,6 @@ const EditorComponent = ({
                 if (publicId && !processedDeletions.current.has(publicId)) {
                   const age = Date.now() - uploadedAt;
                   if (age > 3000) {
-                    // If the user manually removed it after 3s, attempt a deletion
                     deleteMediaByPublicId(publicId)
                       .then((data) => {
                         if (data.result === "ok") {
@@ -367,7 +346,6 @@ const EditorComponent = ({
     }
   }, [deleteMediaByPublicId]);
 
-  // ---------- Editor Configuration ----------
   const config = useMemo(
     () => ({
       readonly: false,
@@ -380,17 +358,11 @@ const EditorComponent = ({
       showXPathInStatusbar: false,
       askBeforePasteHTML: false,
       askBeforePasteFromWord: false,
-
-      // Remove "Powered by Jodit"
       showPoweredByJodit: false,
-      disablePlugins: ["about"], // ensures the 'about' plugin is disabled
+      disablePlugins: ["about"],
       removeButtons: ["about", "source"],
-
-      // Force text to wrap instead of extending editor width
       contentStyle:
         "white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;",
-
-      // Editor toolbar
       buttons: [
         "font",
         "fontsize",
@@ -428,7 +400,6 @@ const EditorComponent = ({
         "print",
       ],
       events: {
-        // We only use afterInit here to bind the delete-click logic
         afterInit: (editorInstance) => {
           editor.current = editorInstance;
           containerRef.current = editorInstance.container;
@@ -485,10 +456,6 @@ const EditorComponent = ({
         </div>
       )}
 
-      {/* 
-        Use defaultValue so Jodit is "uncontrolled," 
-        preventing cursor jump on repeated keystrokes.
-      */}
       <JoditEditor
         ref={editor}
         defaultValue={editorContent}
