@@ -85,6 +85,7 @@ const AddEvent = () => {
             value={eventData.title}
             onChange={handleInputChange}
             required
+            maxlength={60}
           />
           <FormInput
             id="date"
