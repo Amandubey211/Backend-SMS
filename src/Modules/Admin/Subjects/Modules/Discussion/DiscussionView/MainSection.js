@@ -43,9 +43,9 @@ const MainSection = () => {
             refetchDiscussion={handleRefetchDiscussion}
           />
           <div className="p-6 bg-white">
-            <h1 className="text-lg font-semibold">{discussion.title}</h1>
+            <h1 className="text-lg font-semibold">{discussion?.title}</h1>
             <div className="text-gray-700 mb-3">
-              <div dangerouslySetInnerHTML={{ __html: discussion.content }} />
+              <div dangerouslySetInnerHTML={{ __html: discussion?.content }} />
             </div>
             {discussion.attachment && (
               <div className="relative w-full h-64 md:h-80 lg:h-96 overflow-hidden rounded-lg mb-4">

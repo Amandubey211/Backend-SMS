@@ -8,11 +8,11 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-between p-2 pe-5 bg-white border-b border-gray-300 shadow-sm">
+    <div className="w-full flex items-center justify-between px-4 py-2 bg-white border-b border-gray-300 shadow-sm">
       <div className="flex items-center">
         <IoIosArrowBack
-          className="mr-2 text-gray-600 text-2xl cursor-pointer"
-          onClick={() => navigate(-1)} // Navigate to the previous page
+          className="mr-3 text-gray-600 text-2xl cursor-pointer"
+          onClick={() => navigate(-1)}
         />
         <h1 className="text-lg font-semibold text-gray-800">
           {isUpdating ? "Update Discussion" : "Create New Discussion"}
@@ -25,10 +25,8 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
           }
         >
           <button
-            onClick={() => {
-              onSave(true); // Save and publish the discussion
-            }}
-            className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            onClick={() => onSave(true)}
+            className="rounded-md py-2 px-6 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           >
             <span className="text-gradient">
               {isUpdating ? "Update & Publish" : "Save & Publish"}
@@ -41,10 +39,8 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
           }
         >
           <button
-            onClick={() => {
-              onSave(false); // Save without publishing
-            }}
-            className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            onClick={() => onSave(false)}
+            className="rounded-md py-2 px-6 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           >
             <span className="text-gradient">
               {isUpdating ? "Update" : "Save"}

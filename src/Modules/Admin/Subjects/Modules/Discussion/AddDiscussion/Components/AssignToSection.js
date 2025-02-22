@@ -19,7 +19,6 @@ const AssignToSection = ({
         title={assignTitle}
       />
 
-      {/* // critical */}
       <SectionSelect
         assignTo={assignTo}
         sectionId={sectionId}

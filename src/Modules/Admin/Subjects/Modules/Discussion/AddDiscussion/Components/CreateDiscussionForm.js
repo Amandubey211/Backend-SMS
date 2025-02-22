@@ -1,6 +1,5 @@
 import React from "react";
 import DateInput from "../../../../Component/DateInput";
-import OptionRadios from "./OptionRadios";
 import AssignToSection from "./AssignToSection";
 
 const CreateDiscussionForm = ({
@@ -12,22 +11,18 @@ const CreateDiscussionForm = ({
   groupId,
   option,
   handleChange,
+  assignError, // error for assignment field
 }) => {
   return (
     <div>
-      {/* Radio options for threaded replies and post-before-seeing-replies */}
-      {/* <OptionRadios option={option} handleChange={handleChange} /> */}
-
-      {/* Section or Group assignment */}
       <AssignToSection
         assignTo={assignTo}
         sectionId={sectionId}
         handleChange={handleChange}
         groupId={groupId}
         isAssignToLabel={true}
+        error={assignError}
       />
-
-      {/* Date Inputs for availability, due date, and until */}
       <DateInput
         label="Available from"
         name="availableFrom"

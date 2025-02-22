@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import SubjectSideBar from "../../Component/SubjectSideBar";
@@ -20,62 +20,63 @@ const MainSection = () => {
   // Search/filter states
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Store the clicked student in local state
   const [student, setStudent] = useState(null);
 
-  // Our filter object includes a semesterId property
+  // Filter state including semesterId
   const [filters, setFilters] = useState({
     moduleId: "",
     classId: cid,
     assignmentId: "",
     quizId: "",
     subjectId: sid,
-    semesterId: "", // new semester filter
+    semesterId: "",
   });
 
   const { subjectGrades, loading } = useSelector(
     (store) => store.admin.subject_grades
   );
 
+  // Fetch data on mount or when filters change
   useEffect(() => {
-    // On load or when filters change, fetch
     dispatch(fetchSubjectGrades({ classId: cid, subjectId: sid, filters }));
     dispatch(fetchModules({ cid, sid }));
     dispatch(fetchFilteredAssignments({ sid }));
     dispatch(fetchFilteredQuizzesThunk({ sid }));
   }, [dispatch, cid, sid, filters]);
 
-  // Handle top search
-  const handleSearchChange = (value) => {
+  // Stabilize search change handler
+  const handleSearchChange = useCallback((value) => {
     setSearch(value);
-  };
+  }, []);
 
-  // When any filter changes in GradeHeader
-  const handleFilterChange = (name, value) => {
-    const updatedFilters = { ...filters, [name]: value };
-    setFilters(updatedFilters);
+  // Use a functional update to avoid stale closures and remove filters from dependencies
+  const handleFilterChange = useCallback(
+    (name, value) => {
+      setFilters((prevFilters) => {
+        const updatedFilters = { ...prevFilters, [name]: value };
 
-    // Only add filter params that have valid values
-    const params = {};
-    if (updatedFilters.moduleId) params.moduleId = updatedFilters.moduleId;
-    if (updatedFilters.quizId) params.quizId = updatedFilters.quizId;
-    if (updatedFilters.assignmentId)
-      params.assignmentId = updatedFilters.assignmentId;
-    if (updatedFilters.semesterId)
-      params.semesterId = updatedFilters.semesterId;
+        // Build params with only valid filter values
+        const params = {};
+        if (updatedFilters.moduleId) params.moduleId = updatedFilters.moduleId;
+        if (updatedFilters.quizId) params.quizId = updatedFilters.quizId;
+        if (updatedFilters.assignmentId)
+          params.assignmentId = updatedFilters.assignmentId;
+        if (updatedFilters.semesterId)
+          params.semesterId = updatedFilters.semesterId;
 
-    dispatch(
-      fetchSubjectGrades({ classId: cid, subjectId: sid, filters: params })
-    );
-  };
+        dispatch(
+          fetchSubjectGrades({ classId: cid, subjectId: sid, filters: params })
+        );
+        return updatedFilters;
+      });
+    },
+    [dispatch, cid, sid]
+  );
 
-  // User clicks a student row
+  // Handle student row click
   const handleRowClick = (clickedStudent) => {
-    // Load that student's grades
     const params = {};
     if (sid) params.subjectId = sid;
-
     dispatch(
       fetchStudentGrades({
         params,
@@ -83,20 +84,19 @@ const MainSection = () => {
         studentClassId: cid,
       })
     );
-    // Keep track of this student in state
     setStudent(clickedStudent);
     setIsModalOpen(true);
   };
 
-  // Modal close
+  // Modal close handler
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setStudent(null); // Clear student if you want upon closing
+    setStudent(null);
   };
 
-  // Filter the displayed students by search text
+  // Filter students based on search text
   const filteredStudents = subjectGrades?.filter((i) =>
-    i?.studentName?.toLowerCase().includes(search?.toLowerCase())
+    i?.studentName?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -123,7 +123,7 @@ const MainSection = () => {
           <StudentGradeModal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
-            student={student} // Pass the entire student object
+            student={student}
           />
         )}
       </ProtectedSection>

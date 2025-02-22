@@ -181,20 +181,34 @@ const StudentModalGradeList = ({
             <tr key={index} className={getBoldClass(item)}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm text-gray-900">{item?.Name}</div>
-                <div className="text-sm">{item?.type}</div>
+                <div className="mt-1">
+                  {item?.type && (
+                    <span
+                      className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
+                        item?.type.toLowerCase() === "assignment"
+                          ? "bg-blue-100 text-blue-800"
+                          : item?.type.toLowerCase() === "quiz"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {item?.type}
+                    </span>
+                  )}
+                </div>
               </td>
               {filters.gradeMode === "online" && (
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{item?.moduleName}</div>
+                  <div className="text-sm text-gray-900">
+                    {item?.moduleName}
+                  </div>
                 </td>
               )}
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {item?.dueDate?.slice(0, 10) || '-'}
+                {item?.dueDate?.slice(0, 10) || "-"}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {item.submittedDate
-                  ? item?.submittedDate.slice(0, 10)
-                  : '-'}
+                {item.submittedDate ? item?.submittedDate.slice(0, 10) : "-"}
               </td>
               <td
                 className={`px-6 py-4 whitespace-nowrap text-sm ${getStatusClass(
