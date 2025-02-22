@@ -146,47 +146,46 @@ const GroupList = ({ onSeeGradeClick }) => {
                   </span>
                 </div>
 
+                <div
+                  className="relative"
+                  ref={(el) => (menuRefs.current[groupIndex] = el)} // Attach reference to each group
+                >
                   <div
-                    className="relative"
-                    ref={(el) => (menuRefs.current[groupIndex] = el)} // Attach reference to each group
+                    className={`w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer ${
+                      activeMenu === groupIndex ? "bg-blue-100" : ""
+                    }`} // Add active state style here
+                    onClick={() => handleMenuToggle(groupIndex)}
                   >
-                    <div
-                      className={`w-7 h-7 flex items-center justify-center rounded-full border cursor-pointer ${
-                        activeMenu === groupIndex ? "bg-blue-100" : ""
-                      }`} // Add active state style here
-                      onClick={() => handleMenuToggle(groupIndex)}
-                    >
-                      <TbDotsVertical
-                        className={`w-6 h-6 ${
-                          activeMenu === groupIndex
-                            ? "text-blue-500" // Active state color
-                            : "text-gray-500"
-                        }`}
-                      />
-                    </div>
-                    {activeMenu === groupIndex && (
-                      <div className="absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-10">
-                        <div
-                          className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleEdit(group)}
-                        >
-                          <HiOutlinePencilAlt className="text-blue-500 mr-2" />{" "}
-                          {/* Colored Edit Icon */}
-                          Edit
-                        </div>
-                        <div
-                          className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
-                          onClick={() => handleDeleteClick(group)}
-                        >
-                          <HiOutlineTrash className="text-red-500 mr-2" />{" "}
-                          {/* Colored Delete Icon */}
-                          Delete
-                        </div>
-                      </div>
-                    )}
+                    <TbDotsVertical
+                      className={`w-6 h-6 ${
+                        activeMenu === groupIndex
+                          ? "text-blue-500" // Active state color
+                          : "text-gray-500"
+                      }`}
+                    />
                   </div>
+                  {activeMenu === groupIndex && (
+                    <div className="absolute right-0 mt-2 w-32 bg-white border rounded-md shadow-lg z-10">
+                      <div
+                        className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleEdit(group)}
+                      >
+                        <HiOutlinePencilAlt className="text-blue-500 mr-2" />{" "}
+                        {/* Colored Edit Icon */}
+                        Edit
+                      </div>
+                      <div
+                        className="px-4 py-2 flex items-center text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleDeleteClick(group)}
+                      >
+                        <HiOutlineTrash className="text-red-500 mr-2" />{" "}
+                        {/* Colored Delete Icon */}
+                        Delete
+                      </div>
+                    </div>
+                  )}
+                </div>
 
-                  
                 <svg
                   className={`w-7 h-7 text-gray-500 transform p-1 border rounded-full transition-transform ${
                     expandedGroupIndex === groupIndex ? "rotate-180" : ""

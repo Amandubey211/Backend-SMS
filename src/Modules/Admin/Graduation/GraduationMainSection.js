@@ -103,19 +103,6 @@ const GraduationMainSection = () => {
       ? [selectedGraduate._id]
       : selectedStudents;
 
-    /**
-     dispatch(demoteStudents({ studentIds }))
-      .then(() => {
-        toast.success(`${studentIds?.length} student(s) have been demoted`);
-        if (demoteFromSidebar) closeSidebar();
-        else setSelectedStudents([]); // Clear selection after bulk demotion
-        dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Refresh list
-      })
-      .finally(() => {
-        setModalLoading(false);
-        setModalOpen(false);
-      });
-     */
     dispatch(demoteStudents({ studentIds }))
       .then(() => {
         toast.success(`${studentIds?.length} student(s) have been demoted`);
@@ -150,7 +137,6 @@ const GraduationMainSection = () => {
       <ProtectedSection
         requiredPermission={PERMISSIONS.ViewGraduateStudent}
         title={"Graduates"}
-       
       >
         <GraduateList
           students={filteredStudents}
