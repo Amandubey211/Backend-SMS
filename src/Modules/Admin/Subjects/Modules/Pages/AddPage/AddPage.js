@@ -24,7 +24,7 @@ const AddPage = () => {
   const [editorContent, setEditorContent] = useState("");
   const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [loadingType, setLoadingType] = useState(""); // "save" or "publish"
+  const [loadingType, setLoadingType] = useState(""); // "save" (publishing is always required)
   const [publishAtError, setPublishAtError] = useState("");
   const [titleError, setTitleError] = useState("");
 
@@ -71,69 +71,65 @@ const AddPage = () => {
     }
   }, []);
 
-  const handleSave = useCallback(
-    async (shouldPublish) => {
-      // Validate title first
-      if (!title.trim()) {
-        setTitleError("Page title is required.");
-        titleInputRef.current?.focus();
-        return;
-      }
-      // When publishing, validate the publish date
-      if (shouldPublish) {
-        if (!publishAt.trim()) {
-          setPublishAtError("Publish date is required to publish the page.");
-          publishDateRef.current?.focus();
-          return;
-        }
-        const today = new Date();
-        const selectedDate = new Date(publishAt);
-        const todayStart = new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          today.getDate()
-        );
-        if (selectedDate < todayStart) {
-          setPublishAtError("Publish date must be today or a future date.");
-          publishDateRef.current?.focus();
-          return;
-        }
-      }
+  // Updated: Publish date is always required
+  const handleSave = useCallback(async () => {
+    // Validate title first
+    if (!title.trim()) {
+      setTitleError("Page title is required.");
+      titleInputRef.current?.focus();
+      return;
+    }
+    // Always validate publish date
+    if (!publishAt.trim()) {
+      setPublishAtError("Publish date is required.");
+      publishDateRef.current?.focus();
+      return;
+    }
+    const today = new Date();
+    const selectedDate = new Date(publishAt);
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    if (selectedDate < todayStart) {
+      setPublishAtError("Publish date must be today or a future date.");
+      publishDateRef.current?.focus();
+      return;
+    }
 
-      const pageData = {
-        title,
-        content: editorContent,
-        publishAt,
-        publish: shouldPublish,
-      };
-
-      setLoadingType(shouldPublish ? "publish" : "save");
-
-      try {
-        if (isUpdating) {
-          await dispatch(updatePage({ pageId: state?.page._id, pageData }));
-        } else {
-          await dispatch(createPage({ pageData, cid }));
-        }
-        // After successful creation/update, navigate back
-        navigate(-1);
-      } catch (error) {
-        console.error("Error saving page:", error);
-      } finally {
-        setLoadingType("");
-      }
-    },
-    [
+    const pageData = {
       title,
-      editorContent,
+      content: editorContent,
       publishAt,
-      isUpdating,
-      state,
-      dispatch,
-      cid,
-      navigate,
-    ]
-  );
+      publish: true, // Always publish (since publishAt is always required)
+    };
+
+    setLoadingType("save");
+
+    try {
+      if (isUpdating) {
+        await dispatch(updatePage({ pageId: state?.page._id, pageData }));
+      } else {
+        await dispatch(createPage({ pageData, cid }));
+      }
+      // After successful creation/update, navigate back
+      navigate(-1);
+    } catch (error) {
+      console.error("Error saving page:", error);
+    } finally {
+      setLoadingType("");
+    }
+  }, [
+    title,
+    editorContent,
+    publishAt,
+    isUpdating,
+    state,
+    dispatch,
+    cid,
+    navigate,
+  ]);
 
   // Compute if publish date is set (used in header tooltip)
   const isPublishDateSet = publishAt.trim() !== "";
