@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
-import { DatePicker, Tooltip } from "antd";
 import { TbEdit } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import {
@@ -44,7 +43,7 @@ const OfflineExamViewCard = ({
     (s) => s?._id === student?.studentId?._id
   );
 
-  const handleDeleteStudent = async () => {
+  const handleDeleteStudent = async (e) => {
     dispatch(
       deleteOfflineExamStudent({
         subjectId: sid,
@@ -82,7 +81,7 @@ const OfflineExamViewCard = ({
         </span>
       </td>
       <td className="p-3 border w-[15%]">{examType ?? "N/A"}</td>
-      <td className="p-3 border w-[15%">{student?.score ?? "N/A"}</td>
+      <td className="p-3 border w-[15%">{editedData?.score ?? "N/A"}</td>
       <td className="p-3 border w-[15%">{student?.maxMarks ?? "N/A"}</td>
       <td className="p-3 border w-[15%">{startDate ?? "N/A"}</td>
 
@@ -90,14 +89,14 @@ const OfflineExamViewCard = ({
       <td className="p-3 border text-center w-[15%]">
         <span
           className={`px-3 py-1 capitalize rounded-full text-xs font-semibold tracking-wide ${
-            student?.status === "absent"
+            editedData?.status === "absent"
               ? "bg-red-100 text-red-600"
-              : student?.status === "excused"
+              : editedData?.status === "excused"
               ? "bg-orange-100 text-orange-700"
               : "bg-green-100 text-green-600"
           }`}
         >
-          {student?.status ?? "Unknown"}
+          {editedData?.status ?? "Unknown"}
         </span>
       </td>
       {/* Action Buttons */}
@@ -137,23 +136,6 @@ const OfflineExamViewCard = ({
           <div className="bg-white p-6 rounded-lg shadow-lg w-[350px] relative">
             <h2 className="text-lg font-semibold mb-4">Edit Exam Details</h2>
             <form onSubmit={handleEditStudent} className="space-y-4">
-              {/* Name */}
-              {/* <div>
-                <label className="block text-gray-700 font-medium text-sm">
-                  Name:
-                </label>
-                <input
-                  type="text"
-                  value={editedData.students.fullName}
-                  onChange={(e) =>
-                    setEditedData({ ...editedData, fullName: e.target.value })
-                  }
-                  disabled
-                  className="border p-2 rounded-md w-full bg-gray-100"
-                />
-              </div> */}
-
-              {/* Obtained Marks */}
               <div>
                 <label className="block text-gray-700 font-medium text-sm">
                   Obtained Marks:
@@ -170,7 +152,7 @@ const OfflineExamViewCard = ({
               </div>
 
               {/* Max Marks */}
-              <div>
+              {/* <div>
                 <label className="block text-gray-700 font-medium text-sm">
                   Max Marks:
                 </label>
@@ -183,7 +165,7 @@ const OfflineExamViewCard = ({
                   className="border p-2 rounded-md w-full"
                   required
                 />
-              </div>
+              </div> */}
 
               {/* Status */}
               <div>
@@ -203,21 +185,6 @@ const OfflineExamViewCard = ({
                   <option value="excused">Excused</option>
                 </select>
               </div>
-
-              {/* Exam Date */}
-              {/* <div>
-                <label className="block text-gray-700 font-medium text-sm">
-                  Exam Date:
-                </label>
-                <DatePicker
-                  selected={editedData.examDate}
-                  onChange={(date) =>
-                    setEditedData({ ...editedData, examDate: date })
-                  }
-                  className="border p-2 rounded-md w-full"
-                  required
-                />
-              </div> */}
 
               {/* Actions */}
               <div className="flex justify-end gap-3">

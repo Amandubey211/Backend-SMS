@@ -186,8 +186,8 @@ function CreateExam() {
               <UploadExcel
                 data={tableData}
                 handleCreateExam={handleCreateExam}
-                loading={isCreateLoading}
-                setIsLoading={setIsCreateLoading}
+                isCreateLoading={isCreateLoading}
+                setIsCreateLoading={setIsCreateLoading}
                 setIsOpen={setIsOpen}
               />
             )}

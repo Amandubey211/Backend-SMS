@@ -2,14 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.full.css";
 import { Button } from "antd";
-import { ImSpinner3 } from "react-icons/im";
 
 const UploadExcel = ({
   data = [],
   handleCreateExam,
-  loading,
+  isCreateLoading,
   setIsOpen,
-  setIsLoading,
+  setIsCreateLoading,
   isOpen,
 }) => {
   const hotRef = useRef(null);
@@ -17,6 +16,7 @@ const UploadExcel = ({
 
   // ✅ Add state to manage table data
   const [tableData, setTableData] = useState([]);
+  const [isTableDataFilled, setIsTableDataFilled] = useState(false); // New state
 
   useEffect(() => {
     const headers =
@@ -41,6 +41,7 @@ const UploadExcel = ({
         data: formattedData,
         colHeaders: headers,
         readOnly: true,
+        columns: headers.map(() => ({ readOnly: true })),
       });
     } else {
       hotInstanceRef.current = new Handsontable(hotRef.current, {
@@ -53,6 +54,13 @@ const UploadExcel = ({
         contextMenu: true,
         readOnly: true,
         licenseKey: "non-commercial-and-evaluation",
+        columns: headers.map(() => ({ readOnly: true })),
+        afterChange: (changes) => {
+          // Listen for changes
+          if (changes) {
+            checkTableDataFilled();
+          }
+        },
       });
     }
 
@@ -64,10 +72,15 @@ const UploadExcel = ({
     };
   }, [data]); // ✅ Update when data changes
 
+  const checkTableDataFilled = () => {
+    // Function to check if table is filled
+    const isFilled = tableData.some((row) => row.some((cell) => cell !== ""));
+    setIsTableDataFilled(isFilled);
+  };
   const handleCancel = () => {
     // ✅ Clear table data
     setTableData([]);
-
+    setIsTableDataFilled(false);
     // ✅ Reset Handsontable manually
     if (hotInstanceRef.current) {
       hotInstanceRef.current.loadData([["", "", "", "", "", "", ""]]);
@@ -75,7 +88,7 @@ const UploadExcel = ({
     setIsOpen(false);
   };
 
-  console.log("asdasd", loading);
+  console.log("asdasd", isCreateLoading);
 
   return (
     <div className="w-full p-4 bg-white border shadow-md mt-2 ">
@@ -87,8 +100,8 @@ const UploadExcel = ({
       <div className="flex justify-end space-x-4 items-end w-[20%] fixed bottom-5 right-5">
         <Button onClick={handleCancel}>Cancel</Button>
         <Button
-          disabled={tableData.length === 0 || loading}
-          loading={loading}
+          disabled={isTableDataFilled || isCreateLoading}
+          loading={isCreateLoading}
           type="primary"
           htmlType="submit"
           onClick={handleCreateExam}

@@ -129,7 +129,7 @@ export const UpdateOfflineExamStudent = createAsyncThunk(
         payload
       );
       toast.success(response.message);
-      dispatch(fetchAllOfflineExam({ classId: subjectId, subjectId: classId }));
+      dispatch(fetchAllOfflineExam({ classId: classId, subjectId: subjectId }));
       return response;
     } catch (error) {
       toast.error(error.message);
@@ -170,7 +170,6 @@ export const deleteOfflineExamStudent = createAsyncThunk(
       const response = await deleteData(
         `${getRole}/delete/exam/subject/${subjectId}/${admissionNumber}?say=${say}&examId=${examId}`
       );
-      console.log(response, examId);
       dispatch(fetchAllOfflineExam({ classId: classId, subjectId: subjectId }));
       toast.success(response.message);
 

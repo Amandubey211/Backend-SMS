@@ -239,6 +239,7 @@ const studentReducer = combineReducers({
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
   studentTimetable: studentTimeTableReducer,
+  semesters: persistReducer(semesterPersistConfig, semesterReducer),
 });
 
 const ParentReducer = combineReducers({

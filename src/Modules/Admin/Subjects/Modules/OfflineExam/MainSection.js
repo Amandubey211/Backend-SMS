@@ -120,7 +120,7 @@ const MainSection = () => {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [searchQuery, cid, sid, dispatch, debouncedSearch]);
+  }, [searchQuery, debouncedSearch]);
 
   useEffect(() => {
     debouncedSearch(searchQuery);
@@ -132,7 +132,7 @@ const MainSection = () => {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [searchQuery, cid, sid, dispatch, debouncedSearch]);
+  }, [searchQuery, debouncedSearch, cid, sid, dispatch]);
 
   const filteredData = useMemo(() => {
     let data = offlineExamData;
@@ -215,6 +215,7 @@ const MainSection = () => {
                 {filteredData?.map((item, index) => (
                   <div>
                     <OfflineExamCard
+                      key={index}
                       examType={item.examType}
                       examName={item.examName}
                       semester={item.semesterId?.title ?? "NA"}
@@ -223,7 +224,7 @@ const MainSection = () => {
                       maxMarks={item.students?.[0]?.maxMarks}
                       examId={item._id}
                       students={item.students}
-                      semesterId = {item.semesterId?._id}
+                      semesterId={item.semesterId?._id}
                     />
                   </div>
                 ))}

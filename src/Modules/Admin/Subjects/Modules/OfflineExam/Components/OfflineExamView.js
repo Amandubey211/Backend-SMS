@@ -35,8 +35,6 @@ const OfflineExamView = () => {
     []
   );
 
-  console.log(" sem id", semesterId);
-
   useEffect(() => {
     debouncedSearch(searchQuery);
     return () => {
