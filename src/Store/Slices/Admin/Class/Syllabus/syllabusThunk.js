@@ -59,7 +59,7 @@ export const deleteSyllabus = createAsyncThunk(
 export const createSyllabus = createAsyncThunk(
   "syllabus/createSyllabus",
   async (
-    { title, content, subjectId },
+    { title, content, subjectId, navigate },
     { rejectWithValue, dispatch, getState }
   ) => {
     const say = getAY();
@@ -67,13 +67,14 @@ export const createSyllabus = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
+      // Safely retrieve the semesterId from the Redux state
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id;
 
       if (!semesterId) {
         throw new Error("Semester ID is missing");
       }
 
-      // Include semesterId in the request body
+      // Construct the payload including semesterId
       const payload = { title, content, subjectId, semesterId };
 
       const response = await postData(
@@ -83,6 +84,8 @@ export const createSyllabus = createAsyncThunk(
 
       if (response && response.status) {
         toast.success("Syllabus created successfully!");
+        // Redirect only for create operation
+        if (navigate) navigate(-1);
         return response.data;
       }
     } catch (error) {

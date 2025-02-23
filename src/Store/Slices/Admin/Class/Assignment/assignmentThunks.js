@@ -19,9 +19,16 @@ export const createAssignmentThunk = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
+      // Retrieve the current semester ID from the Redux state
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
+
+      // Merge semesterId into the payload without mutating the original assignmentData
+      const payload = { ...assignmentData, semesterId };
+
       const endpoint = `/${getRole}/create_assignment?say=${say}`;
 
-      const response = await postData(endpoint, assignmentData);
+      // Make the API call with the updated payload
+      const response = await postData(endpoint, payload);
 
       if (response.success) {
         toast.success("Assignment created successfully!");

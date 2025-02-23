@@ -34,7 +34,7 @@ const AddPageHeader = ({
           }
         >
           <button
-            onClick={() => onSave(false)}
+            onClick={() => onSave()}
             className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
           >
             <span className="text-gradient flex items-center justify-center">
@@ -51,10 +51,9 @@ const AddPageHeader = ({
             </span>
           </button>
         </ProtectedAction>
+        {/*
         <ProtectedAction
-          requiredPermission={
-            PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE
-          }
+          requiredPermission={PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE}
         >
           <button
             onClick={() => onSave(true)}
@@ -79,6 +78,7 @@ const AddPageHeader = ({
             </span>
           </button>
         </ProtectedAction>
+        */}
       </div>
     </div>
   );

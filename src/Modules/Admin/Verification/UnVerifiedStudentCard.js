@@ -4,6 +4,8 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { CiUser } from "react-icons/ci";
 import { useSelector } from "react-redux";
+import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../config/permission";
 
 const UnVerifiedStudentCard = ({ studentId }) => {
   const { unVerifiedStudents, rejectedStudents } = useSelector(
@@ -47,12 +49,18 @@ const UnVerifiedStudentCard = ({ studentId }) => {
 
   return (
     <div className={`${color} p-6 rounded-lg shadow-md text-white relative`}>
-      <NavLink
-        to={`/verify_students/${student._id}`}
-        className="absolute top-4 right-4 bg-white text-gray-800 font-semibold py-1 px-3 rounded-full shadow-md hover:bg-gray-200 transition-colors"
+      <ProtectedAction
+        requiredPermission={PERMISSIONS.VERIFY_STUDENT}
+        // aman={true}
       >
-        Verify Student
-      </NavLink>
+        <NavLink
+          to={`/verify_students/${student._id}`}
+          className="absolute top-4 right-4 bg-white text-gray-800 font-semibold py-1 px-3 rounded-full shadow-md hover:bg-gray-200 transition-colors"
+        >
+          Verify Student
+        </NavLink>
+      </ProtectedAction>
+
       <div className="mb-4">
         <h2 className="text-lg font-semibold">{student?.firstName}</h2>
         <p className="text-sm">{student.email}</p>
