@@ -135,7 +135,7 @@ const GraduationMainSection = () => {
 
       {/* Display the filtered students */}
       <ProtectedSection
-        requiredPermission={PERMISSIONS.ViewGraduateStudent}
+        requiredPermission={PERMISSIONS.VIEW_GRADUATE_STUDENTS}
         title={"Graduates"}
       >
         <GraduateList

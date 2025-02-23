@@ -6,7 +6,7 @@ import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
 import { fetchUnverifiedStudents } from "../../../Store/Slices/Admin/Verification/VerificationThunks";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUserSlash } from "react-icons/fa"; // Import a suitable icon
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../config/permission";
@@ -15,7 +15,7 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const UnverifiedStudents = () => {
   const dispatch = useDispatch();
-  const { t } = useTranslation('admVerification');
+  const { t } = useTranslation("admVerification");
   const {
     unVerifiedStudents,
     loadingUnverified,
@@ -25,14 +25,15 @@ const UnverifiedStudents = () => {
 
   // Fetch unverified students on mount or if data is stale
   useEffect(() => {
-    const now = Date.now();
-    const isDataStale =
-      !lastFetchedUnverified || now - lastFetchedUnverified > CACHE_DURATION;
+    // const now = Date.now();
+    // const isDataStale =
+    //   !lastFetchedUnverified || now - lastFetchedUnverified > CACHE_DURATION;
 
-    if (unVerifiedStudents?.length === 0 || isDataStale) {
-      dispatch(fetchUnverifiedStudents());
-    }
-  }, [dispatch, unVerifiedStudents?.length, lastFetchedUnverified]);
+    // if (unVerifiedStudents?.length === 0 || isDataStale) {
+    dispatch(fetchUnverifiedStudents());
+    //dispatch, unVerifiedStudents?.length, lastFetchedUnverified
+    // }
+  }, []);
 
   // Memoized filtered students based on search query
   const filteredStudents = useMemo(() => {
@@ -55,23 +56,28 @@ const UnverifiedStudents = () => {
 
   if (filteredStudents?.length === 0) {
     return (
-      <ProtectedSection permission={PERMISSIONS.VIEW_UNVERIFIED_STUDENT} title={t("Unverified Students")}>
-
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.SHOW_UNVERIFIED_STUDENTS}
+        title={t("Unverified Students")}
+      >
         <div className="flex flex-col justify-center items-center h-64">
-          <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
+          <FaUserSlash className="text-6xl text-gray-400 mb-4" />{" "}
+          {/* Big Icon */}
           <p className="text-center text-gray-500 text-xl">
             {t("No Unverified Students found.")}
           </p>{" "}
           {/* Text below icon */}
         </div>
       </ProtectedSection>
-
     );
   }
 
   return (
     <div className="animate-fadeIn">
-      <ProtectedSection permission={PERMISSIONS.VIEW_UNVERIFIED_STUDENT} title={t("Unverified Students")}>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.SHOW_UNVERIFIED_STUDENTS}
+        title={t("Unverified Students")}
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredStudents?.map((student) => (
             <UnVerifiedStudentCard key={student._id} studentId={student._id} />
