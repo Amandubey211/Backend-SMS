@@ -517,8 +517,23 @@ export const PERMISSIONS = {
   //------------------------------------------------End of Class Variables ---------------------------------------------------------
 
   //-------------------------------------------------------------------------//
-  ADMISSION: "addmission to student",
-  VIEW_Verification: "view verification dashboard",
-  VERIFY_STUDENT: "Verifiy student ",
-  ViewGraduateStudent: "view Graduate student",
+
+  // Admission Group (Registering Student & Uploading Documents)
+  REGISTER_STUDENT: "register student",
+  UPLOAD_STUDENT_DOCUMENTS: "upload student documents",
+
+  // Verification Group (Managing Student Verification Status)
+  SHOW_UNVERIFIED_STUDENTS: "show unverified students",
+  SHOW_REJECTED_STUDENTS: "show rejected students",
+  VERIFY_STUDENT: "verify student info",
+  UPDATE_STUDENT_ACTIVE_STATUS: "update student active info",
+  SEND_LOGIN_CREDENTIALS: "sending login credentials",
+  ASSIGN_CLASS: "assigning class",
+
+  // Graduation & Promotion/Demotion Group
+  PROMOTE_STUDENT: "promote student",
+  PROMOTE_IN_SAME_CLASS: "promote in same class",
+  GRADUATE_STUDENT: "graduate student",
+  DEMOTE_STUDENT: "demote student",
+  VIEW_GRADUATE_STUDENTS: "Get list of graduates",
 };
