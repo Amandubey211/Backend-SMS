@@ -33,11 +33,11 @@ const sidebarData = [
     ),
     path: `/children`,
   },
-  // {
-  //   title: "Finance",
-  //   icon: <img src={financeIcon} alt="Finance Icon" style={{ width: '24px', height: '24px' }} />,
-  //   path:'/parentfinance'
-  // },
+  {
+    title: "Finance",
+    icon: <img src={financeIcon} alt="Finance Icon" style={{ width: '24px', height: '24px' }} />,
+    path:'/parentfinance'
+  },
   {
     title: "Library",
     icon: (

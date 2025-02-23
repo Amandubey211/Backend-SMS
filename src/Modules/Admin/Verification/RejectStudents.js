@@ -6,7 +6,7 @@ import UnVerifiedStudentCard from "./UnVerifiedStudentCard";
 import { fetchRejectedStudents } from "../../../Store/Slices/Admin/Verification/VerificationThunks";
 import Spinner from "../../../Components/Common/Spinner";
 import { FaUserSlash } from "react-icons/fa";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../config/permission";
@@ -14,7 +14,7 @@ import { PERMISSIONS } from "../../../config/permission";
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
 const RejectStudents = () => {
-  const { t } = useTranslation('admVerification');
+  const { t } = useTranslation("admVerification");
   const dispatch = useDispatch();
   const {
     rejectedStudents,
@@ -54,9 +54,13 @@ const RejectStudents = () => {
 
   if (filteredStudents?.length === 0) {
     return (
-      <ProtectedSection requiredPermission={PERMISSIONS.VIEW_REJECTED_STUDENTS} title={"Rejected Students"}>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.SHOW_REJECTED_STUDENTS}
+        title={"Rejected Students"}
+      >
         <div className="flex flex-col justify-center items-center h-64">
-          <FaUserSlash className="text-6xl text-gray-400 mb-4" /> {/* Big Icon */}
+          <FaUserSlash className="text-6xl text-gray-400 mb-4" />{" "}
+          {/* Big Icon */}
           <p className="text-center text-gray-500 text-xl">
             {t("No Unverified Students found.")}
           </p>{" "}
@@ -67,7 +71,10 @@ const RejectStudents = () => {
   }
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.VIEW_REJECTED_STUDENTS} title={"Rejected Students"}>
+    <ProtectedSection
+      requiredPermission={PERMISSIONS.SHOW_REJECTED_STUDENTS}
+      title={"Rejected Students"}
+    >
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredStudents?.map((student) => (
           <UnVerifiedStudentCard key={student._id} studentId={student._id} />

@@ -8,7 +8,6 @@ import {
   setSelectedSection,
   filterTeachersBySection,
 } from "../../../Store/Slices/Admin/Class/Teachers/teacherSlice";
-import { PERMISSIONS } from "../../../config/permission";
 
 const AssignTeacher = lazy(() => import("./AssignTeacher"));
 

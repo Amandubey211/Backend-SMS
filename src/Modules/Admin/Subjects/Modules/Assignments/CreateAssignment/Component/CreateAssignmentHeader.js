@@ -1,9 +1,6 @@
 import React, { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import AddRubricModal from "../../../Rubric/Components/AddRubricModal";
-import Sidebar from "../../../../../../../Components/Common/Sidebar";
-import AddNewCriteriaForm from "../../../Rubric/Components/AddNewCriteriaForm";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../../../config/permission";

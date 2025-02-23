@@ -19,8 +19,11 @@ export const postData = async (endpoint, data) => {
     return response?.data;
   } catch (error) {
     if (error.response && error.response.data) {
+      console.log(error.response.data, "sdf");
+
       return error.response.data;
     }
+
     // console.log("Error posting data:", error);
   }
 };
@@ -31,7 +34,7 @@ export const putData = async (endpoint, data) => {
     const response = await apiService.put(endpoint, data);
     return response?.data;
   } catch (error) {
-    // console.log("Error updating data:", error);
+    return error;
   }
 };
 
@@ -41,7 +44,7 @@ export const deleteData = async (endpoint) => {
     const response = await apiService.delete(endpoint);
     return response?.data;
   } catch (error) {
-    // console.log("Error deleting data:", error);
+    return error;
   }
 };
 
@@ -51,7 +54,7 @@ export const patchData = async (endpoint, data) => {
     const response = await apiService.patch(endpoint, data);
     return response?.data;
   } catch (error) {
-    // console.log("Error patching data:", error);
+    return error;
   }
 };
 

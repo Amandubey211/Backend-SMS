@@ -34,10 +34,10 @@ const ViewEvent = ({ event }) => {
   const formattedTime = event?.time ? event?.time : t('Invalid Time');
 
   return (
-    <div className="px-4 bg-white rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
+    <div className="px-4 py-4 bg-gray-50 rounded-lg overflow-hidden shadow-md" >
       <div className="flex flex-col gap-2">
         {/* Event Image */}
-        <img className="h-[200px] w-full rounded" src={event?.image ?? '/default-event.jpg'} alt={t("Event Image")} />
+        <img className="h-[200px] w-full rounded-lg" src={event?.image ?? '/default-event.jpg'} alt={t("Event Image")} />
 
         {/* Grouped Date, Time, Location, and Director */}
         <div className="flex justify-between gap-4 mt-4">
@@ -87,17 +87,21 @@ const ViewEvent = ({ event }) => {
         {/* Line break */}
         <hr className="my-4" />
 
+        {/* Event Title Heading */}
+        <h2 className="text-gray-400 text-lg font-semibold mb-1">{t("Event Title")}</h2>
         {/* Event Name */}
-        <h1 className="font-bold text-[#4D4D4D] text-2xl">{formattedTitle}</h1>
+        <h1 className="font-bold text-[#4D4D4D] text-2xl mb-2">{formattedTitle}</h1>
 
         {/* Event Type */}
         <div className="flex flex-col mt-4">
-          <span className="text-gray-400">{t("Event Type")}</span>
-          <span className="text-lg">{formattedType}</span>
+          <span className="text-gray-400 text-lg font-semibold mb-1">{t("Event Type")}</span>
+          <span className="inline-block bg-blue-100 text-blue-600 rounded-full px-3 py-1 text-sm font-medium w-fit">
+            {formattedType}
+          </span>
         </div>
 
         {/* Event Description */}
-        <div className="text-lg leading-[1.875] mt-4" style={{ color: "#7F7F7F", fontSize: "16px" }}>
+        <div className="bg-white rounded-lg p-4 mt-4 text-lg leading-[1.875]" style={{ color: "#4D4D4D", fontSize: "16px" }}>
           {formattedDescription}
         </div>
       </div>

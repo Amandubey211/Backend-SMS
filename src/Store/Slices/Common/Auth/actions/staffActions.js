@@ -123,7 +123,6 @@ export const staffLogin = createAsyncThunk(
         return rejectWithValue(errorMessage);
       }
     } catch (error) {
-      console.error("Error in staff login:", error);
       const errorMessage =
         error?.response?.data?.msg || error.message || "Login failed.";
       toast.error(errorMessage);

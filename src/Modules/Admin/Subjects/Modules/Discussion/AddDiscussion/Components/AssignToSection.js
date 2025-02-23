@@ -9,17 +9,19 @@ const AssignToSection = ({
   handleChange,
   assignTitle,
   isAssignToLabel,
+  error, // added error prop for validations
 }) => {
   return (
     <div className="mt-5">
-      <AssignToRadios
-        assignTo={assignTo}
-        handleChange={handleChange}
-        isAssignToLabel={isAssignToLabel}
-        title={assignTitle}
-      />
-
-      {/* // critical */}
+      <div className={`p-2 ${error ? "border border-red-500 rounded" : ""}`}>
+        <AssignToRadios
+          assignTo={assignTo}
+          handleChange={handleChange}
+          isAssignToLabel={isAssignToLabel}
+          title={assignTitle}
+        />
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      </div>
       <SectionSelect
         assignTo={assignTo}
         sectionId={sectionId}

@@ -118,9 +118,9 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
                     {/* Name and Label in a Column */}
                     <div className="flex flex-col">
-                      <span className="text-gray-700 font-semibold">
+                      {/* <span className="text-gray-700 font-semibold">
                         {truncateFileName(attachment.name)}
-                      </span>
+                      </span> */}
                       {attachment.label && (
                         <span className="text-gray-500 text-sm italic">
                           {truncateFileName(attachment.label)}

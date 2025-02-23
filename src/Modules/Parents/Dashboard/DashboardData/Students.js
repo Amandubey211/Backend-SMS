@@ -97,23 +97,43 @@ const StudentParentCard = () => {
   return (
     <div className="relative h-3/5">
       <div className="flex justify-between p-4 pb-3 items-center px-2 pt-2">
-        <h2 className="text-lg font-semibold text-gray-600">
-          {t("My Children")} {students?.length || 0} {/* Optional chaining */}
+        <h2 className="text-lg font-semibold text-gray-600 flex items-center">
+          {t("My Children")}
+          <div
+            className="ml-2 flex items-center justify-center rounded-full"
+            style={{
+              background: "linear-gradient(to right, #FAECF0 0%, #F3EBFB 100%)",
+              width: "32px",
+              height: "32px",
+            }}
+          >
+            <span
+              style={{
+                background: "linear-gradient(to right, #C83B62 0%, #7F35CD 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+              className="text-sm font-semibold"
+            >
+              {(students?.length || 0).toString().padStart(2, "0")}
+            </span>
+          </div>
         </h2>
-        {!loadingChildren && !errorChildren && students?.length > 0 && ( // Optional chaining
+
+        {!loadingChildren && !errorChildren && students?.length > 0 && (
           <div className="inline-block">
             <button
               className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
-                       text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
-                       hover:bg-gray-100 hover:shadow-md"
+                   text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
+                   hover:bg-gray-100 hover:shadow-md"
               onClick={handleNavigate}
             >
               {t("See All")}
             </button>
           </div>
-
         )}
       </div>
+
 
       {/* Content area with conditional rendering */}
       <div className={`rounded-lg p-4 m-3 mb-7 bg-transparent ${loadingChildren || errorChildren || students?.length === 0 ? 'h-auto' : ''}`}>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../../Components/Common/Layout";
@@ -13,7 +13,6 @@ import {
   createDiscussion,
   updateDiscussion,
 } from "../../../../../../Store/Slices/Admin/Class/Discussion/discussionThunks";
-import toast from "react-hot-toast";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 
@@ -27,7 +26,6 @@ const AddDiscussion = () => {
     (state) => state.admin.discussions.discussion
   );
   const isLoading = useSelector((state) => state.admin.discussions.loading);
-  const error = useSelector((state) => state.admin.discussions.error);
 
   // Determine if editing or creating
   const isEditing = Boolean(currentDiscussion?._id);
@@ -41,7 +39,7 @@ const AddDiscussion = () => {
   );
   const [file, setFile] = useState(null);
   const [formState, setFormState] = useState({
-    assignTo: currentDiscussion?.assignTo,
+    assignTo: currentDiscussion?.assignTo || "",
     dueDate: currentDiscussion?.dueDate || "",
     sectionId: currentDiscussion?.sectionId || "",
     groupId: currentDiscussion?.groupId || "",
@@ -54,22 +52,40 @@ const AddDiscussion = () => {
     availableUntil: currentDiscussion?.availableUntil || "",
   });
 
+  // Error states for inline validations
+  const [titleError, setTitleError] = useState("");
+  const [assignError, setAssignError] = useState("");
+
+  // Refs for input elements
+  const titleInputRef = useRef(null);
+
   // Event Handlers
-  const handleNameChange = useCallback(
-    (e) => setAssignmentName(e.target.value),
-    []
-  );
+  const handleNameChange = useCallback((e) => {
+    setAssignmentName(e.target.value);
+    if (e.target.value.trim()) {
+      setTitleError("");
+    }
+  }, []);
 
   const handleEditorChange = useCallback(
     (content) => setEditorContent(content),
     []
   );
 
-  const handleFileChange = useCallback((e) => setFile(e.target.files[0]), []);
+  const handleFileChange = useCallback((e) => {
+    setFile(e.target.files[0]);
+  }, []);
 
   const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
+    if (name === "assignTo" && value) {
+      setAssignError("");
+    }
+  }, []);
+
+  const handleClearFile = useCallback(() => {
+    setFile(null);
   }, []);
 
   const handleSave = useCallback(
@@ -94,31 +110,41 @@ const AddDiscussion = () => {
         publish,
       };
 
+      // Validate required fields and set error messages
+      let hasError = false;
       if (!discussionData.assignTo) {
-        toast.error("Please assign the discussion");
-        return;
-      }
-
-      if (!discussionData.title) {
-        toast.error("Please provide a title for the discussion");
-        return;
-      }
-
-      if (isEditing) {
-        dispatch(
-          updateDiscussion({
-            discussionId: currentDiscussion._id,
-            discussionData,
-          })
-        )
-          .unwrap()
-          .then(() => navigate(`/class/${cid}/${sid}/discussions`))
-          .catch((err) => toast.error(`Error updating discussion: ${err}`));
+        setAssignError("Please assign the discussion");
+        hasError = true;
       } else {
-        dispatch(createDiscussion({ discussionData, cid }))
-          .unwrap()
-          .then(() => navigate(`/class/${cid}/${sid}/discussions`))
-          .catch((err) => toast.error(`Error creating discussion: ${err}`));
+        setAssignError("");
+      }
+      if (!discussionData.title.trim()) {
+        setTitleError("Please provide a title for the discussion");
+        titleInputRef.current?.focus();
+        hasError = true;
+      } else {
+        setTitleError("");
+      }
+
+      if (hasError) {
+        return;
+      }
+
+      try {
+        if (isEditing) {
+          await dispatch(
+            updateDiscussion({
+              discussionId: currentDiscussion._id,
+              discussionData,
+            })
+          ).unwrap();
+          navigate(`/class/${cid}/${sid}/discussions`);
+        } else {
+          await dispatch(createDiscussion({ discussionData, cid })).unwrap();
+          navigate(`/class/${cid}/${sid}/discussions`);
+        }
+      } catch (err) {
+        // Handle backend errors appropriately
       }
     },
     [
@@ -141,7 +167,6 @@ const AddDiscussion = () => {
   );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
-  // JSX
   return (
     <Layout
       title={
@@ -152,7 +177,6 @@ const AddDiscussion = () => {
     >
       <div className="flex w-full min-h-screen">
         <SideMenubar />
-
         <div
           className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full w-full`}
           style={{ marginLeft: sidebarWidth }}
@@ -170,10 +194,15 @@ const AddDiscussion = () => {
                       <TopicTitleInput
                         value={assignmentName}
                         onChange={handleNameChange}
+                        error={titleError}
+                        inputRef={titleInputRef}
                       />
-                      <FileInput onChange={handleFileChange} file={file} />
+                      <FileInput
+                        onChange={handleFileChange}
+                        file={file}
+                        onClear={handleClearFile}
+                      />
                     </div>
-
                     <EditorComponent
                       hideInput={true}
                       assignmentLabel="Discussion Name"
@@ -186,21 +215,16 @@ const AddDiscussion = () => {
                     <CreateDiscussionForm
                       handleChange={handleFormChange}
                       {...formState}
+                      assignError={assignError}
                     />
                   </div>
                 </div>
               </ProtectedSection>
             </div>
-
-            {isLoading && <Spinner />}
-            {error && (
-              <p role="alert" className="text-red-400 text-current my-4">
-                {error}
-              </p>
-            )}
           </>
         </div>
       </div>
+      {isLoading && <Spinner />}
     </Layout>
   );
 };

@@ -1,18 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import ProtectedAction from "../../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const AddDiscussionHeader = ({ onSave, isUpdating }) => {
   const navigate = useNavigate();
+  const globalIsLoading = useSelector(
+    (state) => state.admin.discussions.loading
+  );
+  const [actionInProgress, setActionInProgress] = useState(null);
+
+  const handlePublish = () => {
+    setActionInProgress("publish");
+    onSave(true).finally(() => setActionInProgress(null));
+  };
+
+  const handleSave = () => {
+    setActionInProgress("save");
+    onSave(false).finally(() => setActionInProgress(null));
+  };
 
   return (
-    <div className="flex items-center justify-between p-2 pe-5 bg-white border-b border-gray-300 shadow-sm">
+    <div className="w-full flex items-center justify-between px-4 py-2 bg-white border-b border-gray-300 shadow-sm">
       <div className="flex items-center">
         <IoIosArrowBack
-          className="mr-2 text-gray-600 text-2xl cursor-pointer"
-          onClick={() => navigate(-1)} // Navigate to the previous page
+          className="mr-3 text-gray-600 text-2xl cursor-pointer"
+          onClick={() => navigate(-1)}
         />
         <h1 className="text-lg font-semibold text-gray-800">
           {isUpdating ? "Update Discussion" : "Create New Discussion"}
@@ -25,14 +40,15 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
           }
         >
           <button
-            onClick={() => {
-              onSave(true); // Save and publish the discussion
-            }}
-            className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            onClick={handlePublish}
+            disabled={globalIsLoading}
+            className="rounded-md py-2 px-6 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className="text-gradient">
-              {isUpdating ? "Update & Publish" : "Save & Publish"}
-            </span>
+            {actionInProgress === "publish"
+              ? "Processing..."
+              : isUpdating
+              ? "Update & Publish"
+              : "Save & Publish"}
           </button>
         </ProtectedAction>
         <ProtectedAction
@@ -41,14 +57,15 @@ const AddDiscussionHeader = ({ onSave, isUpdating }) => {
           }
         >
           <button
-            onClick={() => {
-              onSave(false); // Save without publishing
-            }}
-            className="flex-grow rounded-md py-2 px-6 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            onClick={handleSave}
+            disabled={globalIsLoading}
+            className="rounded-md py-2 px-6 bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <span className="text-gradient">
-              {isUpdating ? "Update" : "Save"}
-            </span>
+            {actionInProgress === "save"
+              ? "Processing..."
+              : isUpdating
+              ? "Update"
+              : "Save"}
           </button>
         </ProtectedAction>
       </div>
