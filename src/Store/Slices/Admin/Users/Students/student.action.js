@@ -244,8 +244,12 @@ export const fetchCourseProgress = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const say = getAY();
+
+      // ✅ Updated: Added semesterId as query parameter
+      const semesterQuery = ids.semesterId ? `&semesterId=${ids.semesterId}` : "";
+
       const response = await getData(
-        `/${getRole}/course/progress/student/${ids.studentId}/subject/${ids.subjectId}?say=${say}`
+        `/${getRole}/course/progress/student/${ids.studentId}/subject/${ids.subjectId}?say=${say}${semesterQuery}`
       );
       return response.data;
     } catch (error) {
