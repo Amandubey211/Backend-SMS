@@ -7,11 +7,13 @@ import { getAY } from "../../../../Utils/academivYear";
 // fetch student fees details
 export const StudentFinanceDetails = createAsyncThunk(
   `fees/StudentFinanceDetails`,
-  async (_, { rejectWithValue, dispatch }) => {
+  async ({ studentId }, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(`/student/my_fees?say=${say}`);
+      const data = await getData(`/student/fees/${studentId}?say=${say}`);
+      console.log("student finance data", data);
+
       return data;
     } catch (error) {
       console.error("Error in StudentFinanceDetails:", error);
