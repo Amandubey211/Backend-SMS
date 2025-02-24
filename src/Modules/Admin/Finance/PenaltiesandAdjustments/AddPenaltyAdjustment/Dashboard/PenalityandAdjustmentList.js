@@ -53,7 +53,7 @@ const PenalityandAdjustmentList = () => {
     totalPages,
     currentPage,
     pageSize,
-  } = useSelector((state) => state.admin.penaltyAdjustment || {});
+  } = useSelector((state) => state.admin.penaltyAdjustment);
 
   // Local state
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
@@ -68,9 +68,8 @@ const PenalityandAdjustmentList = () => {
   const pdfRef = useRef(null);
   const popupRef = useRef(null);
 
-  const computedPageSize =
-    totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
-
+  const paze_size = pageSize;
+const [computedPageSize, setComputedPageSize] = useState(paze_size);
   // Extract adjustments array from Redux state.
   // If adjustmentData contains an `adjustments` property, use that;
   // otherwise, if adjustmentData is already an array, use it.
@@ -121,25 +120,25 @@ const PenalityandAdjustmentList = () => {
       toast.error("Invalid adjustment ID.");
       return;
     }
-  
+
     console.log("Attempting to send email for adjustment:", record);
-  
+
     // Determine email type: use "cancelReturnInvoice" if cancelled; otherwise "adjustment"
     const emailType = record.isCancel ? "cancelReturnInvoice" : "adjustment";
-  
+
     // Map the record to the required email data structure
     const emailData = mapRecordToEmailData(record);
-  
+
     // Show a loading toast notification in real time
     const toastId = toast.loading("Sending email...");
-  
+
     try {
       // For canceled adjustments, use the linked invoice's _id (if available)
       const idToSend =
         record.isCancel && record.invoiceId && record.invoiceId._id
           ? record.invoiceId._id
           : record._id;
-  
+
       const result = await dispatch(
         sendEmail({
           id: idToSend,
@@ -147,10 +146,10 @@ const PenalityandAdjustmentList = () => {
           payload: emailData,
         })
       );
-  
+
       // Dismiss the loading toast notification
       toast.dismiss(toastId);
-  
+
       // Determine the proper display message for notifications:
       let displayMessage = "Adjustment";
       if (record.isReturn) {
@@ -158,7 +157,7 @@ const PenalityandAdjustmentList = () => {
       } else if (record.isCancel) {
         displayMessage = "Cancelled Adjustment";
       }
-  
+
       if (sendEmail.fulfilled.match(result)) {
         toast.success(`${displayMessage} email sent successfully!`);
       } else {
@@ -171,8 +170,8 @@ const PenalityandAdjustmentList = () => {
       toast.error("Error sending email.");
     }
   };
-  
-  
+
+
 
 
   // Define the action menu for each row
@@ -233,12 +232,12 @@ const PenalityandAdjustmentList = () => {
   );
 
   // Debounced function to fetch adjustments
-  const debouncedFetch = useCallback(
-    debounce((params) => {
-      dispatch(fetchReturnInvoice(params));
-    }, 300),
-    [dispatch]
-  );
+  // const debouncedFetch = useCallback(
+  //   debounce((params) => {
+  //     dispatch(fetchReturnInvoice(params));
+  //   }, 300),
+  //   [dispatch]
+  // );
 
   // Fetch data when component mounts or dependencies change
   useEffect(() => {
@@ -250,8 +249,8 @@ const PenalityandAdjustmentList = () => {
       sortOrder: "desc",
     };
 
-    debouncedFetch(params);
-  }, [debouncedFetch, searchText, currentPage, computedPageSize]);
+    dispatch(fetchReturnInvoice(params));
+  }, [dispatch, searchText, currentPage, computedPageSize, pageSize]);
 
   // Monitor loading state to disable initial render when API call completes
   useEffect(() => {
@@ -547,15 +546,16 @@ const PenalityandAdjustmentList = () => {
                 total: totalRecords,
                 pageSize: computedPageSize,
                 showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "20", "50"],
+                pageSizeOptions: ["10", "20", "50", "100"],
                 size: "small",
                 showTotal: () =>
                   `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
                 onChange: (page, pageSize) => {
                   dispatch(setCurrentPage(page));
+                  setComputedPageSize(pageSize);
                 },
                 onShowSizeChange: (current, size) => {
-                  dispatch(setCurrentPage(1));
+                  setComputedPageSize(size);
                 },
               }}
               className="rounded-lg shadow text-xs"

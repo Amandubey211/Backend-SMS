@@ -548,7 +548,7 @@ const RecentInvoiceList = () => {
                     total: pagination?.totalItems,
                     pageSize: pageSize,
                     showSizeChanger: true,
-                    pageSizeOptions: ["5", "10", "20", "50"],
+                    pageSizeOptions: [ "10", "20", "50","100"],
                     size: "small",
                     showTotal: (total, range) =>
                       `Page ${pagination?.currentPage} of ${pagination?.totalPages} | Total ${pagination?.totalItems} records`,

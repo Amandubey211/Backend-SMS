@@ -390,7 +390,7 @@ console.log(formValues,'...');
           items: [
             {
               category: "",
-              quantity: "",
+              quantity: 1,
               totalAmount: "",
               subCategory: "",
               stationeries: [],

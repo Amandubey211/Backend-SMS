@@ -13,7 +13,7 @@ const initialState = {
   currentPage: 0,
   totalPages: 0,
   totalRecords: 0,
-  pageSize: 5,
+  pageSize: 10,
   loading: false,
   error: null, // Changed from boolean to store error messages
   returnCardData: {},
