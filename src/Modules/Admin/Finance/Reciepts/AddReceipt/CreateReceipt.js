@@ -32,7 +32,7 @@ const CalculationHandler = () => {
     }
 
     const total_amount = values.items.reduce(
-      (acc, item) => acc + Number(item.totalAmount || 0),
+      (acc, item) => acc + Number(item.quantity)*Number(item.totalAmount || 0),
       0
     );
 
@@ -47,7 +47,7 @@ const CalculationHandler = () => {
     });
 
     // Update Formik's subAmount and finalAmount
-    setFieldValue("subAmount", calculated.discountValue, false);
+    setFieldValue("subAmount", total_amount, false);
     setFieldValue("finalAmount", calculated.finalAmount, false);
   }, [
     values.items,
@@ -155,8 +155,8 @@ const CreateReceipt = () => {
     items: [
       {
         category: "",
-        quantity: "",
-        totalAmount: "",
+        quantity: 1,
+        totalAmount: 0,
         subCategory: "",
         stationeries: [],
       },
