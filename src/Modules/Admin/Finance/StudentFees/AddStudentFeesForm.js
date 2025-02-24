@@ -8,16 +8,17 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
 export default function AddStudentFeesForm() {
   const subCategories = [
-    "Tuition Fees",
-    "Transport Fees",
-    "Hostel Fees",
-    "Exam Fees",
-    "Event Fees",
-    "Certificate / ID card",
-    "Meal plan Fees",
-    "Application Fees",
-    "Others",
+            "Tuition Fees",
+            "Hotel Fees",
+            "Application Fees",
+            "Certificate Fees",
+            "Meal Fees",
+            "Event Fees",
+            "Exam Fees",
+            "Transport Fees",
+            "Other"
   ];
+
 
   const [selectCategories, setSelectCategories] = useState([]);
   const [discription, setDescription] = useState('');
@@ -35,7 +36,7 @@ export default function AddStudentFeesForm() {
         setFormData( [ { subCategory: category }]);
       }else{
         setSelectCategories((prev) => [...prev, category]);
-        setFormData((prev) => [...prev, { subCategory: category }]);
+        setFormData((prev) => [...prev, { subCategory: category}]);
       }
       
     } else {

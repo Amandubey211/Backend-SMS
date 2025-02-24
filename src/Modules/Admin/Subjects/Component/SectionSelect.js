@@ -68,7 +68,7 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
             className="block w-full p-2 border border-gray-300 rounded-lg"
             disabled={loading}
           >
-            <option value="">Choose Group</option>
+            <option value="">All Groups</option>
             {groupsList?.length > 0 ? (
               groupsList?.map((group) => (
                 <option key={group._id} value={group._id}>

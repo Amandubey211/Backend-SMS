@@ -220,7 +220,7 @@ const RecentQuotationList = () => {
           </Menu.Item>
         </ProtectedAction>
       )}
-      {record.status !== "reject" && (
+      {!record?.isCancel && (
         <ProtectedAction requiredPermission={PERMISSIONS.REJECT_QUOTATION}>
           <Menu.Item
             key="4"

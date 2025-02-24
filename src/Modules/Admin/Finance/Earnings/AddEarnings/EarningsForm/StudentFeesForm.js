@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Formik, Form, useFormikContext } from "formik";
 
 import StudentDetails from "../Component/StudentDetails";
@@ -82,7 +82,7 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormD
   const getNestedValue = (values, path) => {
     return path.split(".").reduce((acc, part) => acc && acc[part], values);
   };
-  const [imageUrl, setImageUrl] = useState('')
+  const [imageUrl, setImageUrl] = useState('');
   return (
     <Formik
       innerRef={formikRef}
@@ -110,18 +110,22 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormD
               label="Entry Date  & Time"
               name="dateTime"
               type="datetime-local"
+              
               required
             />
             <SelectInput
               label="Paid By"
               name="paidBy"
+              
               options={["Self", "Parent", "Relative", "other"]}
+              default_option={{value:"Self",label:'Self'}}
               required
             />
             <SelectInput
               label="Payment Type"
               name="paymentType"
               options={["cash", "card", "online", "cheque", "other"]}
+              default_option={{value:"cash",label:'cash'}}
               required
             />
             <TextInput

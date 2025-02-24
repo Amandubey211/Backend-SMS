@@ -5,7 +5,7 @@ import { Field, ErrorMessage } from "formik";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 
-const SelectInput = ({ label, name, options, autoComplete = "off" }) => {
+const SelectInput = ({ label, name, options, autoComplete = "off" ,default_option}) => {
   // Subscribe to Redux state
   const readOnly = useSelector((state) => state.admin.earnings.readOnly);
 
@@ -46,8 +46,8 @@ const SelectInput = ({ label, name, options, autoComplete = "off" }) => {
         className={`bg-white border border-gray-300 rounded-sm px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${
           readOnly ? "cursor-not-allowed" : ""
         }`}
-      >
-        <option value="" label={`Select ${label}`} />
+      > 
+        {default_option ?<option value={default_option?.value} label={default_option?.label} />:<option value="" label={`Select ${label}`} />}
         {options.map((option, index) => (
           <motion.option
             key={index}

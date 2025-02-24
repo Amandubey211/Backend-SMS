@@ -44,7 +44,7 @@ const paymentDetailsFields = [
     type: "number",
     placeholder: "Enter final amount",
     min: 0,
-    readOnly: true, // Make it read-only as it's calculated
+    readOnly: true, // Calculated field
   },
 ];
 
@@ -54,11 +54,14 @@ const PaymentDetails = () => {
   useEffect(() => {
     const totalAmount = Number(values.total_amount) || 0;
     const penalty = Number(values.penalty) || 0;
-    const discount = Number(values.discount) || 0;
+    const discountPercentage = Number(values.discount) || 0;
 
-    const calculatedFinalAmount = totalAmount + penalty - discount;
+    // Calculate discount amount as a percentage of totalAmount
+    const discountAmount = (discountPercentage / 100) * totalAmount;
 
-    // Avoid setting the field if the value hasn't changed to prevent infinite loops
+    const calculatedFinalAmount = totalAmount + penalty - discountAmount;
+
+    // Avoid updating if the calculated value is the same to prevent infinite loops
     if (values.final_amount !== calculatedFinalAmount) {
       setFieldValue("final_amount", calculatedFinalAmount);
     }
