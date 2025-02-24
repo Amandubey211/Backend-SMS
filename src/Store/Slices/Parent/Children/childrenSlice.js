@@ -1,3 +1,4 @@
+// childrenSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchChildren,
@@ -16,12 +17,20 @@ const initialState = {
   attendance: [],
   loading: false,
   error: null,
+
+  // NEW: store which child is currently selected
+  selectedChild: null,
 };
 
 const childrenSlice = createSlice({
   name: "children",
   initialState,
-  reducers: {},
+  reducers: {
+    // Action to set the selected child in redux
+    setSelectedChild: (state, action) => {
+      state.selectedChild = action.payload; // e.g. the entire child object
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Handle fetching children
@@ -111,4 +120,5 @@ const childrenSlice = createSlice({
   },
 });
 
+export const { setSelectedChild } = childrenSlice.actions;
 export default childrenSlice.reducer;
