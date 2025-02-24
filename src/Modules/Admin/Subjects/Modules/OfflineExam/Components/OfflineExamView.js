@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import { useLocation, useParams } from "react-router-dom";
 import OfflineExamViewCard from "./OfflineExamViewCard";
 import { CiSearch } from "react-icons/ci";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
@@ -8,13 +7,9 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 import { debounce } from "lodash";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { FaClipboardUser } from "react-icons/fa6";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
+import { useSelector } from "react-redux";
 
 const OfflineExamView = () => {
-  // const location = useLocation();
-  // const { examName, students, examType, startDate, examId, semesterId } =
-  //   location.state;
   const [searchQuery, setSearchQuery] = useState("");
   const selectedExam = useSelector(
     (state) => state.admin.offlineExam.selectedExamStudents
@@ -23,8 +18,6 @@ const OfflineExamView = () => {
     selectedExam || {};
 
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  // const dispatch = useDispatch();
-  // const { cid, sid } = useParams();
   const debouncedSearch = useMemo(
     () =>
       debounce((searchQuery) => {
@@ -35,9 +28,6 @@ const OfflineExamView = () => {
 
   useEffect(() => {
     debouncedSearch(searchQuery);
-    // dispatch(
-    //   fetchAllOfflineExam({ classId: cid, subjectId: sid, query: searchQuery })
-    // );
     return () => {
       debouncedSearch.cancel();
     };
