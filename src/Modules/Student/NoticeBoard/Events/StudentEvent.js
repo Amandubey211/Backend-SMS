@@ -182,7 +182,7 @@ const StudentEvent = () => {
               </h1>
             </div>
 
-            <div className="my-4 w-full h-auto flex rounded-sm gap- relative bg-red-300">
+            <div className="my-4 w-full h-auto flex rounded-sm gap- relative">
               {currentPage > 0 && (
                 <div
                   className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
