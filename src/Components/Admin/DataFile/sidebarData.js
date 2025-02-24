@@ -49,7 +49,7 @@ const sidebarData = [
     title: "Classes",
     icon: <RiGraduationCapLine style={{ fontSize: "1.1rem" }} />,
     path: `/class`,
-    roles: [ROLES.ADMIN, ROLES.TEACHER],
+    roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.VIEW_CLASSES, // Added permission reference
   },
   {

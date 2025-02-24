@@ -1,18 +1,25 @@
+// AuthSlice.js
+
 import { createSlice } from "@reduxjs/toolkit";
 import {
   staffLogin,
   staffLogout,
-  createAcademicYear,
-} from "../actions/staffActions"; // Updated actions file import
-
-import { parentLogin, parentLogout } from "../actions/parentActions"; // Updated actions file import
+  // any other staff actions if needed
+} from "../actions/staffActions";
+import {
+  parentLogin,
+  parentLogout,
+  // ...
+} from "../actions/parentActions";
 import {
   studentLogin,
   studentLogout,
   qidVerification,
   registerStudentDetails,
   uploadStudentDocuments,
+  // ...
 } from "../actions/studentActions";
+import { createAcademicYear } from "../actions/staffActions"; // or wherever this resides
 
 const initialState = {
   isLoggedIn: false,
@@ -22,14 +29,15 @@ const initialState = {
   loading: false,
   error: null,
   selectedLanguage: "en",
-  userRoles: [],
-  permissions: [],
+  userRoles: [], // For multiple department roles
+  permissions: [], // For storing the user’s current permission set
 };
 
 const AuthSlice = createSlice({
   name: "Auth",
   initialState,
   reducers: {
+    // 1) Common set/get methods
     setToken: (state, action) => {
       state.token = action.payload;
     },
@@ -43,26 +51,69 @@ const AuthSlice = createSlice({
       state.permissions = [];
     },
 
+    // 2) Language & Academic Year
     setSelectedLanguage: (state, action) => {
       state.selectedLanguage = action.payload;
     },
     setAcademicYear: (state, action) => {
       state.AcademicYear = action.payload;
     },
+
+    // 3) For roles that come from server (e.g., grouped roles)
     setUserRoles: (state, action) => {
       state.userRoles = action.payload;
     },
+
+    // 4) Comprehensive reset
     resetState: (state) => {
       state.isLoggedIn = false;
       state.role = null;
       state.token = null;
       state.AcademicYear = [];
-      state.permissions = []; // Reset permissio
+      state.permissions = [];
+      state.userRoles = [];
+      state.loading = false;
+      state.error = null;
+      state.selectedLanguage = "en";
+    },
+
+    // 5) Example: storing user details from your login
+    setUserDetails: (state, action) => {
+      // Up to you how you want to store these in state
+      const {
+        schoolId,
+        userId,
+        profile,
+        fullName,
+        email,
+        mobileNumber,
+        position,
+        employeeID,
+        role,
+        monthlySalary,
+        active,
+        dateOfBirth,
+        schoolName,
+      } = action.payload;
+
+      state.schoolId = schoolId;
+      state.userId = userId;
+      state.profile = profile;
+      state.fullName = fullName;
+      state.email = email;
+      state.mobileNumber = mobileNumber;
+      state.position = position;
+      state.employeeID = employeeID;
+      state.role = role;
+      state.monthlySalary = monthlySalary;
+      state.active = active;
+      state.dateOfBirth = dateOfBirth;
+      state.schoolName = schoolName;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Staff login/logout
+      // STAFF LOGIN
       .addCase(staffLogin.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -70,23 +121,26 @@ const AuthSlice = createSlice({
       .addCase(staffLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        // state.role = action.payload.role;
-        // state.token = action.payload.token;
-        // state.AcademicYear = action.payload.academicYear;
-        // localStorage.setItem("token", action.payload.token);
       })
       .addCase(staffLogin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
+      // STAFF LOGOUT
       .addCase(staffLogout.fulfilled, (state) => {
+        // On logout, reset all user-related data
         state.isLoggedIn = false;
         state.role = null;
         state.token = null;
-        localStorage.removeItem("token"); // remove the hard code string and use the env here
+        state.AcademicYear = [];
+        state.permissions = [];
+        state.userRoles = [];
+        // Remove token from localStorage or cookies if applicable
+        localStorage.removeItem("token");
       })
 
-      // Student login/logout
+      // STUDENT LOGIN
       .addCase(studentLogin.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -94,7 +148,7 @@ const AuthSlice = createSlice({
       .addCase(studentLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.isLoggedIn = true;
-        // localStorage.setItem("token", action.payload.token); // remove the hard code string and use the env here
+        // e.g., state.token = action.payload.token;
       })
       .addCase(studentLogin.rejected, (state, action) => {
         state.loading = false;
@@ -104,10 +158,10 @@ const AuthSlice = createSlice({
         state.isLoggedIn = false;
         state.role = null;
         state.token = null;
-        localStorage.removeItem("token"); // remove the hard code string and use the env here
+        localStorage.removeItem("token");
       })
 
-      // Student QID verification
+      // QID Verification
       .addCase(qidVerification.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -121,7 +175,7 @@ const AuthSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Parent login/logout
+      // PARENT LOGIN
       .addCase(parentLogin.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -138,14 +192,16 @@ const AuthSlice = createSlice({
         state.isLoggedIn = false;
         state.role = null;
         state.token = null;
-        localStorage.removeItem("token"); // remove the hard code string and use the env here
+        localStorage.removeItem("token");
       })
+
+      // REGISTER STUDENT
       .addCase(registerStudentDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.signupSuccess = false;
       })
-      .addCase(registerStudentDetails.fulfilled, (state) => {
+      .addCase(registerStudentDetails.fulfilled, (state, action) => {
         state.loading = false;
         state.signupSuccess = true;
       })
@@ -155,6 +211,7 @@ const AuthSlice = createSlice({
         state.signupSuccess = false;
       })
 
+      // CREATE ACADEMIC YEAR
       .addCase(createAcademicYear.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -166,7 +223,8 @@ const AuthSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Upload student documents
+
+      // UPLOAD STUDENT DOCS
       .addCase(uploadStudentDocuments.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -190,5 +248,7 @@ export const {
   setUserRoles,
   setPermissions,
   clearPermissions,
+  setUserDetails,
 } = AuthSlice.actions;
+
 export default AuthSlice.reducer;
