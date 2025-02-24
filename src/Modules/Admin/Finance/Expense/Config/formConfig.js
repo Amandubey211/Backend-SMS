@@ -83,7 +83,7 @@ export const initialValuesMap = {
     // Category-specific fields
     utilityType: "electricity",
     name: "",
-    vendor: "aman",
+    vendor: "",
     description: "",
     expenseSubCategory: "utility",
 
@@ -104,8 +104,8 @@ export const initialValuesMap = {
   // Maintenance
   maintenance: {
     // Category-specific fields
-    name: "Aman Sharma",
-    vendor: "aman",
+    name: "",
+    vendor: "",
     expenseSubCategory: "maintenance",
     maintenanceCategory: "",
     description: "",
@@ -129,8 +129,8 @@ export const initialValuesMap = {
     // Category-specific fields
     itemsPurchased: "",
     description: "",
-    name: "Aman Sharma",
-    vendor: "aman",
+    name: "",
+    vendor: "",
     items: [
       {
         itemName: "",
@@ -163,8 +163,8 @@ export const initialValuesMap = {
     endDate: "",
     itemsPurchased: "",
     description: "",
-    name: "Aman Sharma",
-    vendor: "aman",
+    name: "",
+    vendor: "",
 
     // Base fields
     total_amount: 0,
@@ -185,7 +185,7 @@ export const initialValuesMap = {
     // Category-specific fields
     bookTitle: "",
     name: "",
-    vendor: "aman",
+    vendor: "",
     items: [
       {
         itemName: "",

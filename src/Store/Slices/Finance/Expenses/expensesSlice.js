@@ -141,7 +141,7 @@ const expensesSlice = createSlice({
       })
       .addCase(deleteExpense.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to delete expense.";
+        state.error = action.payload || [];
       })
 
       // Fetch Expense By ID
