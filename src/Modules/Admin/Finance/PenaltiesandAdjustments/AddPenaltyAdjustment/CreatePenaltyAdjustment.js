@@ -214,7 +214,8 @@ const CreatePenaltyAdjustment = () => {
 
   // Handle form submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
- 
+    console.log("Form values:", values); // Debugging
+    console.log("Submitting form..."); 
     try {
       if (readOnly) {
         // Prevent submission in read-only mode
@@ -388,6 +389,21 @@ const CreatePenaltyAdjustment = () => {
         formikRef.current.setFieldValue("subAmount", calculated.discountValue, false);
         formikRef.current.setFieldValue("finalAmount", calculated.finalAmount, false);
       }
+    }
+  }, [readOnly, selectedAdjustment]);
+
+  useEffect(() => {
+    if (!readOnly && selectedAdjustment) {
+      // Prefill form fields based on selectedAdjustment
+      formikRef.current.setValues({
+        ...selectedAdjustment,
+        items: selectedAdjustment.items.map((item) => ({
+          revenueType: item.revenueType,
+          revenueReference: item._id,
+          quantity: item.quantity,
+          amount: item.amount,
+        })),
+      });
     }
   }, [readOnly, selectedAdjustment]);
 
