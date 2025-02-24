@@ -147,10 +147,12 @@ export const createQuizThunk = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
-      dispatch(setShowError(false));
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
 
+      dispatch(setShowError(false));
+      const payload = { ...quizData, semesterId };
       const endpoint = `/${getRole}/create_quiz?say=${say}`;
-      const response = await postData(endpoint, quizData);
+      const response = await postData(endpoint, payload);
 
       if (response.success) {
         toast.success("Quiz created successfully");

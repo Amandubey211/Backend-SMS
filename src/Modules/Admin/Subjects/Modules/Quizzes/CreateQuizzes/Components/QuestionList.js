@@ -9,19 +9,19 @@ const QuestionList = ({
   editQuestion,
   allowShuffleAnswers,
 }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
 
   const totalPoints = questions?.reduce((sum, question) => {
     return sum + parseFloat(question.questionPoint);
   }, 0);
 
   return (
-
     <div className="">
       <div className="flex justify-between px-4 items-center">
         <h3 className="text-xl font-semibold mb-2">{t("All Questions:")}</h3>
-        <h3>{t("Total Points:")} {totalPoints}</h3>
-
+        <h3>
+          {t("Total Points:")} {totalPoints}
+        </h3>
       </div>
 
       {/* Grid Container */}
