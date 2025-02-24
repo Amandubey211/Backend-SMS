@@ -50,7 +50,7 @@ export const SelectDynamicInput = ({ label, name, options, onChange, forWhom, di
             variants={fieldVariants}
             transition={{ delay: 0.2 }}
           >
-            {forWhom == 'class' ? option?.className : forWhom == 'section' ? option?.sectionName : forWhom == 'student' ? option?.firstName + ' ' + option?.lastName : ''}
+            {forWhom == 'class' ? option?.className : forWhom == 'section' ? option?.sectionName : forWhom == 'student' ?` ${option?.firstName}  - ${option?.admissionNumber || 'Students'} ` : ''}
           </motion.option>
         ))}
       </Field>

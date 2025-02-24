@@ -161,10 +161,10 @@ export const validationSchemas = {
         Yup.object({
           itemName: Yup.string().required("Item name is required"),
           quantity: Yup.number()
-            .min(1, "Quantity must be at least 1")
+            .min(1, "Quantity must be at least 1").positive()
             .required("Quantity is required"),
           unitCost: Yup.number()
-            .min(0, "Unit cost cannot be negative")
+            .min(0, "Unit cost cannot be negative").positive()
             .required("Unit cost is required"),
         })
       )
@@ -172,6 +172,7 @@ export const validationSchemas = {
         is: "Stationery Fees",
         then: Yup.array()
           .min(1, "At least one stationery item is required")
+
           .required("Stationery items are required"),
         otherwise: Yup.array().notRequired(),
       }),
