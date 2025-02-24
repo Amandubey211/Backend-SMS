@@ -45,14 +45,13 @@ const TextInput = ({
         placeholder={placeholder}
         disabled={disabled || readOnly}
         min={0}
-  onKeyDown={(e) => {
-    if(type=="number"){
-       if (["-", "e", "E"].includes(e.key)) {
-      e.preventDefault();
-    }
-    }
-   
-  }}
+        onKeyDown={(e) => {
+          if (type == "number") {
+            if (["-", "e", "E"].includes(e.key)) {
+              e.preventDefault();
+            }
+          }
+        }}
         className={`bg-white border ${
           meta.touched && meta.error ? "border-red-500" : "border-gray-300"
         } rounded-sm px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300`}

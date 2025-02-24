@@ -15,15 +15,15 @@ import useCloudinaryUpload from "../../../../../../Hooks/CommonHooks/useCloudina
 import toast from "react-hot-toast";
 
 const FileInput = ({ label, name, onChange, value, required = false }) => {
-  // Corrected the readOnly selector to reference expenses instead of earnings
-  const readOnly = useSelector((state) => state.admin.expenses.readOnly);
+  // Use the earnings.readOnly state for read-only mode
+  const readOnly = useSelector((state) => state.admin.earnings.readOnly);
 
   // Use Formik's useField to get meta
   const [field, meta] = useField(name);
 
   // Cloudinary Configuration
   const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
-  const CLOUDINARY_FOLDER = "expenses"; // Updated folder name for clarity
+  const CLOUDINARY_FOLDER = "expenses"; // or another folder if you prefer
 
   // Utilize the custom hook
   const {
@@ -41,12 +41,11 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
   const [previewType, setPreviewType] = useState(""); // 'image' or 'pdf'
   const fileInputRef = useRef(null);
 
-  // Update fileName and fileSize when value prop changes (e.g., when editing and data is preloaded)
+  // Update fileName and fileSize when value prop changes (e.g., editing / preloaded data)
   useEffect(() => {
     if (value) {
       setFileName(getFileNameFromUrl(value));
-      // Note: File size for preloaded files is not available unless stored separately
-      // You can extend the component to accept fileSize as a prop if needed
+      // File size is generally not known for preloaded URLs unless separately stored
     } else {
       setFileName("");
       setFileSize(0);
@@ -56,15 +55,15 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
   // Helper function to extract file name from URL
   const getFileNameFromUrl = (url) => {
     if (!url) return "";
-    const urlSegments = url?.split("/");
+    const urlSegments = url.split("/");
     const nameWithParams = urlSegments[urlSegments.length - 1];
     const name = nameWithParams.split("?")[0];
     return name;
   };
 
-  // Handle file selection and upload to Cloudinary
+  // Handle file selection + upload to Cloudinary
   const handleFileChange = async (event) => {
-    if (readOnly) return;
+    if (readOnly) return; // Prevent uploading in read-only mode
     const file = event.target.files[0];
     if (file) {
       setFileName(file.name);
@@ -78,17 +77,17 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
 
   // Handle file reset
   const handleFileReset = () => {
-    if (readOnly) return;
+    if (readOnly) return; // Prevent resetting in read-only mode
     setFileName("");
     setFileSize(0);
-    resetUpload(); // Reset the upload state
+    resetUpload(); // Reset upload state in custom hook
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-    onChange({ target: { name, value: null } }); // Reset Formik value
+    onChange({ target: { name, value: null } }); // Reset Formik value to null
   };
 
-  // Determine file type based on URL extension
+  // Determine file type from URL extension
   const getFileType = (url) => {
     if (!url) return "unsupported";
     const extension = url.split(".").pop().toLowerCase();
@@ -101,7 +100,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
     }
   };
 
-  // Handle preview
+  // Handle file preview in a modal
   const handlePreview = () => {
     if (!value) return;
     const type = getFileType(value);
@@ -113,23 +112,21 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
     setPreviewVisible(true);
   };
 
-  // Close preview modal
+  // Close the preview modal
   const handleModalClose = () => {
     setPreviewVisible(false);
   };
 
-  // Get file size in readable format
-  const getReadableFileSizeString = (fileSizeInBytes) => {
-    if (fileSizeInBytes === 0) return "0 Bytes";
+  // Helper for human-readable file size
+  const getReadableFileSizeString = (bytes) => {
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
-    const i = Math.floor(Math.log(fileSizeInBytes) / Math.log(k));
-    return (
-      parseFloat((fileSizeInBytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
-    );
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
   };
 
-  // Get file type icon
+  // Determine icon based on file type
   const getFileTypeIcon = (type) => {
     switch (type) {
       case "image":
@@ -141,7 +138,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
     }
   };
 
-  // Framer Motion variants for error animation
+  // Framer Motion variants for error animations
   const variants = {
     hidden: { opacity: 0, y: -10 },
     visible: { opacity: 1, y: 0 },
@@ -159,7 +156,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
       animate={meta.touched && meta.error ? "error" : "visible"}
       transition={{ duration: 0.3 }}
     >
-      {/* Loading Bar */}
+      {/* Upload Progress */}
       {uploading && (
         <Progress
           percent={uploadProgress}
@@ -174,7 +171,6 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
 
       <label htmlFor={name} className="text-sm text-gray-500 block mb-1">
         {label}
-
         {/* {required && <span className="text-red-500">*</span>} */}
       </label>
 
@@ -185,7 +181,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
           readOnly ? "cursor-not-allowed opacity-60" : "cursor-pointer"
         }`}
       >
-        {/* Left Side: Wrapped in label */}
+        {/* Left side: File icon + name/size */}
         <label
           htmlFor={name}
           className="flex items-center gap-2 flex-grow relative z-0"
@@ -199,9 +195,8 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
             )}
           </div>
 
-          {/* File Name and Size */}
+          {/* File name and size */}
           <div className="flex flex-col">
-            {/* Truncate file name to 20 characters */}
             <Tooltip title={fileName}>
               <span
                 className={`${
@@ -214,7 +209,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
                   : fileName || "No file selected"}
               </span>
             </Tooltip>
-            {/* File Size Badge */}
+            {/* File size badge */}
             {fileSize > 0 && !uploading && (
               <Badge
                 count={getReadableFileSizeString(fileSize)}
@@ -224,7 +219,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
           </div>
         </label>
 
-        {/* Right Side: Action Buttons */}
+        {/* Right side: Preview/Remove */}
         <div className="flex items-center gap-2 relative z-10">
           {value && (
             <>
@@ -240,7 +235,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
                 </button>
               </Tooltip>
 
-              {/* Reset Button */}
+              {/* Remove/Reset Button (hidden if readOnly) */}
               {!readOnly && (
                 <Tooltip title="Remove file">
                   <button
@@ -257,7 +252,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
           )}
         </div>
 
-        {/* Hidden File Input */}
+        {/* Hidden file input (only rendered if NOT readOnly) */}
         {!readOnly && (
           <input
             ref={fileInputRef}
@@ -278,7 +273,7 @@ const FileInput = ({ label, name, onChange, value, required = false }) => {
         </div>
       )}
 
-      {/* Error Message */}
+      {/* Field Error */}
       {meta.touched && meta.error && (
         <div className="text-sm text-red-500 mt-1">
           {meta.error === "Network Error"
