@@ -39,6 +39,8 @@ export const putData = async (endpoint, data) => {
 };
 
 // DELETE request
+// deleteData.js
+// deleteData.js
 export const deleteData = async (endpoint) => {
   try {
     const response = await apiService.delete(endpoint);
@@ -54,7 +56,7 @@ export const patchData = async (endpoint, data) => {
     const response = await apiService.patch(endpoint, data);
     return response?.data;
   } catch (error) {
-    return error;
+    return error.response;
   }
 };
 

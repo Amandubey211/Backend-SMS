@@ -76,18 +76,6 @@ const SemesterManagement = () => {
     dispatch(fetchSemestersByClass());
   }, [dispatch]);
 
-  // Display errors if any
-  // useEffect(() => {
-  //   if (error) {
-  //     message.error(
-  //       error.message || "An error occurred while fetching semesters"
-  //     );
-  //   }
-  // }, [error]);
-
-  /**
-   * Auto-select a semester if none is selected or if the current selection is invalid.
-   */
   useEffect(() => {
     if (reduxSemesters && reduxSemesters.length > 0) {
       const isValid =
@@ -175,21 +163,24 @@ const SemesterManagement = () => {
       okType: "danger",
       cancelText: "Cancel",
       maskClosable: false,
-      onOk: () => {
+      onOk: async () => {
         const originalSemesters = [...localSemesters];
+        // Optimistically update local state
         setLocalSemesters((prev) =>
           prev.filter((sem) => sem._id !== semesterId)
         );
-        return dispatch(deleteSemester({ semesterId }))
-          .unwrap()
-          .then(() => {
-            message.success("Semester deleted successfully");
-          })
-          .catch(() => {
-            message.error("Deletion failed, reverting changes");
-            setLocalSemesters(originalSemesters);
-            return Promise.reject();
-          });
+        try {
+          await dispatch(deleteSemester({ semesterId })).unwrap();
+          message.success("Semester deleted successfully");
+        } catch (error) {
+          // Extract a defined error message
+          const errorMsg =
+            "Cannot remove semester, it is referenced in other models";
+          message.error(errorMsg);
+          // Revert local state on error
+          setLocalSemesters(originalSemesters);
+          // Do not re-throw the error to avoid unhandled promise rejections
+        }
       },
     });
   };

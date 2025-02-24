@@ -9,7 +9,7 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import { PERMISSIONS } from "../../../../config/permission";
 
 const StudentFeesDashboard = () => {
-  useNavHeading("Finance","Student Fees")
+  useNavHeading("Finance", "Student Fees");
   return (
     <Layout title="Finance | Student Fees">
       <AdminDashLayout>

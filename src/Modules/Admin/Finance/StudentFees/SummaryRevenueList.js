@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Modal, Button, Spin, Alert, Tooltip, Tag } from "antd";
+import { Table, Modal, Button, Spin, Alert, Tooltip, Tag, Input } from "antd";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -8,6 +8,7 @@ import {
   EyeOutlined,
   ExportOutlined,
   DollarCircleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
 import AdminLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FiPlus, FiUserPlus } from "react-icons/fi";
@@ -38,11 +39,14 @@ const SummaryRevenueList = () => {
   const { incomes, loading, error, totalRecords, totalPages, currentPage } =
     useSelector((state) => state.admin.earnings);
   const [computedPageSize, setComputedPageSize] = useState(10);
-  let sectionList = useSelector(
+  const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
   const classList = useSelector((state) => state.admin.class.classes);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
+
+  // New search state
+  const [searchText, setSearchText] = useState("");
 
   const [params, setParams] = useState({
     limit: computedPageSize,
@@ -52,20 +56,19 @@ const SummaryRevenueList = () => {
     sectionId: "",
     subCategory: "",
     page: currentPage,
+    search: "", // added search parameter
   });
 
   const [selectedRowIds, setSelectedRowIds] = useState([]); // To store selected rows
 
+  // Initial data fetch for classes and incomes
   useEffect(() => {
     dispatch(fetchAllClasses());
     dispatch(fetchAllIncomes(params));
   }, [dispatch]);
 
-
   const filterOnchange = (e) => {
     const { name, value } = e.target;
-
-    // Fetch filtered incomes immediately
     if (name === "classId") {
       if (!value) {
         setParams((prev) => ({
@@ -82,10 +85,23 @@ const SummaryRevenueList = () => {
       [name]: value,
     }));
   };
+
+  // Update data when params change
   useEffect(() => {
-    dispatch(fetchAllClasses())
+    dispatch(fetchAllClasses());
     dispatch(fetchAllIncomes(params));
-  }, [dispatch,params]);
+  }, [dispatch, params]);
+
+  // Handle search input changes
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+    setParams((prev) => ({
+      ...prev,
+      search: value,
+      page: 1, // reset to first page when searching
+    }));
+  };
 
   const handleDeleteSelected = () => {
     if (selectedRowIds.length > 0) {
@@ -98,24 +114,35 @@ const SummaryRevenueList = () => {
     }
   };
 
-  const [selectedRecords, setSelectedRecords] = useState([]); 
+  const [selectedRecords, setSelectedRecords] = useState([]);
 
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedRowIds(selectedRowKeys);
-      console.log(selectedRows); 
-      if(selectedRows){
-        const record = selectedRows?.filter((i)=>i.paymentStatus == "unpaid");
+      if (selectedRows) {
+        const record = selectedRows?.filter(
+          (i) => i.paymentStatus === "unpaid"
+        );
         const invoiceData = {
-          dueDate: record[0]?.dueDate?.slice(0,10),
+          dueDate: record[0]?.dueDate?.slice(0, 10),
           receiver: {
-            name: record[0]?.studentDetails?.firstName+' '+record[0]?.studentDetails?.lastName,
+            name:
+              record[0]?.studentDetails?.firstName +
+              " " +
+              record[0]?.studentDetails?.lastName,
             address: "",
             contact: record[0]?.studentDetails?.contactNumber,
             email: record[0]?.studentDetails?.email,
           },
-          description: record[0]?.description || '',
-          lineItems: [{ revenueType: record[0]?.category?.categoryName, revenueReference:record[0]?._id, quantity: 1, amount: record[0]?.total_amount }],
+          description: record[0]?.description || "",
+          lineItems: [
+            {
+              revenueType: record[0]?.category?.categoryName,
+              revenueReference: record[0]?._id,
+              quantity: 1,
+              amount: record[0]?.total_amount,
+            },
+          ],
           discountType: record[0]?.discountType,
           discount: record[0]?.discount,
           penalty: record[0]?.penalty,
@@ -123,21 +150,19 @@ const SummaryRevenueList = () => {
           totalAmount: 0,
           finalAmount: record[0]?.final_amount,
           paymentType: record[0]?.paymentType,
-          paymentStatus:record[0]?.paymentStatus,
-          mode:'create'
+          paymentStatus: record[0]?.paymentStatus,
+          mode: "create",
         };
-        setSelectedRecords(record)
-           dispatch(setInvoiceData(invoiceData));
+        setSelectedRecords(record);
+        dispatch(setInvoiceData(invoiceData));
       }
-
     },
     selectedRowKeys: selectedRowIds,
-
   };
 
   const capitalizeFirstLetter = (text) =>
     text ? text.charAt(0).toUpperCase() + text.slice(1) : "N/A";
-  
+
   const columns = [
     {
       title: "Student",
@@ -145,9 +170,14 @@ const SummaryRevenueList = () => {
       key: "studentDetails",
       render: (studentDetails) => (
         <Tooltip
-          title={capitalizeFirstLetter(studentDetails?.firstName) + " " + capitalizeFirstLetter(studentDetails?.lastName)}
+          title={
+            capitalizeFirstLetter(studentDetails?.firstName) +
+            " " +
+            capitalizeFirstLetter(studentDetails?.lastName)
+          }
         >
-          {capitalizeFirstLetter(studentDetails?.firstName?.slice(0, 10)) + ".." || "N/A"}
+          {capitalizeFirstLetter(studentDetails?.firstName?.slice(0, 10)) +
+            ".." || "N/A"}
         </Tooltip>
       ),
     },
@@ -239,31 +269,29 @@ const SummaryRevenueList = () => {
               type="link"
               icon={<EyeOutlined />}
               onClick={() => {
-                handleEditClick({...record,mode:'View'});
+                handleEditClick({ ...record, mode: "View" });
               }}
               className="text-blue-600 hover:text-blue-800 p-0"
               aria-label="View"
             />
-           
           </Tooltip>
           <ProtectedAction requiredPermission={PERMISSIONS.EDIT_FEES}>
-          <Tooltip title="Edit">
-            <Button
-              type="link"
-              icon={<EditOutlined />}
-              onClick={() => {
-                handleEditClick({...record,mode:'Edit'});
-              }}
-              className="text-blue-600 hover:text-blue-800 p-0"
-              aria-label="Edit"
-            />
-          </Tooltip>
+            <Tooltip title="Edit">
+              <Button
+                type="link"
+                icon={<EditOutlined />}
+                onClick={() => {
+                  handleEditClick({ ...record, mode: "Edit" });
+                }}
+                className="text-blue-600 hover:text-blue-800 p-0"
+                aria-label="Edit"
+              />
+            </Tooltip>
           </ProtectedAction>
         </div>
       ),
     },
   ];
-  
 
   const subCategoryList = [
     "Tuition Fees",
@@ -281,8 +309,8 @@ const SummaryRevenueList = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
 
   const handleEditClick = (record) => {
-    setSelectedRecord(record); 
-    setIsEditModalVisible(true); 
+    setSelectedRecord(record);
+    setIsEditModalVisible(true);
   };
 
   const handleModalClose = () => {
@@ -313,231 +341,261 @@ const SummaryRevenueList = () => {
           flattenedIncome["academicYearDetails.year"] || "N/A",
       };
     }) || [];
-    useNavHeading("Finance","Student Fees List")
+
+  useNavHeading("Finance", "Student Fees List");
+
   return (
     <Layout title="Finance | Student Fees">
-    <AdminLayout>
-    <ProtectedSection requiredPermission={PERMISSIONS.SUMMARY_OF_STUDENT_FEES} title={'Fees List'}>
-      <div className="p-6 bg-white shadow-lg rounded-lg">
-        {/* Filters and Buttons Section */}
-        <div className="flex justify-between items-start">
-          <div className="flex flex-col space-y-4">
-            <div className="flex items-center space-x-4">
-              {/* Class Filter */}
-              <div className="flex flex-col">
-                <label className="text-gray-500 text-sm mb-1">Class</label>
-                <select
-                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
-                  onChange={filterOnchange}
-                  name="classId"
-                >
-                  <option value="">All</option>
-                  {classList?.map((i) => (
-                    <option value={i._id} key={i._id}>
-                      {i.className}
-                    </option>
-                  ))}
-                </select>
-              </div>
+      <AdminLayout>
+        <ProtectedSection
+          requiredPermission={PERMISSIONS.SUMMARY_OF_STUDENT_FEES}
+          title={"Fees List"}
+        >
+          <div className="p-6 bg-white rounded-lg">
+            {/* Filters and Buttons Section */}
+            <div className="flex justify-between items-start">
+              <div className="flex flex-col space-y-4">
+                {/* Search Input */}
 
-              {/* Section Filter */}
-              <div className="flex flex-col">
-                <label className="text-gray-500 text-sm mb-1">Section</label>
-                <select
-                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
-                  name="sectionId"
-                  onChange={filterOnchange}
-                >
-                  <option value="">ALL</option>
-                  {sectionList?.map((i) => (
-                    <option value={i?._id} key={i?._id}>
-                      {i?.sectionName}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                <div className="flex items-center justify-center  space-x-4">
+                  <div className="flex items-center mt-6">
+                    <Input
+                      placeholder="Search by description, subcategory, email..."
+                      prefix={<SearchOutlined />}
+                      value={searchText}
+                      onChange={handleSearch}
+                      allowClear
+                      className="rounded-md"
+                      style={{
+                        height: "38px",
+                        width: "350px",
+                      }}
+                    />
+                  </div>
+                  {/* Class Filter */}
+                  <div className="flex flex-col">
+                    <label className="text-gray-500 text-sm mb-1">Class</label>
+                    <select
+                      className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
+                      onChange={filterOnchange}
+                      name="classId"
+                    >
+                      <option value="">All</option>
+                      {classList?.map((i) => (
+                        <option value={i._id} key={i._id}>
+                          {i.className}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* Fees Type Filter */}
-              <div className="flex flex-col">
-                <label className="text-gray-500 text-sm mb-1">Fees Type</label>
-                <select
-                  className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36"
-                  name="subCategory"
-                  onChange={filterOnchange}
-                >
-                  <option value="">All</option>
-                  {subCategoryList.map((i, idx) => (
-                    <option value={i} key={idx}>
-                      {i}
-                    </option>
-                  ))}
-                </select>
+                  {/* Section Filter */}
+                  <div className="flex flex-col ">
+                    <label className="text-gray-500 text-sm mb-1">
+                      Section
+                    </label>
+                    <select
+                      className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-28"
+                      name="sectionId"
+                      onChange={filterOnchange}
+                    >
+                      <option value="">ALL</option>
+                      {sectionList?.map((i) => (
+                        <option value={i?._id} key={i?._id}>
+                          {i?.sectionName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Fees Type Filter */}
+                  <div className="flex flex-col">
+                    <label className="text-gray-500 text-sm mb-1">
+                      Fees Type
+                    </label>
+                    <select
+                      className="border border-gray-300 rounded-lg px-4 py-2 text-gray-700 w-36"
+                      name="subCategory"
+                      onChange={filterOnchange}
+                    >
+                      <option value="">All</option>
+                      {subCategoryList.map((i, idx) => (
+                        <option value={i} key={idx}>
+                          {i}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex space-x-6">
+                  <label className="flex items-center text-sm space-x-2">
+                    <input
+                      type="radio"
+                      name="paymentStatus"
+                      className="form-radio text-green-600"
+                      value=""
+                      defaultChecked
+                      onChange={filterOnchange}
+                    />
+                    <span className="text-green-600 font-medium">Everyone</span>
+                  </label>
+                  <label className="flex items-center text-sm space-x-2">
+                    <input
+                      type="radio"
+                      name="paymentStatus"
+                      className="form-radio text-gray-500"
+                      value="paid"
+                      onChange={filterOnchange}
+                    />
+                    <span className="text-gray-700">Paid</span>
+                  </label>
+                  <label className="flex items-center text-sm space-x-2">
+                    <input
+                      type="radio"
+                      name="paymentStatus"
+                      className="form-radio text-gray-500"
+                      value="partial"
+                      onChange={filterOnchange}
+                    />
+                    <span className="text-gray-700">Partial</span>
+                  </label>
+                  <label className="flex items-center text-sm space-x-2">
+                    <input
+                      type="radio"
+                      name="paymentStatus"
+                      className="form-radio text-gray-500"
+                      value="unpaid"
+                      onChange={filterOnchange}
+                    />
+                    <span className="text-gray-700">Unpaid</span>
+                  </label>
+                  <ProtectedAction requiredPermission={PERMISSIONS.DELETE_FEES}>
+                    <div className="flex items-center space-x-4">
+                      {selectedRowIds?.length > 0 && (
+                        <Button
+                          type="danger"
+                          onClick={handleDeleteSelected}
+                          icon={<DeleteOutlined />}
+                        >
+                          Delete Selected
+                        </Button>
+                      )}
+                    </div>
+                  </ProtectedAction>
+                </div>
+              </div>
+              <div className="flex space-y-4 flex-col">
+                <div className="flex ml-auto">
+                  <ProtectedAction
+                    requiredPermission={PERMISSIONS.ADD_NEW_FEES}
+                  >
+                    <button
+                      onClick={() => navigate("/finance/studentfees/add/form")}
+                      className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
+                    >
+                      <span className="text-gray-800 font-medium">
+                        Add New Fees
+                      </span>
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
+                        <GiTakeMyMoney size={20} />
+                      </div>
+                    </button>
+                  </ProtectedAction>
+                </div>
+                <div className="flex gap-2 justify-between flex-row">
+                  {selectedRowIds?.length === 1 &&
+                    selectedRecords?.length === 1 && (
+                      <Tooltip title="Create an invoice for the selected unpaid record">
+                        <Button
+                          icon={<DollarCircleOutlined />}
+                          onClick={() => {
+                            navigate("/finance/invoices/add-new-invoice");
+                          }}
+                          className="flex items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
+                        >
+                          Create Invoice
+                        </Button>
+                      </Tooltip>
+                    )}
+                  <Button
+                    type="primary"
+                    icon={<ExportOutlined />}
+                    onClick={() => setIsExportModalVisible(true)}
+                    className="flex items-center ml-auto flex-end bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
+                  >
+                    Export
+                  </Button>
+                </div>
               </div>
             </div>
 
-            <div className="flex space-x-6">
-              <label className="flex items-center text-sm space-x-2">
-                <input
-                  type="radio"
-                  name="paymentStatus"
-                  className="form-radio text-green-600"
-                  value=""
-                  defaultChecked
-                  onChange={filterOnchange}
+            <div className="mt-6">
+              {loading ? (
+                <Spinner />
+              ) : (
+                <Table
+                  rowSelection={rowSelection}
+                  dataSource={incomes}
+                  columns={columns}
+                  pagination={{
+                    current: currentPage,
+                    total: totalRecords,
+                    pageSize: computedPageSize,
+                    showSizeChanger: true,
+                    pageSizeOptions: ["5", "10", "20", "50"],
+                    size: "small",
+                    showTotal: (total, range) =>
+                      `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
+                    onChange: (page, pageSize) => {
+                      dispatch(setCurrentPage(page));
+                      setComputedPageSize(pageSize);
+                      dispatch(
+                        fetchAllIncomes({
+                          limit: pageSize,
+                          categoryName: "Student-Based Revenue",
+                          includeDetails: true,
+                          classId: "",
+                          sectionId: "",
+                          subCategory: "",
+                          page: page,
+                          search: searchText,
+                        })
+                      );
+                    },
+                    onShowSizeChange: (current, size) => {
+                      setComputedPageSize(size);
+                      dispatch(setCurrentPage(1));
+                    },
+                  }}
+                  rowKey="_id"
+                  size="small"
                 />
-                <span className="text-green-600 font-medium">Everyone</span>
-              </label>
-              <label className="flex items-center text-sm space-x-2">
-                <input
-                  type="radio"
-                  name="paymentStatus"
-                  className="form-radio text-gray-500"
-                  value="paid"
-                  onChange={filterOnchange}
-                />
-                <span className="text-gray-700">Paid</span>
-              </label>
-              <label className="flex items-center text-sm space-x-2">
-                <input
-                  type="radio"
-                  name="paymentStatus"
-                  className="form-radio text-gray-500"
-                  value="partial"
-                  onChange={filterOnchange}
-                />
-                <span className="text-gray-700">Partial</span>
-              </label>
-              <label className="flex items-center text-sm space-x-2">
-                <input
-                  type="radio"
-                  name="paymentStatus"
-                  className="form-radio text-gray-500"
-                  value="unpaid"
-                  onChange={filterOnchange}
-                />
-                <span className="text-gray-700">Unpaid</span>
-              </label>
-              <ProtectedAction requiredPermission={PERMISSIONS.DELETE_FEES}>
-              <div className="flex items-center space-x-4">
-                {selectedRowIds?.length > 0 && (
-                  <Button
-                    type="danger"
-                    onClick={handleDeleteSelected}
-                    icon={<DeleteOutlined />}
-                  >
-                    Delete Selected
-                  </Button>
-                )}
-              </div>
-              </ProtectedAction>
-            </div>
-          </div>
-          <div className="flex space-y-4  flex-col">
-           <div className="flex ml-auto">
-           <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_FEES}>
-           <button
-              onClick={() => navigate("/finance/studentfees/add/form")}
-              className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
-            >
-              <span className="text-gray-800 font-medium">Add New Fees</span>
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
-                <GiTakeMyMoney size={20} />
-              </div>
-            </button>
-            </ProtectedAction>
-           </div>
-           <div className="flex gap-2 justify-between flex-row">
-           {selectedRowIds?.length ==1 && selectedRecords?.length == 1 && (
-
-                <Tooltip title="Create an invoice for the selected unpaid record">
-                  <Button
-                    icon={<DollarCircleOutlined />}
-                    onClick={() => {
-                      navigate("/finance/invoices/add-new-invoice");
-                    }}
-                    className="flex items-center   bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
-                  >
-                    Create Invoice
-                  </Button>
-                </Tooltip>
               )}
-              <Button
-                type="primary"
-                icon={<ExportOutlined />}
-                onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center ml-auto flex-end bg-gradient-to-r  from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-              >
-                Export
-              </Button>
             </div>
           </div>
-        </div>
-
-        <div className="mt-6">
-          {loading ? (
-            <Spinner />
-          )  : (
-            <Table
-              rowSelection={rowSelection}
-              dataSource={incomes}
-              columns={columns}
-              pagination={{
-                current: currentPage,
-                total: totalRecords,
-                pageSize: computedPageSize,
-                showSizeChanger: true,
-                pageSizeOptions: ["5", "10", "20", "50"],
-                size: "small",
-                showTotal: (total, range) =>
-                  `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-                onChange: (page, pageSize) => {
-                  dispatch(setCurrentPage(page));
-                  setComputedPageSize(pageSize);
-                  dispatch(
-                    fetchAllIncomes({
-                      limit: pageSize,
-                      categoryName: "Student-Based Revenue",
-                      includeDetails: true,
-                      classId: "",
-                      sectionId: "",
-                      subCategory: "",
-                      page: page,
-                    })
-                  );
-                },
-                onShowSizeChange: (current, size) => {
-                  setComputedPageSize(size);
-                  dispatch(setCurrentPage(1));
-                },
-              }}
-              rowKey="_id"
-              size="small"
-            />
-          )}
-        </div>
-      </div>
-      <Sidebar
-        title="Edit/View Student Fees"
-        isOpen={isEditModalVisible}
-        onClose={handleModalClose}
-        width="70"
-      >
-        {selectedRecord && (
-          <EditStudentFeesForm
-            data={selectedRecord}
+          <Sidebar
+            title="Edit/View Student Fees"
+            isOpen={isEditModalVisible}
             onClose={handleModalClose}
+            width="70"
+          >
+            {selectedRecord && (
+              <EditStudentFeesForm
+                data={selectedRecord}
+                onClose={handleModalClose}
+              />
+            )}
+          </Sidebar>
+          <ExportModal
+            visible={isExportModalVisible}
+            onClose={() => setIsExportModalVisible(false)}
+            dataToExport={transformStdFeeData(incomes)}
+            title="Student Fees Data"
+            sheet="student_fees_report"
           />
-        )}
-      </Sidebar>
-      <ExportModal
-        visible={isExportModalVisible}
-        onClose={() => setIsExportModalVisible(false)}
-        dataToExport={transformStdFeeData(incomes)}
-        title="Student Fees Data"
-        sheet="student_fees_report"
-      />
-      </ProtectedSection>
-    </AdminLayout>
+        </ProtectedSection>
+      </AdminLayout>
     </Layout>
   );
 };

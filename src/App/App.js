@@ -10,7 +10,6 @@ import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPass
 import Fallback from "../Components/Common/Fallback.js";
 import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
 import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
-import AllStudents from "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/AllStudents.js";
 import SingleStudent from "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/SingleStudent.js";
 import AllTeachers from "../Modules/Admin/UsersProfiles/TeacherProfile/AllTeachers.js";
 import AllLibrarian from "../Modules/Admin/UsersProfiles/LibrarianProfile/AllLibrarian.js";
@@ -68,8 +67,12 @@ import CreateNewInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/Creat
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
 import CreatePenaltyAdjustment from "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js";
-
 // lazy loaded routes
+const AllStudents = lazy(() =>
+  import(
+    "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/AllStudents.js"
+  )
+);
 const AdjustmentDashboard = lazy(() =>
   import(
     "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/AdjustmentDashboard.js"
@@ -505,14 +508,20 @@ function App() {
     {
       path: "/class",
       element: (
-        <ProtectRoute Component={Classes} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Classes}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
     {
       path: "/class/:cid",
       element: (
-        <ProtectRoute Component={Class} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Class}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -561,7 +570,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Group_Section}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -572,7 +581,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Students}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -582,7 +591,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Attendance}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -592,7 +601,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={TakeAttendance}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -600,7 +609,10 @@ function App() {
     {
       path: "/class/:cid/:sid/module",
       element: (
-        <ProtectRoute Component={Module} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Module}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -609,7 +621,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AssignmentList}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -619,7 +631,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Assignment}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -629,7 +641,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateAssignment}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -637,7 +649,10 @@ function App() {
     {
       path: "/class/:cid/:sid/rubric",
       element: (
-        <ProtectRoute Component={Rubric} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Rubric}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -646,7 +661,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={QuizzList}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -654,7 +669,10 @@ function App() {
     {
       path: "/class/:cid/:sid/quiz/:qid/view",
       element: (
-        <ProtectRoute Component={Quizzes} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Quizzes}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -663,7 +681,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateQuizzes}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -673,7 +691,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={OfflineExamList}
-          allowedRoles={["admin", "teacher", "student"]}
+          allowedRoles={["admin", "teacher", "student", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -683,7 +701,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={OfflineExamViewList}
-          allowedRoles={["admin", "teacher", "student"]}
+          allowedRoles={["admin", "teacher", "student", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -694,7 +712,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Discussion}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -704,7 +722,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddDiscussion}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -714,7 +732,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={DiscussionView}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -724,7 +742,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Syllabus}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -734,7 +752,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateSyllabus}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -744,7 +762,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Announcement}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -754,7 +772,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={AnnouncementView}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -764,7 +782,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={CreateAnnouncement}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -772,7 +790,10 @@ function App() {
     {
       path: "/class/:cid/:sid/grades",
       element: (
-        <ProtectRoute Component={Grade} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Grade}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -781,7 +802,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={SpeedGrade}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -789,14 +810,20 @@ function App() {
     {
       path: "/class/:cid/:sid/page",
       element: (
-        <ProtectRoute Component={Page} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={Page}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
     {
       path: "/class/:cid/:sid/page/create_page",
       element: (
-        <ProtectRoute Component={AddPage} allowedRoles={["admin", "teacher"]} />
+        <ProtectRoute
+          Component={AddPage}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },
@@ -805,7 +832,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={ViewPage}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "staff"]}
         />
       ),
       errorElement: <Error />,
@@ -1148,7 +1175,12 @@ function App() {
     },
     {
       path: "/users/students",
-      element: <AllStudents />,
+      element: (
+        <ProtectRoute
+          Component={AllStudents}
+          allowedRoles={["admin", "teacher", "finance", "librarian", "staff"]}
+        />
+      ),
       errorElement: <Error />,
     },
     {
