@@ -15,61 +15,49 @@ const StudentGradesAccordion = () => {
   const dispatch = useDispatch();
   const { studentId } = useParams();
 
-  // ==============================
-  // Redux Data
-  // ==============================
-  // 1) Parent's children slice
+  // Parent's "children" slice
   const { children } = useSelector((state) => state.Parent.children || {});
-  // 2) Parent's grades slice
+  // Parent's "grades" slice (for the summary panel)
   const { grades } = useSelector((state) => state.Parent.grades || {});
 
-  // Find the child that matches the URL param
+  // Identify which child matches the URL param
   const Child = children?.find((child) => child.id === studentId);
 
-  // ==============================
-  // Local State for Semesters
-  // ==============================
+  // Local state for semester selection
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
 
-  // ==============================
-  // Handler to Fetch Grades
-  // ==============================
+  // Handler to fetch grades from parent side
   const getStudentGrades = (subjectId, semesterId) => {
     if (!Child?.presentClassId) return;
 
-    // Only pass subject info in params
+    // Only pass subject info in "params" if available
     const params = {};
     if (subjectId) params.subjectId = subjectId;
 
-    // Dispatch parent-side grades thunk
     dispatch(
       fetchParentStudentGrades({
         params,
         studentId,
         studentClassId: Child.presentClassId,
-        semesterId,
+        semesterId, // pass it so the thunk appends &semesterId=...
       })
     );
   };
 
-  // ==============================
-  // Load Semesters & Auto-Select First
-  // ==============================
+  // Load semesters and auto-select the first one
   const loadSemesters = async () => {
     if (!Child?.presentClassId) return;
     try {
       const response = await dispatch(
         fetchSemestersByClass({ classId: Child.presentClassId })
       ).unwrap();
-
       if (Array.isArray(response) && response.length > 0) {
         setSemesters(response);
-        // Auto-select the first semester
+        // Auto-select the first
         const firstSem = response[0];
         setSelectedSemester(firstSem._id);
-
-        // Immediately fetch grades with the first semester
+        // Immediately fetch grades for the first semester
         getStudentGrades(null, firstSem._id);
       }
     } catch (error) {
@@ -77,15 +65,11 @@ const StudentGradesAccordion = () => {
     }
   };
 
-  // ==============================
-  // On Mount
-  // ==============================
+  // On mount -> fetch subjects + semesters
   useEffect(() => {
     if (Child?.presentClassId) {
-      // 1) Fetch admin side subjects
-      dispatch(fetchStudentSubjects(studentId));
-      // 2) Load parent side semesters
-      loadSemesters();
+      dispatch(fetchStudentSubjects(studentId)); // admin side
+      loadSemesters(); // parent side
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Child]);
@@ -95,7 +79,7 @@ const StudentGradesAccordion = () => {
       {/* LEFT: Accordion Section */}
       <div className="md:w-3/4 w-full">
         <GradeAccordionItem
-          // Pass getData that includes the selected semester
+          // For each subject click
           getData={(subjectId) => getStudentGrades(subjectId, selectedSemester)}
           semesters={semesters}
           selectedSemester={selectedSemester}

@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { MdKeyboardArrowUp, MdKeyboardArrowDown } from "react-icons/md";
-import { FiLoader } from "react-icons/fi";
 import { GoAlertFill } from "react-icons/go";
 import { useSelector } from "react-redux";
-import { Button, Modal } from "antd";
-import { FaBook } from "react-icons/fa"; // Single import for fallback icon
+import { Button, Modal, Skeleton } from "antd";
+import { FaBook } from "react-icons/fa";
 
 const GradeAccordionItem = ({
-  getData, // (subjectId) => ...
+  getData,
   semesters,
   selectedSemester,
   setSelectedSemester,
@@ -20,26 +19,25 @@ const GradeAccordionItem = ({
   // Parent side: grade data
   const { grades, loading } = useSelector((store) => store.Parent.grades);
 
-  // Toggle open/close for each subject
+  // Toggle open/close each subject
   const toggleOpen = (index, subjectId) => {
     if (isOpen !== index) {
-      // fetch grades for this subject + selected semester
-      getData(subjectId);
+      getData(subjectId); // fetch grades for this subject
     }
     setIsOpen(isOpen === index ? null : index);
+  };
+
+  // If user picks a new semester from the modal
+  const handleSemesterSelect = (sem) => {
+    setSelectedSemester(sem._id);
+    setSemesterModalVisible(false);
+    // Re-fetch with newly selected semester
+    getData(null, sem._id);
   };
 
   // Color helper for status
   const getColorForStatus = (status) =>
     status === "Submit" ? "text-green-500" : "text-red-500";
-
-  // Handle user picking a new semester from the modal
-  const handleSemesterSelect = (sem) => {
-    setSelectedSemester(sem._id);
-    setSemesterModalVisible(false);
-    // Re-fetch grades with the newly selected semester
-    getData(null, sem._id);
-  };
 
   return (
     <div className="w-full bg-white rounded-lg overflow-hidden px-4 py-2">
@@ -61,15 +59,14 @@ const GradeAccordionItem = ({
 
       {/* Subject Accordions */}
       {studentSubjects?.map((subject, index) => {
-        // Attempt a subject-level thumbnail or from the first module
+        // Fallback icon if no thumbnail
         const subjectThumbnail =
           subject?.thumbnail || subject?.modules?.[0]?.thumbnail || null;
 
-        // Filter parent-side grades to only show items matching this subject's modules
-        const subjectModuleNames = subject.modules?.map((m) => m.name) || [];
-        const filteredGrades = (grades?.grades || []).filter((gradeItem) =>
-          subjectModuleNames.includes(gradeItem.moduleName)
-        );
+        // The parent side might be returning the "grades" array
+        // relevant to the last fetch. If the server truly returns
+        // only this subject's data, we can show them directly:
+        const subjectGrades = grades?.grades || [];
 
         return (
           <div key={subject._id} className="border-b last:border-none">
@@ -79,7 +76,6 @@ const GradeAccordionItem = ({
               onClick={() => toggleOpen(index, subject._id)}
             >
               <div className="flex items-center gap-3">
-                {/* Subject Thumbnail or Fallback Icon */}
                 {subjectThumbnail ? (
                   <img
                     src={subjectThumbnail}
@@ -111,48 +107,34 @@ const GradeAccordionItem = ({
               <table className="w-full table-auto">
                 <thead>
                   <tr className="bg-gray-100 text-left">
+                    <th className="px-5 py-2 text-gray-600 font-semibold">Name</th>
+                    <th className="px-5 py-2 text-gray-600 font-semibold">Due</th>
                     <th className="px-5 py-2 text-gray-600 font-semibold">
-                      Name
+                      Submitted
                     </th>
+                    <th className="px-5 py-2 text-gray-600 font-semibold">Status</th>
                     <th className="px-5 py-2 text-gray-600 font-semibold">
-                      Due
-                    </th>
-                    <th className="px-5 py-2 text-gray-600 font-semibold">
-                      Submit
-                    </th>
-                    <th className="px-5 py-2 text-gray-600 font-semibold">
-                      Status
-                    </th>
-                    <th className="px-5 py-2 text-gray-600 font-semibold">
-                      Score
+                      Score / Max
                     </th>
                   </tr>
                 </thead>
                 {loading ? (
                   <tbody>
                     <tr>
-                      <td
-                        className="text-center text-lg py-10 text-gray-400"
-                        colSpan={5}
-                      >
-                        <div className="flex flex-col items-center">
-                          <FiLoader className="animate-spin w-6 h-6 mb-2 text-gray-600" />
-                          <p className="text-gray-800 text-sm">Loading...</p>
-                        </div>
+                      <td className="p-5" colSpan={5}>
+                        <Skeleton active />
                       </td>
                     </tr>
                   </tbody>
                 ) : (
                   <tbody>
-                    {filteredGrades.length > 0 ? (
-                      filteredGrades.map((item, idx) => (
+                    {subjectGrades.length > 0 ? (
+                      subjectGrades.map((item, idx) => (
                         <tr
                           key={idx}
                           className="border-b hover:bg-gray-50 transition-colors last:border-none"
                         >
-                          <td className="px-5 py-3 text-gray-700">
-                            {item?.Name}
-                          </td>
+                          <td className="px-5 py-3 text-gray-700">{item?.Name}</td>
                           <td className="px-5 py-3 text-gray-700">
                             {item?.dueDate?.slice(0, 10)}
                           </td>
@@ -166,8 +148,8 @@ const GradeAccordionItem = ({
                               {item?.status}
                             </span>
                           </td>
-                          <td className="px-5 py-3 text-center text-gray-700">
-                            {item?.score}
+                          <td className="px-5 py-3 text-gray-700 text-center">
+                            {item?.score} / {item?.maxMarks ?? 0}
                           </td>
                         </tr>
                       ))
@@ -205,7 +187,7 @@ const GradeAccordionItem = ({
             <Button
               key={sem._id}
               onClick={() => handleSemesterSelect(sem)}
-              className={`w-full text-left border rounded-md transition-colors duration-200 ${
+              className={`w-full mb-2 text-left border rounded-md transition-colors duration-200 ${
                 selectedSemester === sem._id
                   ? "bg-purple-100 border-purple-400"
                   : "bg-white hover:bg-purple-50"
