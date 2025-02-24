@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { formatDate } from "../../../../../../Utils/helperFunctions";
 import toast from "react-hot-toast";
 import DateSection from "./DateSection";
+import { setSelectedExamStudents } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/offlineExamSlice";
 
 const OfflineExamCard = ({
   examType,
@@ -18,12 +19,13 @@ const OfflineExamCard = ({
   maxMarks,
   examId,
   students,
-  semesterId
+  semesterId,
 }) => {
   const dispatch = useDispatch();
   const { offlineExamData, loading } = useSelector(
     (store) => store.admin.offlineExam
   );
+
   const navigate = useNavigate();
   const { sid, cid } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,7 +57,8 @@ const OfflineExamCard = ({
 
   //  Update state when Redux state changes
   useEffect(() => {
-    const updatedExam = offlineExamData?.find((exam) => exam._id === examId);
+    const updatedExam = offlineExamData?.find((exam) => exam?._id === examId);
+
     if (updatedExam) {
       setExamDetails({
         examName: updatedExam?.examName,
@@ -82,7 +85,7 @@ const OfflineExamCard = ({
           })) || [],
       });
     }
-  }, [offlineExamData, examId, maxMarks]);
+  }, []);
 
   const handleDeleteClick = async () => {
     try {
@@ -116,7 +119,7 @@ const OfflineExamCard = ({
         startDate: examDetails.startDate,
         endDate: examDetails.endDate,
         maxMarks: examDetails.maxMarks,
-        students: examDetails.students.map((student) => ({
+        students: examDetails?.students?.map((student) => ({
           _id: student._id || null,
           score: student.score || 0,
           maxMarks: examDetails.maxMarks || 0,
@@ -147,8 +150,6 @@ const OfflineExamCard = ({
     }
   };
 
-  console.log("semetsert", semester);
-
   return (
     <div className="ps-1 rounded-md bg-green-500 h-auto m-4 hover:shadow-lg">
       <div className="border rounded-md px-5 py-5 shadow-sm relative h-auto  bg-white">
@@ -156,16 +157,17 @@ const OfflineExamCard = ({
           className="cursor-pointer"
           onClick={() => {
             if (!isEditing) {
-              navigate(`/class/${cid}/${sid}/offline_exam/view`, {
-                state: {
+              dispatch(
+                setSelectedExamStudents({
                   examName: examDetails.examName,
                   students: examDetails.students,
                   examType: examType,
                   startDate: formatDate(examDetails.startDate),
                   examId: examId,
-                  semesterId: semesterId
-                },
-              });
+                  semesterId: semesterId,
+                })
+              );
+              navigate(`/class/${cid}/${sid}/offline_exam/view`);
             }
           }}
         >

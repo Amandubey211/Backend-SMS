@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import OfflineExamViewCard from "./OfflineExamViewCard";
 import { CiSearch } from "react-icons/ci";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
@@ -8,25 +8,23 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 import { debounce } from "lodash";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { FaClipboardUser } from "react-icons/fa6";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 
 const OfflineExamView = () => {
-  const location = useLocation();
-  const { examName, students, examType, startDate, examId, semesterId } =
-    location.state;
+  // const location = useLocation();
+  // const { examName, students, examType, startDate, examId, semesterId } =
+  //   location.state;
   const [searchQuery, setSearchQuery] = useState("");
+  const selectedExam = useSelector(
+    (state) => state.admin.offlineExam.selectedExamStudents
+  );
+  const { examName, students, examType, startDate, examId, semesterId } =
+    selectedExam || {};
+
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  // const [editedData, setEditedData] = useState({
-  //   students:
-  //     students?.map((stu) => ({
-  //       _id: stu._id,
-  //       score: stu.score || 0,
-  //       maxMarks: stu.maxMarks || 0,
-  //       status: stu.status || "present",
-  //       studentId: stu.studentId?._id || null, // Send only ID
-  //     })) || [],
-  //   examDate: startDate || new Date(),
-  //   examType: examType || "N/A",
-  // });
+  // const dispatch = useDispatch();
+  // const { cid, sid } = useParams();
   const debouncedSearch = useMemo(
     () =>
       debounce((searchQuery) => {
@@ -37,6 +35,9 @@ const OfflineExamView = () => {
 
   useEffect(() => {
     debouncedSearch(searchQuery);
+    // dispatch(
+    //   fetchAllOfflineExam({ classId: cid, subjectId: sid, query: searchQuery })
+    // );
     return () => {
       debouncedSearch.cancel();
     };
@@ -52,6 +53,7 @@ const OfflineExamView = () => {
         studentId.lastName.toLowerCase().includes(query)
     );
   }, [students, debouncedQuery]);
+
 
   return (
     <div className="flex ">
@@ -103,11 +105,8 @@ const OfflineExamView = () => {
                       student={student}
                       examType={examType}
                       startDate={startDate}
-                      // editedData={editedData}
-                      // setEditedData={setEditedData}
                       examId={examId}
                       semesterId={semesterId}
-                      // handleEditStudent={handleEditStudent}
                     />
                   ))}
                 </tbody>

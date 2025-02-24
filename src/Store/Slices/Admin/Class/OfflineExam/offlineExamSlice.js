@@ -13,7 +13,7 @@ const initialState = {
   error: false,
   loading: false,
   offlineExamData: [],
-  selectedExamStudents: []
+  selectedExamStudents: [],
   // isOpen: false,
   // setIsModalOpen,
 };
@@ -21,7 +21,11 @@ const offlineExamSlice = createSlice({
   name: "offline-exam",
   initialState,
   reducers: {
-    // synchronous reducers
+    setSelectedExamStudents: (state, action) => {
+      console.log("action selected exam", action.payload);
+
+      state.selectedExamStudents = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -45,7 +49,6 @@ const offlineExamSlice = createSlice({
       })
       .addCase(createOfflineExam.fulfilled, (state, action) => {
         state.loading = false;
-        // state.offlineExamData = action?.payload;
       })
       .addCase(createOfflineExam.rejected, (state) => {
         state.loading = false;
@@ -118,5 +121,5 @@ const offlineExamSlice = createSlice({
       });
   },
 });
-export const {} = offlineExamSlice.actions;
+export const { setSelectedExamStudents } = offlineExamSlice.actions;
 export default offlineExamSlice.reducer;

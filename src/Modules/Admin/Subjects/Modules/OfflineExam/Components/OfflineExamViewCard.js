@@ -9,13 +9,12 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { useParams } from "react-router-dom";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
+import DeleteConfirmatiomModal from "../../../../../../Components/Common/DeleteConfirmationModal";
 
 const OfflineExamViewCard = ({
   student,
   examType,
   startDate,
-  // editedData,
-  // setEditedData,
   examId,
   semesterId,
 }) => {
@@ -23,7 +22,12 @@ const OfflineExamViewCard = ({
   const { cid, sid } = useParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // const [loading, setLoading] = useState(false);
+
+  const selectedExam = useSelector(
+    (state) => state.admin.offlineExam.selectedExamStudents
+  );
+  const { students } = selectedExam || {};
+
   const dispatch = useDispatch();
 
   const [editedData, setEditedData] = useState({
@@ -123,7 +127,7 @@ const OfflineExamViewCard = ({
           </button>
         </div>
       </td>
-      <DeleteModal
+      <DeleteConfirmatiomModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleDeleteStudent}

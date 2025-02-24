@@ -10,13 +10,18 @@ const UploadExcel = ({
   setIsOpen,
   setIsCreateLoading,
   isOpen,
+  file,
+  setFile,
+  setData,
 }) => {
   const hotRef = useRef(null);
   const hotInstanceRef = useRef(null);
-
+  const pinkColor = "#EC407A";
+  const purpleColor = "#AB47BC";
+  const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
   // ✅ Add state to manage table data
   const [tableData, setTableData] = useState([]);
-  const [isTableDataFilled, setIsTableDataFilled] = useState(false); // New state
+  // const [isTableDataFilled, setIsTableDataFilled] = useState(false); // New state
 
   useEffect(() => {
     const headers =
@@ -55,12 +60,6 @@ const UploadExcel = ({
         readOnly: true,
         licenseKey: "non-commercial-and-evaluation",
         columns: headers.map(() => ({ readOnly: true })),
-        afterChange: (changes) => {
-          // Listen for changes
-          if (changes) {
-            checkTableDataFilled();
-          }
-        },
       });
     }
 
@@ -70,25 +69,13 @@ const UploadExcel = ({
         hotInstanceRef.current = null;
       }
     };
-  }, [data]); // ✅ Update when data changes
+  }, [data]);
 
-  const checkTableDataFilled = () => {
-    // Function to check if table is filled
-    const isFilled = tableData.some((row) => row.some((cell) => cell !== ""));
-    setIsTableDataFilled(isFilled);
-  };
   const handleCancel = () => {
-    // ✅ Clear table data
-    setTableData([]);
-    setIsTableDataFilled(false);
-    // ✅ Reset Handsontable manually
-    if (hotInstanceRef.current) {
-      hotInstanceRef.current.loadData([["", "", "", "", "", "", ""]]);
-    }
+    setFile(null);
+    setData([]);
     setIsOpen(false);
   };
-
-  console.log("asdasd", isCreateLoading);
 
   return (
     <div className="w-full p-4 bg-white border shadow-md mt-2 ">
@@ -100,11 +87,11 @@ const UploadExcel = ({
       <div className="flex justify-end space-x-4 items-end w-[20%] fixed bottom-5 right-5">
         <Button onClick={handleCancel}>Cancel</Button>
         <Button
-          disabled={isTableDataFilled || isCreateLoading}
+          disabled={!file}
           loading={isCreateLoading}
-          type="primary"
           htmlType="submit"
           onClick={handleCreateExam}
+          style={{ background: primaryGradient, color: "white" }}
         >
           Create
         </Button>

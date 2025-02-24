@@ -126,24 +126,27 @@ const Chapter = ({
             </div>
           )}
 
-          {/* Assignments and Quizzes Section */}
-          <div>
-            {combinedItems?.length > 0 ? (
-              combinedItems?.map((item, index) => (
-                <ChapterItem
-                  key={index}
-                  type={item.type}
-                  title={item.name}
-                  id={item._id}
-                  isPublished={item.isPublished}
-                />
-              ))
-            ) : (
-              <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-                No Data found
-              </p>
-            )}
-          </div>
+          {
+            combinedItems?.length > 0 && (
+              <div>
+                {" "}
+                {combinedItems?.map((item, index) => (
+                  <ChapterItem
+                    key={index}
+                    type={item.type}
+                    title={item.name}
+                    id={item._id}
+                    isPublished={item.isPublished}
+                  />
+                ))}
+              </div>
+            )
+            // : (
+            // <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+            //   No Data Found
+            // </p>
+            // )
+          }
         </div>
       )}
 

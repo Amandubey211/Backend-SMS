@@ -106,6 +106,7 @@ function CreateExam() {
               !event.target.closest(".handsontable")
             ) {
               setTableData([]);
+              setFile(null);
               setIsOpen(false);
             }
           }}
@@ -189,6 +190,9 @@ function CreateExam() {
                 isCreateLoading={isCreateLoading}
                 setIsCreateLoading={setIsCreateLoading}
                 setIsOpen={setIsOpen}
+                file={file}
+                  setFile={setFile}
+                  setData= {setTableData}
               />
             )}
           </div>

@@ -186,7 +186,6 @@ const MainSection = () => {
     setSelectedExportExamTypes([]);
   };
 
-  console.log("filtered data", filteredData);
 
   return (
     <div className="flex h-full w-full">

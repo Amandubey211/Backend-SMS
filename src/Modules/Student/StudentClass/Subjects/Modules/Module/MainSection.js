@@ -120,7 +120,7 @@ const MainSection = () => {
             </span>
           </p>
         </div>
-        <div className="grid grid-cols-1 overflow-y-auto w-full h-full">
+        <div className="grid grid-cols-1 overflow-y-auto w-full h-auto">
           {modulesData?.map((module, index) => (
             <ModuleCard
               key={index}

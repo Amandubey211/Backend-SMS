@@ -3,13 +3,12 @@ import { IoCalendarOutline } from "react-icons/io5";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbCheck, TbEdit } from "react-icons/tb";
 import { formatDate } from "../../../../../../Utils/helperFunctions";
-import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { useTranslation } from "react-i18next";
 import { AiFillFileExcel } from "react-icons/ai";
 import { Tooltip } from "antd";
 import * as XLSX from "xlsx";
-import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
+import DeleteConfirmatiomModal from "../../../../../../Components/Common/DeleteConfirmationModal";
 
 function DateSection({
   isEditing,
@@ -146,11 +145,11 @@ function DateSection({
               </button>
             </Tooltip>
           </div>
-          <DeleteModal
+          <DeleteConfirmatiomModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onConfirm={handleDeleteClick}
-            title={examDetails.examName}
+            
           />
         </div>
       </div>

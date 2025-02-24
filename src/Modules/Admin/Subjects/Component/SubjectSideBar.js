@@ -51,8 +51,6 @@ const SubjectSideBar = () => {
     setSemesterModalVisible(false);
   };
 
-  console.log("semester admin", semesters);
-
   return (
     <div className="flex flex-col min-h-screen h-full w-full md:w-[16%] space-y-3 p-3 border-r">
       {/* Semester Selection Section */}
