@@ -11,7 +11,7 @@ import { Skeleton } from "antd";
 
 const MyTeacher = () => {
     const { t } = useTranslation('prtChildrens');
-    const { ssid: studentId } = useParams(); // Get student ID from the route parameters
+    const { ssid: studentId } = useParams();
     const dispatch = useDispatch();
 
     // Access the teacher-related data from Redux state
