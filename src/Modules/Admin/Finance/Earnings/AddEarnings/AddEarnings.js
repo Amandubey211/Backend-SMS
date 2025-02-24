@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import Header from "./Component/Header";
-import { categories, subCategories } from "./constants/categories";
+import { subCategories } from "./constants/categories";
 import {
   setReadOnly,
   clearSelectedIncome,
@@ -17,14 +17,10 @@ import {
   addEarnings,
   updateEarnings,
 } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
-import { Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "./Config/formConfig";
 import { validationSchemas } from "./Config/validationSchemas";
 import toast from "react-hot-toast";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
-import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
-import { PERMISSIONS } from "../../../../../config/permission";
 
 const AddEarnings = () => {
   const navigate = useNavigate();
