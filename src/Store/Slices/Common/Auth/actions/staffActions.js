@@ -6,6 +6,7 @@ import {
   resetState as resetAuthState,
   setRole,
   setUserRoles,
+  clearPermissions,
 } from "../reducers/authSlice"; // Updated to handle token
 import { setUserDetails, resetUserState } from "../../User/reducers/userSlice"; // For managing user details and resetting state
 import { requestPermissionAndGetToken } from "../../../../../Hooks/NotificationHooks/NotificationHooks";
@@ -24,104 +25,121 @@ export const staffLogin = createAsyncThunk(
   "auth/staffLogin",
   async (staffDetails, { rejectWithValue, dispatch }) => {
     try {
-      dispatch(setShowError(false));
+      // 1) Clear any existing permissions to avoid stale data
+      dispatch(clearPermissions());
 
-      // Get device token for notifications
+      // 2) Optionally get the device token for push notifications
       const deviceToken = await requestPermissionAndGetToken();
       const userDetail = { ...staffDetails, deviceToken };
 
-      // Send login request
+      // 3) Attempt staff login
       const data = await postData("/auth/staff/login", userDetail);
-      console.log(data, "Login response data");
+      console.log("Login response data:", data);
 
-      if (data?.success) {
-        // Dispatch user details to the store
-        dispatch(
-          setUserDetails({
-            schoolId: data.schoolId,
-            userId: data.userId,
-            profile: data.profile,
-            fullName: data.fullName,
-            email: data.email,
-            mobileNumber: data.mobileNumber,
-            position: data.position || "N/A",
-            employeeID: data.employeeID || "N/A",
-            role: data.role,
-            monthlySalary: data.monthlySalary || 0,
-            active: data.active ?? false,
-            dateOfBirth: data?.dateOfBirth || "N/A",
-            schoolName: data?.schoolName,
-          })
-        );
-        dispatch(setRole(data.role));
-
-        // Process academic year data if available
-        if (data.academicYear) {
-          const formattedAcademicYear = formatAcademicYear(
-            data.academicYear?.year,
-            data.academicYear?.startDate,
-            data.academicYear?.endDate
-          );
-          dispatch(
-            setAcademicYear([
-              {
-                ...formattedAcademicYear,
-                isActive: data.isAcademicYearActive,
-              },
-            ])
-          );
-
-          if (
-            data.isAcademicYearActive === true ||
-            data.isAcademicYearActive === "active"
-          ) {
-            setLocalCookies("say", data.academicYear._id);
-            setLocalCookies("isAcademicYearActive", "true");
-          } else {
-            setLocalCookies("isAcademicYearActive", "false");
-          }
-        }
-
-        // Updated Admin logic: always set the admin role
-        if (data.role === "admin") {
-          dispatch(setRole(data.role));
-          const academicYearActive =
-            data.isAcademicYearActive === true ||
-            data.isAcademicYearActive === "active";
-          if (!academicYearActive) {
-            toast.success("Please create an academic year");
-            // Redirect admin to create academic year if inactive
-            return { redirect: "/create_academicYear" };
-          }
-          return { redirect: "/select_branch" };
-        }
-
-        // For staff with multiple roles, force role selection
-        if (data.groupedRoles && data.groupedRoles.length > 1) {
-          dispatch(setUserRoles(data.groupedRoles));
-          dispatch(setRole(null)); // Clear any auto-assigned role
-          return { redirect: "/select_role" };
-        }
-
-        // If exactly one grouped role exists, auto-set it and proceed
-        if (data.groupedRoles && data.groupedRoles.length === 1) {
-          const userRole = data.groupedRoles[0].department;
-          dispatch(setRole(userRole));
-          await dispatch(getMyRolePermissionsThunk());
-          return { redirect: "/dashboard" };
-        }
-
-        // For non-admin users without grouped roles, fetch permissions and redirect
-        if (data.role) {
-          await dispatch(getMyRolePermissionsThunk());
-        }
-        return { redirect: "/dashboard" };
-      } else {
+      if (!data?.success) {
         const errorMessage =
           data?.msg || "Something went wrong. Please try again later.";
         toast.error(errorMessage);
         return rejectWithValue(errorMessage);
       }
+
+      /** -----------------------
+       * POPULATE USER DETAILS
+       * ------------------------*/
+      dispatch(
+        setUserDetails({
+          schoolId: data.schoolId,
+          userId: data.userId,
+          profile: data.profile,
+          fullName: data.fullName,
+          email: data.email,
+          mobileNumber: data.mobileNumber,
+          position: data.position || "N/A",
+          employeeID: data.employeeID || "N/A",
+          role: data.role,
+          monthlySalary: data.monthlySalary || 0,
+          active: data.active ?? false,
+          dateOfBirth: data?.dateOfBirth || "N/A",
+          schoolName: data?.schoolName,
+        })
+      );
+      dispatch(setRole(data.role)); // e.g., 'admin', 'staff', 'teacher'
+
+      /** -----------------------
+       * ACADEMIC YEAR CHECK
+       * ------------------------*/
+      if (data.academicYear) {
+        const formattedAcademicYear = formatAcademicYear(
+          data.academicYear?.year,
+          data.academicYear?.startDate,
+          data.academicYear?.endDate
+        );
+
+        dispatch(
+          setAcademicYear([
+            {
+              ...formattedAcademicYear,
+              isActive: data.isAcademicYearActive,
+            },
+          ])
+        );
+
+        if (
+          data.isAcademicYearActive === true ||
+          data.isAcademicYearActive === "active"
+        ) {
+          setLocalCookies("say", data.academicYear._id);
+          setLocalCookies("isAcademicYearActive", "true");
+        } else {
+          setLocalCookies("isAcademicYearActive", "false");
+        }
+      }
+
+      /** -----------------------
+       * ADMIN LOGIC
+       * ------------------------*/
+      if (data.role === "admin") {
+        const academicYearActive =
+          data.isAcademicYearActive === true ||
+          data.isAcademicYearActive === "active";
+
+        // If the academic year is not active, prompt creation
+        if (!academicYearActive) {
+          toast.success("Please create an academic year");
+          return { redirect: "/create_academicYear" };
+        }
+        // Else, go to branch selection
+        return { redirect: "/select_branch" };
+      }
+
+      /** -----------------------
+       * MULTIPLE GROUPED ROLES
+       * ------------------------*/
+      if (data.groupedRoles && data.groupedRoles.length > 1) {
+        // Force user to pick which role they want to use
+        dispatch(setUserRoles(data.groupedRoles));
+        dispatch(setRole(null)); // Clear auto-assigned role
+        return { redirect: "/select_role" };
+      }
+
+      // If there is exactly one grouped role, set that role
+      if (data.groupedRoles && data.groupedRoles.length === 1) {
+        const userRole = data.groupedRoles[0].department;
+        dispatch(setRole(userRole));
+        await dispatch(getMyRolePermissionsThunk());
+        return { redirect: "/dashboard" };
+      }
+
+      /** -----------------------
+       * SINGLE NON-ADMIN ROLE
+       * ------------------------*/
+      if (data.role) {
+        // e.g., staff, teacher, librarian
+        await dispatch(getMyRolePermissionsThunk());
+      }
+
+      // Default: successful login => send to dashboard
+      return { redirect: "/dashboard" };
     } catch (error) {
       const errorMessage =
         error?.response?.data?.msg || error.message || "Login failed.";
@@ -130,7 +148,6 @@ export const staffLogin = createAsyncThunk(
     }
   }
 );
-
 export const staffLogout = createAsyncThunk(
   "auth/staffLogout",
   async (_, { dispatch }) => {
