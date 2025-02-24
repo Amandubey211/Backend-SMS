@@ -19,7 +19,7 @@ const paymentStatusFields = [
     min: 0,
   },
   {
-    name: "payment_type", // Using snake_case for consistency
+    name: "paymentType", // Using snake_case for consistency
     label: "Payment Type",
     type: "select",
     options: ["cash", "card", "online", "cheque", "other"],
@@ -56,7 +56,7 @@ const PaymentStatus = () => {
   useEffect(() => {
     const newFields = [];
 
-    if (values.payment_type === "cheque") {
+    if (values.paymentType === "cheque") {
       newFields.push({
         name: "chequeNumber",
         label: "Cheque Number",
@@ -65,9 +65,9 @@ const PaymentStatus = () => {
       });
     }
 
-    if (values.payment_type === "online") {
+    if (values.paymentType === "online") {
       newFields.push({
-        name: "transactionId",
+        name: "onlineTransactionId",
         label: "Transaction ID",
         type: "text",
         placeholder: "Enter transaction ID",
@@ -75,7 +75,7 @@ const PaymentStatus = () => {
     }
 
     setConditionalFields(newFields);
-  }, [values.payment_type]);
+  }, [values.paymentType]);
 
   // Combine static and conditional fields
   const combinedFields = [...paymentStatusFields, ...conditionalFields];

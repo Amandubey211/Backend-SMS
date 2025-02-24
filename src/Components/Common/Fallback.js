@@ -6,8 +6,8 @@ const Fallback = () => {
   const [videoFinished, setVideoFinished] = useState(false);
 
   return (
-    <div className="flex justify-center items-center w-screen h-screen bg-black">
-      {!videoFinished ? (
+    <div className="flex justify-center items-center w-screen h-screen ">
+      {/* {!videoFinished ? (
         <video
           src={StudentDiwanLogoVid}
           className="w-full h-full object-cover"
@@ -15,9 +15,9 @@ const Fallback = () => {
           muted
           onEnded={() => setVideoFinished(true)}
         />
-      ) : (
-        <img src={StudentDiwanLogo} className="h-20" alt="Student Diwan" />
-      )}
+      ) : ( */}
+      <img src={StudentDiwanLogo} className="h-20" alt="Student Diwan" />
+      {/* )} */}
     </div>
   );
 };

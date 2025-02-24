@@ -1,6 +1,5 @@
 import React, { useEffect, memo } from "react";
 import Notice from "./Notice";
-import Fallback from "../../../../Components/Common/Fallback";
 import { useNavigate } from "react-router-dom"; // Updated import
 import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
 import { fetchNotices } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import Redux action
@@ -10,6 +9,7 @@ import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import Spinner from "../../../../Components/Common/Spinner";
 
 const icons = [icon1, icon2];
 
@@ -38,18 +38,11 @@ const NoticeBoard = (descriptionLength) => {
     notices,
   } = useSelector((state) => state.admin.adminDashboard);
   useEffect(() => {
-
-
-    dispatch(fetchNotices())
-
+    dispatch(fetchNotices());
   }, [dispatch]);
 
   if (loading) {
-    return <Fallback />;
-  }
-
-  if (error) {
-    return <p>Error: {error}</p>;
+    return <Spinner />;
   }
 
   // Ensure notices is an array and create a copy before sorting
@@ -60,7 +53,10 @@ const NoticeBoard = (descriptionLength) => {
   const topNotices = noticesSort?.slice(0, 3);
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.SHOW_EVENTS} title={"Notices"}>
+    <ProtectedSection
+      requiredPermission={PERMISSIONS.SHOW_EVENTS}
+      title={"Notices"}
+    >
       <div className="p-2">
         <div className="flex justify-between p-4 items-center px-6">
           <h2 className="text-xl font-semibold text-gray-600">
@@ -96,7 +92,6 @@ const NoticeBoard = (descriptionLength) => {
           ))
         )}
       </div>
-
     </ProtectedSection>
   );
 };
