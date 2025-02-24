@@ -11,7 +11,8 @@ export const createAdjustment = createAsyncThunk(
   "penaltyandAdjustment/createAdjustment",
   async (formValues, { rejectWithValue, getState }) => {
     try {
-      console.log("form value is :==>",formValues)
+      console.log("Form values received: ", formValues);
+
       // 1) Fetch necessary IDs
       const storedSchoolId = localStorage.getItem("SelectedschoolId");
       const schoolId = storedSchoolId || "";
@@ -25,54 +26,70 @@ export const createAdjustment = createAsyncThunk(
         academicYear: academicYearId,
       };
 
-      // 3) Create FormData if needed (for file uploads)
+      // 3) Create FormData for multipart/form-data request
       const formData = new FormData();
-      formData.append("invoiceNumber", payload.invoiceNumber);
-      formData.append("reason", payload.reason);
-      // formData.append("discountType", payload.discountType);
-      formData.append("discount", payload.discount);
-      formData.append("adjustmentPenalty", payload.adjustmentPenalty);
-      formData.append("tax", payload.tax);
 
-      // Append items
-      payload.items.forEach((item, index) => {
-        formData.append(`items[${index}].revenueType`, item.revenueType);
-        formData.append(`items[${index}].revenueReference`, item.revenueReference);
-        formData.append(`items[${index}].quantity`, item.quantity);
-        formData.append(`items[${index}].amount`, item.amount);
-      });
+      // Append top-level fields
+      formData.append("invoiceNumber", payload.formValues.invoiceNumber || "");
+      formData.append("reason", payload.formValues.reason || "");
+      formData.append("discountType", payload.formValues.discountType || "amount");
+      formData.append("discount", payload.formValues.discount || 0);
+      formData.append("adjustmentPenalty", payload.formValues.adjustmentPenalty || 0);
+      formData.append("tax", payload.formValues.tax || 0);
+      formData.append("subAmount", payload.formValues.subAmount || 0);
+      formData.append("finalAmount", payload.formValues.finalAmount || 0);
 
-      // Append document if exists
-      // if (payload.document) {
-      //   console.log("this is document uploaded:",payload.document);
-      //   formData.append("document", payload.document);
-      // }
+      // Append items array if it exists and is an array
+      if (Array.isArray(payload.formValues.items) && payload.formValues.items.length > 0) {
+        payload.formValues.items.forEach((item, index) => {
+          formData.append(`items[${index}].revenueType`, item?.revenueType || "");
+          formData.append(`items[${index}].revenueReference`, item?.revenueReference || "");
+          formData.append(`items[${index}].quantity`, item?.quantity || 0);
+          formData.append(`items[${index}].amount`, item?.amount || 0);
+        });
+      } else {
+        console.warn("Warning: items array is missing or empty.");
+      }
 
-      // 4) Make API request
-      const response = await customRequest('POST',`/${getRole}/penaltyAdjustment/add`, formData, 
-      { "Content-Type": "multipart/form-data" },
+      // Append document if exists and is a file
+      if (payload.formValues.document instanceof File) {
+        formData.append("document", payload.formValues.document);
+      } else if (payload.formValues.document) {
+        console.warn("Warning: Document is not a valid file.");
+      }
+
+      // 4) Make API request using customRequest
+      const response = await customRequest(
+        'POST',
+        `/${getRole}/penaltyAdjustment/add`,
+        formData,
+        { "Content-Type": "multipart/form-data" }
       );
 
-      // Handle response
+      // 5) Handle response
       if (response?.status === 201) {
         toast.success("Adjustment created successfully!");
-        return response.data; // Adjust based on your API response structure
+        return response.data; // Return response data if successful
       }
 
       if (response?.message === "Invoice marked as return and adjustment created successfully.") {
         toast.success("Adjustment created successfully!");
-        return response; // Or response.data based on your API
+        return response; // Return response directly if success message matches
       }
 
-      // If response does not indicate success
+      // 6) Handle failure response
       toast.error(response?.message || "Failed to create adjustment.");
       return rejectWithValue(response?.message || "Failed to create adjustment.");
+
     } catch (error) {
+      // 7) Handle errors from the try block
+      console.error("Error in createAdjustment thunk:", error);
       toast.error(error.message || "Error creating adjustment.");
       return rejectWithValue(error.message || "Error creating adjustment.");
     }
   }
 );
+
 
 export const fetchReturnInvoice = createAsyncThunk(
   "fetchreturnInvoice",
