@@ -1,10 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useFormikContext } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 
 const StudentPaymentDetails = ({ category }) => {
   const { values, setFieldValue } = useFormikContext();
+  useEffect(()=>{
+    setFieldValue(`paymentStatus_${category}`,'paid');
+    setFieldValue(`frequencyOfPayment_${category}`,'Monthly');
+    setFieldValue(`discountType_${category}`,"percentage");
+    setFieldValue(`discount_${category}`,0);
+    setFieldValue(`penalty_${category}`,0);
+  },[])
 
   return (
     <div className="mb-6">
@@ -14,6 +21,7 @@ const StudentPaymentDetails = ({ category }) => {
             label="Exam Type"
             name={`examType_${category}`}
             placeholder="Enter Exam Type"
+           
             required
           />
         ) : (<>

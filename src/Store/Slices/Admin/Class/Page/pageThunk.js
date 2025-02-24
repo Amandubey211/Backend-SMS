@@ -67,7 +67,7 @@ export const createPage = createAsyncThunk(
         throw new Error("Semester ID is missing");
       }
 
-      // Include semesterId in the request body
+      // Merge semesterId into the payload with pageData
       const payload = { ...pageData, semesterId };
 
       const response = await postData(

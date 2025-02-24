@@ -17,14 +17,12 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  // Fetch sections and groups from the Redux store
   const AllSections = useSelector(selectSections);
   const groupsList = useSelector(
     (store) => store.admin.group_section.groupsList
   );
   const loading = useSelector((store) => store.admin.group_section.loading);
 
-  // Fetch sections and groups when the component mounts or when `cid` changes
   useEffect(() => {
     if (cid) {
       dispatch(fetchSectionsByClass(cid));
@@ -70,7 +68,7 @@ const SectionSelect = ({ sectionId, handleChange, groupId, assignTo }) => {
             className="block w-full p-2 border border-gray-300 rounded-lg"
             disabled={loading}
           >
-            <option value="">Choose Group</option>
+            <option value="">All Groups</option>
             {groupsList?.length > 0 ? (
               groupsList?.map((group) => (
                 <option key={group._id} value={group._id}>

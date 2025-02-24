@@ -92,6 +92,11 @@ const StationeryItemsSection = () => {
               onBlur={handleBlur}
               style={{ width: "80%" }}
               min={0}
+              onKeyDown={(e) => {
+                if (["-", "e", "E"].includes(e.key)) {
+                  e.preventDefault();
+                }
+              }}
             />
           ) : (
             <Input

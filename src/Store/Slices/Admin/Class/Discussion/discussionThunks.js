@@ -92,6 +92,7 @@ export const createDiscussion = createAsyncThunk(
         return response.data;
       }
     } catch (error) {
+      toast.error(" Discussion Not Created, Try Again!");
       return handleError(error, dispatch, rejectWithValue);
     }
   }

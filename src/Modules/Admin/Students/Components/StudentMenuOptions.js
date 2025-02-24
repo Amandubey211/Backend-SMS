@@ -14,7 +14,8 @@ import DeleteModal from "../../../../Components/Common/DeleteModal";
 import DemoteClass from "./DemoteClass";
 import GraduateStudent from "./GraduateStudent";
 import { removeStudentFromGroup } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
-// import { RiDeleteBin2Line } from "react-icons/ri";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../config/permission";
 
 const StudentMenuOptions = ({
   studentName,
@@ -69,32 +70,14 @@ const StudentMenuOptions = ({
           "Move to Section": (
             <MoveToSection student={student} onClose={handleSidebarClose} />
           ),
-          // "Class change": (
-          //   <EditStudent
-          //     studentId={studentId}
-          //     fetchGroups={fetchGroups}
-          //     onClose={handleSidebarClose}
-          //   />
-          // ),
           "Demote Class": <DemoteClass student={student} />,
           "Graduate Student": <GraduateStudent student={student} />,
-
-          // "Edit Student": (
-          //   <EditStudent
-          //     studentId={studentId}
-          //     fetchGroups={fetchGroups}
-          //     onClose={handleSidebarClose}
-          //   />
-          // ),
-          // "Delete Student": (
-          //   <DeleteStudent studentId={studentId} groupId={groupId} />
-          // ),
         };
 
         handleSidebarOpen(action, sidebarComponents[action]);
       }
     },
-    [studentId]
+    [student, studentId]
   );
 
   const handleSidebarOpen = (title, content) => {
@@ -123,15 +106,15 @@ const StudentMenuOptions = ({
 
   return (
     <>
-        <button
-          ref={buttonRef}
-          onClick={() => toggleMenu(studentId)}
-          className="p-2"
-          aria-haspopup="true"
-          aria-expanded={showMenu === studentId}
-        >
-          <HiOutlineDotsVertical />
-        </button>
+      <button
+        ref={buttonRef}
+        onClick={() => toggleMenu(studentId)}
+        className="p-2"
+        aria-haspopup="true"
+        aria-expanded={showMenu === studentId}
+      >
+        <HiOutlineDotsVertical />
+      </button>
       {showMenu === studentId && (
         <div
           ref={menuRef}
@@ -139,41 +122,36 @@ const StudentMenuOptions = ({
           style={{ right: 0 }}
         >
           <ul className="space-y-2">
-            <MenuItem
-              icon={<TfiStatsUp className="text-[#333333]" />}
-              text="Promote Class"
-              onClick={() => handleMenuItemClick("Promote Class")}
-            />
-            <MenuItem
-              icon={<TfiStatsDown className="text-[#E33131]" />}
-              text="Demote Class"
-              onClick={() => handleMenuItemClick("Demote Class")}
-            />
-            <MenuItem
-              icon={<BsArrow90DegRight />}
-              text="Move to Section"
-              onClick={() => handleMenuItemClick("Move to Section")}
-            />
-            {/* <MenuItem
-              icon={<MdOutlineModeEditOutline className="text-[#0D9755]" />}
-              text="Class change"
-              onClick={() => handleMenuItemClick("Class change")}
-            /> */}
-            <MenuItem
-              icon={<FaGraduationCap className="text-yellow-400" />}
-              text="Graduate Student"
-              onClick={() => handleMenuItemClick("Graduate Student")}
-            />
-            {/* <MenuItem
-              icon={<MdOutlineModeEditOutline className="text-[#0D9755]" />}
-              text="Edit Student"
-              onClick={() => handleMenuItemClick("Edit Student")}
-            /> */}
-            {/* <MenuItem
-              icon={<RiDeleteBin2Line className="text-[#E33131]" />}
-              text="Delete Student"
-              onClick={() => handleMenuItemClick("Delete Student")}
-            /> */}
+            <ProtectedAction requiredPermission={PERMISSIONS.PROMOTE_STUDENT}>
+              <MenuItem
+                icon={<TfiStatsUp className="text-[#333333]" />}
+                text="Promote Class"
+                onClick={() => handleMenuItemClick("Promote Class")}
+              />
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.DEMOTE_STUDENT}>
+              <MenuItem
+                icon={<TfiStatsDown className="text-[#E33131]" />}
+                text="Demote Class"
+                onClick={() => handleMenuItemClick("Demote Class")}
+              />
+            </ProtectedAction>
+            <ProtectedAction
+              requiredPermission={PERMISSIONS.ASSIGN_STUDENT_TO_SECTION}
+            >
+              <MenuItem
+                icon={<BsArrow90DegRight />}
+                text="Move to Section"
+                onClick={() => handleMenuItemClick("Move to Section")}
+              />
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.GRADUATE_STUDENT}>
+              <MenuItem
+                icon={<FaGraduationCap className="text-yellow-400" />}
+                text="Graduate Student"
+                onClick={() => handleMenuItemClick("Graduate Student")}
+              />
+            </ProtectedAction>
           </ul>
         </div>
       )}

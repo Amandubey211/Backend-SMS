@@ -78,7 +78,7 @@ const Header = ({
       {/* Header Title and Buttons */}
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-800">
-          {isUpdate ? "Update Earnings" : "Add New Earnings"}
+          {isUpdate & !readOnly ? "Update Earnings" : readOnly ? "View Earnings" :"Add New Earnings"}
         </h1>
         {!readOnly && ( // Hide buttons if readOnly is true
           <div className="flex gap-4">

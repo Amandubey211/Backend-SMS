@@ -380,7 +380,6 @@ const CreateQuotation = () => {
       resetForm();
       navigate("/finance/quotations/quotations-list");
     } catch (error) {
-      toast.error(error || "Failed to create quotation.");
     } finally {
       setLoading(false);
       setSubmitting(false);

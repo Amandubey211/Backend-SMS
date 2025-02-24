@@ -14,18 +14,21 @@ const BookSalesForm = () => {
       label: "Book Name",
       name: "bookName",
       placeholder: "Enter book name",
+    
     },
     {
       type: "number",
       label: "Price Per Book (QR)",
       name: "pricePerBook",
       placeholder: "Enter price per book",
+      min:0
     },
     {
       type: "number",
       label: "Quantity Sold",
       name: "quantitySold",
       placeholder: "Enter quantity sold",
+      min:0
     },
     {
       type: "date",
@@ -37,6 +40,7 @@ const BookSalesForm = () => {
       label: "Buyer Name",
       name: "buyerName",
       placeholder: "Enter buyer name",
+      
     },
   ];
 

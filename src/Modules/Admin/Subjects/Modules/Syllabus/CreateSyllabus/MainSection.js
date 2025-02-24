@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import EditorComponent from "../../../Component/AdminEditor";
@@ -15,9 +15,12 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 const MainSection = ({ setIsEditing }) => {
   const { state } = useLocation();
   const { cid, sid } = useParams();
+  const navigate = useNavigate(); // Added navigate hook
+  console.log(state, "state");
   const [assignmentName, setAssignmentName] = useState(
     state?.syllabus?.title || ""
   );
+  // Use optional chaining to safely preload the content
   const [editorContent, setEditorContent] = useState(
     state?.syllabus?.content || ""
   );
@@ -44,13 +47,15 @@ const MainSection = ({ setIsEditing }) => {
     };
 
     if (state?.syllabus?._id) {
+      // Edit operation (no redirection here)
       await dispatch(
         editSyllabus({ syllabusId: state.syllabus._id, data, cid })
       );
     } else {
-      await dispatch(createSyllabus(data));
+      // Create operation: pass navigate so the thunk can redirect on success
+      await dispatch(createSyllabus({ ...data, navigate }));
     }
-  }, [assignmentName, editorContent, sid, state, dispatch]);
+  }, [assignmentName, editorContent, sid, state, dispatch, cid, navigate]);
 
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen

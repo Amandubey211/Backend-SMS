@@ -455,10 +455,10 @@ const EditorComponent = ({
           </div>
         </div>
       )}
-
+      {/* Changed from defaultValue to value for controlled behavior */}
       <JoditEditor
         ref={editor}
-        defaultValue={editorContent}
+        value={editorContent}
         config={config}
         tabIndex={1}
         onChange={(newContent) => onEditorChange(newContent)}
