@@ -71,10 +71,17 @@ export const createReceipt = createAsyncThunk(
       formData.append("invoiceNumber", payload.invoiceNumber);
 
       // Append receiver object directly as JSON string
-      formData.append("receiver", JSON.stringify(payload.receiver));
+      formData.append("receiver[name]", payload.receiver.name);
+      formData.append("receiver[email]", payload.receiver.email);
+      formData.append("receiver[phone]", payload.receiver.phone);
+      formData.append("receiver[address]", payload.receiver.address);
 
       // Append lineItems array directly as JSON string
-      formData.append("lineItems", JSON.stringify(payload.lineItems));
+      payload.lineItems.forEach((item, index) => {
+        formData.append(`lineItems[${index}][revenueType]`, item.revenueType);
+        formData.append(`lineItems[${index}][quantity]`, item.quantity);
+        formData.append(`lineItems[${index}][total]`, item.total);
+      });
 
       // Optionally attach document file if present
       // if (payload.document) {

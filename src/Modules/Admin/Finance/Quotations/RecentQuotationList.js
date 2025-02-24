@@ -71,8 +71,7 @@ const RecentQuotationList = () => {
 
   const popupRef = useRef(null);
 
-  const paze_size =
-    totalPages > 0 ? Math.ceil(totalRecords / totalPages) : pageSize;
+  const paze_size = pageSize;
   const [computedPageSize, setComputedPageSize] = useState(paze_size);
 
   // Build a map for full quotation objects (keyed by _id)

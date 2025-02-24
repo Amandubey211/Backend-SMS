@@ -6,7 +6,7 @@ const initialState = {
   totalRecords: 0,
   totalPages: 0,
   currentPage: 1,
-  pageSize: 5,
+  pageSize: 10,
   filters: {},
   loading: false,
   error: null,
