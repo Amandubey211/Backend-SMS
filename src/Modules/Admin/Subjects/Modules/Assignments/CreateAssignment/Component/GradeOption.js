@@ -1,19 +1,17 @@
+// GradeOption.jsx
 import React, { useState, useEffect } from "react";
 
 const GradeOption = ({ displayGrade, setDisplayGrade }) => {
-  // Initialize as a string for proper control of radio inputs ("true" or "false")
   const [selectedOption, setSelectedOption] = useState(
     displayGrade ? "true" : "false"
   );
 
   const handleOptionChange = (e) => {
-    const value = e.target.value; // This returns "true" or "false"
+    const value = e.target.value;
     setSelectedOption(value);
-    // Convert the string value back to boolean before updating state
     setDisplayGrade(value === "true");
   };
 
-  // Update the local state when displayGrade prop changes (e.g., during editing)
   useEffect(() => {
     setSelectedOption(displayGrade ? "true" : "false");
   }, [displayGrade]);
@@ -26,26 +24,26 @@ const GradeOption = ({ displayGrade, setDisplayGrade }) => {
       <div className="flex items-center">
         <input
           type="radio"
-          id="yes"
+          id="gradeYes"
           name="grade"
           value="true"
           checked={selectedOption === "true"}
           onChange={handleOptionChange}
-          className="form-radio h-4 w-4 text-green-500 transition duration-150 ease-in-out"
+          className="mr-2 focus:ring-blue-500"
         />
-        <label htmlFor="yes" className="ml-2 text-sm text-gray-700">
+        <label htmlFor="gradeYes" className="text-sm text-gray-700 mr-4">
           Yes
         </label>
         <input
           type="radio"
-          id="no"
+          id="gradeNo"
           name="grade"
           value="false"
           checked={selectedOption === "false"}
           onChange={handleOptionChange}
-          className="form-radio h-4 w-4 text-gray-500 ml-6 transition duration-150 ease-in-out"
+          className="mr-2 focus:ring-blue-500"
         />
-        <label htmlFor="no" className="ml-2 text-sm text-gray-700">
+        <label htmlFor="gradeNo" className="text-sm text-gray-700">
           No
         </label>
       </div>

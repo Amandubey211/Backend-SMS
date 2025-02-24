@@ -7,31 +7,41 @@ import LabeledSelect from "./LabeledSelect";
 import LabeledInput from "./LabeledInput";
 import { useParams } from "react-router-dom";
 import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
-import { format } from "date-fns"; // Import date-fns for formatting
+import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
 
-const AllowedAttemptsSelect = ({ allowedAttempts, handleChange }) => {
+const AllowedAttemptsSelect = ({ allowedAttempts, handleChange, error }) => {
   const { t } = useTranslation("quiz");
   return (
     <div className="mb-4">
-      <label className="block text-gray-700">{t("Allowed Attempts")}</label>
+      <label htmlFor="allowedAttempts" className="block text-gray-700">
+        {t("Allowed Attempts")} <span className="text-red-500">*</span>
+      </label>
       <select
+        id="allowedAttempts" // ID must match error key
         name="allowedAttempts"
-        value={allowedAttempts ? "true" : "false"} // Handle boolean as string
+        value={allowedAttempts ? "true" : "false"}
         onChange={(e) =>
           handleChange({
             target: {
               name: "allowedAttempts",
-              value: e.target.value === "true", // Convert to boolean
+              value: e.target.value === "true",
             },
           })
         }
-        className="w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`w-full p-3 border rounded-md shadow-sm focus:outline-none
+          ${
+            error
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
+          }
+        `}
       >
         <option value="">{t("Select")}</option>
         <option value="true">{t("Limited")}</option>
         <option value="false">{t("Unlimited")}</option>
       </select>
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
     </div>
   );
 };
@@ -54,6 +64,7 @@ const CreateQuizForm = ({
   moduleId,
   chapterId,
   groupId,
+  formErrors = {},
 }) => {
   const dispatch = useDispatch();
   const [chapters, setChapters] = useState([]);
@@ -62,11 +73,9 @@ const CreateQuizForm = ({
   const { t } = useTranslation("admModule");
 
   useEffect(() => {
-    // Fetch modules if not already present
     dispatch(fetchModules({ cid, sid }));
-  }, [dispatch, modules]);
+  }, [dispatch, cid, sid]);
 
-  // Populate chapters based on selected module
   useEffect(() => {
     if (moduleId) {
       const selectedModule = modules.find((mod) => mod._id === moduleId);
@@ -76,17 +85,20 @@ const CreateQuizForm = ({
     }
   }, [moduleId, modules]);
 
-  // Function to format date to "yyyy-MM-dd"
-  const formatDate = (date) => {
-    return date ? format(new Date(date), "yyyy-MM-dd") : "";
-  };
+  const formatDate = (date) =>
+    date ? format(new Date(date), "yyyy-MM-dd") : "";
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white space-y-2">
       <h2 className="text-xl font-semibold">{t("Options")}</h2>
       <div className="space-y-4">
+        {/* Quiz Type */}
         <LabeledSelect
-          label={t("Quiz Type")}
+          label={
+            <>
+              {t("Quiz Type")} <span className="text-red-500">*</span>
+            </>
+          }
           name="quizType"
           value={quizType}
           onChange={handleChange}
@@ -95,73 +107,74 @@ const CreateQuizForm = ({
             { value: "Practice", label: t("Practice Quiz") },
             { value: "Graded", label: t("Graded Quiz") },
           ]}
+          error={formErrors.quizType}
+          fieldId="quizType" // pass to LabeledSelect for id
         />
 
-        {/* Shuffle Answers Input */}
+        {/* Shuffle Answers */}
         <div className="p-2">
           <h3 className="text-gray-700">{t("Shuffle Answers")}</h3>
-          <div className="flex items-center">
+          <div className="flex items-center mt-1">
             <input
               type="radio"
-              id="shuffleYes"
+              id="allowShuffleAnswersYes"
               name="allowShuffleAnswers"
               value="true"
               checked={allowShuffleAnswers === true}
-              onChange={(e) =>
+              onChange={() =>
                 handleChange({
-                  target: {
-                    name: "allowShuffleAnswers",
-                    value: true,
-                  },
+                  target: { name: "allowShuffleAnswers", value: true },
                 })
               }
               className="mr-2"
             />
-            <label htmlFor="shuffleYes" className="mr-4">
+            <label htmlFor="allowShuffleAnswersYes" className="mr-4">
               {t("Yes")}
             </label>
             <input
               type="radio"
-              id="shuffleNo"
+              id="allowShuffleAnswersNo"
               name="allowShuffleAnswers"
               value="false"
               checked={allowShuffleAnswers === false}
-              onChange={(e) =>
+              onChange={() =>
                 handleChange({
-                  target: {
-                    name: "allowShuffleAnswers",
-                    value: false,
-                  },
+                  target: { name: "allowShuffleAnswers", value: false },
                 })
               }
               className="mr-2"
             />
-            <label htmlFor="shuffleNo">{t("No")}</label>
+            <label htmlFor="allowShuffleAnswersNo">{t("No")}</label>
           </div>
         </div>
 
-        {/* Time Limit Input */}
+        {/* Time Limit */}
         <LabeledInput
           label={t("Time Limit in Minutes")}
           name="timeLimit"
           value={timeLimit}
           onChange={handleChange}
+          error={formErrors.timeLimit}
+          fieldId="timeLimit"
         />
 
-        {/* Allowed Attempts using Select Box */}
+        {/* Allowed Attempts */}
         <AllowedAttemptsSelect
           allowedAttempts={allowedAttempts}
           handleChange={handleChange}
+          error={formErrors.allowedAttempts}
         />
 
-        {/* Conditionally show Number of Attempts input when allowedAttempts is false (i.e., Limited) */}
+        {/* # of Attempts (only if allowedAttempts === true) */}
         {allowedAttempts && (
           <LabeledInput
             label={t("Number of Attempts")}
             name="allowNumberOfAttempts"
             type="number"
-            value={allowNumberOfAttempts || ""} // Reset to empty if null
+            value={allowNumberOfAttempts || ""}
             onChange={handleChange}
+            error={formErrors.allowNumberOfAttempts}
+            fieldId="allowNumberOfAttempts"
           />
         )}
 
@@ -170,7 +183,7 @@ const CreateQuizForm = ({
           {t("Quiz Restrictions")}
         </h2>
 
-        {/* See Answer Option */}
+        {/* Students See the Correct Answer */}
         <div className="p-2">
           <h3 className="text-gray-700 mb-1">
             {t("Students See the Correct Answer")}
@@ -178,35 +191,37 @@ const CreateQuizForm = ({
           <div className="flex items-center mb-2">
             <input
               type="radio"
-              id="seeAnswerYes"
+              id="studentSeeAnswerYes"
               name="studentSeeAnswer"
               value="true"
-              checked={studentSeeAnswer === "true" || studentSeeAnswer === true}
+              checked={studentSeeAnswer === true || studentSeeAnswer === "true"}
               onChange={handleChange}
               className="mr-2"
             />
-            <label htmlFor="seeAnswerYes" className="mr-4">
+            <label htmlFor="studentSeeAnswerYes" className="mr-4">
               {t("Yes")}
             </label>
             <input
               type="radio"
-              id="seeAnswerNo"
+              id="studentSeeAnswerNo"
               name="studentSeeAnswer"
               value="false"
               checked={
-                studentSeeAnswer === "false" || studentSeeAnswer === false
+                studentSeeAnswer === false || studentSeeAnswer === "false"
               }
               onChange={handleChange}
               className="mr-2"
             />
-            <label htmlFor="seeAnswerNo">{t("No")}</label>
+            <label htmlFor="studentSeeAnswerNo">{t("No")}</label>
           </div>
-          {(studentSeeAnswer === "true" || studentSeeAnswer === true) && (
+          {(studentSeeAnswer === true || studentSeeAnswer === "true") && (
             <DateInput
               label={t("Select Date")}
               name="showAnswerDate"
-              value={formatDate(showAnswerDate)} // Use formatted date here
+              value={formatDate(showAnswerDate)}
               handleChange={handleChange}
+              error={formErrors.showAnswerDate}
+              fieldId="showAnswerDate"
             />
           )}
         </div>
@@ -221,6 +236,8 @@ const CreateQuizForm = ({
             { value: "true", label: t("Yes") },
             { value: "false", label: t("No") },
           ]}
+          error={formErrors.showOneQuestionOnly}
+          fieldId="showOneQuestionOnly"
         />
 
         {/* Lock Question After Answering */}
@@ -238,50 +255,72 @@ const CreateQuizForm = ({
           </label>
         </div>
 
-        {/* Assign To Section */}
+        {/* Assign To */}
         <AssignToRadios
           assignTo={assignTo}
           handleChange={handleChange}
-          isAssignToLabel={true}
+          isAssignToLabel
         />
+        {formErrors.assignTo && (
+          <p id="assignTo" className="text-red-500 text-sm mt-1">
+            {formErrors.assignTo}
+          </p>
+        )}
 
-        {/* Section Select */}
+        {/* Section/Group */}
         <SectionSelect
           sectionId={sectionId}
           handleChange={handleChange}
           groupId={groupId}
           assignTo={assignTo}
+          formErrors={formErrors}
         />
 
-        {/* Module and Chapter Select */}
+        {/* Module */}
         <div className="mb-4">
-          <label className="block text-gray-700" htmlFor="module-select">
+          <label className="block text-gray-700" htmlFor="moduleId">
             {t("Module")}
           </label>
           <select
-            id="module-select"
-            className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            value={moduleId}
+            id="moduleId" // match potential error key if you want to validate
+            className={`mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none sm:text-sm rounded-md
+              ${
+                formErrors.moduleId
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }
+            `}
+            value={moduleId || ""}
             name="moduleId"
             onChange={handleChange}
           >
             <option value="">{t("Select")}</option>
-            {modules?.map((module) => (
-              <option key={module._id} value={module._id}>
-                {module.moduleName}
+            {modules?.map((mod) => (
+              <option key={mod._id} value={mod._id}>
+                {mod.moduleName}
               </option>
             ))}
           </select>
+          {formErrors.moduleId && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.moduleId}</p>
+          )}
         </div>
 
+        {/* Chapter */}
         <div className="mb-4">
-          <label className="block text-gray-700" htmlFor="chapter-select">
+          <label className="block text-gray-700" htmlFor="chapterId">
             {t("Chapter")}
           </label>
           <select
-            id="chapter-select"
-            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-            value={chapterId}
+            id="chapterId" // match potential error key if you want to validate
+            className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none sm:text-sm rounded-md
+              ${
+                formErrors.chapterId
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }
+            `}
+            value={chapterId || ""}
             name="chapterId"
             onChange={handleChange}
             disabled={!moduleId}
@@ -289,9 +328,9 @@ const CreateQuizForm = ({
             {moduleId ? (
               <>
                 <option value="">{t("Select")}</option>
-                {chapters?.map((chapter) => (
-                  <option key={chapter._id} value={chapter._id}>
-                    {chapter.name}
+                {chapters?.map((ch) => (
+                  <option key={ch._id} value={ch._id}>
+                    {ch.name}
                   </option>
                 ))}
               </>
@@ -299,20 +338,37 @@ const CreateQuizForm = ({
               <option value="">{t("Select Module First")}</option>
             )}
           </select>
+          {formErrors.chapterId && (
+            <p className="text-red-500 text-sm mt-1">{formErrors.chapterId}</p>
+          )}
         </div>
 
-        {/* Date Inputs */}
+        {/* Available From */}
         <DateInput
-          label={t("Available From")}
+          label={
+            <>
+              {t("Available From")} <span className="text-red-500">*</span>
+            </>
+          }
           name="availableFrom"
-          value={formatDate(availableFrom)} // Format date for input
+          value={formatDate(availableFrom)}
           handleChange={handleChange}
+          error={formErrors.availableFrom}
+          fieldId="availableFrom" // must match error key
         />
+
+        {/* Due Date */}
         <DateInput
-          label={t("Due")}
+          label={
+            <>
+              {t("Due")} <span className="text-red-500">*</span>
+            </>
+          }
           name="dueDate"
-          value={formatDate(dueDate)} // Format date for input
+          value={formatDate(dueDate)}
           handleChange={handleChange}
+          error={formErrors.dueDate}
+          fieldId="dueDate" // must match error key
         />
       </div>
     </div>

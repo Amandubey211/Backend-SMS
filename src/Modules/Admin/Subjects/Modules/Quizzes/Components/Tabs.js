@@ -1,6 +1,7 @@
 import React from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import { Tooltip, Tag } from "antd"; // Import antd components
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../../config/permission";
 
@@ -18,9 +19,9 @@ const Tabs = ({
   };
 
   const { quizzDetail } = useSelector((store) => store.admin.quizzes);
-  const { name, availableFrom } = quizzDetail || {};
+  const { name, availableFrom, publish } = quizzDetail || {};
 
-  // Determine the display date: format if present, else use placeholder "dd-mm-yy"
+  // Determine the display date: format if present, else use a placeholder "DD-MM-YY"
   const displayDate = availableFrom
     ? new Date(availableFrom).toLocaleDateString()
     : "DD-MM-YY";
@@ -28,11 +29,28 @@ const Tabs = ({
   return (
     <>
       <div className="flex justify-between items-center p-2 px-3 border-b">
+        {/* Quiz Title and Publish Badge */}
         {!createPage && (
           <div>
-            <h2 className="text-xl font-semibold mb-1">
-              {name || "Quiz Name"}
-            </h2>
+            <div className="flex items-center mb-1">
+              <h2 className="text-xl font-semibold">{name || "Quiz Name"}</h2>
+
+              {/* Show Published/Unpublished Badge */}
+              {typeof publish === "boolean" && (
+                <div className="ml-2">
+                  <Tooltip
+                    title={`This quiz is ${
+                      publish ? "published" : "unpublished"
+                    }`}
+                  >
+                    <Tag color={publish ? "green" : "red"}>
+                      {publish ? "Published" : "Unpublished"}
+                    </Tag>
+                  </Tooltip>
+                </div>
+              )}
+            </div>
+
             <div className="flex items-center text-gray-500">
               <span className="text-green-600 font-medium mr-2">Quiz</span>
               <span className="mx-2">|</span>
@@ -42,6 +60,7 @@ const Tabs = ({
           </div>
         )}
 
+        {/* Tab Buttons */}
         <div className="flex gap-2 bg-white">
           <button
             onClick={() => handleTabClick("instructions")}
@@ -78,6 +97,7 @@ const Tabs = ({
           </button>
         </div>
 
+        {/* Add Question Button (Protected) */}
         {activeTab === "questions" && createPage && (
           <ProtectedAction
             requiredPermission={PERMISSIONS.ADD_QUESTION_TO_QUIZ}
@@ -94,6 +114,8 @@ const Tabs = ({
           </ProtectedAction>
         )}
       </div>
+
+      {/* Tab Content */}
       <div className="p-4">{children(activeTab)}</div>
     </>
   );

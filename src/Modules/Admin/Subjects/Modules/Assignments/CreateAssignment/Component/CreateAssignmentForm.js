@@ -1,3 +1,4 @@
+// CreateAssignmentForm.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PointsInput from "./PointsInput";
@@ -27,8 +28,18 @@ const CreateAssignmentForm = ({
   moduleId,
   chapterId,
   groupId,
+  // Refs passed from MainSection:
   moduleRef,
+  pointsRef,
+  submissionTypeRef,
+  availableFromRef,
+  dueDateRef,
+  // Error messages:
   moduleError,
+  pointsError,
+  submissionTypeError,
+  availableFromError,
+  dueDateError,
 }) => {
   const dispatch = useDispatch();
   const moduleList = useSelector((store) => store.admin.module.modules);
@@ -41,50 +52,54 @@ const CreateAssignmentForm = ({
 
   useEffect(() => {
     if (moduleId) {
-      const module = moduleList.find((mod) => mod._id === moduleId);
-      if (module) {
-        setChapters(module.chapters);
-      } else {
-        setChapters([]);
-      }
+      const currentModule = moduleList.find((m) => m._id === moduleId);
+      setChapters(currentModule ? currentModule.chapters : []);
     } else {
       setChapters([]);
     }
   }, [moduleId, moduleList]);
 
   const handleModuleChange = (e) => {
-    const value = e.target.value;
-    handleChange({ target: { name: "moduleId", value } });
+    handleChange(e);
   };
 
   const handleChapterChange = (e) => {
-    const value = e.target.value;
-    handleChange({ target: { name: "chapterId", value } });
+    handleChange(e);
   };
 
   return (
     <div className="max-w-sm mx-auto p-6 bg-white border">
       <h3 className="text-lg font-semibold mb-4">Options</h3>
 
-      <PointsInput points={points} handleChange={handleChange} />
+      <PointsInput
+        id="points"
+        points={points}
+        handleChange={handleChange}
+        inputRef={pointsRef}
+        error={pointsError}
+      />
 
+      {/* Module Select */}
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="module-select">
+        <label className="block text-gray-700" htmlFor="moduleId">
           Module
         </label>
         <select
-          id="module-select"
+          id="moduleId"
           ref={moduleRef}
-          className={`mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md ${
-            moduleError ? "border-red-500" : "border-gray-300"
-          }`}
-          value={moduleId}
+          name="moduleId"
+          value={moduleId || ""}
           onChange={handleModuleChange}
+          className={`mt-1 block w-full pl-3 pr-10 py-2 text-base sm:text-sm rounded-md focus:outline-none ${
+            moduleError
+              ? "border-red-500 focus:ring-red-500"
+              : "border-gray-300 focus:ring-blue-500"
+          }`}
         >
           <option value="">Select</option>
-          {moduleList?.map((module) => (
-            <option key={module._id} value={module._id}>
-              {module.moduleName}
+          {moduleList?.map((mod) => (
+            <option key={mod._id} value={mod._id}>
+              {mod.moduleName}
             </option>
           ))}
         </select>
@@ -100,14 +115,16 @@ const CreateAssignmentForm = ({
         )}
       </div>
 
+      {/* Chapter Select */}
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="chapter-select">
+        <label className="block text-gray-700" htmlFor="chapterId">
           Chapter
         </label>
         <select
-          id="chapter-select"
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          value={chapterId}
+          id="chapterId"
+          name="chapterId"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+          value={chapterId || ""}
           onChange={handleChapterChange}
           disabled={!moduleId}
         >
@@ -126,8 +143,11 @@ const CreateAssignmentForm = ({
       />
 
       <SubmissionTypeDropdown
+        id="submissionType"
         submissionType={submissionType}
         handleChange={handleChange}
+        inputRef={submissionTypeRef}
+        error={submissionTypeError}
       />
 
       <AllowedAttemptsSelect
@@ -143,30 +163,35 @@ const CreateAssignmentForm = ({
       )}
 
       <AssignToRadios
-        isAssignToLabel={true}
+        isAssignToLabel
         assignTo={assignTo}
         handleChange={handleChange}
       />
 
       <SectionSelect
+        sectionId={sectionId}
+        groupId={groupId}
         assignTo={assignTo}
-        section={sectionId}
         handleChange={handleChange}
-        group={groupId}
       />
 
       <DateInput
-        label="Available from"
+        label="Available From"
         name="availableFrom"
         value={availableFrom}
         handleChange={handleChange}
+        fieldId="availableFrom"
+        inputRef={availableFromRef}
+        error={availableFromError}
       />
-
       <DateInput
         label="Due"
         name="dueDate"
         value={dueDate}
         handleChange={handleChange}
+        fieldId="dueDate"
+        inputRef={dueDateRef}
+        error={dueDateError}
       />
     </div>
   );

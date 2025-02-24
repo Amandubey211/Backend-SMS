@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// CreateAssignmentHeader.jsx
+import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -7,53 +8,12 @@ import { PERMISSIONS } from "../../../../../../../config/permission";
 
 const CreateAssignmentHeader = ({
   onSave,
-  id,
   isEditing,
-  criteriaList,
-  setCriteriaList,
-  existingRubricId,
-  setExistingRubricId,
   saveLoading,
   publishLoading,
 }) => {
   const { t } = useTranslation("admModule");
   const navigate = useNavigate();
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [criteriaToEdit, setCriteriaToEdit] = useState(null);
-
-  const handleAddCriteria = () => {
-    setSidebarOpen(true);
-  };
-
-  const handleAddNewCriteria = (newCriteria) => {
-    if (editMode) {
-      setCriteriaList(
-        criteriaList?.map((crit, index) =>
-          index === criteriaToEdit.index ? newCriteria : crit
-        )
-      );
-    } else {
-      setCriteriaList([...criteriaList, newCriteria]);
-    }
-    setSidebarOpen(false);
-    setEditMode(false);
-    setCriteriaToEdit(null);
-  };
-
-  const handleSubmit = async (rubricData) => {
-    const result = await onSave(rubricData);
-    if (result.success) {
-      setModalOpen(false);
-    }
-  };
-
-  const handleEditCriteria = (index) => {
-    setCriteriaToEdit({ ...criteriaList[index], index });
-    setSidebarOpen(true);
-    setEditMode(true);
-  };
 
   return (
     <div className="flex items-center justify-between p-2 bg-white border border-gray-300 shadow-sm">

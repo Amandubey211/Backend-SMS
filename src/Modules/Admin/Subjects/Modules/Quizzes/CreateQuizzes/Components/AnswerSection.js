@@ -1,3 +1,4 @@
+// AnswerSection.jsx
 import React from "react";
 import {
   AiOutlinePlus,
@@ -15,11 +16,12 @@ const AnswerSection = ({
   setRightAnswerComment,
   wrongAnswerComment,
   setWrongAnswerComment,
+  error, // new error prop
 }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
 
   const handleCheckboxChange = (index) => {
-    const newAnswers = answers?.map((answer, i) => ({
+    const newAnswers = answers.map((answer, i) => ({
       ...answer,
       isCorrect: i === index ? !answer.isCorrect : false,
     }));
@@ -33,14 +35,18 @@ const AnswerSection = ({
 
   const handleInputChange = (index, event) => {
     const { value } = event.target;
-    const newAnswers = answers?.map((answer, i) =>
+    const newAnswers = answers.map((answer, i) =>
       i === index ? { ...answer, text: value } : answer
     );
     setAnswers(newAnswers);
   };
 
   return (
-    <div className="p-6 bg-white space-y-6">
+    <div
+      className={`p-6 bg-white space-y-6 ${
+        error ? "border border-red-500" : ""
+      }`}
+    >
       <h2 className="text-xl font-semibold">{t("Answer Section")}</h2>
       <div className="flex items-center space-x-2">
         <AiOutlineInfoCircle className="text-gray-500" />
@@ -60,7 +66,9 @@ const AnswerSection = ({
                 answer.isCorrect ? "bg-green-500" : "bg-gray-200"
               } text-white cursor-pointer`}
               onClick={() => handleCheckboxChange(index)}
-              aria-label={t("Set answer {{index}} as correct", { index: index + 1 })}
+              aria-label={t("Set answer {{index}} as correct", {
+                index: index + 1,
+              })}
               role="checkbox"
               aria-checked={answer.isCorrect}
             >
@@ -119,6 +127,7 @@ const AnswerSection = ({
           />
         </div>
       </div>
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </div>
   );
 };

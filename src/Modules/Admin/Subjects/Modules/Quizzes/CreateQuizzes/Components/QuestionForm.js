@@ -1,8 +1,8 @@
-import React, { useEffect } from "react";
+// QuestionForm.jsx
+import React, { useEffect, useState } from "react";
 import EditorComponent from "../../../../Component/AdminEditor";
 import AnswerSection from "./AnswerSection";
 import AddQuestionButton from "./AddQuestionButton";
-import { BsCheck } from "react-icons/bs";
 import { useTranslation } from "react-i18next";
 
 const QuestionForm = ({
@@ -21,7 +21,8 @@ const QuestionForm = ({
   setQuestionType,
   addNewQuestion,
 }) => {
-  const { t } = useTranslation('admModule');
+  const { t } = useTranslation("admModule");
+  const [answerError, setAnswerError] = useState("");
 
   useEffect(() => {
     if (questionType === "true/false") {
@@ -40,6 +41,19 @@ const QuestionForm = ({
       setAnswers([]);
     }
   }, [questionType, setAnswers, t]);
+
+  // Wrapper to validate correct answer selection before adding question
+  const handleAddQuestion = () => {
+    if (
+      (questionType === "multiple choice" || questionType === "true/false") &&
+      !answers.some((answer) => answer.isCorrect)
+    ) {
+      setAnswerError(t("Please select the correct answer."));
+      return;
+    }
+    setAnswerError("");
+    addNewQuestion();
+  };
 
   return (
     <div className="h-full pb-16 overflow-y-scroll">
@@ -82,15 +96,18 @@ const QuestionForm = ({
       />
 
       {questionType === "multiple choice" && (
-        <AnswerSection
-          answers={answers}
-          setAnswers={setAnswers}
-          handleAnswerChange={handleAnswerChange}
-          rightAnswerComment={rightAnswerComment}
-          setRightAnswerComment={setRightAnswerComment}
-          wrongAnswerComment={wrongAnswerComment}
-          setWrongAnswerComment={setWrongAnswerComment}
-        />
+        <>
+          <AnswerSection
+            answers={answers}
+            setAnswers={setAnswers}
+            handleAnswerChange={handleAnswerChange}
+            rightAnswerComment={rightAnswerComment}
+            setRightAnswerComment={setRightAnswerComment}
+            wrongAnswerComment={wrongAnswerComment}
+            setWrongAnswerComment={setWrongAnswerComment}
+            error={answerError}
+          />
+        </>
       )}
 
       {questionType === "true/false" && (
@@ -109,7 +126,7 @@ const QuestionForm = ({
                   ])
                 }
               >
-                {answers[0]?.isCorrect && <BsCheck />}
+                {answers[0]?.isCorrect && <span>{/* icon */}</span>}
               </div>
               <input
                 type="text"
@@ -131,7 +148,7 @@ const QuestionForm = ({
                   ])
                 }
               >
-                {answers[1]?.isCorrect && <BsCheck />}
+                {answers[1]?.isCorrect && <span>{/* icon */}</span>}
               </div>
               <input
                 type="text"
@@ -142,6 +159,9 @@ const QuestionForm = ({
               />
             </div>
           </div>
+          {answerError && (
+            <p className="text-red-500 text-sm mt-2">{answerError}</p>
+          )}
         </div>
       )}
 
@@ -156,7 +176,7 @@ const QuestionForm = ({
         </div>
       )}
 
-      <AddQuestionButton addNewQuestion={addNewQuestion} />
+      <AddQuestionButton addNewQuestion={handleAddQuestion} />
     </div>
   );
 };
