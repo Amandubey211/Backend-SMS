@@ -11,6 +11,7 @@ export const createAdjustment = createAsyncThunk(
   "penaltyandAdjustment/createAdjustment",
   async (formValues, { rejectWithValue, getState }) => {
     try {
+      console.log("form value is :==>",formValues)
       // 1) Fetch necessary IDs
       const storedSchoolId = localStorage.getItem("SelectedschoolId");
       const schoolId = storedSchoolId || "";
@@ -19,7 +20,7 @@ export const createAdjustment = createAsyncThunk(
 
       // 2) Prepare payload
       const payload = {
-        ...formValues,
+        formValues,
         schoolId,
         academicYear: academicYearId,
       };

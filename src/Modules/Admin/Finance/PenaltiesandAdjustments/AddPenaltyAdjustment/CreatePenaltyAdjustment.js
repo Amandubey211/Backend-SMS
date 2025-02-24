@@ -45,7 +45,7 @@ const CalculateAmounts = () => {
     }
 
     const total_amount = values.items.reduce(
-      (acc, item) => acc + Number(item.amount || 0),
+      (acc, item) => acc + Number(item.quantity)*Number(item.amount || 0),
       0
     );
 
@@ -60,7 +60,7 @@ const CalculateAmounts = () => {
     });
 
     // Update Formik's subAmount and finalAmount
-    setFieldValue("subAmount", calculated.discountValue, false);
+    setFieldValue("subAmount", total_amount, false);
     setFieldValue("finalAmount", calculated.finalAmount, false);
   }, [
     values.items,
@@ -214,13 +214,14 @@ const CreatePenaltyAdjustment = () => {
 
   // Handle form submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    if (readOnly) {
-      // Prevent submission in read-only mode
-      setSubmitting(false);
-      return;
-    }
-    setSubmitting(true);
+ 
     try {
+      if (readOnly) {
+        // Prevent submission in read-only mode
+        setSubmitting(false);
+        return;
+      }
+      setSubmitting(true);
       // Prepare the payload
       const payload = {
         invoiceNumber: values.invoiceNumber,
@@ -240,8 +241,8 @@ const CreatePenaltyAdjustment = () => {
       };
 
       // Include 'document' only if it exists
-      if (values.document) {
-        payload.document = values.document;
+      if (values?.document) {
+        payload.document = values?.document;
       }
 
       await dispatch(createAdjustment(payload)).unwrap();
