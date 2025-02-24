@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-// Parent-side thunk
+// Parent-Side Grades & Semesters
 import { fetchParentStudentGrades } from "../../../Store/Slices/Parent/Grades/parentGrade.action";
-// Suppose we also fetch parent semesters
 import { fetchSemestersByClass } from "../../../Store/Slices/Parent/Semesters/parentSemester.action";
-// Suppose we fetch admin subjects
+
+// Admin-Side Subjects
 import { fetchStudentSubjects } from "../../../Store/Slices/Admin/Users/Students/student.action";
 
 import GradeAccordionItem from "./GradeAccordionItem";
@@ -15,63 +15,76 @@ const StudentGradesAccordion = () => {
   const dispatch = useDispatch();
   const { studentId } = useParams();
 
-  // Parent children data
+  // ==============================
+  // Redux Data
+  // ==============================
+  // 1) Parent's children slice
   const { children } = useSelector((state) => state.Parent.children || {});
-  // Parent grades data
+  // 2) Parent's grades slice
   const { grades } = useSelector((state) => state.Parent.grades || {});
 
-  // Find the relevant child
+  // Find the child that matches the URL param
   const Child = children?.find((child) => child.id === studentId);
 
-  // =============== Semesters ===============
+  // ==============================
+  // Local State for Semesters
+  // ==============================
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState(null);
 
-  // =============== Handler to Fetch Grades ===============
+  // ==============================
+  // Handler to Fetch Grades
+  // ==============================
   const getStudentGrades = (subjectId, semesterId) => {
     if (!Child?.presentClassId) return;
 
-    // Build only "params" for subject, module, etc.
+    // Only pass subject info in params
     const params = {};
     if (subjectId) params.subjectId = subjectId;
 
-    // Call the parent thunk
+    // Dispatch parent-side grades thunk
     dispatch(
       fetchParentStudentGrades({
         params,
         studentId,
         studentClassId: Child.presentClassId,
-        semesterId, // pass it as a separate arg to the thunk
+        semesterId,
       })
     );
   };
 
-  // =============== Load Semesters & Auto-Select First ===============
+  // ==============================
+  // Load Semesters & Auto-Select First
+  // ==============================
   const loadSemesters = async () => {
     if (!Child?.presentClassId) return;
     try {
       const response = await dispatch(
         fetchSemestersByClass({ classId: Child.presentClassId })
       ).unwrap();
+
       if (Array.isArray(response) && response.length > 0) {
         setSemesters(response);
-        // auto-select first
-        const first = response[0];
-        setSelectedSemester(first._id);
-        // fetch grades immediately with first semester
-        getStudentGrades(null, first._id);
+        // Auto-select the first semester
+        const firstSem = response[0];
+        setSelectedSemester(firstSem._id);
+
+        // Immediately fetch grades with the first semester
+        getStudentGrades(null, firstSem._id);
       }
     } catch (error) {
       console.error("Failed to fetch semesters:", error);
     }
   };
 
-  // =============== On Mount ===============
+  // ==============================
+  // On Mount
+  // ==============================
   useEffect(() => {
     if (Child?.presentClassId) {
-      // fetch admin subjects
+      // 1) Fetch admin side subjects
       dispatch(fetchStudentSubjects(studentId));
-      // load parent semesters
+      // 2) Load parent side semesters
       loadSemesters();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,9 +92,10 @@ const StudentGradesAccordion = () => {
 
   return (
     <div className="flex flex-col md:flex-row w-full p-4 pl-0">
-      {/* LEFT: Accordion */}
+      {/* LEFT: Accordion Section */}
       <div className="md:w-3/4 w-full">
         <GradeAccordionItem
+          // Pass getData that includes the selected semester
           getData={(subjectId) => getStudentGrades(subjectId, selectedSemester)}
           semesters={semesters}
           selectedSemester={selectedSemester}
@@ -89,7 +103,7 @@ const StudentGradesAccordion = () => {
         />
       </div>
 
-      {/* RIGHT: Grade Summary */}
+      {/* RIGHT: Grade Summary Section */}
       <div className="md:w-1/4 w-full mt-4 md:mt-0 border-l border-gray-200 pl-4">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">Grade Summary</h3>
 
