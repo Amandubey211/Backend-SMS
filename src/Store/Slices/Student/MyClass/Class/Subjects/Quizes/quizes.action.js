@@ -12,12 +12,16 @@ import {
 
 export const stdGetQuiz = createAsyncThunk(
   "quiz/stdGetQuiz",
-  async ({ cid, sid, moduleId, chapterId }, { rejectWithValue, dispatch }) => {
+  async (
+    { cid, sid, moduleId, chapterId },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     try {
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
       dispatch(setShowError(false));
       const res = await getData(
-        `/student/studentquiz/class/${cid}?say=${say}`,
+        `/student/studentquiz/class/${cid}?say=${say}&semesterId=${semesterId}`,
         { subjectId: sid, moduleId, chapterId }
       );
 

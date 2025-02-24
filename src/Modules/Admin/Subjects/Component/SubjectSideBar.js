@@ -70,7 +70,7 @@ const SubjectSideBar = () => {
     break-words       /* break long words */
     text-center       /* optionally center-align text */
     transition-colors
-    duration-200
+    duration-200  
     hover:bg-pink-400
     hover:text-pink-900
   "

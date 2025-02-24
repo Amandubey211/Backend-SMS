@@ -673,7 +673,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={OfflineExamList}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "student"]}
         />
       ),
       errorElement: <Error />,
@@ -683,7 +683,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={OfflineExamViewList}
-          allowedRoles={["admin", "teacher"]}
+          allowedRoles={["admin", "teacher", "student"]}
         />
       ),
       errorElement: <Error />,

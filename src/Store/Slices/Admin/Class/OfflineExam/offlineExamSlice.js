@@ -2,10 +2,10 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   createOfflineExam,
   deleteOfflineExamCard,
-  deleteOfflineExamStudentSheet,
+  deleteOfflineExamStudent,
   fetchAllOfflineExam,
   UpdateOfflineExamCard,
-  UpdateOfflineExamStudentSheet,
+  UpdateOfflineExamStudent,
   UploadOfflineExamSheet,
 } from "./oflineExam.action";
 
@@ -13,12 +13,19 @@ const initialState = {
   error: false,
   loading: false,
   offlineExamData: [],
+  selectedExamStudents: [],
+  // isOpen: false,
+  // setIsModalOpen,
 };
 const offlineExamSlice = createSlice({
   name: "offline-exam",
   initialState,
   reducers: {
-    // synchronous reducers
+    setSelectedExamStudents: (state, action) => {
+      console.log("action selected exam", action.payload);
+
+      state.selectedExamStudents = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -29,7 +36,6 @@ const offlineExamSlice = createSlice({
       .addCase(fetchAllOfflineExam.fulfilled, (state, action) => {
         state.loading = false;
         state.offlineExamData = action?.payload?.data;
-        console.log("action data", action?.payload?.data);
       })
       .addCase(fetchAllOfflineExam.rejected, (state) => {
         state.loading = false;
@@ -43,7 +49,6 @@ const offlineExamSlice = createSlice({
       })
       .addCase(createOfflineExam.fulfilled, (state, action) => {
         state.loading = false;
-        // state.offlineExamData = action?.payload;
       })
       .addCase(createOfflineExam.rejected, (state) => {
         state.loading = false;
@@ -77,14 +82,14 @@ const offlineExamSlice = createSlice({
       });
 
     builder
-      .addCase(UpdateOfflineExamStudentSheet.pending, (state) => {
+      .addCase(UpdateOfflineExamStudent.pending, (state) => {
         state.loading = true;
         state.error = false;
       })
-      .addCase(UpdateOfflineExamStudentSheet.fulfilled, (state, action) => {
+      .addCase(UpdateOfflineExamStudent.fulfilled, (state, action) => {
         state.loading = false;
       })
-      .addCase(UpdateOfflineExamStudentSheet.rejected, (state) => {
+      .addCase(UpdateOfflineExamStudent.rejected, (state) => {
         state.loading = false;
         state.error = true;
       });
@@ -103,18 +108,18 @@ const offlineExamSlice = createSlice({
       });
 
     builder
-      .addCase(deleteOfflineExamStudentSheet.pending, (state) => {
+      .addCase(deleteOfflineExamStudent.pending, (state) => {
         state.loading = true;
         state.error = false;
       })
-      .addCase(deleteOfflineExamStudentSheet.fulfilled, (state, action) => {
+      .addCase(deleteOfflineExamStudent.fulfilled, (state, action) => {
         state.loading = false;
       })
-      .addCase(deleteOfflineExamStudentSheet.rejected, (state) => {
+      .addCase(deleteOfflineExamStudent.rejected, (state) => {
         state.loading = false;
         state.error = true;
       });
   },
 });
-export const {} = offlineExamSlice.actions;
+export const { setSelectedExamStudents } = offlineExamSlice.actions;
 export default offlineExamSlice.reducer;

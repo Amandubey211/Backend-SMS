@@ -71,7 +71,7 @@ const StudentTimeTableList = ({ timetables, loading }) => {
    * Handle card click - navigates to the detailed view of the timetable.
    */
   const handleCardClick = (timetable) => {
-    navigate(`/viewtable/${timetable._id}`, { state: { timetable } });
+    navigate(`viewtable/${timetable?._id}`, { state: { timetable } });
   };
 
   /**
@@ -181,7 +181,7 @@ const StudentTimeTableList = ({ timetables, loading }) => {
   return (
     <div className="flex flex-col p-2">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
-        {sortedTimetables.map((timetable) => (
+        {sortedTimetables?.map((timetable) => (
           <div
             key={timetable?._id}
             onClick={() => handleCardClick(timetable)}

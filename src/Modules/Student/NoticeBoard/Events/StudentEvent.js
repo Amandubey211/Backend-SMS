@@ -36,7 +36,7 @@ const StudentEvent = () => {
     itemsPerPage,
     currentDate,
     loading,
-    error
+    error,
   } = useSelector((store) => store.student.studentEvent);
   const { showError } = useSelector((store) => store?.common?.alertMsg);
 
@@ -61,12 +61,11 @@ const StudentEvent = () => {
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
-  }
-
+  };
 
   useEffect(() => {
     dispatch(stdEvent());
-  }, [dispatch,stdEvent]);
+  }, [dispatch, stdEvent]);
 
   useEffect(() => {
     filterAndSortEvents(eventData, selectedMonthYear);
@@ -90,29 +89,34 @@ const StudentEvent = () => {
 
   // calender function
   const handleDateCellRender = (value) => {
-    const formattedDate = format(value.toDate(), 'yyyy-MM-dd');
+    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
     const dayEvents = filteredEvents.filter(
-      (event) => format(event?.startDate, 'yyyy-MM-dd') === formattedDate
+      (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
     );
-  
-    const bgColors = ['bg-pink-500', 'bg-purple-500', 'bg-blue-500', 'bg-indigo-500'];
-  
+
+    const bgColors = [
+      "bg-pink-500",
+      "bg-purple-500",
+      "bg-blue-500",
+      "bg-indigo-500",
+    ];
+
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
         {dayEvents?.map((event, index) => {
           // Parse time from event, support both 24-hour and 12-hour formats
           let eventTime = event?.time
-            ? parse(event?.time, 'hh:mm a', new Date()) // Try parsing as 12-hour format first
+            ? parse(event?.time, "hh:mm a", new Date()) // Try parsing as 12-hour format first
             : event?.startDate;
-  
+
           if (!isValid(eventTime)) {
-            eventTime = parse(event?.time, 'HH:mm', new Date()); // Fallback for 24-hour format
+            eventTime = parse(event?.time, "HH:mm", new Date()); // Fallback for 24-hour format
           }
-  
+
           const timeString = isValid(eventTime)
-            ? format(eventTime, 'hh:mm a')  // Always display in 12-hour format
-            : 'Invalid Time';
-  
+            ? format(eventTime, "hh:mm a") // Always display in 12-hour format
+            : "Invalid Time";
+
           return (
             <li
               key={event?.id}
@@ -166,19 +170,19 @@ const StudentEvent = () => {
   };
 
   // selected Month and Year
-// console.log("dsdfasasasa",paginatedEvents)
+  // console.log("dsdfasasasa",paginatedEvents)
   return (
     <>
       <Layout title="Event">
         <StudentDashLayout>
-          <div className="min-h-screen p-4 bg-gray-50">
+          <div className="min-h-screen p-4 bg-gray-50 w-full">
             <div className="flex flex-row justify-between">
               <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
                 {t("Student Events", gt.stdEvents)}
               </h1>
             </div>
 
-            <div className="my-4 w-full h-40 flex rounded-sm gap-8 pl-8 relative ">
+            <div className="my-4 w-full h-auto flex rounded-sm gap- relative">
               {currentPage > 0 && (
                 <div
                   className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
@@ -187,10 +191,11 @@ const StudentEvent = () => {
                   <IoIosArrowBack />
                 </div>
               )}
-              {loading && !error? (<div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
-                <Spinner />
-              </div>
-              ) : (!loading && paginatedEvents?.length === 0) ? (
+              {loading && !error ? (
+                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                  <Spinner />
+                </div>
+              ) : !loading && paginatedEvents?.length === 0 ? (
                 <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
                   <IoCalendarOutline className="text-6xl" />
                   <span>{t("No Events in this Month", gt.stdEvents)}</span>
@@ -216,8 +221,8 @@ const StudentEvent = () => {
               )}
             </div>
 
-            <hr className="my-6 border-t-2 mt-12 " />
-            <div className="py-7">
+            <hr className="border-t-1 mt-12" />
+            <div className="w-full px-2">
               <Calendar
                 dateCellRender={handleDateCellRender}
                 headerRender={({ value, type, onChange, onTypeChange }) => {
@@ -251,9 +256,8 @@ const StudentEvent = () => {
                   }
                   return (
                     <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
-
                       <select
-                        className="border rounded px-2 py-1"
+                        className="border rounded  bg-pink-100  px-3 py-2 text-pink-800 font-medium  "
                         value={month}
                         onChange={(event) => {
                           const newMonth = parseInt(event.target.value, 10);
@@ -268,7 +272,7 @@ const StudentEvent = () => {
                         {monthOptions}
                       </select>
                       <select
-                        className="border rounded px-2 py-1"
+                        className="border bg-pink-100 rounded px-3 py-2 text-pink-800 font-medium"
                         value={year}
                         onChange={(event) => {
                           const newYear = parseInt(event.target.value, 10);

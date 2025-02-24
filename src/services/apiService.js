@@ -1,8 +1,6 @@
 // services/apiService.js
 import axios from 'axios';
 import { baseUrl } from '../config/Common';
-import Cookies from 'js-cookie';
-
 
 // Create an instance of axios with default configurations
 const apiService = axios.create({

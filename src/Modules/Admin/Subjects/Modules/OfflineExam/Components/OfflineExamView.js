@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
-import { useLocation } from "react-router-dom";
 import OfflineExamViewCard from "./OfflineExamViewCard";
 import { CiSearch } from "react-icons/ci";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
@@ -8,13 +7,17 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 import { debounce } from "lodash";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { FaClipboardUser } from "react-icons/fa6";
+import { useSelector } from "react-redux";
 
 const OfflineExamView = () => {
-  const location = useLocation();
-  const { examName, students, examType, startDate } = location.state;
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const selectedExam = useSelector(
+    (state) => state.admin.offlineExam.selectedExamStudents
+  );
+  const { examName, students, examType, startDate, examId, semesterId } =
+    selectedExam || {};
 
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const debouncedSearch = useMemo(
     () =>
       debounce((searchQuery) => {
@@ -41,6 +44,7 @@ const OfflineExamView = () => {
     );
   }, [students, debouncedQuery]);
 
+
   return (
     <div className="flex ">
       <SubjectSideBar />
@@ -50,7 +54,7 @@ const OfflineExamView = () => {
           requiredPermission={PERMISSIONS.SHOW_ALL_EXAMS}
         >
           <div className="flex gap-7 items-center">
-            <h2 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold capitalize">
               {examName}
               <span className="border-none rounded-full text-sm p-1 px-2 ml-1 text-purple-600 bg-purple-100">
                 {searchedData?.length}
@@ -70,38 +74,33 @@ const OfflineExamView = () => {
             </div>
           </div>
           {searchedData?.length ? (
-            <div className="border border-gray-300 bg-white mt-5">
-              {/* Table Header Wrapper */}
-              <div className="overflow-hidden">
-                <table className="w-full text-gray-700 text-sm">
-                  <thead className="bg-gray-100 sticky top-0 shadow-md">
-                    <tr className="text-left">
-                      <th className="p-2 border w-[25%]">Student</th>
-                      <th className="p-2 border w-[15%]">Type</th>
-                      <th className="p-2 border w-[15%]">Obtained Marks</th>
-                      <th className="p-2 border w-[15%]">Max Marks</th>
-                      <th className="p-2 border w-[15%]">Exam Date</th>
-                      <th className="p-2 border w-[15%]">Status</th>
-                    </tr>
-                  </thead>
-                </table>
-              </div>
+            <div className=" bg-white mt-5 rounded-lg shadow-md">
+              <table className="w-full text-gray-700 text-sm table-fixed border-collapse">
+                <thead className="bg-gradient-to-r  from-pink-500 to-purple-500  text-white">
+                  <tr>
+                    <th className="p-3 border w-[15%]">Student</th>
+                    <th className="p-3 border w-[15%]">Type</th>
+                    <th className="p-3 border w-[15%]">Obtained Marks</th>
+                    <th className="p-3 border w-[15%]">Max Marks</th>
+                    <th className="p-3 border w-[15%]">Exam Date</th>
+                    <th className="p-3 border w-[15%]">Status</th>
+                    <th className="p-3 border w-[10%]">Actions</th>
+                  </tr>
+                </thead>
 
-              {/* Scrollable Body Wrapper */}
-              <div className="max-h-[400px]">
-                <table className="w-full text-gray-700 text-sm">
-                  <tbody>
-                    {searchedData?.map((student, index) => (
-                      <OfflineExamViewCard
-                        key={index}
-                        student={student}
-                        examType={examType}
-                        startDate={startDate}
-                      />
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                <tbody className="w-full">
+                  {searchedData?.map((student, index) => (
+                    <OfflineExamViewCard
+                      key={index}
+                      student={student}
+                      examType={examType}
+                      startDate={startDate}
+                      examId={examId}
+                      semesterId={semesterId}
+                    />
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : (
             <NoDataFound

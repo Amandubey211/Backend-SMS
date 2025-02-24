@@ -13,7 +13,7 @@ import {
 import { useParams } from "react-router-dom";
 import { fetchStudentsByClassAndSectionNames } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
-import { Tooltip, Modal, Button } from "antd";
+import { Tooltip, Modal } from "antd";
 import { motion } from "framer-motion";
 
 const AddGroup = ({ group, isUpdate, groupId, onClose }) => {

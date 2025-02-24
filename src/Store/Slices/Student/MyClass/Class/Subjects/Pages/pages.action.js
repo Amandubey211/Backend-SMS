@@ -6,12 +6,13 @@ import { getData } from "../../../../../../../services/apiEndpoints";
 
 export const stdPages = createAsyncThunk(
   "pages/stdPages",
-  async ({ classId }, { rejectWithValue, dispatch }) => {
+  async ({ classId }, { rejectWithValue, dispatch, getState }) => {
     try {
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
       dispatch(setShowError(false));
       const res = await getData(
-        `/admin/api/pages/class/pages/${classId}?say=${say}`
+        `/admin/api/pages/class/pages/${classId}?say=${say}&semesterId=${semesterId}`
       );
       // console.log(res)
       const data = res?.data;

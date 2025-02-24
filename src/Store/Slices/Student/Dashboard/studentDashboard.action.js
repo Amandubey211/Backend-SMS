@@ -139,10 +139,11 @@ export const fetchStudentGrades = createAsyncThunk(
       return rejectWithValue("Invalid student or class ID.");
     }
     try {
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(
-        `/admin/grades/student/${userId}/class/${classId}?say=${say}`
+        `/admin/grades/student/${userId}/class/${classId}?say=${say}&semesterId=${semesterId}`
       );
       return data;
     } catch (error) {
