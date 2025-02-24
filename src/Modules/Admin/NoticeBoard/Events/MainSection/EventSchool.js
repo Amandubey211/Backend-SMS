@@ -334,7 +334,7 @@ const EventScheduler = () => {
               onClose={handleSidebarClose}
             >
               {sidebarContent === "viewEvent" && selectedEvent ? (
-                <ViewEvent />
+                <ViewEvent onClose={handleSidebarClose} />
               ) : sidebarContent === "viewEvent" ? (
                 <p>{t("No event selected")}</p>
               ) : null}
