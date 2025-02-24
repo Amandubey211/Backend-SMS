@@ -1,20 +1,20 @@
+// parentSemester.action.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../Utils/academivYear";
 import { getData } from "../../../../services/apiEndpoints";
-import { getUserRole } from "../../../../Utils/getRoles";
 
-// ✅ Thunk for fetching semesters by class (updated endpoint path)
+// ✅ Thunk for fetching semesters by class (Force /admin route)
 export const fetchSemestersByClass = createAsyncThunk(
   "parent/semesters",
-  async ({ classId }, { rejectWithValue, dispatch, getState }) => {
-    const say = getAY(); // Get Academic Year
+  async ({ classId }, { rejectWithValue, dispatch }) => {
     dispatch(setShowError(false));
 
     try {
-      const getRole = getUserRole(getState); // Dynamically get user role
-      const endpoint = `/${getRole}/get-semester?classId=${classId}&say=${say}`;  // <-- Updated API path
+      const say = getAY(); 
+
+      const endpoint = `/admin/get-semester?classId=${classId}&say=${say}`;
 
       const response = await getData(endpoint);
 
@@ -29,5 +29,5 @@ export const fetchSemestersByClass = createAsyncThunk(
   }
 );
 
-// ✅ Alias fetchSemestersByClass as fetchSemesters
-export const fetchSemesters = fetchSemestersByClass;  // <-- Added this line
+// ✅ Optional alias if needed
+export const fetchSemesters = fetchSemestersByClass;

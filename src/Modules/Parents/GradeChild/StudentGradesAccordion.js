@@ -1,53 +1,95 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentGrades } from "../../../Store/Slices/Admin/Users/Students/student.action";
 import { useParams } from "react-router-dom";
+
+// Parent-side thunk
+import { fetchParentStudentGrades } from "../../../Store/Slices/Parent/Grades/parentGrade.action";
+// Suppose we also fetch parent semesters
+import { fetchSemestersByClass } from "../../../Store/Slices/Parent/Semesters/parentSemester.action";
+// Suppose we fetch admin subjects
+import { fetchStudentSubjects } from "../../../Store/Slices/Admin/Users/Students/student.action";
+
 import GradeAccordionItem from "./GradeAccordionItem";
 
 const StudentGradesAccordion = () => {
-  const { grades } = useSelector((store) => store.admin.all_students);
-  const role = useSelector((state) => state.common.auth.role);
-  const { children } = useSelector((state) => state?.Parent?.children || {});
-  const { studentId } = useParams();
   const dispatch = useDispatch();
-  console.log("role",role);
-  // Filter the child whose id matches the URL param
-  const Child = children?.filter((child) => child.id === studentId);
+  const { studentId } = useParams();
 
-  const getStudentGrades = async (
-    subjectId,
-    moduleId,
-    chapterId,
-    arrangeBy
-  ) => {
+  // Parent children data
+  const { children } = useSelector((state) => state.Parent.children || {});
+  // Parent grades data
+  const { grades } = useSelector((state) => state.Parent.grades || {});
+
+  // Find the relevant child
+  const Child = children?.find((child) => child.id === studentId);
+
+  // =============== Semesters ===============
+  const [semesters, setSemesters] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState(null);
+
+  // =============== Handler to Fetch Grades ===============
+  const getStudentGrades = (subjectId, semesterId) => {
+    if (!Child?.presentClassId) return;
+
+    // Build only "params" for subject, module, etc.
     const params = {};
     if (subjectId) params.subjectId = subjectId;
-    if (moduleId) params.moduleId = moduleId;
-    if (chapterId) params.chapterId = chapterId;
-    if (arrangeBy) params.arrangeBy = arrangeBy;
 
+    // Call the parent thunk
     dispatch(
-      fetchStudentGrades({
+      fetchParentStudentGrades({
         params,
         studentId,
-        studentClassId: Child?.[0]?.presentClassId,
+        studentClassId: Child.presentClassId,
+        semesterId, // pass it as a separate arg to the thunk
       })
     );
   };
 
+  // =============== Load Semesters & Auto-Select First ===============
+  const loadSemesters = async () => {
+    if (!Child?.presentClassId) return;
+    try {
+      const response = await dispatch(
+        fetchSemestersByClass({ classId: Child.presentClassId })
+      ).unwrap();
+      if (Array.isArray(response) && response.length > 0) {
+        setSemesters(response);
+        // auto-select first
+        const first = response[0];
+        setSelectedSemester(first._id);
+        // fetch grades immediately with first semester
+        getStudentGrades(null, first._id);
+      }
+    } catch (error) {
+      console.error("Failed to fetch semesters:", error);
+    }
+  };
+
+  // =============== On Mount ===============
   useEffect(() => {
-    getStudentGrades();
+    if (Child?.presentClassId) {
+      // fetch admin subjects
+      dispatch(fetchStudentSubjects(studentId));
+      // load parent semesters
+      loadSemesters();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, [Child]);
 
   return (
     <div className="flex flex-col md:flex-row w-full p-4 pl-0">
-      {/* Accordion Section */}
+      {/* LEFT: Accordion */}
       <div className="md:w-3/4 w-full">
-        <GradeAccordionItem getData={(subjectId) => getStudentGrades(subjectId)} />
+        <GradeAccordionItem
+          getData={(subjectId) => getStudentGrades(subjectId, selectedSemester)}
+          semesters={semesters}
+          selectedSemester={selectedSemester}
+          setSelectedSemester={setSelectedSemester}
+        />
       </div>
 
-      {/* Vertical Divider and Grade Summary Section */}
+      {/* RIGHT: Grade Summary */}
       <div className="md:w-1/4 w-full mt-4 md:mt-0 border-l border-gray-200 pl-4">
         <h3 className="text-lg font-semibold mb-4 text-gray-700">Grade Summary</h3>
 

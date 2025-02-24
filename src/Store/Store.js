@@ -93,7 +93,7 @@ import libraryReducer from "../Store/Slices/Parent/Library/librarySlices";
 import eventReducer from "../Store/Slices/Parent/Events/eventSlice";
 import parentTimeTableReducer from "../Store/Slices/Parent/TimeTable/parentTimeTableSlice";
 import parentSemesterReducer from "./Slices/Parent/Semesters/parentSemesterSlice";
-
+import parentChildGradesReducer from "./Slices/Parent/Grades/parentGradeSlice";
 // teacher
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
 
@@ -251,6 +251,7 @@ const ParentReducer = combineReducers({
   events: eventReducer,
   parentTimetable: parentTimeTableReducer,
   semesters: parentSemesterReducer,
+  grades: parentChildGradesReducer,
 });
 
 // Create the store
