@@ -10,6 +10,7 @@ import {
   putData,
 } from "../../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../../Utils/getRoles";
+import toast from "react-hot-toast";
 
 export const fetchAllOfflineExam = createAsyncThunk(
   "subject/offline_get_exam",
@@ -20,9 +21,10 @@ export const fetchAllOfflineExam = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       dispatch(setShowError(false));
       const response = await getData(
-        `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}&search=${query}`
+        `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}&search=${query}&semesterId=${semesterId}`
       );
 
       return response;
@@ -34,7 +36,7 @@ export const fetchAllOfflineExam = createAsyncThunk(
 
 export const createOfflineExam = createAsyncThunk(
   "subject/offline_create_exam",
-  async ({ payload }, { rejectWithValue, dispatch, getState }) => {
+  async ({ payload, cid, sid }, { rejectWithValue, dispatch, getState }) => {
     try {
       const getRole = getUserRole(getState);
       const schoolId = getState().common.user.userDetails.schoolId;
@@ -47,15 +49,13 @@ export const createOfflineExam = createAsyncThunk(
         academicYearId: say,
       };
 
-      console.log("Payload", payload);
       dispatch(setShowError(false));
 
       const response = await postData(
         `${getRole}/exam/create?say=${say}`,
         updatedPayload
       );
-      console.log("response", response);
-
+      dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -81,9 +81,10 @@ export const UploadOfflineExamSheet = createAsyncThunk(
         }
       );
       dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
-
+      toast.success(response.message);
       return response;
     } catch (error) {
+      toast.error(error.message);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -96,8 +97,6 @@ export const UpdateOfflineExamCard = createAsyncThunk(
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
-      console.log("update exam Payload", payload);
-
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
@@ -106,8 +105,6 @@ export const UpdateOfflineExamCard = createAsyncThunk(
         payload
       );
       dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
-      console.log("response", response);
-
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -115,24 +112,27 @@ export const UpdateOfflineExamCard = createAsyncThunk(
   }
 );
 
-export const UpdateOfflineExamStudentSheet = createAsyncThunk(
+export const UpdateOfflineExamStudent = createAsyncThunk(
   "subject/offline_update_exam_student",
   async (
-    { payload, admissionNumber },
+    { payload, admissionNumber, subjectId, classId },
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
+      console.log("payload update student", payload, admissionNumber);
 
       const response = await putData(
         `${getRole}/update/exam/${admissionNumber}?say=${say}`,
         payload
       );
-
+      toast.success(response.message);
+      dispatch(fetchAllOfflineExam({ classId: classId, subjectId: subjectId }));
       return response;
     } catch (error) {
+      toast.error(error.message);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -145,7 +145,6 @@ export const deleteOfflineExamCard = createAsyncThunk(
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));
-
       const response = await deleteData(
         `${getRole}/delete/offlineExam/${examId}?say=${say}`
       );
@@ -157,10 +156,10 @@ export const deleteOfflineExamCard = createAsyncThunk(
   }
 );
 
-export const deleteOfflineExamStudentSheet = createAsyncThunk(
+export const deleteOfflineExamStudent = createAsyncThunk(
   "subject/offline_delete_exam_student",
   async (
-    { subjectId, admissionNumber },
+    { subjectId, classId, admissionNumber, examId },
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
@@ -169,11 +168,14 @@ export const deleteOfflineExamStudentSheet = createAsyncThunk(
       dispatch(setShowError(false));
 
       const response = await deleteData(
-        `${getRole}/delete/exam/subject/${subjectId}/${admissionNumber}?say=${say}`
+        `${getRole}/delete/exam/subject/${subjectId}/${admissionNumber}?say=${say}&examId=${examId}`
       );
+      dispatch(fetchAllOfflineExam({ classId: classId, subjectId: subjectId }));
+      toast.success(response.message);
 
       return response;
     } catch (error) {
+      toast.success(error.message);
       return handleError(error, dispatch, rejectWithValue);
     }
   }

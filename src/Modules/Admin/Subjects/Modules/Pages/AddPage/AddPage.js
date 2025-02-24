@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import AddPageHeader from "./AddPageHeader";
@@ -6,7 +6,7 @@ import EditorComponent from "../../../Component/AdminEditor";
 import DateInput from "../../../Component/DateInput";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import {
   createPage,
   updatePage,
@@ -18,12 +18,19 @@ const AddPage = () => {
   const { t } = useTranslation("admAccounts");
   const { state } = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const [title, setTitle] = useState("");
   const [editorContent, setEditorContent] = useState("");
-  // const [editPermission, setEditPermission] = useState("Only Instructor");
   const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [loadingType, setLoadingType] = useState(""); // Separate loading state for each button
+  const [loadingType, setLoadingType] = useState(""); // "save" (publishing is always required)
+  const [publishAtError, setPublishAtError] = useState("");
+  const [titleError, setTitleError] = useState("");
+
+  // Refs for validations
+  const publishDateRef = useRef(null);
+  const titleInputRef = useRef(null);
 
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
@@ -36,7 +43,6 @@ const AddPage = () => {
     if (state?.page) {
       setTitle(state.page.title || "");
       setEditorContent(state.page.content || "");
-      // setEditPermission(state.page.editPermission || "Only Instructor");
       if (state.page.publishAt) {
         setPublishDate(
           new Date(state.page.publishAt).toISOString().substring(0, 10)
@@ -46,56 +52,86 @@ const AddPage = () => {
     }
   }, [state]);
 
-  const handleNameChange = useCallback((name) => setTitle(name), []);
+  const handleNameChange = useCallback((name) => {
+    setTitle(name);
+    if (name.trim()) {
+      setTitleError("");
+    }
+  }, []);
+
   const handleEditorChange = useCallback(
     (content) => setEditorContent(content),
     []
   );
-  // const handleEditPermissionChange = useCallback(
-  //   (e) => setEditPermission(e.target.value),
-  //   []
-  // );
-  const handlePublishDateChange = useCallback(
-    (e) => setPublishDate(e.target.value),
-    []
-  );
 
-  const handleSave = useCallback(
-    async (shouldPublish) => {
-      const pageData = {
-        title,
-        content: editorContent,
-        // editPermission,
-        publishAt,
-        publish: shouldPublish,
-      };
+  const handlePublishDateChange = useCallback((e) => {
+    setPublishDate(e.target.value);
+    if (e.target.value.trim()) {
+      setPublishAtError("");
+    }
+  }, []);
 
-      setLoadingType(shouldPublish ? "publish" : "save");
+  // Updated: Publish date is always required
+  const handleSave = useCallback(async () => {
+    // Validate title first
+    if (!title.trim()) {
+      setTitleError("Page title is required.");
+      titleInputRef.current?.focus();
+      return;
+    }
+    // Always validate publish date
+    if (!publishAt.trim()) {
+      setPublishAtError("Publish date is required.");
+      publishDateRef.current?.focus();
+      return;
+    }
+    const today = new Date();
+    const selectedDate = new Date(publishAt);
+    const todayStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    if (selectedDate < todayStart) {
+      setPublishAtError("Publish date must be today or a future date.");
+      publishDateRef.current?.focus();
+      return;
+    }
 
-      try {
-        if (isUpdating) {
-          await dispatch(updatePage({ pageId: state?.page._id, pageData }));
-        } else {
-          await dispatch(createPage({ pageData, cid }));
-        }
-      } catch (error) {
-        console.error("Error saving page:", error);
-      } finally {
-        setLoadingType("");
-      }
-    },
-    [
+    const pageData = {
       title,
-      editorContent,
-      // editPermission,
+      content: editorContent,
       publishAt,
-      isUpdating,
-      state,
-      dispatch,
-    ]
-  );
+      publish: true, // Always publish (since publishAt is always required)
+    };
 
-  // Compute if publish date is set
+    setLoadingType("save");
+
+    try {
+      if (isUpdating) {
+        await dispatch(updatePage({ pageId: state?.page._id, pageData }));
+      } else {
+        await dispatch(createPage({ pageData, cid }));
+      }
+      // After successful creation/update, navigate back
+      navigate(-1);
+    } catch (error) {
+      console.error("Error saving page:", error);
+    } finally {
+      setLoadingType("");
+    }
+  }, [
+    title,
+    editorContent,
+    publishAt,
+    isUpdating,
+    state,
+    dispatch,
+    cid,
+    navigate,
+  ]);
+
+  // Compute if publish date is set (used in header tooltip)
   const isPublishDateSet = publishAt.trim() !== "";
 
   return (
@@ -109,14 +145,14 @@ const AddPage = () => {
       <div className="flex w-full min-h-screen h-full">
         <SideMenubar />
         <div
-          className={`ml-${sidebarWidth} transition-all min-h-screen  duration-500 flex-1 h-full`}
+          className={`ml-${sidebarWidth} transition-all min-h-screen duration-500 flex-1 h-full`}
           style={{ marginLeft: sidebarWidth }}
         >
           <AddPageHeader
             onSave={handleSave}
             isUpdating={isUpdating}
             loadingType={loadingType}
-            isPublishDateSet={isPublishDateSet} // Passing the prop
+            isPublishDateSet={isPublishDateSet}
           />
 
           <ProtectedSection
@@ -133,31 +169,19 @@ const AddPage = () => {
                   editorContent={editorContent}
                   onNameChange={handleNameChange}
                   onEditorChange={handleEditorChange}
+                  error={titleError}
+                  inputRef={titleInputRef}
                 />
               </div>
               <div className="w-[30%] border-l min-h-screen px-4 py-2">
                 <h2 className="text-lg font-semibold mb-4">{t("Option")}</h2>
-                {/* <div className="mb-4">
-
-                <label className="block text-gray-700" htmlFor="editPermission">
-                  {t("Users allowed to edit this page")}
-                </label>
-                <select
-                  id="editPermission"
-                  value={editPermission}
-                  onChange={handleEditPermissionChange}
-                  className="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                >
-                  <option>{t("Only Instructor")}</option>
-                  <option>{t("All Students")}</option>
-                  <option>{t("Instructor and TA")}</option>
-                </select>
-              </div> */}
                 <DateInput
                   label={t("Publish at")}
                   name="publishAt"
                   value={publishAt}
                   handleChange={handlePublishDateChange}
+                  error={publishAtError}
+                  ref={publishDateRef}
                 />
               </div>
             </div>

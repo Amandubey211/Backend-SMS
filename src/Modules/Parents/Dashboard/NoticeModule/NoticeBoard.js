@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useCallback } from "react";
 import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
-import { Skeleton } from "antd";
 import { format } from 'date-fns';
 import { FaBell } from "react-icons/fa"; // Keeping the bell icon for consistency
 import Spinner from "../../../../Components/Common/Spinner";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchNotices } from '../../../../Store/Slices/Parent/Dashboard/dashboard.action';
 import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
+import { DashNoticeSkeleton } from "../../Skeletons";
 
 // Gradient backgrounds for the notices
 const gradientBackgrounds = [
@@ -67,35 +67,6 @@ const NoticeBoard = ({ textTrimCount }) => {
   }, [notices]);
 
 
-  const NoticeSkeleton = () => (
-    <div className="p-4 w-full">
-      {/* Notice Item */}
-      <div className="flex items-start gap-4 p-4 border-b w-full">
-        {/* Notice Icon (Increased Size & Rounded Corners) */}
-        <Skeleton.Avatar active size={60} shape="square" style={{ borderRadius: 12 }} />
-
-        {/* Notice Content */}
-        <div className="flex-1 space-y-3">
-          {/* Title + Author (Aligned Horizontally) */}
-          <div className="flex items-center justify-between">
-            <Skeleton.Input active size="small" style={{ width: "50%" }} />
-            <Skeleton.Input active size="small" style={{ width: "30%" }} />
-          </div>
-
-          {/* Date & Priority (Aligned Inline) */}
-          <div className="flex items-center gap-3">
-            <Skeleton.Input active size="small" style={{ width: "40%" }} />
-            <Skeleton.Button active size="small" shape="round" style={{ width: 100 }} />
-          </div>
-
-          {/* Notice Description */}
-          <Skeleton paragraph={{ rows: 1, width: ["70%"] }} active />
-        </div>
-      </div>
-    </div>
-  );
-
-
 
   // Get the number of notices to show based on the number of children
   const numberOfNoticesToShow = 2
@@ -121,7 +92,7 @@ const NoticeBoard = ({ textTrimCount }) => {
           <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-hidden shadow rounded-lg p-4">
-          <NoticeSkeleton />
+          <DashNoticeSkeleton />
         </div>
       </div>
     );
@@ -145,13 +116,15 @@ const NoticeBoard = ({ textTrimCount }) => {
   // No data available state
   if (!notices?.length) {
     return (
-      <div className="p-4 border-l border-gray-300">
+      <div className="p-4 border-gray-300">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
+          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2>
         </div>
-        <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
-          <FaBell className="text-gray-400 text-6xl mb-4" />
-          <p className="text-gray-600 text-lg">{t("No Notices Available")}</p>
+        <div className="border border-gray-300 rounded-lg bg-white shadow-sm">
+          <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
+            <FaBell className="text-gray-400 text-6xl mb-4" />
+            <p className="text-gray-600 text-lg">No Notices Available</p>
+          </div>
         </div>
       </div>
     );

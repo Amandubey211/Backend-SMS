@@ -15,14 +15,20 @@ function FilterExam({
   const SemesterList = ["Semester I", "Semester II", "Semester III"];
   const { t } = useTranslation("admModule");
   return (
-    <div className="bg-white p-4 border border-gray-200 rounded-lg  w-80 relative mt-8">
-      <button
+    <div className="bg-white p-4 border border-gray-200 rounded-lg  w-full relative mt-8">
+      {/* <button
+          onClick={handleApplyFilters}
+          className="absolute right-2 mr-1 text-gray-600 rounded-full  pr-4 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+          aria-label={t("Reset filters")}
+        > */}
+      <FiRefreshCw
         onClick={handleApplyFilters}
-        className="absolute right-2 mr-1 text-gray-600 rounded-full  pr-4 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-        aria-label={t("Reset filters")}
-      >
-        <FiRefreshCw size={24} />
-      </button>
+        size={25}
+        className="ml-auto mt-5 cursor-pointer text-gray-500 hover:text-blue-500
+            transition-transform duration-300 hover:rotate-180"
+        title="Reset Filters"
+      />
+      {/* </button> */}
 
       <h2 className="text-lg font-medium mb-4">{t("Filter")}</h2>
       <div className="mb-4">
@@ -68,7 +74,7 @@ function FilterExam({
           isClearable
           startDate={startDate}
           endDate={endDate}
-          minDate={startDate} 
+          minDate={startDate}
           className="border p-2 rounded-md w-full"
           placeholderText="Select End Date"
         />

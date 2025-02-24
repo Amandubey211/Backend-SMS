@@ -19,6 +19,81 @@ import {
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import toast from "react-hot-toast";
+
+/**
+ * Validation function.
+ * If `isPublishing` is true, we require all fields;
+ * if false, we just require name + content.
+ */
+function validateQuizForm(quizData, isPublishing) {
+  const errors = {};
+
+  // Always require quiz name & instructions
+  if (!quizData.name || !quizData.name.trim()) {
+    // Matches the `id="name"` we use in the input
+    errors.name = "Quiz name is required.";
+  }
+  if (!quizData.content || !quizData.content.trim()) {
+    // Matches the `id="content"` we use for the editor container
+    errors.content = "Quiz instructions are required.";
+  }
+
+  // If user is publishing, check additional fields
+  if (isPublishing) {
+    if (!quizData.quizType) {
+      errors.quizType = "Quiz Type is required when publishing.";
+    }
+    if (
+      quizData.allowedAttempts === null ||
+      quizData.allowedAttempts === undefined
+    ) {
+      errors.allowedAttempts = "Allowed Attempts is required when publishing.";
+    } else if (
+      quizData.allowedAttempts === true &&
+      !quizData.allowNumberOfAttempts
+    ) {
+      errors.allowNumberOfAttempts =
+        "Number of Attempts is required when attempts are limited.";
+    }
+
+    if (!quizData.assignTo) {
+      errors.assignTo = "You must specify who to assign the quiz to.";
+    } else {
+      if (quizData.assignTo === "Section" && !quizData.sectionId) {
+        errors.sectionId = "Please select a Section.";
+      }
+      if (quizData.assignTo === "Group" && !quizData.groupId) {
+        errors.groupId = "Please select a Group.";
+      }
+    }
+
+    if (!quizData.availableFrom) {
+      errors.availableFrom = "Available From date is required when publishing.";
+    }
+    if (!quizData.dueDate) {
+      errors.dueDate = "Due Date is required when publishing.";
+    }
+  }
+
+  return errors;
+}
+
+/**
+ * Smoothly scrolls to the first error field and focuses it.
+ */
+function scrollToFirstError(errors) {
+  const firstErrorKey = Object.keys(errors)[0];
+  if (!firstErrorKey) return;
+
+  // Attempt to find an element with id matching the error key
+  const el = document.getElementById(firstErrorKey);
+  if (el) {
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    // optional small timeout before focusing
+    setTimeout(() => el.focus({ preventScroll: true }), 400);
+  }
+}
 
 const initialFormState = {
   points: "",
@@ -54,15 +129,17 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const { cid, sid } = useParams();
   const location = useLocation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { quizzDetail: quiz } = useSelector((state) => state.admin.quizzes);
+
   const [activeTab, setActiveTab] = useState("instructions");
   const [assignmentName, setAssignmentName] = useState("");
   const [instruction, setInstruction] = useState("");
   const [formState, setFormState] = useState(initialFormState);
   const [quizId, setQuizId] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [question, setQuestion] = useState(""); // <-- Add this line to fix the error
+  const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState(initialAnswersState);
   const [rightAnswerComment, setRightAnswerComment] = useState("");
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
@@ -70,129 +147,144 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [questionType, setQuestionType] = useState("multiple choice");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-  // const [isEditing, setLocalIsEditing] = useState(false);
-  const navigate = useNavigate();
+
+  // formErrors for highlight + scroll
+  const [formErrors, setFormErrors] = useState({});
+
   const quizIdFromRedux = useSelector(
     (state) => state.admin.quizzes.quizzDetail?._id || ""
   );
-  // Fetch quiz by ID if it exists
+
+  // Load quiz if editing
   useEffect(() => {
     const quizIdFromState = location.state?.quizId;
-
     if (quizIdFromState) {
       setQuizId(quizIdFromState || quizIdFromRedux);
       setIsEditing(true);
-
       dispatch(fetchQuizByIdThunk(quizIdFromState));
     } else {
-      // Reset form when not editing
+      // Reset if not editing
       setIsEditing(false);
-      setQuizId(""); // Clear quiz ID
-      setFormState(initialFormState); // Reset form to initial state
-      setAssignmentName(""); // Reset name
-      setInstruction(""); // Reset instructions
-      setQuestions([]); // Reset questions
-      setAnswers(initialAnswersState); // Reset answers
-      setRightAnswerComment(""); // Reset right answer comment
-      setWrongAnswerComment(""); // Reset wrong answer comment
+      setQuizId("");
+      setFormState(initialFormState);
+      setAssignmentName("");
+      setInstruction("");
+      setQuestions([]);
+      setAnswers(initialAnswersState);
+      setRightAnswerComment("");
+      setWrongAnswerComment("");
     }
-  }, [location.state, dispatch, setIsEditing]);
+  }, [location.state, dispatch, setIsEditing, quizIdFromRedux]);
 
-  // Set form values when quiz data is available
+  // Populate form on quiz data load
   useEffect(() => {
     if (isEditing && quiz) {
       setAssignmentName(quiz.name || "");
       setInstruction(quiz.content || "");
-      setQuizId(quiz?._id || "");
+      setQuizId(quiz._id || "");
 
-      setFormState((prevState) => ({
-        ...prevState,
-        points: quiz.points || prevState.points,
-        quizType: quiz.quizType || prevState.quizType,
-        submissionFormat: quiz.submissionFormat || prevState.submissionFormat,
+      setFormState((prev) => ({
+        ...prev,
+        points: quiz.points || prev.points,
+        quizType: quiz.quizType || prev.quizType,
+        submissionFormat: quiz.submissionFormat || prev.submissionFormat,
         allowedAttempts: quiz.allowedAttempts,
         allowNumberOfAttempts: quiz.allowNumberOfAttempts,
-        assignTo: quiz.assignTo || prevState.assignTo,
+        assignTo: quiz.assignTo || prev.assignTo,
         showOneQuestionOnly:
-          quiz.showOneQuestionOnly || prevState.showOneQuestionOnly,
-        questionType: quiz.questionType || prevState.questionType,
-        sectionId: quiz.sectionId || prevState.sectionId,
+          quiz.showOneQuestionOnly || prev.showOneQuestionOnly,
+        questionType: quiz.questionType || prev.questionType,
+        sectionId: quiz.sectionId || prev.sectionId,
         allowShuffleAnswers:
-          quiz.allowShuffleAnswers || prevState.allowShuffleAnswers,
-        studentSeeAnswer: quiz.studentSeeAnswer || prevState.studentSeeAnswer,
-        showAnswerDate: quiz.showAnswerDate || prevState.showAnswerDate,
-        dueDate: quiz.dueDate || prevState.dueDate,
-        availableFrom: quiz.availableFrom || prevState.availableFrom,
+          quiz.allowShuffleAnswers ?? prev.allowShuffleAnswers,
+        studentSeeAnswer: quiz.studentSeeAnswer ?? prev.studentSeeAnswer,
+        showAnswerDate: quiz.showAnswerDate || prev.showAnswerDate,
+        dueDate: quiz.dueDate || prev.dueDate,
+        availableFrom: quiz.availableFrom || prev.availableFrom,
         lockQuestionAfterAnswering:
-          quiz.lockQuestionAfterAnswering ||
-          prevState.lockQuestionAfterAnswering,
-        until: quiz.until || prevState.until,
-        timeLimit: quiz.timeLimit || prevState.timeLimit,
-        moduleId: quiz.moduleId || prevState.moduleId,
-        chapterId: quiz.chapterId || prevState.chapterId,
-        groupId: quiz.groupId || prevState.groupId,
+          quiz.lockQuestionAfterAnswering ?? prev.lockQuestionAfterAnswering,
+        until: quiz.until || prev.until,
+        timeLimit: quiz.timeLimit || prev.timeLimit,
+        moduleId: quiz.moduleId || prev.moduleId,
+        chapterId: quiz.chapterId || prev.chapterId,
+        groupId: quiz.groupId || prev.groupId,
       }));
-      setQuestions(quiz.questions || []); // Preload questions
-      setAnswers(quiz.answers || initialAnswersState); // Preload answers
+      setQuestions(quiz.questions || []);
+      setAnswers(quiz.answers || initialAnswersState);
       setRightAnswerComment(quiz.rightAnswerComment || "");
       setWrongAnswerComment(quiz.wrongAnswerComment || "");
     }
   }, [isEditing, quiz]);
+
+  // If quiz was created in Redux after first load
   useEffect(() => {
     if (quizIdFromRedux) {
       setQuizId(quizIdFromRedux);
       setIsEditing(true);
     }
-  }, [quizIdFromRedux]);
+  }, [quizIdFromRedux, setIsEditing]);
 
+  // ========== HANDLERS ==========
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    let updatedValue = type === "checkbox" ? checked : value;
+    const finalValue = type === "checkbox" ? checked : value;
 
-    // If 'allowedAttempts' is unchecked (false), set 'allowNumberOfAttempts' to null
     if (name === "allowedAttempts" && !checked) {
-      setFormState((prevState) => ({
-        ...prevState,
-        allowedAttempts: updatedValue,
-        allowNumberOfAttempts: null, // Reset when attempts are disallowed
+      setFormState((prev) => ({
+        ...prev,
+        allowedAttempts: false,
+        allowNumberOfAttempts: null,
       }));
     } else {
-      setFormState((prevState) => ({
-        ...prevState,
-        [name]: updatedValue,
+      setFormState((prev) => ({
+        ...prev,
+        [name]: finalValue,
       }));
     }
+
+    setFormErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
 
+  const handleInstructionChange = useCallback((newContent) => {
+    setInstruction(newContent);
+    setFormErrors((prev) => ({ ...prev, content: undefined }));
+  }, []);
+
+  const handleNameChange = useCallback((newName) => {
+    setAssignmentName(newName);
+    setFormErrors((prev) => ({ ...prev, name: undefined }));
+  }, []);
+
+  // QUESTION changes
   const handleQuestionChange = useCallback(
     (content) => setQuestion(content),
     []
   );
-
   const handleAnswerChange = useCallback(
     (index, e) => {
       const { name, value } = e.target;
-      const newAnswers = [...answers];
-      newAnswers[index][name] = value;
-      setAnswers(newAnswers);
+      const updated = [...answers];
+      updated[index][name] = value;
+      setAnswers(updated);
     },
     [answers]
   );
 
+  // Adding a new Question
   const handleAddNewQuestion = () => {
-    setQuestion(""); // Reset the question
+    setQuestion("");
     setAnswers(initialAnswersState);
     setRightAnswerComment("");
     setWrongAnswerComment("");
     setQuestionPoint(1);
     setQuestionType("multiple choice");
-    setSidebarOpen(true); // Open sidebar for adding a new question
-    setEditingQuestionId(null); // Ensure it's a new question
+    setSidebarOpen(true);
+    setEditingQuestionId(null);
   };
 
   const addNewQuestion = useCallback(async () => {
-    const correctOption = answers.find((answer) => answer.isCorrect);
-    const newQuestion = {
+    const correctOption = answers.find((a) => a.isCorrect);
+    const newQ = {
       questionText: question,
       questionPoint: Number(questionPoint),
       type: questionType,
@@ -201,35 +293,33 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
-
     try {
       const result = await dispatch(
-        addQuestionThunk({ quizId, question: newQuestion })
+        addQuestionThunk({ quizId, question: newQ })
       );
-
       if (addQuestionThunk.fulfilled.match(result)) {
-        setSidebarOpen(false); // Close the sidebar on success
+        setSidebarOpen(false);
       } else {
-        // Optionally handle the error case
         console.error("Failed to add question:", result.payload);
       }
     } catch (error) {
-      console.error("An error occurred while adding the question:", error);
+      console.error("Error adding question:", error);
     }
   }, [
+    answers,
     dispatch,
     quizId,
     question,
     questionPoint,
     questionType,
-    answers,
     rightAnswerComment,
     wrongAnswerComment,
   ]);
 
+  // Updating existing question
   const updateQuestion = useCallback(async () => {
-    const correctOption = answers.find((answer) => answer.isCorrect);
-    const updatedQuestion = {
+    const correctOption = answers.find((a) => a.isCorrect);
+    const updatedQ = {
       questionText: question,
       questionPoint: Number(questionPoint),
       type: questionType,
@@ -238,42 +328,37 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
-
     try {
       const result = await dispatch(
         updateQuestionThunk({
           quizId,
           questionId: editingQuestionId,
-          question: updatedQuestion,
+          question: updatedQ,
         })
       );
-
       if (updateQuestionThunk.fulfilled.match(result)) {
-        setSidebarOpen(false); // Close the sidebar on success
+        setSidebarOpen(false);
       } else {
-        // Optionally handle the error case
         console.error("Failed to update question:", result.payload);
       }
     } catch (error) {
-      console.error("An error occurred while updating the question:", error);
+      console.error("Error updating question:", error);
     }
   }, [
+    answers,
     dispatch,
     quizId,
-    editingQuestionId,
     question,
     questionPoint,
     questionType,
-    answers,
     rightAnswerComment,
     wrongAnswerComment,
+    editingQuestionId,
   ]);
 
   const deleteQuestionHandler = useCallback(
     async (questionId) => {
-      const result = await dispatch(
-        deleteQuestionThunk({ quizId, questionId })
-      );
+      await dispatch(deleteQuestionThunk({ quizId, questionId }));
     },
     [dispatch, quizId]
   );
@@ -281,20 +366,23 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const editQuestionHandler = useCallback(
     (questionId) => {
       const questionToEdit = questions.find((q) => q._id === questionId);
-      setQuestion(questionToEdit.questionText); // Populate question data
-      setAnswers(questionToEdit.options);
-      setRightAnswerComment(questionToEdit.correctAnswerComment);
-      setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
-      setQuestionPoint(questionToEdit.questionPoint);
-      setQuestionType(questionToEdit.type);
-      setEditingQuestionId(questionToEdit._id);
-      setSidebarOpen(true); // Open sidebar for editing the question
+      if (questionToEdit) {
+        setQuestion(questionToEdit.questionText);
+        setAnswers(questionToEdit.options);
+        setRightAnswerComment(questionToEdit.correctAnswerComment);
+        setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
+        setQuestionPoint(questionToEdit.questionPoint);
+        setQuestionType(questionToEdit.type);
+        setEditingQuestionId(questionToEdit._id);
+        setSidebarOpen(true);
+      }
     },
     [questions]
   );
 
+  // SAVE QUIZ
   const handleSaveQuiz = useCallback(
-    async (publish) => {
+    (publish) => {
       const quizData = {
         ...formState,
         name: assignmentName,
@@ -306,41 +394,52 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         publish,
       };
 
-      // If `assignTo` is Section or Group, set the respective ID
+      // If assignTo is Section or Group, set IDs
       if (formState.assignTo === "Section") {
         quizData.sectionId = formState.sectionId || null;
       } else if (formState.assignTo === "Group") {
         quizData.groupId = formState.groupId || null;
       }
 
-      // Ensure allowedAttempts is properly set as a boolean
       const allowedAttempts = formState.allowedAttempts === true;
-
       let allowNumberOfAttempts = null;
-      // Set allowNumberOfAttempts only if allowedAttempts is false (meaning attempts are limited)
       if (allowedAttempts && formState.allowNumberOfAttempts) {
         allowNumberOfAttempts = Number(formState.allowNumberOfAttempts);
       }
 
-      // Include the allowedAttempts and allowNumberOfAttempts in the quizData
       quizData.allowedAttempts = allowedAttempts;
       quizData.allowNumberOfAttempts = allowNumberOfAttempts;
-      // console.log("Saving quiz with ID:", quizId);
+
+      // VALIDATE
+      const errors = validateQuizForm(quizData, publish === true);
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        toast.error("Please fix the highlighted fields.");
+        scrollToFirstError(errors);
+        return;
+      }
+
+      // No validation errors => proceed
       if (quizId) {
-        // console.log("Updating existing quiz...");
         dispatch(updateQuizThunk({ quizId, quizData, navigate }));
       } else {
-        // console.log("Creating new quiz...");
         dispatch(createQuizThunk(quizData));
         setActiveTab("questions");
       }
     },
-    [dispatch, formState, assignmentName, instruction, cid, sid, quizId]
+    [
+      assignmentName,
+      cid,
+      sid,
+      dispatch,
+      formState,
+      instruction,
+      navigate,
+      quizId,
+      rightAnswerComment,
+      wrongAnswerComment,
+    ]
   );
-
-  const handleInstructionChange = useCallback((content) => {
-    setInstruction(content);
-  }, []);
 
   return (
     <div className="flex flex-col w-full">
@@ -348,7 +447,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         activeTab={activeTab}
         onSave={handleSaveQuiz}
         isEditing={!!quizId}
-        quizId={quizId}
       />
 
       <div className="w-full flex">
@@ -364,18 +462,21 @@ const MainSection = ({ setIsEditing, isEditing }) => {
             onTabChange={setActiveTab}
             handleSidebarOpen={handleAddNewQuestion}
           >
-            {(activeTab) => (
+            {(currentTab) => (
               <div className="h-full">
-                {activeTab === "instructions" ? (
+                {currentTab === "instructions" ? (
                   <ProtectedSection
-                    title="Add/Edit Quiz Instructuin"
+                    title="Add/Edit Quiz Instruction"
                     requiredPermission={PERMISSIONS.UPDATE_QUIZ}
                   >
                     <QuizInstructions
                       assignmentName={assignmentName}
                       instruction={instruction}
-                      handleNameChange={setAssignmentName}
+                      handleNameChange={handleNameChange}
                       handleInstructionChange={handleInstructionChange}
+                      // Pass error fields to highlight
+                      nameError={formErrors.name}
+                      contentError={formErrors.content}
                     />
                   </ProtectedSection>
                 ) : (
@@ -398,15 +499,19 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         </div>
 
         {activeTab === "instructions" && (
-          <div className="w-[30%] h-full ">
+          <div className="w-[30%] h-full">
             <ProtectedSection requiredPermission={PERMISSIONS.UPDATE_QUIZ}>
-              <CreateQuizForm {...formState} handleChange={handleFormChange} />
+              <CreateQuizForm
+                {...formState}
+                handleChange={handleFormChange}
+                formErrors={formErrors}
+              />
             </ProtectedSection>
           </div>
         )}
       </div>
 
-      {/* Sidebar for Add/Edit Question */}
+      {/* SIDEBAR for Add/Edit Question */}
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -414,14 +519,14 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         width="95%"
       >
         <ProtectedSection
-          title={"Add/Edit Question"}
+          title="Add/Edit Question"
           requiredPermission={
             PERMISSIONS.UPDATE_QUESTION_IN_QUIZ ||
             PERMISSIONS.ADD_QUESTION_TO_QUIZ
           }
         >
           <QuestionForm
-            question={question} // Pass question state here
+            question={question}
             answers={answers}
             questionPoint={questionPoint}
             questionType={questionType}

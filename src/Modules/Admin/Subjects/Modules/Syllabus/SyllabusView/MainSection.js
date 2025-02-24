@@ -48,10 +48,15 @@ const MainSection = () => {
     }
 
     if (error) {
-      return <div className="mt-10"><NoDataFound title={t("Syllabus")}  /></div>;
+      // Centering error state within the right section
+      return (
+        <div className="h-full w-full flex items-center justify-center">
+          <NoDataFound title={t("Syllabus")} />
+        </div>
+      );
     }
 
-    if (syllabi && syllabi?.length > 0) {
+    if (syllabi && syllabi.length > 0) {
       return (
         <>
           <SyllabusHeader
@@ -67,12 +72,13 @@ const MainSection = () => {
       );
     }
 
+    // Centering no-data state within the right section
     return (
       <div className="h-full w-full flex items-center justify-center">
         <NoDataFound
           title={t("Syllabus")}
           desc={t(
-            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus .'"
+            "Your syllabus section is waiting to be filled. Get started by clicking 'Add New Syllabus'."
           )}
           icon={AiOutlineFileAdd}
           iconColor="text-gray-500"
@@ -90,9 +96,10 @@ const MainSection = () => {
         title="Syllabus"
         requiredPermission={PERMISSIONS.VIEW_SYLLABUS}
       >
-        <div className="border-l w-full p-4 relative">
+        {/* Updated container: flex layout ensures content is centered when needed */}
+        <div className="border-l w-full py-1 px-4 relative flex flex-col h-full">
           {renderContent()}
-          {syllabi && syllabi?.length === 0 && (
+          {syllabi && syllabi.length === 0 && (
             <ProtectedAction requiredPermission={PERMISSIONS.CREATE_SYLLABUS}>
               <NavLink
                 to={`/class/${cid}/${sid}/syllabus/create_syllabus`}

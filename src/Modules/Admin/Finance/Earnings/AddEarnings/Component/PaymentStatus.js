@@ -12,20 +12,14 @@ const paymentStatusFields = [
     options: ["paid", "unpaid", "partial", "advance"],
   },
   {
-    name: "paid_amount", // Changed to snake_case
+    name: "paid_amount", // Using snake_case for consistency
     label: "Paid Amount (QR)",
     type: "number",
     placeholder: "Enter paid amount",
     min: 0,
   },
-  // {
-  //   name: "paid_by", // Changed to snake_case
-  //   label: "Paid By",
-  //   type: "select",
-  //   options: ["Manual", "Auto"],
-  // },
   {
-    name: "payment_type", // Changed to snake_case
+    name: "paymentType", // Using snake_case for consistency
     label: "Payment Type",
     type: "select",
     options: ["cash", "card", "online", "cheque", "other"],
@@ -43,7 +37,7 @@ const paymentStatusFields = [
     type: "number",
     placeholder: "Enter remaining amount",
     min: 0,
-    readOnly: true, // Make it read-only as it's calculated
+    readOnly: true, // Calculated field
   },
   {
     type: "array",
@@ -58,11 +52,11 @@ const PaymentStatus = () => {
   const { setFieldValue, values } = useFormikContext();
   const [conditionalFields, setConditionalFields] = useState([]);
 
-  // Determine conditional fields based on paymentType
+  // Update conditional fields based on payment type
   useEffect(() => {
     const newFields = [];
 
-    if (values.payment_type === "cheque") {
+    if (values.paymentType === "cheque") {
       newFields.push({
         name: "chequeNumber",
         label: "Cheque Number",
@@ -71,9 +65,9 @@ const PaymentStatus = () => {
       });
     }
 
-    if (values.payment_type === "online") {
+    if (values.paymentType === "online") {
       newFields.push({
-        name: "transactionId",
+        name: "onlineTransactionId",
         label: "Transaction ID",
         type: "text",
         placeholder: "Enter transaction ID",
@@ -81,28 +75,24 @@ const PaymentStatus = () => {
     }
 
     setConditionalFields(newFields);
-  }, [values.payment_type]);
+  }, [values.paymentType]);
 
   // Combine static and conditional fields
   const combinedFields = [...paymentStatusFields, ...conditionalFields];
 
-  // Calculate remaining_amount whenever final_amount or paid_amount changes
+  // Calculate remaining_amount and advance_amount consistently
   useEffect(() => {
     const finalAmount = Number(values.final_amount) || 0;
     const paidAmount = Number(values.paid_amount) || 0;
 
-    const calculatedRemainingAmount = finalAmount - paidAmount;
+    // Calculate remaining and advance amounts
+    const remainingAmount = Math.max(finalAmount - paidAmount, 0);
+    const advanceAmount = Math.max(paidAmount - finalAmount, 0);
 
-    // Avoid setting the field if the value hasn't changed
-    if (values.remaining_amount !== calculatedRemainingAmount) {
-      setFieldValue("remaining_amount", calculatedRemainingAmount);
-    }
-  }, [
-    values.final_amount,
-    values.paid_amount,
-    setFieldValue,
-    values.remaining_amount,
-  ]);
+    // Update formik state
+    setFieldValue("remaining_amount", remainingAmount);
+    setFieldValue("advance_amount", advanceAmount);
+  }, [values.final_amount, values.paid_amount, setFieldValue]);
 
   return (
     <div className="mb-6">

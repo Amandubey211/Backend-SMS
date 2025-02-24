@@ -29,25 +29,26 @@ const MainSection = () => {
       >
         <div className="border-l w-full">
           <AnnouncementViewHeader />
-
           <div className="p-4 bg-white ">
-            {loading && <Spinner />}
-            {error && <NoDataFound title="Announcement" />}
-            {announcement && (
+            {loading ? (
+              <Spinner />
+            ) : error ? (
+              <NoDataFound title="Announcement" />
+            ) : announcement ? (
               <>
                 {announcement.attachment && (
                   <img
-                    src={announcement.attachment || "default_image_url_here"}
+                    src={announcement.attachment}
                     alt="Announcement"
-                    className=" w-full h-full"
+                    className="w-full h-full"
                   />
                 )}
                 <div
                   className="text-gray-700 mb-6"
-                  dangerouslySetInnerHTML={{ __html: announcement?.content }}
+                  dangerouslySetInnerHTML={{ __html: announcement.content }}
                 />
               </>
-            )}
+            ) : null}
           </div>
         </div>
       </ProtectedSection>

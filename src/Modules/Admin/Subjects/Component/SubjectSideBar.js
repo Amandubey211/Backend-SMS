@@ -70,7 +70,7 @@ const SubjectSideBar = () => {
     break-words       /* break long words */
     text-center       /* optionally center-align text */
     transition-colors
-    duration-200
+    duration-200  
     hover:bg-pink-400
     hover:text-pink-900
   "
@@ -79,13 +79,9 @@ const SubjectSideBar = () => {
           {selectedSemester && selectedSemester.name ? (
             <>
               {/* Show full label on screens ≥ small */}
-              <span className="hidden sm:inline">
-                Sem: {selectedSemester.name}
-              </span>
+              <span className="hidden sm:inline">{selectedSemester.name}</span>
               {/* Short label on smaller screens (< sm) */}
-              <span className="inline sm:hidden">
-                Sem: {selectedSemester.name}
-              </span>
+              <span className="inline sm:hidden">{selectedSemester.name}</span>
             </>
           ) : (
             <>

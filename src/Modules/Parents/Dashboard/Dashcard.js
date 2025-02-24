@@ -5,7 +5,8 @@ import { RiBookOpenLine, RiMoneyDollarBoxFill, RiCalendarCheckLine } from "react
 import { CiMoneyBill } from "react-icons/ci";
 import { useTranslation } from "react-i18next"; // Import i18next hook
 import { fetchAllNotices } from "../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
-import { Skeleton } from "antd";
+import { ParentDashcard } from "../Skeletons.js";
+
 
 const DashCard = () => {
   const dispatch = useDispatch();
@@ -66,13 +67,7 @@ const DashCard = () => {
           className={`p-4 px-6 flex-none w-[24%] rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`}
         >
           {isLoading ? (
-            <Skeleton
-              active
-              avatar={{ shape: "circle", size: 50 }} // Added Circle Skeleton
-              title={false}
-              paragraph={{ rows: 2, width: ["60%", "80%"] }} // Matching text layout
-              className="h-[80px]" // Ensure Skeleton matches card height
-            />
+            <ParentDashcard />
           ) : (
             <div className="flex gap-4 items-center">
               {/* Icon */}

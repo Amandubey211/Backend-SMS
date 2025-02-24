@@ -6,6 +6,8 @@ const QuizInstructions = ({
   instruction,
   handleNameChange,
   handleInstructionChange,
+  nameError,
+  contentError,
 }) => (
   <EditorComponent
     assignmentLabel="Quiz Name"
@@ -13,6 +15,9 @@ const QuizInstructions = ({
     editorContent={instruction}
     onNameChange={handleNameChange}
     onEditorChange={handleInstructionChange}
+    // these two lines ensure the scroll/focus works:
+    nameError={nameError}
+    contentError={contentError}
   />
 );
 

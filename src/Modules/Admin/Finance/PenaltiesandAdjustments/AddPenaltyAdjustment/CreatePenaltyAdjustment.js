@@ -45,7 +45,7 @@ const CalculateAmounts = () => {
     }
 
     const total_amount = values.items.reduce(
-      (acc, item) => acc + Number(item.amount || 0),
+      (acc, item) => acc + Number(item.quantity)*Number(item.amount || 0),
       0
     );
 
@@ -60,7 +60,7 @@ const CalculateAmounts = () => {
     });
 
     // Update Formik's subAmount and finalAmount
-    setFieldValue("subAmount", calculated.discountValue, false);
+    setFieldValue("subAmount", total_amount, false);
     setFieldValue("finalAmount", calculated.finalAmount, false);
   }, [
     values.items,
@@ -213,48 +213,57 @@ const CreatePenaltyAdjustment = () => {
   });
 
   // Handle form submission
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+// Handle form submission
+const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  console.log("Form values:", values); // Debugging
+  console.log("Submitting form...");
+
+  try {
     if (readOnly) {
       // Prevent submission in read-only mode
       setSubmitting(false);
       return;
     }
+
     setSubmitting(true);
-    try {
-      // Prepare the payload
-      const payload = {
-        invoiceNumber: values.invoiceNumber,
-        items: values.items.map((item) => ({
-          revenueType: item.revenueType,
-          revenueReference: item.revenueReference, // **This is the `_id` from lineItems**
-          quantity: item.quantity,
-          amount: item.amount,
-        })),
-        reason: values.reason,
-        discountType: values.discountType,
-        discount: values.discount,
-        adjustmentPenalty: values.adjustmentPenalty,
-        tax: values.tax,
-        subAmount: values.subAmount,
-        finalAmount: values.finalAmount,
-      };
 
-      // Include 'document' only if it exists
-      if (values.document) {
-        payload.document = values.document;
-      }
+    // Ensure 'items' is an array and filter out invalid items
+    const itemsArray = Array.isArray(values.items) && values.items.length > 0
+      ? values.items.map(item => ({
+            revenueType: item?.revenueType || "", // Default to empty string if undefined
+            revenueReference: item?.revenueReference || "", // Default to empty string if undefined
+            quantity: item?.quantity || 0, // Default to 0 if undefined
+            amount: item?.amount || 0, // Default to 0 if undefined
+          }))
+      : []; // Default to an empty array if no valid items exist
 
-      await dispatch(createAdjustment(payload)).unwrap();
-      // toast.success("Penalty & Adjustment created successfully!");
-      resetForm();
-      navigate("/finance/penaltyAdjustment-list"); // **Ensure this path is correct**
-    } catch (err) {
-      // toast.error(err || "Failed to create penalty & adjustment.");
-      console.log(err || "Failed to create penalty & adjustment.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    // Prepare the payload with all required properties and safe fallbacks
+    const payload = {
+      invoiceNumber: values?.invoiceNumber || "", // Default to empty string if undefined
+      items: itemsArray,
+      reason: values?.reason || "", // Default to empty string if undefined
+      discountType: values?.discountType || "", // Default to empty string if undefined
+      discount: values?.discount || 0, // Default to 0 if undefined
+      adjustmentPenalty: values?.adjustmentPenalty || 0, // Default to 0 if undefined
+      tax: values?.tax || 0, // Default to 0 if undefined
+      subAmount: values?.subAmount || 0, // Default to 0 if undefined
+      finalAmount: values?.finalAmount || 0, // Default to 0 if undefined
+      ...(values?.document && { document: values.document }), // Conditionally add document if present
+    };
+
+    console.log("Payload being sent:", payload); // Debugging
+
+    await dispatch(createAdjustment(payload)).unwrap();
+    // toast.success("Penalty & Adjustment created successfully!");
+    resetForm();
+    navigate("/finance/penaltyAdjustment-list");
+  } catch (err) {
+    console.error("Error in form submission:", err);
+    // toast.error(err || "Failed to create penalty & adjustment.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   // Extract invoice state from Redux
   const { invoiceDetails, invoiceFetchSuccess, error: invoiceErrorMsg } = useSelector(
@@ -387,6 +396,21 @@ const CreatePenaltyAdjustment = () => {
         formikRef.current.setFieldValue("subAmount", calculated.discountValue, false);
         formikRef.current.setFieldValue("finalAmount", calculated.finalAmount, false);
       }
+    }
+  }, [readOnly, selectedAdjustment]);
+
+  useEffect(() => {
+    if (!readOnly && selectedAdjustment) {
+      // Prefill form fields based on selectedAdjustment
+      formikRef.current.setValues({
+        ...selectedAdjustment,
+        items: selectedAdjustment.items.map((item) => ({
+          revenueType: item.revenueType,
+          revenueReference: item._id,
+          quantity: item.quantity,
+          amount: item.amount,
+        })),
+      });
     }
   }, [readOnly, selectedAdjustment]);
 

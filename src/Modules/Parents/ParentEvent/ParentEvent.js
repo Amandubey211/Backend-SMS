@@ -14,24 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchAllEvents } from "../../../Store/Slices/Parent/Events/event.action.js";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
-import { Skeleton } from "antd";
-
-
-const EventCardSkeleton = ({ count = 0 }) => {
-  return (
-    <div className="my-4 w-full h-40 flex gap-8 pl-8 relative">
-      {Array(count).fill("").map((_, i) => (
-        <Skeleton.Button
-          key={i}
-          active
-          shape="default" // 'default' = square corners
-          style={{ width: "200px", height: "170px", borderRadius: "20px" }}
-          className="rounded-xl p-4" // Adjust to match your card's size
-        />
-      ))}
-    </div>
-  );
-};
+import { EventCardSkeleton } from "../../../Modules/Parents/Skeletons.js";
 
 
 const ParentEvent = () => {

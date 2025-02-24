@@ -7,7 +7,7 @@ import { FaExclamationCircle, FaMoneyBillWave } from "react-icons/fa"; // Icons 
 import { IoArrowBackCircleOutline, IoArrowForwardCircleOutline } from "react-icons/io5"; // Icons for pagination arrows
 import Spinner from "../../../../Components/Common/Spinner"; // Spinner component
 import { useTranslation } from "react-i18next"; // Import useTranslation from i18next
-import { Skeleton } from "antd";
+import { FinanceTableSkeleton } from "../../Skeletons";
 
 // Utility function to get unique filter options from the data (with optional chaining)
 const uniqueFilterOptions = (data, key) => {
@@ -63,44 +63,6 @@ const AccountingSection = () => {
   const sections = useMemo(() => uniqueFilterOptions(fees, "section"), [fees]);
   const feesTypes = useMemo(() => uniqueFilterOptions(fees, "feeType"), [fees]);
 
-  // Skeleton Component for Finance Table
-  const FinanceTableSkeleton = () => (
-    <div className="p-4 w-full">
-
-
-      {/* Table Skeleton */}
-      <div className="rounded-lg w-full border border-gray-200">
-        <table className="w-full table-fixed leading-normal">
-          <thead>
-            <tr className="bg-[#e5e5e5] text-gray-700">
-              {["Fee Type", "Paid By", "Due Date", "Amount", "Status", "Action"].map((col, index) => (
-                <th key={index} className="px-5 py-3 border-b border-gray-200 font-normal w-1/6">
-                  <Skeleton.Input active size="small" style={{ width: "80%" }} />
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {[...Array(3)].map((_, rowIndex) => (
-              <tr key={rowIndex} className="text-left text-gray-700 bg-white shadow-sm hover:bg-gray-100 transition-colors duration-200">
-                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "70%" }} /></td>
-                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "60%" }} /></td>
-                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "50%" }} /></td>
-                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200"><Skeleton.Input active size="small" style={{ width: "40%" }} /></td>
-                <td className="px-5 pl-[2.3rem] py-4 border-b border-gray-200">
-                  <Skeleton.Button active size="small" shape="round" style={{ width: 90, height: 28, borderRadius: 16 }} />
-                </td>
-                <td className="px-5 py-4 border-b border-gray-200">
-                  <Skeleton.Button active size="small" shape="round" style={{ width: 110, height: 36, borderRadius: 20 }} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-
 
   // Apply filters to the fees data, useMemo to optimize the filtered data calculation
   const filteredData = useMemo(() => {
@@ -152,26 +114,10 @@ const AccountingSection = () => {
           <h2 className="text-lg font-semibold text-gray-600 text-center">
             {t("Finance")}
           </h2>
-          {!error && paginatedData?.length > 0 && (
+          {!error && (
             <div className="flex items-center space-x-4">
-              <button
-                className="text-gray-500"
-                onClick={handlePrevPage}
-                disabled={currentPage === 1}
-              >
-                <IoArrowBackCircleOutline className="inline-block text-2xl" />
-              </button>
-              <span className="font-normal text-gray-600">
-                {`${currentPage.toString().padStart(2, '0')} / ${totalPages.toString().padStart(2, '0')}`}
-              </span>
-              <button
-                className="text-gray-500"
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-              >
-                <IoArrowForwardCircleOutline className="inline-block text-2xl" />
-              </button>
-              <div className="inline-block">
+
+              <div className="inline-block mr-5">
                 <button
                   className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
                text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal

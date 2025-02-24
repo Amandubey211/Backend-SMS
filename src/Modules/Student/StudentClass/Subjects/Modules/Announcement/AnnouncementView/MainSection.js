@@ -3,7 +3,6 @@ import { useParams } from "react-router-dom";
 import { AiOutlineFileAdd } from "react-icons/ai";
 import SubjectSideBar from "../../../Component/SubjectSideBar";
 import AnnouncementViewHeader from "./Components/AnnouncementHeader";
-import { ImSpinner3 } from "react-icons/im";
 import Spinner from "../../../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../../../Components/Common/NoDataFound";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +17,7 @@ const StudentMainSection = () => {
     dispatch(fetchStudentAnnounceById(aid))
   }, [aid, dispatch]);
 
+  
   let content;
 
   if (loading) {

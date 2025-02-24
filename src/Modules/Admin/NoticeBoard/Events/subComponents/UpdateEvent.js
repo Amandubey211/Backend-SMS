@@ -78,7 +78,7 @@ const UpdateEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!eventData.title || !eventData.date || !eventData.time || !eventData.image) {
+    if (!eventData.title || !eventData.date || !eventData.time ) {
       toast.error(t("Please fill in all required fields."));
       return;
     }

@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
 import Header from "./Component/Header";
-import { categories, subCategories } from "./constants/categories";
+import { subCategories } from "./constants/categories";
 import {
   setReadOnly,
   clearSelectedIncome,
@@ -17,14 +17,10 @@ import {
   addEarnings,
   updateEarnings,
 } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
-import { Button } from "antd";
-import { EditOutlined } from "@ant-design/icons";
 import { formComponentsMap, initialValuesMap } from "./Config/formConfig";
 import { validationSchemas } from "./Config/validationSchemas";
 import toast from "react-hot-toast";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
-import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
-import { PERMISSIONS } from "../../../../../config/permission";
 
 const AddEarnings = () => {
   const navigate = useNavigate();
@@ -175,8 +171,10 @@ const AddEarnings = () => {
         dateTime: incomeData.dateTime || "",
         total_amount: incomeData.total_amount || 0,
         final_amount: incomeData.final_amount || 0,
-        receipt: incomeData.receipt || null,
+        document: incomeData.document || null,
         description: incomeData.description || "",
+        chequeNumber: incomeData.chequeNumber || "",
+        onlineTransactionId: incomeData.onlineTransactionId || "",
         // **4. Spread subcategory-specific fields from 'specificFields'**
         ...specificFields,
       };
@@ -205,7 +203,7 @@ const AddEarnings = () => {
       dateTime: "",
       total_amount: 0,
       final_amount: 0,
-      receipt: null,
+      document: null,
       description: "",
       ...initialValuesMap[selectedSubCategory],
     };
@@ -233,8 +231,14 @@ const AddEarnings = () => {
   const handleSaveOrUpdate = async (values, actions) => {
     try {
       // **1. Destructure 'sub_category' instead of 'subCategory'**
-      const { _id, categoryName, sub_category, description, receipt, ...rest } =
-        values;
+      const {
+        _id,
+        categoryName,
+        sub_category,
+        description,
+        document,
+        ...rest
+      } = values;
 
       let specificFields = {};
 
@@ -330,7 +334,7 @@ const AddEarnings = () => {
         categoryName: categoryName, // Top-level field
         subCategory: sub_category, // Map 'sub_category' to 'subCategory'
         description: description, // Top-level field
-        receipt: receipt, // Top-level field
+        document: document, // Top-level field
         paymentType: values.paymentType,
         paymentStatus: values.paymentStatus,
         paid_amount: values.paid_amount,
@@ -345,9 +349,15 @@ const AddEarnings = () => {
         dateTime: values.dateTime,
         total_amount: values.total_amount,
         final_amount: values.final_amount,
+
         ...specificFields,
       };
-
+      if (values.paymentType === "cheque") {
+        payloadCamelCase.chequeNumber = values.chequeNumber || "";
+      }
+      if (values.paymentType === "online") {
+        payloadCamelCase.onlineTransactionId = values.onlineTransactionId || "";
+      }
       // **3. Convert all numeric fields to numbers to prevent NaN**
       const numericFields = [
         "paid_amount",
@@ -529,7 +539,7 @@ const AddEarnings = () => {
                       dateTime: "",
                       total_amount: 0,
                       final_amount: 0,
-                      receipt: null,
+                      document: null,
                       description: "",
                       // **6. Spread 'initialValuesMap' only for the new subcategory**
                       ...initialValuesMap[firstSubCategory],
@@ -559,7 +569,7 @@ const AddEarnings = () => {
                       dateTime: "",
                       total_amount: 0,
                       final_amount: 0,
-                      receipt: null,
+                      document: null,
                       description: "",
                       // **7. Spread 'initialValuesMap' only for the new subcategory**
                       ...initialValuesMap[subCategory],

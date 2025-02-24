@@ -82,7 +82,17 @@ const AddNotice = ({ isEditing, onClose }) => {
     } else {
       await dispatch(createNoticeThunk(announcementData)).then(()=>toast.success('Notice Add Successfully'));
     }
-    onClose(); // Close the form after submitting
+    setAnnouncementData({
+      title: "",
+      startDate: "",
+      endDate: "",
+      description: "",
+      priority: "High priority",
+      classId: "",
+      noticeFor: "",
+    });
+    onClose(); 
+   
   };
 
   return (
@@ -101,6 +111,7 @@ const AddNotice = ({ isEditing, onClose }) => {
             onChange={handleInputChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             required
+            maxlength={60}
           />
         </div>
 

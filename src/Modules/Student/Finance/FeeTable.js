@@ -7,23 +7,30 @@ import { gt } from "../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
 
 const FeeTable = ({ feesDetails }) => {
-  const { loading, error } = useSelector((store) => store.student.studentFinance);
+  const { loading, error } = useSelector(
+    (store) => store.student.studentFinance
+  );
   const { t } = useTranslation();
 
+  console.log("fee datils fee table", feesDetails);
+
   return (
-    <div className="relative overflow-x-auto">
-      <table className="min-w-full leading-normal" role="table">
-        <thead className="bg-gray-100">
-          <tr className="text-left text-gray-700" role="rowgroup">
-            <th className="px-5 py-3 border-b-2 border-gray-200">{t("Fees Type", gt.stdFinance)}</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">{t("Paid By", gt.stdFinance)}</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">{t("Due Date", gt.stdFinance)}</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">{t("Amount", gt.stdFinance)}</th>
-            <th className="px-5 py-3 border-b-2 border-gray-200">{t("Status", gt.stdFinance)}</th>
+    <div className="relative overflow-x-auto shadow-md rounded-lg  ">
+      <table className="w-full border-collapse bg-white text-sm text-left text-gray-700">
+        {/* Table Header */}
+        <thead className="bg-gradient-to-r from-pink-500 to-purple-500 text-white sticky top-0 shadow-sm">
+          <tr className="text-left text-sm font-semibold uppercase">
+            <th className="px-6 py-4"> {t("Fees Type", gt.stdFinance)} </th>
+            <th className="px-6 py-4"> {t("Paid By", gt.stdFinance)} </th>
+            <th className="px-6 py-4"> {t("Due Date", gt.stdFinance)} </th>
+            <th className="px-6 py-4"> {t("Amount", gt.stdFinance)} </th>
+            <th className="px-6 py-4"> {t("Status", gt.stdFinance)} </th>
           </tr>
         </thead>
-        <tbody role="rowgroup">
-          {/* Display Loading Spinner */}
+
+        {/* Table Body */}
+        <tbody className="divide-y divide-gray-200">
+          {/* Loading Spinner */}
           {loading && (
             <tr>
               <td colSpan="5" className="text-center py-10">
@@ -32,52 +39,53 @@ const FeeTable = ({ feesDetails }) => {
             </tr>
           )}
 
-          {/* Display Error Message */}
-          {/* {error && (
+          {/* No Data Found */}
+          {!loading && feesDetails?.length === 0 && (
             <tr>
-              <td colSpan="5" className="text-center py-10 text-red-600">
-                <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-                <p className="text-lg font-semibold">{error}</p>
-              </td>
-            </tr>
-          )} */}
-
-          {/* Display No Data Found */}
-          {(!loading && feesDetails?.length === 0) && (
-            <tr>
-              <td colSpan="5" className="text-center py-5">
-                <NoDataFound />
+              <td colSpan="5" className="text-center py-10">
+                <NoDataFound title="No Fees Data" />
               </td>
             </tr>
           )}
 
-          {/* Display Fees Data */}
-          {!loading  && feesDetails?.reverse()?.map((item, index) => (
-            <tr key={index} className="text-left text-gray-700" role="row">
-              <td className="px-5 py-2 border-b border-gray-200" role="cell">
-                {item?.feeType}
-              </td>
-              <td className="px-5 py-2 border-b border-gray-200" role="cell">
-                {item?.paidBy ? item?.paidBy : "-"}
-              </td>
-              <td className="px-5 py-2 border-b border-gray-200" role="cell">
-                {item?.dueDate}
-              </td>
-              <td className="px-5 py-2 border-b border-gray-200" role="cell">
-                {item?.amount}
-              </td>
-              <td className="px-5 py-2 border-b border-gray-200" role="cell">
-                <span
-                  className={`inline-block px-3 py-1 text-xs font-semibold rounded-full min-w-[75px] text-center ${item?.status === "Paid"
-                      ? "bg-green-200 text-green-800"
-                      : "bg-red-200 text-red-800"
-                    }`}
+          {/* Fees Data */}
+          {!loading &&
+            feesDetails
+              ?.slice()
+              .reverse()
+              .map((item, index) => (
+                <tr
+                  key={index}
+                  className="border-b hover:bg-gray-100 transition duration-200"
                 >
-                  {t(item?.status, gt.stdFinance)}
-                </span>
-              </td>
-            </tr>
-          ))}
+                  <td className="px-6 py-3 font-semibold text-gray-800">
+                    {item?.subCategory}
+                  </td>
+                  <td className="px-6 py-3 font-semibold text-gray-800">
+                    {item?.paidBy || "-"}
+                  </td>
+                  <td className="px-6 py-3 font-semibold text-gray-800">
+                    {item?.dueDate || "NA"}
+                  </td>
+                  <td className="px-6 py-3 font-semibold text-gray-800">
+                    ₹{item?.totalAmount}
+                  </td>
+                  <td className="px-6 py-3">
+                    <span
+                      className={`inline-block px-3 py-1 text-xs font-semibold rounded-full text-center w-20 
+                      ${
+                        item?.paymentStatus === "Paid"
+                          ? "bg-green-200 text-green-800"
+                          : item?.paymentStatus === "Partial"
+                          ? "bg-orange-200 text-orange-800"
+                          : "bg-red-200 text-red-800"
+                      }`}
+                    >
+                      {t(item?.paymentStatus, gt.stdFinance)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
         </tbody>
       </table>
     </div>

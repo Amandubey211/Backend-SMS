@@ -43,38 +43,17 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   const purpleColor = "#AB47BC";
   const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
-  const handleCellChange = (rowIdx, colIdx, value, updateAll = false) => {
-    setTableData((prev) => {
-      const newData = [...prev];
+  const handleCellChange = (rowIdx, colIdx, value) => {
+    setTableData((prevData) => {
+      const newData = [...prevData];
+      newData[rowIdx][colIdx] = value;
+      console.log("new", newData);
 
-      if (updateAll) {
-        // Update the entire column for all rows
-        return newData.map((row) => {
-          row[colIdx] = value.trim();
-          return row;
-        });
-      } else {
-        // Update only the specific row
-        newData[rowIdx] = [...newData[rowIdx]];
-        newData[rowIdx][colIdx] = value.trim();
-        return newData;
-      }
+      return newData;
     });
   };
 
-  // const isRowFilled = (row) => row.every((cell) => cell.trim() !== "");
-
   const addRow = () => {
-    // if (tableData.length >= 5) {
-    //   toast.error("You can only add up to 5 rows. Please upload via Excel.");
-    //   return;
-    // }
-
-    // if (!isRowFilled(tableData[tableData.length - 1])) {
-    //   toast.error("Please fill the current row before adding a new one.");
-    //   return;
-    // }
-
     const newRow = new Array(headers.length).fill("");
     setTableData((prev) => [...prev, newRow]);
   };
@@ -82,35 +61,6 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   const removeRow = (rowIdx) => {
     setTableData((prev) => prev.filter((_, idx) => idx !== rowIdx));
   };
-  useEffect(() => {
-    // Update Exam Type for all rows
-    setTableData((prev) =>
-      prev.map((row) => {
-        row[3] = selectedExamType || ""; // 3rd index is "Exam Type"
-        return row;
-      })
-    );
-  }, [selectedExamType]);
-
-  useEffect(() => {
-    // Update Exam Name for all rows
-    setTableData((prev) =>
-      prev.map((row) => {
-        row[2] = selectedExamName || ""; // 2nd index is "Exam Name"
-        return row;
-      })
-    );
-  }, [selectedExamName]);
-
-  useEffect(() => {
-    // Update Max Score for all rows
-    setTableData((prev) =>
-      prev.map((row) => {
-        row[5] = enteredMaxScore || ""; // 5th index is "Max Score"
-        return row;
-      })
-    );
-  }, [enteredMaxScore]);
 
   useEffect(() => {
     dispatch(fetchStudentsByClassAndSectionNames(cid));
@@ -118,20 +68,6 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
   }, []);
 
   const handleCreate = () => {
-    // if (!tableData.every(isRowFilled)) {
-    //   toast.error("All fields must be filled before submitting.");
-    //   return;
-    // }
-    // for (let row of tableData) {
-    //   const obtainedScore = parseFloat(row[4]);
-    //   const maxScore = parseFloat(row[5]);
-
-    //   if (isNaN(obtainedScore) || isNaN(maxScore) || obtainedScore > maxScore) {
-    //     toast.error("Obtained Score must be less than or equal to Max Score.");
-    //     return;
-    //   }
-    // }
-
     const payload = {
       examType: selectedExamType,
       examName: selectedExamName,
@@ -148,17 +84,17 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
           studentId: selectedStudent?._id || "",
           score: row[4],
           maxMarks: enteredMaxScore || 0,
-          status: row[6] || "present",
+          status: row[8] ?? "present",
         };
       }),
     };
     setLoading(true);
-    dispatch(createOfflineExam({ payload }))
+    dispatch(createOfflineExam({ payload: payload, cid: cid, sid: sid }))
       .then(() => {
         setLoading(false);
         toast.success("Exam Created Successfully");
         resetForm();
-        navigate(-1);
+        setIsOpen(false);
       })
       .catch((error) => {
         setLoading(false);
@@ -219,10 +155,11 @@ const CreateManually = ({ setIsOpen, setLoading, loading, isOpen }) => {
       />
 
       {/* Submit Buttons */}
-      <div className="fixed bottom-5 right-5 flex space-x-4 ">
+      <div className=" bottom-5 right-5 fixed flex justify-end space-x-4">
         <Button onClick={handleClear}>Cancel</Button>
         <Button
           style={{
+            marginBottom: "20px",
             background: primaryGradient,
             border: "none",
             color: "white",

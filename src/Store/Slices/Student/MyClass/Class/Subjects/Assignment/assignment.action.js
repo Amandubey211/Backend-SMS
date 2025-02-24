@@ -1,18 +1,19 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  setShowError,
-} from "../../../../../Common/Alerts/alertsSlice";
-import {
-  handleError,
-} from "../../../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../../../Common/Alerts/errorhandling.action";
 import { getAY } from "../../../../../../../Utils/academivYear";
-import { getData, postData, putData } from "../../../../../../../services/apiEndpoints";
+import {
+  getData,
+  postData,
+  putData,
+} from "../../../../../../../services/apiEndpoints";
 
 // Fetch assignment details
 export const stdGetAssignment = createAsyncThunk(
   "assignment/stdGetAssignment",
-  async (aid, { rejectWithValue, dispatch }) => {
+  async (aid, { rejectWithValue, dispatch, getState }) => {
     try {
+      // const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
       dispatch(setShowError(false));
       const res = await getData(`/student/studentAssignment/${aid}?say=${say}`);
@@ -88,19 +89,20 @@ export const stdGetFilteredAssignment = createAsyncThunk(
   "assignment/stdGetFilteredAssignment",
   async (
     { cid, subjectId, moduleId, chapterId },
-    { rejectWithValue, dispatch }
+    { rejectWithValue, dispatch, getState }
   ) => {
-
     try {
-      const say=getAY();
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
+      const say = getAY();
       dispatch(setShowError(false));
       const res = await getData(
-        `/student/studentAssignment/class/${cid}?say=${say}`,{ subjectId, moduleId, chapterId }  
+        `/student/studentAssignment/class/${cid}?say=${say}&semesterId=${semesterId}`,
+        { subjectId, moduleId, chapterId }
       );
       const data = res?.data;
       return data;
     } catch (error) {
-      handleError(error,dispatch,rejectWithValue);
+      handleError(error, dispatch, rejectWithValue);
     }
   }
 );

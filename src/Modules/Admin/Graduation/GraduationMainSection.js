@@ -4,8 +4,14 @@ import GraduateList from "./Components/GraduateList";
 import TopNavigationWithFilters from "./Components/TopNavigationWithFilters";
 import Sidebar from "./Components/Sidebar";
 import DeleteConfirmationModal from "../../../Components/Common/DeleteConfirmationModal";
-import { fetchGraduates, demoteStudents } from "../../../Store/Slices/Admin/Graduate/graduate.action";
-import { setSelectedGraduate, clearSelectedGraduate } from "../../../Store/Slices/Admin/Graduate/graduateSlice";
+import {
+  fetchGraduates,
+  demoteStudents,
+} from "../../../Store/Slices/Admin/Graduate/graduate.action";
+import {
+  setSelectedGraduate,
+  clearSelectedGraduate,
+} from "../../../Store/Slices/Admin/Graduate/graduateSlice";
 import { toast } from "react-hot-toast";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
@@ -15,9 +21,15 @@ const GraduationMainSection = () => {
   const dispatch = useDispatch();
 
   // Accessing Redux state
-  const { graduates, loading, error, selectedGraduate, total, currentPage, totalPages } = useSelector(
-    (state) => state?.admin?.graduates
-  );
+  const {
+    graduates,
+    loading,
+    error,
+    selectedGraduate,
+    total,
+    currentPage,
+    totalPages,
+  } = useSelector((state) => state?.admin?.graduates);
 
   const [filteredStudents, setFilteredStudents] = useState([]); // Filtered students data
   const [filters, setFilters] = useState({}); // Stores applied filters
@@ -87,21 +99,10 @@ const GraduationMainSection = () => {
   // Confirm demotion action in modal
   const confirmDemotion = () => {
     setModalLoading(true);
-    const studentIds = demoteFromSidebar ? [selectedGraduate._id] : selectedStudents;
+    const studentIds = demoteFromSidebar
+      ? [selectedGraduate._id]
+      : selectedStudents;
 
-    /**
-     dispatch(demoteStudents({ studentIds }))
-      .then(() => {
-        toast.success(`${studentIds?.length} student(s) have been demoted`);
-        if (demoteFromSidebar) closeSidebar();
-        else setSelectedStudents([]); // Clear selection after bulk demotion
-        dispatch(fetchGraduates({ ...filters, page: 1, limit: 10 })); // Refresh list
-      })
-      .finally(() => {
-        setModalLoading(false);
-        setModalOpen(false);
-      });
-     */
     dispatch(demoteStudents({ studentIds }))
       .then(() => {
         toast.success(`${studentIds?.length} student(s) have been demoted`);
@@ -127,10 +128,16 @@ const GraduationMainSection = () => {
   return (
     <div className="relative p-5">
       {/* Search and Filter Navigation */}
-      <TopNavigationWithFilters onSearch={handleSearch} onFilterChange={handleFilterChange} />
+      <TopNavigationWithFilters
+        onSearch={handleSearch}
+        onFilterChange={handleFilterChange}
+      />
 
       {/* Display the filtered students */}
-      <ProtectedSection requiredPermission={""} title={"Graduates"}>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.VIEW_GRADUATE_STUDENTS}
+        title={"Graduates"}
+      >
         <GraduateList
           students={filteredStudents}
           selectedStudents={selectedStudents}

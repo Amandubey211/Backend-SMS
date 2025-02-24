@@ -1,8 +1,7 @@
-// src/Modules/Admin/Finance/Receipts/AddReceipt/Components/ReturnItems.js
-
 import React from "react";
 import { FieldArray } from "formik";
 import TextInput from "./TextInput";
+import SelectInput from "./SelectInput";
 
 const ReturnItems = ({ values, setFieldValue, disabled }) => (
   <div className="mb-6 p-6 rounded-md" style={{ backgroundColor: "#ECECEC" }}>
@@ -20,17 +19,24 @@ const ReturnItems = ({ values, setFieldValue, disabled }) => (
 
           {values.items && values.items.length > 0 ? (
             values.items.map((item, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-12 gap-4 items-center mb-4"
-              >
+              <div key={index} className="grid grid-cols-12 gap-4 items-center mb-4">
                 {/* Category */}
                 <div className="col-span-4">
-                  <TextInput
+                  <SelectInput
                     name={`items.${index}.category`}
-                    label=""
-                    placeholder="Enter category"
-                    disabled={disabled} // Updated to use 'disabled'
+                    label="Revenue Type"
+                    options={[
+                      { label: "Student Fee", value: "studentFee" },
+                      { label: "Facility Revenue", value: "FacilityRevenue" },
+                      { label: "Service-Based Revenue", value: "service_based_revenue" },
+                      { label: "Community & External Affairs Revenue", value: "community_externalaffair_revenue" },
+                      { label: "Financial Investment Revenue", value: "financial_investment_revenue" },
+                      { label: "Penalties", value: "Penalties" },
+                      { label: "Other", value: "Other" },
+                    ]}
+                    required={true}
+                    readOnly={disabled}
+                    disabled={disabled}
                   />
                 </div>
 
@@ -38,9 +44,12 @@ const ReturnItems = ({ values, setFieldValue, disabled }) => (
                 <div className="col-span-3">
                   <TextInput
                     name={`items.${index}.quantity`}
+                    label="Quantity"
                     type="number"
-                    placeholder="Enter quantity"
-                    disabled={disabled} // Updated to use 'disabled'
+                    placeholder="Enter Quantity"
+                    required={true}
+                    readOnly={disabled}
+                    disabled={disabled}
                   />
                 </div>
 
@@ -48,10 +57,12 @@ const ReturnItems = ({ values, setFieldValue, disabled }) => (
                 <div className="col-span-4">
                   <TextInput
                     name={`items.${index}.totalAmount`}
-                    label=""
+                    label="Amount"
                     type="number"
-                    placeholder="Enter total amount"
-                    disabled={disabled} // Updated to use 'disabled'
+                    placeholder="Enter Amount"
+                    required={true}
+                    readOnly={disabled}
+                    disabled={disabled}
                   />
                 </div>
 
@@ -80,9 +91,9 @@ const ReturnItems = ({ values, setFieldValue, disabled }) => (
                 type="button"
                 onClick={() =>
                   arrayHelpers.push({
-                    category: "",
+                    revenueType: "",
                     quantity: "",
-                    totalAmount: "",
+                    amount: "",
                   })
                 }
                 className="rounded-full w-12 h-12 flex items-center justify-center"

@@ -20,10 +20,10 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 
 const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
   const { sid, cid } = useParams();
-  const lastReply =
-    discussion.replies?.length > 0
-      ? discussion.replies[discussion.replies?.length - 1]
-      : null;
+  const lastReply = discussion.updatedAt;
+  // discussion.replies?.length > 0
+  //   ? discussion.replies[discussion.replies?.length - 1]
+  //   : null;
 
   const dispatch = useDispatch();
   const [isPinned, setIsPinned] = useState(discussion.isPinned);
@@ -95,7 +95,7 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
           <BsPatchCheckFill className="text-green-600 w-6 h-6 transition-transform transform hover:scale-110" />
         )} */}
 
-        {!discussion.publish ? (
+        {discussion.publish ? (
           <>
             <BsPatchCheckFill
               aria-hidden="true"
@@ -155,10 +155,7 @@ const DiscussionCard = ({ discussion, fetchClassDiscussions }) => {
         <div className="flex justify-center items-center mb-7 space-x-2">
           <MdCalendarToday className="w-4 h-4 transition-transform transform hover:scale-110" />
           <span>
-            Last Post at:{" "}
-            {lastReply
-              ? new Date(lastReply.updatedAt).toLocaleDateString()
-              : "N/A"}
+            Last Post at: {new Date(lastReply).toLocaleDateString() || "N/A"}
           </span>
         </div>
         <div className="flex justify-center space-x-4">

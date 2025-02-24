@@ -8,7 +8,8 @@ import { fetchUserData, updateAdminProfile } from "../../../../Store/Slices/Comm
 
 const EditAdmin = ({data}) => {
   const [imagePreview, setImagePreview] = useState(data?.profile||null);
-  const [loading,setLoading] = useState(false)
+  const [loading,setLoading] = useState(false);
+  const [disabled,setDisabled] = useState(true);
   const dispatch = useDispatch()
   const [adminData, setAdminData] = useState({
     _id:data?._id,
@@ -21,6 +22,7 @@ const EditAdmin = ({data}) => {
     setImagePreview(data?.profile);
   },[])
   const handleInputChange = (e) => {
+    setDisabled(false)
     const { name, value } = e.target;
     setAdminData((prev) => ({
       ...prev,
@@ -62,31 +64,33 @@ const EditAdmin = ({data}) => {
     
       // Dispatch the action
     await   dispatch(updateAdminProfile({ data: formData }));
-    setLoading(false)
+    setLoading(false);
+    setDisabled(true)
     };
 
   return (
     <>
       <div className="p-4 h-full border rounded-lg">
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="flex flex-col justify-around gap-5">
-          <div className="flex flex-row justify-around p-2 border-b border-gray-200">
-            <div>
+        <div className="flex flex-col justify-around gap-2">
+          <div className="flex flex-row justify-around p-2 ">
+            <div className="flex items-center justify-center">
               <ImageUpload
                 imagePreview={imagePreview}
                 handleImageChange={handleImageChange}
                 handleRemoveImage={handleRemoveImage}
               />
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2">
               <FormInput id="adminName" label="Full Name" value={adminData.adminName} onChange={handleInputChange} />
               <FormInput id="email"  label="Email" type="email"   value={adminData.email} readOnly={true} />
               <FormInput id="contactNumber" label="Contact" type="text" value={adminData.contactNumber} onChange={handleInputChange} />
-            </div>
-          </div>
-          <button type="submit" disabled={loading}  className="bg-gradient-to-r w-[15rem] mx-10 from-pink-500 to-purple-500 text-white py-2 px-10 rounded-md hover:from-pink-600 hover:to-purple-600">
+              <button type="submit" disabled={loading || disabled}  className="bg-gradient-to-r w-[15rem] mt-2 from-pink-500 to-purple-500 text-white p-2  rounded-md hover:from-pink-600 hover:to-purple-600">
           {loading?'loading...':'Update Profile'}
         </button>
+            </div>
+          </div>
+       
         </div>
        
       </form>

@@ -25,6 +25,7 @@ function CreateExam() {
   const [tableData, setTableData] = useState([]);
   const [showManual, setShowManual] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [isCreateLoading, setIsCreateLoading] = useState(false);
   const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
 
   const pinkColor = "#EC407A";
@@ -60,7 +61,7 @@ function CreateExam() {
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  const handleData = () => {
+  const handleCreateExam = () => {
     if (!file) {
       console.error("No file selected");
       return;
@@ -71,22 +72,11 @@ function CreateExam() {
     formData.append("subjectId", sid);
 
     if (formData) {
-      setLoading(true);
-
+      setIsCreateLoading(true);
       dispatch(
         UploadOfflineExamSheet({ formData: formData, cid: cid, sid: sid })
-      )
-        .then(() => {
-          setLoading(false);
-          toast.success("Exam Uploaded Successfully");
-        })
-        .catch((error) => {
-          setLoading(false);
-          toast.error(error.message || "Failed to Upload Exam");
-        });
-    } else {
-      setLoading(false);
-      toast.error("Failed to Upload Exam");
+      );
+      setIsCreateLoading(false);
     }
   };
 
@@ -115,6 +105,8 @@ function CreateExam() {
               event.target &&
               !event.target.closest(".handsontable")
             ) {
+              setTableData([]);
+              setFile(null);
               setIsOpen(false);
             }
           }}
@@ -167,10 +159,10 @@ function CreateExam() {
                 <Tooltip title="View Upload Excel Guidelines">
                   <button
                     onClick={() => setGuidelinesModalVisible(true)}
-                    className="ml-2 focus:outline-none mt-2"
+                    className="ml-2 focus:outline-none mt-3"
                     aria-label="Upload Excel Guidelines"
                   >
-                    <FiInfo className="text-blue-500 text-2xl" />
+                    <FiInfo className="text-blue-500 text-xl" />
                   </button>
                 </Tooltip>
               </ProtectedAction>
@@ -181,13 +173,9 @@ function CreateExam() {
               guidelinesModalVisible={guidelinesModalVisible}
               setGuidelinesModalVisible={setGuidelinesModalVisible}
             />
-
-            {/* Handsontable Component */}
-            {!showManual
-              ? fileName && (
-                  <p className="text-sm text-red-600 mt-1">{fileName}</p>
-                )
-              : ""}
+            {!showManual && tableData.length > 0 && fileName && (
+              <p className="text-sm text-red-600 mt-1">{fileName}</p>
+            )}
             {showManual ? (
               <CreateManually
                 setIsOpen={setIsOpen}
@@ -198,10 +186,13 @@ function CreateExam() {
             ) : (
               <UploadExcel
                 data={tableData}
-                handleData={handleData}
-                loading={loading}
-                isOpen={isOpen}
+                handleCreateExam={handleCreateExam}
+                isCreateLoading={isCreateLoading}
+                setIsCreateLoading={setIsCreateLoading}
                 setIsOpen={setIsOpen}
+                file={file}
+                  setFile={setFile}
+                  setData= {setTableData}
               />
             )}
           </div>

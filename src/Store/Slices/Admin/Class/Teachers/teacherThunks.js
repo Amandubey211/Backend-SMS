@@ -14,6 +14,7 @@ import {
   putData,
 } from "../../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../../Utils/getRoles";
+import toast from "react-hot-toast";
 
 // Fetch all teachers
 export const fetchAllTeachers = createAsyncThunk(
@@ -65,8 +66,12 @@ export const assignTeacher = createAsyncThunk(
         `/${getRole}/teacher?say=${say}`,
         assignData
       );
-      dispatch(fetchTeachersByClass(assignData.classId));
-      return response.data;
+      if (response.success) {
+        dispatch(fetchTeachersByClass(assignData.classId));
+        return response.data || [];
+      } else {
+        toast.error(response.message || "Teacher Not Assigned, Try again!");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

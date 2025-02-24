@@ -34,7 +34,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Exam Center Fees": {
@@ -56,7 +56,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Parking Fees": {
@@ -79,7 +79,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Stationery Fees": {
@@ -98,7 +98,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Other Facility Fees": {
@@ -118,7 +118,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Subscription Fees": {
@@ -138,7 +138,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Workshop/Training Fees": {
@@ -159,7 +159,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   "Canteen Profit": {
@@ -179,7 +179,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
   },
   Donations: {
@@ -200,7 +200,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
     subCategory: "Donations",
   },
@@ -222,7 +222,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: 0,
     final_amount: 0,
-    receipt: "",
+    document: "",
     description: "",
     subCategory: "Fundraising/Sponsorships",
   },
@@ -249,7 +249,7 @@ export const initialValuesMap = {
     dateTime: "",
     total_amount: "",
     final_amount: "",
-    receipt: "",
+    document: "",
     description: "",
   },
   // Repeat for other subCategories with flat fields

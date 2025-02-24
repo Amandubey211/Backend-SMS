@@ -29,6 +29,8 @@ const financeSlice = createSlice({
         state.error = false;
       })
       .addCase(StudentFinanceDetails.fulfilled, (state, action) => {
+        console.log("finnace slice", action.payload);
+
         state.loading = false;
         state.stdFinanceData = action.payload.fees;
         state.totalPaidFees = action.payload.totalPaidFees;

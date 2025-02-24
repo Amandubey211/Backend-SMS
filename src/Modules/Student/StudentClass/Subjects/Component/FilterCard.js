@@ -13,9 +13,10 @@ const FilterCard = ({ filters, setFilters }) => {
   const { modulesData } = useSelector((store) => store?.student?.studentModule);
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
+  
   useEffect(() => {
-    dispatch(stdModule({ cid, sid }));
-  }, []);
+      dispatch(stdModule({ cid, sid }));
+  }, [cid, dispatch, sid]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -40,6 +41,8 @@ const FilterCard = ({ filters, setFilters }) => {
     setSelectedChapter("");
     setFilters({ moduleId: "", chapterId: "" });
   };
+
+  // console.log("selected sem", semesterId);
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-md w-80 relative">

@@ -1,8 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import { resetState, setRole, setToken } from "../reducers/authSlice";
+import { resetState, setRole } from "../reducers/authSlice";
 import { setUserDetails } from "../../User/reducers/userSlice";
-import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { customRequest, postData } from "../../../../../services/apiEndpoints";
@@ -10,6 +9,7 @@ import { handleError } from "../../Alerts/errorhandling.action";
 import { setShowError } from "../../Alerts/alertsSlice";
 import Cookies from "js-cookie";
 import { setLocalCookies } from "../../../../../Utils/academivYear";
+import { getUserRole } from "../../../../../Utils/getRoles";
 // Student login action
 export const studentLogin = createAsyncThunk(
   "auth/studentLogin",
@@ -109,19 +109,21 @@ export const qidVerification = createAsyncThunk(
   }
 );
 
-// / Thunk for registering student details
+// Import getUserRole from your utils/helpers
+
+// Thunk for registering student details
 export const registerStudentDetails = createAsyncThunk(
   "auth/registerStudentDetails",
-  async (formData, { rejectWithValue, dispatch }) => {
+  async (formData, { rejectWithValue, dispatch, getState }) => {
     try {
-      const response = await customRequest(
-        "post",
-        `/student/student_register`,
-        formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
-      );
+      // Get the user role; default to 'student' if not authenticated
+      const role = getUserRole(getState) || "student";
+      const endpoint = `/${role}/student_register`;
+
+      const response = await customRequest("post", endpoint, formData, {
+        "Content-Type": "multipart/form-data",
+      });
+
       if (response?.success) {
         toast.success("Registered Successfully");
         return response;
@@ -141,7 +143,7 @@ export const uploadStudentDocuments = createAsyncThunk(
   "auth/uploadStudentDocuments",
   async (
     { email, schoolId, studentDocuments },
-    { rejectWithValue, dispatch }
+    { rejectWithValue, dispatch, getState }
   ) => {
     try {
       if (!email) {
@@ -151,26 +153,27 @@ export const uploadStudentDocuments = createAsyncThunk(
         return rejectWithValue("School ID is required");
       }
 
+      // Get the user role; default to 'student' if not authenticated
+      const role = getUserRole(getState) || "student";
+      const endpoint = `/${role}/upload_documents`;
+
       const formData = new FormData();
       formData.append("email", email);
       formData.append("schoolId", schoolId);
       studentDocuments.documents.forEach(({ file, label }) => {
-        formData.append(`documents`, file);
-        formData.append(`documentLabels`, label);
+        formData.append("documents", file);
+        formData.append("documentLabels", label);
       });
-      const response = await customRequest(
-        "post",
-        `/student/upload_documents`,
-        formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
-      );
+
+      const response = await customRequest("post", endpoint, formData, {
+        "Content-Type": "multipart/form-data",
+      });
+
       if (response?.success) {
         return response;
       } else {
         return rejectWithValue(
-          response?.data.msg || "Failed to upload the document"
+          response?.data?.msg || "Failed to upload the document"
         );
       }
     } catch (error) {

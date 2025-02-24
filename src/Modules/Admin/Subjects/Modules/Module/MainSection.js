@@ -144,31 +144,33 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex min-h-screen h-full w-full ">
+    <div className="flex min-h-screen h-full w-full">
       <SubjectSideBar />
+
       <ProtectedSection
         requiredPermission={PERMISSIONS.MODULES_FOR_A_STUDENT_MODULES}
         title="Module"
       >
-        <div className="flex">
-          {/* Main Module/Chapter Section */}
-          <div className="w-[60%] bg-white p-2">
-            {moduleLoading ? (
-              <Spinner />
-            ) : modulesData?.length === 0 ? (
-              // Centering NoDataFound when no modules exist
-              <div className="flex items-center justify-center h-screen">
-                <NoDataFound
-                  title="Modules"
-                  desc={t(
-                    "No modules available yet! Start by adding your first module."
-                  )}
-                  icon={FaBookOpen}
-                  iconColor="text-blue-500"
-                  textColor="text-gray-600"
-                />
-              </div>
-            ) : (
+        {moduleLoading ? (
+          <Spinner />
+        ) : modulesData?.length === 0 ? (
+          // If no modules, show a single NoDataFound centered both horizontally and vertically
+          <div className="flex items-center justify-center w-full min-h-screen">
+            <NoDataFound
+              title="Modules"
+              desc={t(
+                "No modules available yet! Start by adding your first module."
+              )}
+              icon={FaBookOpen}
+              iconColor="text-blue-500"
+              textColor="text-gray-600"
+            />
+          </div>
+        ) : (
+          // Otherwise, render two-column layout for modules and chapters
+          <div className="flex w-full">
+            {/* Left Section: Chapters */}
+            <div className="w-[60%] bg-white p-2">
               <div className="bg-white p-2 rounded-lg">
                 <div className="flex justify-between px-4 mb-3 items-center">
                   <h1 className="text-lg font-semibold">
@@ -191,6 +193,7 @@ const MainSection = () => {
                     </ProtectedAction>
                   )}
                 </div>
+
                 {chapterLoading ? (
                   <Spinner />
                 ) : selectedModule?.chapters?.length > 0 ? (
@@ -219,11 +222,9 @@ const MainSection = () => {
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </div>
 
-          {/* Modules List Section */}
-          {modulesData?.length > 0 && (
+            {/* Right Section: Modules List */}
             <div className="w-[35%] p-2 border-l">
               <div className="bg-white p-4 rounded-lg">
                 <div className="flex items-center gap-1 mb-2">
@@ -245,48 +246,48 @@ const MainSection = () => {
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Floating Add Module Button */}
-          <div className="relative">
-            <ProtectedAction requiredPermission={PERMISSIONS.ADD_MODULE}>
-              <button
-                onClick={openAddModule}
-                className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
-                aria-label={t("Add Module")}
-              >
-                <RiAddFill size={24} />
-              </button>
-            </ProtectedAction>
-
-            <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
-              {t("Add Module")}
-            </span>
           </div>
+        )}
 
-          {/* Sidebar */}
-          {isSidebarOpen && (
-            <Sidebar
-              isOpen={isSidebarOpen}
-              onClose={handleSidebarClose}
-              title={
-                sidebarContent === "chapter"
-                  ? t("Add New Chapter")
-                  : sidebarContent === "module"
-                  ? t("Add New Module")
-                  : t("Edit Module")
-              }
+        {/* Floating Add Module Button (always accessible) */}
+        <div className="relative">
+          <ProtectedAction requiredPermission={PERMISSIONS.ADD_MODULE}>
+            <button
+              onClick={openAddModule}
+              className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
+              aria-label={t("Add Module")}
             >
-              {sidebarContent === "chapter" ? (
-                <AddChapter onClose={handleSidebarClose} />
-              ) : sidebarContent === "module" ? (
-                <AddModule onClose={handleSidebarClose} />
-              ) : (
-                sidebarContent
-              )}
-            </Sidebar>
-          )}
+              <RiAddFill size={24} />
+            </button>
+          </ProtectedAction>
+
+          <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
+            {t("Add Module")}
+          </span>
         </div>
+
+        {/* Sidebar for Adding/Editing Modules or Chapters */}
+        {isSidebarOpen && (
+          <Sidebar
+            isOpen={isSidebarOpen}
+            onClose={handleSidebarClose}
+            title={
+              sidebarContent === "chapter"
+                ? t("Add New Chapter")
+                : sidebarContent === "module"
+                ? t("Add New Module")
+                : t("Edit Module")
+            }
+          >
+            {sidebarContent === "chapter" ? (
+              <AddChapter onClose={handleSidebarClose} />
+            ) : sidebarContent === "module" ? (
+              <AddModule onClose={handleSidebarClose} />
+            ) : (
+              sidebarContent
+            )}
+          </Sidebar>
+        )}
       </ProtectedSection>
     </div>
   );

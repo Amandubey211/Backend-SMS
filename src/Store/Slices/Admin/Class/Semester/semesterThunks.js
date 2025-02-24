@@ -9,12 +9,13 @@ import {
   getData,
 } from "../../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../../Utils/getRoles";
+import toast from "react-hot-toast";
 
 // Fetch semesters for the selected class (classId derived from state)
 export const fetchSemestersByClass = createAsyncThunk(
   "semesters/fetchSemestersByClass",
-  async (_, { rejectWithValue, dispatch, getState }) => {
-    const cid = getState().common.user.classInfo.selectedClassId;
+  async (classId, { rejectWithValue, dispatch, getState }) => {
+    const cid = getState().common.user.classInfo.selectedClassId || classId;
     const say = getAY();
     dispatch(setShowError(false));
     try {
@@ -93,6 +94,8 @@ export const updateSemester = createAsyncThunk(
 );
 
 // Delete a semester and then refresh the semester list
+// semesterThunks.js
+// semesterThunks.js
 export const deleteSemester = createAsyncThunk(
   "semesters/deleteSemester",
   async ({ semesterId }, { rejectWithValue, dispatch, getState }) => {
@@ -104,14 +107,16 @@ export const deleteSemester = createAsyncThunk(
         `/${getRole}/delete-semester/${semesterId}?say=${say}`
       );
       if (response && response.success) {
-        // Removed toast.success here to avoid duplicate notifications.
         // Re-fetch semesters after deletion
         await dispatch(fetchSemestersByClass());
         return semesterId;
       } else {
-        return rejectWithValue(response.message || "Failed to delete semester");
+        const errMsg =
+          (response && response?.message) || "Failed to delete semester";
+        return rejectWithValue(errMsg);
       }
     } catch (error) {
+      // Ensure error message is defined before rejecting
       return handleError(error, dispatch, rejectWithValue);
     }
   }

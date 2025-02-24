@@ -314,23 +314,23 @@ const HeaderActions = ({
   groupRoleNames,
   highlightEditButton,
 }) => {
+  const isGroupRole =
+    computedSelectedRoleObj &&
+    groupRoleNames.includes(computedSelectedRoleObj.name);
+
   return (
     <div className="flex justify-between bg-gray-50 items-center mb-4 px-4 py-3 rounded-t-lg">
       <h2 className="text-lg font-bold">Manage Role Permissions</h2>
       <div className="flex items-center gap-4">
+        {/* Toggle Edit Mode (still protected by EDIT_ROLE) */}
         <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ROLE}>
           <Tooltip
-            title={
-              computedSelectedRoleObj &&
-              groupRoleNames.includes(computedSelectedRoleObj.name)
-                ? "Cannot edit group role"
-                : "Toggle Edit Mode"
-            }
+            title={isGroupRole ? "Cannot edit group role" : "Toggle Edit Mode"}
           >
             <motion.button
               onClick={onToggleEdit}
               aria-label="Toggle edit mode"
-              disabled={disableEdit}
+              disabled={disableEdit || isGroupRole}
               className={`flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-all duration-200 ${
                 highlightEditButton
                   ? "ring-2 ring-red-500"
@@ -352,25 +352,24 @@ const HeaderActions = ({
             </motion.button>
           </Tooltip>
         </ProtectedAction>
-        <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_ROLE}>
-          <Tooltip
-            title={
-              computedSelectedRoleObj &&
-              groupRoleNames.includes(computedSelectedRoleObj.name)
-                ? "Cannot delete group role"
-                : "Delete Role"
-            }
-          >
-            <button
-              className="hover:text-gray-500"
-              onClick={onDelete}
-              aria-label="Delete role"
-              disabled={disableDelete}
+
+        {/* Delete Role (only show if in edit mode & user has permission & not a group role) */}
+        {isEditMode && (
+          <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_ROLE}>
+            <Tooltip
+              title={isGroupRole ? "Cannot delete group role" : "Delete Role"}
             >
-              <FiTrash2 size={20} />
-            </button>
-          </Tooltip>
-        </ProtectedAction>
+              <button
+                className="hover:text-gray-500"
+                onClick={onDelete}
+                aria-label="Delete role"
+                disabled={disableDelete || isGroupRole}
+              >
+                <FiTrash2 size={20} />
+              </button>
+            </Tooltip>
+          </ProtectedAction>
+        )}
       </div>
     </div>
   );
@@ -399,20 +398,23 @@ const FullScreenModal = ({
       aria-label="Full Screen Permissions Modal"
     >
       <div className="p-4 h-full flex flex-col">
-        {/* Single top bar with "Set Permissions" + Close */}
+        {/* Top bar with "Set Permissions" + Close */}
         <div className="flex justify-between items-center mb-4">
           <div />
           <div className="flex items-center gap-2">
-            <Tooltip title="Save Permissions for This Role">
-              <Button
-                type="primary"
-                onClick={onSetPermissions}
-                disabled={disableSetPermissions}
-                loading={isSettingPermissions}
-              >
-                {isSettingPermissions ? "Saving..." : "Set Permissions"}
-              </Button>
-            </Tooltip>
+            {/* Wrap the button in ProtectedAction to hide from unauthorized users */}
+            <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ROLE}>
+              <Tooltip title="Save Permissions for This Role">
+                <Button
+                  type="primary"
+                  onClick={onSetPermissions}
+                  disabled={disableSetPermissions}
+                  loading={isSettingPermissions}
+                >
+                  {isSettingPermissions ? "Saving..." : "Set Permissions"}
+                </Button>
+              </Tooltip>
+            </ProtectedAction>
             <Tooltip title="Close Full Screen">
               <button
                 onClick={onClose}
@@ -485,8 +487,6 @@ const ManageRolePage = () => {
 
   // Load roles/permissions
   useEffect(() => {
-    // Attempt to fetch roles & permissions
-    // If an error occurs, it will be handled in the thunks or by the error state
     dispatch(getAllRolesThunk());
     dispatch(getPermissionsThunk());
   }, [dispatch]);
@@ -585,8 +585,8 @@ const ManageRolePage = () => {
   /**
    * Handlers
    */
-
   const handleSearchChange = useCallback((e) => {
+    // Keep search always enabled
     setSearchQuery(e.target.value);
   }, []);
 
@@ -841,7 +841,6 @@ const ManageRolePage = () => {
   return (
     <Layout title="Manage Roles | Student Diwan">
       <DashLayout>
-        {/* Use min-h-screen so content can scroll, and button is fixed */}
         <div className="min-h-screen relative">
           <motion.div
             className="bg-white rounded-lg w-full p-4"
@@ -870,7 +869,7 @@ const ManageRolePage = () => {
               requiredPermission={PERMISSIONS.GET_ALL_ROLE}
               title="Select Permission"
             >
-              {/* Align the top fields in a row */}
+              {/* Top Filters Row */}
               <div className="grid grid-cols-3 gap-4 items-center mb-4">
                 {/* Department */}
                 <div>
@@ -903,7 +902,6 @@ const ManageRolePage = () => {
                 <div>
                   <label className="block text-sm font-semibold mb-1 flex items-center gap-2">
                     Add Description
-                    {/* Show edit icon only in edit mode + role selected */}
                     {isEditMode && hasRoleSelected && !isGroupRoleSelected && (
                       <Tooltip title="Add / Edit Description">
                         <button
@@ -952,13 +950,13 @@ const ManageRolePage = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <Tooltip title="Search Permissions by Name">
+                      {/* Search is always enabled now (removed the !hasRoleSelected check) */}
                       <Search
                         placeholder="Search permission..."
                         onChange={handleSearchChange}
                         style={{ width: 200 }}
                         allowClear
                         aria-label="Search Permissions"
-                        disabled={!hasRoleSelected}
                       />
                     </Tooltip>
                     <Tooltip title="Expand to Full Screen">
@@ -973,6 +971,7 @@ const ManageRolePage = () => {
                     </Tooltip>
                   </div>
                 </div>
+
                 <PermissionList
                   loading={loading}
                   filteredPermissionDepartments={filteredPermissionDepartments}
@@ -991,26 +990,29 @@ const ManageRolePage = () => {
           </motion.div>
 
           {/* 
-            Fixed "Set Permissions" button at bottom-right of the page. 
-            Always visible, even if content is long and scrolls.
+            "Set Permissions" button (Fixed at bottom-right).
+            Wrap with ProtectedAction so only those with EDIT_ROLE permission see it.
           */}
-          <div className="fixed bottom-4 right-4 z-50">
-            <Tooltip title="Save Permissions for This Role">
-              <Button
-                type="primary"
-                onClick={handleSetPermissions}
-                disabled={
-                  !isEditMode ||
-                  isSettingPermissions ||
-                  !computedSelectedRoleObj ||
-                  isGroupRoleSelected
-                }
-                loading={isSettingPermissions}
-              >
-                {isSettingPermissions ? "Saving..." : "Set Permissions"}
-              </Button>
-            </Tooltip>
-          </div>
+          {!isGroupRoleSelected && (
+            <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ROLE}>
+              <div className="fixed bottom-4 right-4 z-50">
+                <Tooltip title="Save Permissions for This Role">
+                  <Button
+                    type="primary"
+                    onClick={handleSetPermissions}
+                    disabled={
+                      !isEditMode ||
+                      isSettingPermissions ||
+                      !computedSelectedRoleObj
+                    }
+                    loading={isSettingPermissions}
+                  >
+                    {isSettingPermissions ? "Saving..." : "Set Permissions"}
+                  </Button>
+                </Tooltip>
+              </div>
+            </ProtectedAction>
+          )}
         </div>
       </DashLayout>
 
@@ -1053,13 +1055,13 @@ const ManageRolePage = () => {
             </Tooltip>
           </div>
           <Tooltip title="Search Permissions by Name">
+            {/* Search always enabled here as well */}
             <Search
               placeholder="Search permission..."
               onChange={handleSearchChange}
               style={{ width: 200 }}
               allowClear
               aria-label="Search Permissions in Full Screen"
-              disabled={!hasRoleSelected}
             />
           </Tooltip>
         </div>

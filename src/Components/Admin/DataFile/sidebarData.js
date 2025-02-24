@@ -49,7 +49,7 @@ const sidebarData = [
     title: "Classes",
     icon: <RiGraduationCapLine style={{ fontSize: "1.1rem" }} />,
     path: `/class`,
-    roles: [ROLES.ADMIN, ROLES.TEACHER],
+    roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.VIEW_CLASSES, // Added permission reference
   },
   {
@@ -74,7 +74,13 @@ const sidebarData = [
         title: "Manage Role",
         icon: <MdOutlineManageAccounts />,
         path: "/users/manage-roles",
-        roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.FINANCE, ROLES.LIBRARIAN, ROLES.STAFF],
+        roles: [
+          ROLES.ADMIN,
+          ROLES.TEACHER,
+          ROLES.FINANCE,
+          ROLES.LIBRARIAN,
+          ROLES.STAFF,
+        ],
         //requiredPermission: PERMISSIONS.MANAGE_ROLES, // Added permission reference
       },
 
@@ -89,26 +95,21 @@ const sidebarData = [
         title: "Finance",
         icon: <MdManageAccounts />,
         path: "/users/accountants",
-        roles: [ROLES.ADMIN,ROLES.FINANCE],
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_ACCOUNTANTS, // Added permission reference
       },
       {
         title: "Librarian",
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
-        roles: [ROLES.ADMIN, ROLES.LIBRARIAN ,ROLES.FINANCE],
+        roles: [ROLES.ADMIN, ROLES.LIBRARIAN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_LIBRARIANS, // Added permission reference
       },
       {
         title: "Staff",
         icon: <GrUserWorker />,
         path: "/users/staffs",
-        roles: [
-          ROLES.ADMIN,
-          ROLES.FINANCE,
-          ROLES.LIBRARIAN,
-          ROLES.STAFF,
-        ],
+        roles: [ROLES.ADMIN, ROLES.FINANCE, ROLES.LIBRARIAN, ROLES.STAFF],
         //requiredPermission: PERMISSIONS.VIEW_STAFF, // Added permission reference
       },
       {
@@ -252,7 +253,7 @@ const sidebarData = [
     title: "Time Table",
     icon: <ImTable2 />,
     path: "/timetable",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.ADMIN, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
   },
   {
@@ -266,27 +267,27 @@ const sidebarData = [
     title: "Library",
     icon: <BsBook />,
     path: "/library",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.ADMIN, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.MANAGE_LIBRARY, // Added permission reference
   },
   {
     title: "Admissions",
     icon: <RiUserAddLine />,
     path: "/admissions",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.ADMIN, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.MANAGE_ADMISSIONS, // Added permission reference
   },
   {
     title: "Verification",
     icon: <BsCheckCircle />,
     path: "/verify_students",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.ADMIN, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.VERIFY_STUDENTS, // Added permission reference
   },
   {
     title: "Graduate",
     icon: <FaUserGraduate />,
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.ADMIN, ROLES.STAFF],
     path: `/graduates`,
     //requiredPermission: PERMISSIONS.VIEW_GRADUATES, // Added permission reference
   },

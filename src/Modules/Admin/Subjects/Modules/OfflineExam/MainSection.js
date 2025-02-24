@@ -48,7 +48,7 @@ const MainSection = () => {
     const start = new Date(startDate).setHours(0, 0, 0, 0);
     const end = new Date(endDate).setHours(23, 59, 59, 999);
 
-    const filteredExams = offlineExamData.filter((exam) => {
+    const filteredExams = offlineExamData?.filter((exam) => {
       const examDate = new Date(exam.startDate);
       const isWithinDateRange = examDate >= start && examDate <= end;
       const isMatchingExamType =
@@ -81,8 +81,8 @@ const MainSection = () => {
         }
         studentData[studentId][exam.examName] =
           student.status === "absent" || student.status === "excused"
-            ? `${student.status}/${student.maxMarks}`
-            : `${student.score}/${student.maxMarks}`;
+            ? `${student.status}/${student?.maxMarks}`
+            : `${student.score}/${student?.maxMarks}`;
       });
     });
     const studentList = Object.values(studentData).map((student) => {
@@ -120,7 +120,7 @@ const MainSection = () => {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [searchQuery, cid, sid, dispatch, debouncedSearch]);
+  }, [searchQuery, debouncedSearch]);
 
   useEffect(() => {
     debouncedSearch(searchQuery);
@@ -132,7 +132,7 @@ const MainSection = () => {
     return () => {
       debouncedSearch.cancel();
     };
-  }, [searchQuery, cid, sid, dispatch, debouncedSearch]);
+  }, [searchQuery, debouncedSearch, cid, sid, dispatch]);
 
   const filteredData = useMemo(() => {
     let data = offlineExamData;
@@ -186,6 +186,7 @@ const MainSection = () => {
     setSelectedExportExamTypes([]);
   };
 
+
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
@@ -213,14 +214,16 @@ const MainSection = () => {
                 {filteredData?.map((item, index) => (
                   <div>
                     <OfflineExamCard
+                      key={index}
                       examType={item.examType}
                       examName={item.examName}
                       semester={item.semesterId?.title ?? "NA"}
                       startDate={formatDate(item.startDate)}
                       endDate={formatDate(item.endDate)}
-                      maxMarks={item.students?.[0].maxMarks}
+                      maxMarks={item.students?.[0]?.maxMarks}
                       examId={item._id}
                       students={item.students}
+                      semesterId={item.semesterId?._id}
                     />
                   </div>
                 ))}

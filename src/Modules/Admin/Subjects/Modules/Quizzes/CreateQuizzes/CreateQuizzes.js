@@ -4,7 +4,6 @@ import MainSection from "./MainSection";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const CreateQuizzes = () => {
   const location = useLocation();

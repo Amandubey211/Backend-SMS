@@ -25,13 +25,12 @@ const TimeTablePage = () => {
     role === "admin"
       ? AdminDashLayout
       : role === "student"
-        ? StudentDashLayout
-        : role === "teacher"
-          ? TeacherDashLayout
-          : role === "parent"
-            ? ParentDashLayout
-            : AdminDashLayout;
-
+      ? StudentDashLayout
+      : role === "teacher"
+      ? TeacherDashLayout
+      : role === "parent"
+      ? ParentDashLayout
+      : AdminDashLayout;
 
   return (
     <Layout title="TimeTable | Student Diwan">

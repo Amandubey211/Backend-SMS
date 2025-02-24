@@ -24,12 +24,21 @@ const TextInput = ({ label, name, type = "text", placeholder, disabled, autoComp
         id={name}
         name={name}
         type={type}
+        min={0}
+        onKeyDown={(e) => {
+          if(type == "number"){
+           if (["-", "e", "E"].includes(e.key)) {
+            e.preventDefault();
+          } 
+          }
+        }}
         placeholder={placeholder}
         disabled={disabled || false}
         className={`bg-white border border-gray-300 rounded-md px-4 py-3 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300 ${
           disabled ? "cursor-not-allowed bg-gray-100" : ""
         }`}
         autoComplete={autoComplete}
+        
       />
       <ErrorMessage
         name={name}

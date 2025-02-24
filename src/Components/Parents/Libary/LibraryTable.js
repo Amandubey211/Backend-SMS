@@ -7,32 +7,7 @@ import { FaBookOpen } from "react-icons/fa"; // Importing an icon for no data or
 import { RiSignalWifiErrorFill } from "react-icons/ri";
 import dayjs from 'dayjs'; // For formatting dates
 import { useTranslation } from 'react-i18next'; // Import i18next hook
-
-// 1. NEW: Skeleton for table rows (rectangle boxes)
-const LibraryRowSkeleton = ({ rows = 3 }) => {
-  return (
-    <>
-      {/* Single <tr> so antd Table can display it via `locale.emptyText` */}
-      <tr>
-        <td colSpan={6} style={{ width: '88rem' }}>
-          <div className="flex flex-col space-y-2">
-            {/* Render multiple skeleton rows */}
-            {Array(rows).fill("").map((_, rowIndex) => (
-              <div key={rowIndex} className="border-b p-3 flex space-x-3">
-                {/* 6 columns => 6 rectangle placeholders */}
-                {Array(6).fill("").map((__, colIndex) => (
-                  <div key={colIndex} className="flex-1">
-                    <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
-                  </div>
-                ))}
-              </div>
-            ))}
-          </div>
-        </td>
-      </tr>
-    </>
-  );
-};
+import { LibraryRowSkeleton } from '../../../Modules/Parents/Skeletons'; // Importing LibraryRowSkeleton
 
 // 2. Your ORIGINAL `LibraryTable` component, unchanged except referencing the new skeleton in `renderLoading`.
 const LibraryTable = () => {

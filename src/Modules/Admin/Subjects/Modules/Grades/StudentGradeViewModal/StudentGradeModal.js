@@ -178,6 +178,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
   // Grab the grades data from Redux
   const { grades, loading } =
     useSelector((store) => store.admin.all_students) || {};
+  console.log(grades, "sdfsdf");
 
   // Mark the initial load done once we have fetched data at least once
   useEffect(() => {

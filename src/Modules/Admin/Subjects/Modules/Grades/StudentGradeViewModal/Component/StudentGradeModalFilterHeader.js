@@ -71,10 +71,6 @@ const StudentGradeModalFilterHeader = ({
             <option value="online">Online</option>
             <option value="offline">Offline</option>
           </select>
-          <FiChevronDown
-            className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-            size={16}
-          />
         </div>
       </div>
 
@@ -96,15 +92,11 @@ const StudentGradeModalFilterHeader = ({
               >
                 <option value="">Select</option>
                 <option value="assignment">Assignment</option>
-                <option value="group assignment">Group Assignment</option>
+                {/* <option value="group assignment">Group Assignment</option> */}
                 <option value="quiz">Quiz</option>
-                <option value="group quiz">Group Quiz</option>
-                <option value="offline_exam">Offline Exam</option>
+                {/* <option value="group quiz">Group Quiz</option> */}
+                {/* <option value="offline_exam">Offline Exam</option> */}
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
             </div>
           </div>
 
@@ -125,15 +117,11 @@ const StudentGradeModalFilterHeader = ({
                 >
                   <option value="">All</option>
                   {studentSubjectProgress?.map((s) => (
-                    <option key={s.subjectId} value={s.subjectId}>
-                      {s.subjectName}
+                    <option key={s?.subjectId} value={s?.subjectId}>
+                      {s?.subjectName}
                     </option>
                   ))}
                 </select>
-                <FiChevronDown
-                  className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                  size={16}
-                />
               </div>
             </div>
           )}
@@ -157,10 +145,6 @@ const StudentGradeModalFilterHeader = ({
                   </option>
                 ))}
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
             </div>
           </div>
 
@@ -190,10 +174,6 @@ const StudentGradeModalFilterHeader = ({
                   </>
                 )}
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
             </div>
           </div>
 
@@ -214,10 +194,6 @@ const StudentGradeModalFilterHeader = ({
                 <option value="Excused">Excused</option>
                 <option value="Missing">Missing</option>
               </select>
-              <FiChevronDown
-                className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                size={16}
-              />
             </div>
           </div>
         </>
@@ -237,10 +213,6 @@ const StudentGradeModalFilterHeader = ({
               className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
                          rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
                          focus:border-indigo-500 sm:text-sm"
-            />
-            <FiChevronDown
-              className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-              size={16}
             />
           </div>
         </div>

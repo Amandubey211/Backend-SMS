@@ -1,24 +1,20 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { baseUrl } from "../../../../config/Common";
-import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
-import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
-import { getAY } from "../../../../Utils/academivYear"
+import { handleError } from "../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
+import { getAY } from "../../../../Utils/academivYear";
 import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../Utils/getRoles";
-
 
 // Fetch Unverified Students
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
   async (_, { rejectWithValue, dispatch, getState }) => {
-
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await  getData(
+      const response = await getData(
         `/${getRole}/get_unverified_student_details?say=${say}`
       );
 
@@ -36,13 +32,13 @@ export const fetchUnverifiedStudents = createAsyncThunk(
 export const fetchRejectedStudents = createAsyncThunk(
   "verification/fetchRejectedStudents",
   async (_, { rejectWithValue, getState, dispatch }) => {
- 
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/get_rejected_student_details?say=${say}`);
+        `/${getRole}/get_rejected_student_details?say=${say}`
+      );
 
       if (!response.students || response.students?.length === 0) {
         return rejectWithValue("No rejected students found.");
@@ -57,7 +53,7 @@ export const fetchRejectedStudents = createAsyncThunk(
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
-  async (verificationDetails, { rejectWithValue,  dispatch , getState}) => {
+  async (verificationDetails, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
@@ -74,10 +70,14 @@ export const verifyStudent = createAsyncThunk(
           verifyResponse.data.msg || "Failed to verify student"
         );
       }
-      toast.success(verifyResponse.msg || "Student verified successfully");
+
+      // Collect success messages
+      let successMessages = [
+        verifyResponse.msg || "Student verified successfully.",
+      ];
 
       // Step 2: Assign Class to Student (if verified)
-      if (verificationDetails.isVerifiedDocuments == "verified") {
+      if (verificationDetails.isVerifiedDocuments === "verified") {
         const assignClassDetails = {
           studentId: verificationDetails.studentId,
           presentClassId: verificationDetails.presentClassId,
@@ -93,7 +93,10 @@ export const verifyStudent = createAsyncThunk(
             assignResponse.data.msg || "Failed to assign class"
           );
         }
-        toast.success(assignResponse.msg || "Class assigned successfully");
+
+        successMessages.push(
+          assignResponse.msg || "Class assigned successfully."
+        );
         dispatch(fetchUnverifiedStudents());
       } else {
         dispatch(fetchRejectedStudents());
@@ -116,9 +119,13 @@ export const verifyStudent = createAsyncThunk(
         );
       }
 
-      toast.success(
-        sendCredentialsResponse.msg || "Credentials sent successfully"
+      successMessages.push(
+        sendCredentialsResponse.msg || "Credentials sent successfully."
       );
+
+      // Display one aggregated toast notification
+      toast.success(successMessages.join(" "));
+
       return verifyResponse.student;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -130,12 +137,11 @@ export const verifyStudent = createAsyncThunk(
 export const assignClassToStudent = createAsyncThunk(
   "verification/assignClassToStudent",
   async (classDetails, { rejectWithValue, getState, dispatch }) => {
-  
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const  data  = await putData(
+      const data = await putData(
         `/${getRole}/assign_class?say=${say}`,
         classDetails
       );

@@ -51,17 +51,17 @@ export const createReceipt = createAsyncThunk(
       // 2) Fetch academicYear
       const academicYearId = getAY();
 
-      // 3) Merge formValues with schoolId, academicYear
+      // 3) Merge formValues with schoolId and academicYear
       const payload = {
         ...formValues,
         schoolId,
         academicYear: academicYearId,
       };
 
-      // 4) Create FormData
+      // 4) Create FormData instance and append simple fields
       const formData = new FormData();
       formData.append("tax", payload.tax);
-      formData.append("discountType", payload.discountType); // Add discountType to the payload
+      formData.append("discountType", payload.discountType);
       formData.append("discount", payload.discount);
       formData.append("penalty", payload.penalty);
       formData.append("govtRefNumber", payload.govtRefNumber);
@@ -70,39 +70,38 @@ export const createReceipt = createAsyncThunk(
       formData.append("academicYear", payload.academicYear);
       formData.append("invoiceNumber", payload.invoiceNumber);
 
-      // Receiver (nested)
+      // Append receiver object directly as JSON string
       formData.append("receiver[name]", payload.receiver.name);
       formData.append("receiver[email]", payload.receiver.email);
       formData.append("receiver[phone]", payload.receiver.phone);
       formData.append("receiver[address]", payload.receiver.address);
 
-      // Line Items (nested array)
+      // Append lineItems array directly as JSON string
       payload.lineItems.forEach((item, index) => {
         formData.append(`lineItems[${index}][revenueType]`, item.revenueType);
         formData.append(`lineItems[${index}][quantity]`, item.quantity);
         formData.append(`lineItems[${index}][total]`, item.total);
       });
 
-      // Document (file) if present
+      // Optionally attach document file if present
       // if (payload.document) {
       //   console.log("Attaching document:", payload.document);
       //   formData.append("document", payload.document);
       // }
+
       const getRole = getUserRole(getState);
       // 5) POST
-      const response = await customRequest('POST',`/${getRole}/revenue/create/receipt`, formData, 
-         { "Content-Type": "multipart/form-data" },
+      const response = await customRequest(
+        "POST",
+        `/${getRole}/revenue/create/receipt`,
+        formData,
+        { "Content-Type": "multipart/form-data" }
       );
 
       // Success response handling
-      if (response?.status === 201) {
+      if (response?.status === 201 || response?.message === "Receipt created successfully") {
         toast.success("Receipt created successfully!");
-        return response.data;
-      }
-
-      if (response?.message === "Receipt created successfully") {
-        toast.success("Receipt created successfully!");
-        return response;
+        return response.data || response;
       }
 
       // Failure handling
@@ -115,6 +114,7 @@ export const createReceipt = createAsyncThunk(
     }
   }
 );
+
 
 
 

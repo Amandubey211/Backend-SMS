@@ -2,14 +2,26 @@ import React, { useEffect, useRef, useState } from "react";
 import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.full.css";
 import { Button } from "antd";
-import { ImSpinner3 } from "react-icons/im";
 
-const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
+const UploadExcel = ({
+  data = [],
+  handleCreateExam,
+  isCreateLoading,
+  setIsOpen,
+  setIsCreateLoading,
+  isOpen,
+  file,
+  setFile,
+  setData,
+}) => {
   const hotRef = useRef(null);
   const hotInstanceRef = useRef(null);
-
+  const pinkColor = "#EC407A";
+  const purpleColor = "#AB47BC";
+  const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
   // ✅ Add state to manage table data
   const [tableData, setTableData] = useState([]);
+  // const [isTableDataFilled, setIsTableDataFilled] = useState(false); // New state
 
   useEffect(() => {
     const headers =
@@ -34,6 +46,7 @@ const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
         data: formattedData,
         colHeaders: headers,
         readOnly: true,
+        columns: headers.map(() => ({ readOnly: true })),
       });
     } else {
       hotInstanceRef.current = new Handsontable(hotRef.current, {
@@ -46,6 +59,7 @@ const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
         contextMenu: true,
         readOnly: true,
         licenseKey: "non-commercial-and-evaluation",
+        columns: headers.map(() => ({ readOnly: true })),
       });
     }
 
@@ -55,22 +69,16 @@ const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
         hotInstanceRef.current = null;
       }
     };
-  }, [data]); // ✅ Update when data changes
+  }, [data]);
 
   const handleCancel = () => {
-    // ✅ Clear table data
-    setTableData([]);
-
-    // ✅ Reset Handsontable manually
-    if (hotInstanceRef.current) {
-      hotInstanceRef.current.loadData([["", "", "", "", "", "", ""]]);
-    }
-
+    setFile(null);
+    setData([]);
     setIsOpen(false);
   };
 
   return (
-    <div className="w-full p-4 bg-white border shadow-md mt-2">
+    <div className="w-full p-4 bg-white border shadow-md mt-2 ">
       <div
         ref={hotRef}
         className="h-full w-[60%] border rounded-sm shadow-sm bg-gray-50 overflow-x-scroll"
@@ -79,17 +87,13 @@ const UploadExcel = ({ data = [], handleData, loading, setIsOpen, isOpen }) => {
       <div className="flex justify-end space-x-4 items-end w-[20%] fixed bottom-5 right-5">
         <Button onClick={handleCancel}>Cancel</Button>
         <Button
-          className={`${loading ? "cursor-not-allowed" : ""}`}
-          disabled={loading}
-          type="primary"
+          disabled={!file}
+          loading={isCreateLoading}
           htmlType="submit"
-          onClick={handleData}
+          onClick={handleCreateExam}
+          style={{ background: primaryGradient, color: "white" }}
         >
-          {loading ? (
-            <ImSpinner3 className="w-6 h-6 animate-spin text-white" />
-          ) : (
-            "Create"
-          )}
+          Create
         </Button>
       </div>
     </div>
