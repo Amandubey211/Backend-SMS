@@ -10,7 +10,7 @@ import { PERMISSIONS } from "../../../../../config/permission";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
-const ViewEvent = () => {
+const ViewEvent = ({onClose}) => {
   const dispatch = useDispatch();
   const selectedEvent = useSelector(
     (state) => state.admin.events.selectedEvent
@@ -36,7 +36,7 @@ const ViewEvent = () => {
 
   // Handler for delete event
   const handleDelete = () => {
-    dispatch(deleteEventThunk(selectedEvent?._id));
+    dispatch(deleteEventThunk(selectedEvent?._id)).then(()=> onClose());
   };
 
   // Handler for editing event

@@ -254,6 +254,7 @@ const CreateReceipt = () => {
       finalAmount: values.finalAmount, // Include finalAmount in the payload
       document: values.document, // Include document if needed
     };
+console.log(formValues,'...');
 
     dispatch(createReceipt(formValues))
       .unwrap()

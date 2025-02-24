@@ -82,7 +82,17 @@ const AddNotice = ({ isEditing, onClose }) => {
     } else {
       await dispatch(createNoticeThunk(announcementData)).then(()=>toast.success('Notice Add Successfully'));
     }
-    onClose(); // Close the form after submitting
+    setAnnouncementData({
+      title: "",
+      startDate: "",
+      endDate: "",
+      description: "",
+      priority: "High priority",
+      classId: "",
+      noticeFor: "",
+    });
+    onClose(); 
+   
   };
 
   return (

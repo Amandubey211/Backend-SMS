@@ -16,7 +16,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   const role = useSelector((store) => store.common.auth.role);
 
   const classLevels = [
-    ...new Set(books?.map((book) => book.classId?.className)),
+    ...new Set(books?.map((book) => book?.className)),
   ].filter(Boolean);
   const categories = [...new Set(books?.map((book) => book.category))].filter(
     Boolean
@@ -25,7 +25,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   const filteredBooks = books?.filter((book) => {
     const bookClassName = book?.classId?.className?.toLowerCase() || "";
     const bookCategory = book?.category?.toLowerCase() || "";
-    const selectedClass = filters?.class?.toLowerCase() || "";
+    const selectedClass = filters?.className?.toLowerCase() || "";
     const selectedCategory = filters?.category?.toLowerCase() || "";
 
     if (selectedClass && selectedCategory) {
