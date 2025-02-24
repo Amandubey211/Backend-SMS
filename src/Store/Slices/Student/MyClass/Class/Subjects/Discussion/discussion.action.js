@@ -1,11 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
-import {
-  handleError,
-} from "../../../../../Common/Alerts/errorhandling.action";
-import {
-  setShowError,
-} from "../../../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../../../../Utils/academivYear";
 import {
   deleteData,
@@ -16,12 +12,13 @@ import {
 
 export const fetchStudentDiscussion = createAsyncThunk(
   "discussion/fetchStudentDiscussion",
-  async ({cid,sid}, { rejectWithValue, dispatch }) => {
+  async ({ cid, sid }, { rejectWithValue, dispatch, getState }) => {
     try {
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(
-        `/admin/getDiscussion/class/${cid}/subject/${sid}?say=${say}`
+        `/admin/getDiscussion/class/${cid}/subject/${sid}?say=${say}&semesterId=${semesterId}`
       );
       const data = response?.data;
       // console.log("response data---", data);

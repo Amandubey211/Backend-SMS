@@ -6,12 +6,14 @@ import { getData } from "../../../../../../../services/apiEndpoints";
 
 export const stdSyllabus = createAsyncThunk(
     'syllabus/stdSyllabus',
-    async ({ classId, subjectId }, { rejectWithValue, dispatch }) => {
+    async ({ classId, subjectId }, { rejectWithValue, dispatch,getState }) => {
 
+        
         try {
+            const semesterId = getState().common.user.classInfo.selectedSemester.id;
             const say=getAY();
             dispatch(setShowError(false));
-            const res = await getData(`/admin/syllabus/${subjectId}/class/${classId}?say=${say}`);
+            const res = await getData(`/admin/syllabus/${subjectId}/class/${classId}?say=${say}&semesterId=${semesterId}`);
             const data = res?.data;
             return data;
 

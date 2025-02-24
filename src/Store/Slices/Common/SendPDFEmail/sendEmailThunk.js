@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { customRequest, postData } from "../../../../services/apiEndpoints";
+import { customRequest } from "../../../../services/apiEndpoints";
 import toast from "react-hot-toast";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getUserRole } from "../../../../Utils/getRoles";
@@ -16,7 +16,12 @@ export const sendEmail = createAsyncThunk(
 
       console.log("Sending email payload:", payload);
 
-      const response = await customRequest('POST',`/${getRole}/invoice/send/${type}/${id}`, payload,{ "Content-Type": "application/json"});
+      const response = await customRequest(
+        "POST",
+        `/${getRole}/invoice/send/${type}/${id}`,
+        payload,
+        { "Content-Type": "application/json" }
+      );
 
       if (response?.success) {
         return response.message;

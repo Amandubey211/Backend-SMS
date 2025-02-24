@@ -1,10 +1,8 @@
 // Header.js
-import React, { useState } from "react";
+import React from "react";
 import { BsChat } from "react-icons/bs";
 import DiscussionMessage from "../../DiscussionMessage/DiscussionMessage";
 import Sidebar from "../../../../../../../../Components/Common/Sidebar";
-import { ImSpinner3 } from 'react-icons/im';
-import { FaExclamationTriangle } from 'react-icons/fa';
 import { CiUser } from "react-icons/ci";
 import { useDispatch, useSelector } from "react-redux";
 import { setSidebarOpen } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";

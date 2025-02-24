@@ -13,6 +13,7 @@ const initialState = {
   error: false,
   loading: false,
   offlineExamData: [],
+  selectedExamStudents: []
   // isOpen: false,
   // setIsModalOpen,
 };

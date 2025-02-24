@@ -1,10 +1,11 @@
 import { Button, Divider, Modal } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { setSelectedSemester } from "../../../../../Store/Slices/Common/User/reducers/userSlice";
 import { useTranslation } from "react-i18next";
+import { fetchSemestersByClass } from "../../../../../Store/Slices/Student/MyClass/Class/semester/semesterThunks";
 
 const SubjectSideBar = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ const SubjectSideBar = () => {
     { name: "Module", path: "module" },
     { name: "Assignments", path: "assignments" },
     { name: "Quizzes", path: "quizzes" },
+    // { name: "Offline Exam", path: "offline_exam" },
     { name: "Discussions", path: "discussions" },
     { name: "Page", path: "page" },
     { name: "Grades", path: "grades" },
@@ -39,13 +41,14 @@ const SubjectSideBar = () => {
 
   const getBasePath = (item) => `/student_class/${cid}/${sid}/${item?.path}`;
 
+  useEffect(() => {
+    dispatch(fetchSemestersByClass(cid));
+  }, []);
   // Handler for selecting a semester from the modal
   const handleSemesterSelect = (semester) => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     setSemesterModalVisible(false);
   };
-
-  console.log("seemssdaas", semesters);
 
   return (
     <div className="flex flex-col min-h-screen h-full w-[18%] space-y-4 p-4">

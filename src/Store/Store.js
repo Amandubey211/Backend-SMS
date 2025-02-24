@@ -83,7 +83,7 @@ import studentPagesReducer from "../Store/Slices/Student/MyClass/Class/Subjects/
 import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
 import studentTimeTableReducer from "../Store/Slices/Student/TimeTable/studentTimeTableSlice";
-
+import studentSemesterReducer from "../Store/Slices/Student/MyClass/Class/semester/semesterSlice";
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -213,7 +213,7 @@ const AdminReducer = combineReducers({
   studentFees: studentFeesReducer,
   invoices: invoiceReducer,
   penaltyAdjustment: penaltyAdjustmentReducer,
-  offlineExam: adminOfflineExamReducer
+  offlineExam: adminOfflineExamReducer,
 });
 
 const studentReducer = combineReducers({
@@ -239,7 +239,7 @@ const studentReducer = combineReducers({
   studentDiscussion: studentDiscussionReducer,
   studentAnnounce: studentAnnounceReducer,
   studentTimetable: studentTimeTableReducer,
-  semesters: persistReducer(semesterPersistConfig, semesterReducer),
+  semesters: persistReducer(semesterPersistConfig, studentSemesterReducer),
 });
 
 const ParentReducer = combineReducers({

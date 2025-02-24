@@ -51,6 +51,8 @@ const SubjectSideBar = () => {
     setSemesterModalVisible(false);
   };
 
+  console.log("semester admin", semesters);
+
   return (
     <div className="flex flex-col min-h-screen h-full w-full md:w-[16%] space-y-3 p-3 border-r">
       {/* Semester Selection Section */}
@@ -70,7 +72,7 @@ const SubjectSideBar = () => {
     break-words       /* break long words */
     text-center       /* optionally center-align text */
     transition-colors
-    duration-200
+    duration-200  
     hover:bg-pink-400
     hover:text-pink-900
   "

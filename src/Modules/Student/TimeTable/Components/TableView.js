@@ -3,8 +3,8 @@ import { Table, Button, Input, message, Row } from "antd";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { FaArrowLeft, FaEdit, FaTrashAlt } from "react-icons/fa";
-import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action"; 
-import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal"; 
+import { deleteTimetable } from "../../../../Store/Slices/Admin/TimeTable/timetable.action";
+import DeleteConfirmatiomModal from "../../../../Components/Common/DeleteConfirmationModal";
 import { useTranslation } from "react-i18next";
 
 const TableView = () => {
@@ -19,6 +19,8 @@ const TableView = () => {
     current: 1,
     pageSize: 10,
   });
+
+  console.log("time table", timetable);
 
   const dispatch = useDispatch();
   const role = useSelector((store) => store.common.auth.role);
@@ -122,19 +124,21 @@ const TableView = () => {
 
   const tableData = useMemo(() => {
     if (!timetable) return [];
-    return timetable.days?.flatMap((day) =>
-      day.slots?.map((slot) => ({
-        key: slot._id,
-        day: day.day || t("N/A"),
-        date: day.date ? new Date(day.date).toLocaleDateString() : t("N/A"),
-        eventName: slot.eventName || t("N/A"),
-        subject: slot.subjectId?.name || t("N/A"),
-        startTime: slot.startTime || t("N/A"),
-        endTime: slot.endTime || t("N/A"),
-        description: slot.description || t("N/A"),
-        otherTitle: slot.heading || t("N/A"),
-      }))
-    ) || [];
+    return (
+      timetable.days?.flatMap((day) =>
+        day.slots?.map((slot) => ({
+          key: slot._id,
+          day: day.day || t("N/A"),
+          date: day.date ? new Date(day.date).toLocaleDateString() : t("N/A"),
+          eventName: slot.eventName || t("N/A"),
+          subject: slot.subjectId?.name || t("N/A"),
+          startTime: slot.startTime || t("N/A"),
+          endTime: slot.endTime || t("N/A"),
+          description: slot.description || t("N/A"),
+          otherTitle: slot.heading || t("N/A"),
+        }))
+      ) || []
+    );
   }, [timetable, t]);
 
   useEffect(() => {
@@ -167,7 +171,9 @@ const TableView = () => {
         })
         .catch((err) => {
           setDeleteLoading(false);
-          message.error(t(`Failed to delete ${timetable.name}: ${err.message}`));
+          message.error(
+            t(`Failed to delete ${timetable.name}: ${err.message}`)
+          );
         });
     }
   };
@@ -192,7 +198,11 @@ const TableView = () => {
 
   return (
     <div className="p-6">
-      <Button onClick={() => navigate(-1)} icon={<FaArrowLeft />} className="mb-4">
+      <Button
+        onClick={() => navigate(-1)}
+        icon={<FaArrowLeft />}
+        className="mb-4"
+      >
         {t("Back to Timetables")}
       </Button>
       <h1 className="text-3xl font-bold mb-6">
@@ -208,7 +218,7 @@ const TableView = () => {
           allowClear
           style={{ width: 200, marginRight: 10 }}
         />
-        {(role !== "parent" && role !== "student") && (
+        {role !== "parent" && role !== "student" && (
           <>
             <Button
               icon={<FaEdit />}

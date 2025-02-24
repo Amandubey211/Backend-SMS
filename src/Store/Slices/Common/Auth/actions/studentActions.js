@@ -1,8 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
-import { resetState, setRole, setToken } from "../reducers/authSlice";
+import { resetState, setRole } from "../reducers/authSlice";
 import { setUserDetails } from "../../User/reducers/userSlice";
-import { baseUrl } from "../../../../../config/Common";
 import toast from "react-hot-toast";
 import { fetchAcademicYear } from "../../AcademicYear/academicYear.action";
 import { customRequest, postData } from "../../../../../services/apiEndpoints";
