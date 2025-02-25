@@ -51,7 +51,7 @@ const initialFormState = {
   submissionType: "",
   allowedAttempts: false,
   numberOfAttempts: null,
-  assignTo: "",
+  assignTo: "Everyone",
   sectionId: "",
   dueDate: "",
   availableFrom: "",

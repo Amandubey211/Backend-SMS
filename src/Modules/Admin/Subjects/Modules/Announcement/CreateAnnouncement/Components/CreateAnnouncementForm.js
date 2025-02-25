@@ -38,7 +38,7 @@ const CreateAnnouncementForm = ({
       </div>
 
       <DateInput
-        label="Delay Posting"
+        label="Scheduled Post"
         name="availableFrom"
         value={availableFrom}
         handleChange={handleChange}
