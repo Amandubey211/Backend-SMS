@@ -108,9 +108,9 @@ const AccountingSection = () => {
 
   return (
     <Layout title={t("Finance")}>
-      <div className="p-4 w-full">
+      <div className="p-4 pt-0 w-full">
         {/* Accounting Section Header */}
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold text-gray-600 text-center">
             {t("Finance")}
           </h2>

@@ -4,29 +4,17 @@ import crossIcon from '../../../Assets/ParentAssets/svg/cross.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 import { useTranslation } from "react-i18next";
 
-const AttendanceCard = ({ attendanceData }) => {
+const AttendanceCard = ({ presentCount = 0, absentCount = 0, leaveCount = 0 }) => {
   const { t } = useTranslation('prtChildrens');
-
-  const [summary, setSummary] = useState({ presentCount: 0, absentCount: 0, leaveCount: 0 });
-
-  useEffect(() => {
-    if (attendanceData) {
-      const presentCount = attendanceData?.filter(item => item.status === 'present')?.length;
-      const absentCount = attendanceData?.filter(item => item.status === 'absent')?.length;
-      const leaveCount = attendanceData?.filter(item => item.status === 'leave')?.length;
-
-      setSummary({ presentCount, absentCount, leaveCount });
-    }
-  }, [attendanceData]);
 
   const totalPresent = t("Total Present");
   const totalAbsent = t("Total Absent");
   const totalLeave = t("Total Leave");
 
   const summaryData = [
-    { title: totalPresent, value: summary.presentCount, icon: checkboxIcon, color: 'bg-green-100' },
-    { title: totalAbsent, value: summary.absentCount, icon: crossIcon, color: 'bg-red-100' },
-    { title: totalLeave, value: summary.leaveCount, icon: leaveIcon, color: 'bg-purple-100', isGradient: true }
+    { title: totalPresent, value: presentCount, icon: checkboxIcon, color: 'bg-green-100' },
+    { title: totalAbsent, value: absentCount, icon: crossIcon, color: 'bg-red-100' },
+    { title: totalLeave, value: leaveCount, icon: leaveIcon, color: 'bg-purple-100', isGradient: true }
   ];
 
   return (
@@ -42,8 +30,8 @@ const AttendanceCard = ({ attendanceData }) => {
 
 const CardComponent = ({ data }) => {
   const cardStyle = data.isGradient
-    ? 'bg-gradient-to-b from-[#FAECF0] to-[#F3EBFB]' // Apply gradient background
-    : data.color; // Use solid color for other cards
+    ? 'bg-gradient-to-b from-[#FAECF0] to-[#F3EBFB]'
+    : data.color;
 
   return (
     <div

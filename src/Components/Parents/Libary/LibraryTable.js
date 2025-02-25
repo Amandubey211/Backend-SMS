@@ -117,7 +117,7 @@ const LibraryTable = () => {
           <div className="w-full flex flex-col items-center justify-center py-4" style={{"marginTop": '5rem', marginBottom: '10rem'}}>
             <FaBookOpen className="text-gray-400 text-8xl mb-6" />
             <p className="text-gray-600 text-lg text-center mt-2">
-              {t('No data available')}
+              {t('No borrowed books at the moment. Encourage your child to explore the library!')}
             </p>
           </div>
         </td>
