@@ -1,44 +1,43 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchParentFinanceData } from "../../Store/Slices/Parent/Finance/finance.action.js";
+import {
+  fetchParentFinanceData,
+  fetchParentFeeBreakdown,
+} from "../../Store/Slices/Parent/Finance/finance.action.js";
 import { fetchChildren } from "../../Store/Slices/Parent/Children/children.action";
-import { fetchParentFeeBreakdown } from "../../Store/Slices/Parent/Finance/finance.action.js";
 import Layout from "../../Components/Common/Layout";
 import ParentDashLayout from "../../Components/Parents/ParentDashLayout.js";
 import { MdAccessTime } from "react-icons/md";
 import { GiExpense } from "react-icons/gi";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
-import { FaMoneyBillWave } from "react-icons/fa";
 import { CiSearch } from "react-icons/ci";
 import { Select, Avatar, Table, Skeleton, Tag, Empty } from "antd";
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../Hooks/CommonHooks/useNavHeading ";
 
-// Destructure Option from Select
 const { Option } = Select;
 
-// A helper to unify the filtering + searching logic
+/* 
+  1) filterAndSearchData:
+     - Filters data by "Everyone", "Paid", "Unpaid", "Partial".
+     - Applies searchTerm across either 'feeType' or 'category' plus other fields.
+*/
 function filterAndSearchData(data, filters, searchTerm, isChildBreakdown) {
   if (!data) return [];
-
-  // 1) Filter by status: Everyone, Paid, Unpaid, Partial
   let result = data;
+
+  // Filter by status
   if (filters.status !== "Everyone") {
     result = result.filter((item) => item.status === filters.status);
   }
 
-  // 2) Filter by searchTerm
+  // Search
   if (searchTerm.trim()) {
     const lower = searchTerm.toLowerCase();
-    // For child breakdown, fields: category, paidBy, dueDate, amount, status
-    // For finance data, fields: feeType, paidBy, dueDate, amount, status
-    // We'll unify by checking isChildBreakdown
     result = result.filter((item) => {
-      // unify the text fields
       const feeTypeOrCategory = isChildBreakdown
         ? (item.category || "").toLowerCase()
         : (item.feeType || "").toLowerCase();
-
       const paidBy = (item.paidBy || "").toLowerCase();
       const dueDate = (item.dueDate || "").toLowerCase();
       const amount = String(item.amount || "").toLowerCase();
@@ -57,66 +56,106 @@ function filterAndSearchData(data, filters, searchTerm, isChildBreakdown) {
   return result;
 }
 
+/*
+  2) getStatusTag:
+     Renders a colored tag for "Paid", "Unpaid", or "Partial".
+*/
+function getStatusTag(status) {
+  const map = { Unpaid: "red", Paid: "green", Partial: "gold" };
+  return (
+    <Tag
+      color={map[status] || "blue"}
+      style={{ fontWeight: 500, borderRadius: "12px", padding: "4px 10px" }}
+    >
+      {status}
+    </Tag>
+  );
+}
+
+/*
+  3) getAmountColorClass:
+     Returns a Tailwind class for color-coding amounts in the expanded row.
+     - "Paid Amount" => green
+     - "Remaining Amount" => red if > 0 else green
+     - "Total Amount" => blue
+*/
+function getAmountColorClass(label, value) {
+  switch (label) {
+    case "Paid Amount":
+      return "text-green-600 font-semibold";
+    case "Remaining Amount":
+      return value > 0 ? "text-red-600 font-semibold" : "text-green-600 font-semibold";
+    case "Total Amount":
+      return "text-blue-600 font-semibold";
+    default:
+      return "text-gray-800";
+  }
+}
+
+/*
+  4) RowItem:
+     - Used in the expanded row to show label + colored value
+*/
+const RowItem = ({ label, value }) => {
+  const colorClass = getAmountColorClass(label, value);
+  return (
+    <div className="flex items-center justify-between">
+      <span className="font-medium text-gray-700">{label}</span>
+      <span className={colorClass}>{value}</span>
+    </div>
+  );
+};
+
 const ParentFinanceTable = () => {
   const { t } = useTranslation("prtFinance");
   const dispatch = useDispatch();
 
-  // -----------------------------
-  // 1. FETCH DEFAULT FINANCE DATA
-  // -----------------------------
-  var { financeData, totalUnpaidFees, totalPaidFees, loading, error } =
-    useSelector((state) => state?.Parent?.finance || {});
+  // -------------- Finance Data (Redux) --------------
+  const {
+    financeData,
+    totalUnpaidFees,
+    totalPaidFees,
+    loading: financeLoading,
+    error,
+  } = useSelector((state) => state?.Parent?.finance || {});
 
-  // For the default table filters (radio + search)
-  const [filters, setFilters] = useState({
-    feesType: "",
-    // ADDED "Partial" as an option => see radio group below
-    status: "Everyone",
-  });
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // On mount, fetch the default finance data
-  useEffect(() => {
-    dispatch(fetchParentFinanceData());
-  }, [dispatch]);
-
-  // 2) We'll keep the raw financeData in store, but we filter it here
-  //    if user hasn't selected a child
-  //    (the child selection logic is separate)
-  // ------------------------------------------------------
-
-  // -----------------------------
-  // 2. FETCH CHILDREN
-  // -----------------------------
+  // -------------- Children (Redux) --------------
+  // We always fetch the latest children from the API.
   const { children: childList = [], loading: childLoading } = useSelector(
     (state) => state?.Parent?.children || {}
   );
   const currentUserId = useSelector((state) => state?.Auth?.user?.id);
-  const hasFetchedChildren = useRef(false);
 
+  // -------------- Table Filters --------------
+  const [filters, setFilters] = useState({ status: "Everyone" });
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // -------------- 1) Fetch Finance Data --------------
   useEffect(() => {
-    if (currentUserId && !hasFetchedChildren.current) {
+    dispatch(fetchParentFinanceData());
+  }, [dispatch]);
+
+  // -------------- 2) Fetch Children Always --------------
+  useEffect(() => {
+    if (currentUserId) {
       dispatch(fetchChildren(currentUserId));
-      hasFetchedChildren.current = true;
     }
   }, [currentUserId, dispatch]);
 
-  // -----------------------------
-  // 3. CHILD BREAKDOWN LOGIC
-  // -----------------------------
+  // -------------- 3) Child Fee Breakdown --------------
   const [selectedChildId, setSelectedChildId] = useState("");
   const [childFeeBreakdown, setChildFeeBreakdown] = useState(null);
   const [breakdownLoading, setBreakdownLoading] = useState(false);
   const [breakdownError, setBreakdownError] = useState(null);
 
-  // On child selection => fetch the child's fee breakdown
+  // On selecting a child => fetch fee breakdown
   const handleChildSelect = async (childId) => {
     setSelectedChildId(childId);
-    setBreakdownError(null);
     setChildFeeBreakdown(null);
+    setBreakdownError(null);
 
     if (!childId) {
-      // user cleared the dropdown => revert to default
+      // Clearing the dropdown => revert to default
       setBreakdownLoading(false);
       return;
     }
@@ -127,13 +166,12 @@ const ParentFinanceTable = () => {
       const payload = resultAction?.payload;
 
       if (payload?.success) {
-        // Usually only one child object if a single studentId is used
         const childData = payload.feeBreakdown[0];
         if (!childData) {
-          // No fees => empty => triggers <Empty />
+          // No fees => triggers "No Data"
           setChildFeeBreakdown([]);
         } else {
-          // Convert each feeCategory into a row
+          // Convert each feeCategory into a table row
           const rows = Object.entries(childData.feeCategories).map(([catName, catVal]) => {
             let rowStatus = "Paid";
             if (catVal.remainingAmount > 0 && catVal.paidAmount > 0) {
@@ -141,7 +179,6 @@ const ParentFinanceTable = () => {
             } else if (catVal.remainingAmount > 0 && catVal.paidAmount === 0) {
               rowStatus = "Unpaid";
             }
-
             return {
               key: catName,
               category: catName,
@@ -159,41 +196,22 @@ const ParentFinanceTable = () => {
           setChildFeeBreakdown(rows);
         }
       } else {
-        setBreakdownError(payload?.message || "No Fees at the Moment for this Child, Please Check later.");
+        // e.g. { "message": "Invalid studentId..." }
+        // => triggers "No Data"
+        setChildFeeBreakdown([]);
+        setBreakdownError(payload?.message || "");
       }
     } catch (err) {
+      // On error => empty => "No Data"
+      setChildFeeBreakdown([]);
       setBreakdownError(err.message || "Error fetching fee breakdown.");
     } finally {
       setBreakdownLoading(false);
     }
   };
 
-  // Renders child in dropdown with avatar + name
-  const renderChildOption = (child) => (
-    <div className="flex items-center gap-2">
-      <Avatar src={child.profile} size="small" />
-      <span>{child.name}</span>
-    </div>
-  );
-
-  // True if child is selected + we have data (or empty array) + no error
-  const isUsingBreakdown = Boolean(selectedChildId) && childFeeBreakdown && !breakdownError;
-
-  // A helper to color the status
-  const tagColors = ["purple", "red", "blue", "green", "orange", "cyan", "magenta", "gold", "lime"];
-  const getStatusTag = (status) => {
-    const map = { Unpaid: "red", Paid: "green", Partial: "gold" };
-    const color = map[status] || tagColors[Math.floor(Math.random() * tagColors.length)];
-    return (
-      <Tag color={color} style={{ fontWeight: 500, borderRadius: "12px", padding: "4px 10px" }}>
-        {status}
-      </Tag>
-    );
-  };
-
-  // We define final data either from child breakdown or the default finance
-  // Then we apply the same filterAndSearchData for radio + search
-  // This ensures "Partial" filter also works for child data
+  // If child is selected + we have breakdown data => use child data
+  const isUsingBreakdown = Boolean(selectedChildId) && childFeeBreakdown !== null;
   let rawData;
   let isChildData = false;
 
@@ -203,27 +221,25 @@ const ParentFinanceTable = () => {
   } else {
     // default finance data
     if (error) {
-      // if top-level error => no rows
       rawData = [];
-    } else if (loading) {
-      // show skeleton rows
-      rawData = Array.from({ length: 5 }, (_, i) => ({ key: `skeleton-${i}`, skeleton: true }));
+    } else if (financeLoading) {
+      // skeleton placeholders
+      rawData = Array.from({ length: 5 }, (_, i) => ({
+        key: `skeleton-${i}`,
+        skeleton: true,
+      }));
     } else {
       rawData = financeData || [];
     }
   }
 
-  // Apply the same radio + search filtering to rawData
+  // -------------- Filter + Search --------------
   const finalTableData = useMemo(() => {
-    // If we have skeleton rows, just return them
-    if (rawData.some((item) => item.skeleton)) {
-      return rawData;
-    }
-    // Otherwise, do actual filter + search
+    if (rawData.some((item) => item.skeleton)) return rawData;
     return filterAndSearchData(rawData, filters, searchTerm, isChildData);
   }, [rawData, filters, searchTerm, isChildData]);
 
-  // Expand row for child breakdown
+  // -------------- Expanded Row --------------
   const expandedRowRender = (record) => (
     <div className="bg-white rounded-lg p-4 border border-gray-200">
       <div className="flex flex-col gap-2">
@@ -243,17 +259,10 @@ const ParentFinanceTable = () => {
     </div>
   );
 
-  const RowItem = ({ label, value }) => (
-    <div className="flex items-center justify-between">
-      <span className="font-medium text-gray-700">{label}</span>
-      <span className="text-gray-800">{value}</span>
-    </div>
-  );
-
-  // Build columns differently if child breakdown is in use
+  // -------------- Table Columns --------------
   const mainColumns = useMemo(() => {
     if (!isChildData) {
-      // Original columns for finance data
+      // Default finance data columns
       return [
         {
           title: t("Fee Type"),
@@ -333,7 +342,7 @@ const ParentFinanceTable = () => {
       ];
     }
 
-    // If we are using the child's breakdown columns
+    // Child breakdown columns
     return [
       {
         title: t("Fee Type"),
@@ -418,32 +427,41 @@ const ParentFinanceTable = () => {
     ];
   }, [isChildData, t]);
 
+  // Update nav heading
   useNavHeading(t("Children Fees"));
-  totalPaidFees = 0;
+
+  const getNumericValue = (value) => {
+    if (!value) return 0; // Handle null, undefined, empty string
+    if (typeof value === "number") return value; // Already a number, return as is
+    if (typeof value === "string") {
+      return Number(value.replace(/\D/g, "")) || 0; // Remove non-numeric characters (e.g., "QR")
+    }
+    return 0; // Fallback case
+  };
+
+  const unpaidFeesAmount = getNumericValue(totalUnpaidFees);
+
+
   return (
     <Layout title={t("Child Fees | Parents")}>
       <ParentDashLayout hideAvatarList={true}>
         <div className="flex flex-col w-full">
-
           {/* ---- TOP CARDS ---- */}
           <div className="grid grid-cols-2 gap-4 w-full px-4 py-4">
-            {/* Card 1: Total Unpaid Fees */}
             {/* Card 1: Total Unpaid Fees */}
             <div className="flex flex-col p-4 border border-gray-300 rounded-lg transition-transform">
               <div className="flex items-center justify-center mb-2">
                 <MdAccessTime className="text-2xl text-red-400" />
               </div>
-
-              {/* Title */}
               <span className="text-sm text-center">{t("Total Unpaid Fees")}</span>
 
-              {/* Fees Amount */}
+              {/* Display Cleaned Unpaid Fees */}
               <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text text-center">
-                {totalUnpaidFees || "0"}
+                {unpaidFeesAmount} QR
               </span>
 
-              {/* Conditional Rendering */}
-              {totalUnpaidFees > 0 ? (
+              {/* Corrected Conditional Rendering */}
+              {unpaidFeesAmount > 0 ? (
                 <button className="flex items-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white p-1 w-full justify-center px-5 rounded-full mt-2">
                   {t("Pay Now")}
                 </button>
@@ -455,27 +473,23 @@ const ParentFinanceTable = () => {
             </div>
 
 
+
+
             {/* Card 2: Total Paid Fees */}
             <div className="flex flex-col items-center p-6 border border-gray-300 rounded-lg transition-transform">
-              {/* Centered Icon */}
               <div className="flex items-center justify-center mb-2">
                 <GiExpense className="text-3xl text-red-400" />
               </div>
-
-              {/* Centered Title */}
               <span className="text-md font-medium text-gray-700">{t("Total Paid Fees")}</span>
-
-              {/* Centered Amount */}
               <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text text-center mt-1">
                 {totalPaidFees || "0"}
               </span>
             </div>
-
           </div>
 
           {/* ---- FILTERS, CHILD DROPDOWN & SEARCH BAR ---- */}
           <div className="flex p-[10px] justify-between items-center">
-            {/* Left: Radio filters => ADDED PARTIAL */}
+            {/* Left: Radio filters */}
             <div className="flex gap-[0.5rem]">
               {["Everyone", "Paid", "Unpaid", "Partial"].map((status) => (
                 <div key={status}>
@@ -522,7 +536,7 @@ const ParentFinanceTable = () => {
               ))}
             </div>
 
-            {/* Middle: Child Dropdown */}
+            {/* Middle: Child Dropdown (always from Redux, always re-fetched) */}
             <div className="relative flex items-center max-w-xs w-full mr-4">
               {childLoading ? (
                 <Skeleton.Input active style={{ width: 200 }} />
@@ -563,7 +577,6 @@ const ParentFinanceTable = () => {
 
           {/* ---- TABLE SECTION ---- */}
           <div className="px-4 pb-4">
-            {/* If there's a top-level error from fetchParentFinanceData => show no table */}
             {error ? (
               <div className="flex flex-col items-center justify-center my-8">
                 <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
@@ -571,15 +584,16 @@ const ParentFinanceTable = () => {
               </div>
             ) : (
               <>
-                {/* If the child breakdown fails => show red error once */}
-                {breakdownError && <p className="text-red-500 mb-2">{breakdownError}</p>}
+                {/* If breakdownError => show it once (but still show table if childFeeBreakdown is empty) */}
+                {breakdownError && (
+                  <p className="text-red-500 mb-2">{breakdownError}</p>
+                )}
 
                 <Table
                   columns={mainColumns}
                   dataSource={finalTableData}
                   pagination={{ pageSize: 5 }}
-                  loading={false} // We handle skeleton rows ourselves
-                  // Expand rows only if child data is in use
+                  loading={breakdownLoading}
                   expandable={
                     isUsingBreakdown
                       ? {
@@ -589,7 +603,6 @@ const ParentFinanceTable = () => {
                       : undefined
                   }
                   locale={{
-                    // If finalTableData is empty => show default "No Data" icon
                     emptyText: <Empty />,
                   }}
                 />
