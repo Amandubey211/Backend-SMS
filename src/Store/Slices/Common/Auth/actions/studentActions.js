@@ -23,7 +23,12 @@ export const studentLogin = createAsyncThunk(
       }
 
       const data = await postData(`/auth/student/login`, studentDetails);
-
+      if (!data?.success) {
+        const errorMessage =
+          data?.msg || "Something went wrong. Please try again later.";
+        toast.error(errorMessage);
+        return rejectWithValue(errorMessage);
+      }
       if (data.success) {
         //  localStorage.setItem("classId", `${data.classId}`);
         //   dispatch(setToken(data?.token)); // Store token in state
@@ -58,8 +63,6 @@ export const studentLogin = createAsyncThunk(
         } else {
           return { redirect: "/verify_qid" };
         }
-      } else {
-        return rejectWithValue(data.msg || "Login failed.");
       }
     } catch (error) {
       const errorMessage =
