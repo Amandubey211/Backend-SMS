@@ -57,7 +57,7 @@ const ParentProfile = () => {
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
   const [showPassword, setShowPassword] = useState(false);
-
+  console.log("userDetails", userDetails);
   return (
     <>
     <Layout title={t('My Profile')}>
@@ -90,13 +90,13 @@ const ParentProfile = () => {
               </div>
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">{t("Mother's Name")}</span>
+                  <span className="font-normal text-gray-500">{t("Wife's Name")}</span>
                   <span className="font-medium text-gray-800">
                     {userDetails?.motherName || '-'}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">{t("Guardian's Name")}</span>
+                  <span className="font-normal text-gray-500">{t("Relative's Name")}</span>
                   <span className="font-medium text-gray-800">{userDetails?.guardianName || '-'}</span>
                 </div>
               </div>

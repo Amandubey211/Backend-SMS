@@ -64,7 +64,7 @@ const ParentFinanceTable = () => {
   // -----------------------------
   // 1. FETCH DEFAULT FINANCE DATA
   // -----------------------------
-  const { financeData, totalUnpaidFees, totalPaidFees, loading, error } =
+  var { financeData, totalUnpaidFees, totalPaidFees, loading, error } =
     useSelector((state) => state?.Parent?.finance || {});
 
   // For the default table filters (radio + search)
@@ -418,8 +418,8 @@ const ParentFinanceTable = () => {
     ];
   }, [isChildData, t]);
 
-  useNavHeading(t("Child Fees | Parents"));
-
+  useNavHeading(t("Children Fees"));
+  totalPaidFees = 0;
   return (
     <Layout title={t("Child Fees | Parents")}>
       <ParentDashLayout hideAvatarList={true}>
@@ -428,34 +428,55 @@ const ParentFinanceTable = () => {
           {/* ---- TOP CARDS ---- */}
           <div className="grid grid-cols-2 gap-4 w-full px-4 py-4">
             {/* Card 1: Total Unpaid Fees */}
-            <div className="flex flex-col p-4 border border-gray-300 rounded-lg transition-transform hover:scale-105">
+            {/* Card 1: Total Unpaid Fees */}
+            <div className="flex flex-col p-4 border border-gray-300 rounded-lg transition-transform">
               <div className="flex items-center justify-center mb-2">
                 <MdAccessTime className="text-2xl text-red-400" />
               </div>
+
+              {/* Title */}
               <span className="text-sm text-center">{t("Total Unpaid Fees")}</span>
+
+              {/* Fees Amount */}
               <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text text-center">
                 {totalUnpaidFees || "0"}
               </span>
-              <button className="flex items-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white p-1 w-full justify-center px-5 rounded-full mt-2">
-                {t("Pay Now")}
-              </button>
+
+              {/* Conditional Rendering */}
+              {totalUnpaidFees > 0 ? (
+                <button className="flex items-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white p-1 w-full justify-center px-5 rounded-full mt-2">
+                  {t("Pay Now")}
+                </button>
+              ) : (
+                <div className="bg-green-100 text-green-700 px-3 py-1 text-sm font-semibold text-center rounded-full mt-2 mx-auto w-1/2">
+                  {t("All Cleared")}
+                </div>
+              )}
             </div>
+
+
             {/* Card 2: Total Paid Fees */}
-            <div className="flex flex-col p-4 border border-gray-300 rounded-lg transition-transform hover:scale-105">
+            <div className="flex flex-col items-center p-6 border border-gray-300 rounded-lg transition-transform">
+              {/* Centered Icon */}
               <div className="flex items-center justify-center mb-2">
-                <GiExpense className="text-2xl text-red-400" />
+                <GiExpense className="text-3xl text-red-400" />
               </div>
-              <span className="text-sm text-center">{t("Total Paid Fees")}</span>
-              <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text text-center">
+
+              {/* Centered Title */}
+              <span className="text-md font-medium text-gray-700">{t("Total Paid Fees")}</span>
+
+              {/* Centered Amount */}
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text text-center mt-1">
                 {totalPaidFees || "0"}
               </span>
             </div>
+
           </div>
 
           {/* ---- FILTERS, CHILD DROPDOWN & SEARCH BAR ---- */}
           <div className="flex p-[10px] justify-between items-center">
             {/* Left: Radio filters => ADDED PARTIAL */}
-            <div className="flex gap-4">
+            <div className="flex gap-[0.5rem]">
               {["Everyone", "Paid", "Unpaid", "Partial"].map((status) => (
                 <div key={status}>
                   <label className="flex items-center cursor-pointer">
@@ -470,11 +491,10 @@ const ParentFinanceTable = () => {
                       className="hidden"
                     />
                     <div
-                      className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
-                        filters.status === status
-                          ? "border-green-500 bg-white"
-                          : "border-gray-300 bg-white"
-                      }`}
+                      className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
+                        ? "border-green-500 bg-white"
+                        : "border-gray-300 bg-white"
+                        }`}
                       style={{ position: "relative" }}
                     >
                       {filters.status === status && (
@@ -491,9 +511,8 @@ const ParentFinanceTable = () => {
                       )}
                     </div>
                     <span
-                      className={`transition-colors duration-200 ${
-                        filters.status === status ? "text-green-700" : "text-gray-700"
-                      }`}
+                      className={`transition-colors duration-200 ${filters.status === status ? "text-green-700" : "text-gray-700"
+                        }`}
                       style={{ paddingLeft: "2px" }}
                     >
                       {t(status)}
@@ -564,9 +583,9 @@ const ParentFinanceTable = () => {
                   expandable={
                     isUsingBreakdown
                       ? {
-                          expandedRowRender,
-                          rowExpandable: (record) => !record.skeleton,
-                        }
+                        expandedRowRender,
+                        rowExpandable: (record) => !record.skeleton,
+                      }
                       : undefined
                   }
                   locale={{

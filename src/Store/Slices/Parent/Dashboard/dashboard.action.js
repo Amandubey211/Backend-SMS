@@ -28,7 +28,7 @@ export const fetchNotices = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(`/admin/all/notices?say=${say}`);
+      const data = await getData(`/admin/dashboard/notices`);
 
       // console.log("API Response for Notices:", data?.notices);
       return data?.notices;
