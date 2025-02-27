@@ -120,11 +120,10 @@ const ParentFinanceTable = () => {
   } = useSelector((state) => state?.Parent?.finance || {});
 
   // -------------- Children (Redux) --------------
-  // We always fetch the latest children from the API.
-  const { children: childList = [], loading: childLoading } = useSelector(
-    (state) => state?.Parent?.children || {}
-  );
+
   const currentUserId = useSelector((state) => state?.Auth?.user?.id);
+  const [childList, setChildList] = useState([]);
+  const [childLoading, setChildLoading] = useState(false);
 
   // -------------- Table Filters --------------
   const [filters, setFilters] = useState({ status: "Everyone" });
@@ -137,9 +136,18 @@ const ParentFinanceTable = () => {
 
   // -------------- 2) Fetch Children Always --------------
   useEffect(() => {
-    if (currentUserId) {
-      dispatch(fetchChildren(currentUserId));
-    }
+    setChildLoading(true);
+    dispatch(fetchChildren(currentUserId))
+      .then((resultAction) => {
+        const payload = resultAction?.payload;
+        setChildList(payload || []);
+      })
+      .catch((error) => {
+        setChildList([]);
+      })
+      .finally(() => {
+        setChildLoading(false);
+      });
   }, [currentUserId, dispatch]);
 
   // -------------- 3) Child Fee Breakdown --------------
@@ -441,7 +449,6 @@ const ParentFinanceTable = () => {
 
   const unpaidFeesAmount = getNumericValue(totalUnpaidFees);
 
-
   return (
     <Layout title={t("Child Fees | Parents")}>
       <ParentDashLayout hideAvatarList={true}>
@@ -454,12 +461,10 @@ const ParentFinanceTable = () => {
                 <MdAccessTime className="text-2xl text-red-400" />
               </div>
               <span className="text-sm text-center">{t("Total Unpaid Fees")}</span>
-
               {/* Display Cleaned Unpaid Fees */}
               <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text text-center">
                 {unpaidFeesAmount} QR
               </span>
-
               {/* Corrected Conditional Rendering */}
               {unpaidFeesAmount > 0 ? (
                 <button className="flex items-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white p-1 w-full justify-center px-5 rounded-full mt-2">
@@ -471,10 +476,6 @@ const ParentFinanceTable = () => {
                 </div>
               )}
             </div>
-
-
-
-
             {/* Card 2: Total Paid Fees */}
             <div className="flex flex-col items-center p-6 border border-gray-300 rounded-lg transition-transform">
               <div className="flex items-center justify-center mb-2">
@@ -505,10 +506,11 @@ const ParentFinanceTable = () => {
                       className="hidden"
                     />
                     <div
-                      className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${filters.status === status
-                        ? "border-green-500 bg-white"
-                        : "border-gray-300 bg-white"
-                        }`}
+                      className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 ${
+                        filters.status === status
+                          ? "border-green-500 bg-white"
+                          : "border-gray-300 bg-white"
+                      }`}
                       style={{ position: "relative" }}
                     >
                       {filters.status === status && (
@@ -525,8 +527,9 @@ const ParentFinanceTable = () => {
                       )}
                     </div>
                     <span
-                      className={`transition-colors duration-200 ${filters.status === status ? "text-green-700" : "text-gray-700"
-                        }`}
+                      className={`transition-colors duration-200 ${
+                        filters.status === status ? "text-green-700" : "text-gray-700"
+                      }`}
                       style={{ paddingLeft: "2px" }}
                     >
                       {t(status)}
@@ -536,45 +539,46 @@ const ParentFinanceTable = () => {
               ))}
             </div>
 
-            {/* Middle: Child Dropdown (always from Redux, always re-fetched) */}
-            <div className="relative flex items-center max-w-xs w-full mr-4">
-              {childLoading ? (
-                <Skeleton.Input active style={{ width: 200 }} />
-              ) : (
-                <Select
-                  placeholder="Select Child"
-                  style={{ width: 200 }}
-                  value={selectedChildId || undefined}
-                  onChange={handleChildSelect}
-                  allowClear
-                >
-                  {childList.map((child) => (
-                    <Option key={child.id} value={child.id}>
-                      <div className="flex items-center gap-2">
-                        <Avatar src={child.profile} size="small" />
-                        <span>{child.name}</span>
-                      </div>
-                    </Option>
-                  ))}
-                </Select>
-              )}
-            </div>
+            {/* Middle: Child Dropdown (Always Fresh Data) */}
+            <div className="flex items-center gap-6">
+              <div className="relative flex items-center max-w-xs w-full mr-4">
+                {childLoading ? (
+                  <Skeleton.Input active style={{ width: 200 }} />
+                ) : (
+                  <Select
+                    placeholder="Select Child"
+                    style={{ width: 200 }}
+                    value={selectedChildId || undefined}
+                    onChange={handleChildSelect}
+                    allowClear
+                  >
+                    {childList.map((child) => (
+                      <Option key={child.id} value={child.id}>
+                        <div className="flex items-center gap-2">
+                          <Avatar src={child.profile} size="small" />
+                          <span>{child.name}</span>
+                        </div>
+                      </Option>
+                    ))}
+                  </Select>
+                )}
+              </div>
 
-            {/* Right: Search bar */}
-            <div className="relative flex items-center max-w-xs w-full mr-4">
-              <input
-                type="text"
-                placeholder="Search here"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
-              />
-              <button className="absolute right-3">
-                <CiSearch className="w-5 h-5 text-gray-500" />
-              </button>
+              {/* Right: Search bar */}
+              <div className="relative flex items-center max-w-xs w-full mr-4">
+                <input
+                  type="text"
+                  placeholder="Search here"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+                />
+                <button className="absolute right-3">
+                  <CiSearch className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
             </div>
           </div>
-
           {/* ---- TABLE SECTION ---- */}
           <div className="px-4 pb-4">
             {error ? (
@@ -597,9 +601,9 @@ const ParentFinanceTable = () => {
                   expandable={
                     isUsingBreakdown
                       ? {
-                        expandedRowRender,
-                        rowExpandable: (record) => !record.skeleton,
-                      }
+                          expandedRowRender,
+                          rowExpandable: (record) => !record.skeleton,
+                        }
                       : undefined
                   }
                   locale={{

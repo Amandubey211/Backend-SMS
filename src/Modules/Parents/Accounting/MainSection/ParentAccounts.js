@@ -137,7 +137,7 @@ const AccountingSection = () => {
       dataIndex: "status",
       key: "action",
       render: (status) => {
-        if (status === "Unpaid") {
+        if (status === "Unpaid" || status === "Partial") {
           return (
             <button
               className="text-white bg-gradient-to-r from-[#C83B62] to-[#7F35CD] hover:bg-gradient-to-l px-4 py-1 font-normal rounded-md transition duration-300 ease-in-out"
