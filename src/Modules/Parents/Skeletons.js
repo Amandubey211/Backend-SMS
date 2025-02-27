@@ -438,7 +438,7 @@ export const LibraryRowSkeleton = ({ rows = 3 }) => {
         <>
             {/* Single <tr> so antd Table can display it via `locale.emptyText` */}
             <tr>
-                <td colSpan={6} style={{ width: '88rem' }}>
+                <td colSpan={7} style={{ width: '88rem' }}>
                     <div className="flex flex-col space-y-2">
                         {/* Render multiple skeleton rows */}
                         {Array(rows).fill("").map((_, rowIndex) => (

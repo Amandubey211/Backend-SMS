@@ -35,22 +35,37 @@ const Notice = ({ title, startDate, endDate, priority, content, image, backgroun
         <div className="mr-2">
           {renderImageOrFallback(image)}
         </div>
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-semibold text-gray-800">{title} <span className="ml-4 text-sm text-gray-500">(Posted by <span className="text-sm text-gray-700">{authorName || '-'}</span>)</span></h2>
-          <div className="flex items-center gap-4 mb-2">
-            <div className="flex gap-1 items-center">
-              <IoCalendarOutline />
-              <span className="text-gray-500">
-                {formattedStartDate} - {formattedEndDate}
-              </span>
-            </div>
-            <span
-              className={`px-2 py-1 text-xs font-medium rounded ${priorityClasses[priority] || "bg-gray-100 text-black"}`}
+        <div className="flex-1 flex flex-col gap-2">
+          {/* Title with Posted By */}
+          <h2 className="font-semibold text-lg gap-2">
+            {title}
+            <span className="ml-4 text-sm text-gray-500">
+              (Posted by{" "}
+              <span className="text-sm text-gray-700">{authorName || "-"}</span>
+              )
+            </span>
+          </h2>
+
+          {/* Date and Priority Label */}
+          <div className="flex items-center text-xs">
+            <IoCalendarOutline className="text-gray-400" />
+            <span className="ml-2 text-sm text-gray-500">
+              {formattedStartDate}
+              {formattedEndDate && ` - ${formattedEndDate}`}
+            </span>
+
+            {/* Priority Label with inherited styles */}
+            <div
+              className={`ml-3 px-3 py-1  rounded-full ${priority === "High priority"
+                  ? "text-pink-500 bg-pink-100"
+                  : "text-gray-500"
+                }`}
             >
               {priority}
-            </span>
+            </div>
           </div>
         </div>
+
       </div>
 
       <p className="text-gray-600">{content}</p>

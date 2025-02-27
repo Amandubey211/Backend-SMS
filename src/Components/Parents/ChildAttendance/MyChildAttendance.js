@@ -4,32 +4,44 @@ import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard.j
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAttendance } from '../../../Store/Slices/Parent/Children/children.action.js';
 import { FaExclamationTriangle } from 'react-icons/fa';
-import presentIcon from '../../../Assets/ParentAssets/svg/present.svg';
-import absentIcon from '../../../Assets/ParentAssets/svg/absent.svg';
+import presentIcon from '../../../Assets/ParentAssets/svg/checkbox.svg';
+import absentIcon from '../../../Assets/ParentAssets/svg/cross.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
 import './ChildrenAttendance.css';
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
-import CustomSpinner from '../../../Components/Common/Spinner.js';
-import { useTranslation } from "react-i18next";
 import { ThreeRectCardSkeleton } from '../../../Modules/Parents/Skeletons.js';
-
+import { useTranslation } from "react-i18next";
+import Layout from '../../Common/Layout.js';
+import dayjs from 'dayjs'; // Ensure you are using dayjs
 
 const MyChildAttendance = () => {
-  const { t } = useTranslation('prtChildrens'); // Initialize translation hook
+  const { t } = useTranslation('prtChildrens'); // Translation hook
   const dispatch = useDispatch();
-  var { attendance, loading, error, children } = useSelector((state) => state.Parent.children); // Access Redux state
+  const { loading, error, children } = useSelector((state) => state.Parent.children);
+
+  const [attendanceData, setAttendanceData] = useState(null); // Store API response directly
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
 
-  // Fetch the student ID from the Redux state
+  // Extract student ID from Redux state
   const studentId = children?.[0]?.id || null;
 
   // Fetch attendance data when studentId, month, or year changes
   useEffect(() => {
-    if (studentId) {
-      dispatch(fetchAttendance({ studentId, month, year }));
-    }
+    const fetchData = async () => {
+      if (studentId) {
+        try {
+          const response = await dispatch(fetchAttendance({ studentId, month, year })).unwrap();
+          setAttendanceData(response); // Store API response directly in local state
+        } catch (err) {
+          console.error('Error fetching attendance:', err);
+        }
+      }
+    };
+    fetchData();
   }, [studentId, month, year, dispatch]);
+
+  console.log("attendanceData", attendanceData);
 
   // Handle calendar panel change (month/year)
   const handlePanelChange = (value) => {
@@ -37,22 +49,24 @@ const MyChildAttendance = () => {
     setYear(value.year());
   };
 
-  // 2. Prevent the calendar from auto-switching months when clicking attendance icons
-  const handleSelect = useCallback(() => {
-    // Do nothing so the calendar doesn't jump to another month/year
-  }, []);
+  // Prevent calendar from auto-switching months on icon click
+  const handleSelect = useCallback(() => {}, []);
 
   useNavHeading(t("My Childs"), t("Attendance"));
 
-  // dateCellRender function to show attendance icons
+  // Extract attendance entries and summary
+  const attendanceEntries = attendanceData?.attendanceEntries || [];
+  const { presentCount = 0, absentCount = 0, leaveCount = 0 } = attendanceData?.summary || {};
+
+  // Render attendance icons in each calendar cell
   const dateCellRender = useCallback((value) => {
-    const listData = attendance?.filter(entry =>
-      new Date(entry.date).toDateString() === value.toDate().toDateString()
-    );
+    const cellDate = dayjs(value).format('YYYY-MM-DD'); // Use dayjs to ensure exact format
+
+    const listData = attendanceEntries.filter((entry) => entry.date === cellDate);
 
     return (
       <ul className="events">
-        {listData?.map((item) => {
+        {listData.map((item) => {
           let icon;
           switch (item.status) {
             case 'present':
@@ -69,25 +83,23 @@ const MyChildAttendance = () => {
           }
           return (
             <li key={item?.date}>
-              {icon} {item?.status?.charAt(0)?.toUpperCase() + item?.status?.slice(1)}
+              {icon}
             </li>
           );
         })}
       </ul>
     );
-  }, [attendance]);
+  }, [attendanceEntries]);
 
-  // Memoize the content rendering to avoid unnecessary re-renders
+  // Memoized content rendering
   const renderContent = useCallback(() => {
     if (loading) {
-      // 3. Show our new 3-card skeleton instead of the spinner
       return (
         <>
           <ThreeRectCardSkeleton />
           <AntdCalendar
             onPanelChange={handlePanelChange}
-            onSelect={handleSelect}  // Fixes the calendar jump
-            // We can omit dateCellRender here or keep it empty while loading
+            onSelect={handleSelect}
             dateCellRender={() => null}
           />
         </>
@@ -106,18 +118,26 @@ const MyChildAttendance = () => {
     return (
       <>
         <div className="attendance-card-wrapper">
-          <AttendanceCard attendanceData={attendance} />
+          <AttendanceCard
+            presentCount={presentCount}
+            absentCount={absentCount}
+            leaveCount={leaveCount}
+          />
         </div>
         <AntdCalendar
           onPanelChange={handlePanelChange}
-          onSelect={handleSelect}   // Prevents unintended month jump
+          onSelect={handleSelect}
           dateCellRender={dateCellRender}
         />
       </>
     );
-  }, [loading, error, attendance, handlePanelChange, handleSelect, dateCellRender]);
+  }, [loading, error, presentCount, absentCount, leaveCount, handlePanelChange, handleSelect, dateCellRender]);
 
-  return <div className="calendar-container">{renderContent()}</div>;
+  return (
+    <Layout title="Child Attendance | Parent">
+      <div className="calendar-container">{renderContent()}</div>
+    </Layout>
+  );
 };
 
 export default MyChildAttendance;
