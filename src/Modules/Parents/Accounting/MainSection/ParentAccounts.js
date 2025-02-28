@@ -24,7 +24,7 @@ const AccountingSection = () => {
     class: "",
     section: "",
     feesType: "",
-    status: "Everyone", 
+    status: "Everyone",
   });
 
   // Redux state for accounting data
@@ -174,19 +174,21 @@ const AccountingSection = () => {
   return (
     <Layout title={t("Finance")}>
       <div className="p-4 pt-0 pl-[0.5rem] w-full">
-        {/* Header: DO NOT CHANGE */}
+        {/* Header: Show "See All" only when fees exist */}
         <div className="flex justify-between items-center">
           <h2 className="text-lg font-semibold text-gray-600 text-center">
             {t("Finance")}
           </h2>
-          {!error && (
+
+          {/* Show "See All" only if there's data and no error */}
+          {topFiveData?.length > 0 && !error && (
             <div className="flex items-center space-x-4">
               <div className="inline-block mr-5">
                 <button
                   className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
-               text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
-               hover:bg-gradient-to-r hover:from-[#7F35CD] hover:to-[#C83B62]  
-               hover:shadow-md"
+                        text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD] font-normal
+                        hover:bg-gradient-to-r hover:from-[#7F35CD] hover:to-[#C83B62]  
+                        hover:shadow-md"
                   onClick={handleNavigate}
                 >
                   {t("See All")}

@@ -132,7 +132,7 @@ const NoticeBoard = ({ textTrimCount }) => {
 
   return (
     <div className="p-2 ">
-      <div className="flex justify-between p-4 items-center px-6 pt-0 pl-[0.3rem">
+      <div className="flex justify-between p-4 items-center px-6 pl-[0.3rem] pt-0">
         <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         <div className="inline-block">
           <button
