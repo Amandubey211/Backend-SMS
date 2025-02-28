@@ -1,24 +1,26 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { MdAccessTime } from "react-icons/md";
+import { gt } from "../../../../Utils/translator/translation";
 
-const StudentDashFeeCard = ({ title, amount, unpaidFees, buttonText }) => {
+const StudentDashFeeCard = ({ title, amount, buttonText, buttonAction }) => {
+  const { t } = useTranslation();
   return (
-    <div className=" flex flex-1 flex-col justify-around items-center gap-2">
-      <div className="">
-        <MdAccessTime className="text-3xl text-red-400" />
+    <div className="px-7 py-5 flex flex-1 flex-col justify-around items-center gap-2">
+      <div className="border border-black flex items-center justify-center p-1.5 rounded-full">
+        <MdAccessTime className="text-2xl text-red-400" />
       </div>
-      <span className="text-xl">{title}</span>
+      <span className="text-sm">{t(title, gt.stdFinance)}</span>
       <span className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-        {amount} QR
+        {amount}
       </span>
-
-      {buttonText && unpaidFees > 0 && (
+      {buttonText && (
         <button
-          // className="flex items-center border border-blue-800 w-[50%] justify-center px-5 rounded-full mt-2"
-          className=" w-[50%]  mt-2 items-center space-x-2 bg-gradient-to-r from-purple-100 to-pink-100 text-white py-1 px-3 rounded-full"
+          onClick={buttonAction}
+          className="flex items-center border bg-gradient-to-r from-pink-500 to-purple-500 w-full justify-center rounded-full"
         >
-          <span className="text-sm text-gradient font-medium">
-            {buttonText}
+          <span className="text-white m-1 ">
+            {t(buttonText, gt.stdFinance)}
           </span>
         </button>
       )}

@@ -12,18 +12,15 @@ import { GoAlertFill } from "react-icons/go";
 import ClassmateModal from "./ClassmateModal";
 import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../../../Components/Common/Offline";
-import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
+import SidebarSlide from "../../../../../../Components/Common/SidebarSlide";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 
-
 const StudentClassMates = () => {
-
   const { classData } = useSelector((store) => store?.student?.studentClass);
 
   const className = classData?.className;
 
   useNavHeading(` ${className}`, "Classmates");
-
 
   const { classmateData, loading, error } = useSelector(
     (store) => store?.student?.studentClassmate
@@ -37,30 +34,32 @@ const StudentClassMates = () => {
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
-  }
+  };
 
   useEffect(() => {
     dispatch(stdClassmate({ classId }));
   }, [dispatch, classId]);
 
-const [isSidebarOpen,setIsSidebarOpen] = useState(false)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const handleProfileClick = (classmate) => {
     setSelectedClassmate(classmate);
-    setIsSidebarOpen(true) // Set selected classmate for modal
+    setIsSidebarOpen(true); // Set selected classmate for modal
   };
 
   const closeModal = () => {
     setSelectedClassmate(null);
-    setIsSidebarOpen(false)
-     // Close modal
+    setIsSidebarOpen(false);
+    // Close modal
   };
 
   return (
-    <Layout title="My Classmates">
+    <Layout title="My Classmate">
       <DashLayout>
         <div className="p-4">
           <div className="flex items-center mb-4 gap-3">
-            <h2 className="text-xl text-gray-600 font-semibold">My Classmates</h2>
+            <h2 className="text-xl text-gray-600 font-semibold">
+              My Classmates
+            </h2>
             <div
               className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300"
               aria-label={`Number of classmates: ${classmateData?.length || 0}`}
@@ -75,14 +74,13 @@ const [isSidebarOpen,setIsSidebarOpen] = useState(false)
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
             </div>
-          )
-          //  : error ? (
+          ) : //  : error ? (
           //   <div className="w-full flex flex-col items-center justify-center py-20">
           //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
           //     <p className="text-lg font-semibold">{error}</p>
           //   </div>
-          // ) 
-          : classmateData?.length > 0 ? (
+          // )
+          classmateData?.length > 0 ? (
             <div className="flex flex-wrap -mx-2">
               {classmateData?.map((classmate, index) => (
                 <ProfileCard
@@ -92,34 +90,35 @@ const [isSidebarOpen,setIsSidebarOpen] = useState(false)
                 />
               ))}
             </div>
-          ) : (!loading && classmateData?.length === 0) && (
-            <div className="w-full flex flex-col items-center justify-center py-20">
-              <NoDataFound title="No Classmates Found" />
-            </div>
+          ) : (
+            !loading &&
+            classmateData?.length === 0 && (
+              <div className="w-full flex flex-col items-center justify-center py-20">
+                <NoDataFound title="Classmates" />
+              </div>
+            )
           )}
         </div>
 
         {/* Render the modal if a classmate is selected */}
         {selectedClassmate && (
-         <SidebarSlide
-         isOpen={isSidebarOpen}
-         onClose={closeModal}
-         title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-           Classmate
-
-         </span>}
-         width="30%"
-         height="100%"
-       >
-        <ClassmateModal
-            classmate={selectedClassmate}
-          />
-       </SidebarSlide>
+          <SidebarSlide
+            isOpen={isSidebarOpen}
+            onClose={closeModal}
+            title={
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                Classmate
+              </span>
+            }
+            width="30%"
+            height="100%"
+          >
+            <ClassmateModal classmate={selectedClassmate} />
+          </SidebarSlide>
         )}
         {!loading && showError && (
           <OfflineModal error={error} onDismiss={handleDismiss} />
         )}
-        
       </DashLayout>
     </Layout>
   );

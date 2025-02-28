@@ -14,10 +14,13 @@ import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice
 import OfflineModal from "../../../../Components/Common/Offline";
 
 const BookIssue = () => {
-
-  const { loading, error, issueBooks, filters } = useSelector((store) => store?.student?.studentIssueBooks);
-  const {  activeTab } = useSelector((store) => store?.student?.studentLibraryBooks);
-  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+  const { loading, error, issueBooks, filters } = useSelector(
+    (store) => store?.student?.studentIssueBooks
+  );
+  const { activeTab } = useSelector(
+    (store) => store?.student?.studentLibraryBooks
+  );
+  const { showError } = useSelector((store) => store?.common?.alertMsg);
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
@@ -35,7 +38,7 @@ const BookIssue = () => {
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
-  }
+  };
 
   return (
     <div className="">
@@ -52,10 +55,11 @@ const BookIssue = () => {
               className="hidden"
             />
             <div
-              className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 transition-colors duration-300 ${filters.status === status
-                ? "border-green-500"
-                : "border-gray-300"
-                }`}
+              className={`h-5 w-5 rounded-full mr-2 flex items-center justify-center border-2 transition-colors duration-300 ${
+                filters.status === status
+                  ? "border-green-500"
+                  : "border-gray-300"
+              }`}
             >
               {/* Icon for selected radio button */}
               {filters.status === status && (
@@ -63,10 +67,11 @@ const BookIssue = () => {
               )}
             </div>
             <span
-              className={`transition-colors duration-300 text-md ${filters.status === status ? "text-gradient" : "text-gray-600"
-                } hover:text-pink-500 focus:outline-none`}
+              className={`transition-colors duration-300 text-md ${
+                filters.status === status ? "text-gradient" : "text-gray-600"
+              } hover:text-pink-500 focus:outline-none`}
             >
-              {t(status,gt.stdLibrary)}
+              {t(status, gt.stdLibrary)}
             </span>
           </label>
         ))}
@@ -79,21 +84,28 @@ const BookIssue = () => {
             <thead>
               <tr className="text-left text-gray-600 bg-gray-100">
                 <th className="px-5 py-3 border-b border-gray-200">
-                  {t('Issue Book', gt.stdLibrary)}
-                </th>
-                <th className="px-5 py-3 border-b border-gray-200"> {t('Author', gt.stdLibrary)} </th>
-                <th className="px-5 py-3 border-b border-gray-200"> {t('Category', gt.stdLibrary)} </th>
-                <th className="px-5 py-3 border-b border-gray-200">
-                  {t('Issue Date', gt.stdLibrary)}
+                  {t("Issue Book", gt.stdLibrary)}
                 </th>
                 <th className="px-5 py-3 border-b border-gray-200">
-                  {t('Return Date', gt.stdLibrary)}
+                  {" "}
+                  {t("Author", gt.stdLibrary)}{" "}
                 </th>
-                <th className="px-5 py-3 border-b border-gray-200">{t('Status', gt.stdLibrary)}</th>
+                <th className="px-5 py-3 border-b border-gray-200">
+                  {" "}
+                  {t("Category", gt.stdLibrary)}{" "}
+                </th>
+                <th className="px-5 py-3 border-b border-gray-200">
+                  {t("Issue Date", gt.stdLibrary)}
+                </th>
+                <th className="px-5 py-3 border-b border-gray-200">
+                  Last Return Date
+                </th>
+                <th className="px-5 py-3 border-b border-gray-200">
+                  {t("Status", gt.stdLibrary)}
+                </th>
               </tr>
             </thead>
             <tbody role="rowgroup">
-
               {/* Display Loading Spinner */}
               {loading && (
                 <tr>
@@ -114,7 +126,7 @@ const BookIssue = () => {
               )} */}
 
               {/* Display No Data Found */}
-              {!loading  && issueBooks?.length == 0 && (
+              {!loading && issueBooks?.length == 0 && (
                 <tr>
                   <td colSpan="6" className="text-center py-20">
                     <NoDataFound />
@@ -122,16 +134,19 @@ const BookIssue = () => {
                 </tr>
               )}
 
-              {!loading && !error && issueBooks?.length > 0 && (filteredBookIssueData()?.map((item) => (
-                <BookIssueRow key={item.id} item={item} />
-              )))}
+              {!loading &&
+                !error &&
+                issueBooks?.length > 0 &&
+                filteredBookIssueData()?.map((item) => (
+                  <BookIssueRow key={item.id} item={item} />
+                ))}
             </tbody>
           </table>
         }
       </div>
       {!loading && showError && (
-            <OfflineModal error={error} onDismiss={handleDismiss} />
-          )}
+        <OfflineModal error={error} onDismiss={handleDismiss} />
+      )}
     </div>
   );
 };

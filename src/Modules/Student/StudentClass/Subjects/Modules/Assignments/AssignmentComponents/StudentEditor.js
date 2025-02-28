@@ -223,17 +223,20 @@ const StudentEditor = forwardRef(
 
         <style jsx>{`
           .editable-blank {
-            display: inline-block;
+            display: block;
             margin: 0 2px;
           }
 
           .blank-input {
             border: none;
+            margin-top: 15px;
             border-bottom: 2px solid #c71585;
             outline: none;
             background-color: transparent;
-            text-align: center;
-            min-width: 50px;
+            text-align: start;
+            width: 50%;
+            max-width: 100%;
+            height: auto;
             transition: border-color 0.3s, background-color 0.3s;
             pointer-events: auto;
             user-select: auto;

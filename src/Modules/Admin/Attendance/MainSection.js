@@ -43,9 +43,12 @@ const MainSection = () => {
       ) : error ? (
         <NoDataFound title="Attendance" />
       ) : (
-        <ProtectedSection requiredPermission={PERMISSIONS.STUDENT_MONTHLY_ATTENDANCE_LIST} title={"Student Attendence"}>
-        <AttendanceTable />
-        </ProtectedSection >
+        <ProtectedSection
+          requiredPermission={PERMISSIONS.STUDENT_MONTHLY_ATTENDANCE_LIST}
+          title={"Student Attendence"}
+        >
+          <AttendanceTable />
+        </ProtectedSection>
       )}
     </div>
   );

@@ -10,7 +10,7 @@ import { PERMISSIONS } from "../../../../../config/permission";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
-const ViewEvent = ({onClose}) => {
+const ViewEvent = ({ onClose }) => {
   const dispatch = useDispatch();
   const selectedEvent = useSelector(
     (state) => state.admin.events.selectedEvent
@@ -36,7 +36,7 @@ const ViewEvent = ({onClose}) => {
 
   // Handler for delete event
   const handleDelete = () => {
-    dispatch(deleteEventThunk(selectedEvent?._id)).then(()=> onClose());
+    dispatch(deleteEventThunk(selectedEvent?._id)).then(() => onClose());
   };
 
   // Handler for editing event
@@ -45,7 +45,6 @@ const ViewEvent = ({onClose}) => {
   };
 
   return (
-   
     <div className="flex flex-col h-full max-w-xl mx-auto bg-white ">
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">
@@ -102,7 +101,9 @@ const ViewEvent = ({onClose}) => {
               <MdPersonOutline className="text-white text-lg" />
             </div>
             <div className="flex flex-col items-start justify-start">
-              <span className="text-gray-500 text-sm">{t("Event Director")}</span>
+              <span className="text-gray-500 text-sm">
+                {t("Event Director")}
+              </span>
               <span
                 className="text-md truncate max-w-xs"
                 title={selectedEvent.director}
@@ -122,35 +123,34 @@ const ViewEvent = ({onClose}) => {
       {/* Sticky footer for buttons */}
       <div className="p-4 bg-white border-t sticky bottom-0 flex gap-4">
         {/* Conditionally render Edit and Delete buttons if role is not "teacher" */}
-        {!["parent","student"].includes(role) && (
+        {!["parent", "student"].includes(role) && (
           <>
-          <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_EVENT}>
-            <button
-              className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
-              onClick={handleDelete}
-              disabled={deleteLoading}
-            >
-              {deleteLoading ? (
-                <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
-              ) : (
-                t("Delete")
-              )}
-            </button>
+            <ProtectedAction requiredPermission={PERMISSIONS.REMOVE_EVENT}>
+              <button
+                className="flex items-center justify-center bg-red-500 text-white px-4 py-2 rounded-md w-full"
+                onClick={handleDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? (
+                  <div className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></div>
+                ) : (
+                  t("Delete")
+                )}
+              </button>
             </ProtectedAction>
             <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_EVENT}>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
-              onClick={handleEdit}
-            >
-              {t("Edit")}
-            </button>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-md w-full"
+                onClick={handleEdit}
+              >
+                {t("Edit")}
+              </button>
             </ProtectedAction>
           </>
         )}
       </div>
     </div>
- 
-  )
+  );
 };
 
 export default ViewEvent;

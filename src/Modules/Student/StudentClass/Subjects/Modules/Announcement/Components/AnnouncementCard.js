@@ -26,8 +26,11 @@ const AnnouncementCard = ({ title, date, section, id }) => {
   const bgColor = getRandomColor();
 
   return (
-    <div style={{ backgroundColor: bgColor }} className="ps-1 rounded-md h-36">
-      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4 h-36">
+    <div
+      style={{ backgroundColor: bgColor }}
+      className="ps-1 rounded-md h-auto"
+    >
+      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4 h-auto">
         <NavLink
           to={`/student_class/${cid}/${sid}/announcements/${id}/view`}
           className="flex flex-col items-start justify-start"
