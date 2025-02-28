@@ -32,6 +32,8 @@ export default function EditStudentFeesForm({ data }) {
         paid_amount: 0,
         paymentStatus: "",
         studentId: '',
+        discription:'',
+        document:[],
         classId: '',
         sectionId: '',
     });
@@ -64,6 +66,8 @@ export default function EditStudentFeesForm({ data }) {
                 paymentStatus: data.paymentStatus || "",
                 studentId: data.studentId,
                 classId: data.classId,
+                discription:data.discription,
+                document:data?.document || [],
                 sectionId: data.sectionId
             });
         }
@@ -287,16 +291,15 @@ export default function EditStudentFeesForm({ data }) {
 
                             />}
                         </div>
-                        <div className="grid grid-cols-3 gap-6 w-full">
+                       <div className="grid grid-cols-3 gap-6 w-full">
                             <FileInput
                                 label="Add receipt/document"
                                 name="document"
-
                                 onChange={
-                                    (e) => { setFieldValue("document", e.target.value || null) }
+                                    (e) => { setFieldValue("document", [e.target.value] || null) }
                                 }
-                                value={values.document || ''}
-                                disabled={viewMode}
+                                value={values?.document[0] || ''}
+                                disabled={data.mode == 'View' ? true:false }
                             />
                         </div>
                         {data.mode == 'Edit' &&
