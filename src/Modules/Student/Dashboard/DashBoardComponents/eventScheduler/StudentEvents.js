@@ -153,7 +153,7 @@ const StudentEvents = () => {
                 {event.title}
               </h3>
               <h3 className="text-xs font-semibold text-gray-600">
-                {moment(selectedEvents[0].start).format("dddd, MMMM D, YYYY")} ({" "}
+                {moment(selectedEvents[0].start).format("ddd, MMM D, YYYY")} ({" "}
                 {moment(event.start).format("hh:mm A")} -{" "}
                 {moment(event.end).format("hh:mm A")})
               </h3>
@@ -198,7 +198,8 @@ const StudentEvents = () => {
           }
           .rbc-date-cell {
             display: flex;
-            top:12px;
+            top:16px;
+            left:2px;
             justify-content: center;
             align-items: center;
             font-size: 12px;

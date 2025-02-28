@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Student/StudentDashLayout";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
@@ -17,6 +17,7 @@ import { gt } from "../../../../Utils/translator/translation";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../Components/Common/Offline";
 import { CiSearch } from "react-icons/ci";
+import { FiRefreshCw } from "react-icons/fi";
 
 const StudentAnnounce = () => {
   const {
@@ -32,6 +33,8 @@ const StudentAnnounce = () => {
   } = useSelector((store) => store.student.studentAnnouncement);
   const { showError } = useSelector((store) => store?.common?.alertMsg);
 
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
   const dispatch = useDispatch();
   const { t } = useTranslation();
   useNavHeading("Notice");
@@ -48,13 +51,17 @@ const StudentAnnounce = () => {
 
   const filteredNotices = () => {
     return noticeData.filter((notice) => {
-      const titleMatch = notice?.title?.toLowerCase()
+      const titleMatch = notice?.title
+        ?.toLowerCase()
         .includes(searchTerm.toLowerCase());
 
-      // Ensure priority filtering works
       const priorityMatch = priority ? notice.priority === priority : true;
 
-      return titleMatch && priorityMatch;
+      const dateMatch =
+        (!startDate || new Date(notice.startDate) >= new Date(startDate)) &&
+        (!endDate || new Date(notice.endDate) <= new Date(endDate));
+
+      return titleMatch && priorityMatch && dateMatch;
     });
   };
 
@@ -84,6 +91,13 @@ const StudentAnnounce = () => {
     });
   }, [currentPage, dispatch, priority, searchTerm]);
 
+  const handleApplyFilters = () => {
+    dispatch(setSearchTerm(""));
+    dispatch(setPriority(""));
+    dispatch(setCurrentPage(1));
+    setEndDate(null);
+    setStartDate(null);
+  };
   return (
     <Layout title="Event">
       <DashLayout>
@@ -92,8 +106,8 @@ const StudentAnnounce = () => {
             {t("Student Notice Board", gt.stdNoticeboard)}
           </h1>
 
-          <div className="flex flex-row w-[60%] items-center justify-between mt-2">
-            <div className="relative flex items-center w-[65%] ">
+          <div className="flex flex-row w-[100%] gap-x-4 items-center justify-between mt-2 pr-5">
+            <div className="relative flex items-center w-[50%] ">
               <input
                 type="text"
                 placeholder={t("Search by Notice", gt.stdNoticeboard)}
@@ -106,7 +120,7 @@ const StudentAnnounce = () => {
               </button>
             </div>
             {/* Search & Priority Filters */}
-            <div className="w-[25%] pr-4">
+            <div className="w-[23%] ">
               <select
                 value={priority}
                 onChange={(e) => dispatch(setPriority(e.target.value))}
@@ -119,6 +133,33 @@ const StudentAnnounce = () => {
                 <option value="Low priority">Low Priority</option>
               </select>
             </div>
+            <div className="md:w-[23%] pr-2 mb-2 md:mb-0">
+              <input
+                type="date"
+                value={startDate ? startDate.toISOString().split("T")[0] : ""}
+                onChange={(e) =>
+                  setStartDate(e.target.value ? new Date(e.target.value) : null)
+                }
+                className="px-3 py-2 border rounded w-full text-md text-gray-500"
+              />
+            </div>
+            <div className=" md:w-[23%]">
+              <input
+                type="date"
+                value={endDate ? endDate.toISOString().split("T")[0] : ""}
+                onChange={(e) =>
+                  setEndDate(e.target.value ? new Date(e.target.value) : null)
+                }
+                className="px-3 py-2 border rounded w-full text-md text-gray-500"
+              />
+            </div>
+            <FiRefreshCw
+              onClick={handleApplyFilters}
+              size={25}
+              className="ml-auto cursor-pointer text-gray-500 hover:text-blue-500
+                        transition-transform duration-300 hover:rotate-180"
+              title="Reset Filters"
+            />
           </div>
         </div>
 

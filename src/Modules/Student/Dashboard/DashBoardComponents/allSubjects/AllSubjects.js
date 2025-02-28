@@ -17,20 +17,6 @@ const AllSubjects = ({ subjects }) => {
                 <div
                   key={subject._id}
                   className=" subject-card mb-1 py-4 border-t"
-                  // style={{
-                  //   transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                  //   boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-                  // }}
-                  // onMouseEnter={(e) => {
-                  //   e.currentTarget.style.transform = "scale(1.05)";
-                  //   e.currentTarget.style.boxShadow =
-                  //     "0px 8px 15px rgba(0, 0, 0, 0.1)";
-                  // }}
-                  // onMouseLeave={(e) => {
-                  //   e.currentTarget.style.transform = "scale(1)";
-                  //   e.currentTarget.style.boxShadow =
-                  //     "0px 4px 6px rgba(0, 0, 0, 0.1)";
-                  // }}
                 >
                   <div className="flex items-center mb-2">
                     <img
@@ -42,10 +28,10 @@ const AllSubjects = ({ subjects }) => {
                       className="w-12 h-12 rounded mr-4"
                     />
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-700">
+                      <h3 className="text-md font-semibold text-gray-700">
                         {subject?.subjectName}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs text-gray-500">
                         Started: {subject?.started?.slice(0, 10)}
                       </p>
                     </div>

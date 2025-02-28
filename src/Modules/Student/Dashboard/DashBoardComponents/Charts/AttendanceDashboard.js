@@ -14,7 +14,7 @@ const AttendanceDashboard = ({ attendanceSummary, error }) => {
 
   return (
     <div className="attendance-dashboard w-[95%] mx-4 rounded-md">
-      <h1 className="text-xl font-semibold text-gray-600 mt-3">Attendance</h1>
+      <h1 className="text-lg font-semibold text-black mt-3">Attendance</h1>
 
       {loading ? (
         <div className="flex items-center justify-center mt-4">

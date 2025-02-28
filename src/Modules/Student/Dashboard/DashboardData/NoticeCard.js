@@ -45,7 +45,7 @@ const NoticeCard = ({
       <div className="flex flex-col justify-between flex-grow">
         <div>
           <div className="flex items-start justify-between">
-            <h2 className="text-base font-semibold text-gray-700 capitalize m-0 leading-5">
+            <h2 className=" text-sm font-semibold text-gray-800 capitalize m-0 leading-5">
               {truncatedTitle}
             </h2>
 
@@ -57,14 +57,22 @@ const NoticeCard = ({
             </span>
           </div>
 
-          <div className="flex items-center gap-1 text-gray-500 ">
+          {/* <div className="flex items-center gap-1 text-gray-500 ">
             <p className="text-xs m-0 leading-4">
-              Posted by {authorName || "-"} ({date})
+              By {authorName || "-"} ({date})
             </p>
+          </div> */}
+          <div className="flex items-center gap-1 font-semibold">
+            <p className="text-sm text-gray-600 m-0 leading-4">
+              By - {authorName || "-"}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 m-0 leading-4">{date}</p>
           </div>
 
           {/* Content Snippet */}
-          <div className="flex items-center gap-1 text-gray-500 ">
+          {/* <div className="flex items-center gap-1 text-gray-500 ">
             <CiBookmarkCheck size={15} />
             <p className="text-xs m-0 leading-4">
               {truncateText(
@@ -72,7 +80,7 @@ const NoticeCard = ({
                 descriptionLength?.descriptionLength || 100
               )}
             </p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

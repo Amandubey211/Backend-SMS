@@ -207,75 +207,8 @@ const StudentMainSection = () => {
           </div>
         </div>
       </div>
-
-      {/* Parent Wrapper for Left and Right Sections */}
-      {/* <div className="flex flex-row w-[100%]  bg-gray-100">
-        <div className="w-[100%] flex flex-row bg-gray-100">
-          <div className="w-[60%] flex items-center justify-center bg-gray-100 rounded-md pb-5">
-            <div className="w-full h-full bg-gray-100 mx-5 mb-5">
-              <AttendanceDashboard
-                attendanceSummary={dashboardAttendance}
-                error={attendanceError}
-              />
-            </div>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 };
 
 export default StudentMainSection;
-{
-  /* Notice Board */
-}
-{
-  /* <div className="flex w-[40%]  items-center justify-center px-4 bg-white">
-            <div className="w-full h-full">
-              <DashboardNoticeBoard descriptionLength={58} />
-            </div>
-          </div> */
-}
-
-{
-  /* Recent Exam Results */
-}
-{
-  /* {results?.length > 0 ? (
-            <div className="flex items-center justify-center p-4 border-t border-gray-300">
-              <div className="w-full h-full">
-                <div className="flex justify-between items-center px-4">
-                  <h4 className="text-xl font-semibold text-gray-600">
-                    Recent Exam Results
-                  </h4>
-
-                  <span
-                    className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent font-normal cursor-pointer"
-                    onClick={() => {
-                      if (selectedClass && selectedSection) {
-                        navigate(
-                          `/student_class/${selectedClass}/${selectedSection}/grades`
-                        );
-                      } else {
-                        console.error(
-                          "Unable to navigate to grades. Class or Section is missing."
-                        );
-                      }
-                    }}
-                  >
-                    See All
-                  </span>
-                </div>
-                <ExamResults />
-              </div>
-            </div>
-          ) : (
-            <div className="text-gray-500 flex flex-col justify-center items-center m-7 ">
-              <IoNewspaperOutline size={50} />
-              <span className=" text-lg font-semibold text-center">
-                No Exam Results for Now
-              </span>
-            </div>
-           
-          )} */
-}
