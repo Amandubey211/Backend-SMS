@@ -241,7 +241,7 @@ const LibraryTable = () => {
   return (
     <div className="p-6 pt-5">
       {/* Header: Title + Filters */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-end mb-4">
         <div className="flex items-center space-x-6">
           {/* Child Filter */}
           <Select
