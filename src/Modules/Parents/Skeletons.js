@@ -124,7 +124,7 @@ export const ChildCardSkeleton = ({ count }) => {
 
                     {/* Big Button (CHECK SUBJECT PROGRESS) */}
                     <div className="flex justify-center mt-5">
-                        <Skeleton.Button active size="large" shape="round" style={{ width: "85%", height: 48, borderRadius: "12px" }} />
+                        <Skeleton.Button active size="large" shape="round" style={{ width: 190, height: 30, borderRadius: "12px" }} />
                     </div>
                 </div>
             ))}
