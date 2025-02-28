@@ -42,7 +42,7 @@ const AllNotice = () => {
       )
       .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   }, [notices, searchTerm]);
-  
+
 
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
@@ -126,24 +126,31 @@ const AllNotice = () => {
                           <span className="ml-2 text-sm text-gray-500">{formatDate(notice?.startDate)}</span>
 
                           <div
-                            className={`ml-3 px-3 py-1 bg-gray-100 rounded-full ${notice?.priority === t("High Priority")
-                              ? "text-pink-500 bg-pink-100"
-                              : "text-gray-500"
+                            className={`ml-3 px-3 py-1 rounded-full 
+                                ${notice?.priority?.toLowerCase() === "high priority"
+                                ? "text-pink-600 bg-pink-200"
+                                : "text-gray-600 bg-gray-200"
                               }`}
                           >
                             {notice?.priority || t("Low Priority")}
                           </div>
+
                         </div>
                       </div>
 
                       {/* Expand Icon */}
                       <div className="flex items-center gap-4">
-                        {activeIndex === index ? (
-                          <MdExpandLess className="text-xl" />
-                        ) : (
-                          <MdExpandMore className="text-xl" />
-                        )}
+                        <div
+                          className={`h-8 w-8 flex items-center justify-center rounded-full border border-gray-300 bg-white 
+               cursor-pointer transition-all duration-300 ease-in-out hover:bg-gray-100`}
+                        >
+                          <MdExpandMore
+                            className={`text-2xl text-gray-600 transition-transform duration-300 ease-in-out 
+                 ${activeIndex === index ? "rotate-180" : "rotate-0"}`}
+                          />
+                        </div>
                       </div>
+
                     </div>
 
                     {/* Description */}
