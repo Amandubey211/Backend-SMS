@@ -70,9 +70,7 @@ const BookCard = ({ book }) => {
           <h3 className="text-lg font-bold text-[#333333]">{name}</h3>
           <p className="text-base font-semibold">{category}</p>
           <div className="flex gap-2">
-            <p className="text-sm font-medium text-gray-500">
-              {t("Author")}:{" "}
-            </p>
+            <p className="text-sm font-medium text-gray-500">{t("Author")}: </p>
             <p className="text-sm font-medium text-gray-600">{author}</p>
           </div>
           {role !== "teacher" && (

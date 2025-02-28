@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import TextInput from "./TextInput"; // Reusable TextInput component
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const AddressInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
   const [sameAddress, setSameAddress] = useState(false);
 
   const handleSameAddressChange = (e) => {
@@ -42,7 +42,7 @@ const AddressInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
           name="contactNumber"
           value={studentInfo.contactNumber || ""}
           onChange={handleInputChange}
-          placeholder={t("000-000-0000")}
+          placeholder={t("0000-0000")}
           error={errors.contactNumber}
           //ref={inputRefs.contactNumber}
         />
@@ -51,7 +51,7 @@ const AddressInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
           name="emergencyNumber"
           value={studentInfo.emergencyNumber || ""}
           onChange={handleInputChange}
-          placeholder={t("000-000-0000")}
+          placeholder={t("0000-0000")}
           error={errors.emergencyNumber}
           ref={inputRefs.emergencyNumber}
         />
@@ -136,7 +136,9 @@ const AddressInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
       {/* Residential Address */}
       {!sameAddress && (
         <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">{t("Residential Address")}</h3>
+          <h3 className="text-lg font-semibold mb-2">
+            {t("Residential Address")}
+          </h3>
           <TextInput
             label={t("Street")}
             name="residentialAddress.street"
@@ -205,7 +207,7 @@ const AddressInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
           name="Q_Id"
           value={studentInfo.Q_Id || ""}
           onChange={handleInputChange}
-          placeholder={t("e.g., 123456789")}
+          placeholder={t("11 digit")}
           error={errors.Q_Id}
           ref={inputRefs.Q_Id}
         />

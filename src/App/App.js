@@ -30,6 +30,9 @@ import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
 import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 
+// new Timetable
+import TimeTableDash from "../Modules/Admin/TimeTables/Timetable.js";
+
 // Timetable
 // Admin
 import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
@@ -864,10 +867,11 @@ function App() {
       ),
     },
     {
-      path: "/timetable/*",
+      path: "/timetable",
       element: (
         <ProtectRoute
-          Component={TimeTablePage}
+          // Component={TimeTablePage}
+          Component={TimeTableDash}
           allowedRoles={["admin", "teacher", "student", "parent", "staff"]}
         />
       ),

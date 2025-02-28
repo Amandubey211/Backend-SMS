@@ -39,7 +39,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
     const { name, value } = e.target;
     setLocalFilters((prev) => ({ ...prev, [name]: value }));
 
-    if (name === "classLevel"  && value) {
+    if (name === "classLevel" && value) {
       dispatch(fetchSectionsNamesByClass(value));
     }
   };
@@ -111,16 +111,15 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             ]}
           />
         </div>
-       
-          <ProtectedAction requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}>
-            <button
-              onClick={handleSidebarOpen}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-            >
-              {t("Add Book Issue")}
-            </button>
-          </ProtectedAction>
-        
+
+        <ProtectedAction requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}>
+          <button
+            onClick={handleSidebarOpen}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          >
+            {t("Add Book Issue")}
+          </button>
+        </ProtectedAction>
       </div>
 
       <div className="overflow-x-auto bg-white shadow rounded-lg">
