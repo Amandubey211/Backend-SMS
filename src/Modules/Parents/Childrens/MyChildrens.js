@@ -6,7 +6,7 @@ import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 import { ChildCardSkeleton } from "../Skeletons";
-import { setSelectedChild } from "../../../Store/Slices/Parent/Children/childrenSlice"; // <-- new import
+import { setSelectedChild } from "../../../Store/Slices/Parent/Children/childrenSlice";
 
 const MyChildren = () => {
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const MyChildren = () => {
   );
   const userId = useSelector((state) => state.common.user.userDetails.userId);
 
-  // Always call fetchChildren on mount (every refresh) so that we update the redux state.
+  // Fetch children on mount
   useEffect(() => {
     if (userId) {
       dispatch(fetchChildren(userId));
@@ -27,7 +27,7 @@ const MyChildren = () => {
 
   const memoizedChildren = useMemo(() => children, [children]);
 
-  // Handler when user clicks on a child's card
+  // Handler for child card click
   const handleChildSelect = useCallback(
     (child) => {
       dispatch(setSelectedChild(child));
@@ -92,7 +92,7 @@ const MyChildren = () => {
           </div>
         </div>
 
-        {/* Render Actual Child Cards */}
+        {/* Responsive grid for child cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {memoizedChildren?.map((child) => (
             <div
