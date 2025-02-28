@@ -1,9 +1,14 @@
 import React from "react";
 import { MdAccessTime, MdLocationOn, MdPersonOutline } from "react-icons/md";
 import { BiCalendarEvent } from "react-icons/bi";
-import { FaRegCalendarAlt, FaRegBookmark, FaRegStickyNote } from "react-icons/fa";
+import {
+  FaRegCalendarAlt,
+  FaRegBookmark,
+  FaRegStickyNote,
+} from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { gt } from "../../../../Utils/translator/translation";
+import EventDescription from "./EventDescription";
 
 const Sidebar = ({ isOpen, onClose, event }) => {
   const { t } = useTranslation();
@@ -22,7 +27,7 @@ const Sidebar = ({ isOpen, onClose, event }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-end">
-      <div className="bg-white w-1/3 p-6 h-full shadow-lg overflow-y-auto relative">
+      <div className="bg-white w-1/4 p-6 h-full shadow-lg relative">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -31,78 +36,87 @@ const Sidebar = ({ isOpen, onClose, event }) => {
           <span className="text-gray-600 text-2xl font-bold">&times;</span>
         </button>
 
-
         {event && (
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2 ">
             {/* Event Image */}
             <img
               src={event.image}
               alt={event.title}
-              className="w-full h-48 object-cover rounded-lg"
+              className="w-full h-[200px] object-cover rounded-lg"
             />
 
             {/* Event Date and Time */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <BiCalendarEvent className="text-pink-500 text-2xl" />
-                <span className="text-gray-700 font-medium">{startDateTime.date}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MdAccessTime className="text-orange-500 text-2xl" />
-                <span className="text-gray-700 font-medium">{event.time}</span>
-              </div>
-            </div>
-
-            {/* Event Title */}
-            <h1 className="text-2xl font-bold text-gray-800">{event.title}</h1>
-
-            {/* Event Details */}
-            <div className="space-y-4">
-              {/* Location */}
-              <div className="flex items-start gap-2">
-                <MdLocationOn className="text-purple-500 text-2xl" />
-                <div>
-                  <span className="text-gray-400 block">{t("Location", gt.stdEvents)}</span>
-                  <p className="text-gray-800 font-medium">{event.location}</p>
+            <div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1">
+                  <BiCalendarEvent className="text-gray-400 text-lg" />
+                  <span className="text-gray-500 font-medium text-sm">
+                    {startDateTime.date}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <MdAccessTime className="text-gray-400 text-lg" />
+                  <span className="text-gray-400 text-sm font-medium">
+                    {event.time}
+                  </span>
                 </div>
               </div>
 
-              {/* Event Director */}
-              <div className="flex items-start gap-2">
-                <MdPersonOutline className="text-blue-500 text-2xl" />
-                <div>
-                  <span className="text-gray-400 block">{t("Event Director", gt.stdEvents)}</span>
-                  <p className="text-gray-800 font-medium">{event.director}</p>
-                </div>
-              </div>
+              {/* Event Title */}
+              <h1 className="text-xl py-3 font-semibold bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent ">
+                {event.title}
+              </h1>
 
-              {/* Event Type */}
-              <div className="flex items-start gap-2">
-                <FaRegBookmark className="text-green-500 text-2xl" />
-                <div>
-                  <span className="text-gray-400 block">{t("Event Type", gt.stdEvents)}</span>
-                  <p className="text-gray-800 font-medium">{event.type || t("No Type Available")}</p>
+              {/* Event Details */}
+              <div className="flex flex-col space-y-1">
+                {/* Location */}
+                <div className="flex flex-row items-start gap-2">
+                  <MdLocationOn className="text-gray-400 text-2xl mt-1" />
+                  <div>
+                    <span className="text-gray-400 block text-sm capitalize">
+                      {t("Location", gt.stdEvents)}
+                    </span>
+                    <p className="text-black font-medium">{event.location}</p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Event Name */}
-              <div className="flex items-start gap-2">
-                <FaRegCalendarAlt className="text-red-500 text-2xl" />
-                <div>
-                  <span className="text-gray-400 block">{t("Event name", gt.stdEvents)}</span>
-                  <p className="text-gray-800 font-medium">{event.title}</p>
+                {/* Event Director */}
+                <div className="flex  flex-row  items-start gap-2">
+                  <MdPersonOutline className="text-gray-400 text-2xl mt-1" />
+                  <div>
+                    <span className="text-gray-400 block  text-sm capitalize">
+                      {t("Event Director", gt.stdEvents)}
+                    </span>
+                    <p className="text-black font-medium">{event.director}</p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Event Description */}
-              <div className="flex items-start gap-2">
-                <FaRegStickyNote className="text-yellow-500 text-2xl" />
-                <div>
-                  <span className="text-gray-400 block">{t("Event Description", gt.stdEvents)}</span>
-                  <p className="text-sm text-gray-600">
-                    {event.description || t("No Details Available")}
-                  </p>
+                {/* Event Type */}
+                <div className="flex flex-row items-start gap-2">
+                  <FaRegBookmark className="text-gray-400 text-md mt-2" />
+                  <div>
+                    <span className="text-gray-400 block text-sm">
+                      {t("Event Type", gt.stdEvents)}
+                    </span>
+                    <p className="text-black font-medium">
+                      {event.type || t("No Type Available")}
+                    </p>
+                  </div>
                 </div>
+
+                {/* Event Name */}
+                <div className="flex  flex-row  items-start gap-2">
+                  <FaRegCalendarAlt className="text-gray-400 text-lg mt-2" />
+                  <div>
+                    <span className="text-gray-400 block text-sm">
+                      {t("Event name", gt.stdEvents)}
+                    </span>
+                    <p className="text-gray-800 font-medium">{event.title}</p>
+                  </div>
+                </div>
+
+                {/* Event Description */}
+                <EventDescription description={event.description} />
               </div>
             </div>
           </div>

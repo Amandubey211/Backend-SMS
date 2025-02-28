@@ -9,8 +9,8 @@ import { ImSpinner3 } from "react-icons/im";
 import { LuSchool } from "react-icons/lu";
 
 const StudentProfile = () => {
-  const {userDetails} = useSelector((store) => store.common.user);
-;  const [loading ,setLoading] = useState(false)
+  const { userDetails } = useSelector((store) => store.common.user);
+  const [loading, setLoading] = useState(false);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -22,10 +22,9 @@ const StudentProfile = () => {
     dataSetter((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     // console.log('ud',userDetails);
-    
-  },[])
+  }, []);
   const updateProfile = () => {
     // Logic to update profile
     // console.log("Profile updated:");
@@ -34,18 +33,20 @@ const StudentProfile = () => {
   const dispatch = useDispatch();
 
   const updatePassword = () => {
-    setLoading(true)
+    setLoading(true);
     if (passwordData.newPassword === passwordData.confirmPassword) {
-     dispatch(updatePasswordThunk(passwordData)).then(()=> {  setLoading(false);   setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: "",
-    });})
+      dispatch(updatePasswordThunk(passwordData)).then(() => {
+        setLoading(false);
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      });
     } else {
       toast.error("confirm Password must be same ");
-      setLoading(false)
+      setLoading(false);
     }
-  
   };
 
   const cancelUpdatePassword = () => {
@@ -63,30 +64,35 @@ const StudentProfile = () => {
 
   return (
     <>
-    <Toaster/>
+      <Toaster />
       <StudentDashLayout>
         <div className="flex flex-col w-full p-4 gap-3 ">
-          <div className="flex items-center px-6 py-4 gap-3  rounded-md">
+          <div className="flex items-center py-4 gap-3 rounded-md">
             <img
               src={userDetails?.profile ? userDetails?.profile : profileIcon}
               alt="Profile"
               className="w-20 h-20 rounded-full shadow-lg border"
             />
             <div className="flex flex-row justify-between w-full">
-            <div className="flex flex-row justify-between w-full">
+              <div className="flex flex-row justify-between w-full">
                 <div className="flex flex-col w-[75%]">
-                <h2 className="text-xl font-semibold">{userDetails?.fullName}</h2>
-                <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool/></span>{userDetails?.schoolName}</h2>
+                  <h2 className="text-xl font-semibold">
+                    {userDetails?.fullName}
+                  </h2>
+                  <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2">
+                    {" "}
+                    <span>
+                      <LuSchool />
+                    </span>
+                    {userDetails?.schoolName}
+                  </h2>
                 </div>
+              </div>
+              <div className="w-[22%] flex items-center ">
+                <div className="bg-purple-100 w-auto text-purple-800 text-sm  font-semibold rounded-full px-4 py-2">
+                  Enrollment : {userDetails?.enrollment}
                 </div>
-            <div className="flex w-[25%]">
-            <button
-                // onClick={handleSidebarOpen}
-                className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
-              >
-                Enrollment : {userDetails?.enrollment}
-              </button>
-            </div>
+              </div>
             </div>
           </div>
           <h3 className="text-lg font-semibold mb-4">Personal Information</h3>
@@ -141,13 +147,13 @@ const StudentProfile = () => {
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Section</span>
                 <span className="font-medium text-gray-800">
-                  {userDetails?.sectionName ||"-"}
+                  {userDetails?.sectionName || "-"}
                 </span>
               </div>
               <div className="flex flex-col">
                 <span className="font-normal text-gray-500">Class</span>
                 <span className="font-medium text-gray-800">
-                  {userDetails?.className ||"-"}
+                  {userDetails?.className || "-"}
                 </span>
               </div>
             </div>
@@ -194,7 +200,11 @@ const StudentProfile = () => {
                 onClick={updatePassword}
                 className="px-4 w-[150px h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
               >
-                { loading ? <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" />: 'Update Password'}
+                {loading ? (
+                  <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" />
+                ) : (
+                  "Update Password"
+                )}
               </button>
               <button
                 onClick={cancelUpdatePassword}

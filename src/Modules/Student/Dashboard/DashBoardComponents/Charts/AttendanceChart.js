@@ -124,9 +124,9 @@ const AttendanceChart = ({ data }) => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto p-5 bg-white shadow-md rounded-lg">
-      <Line data={chartData} options={options} />
-    </div>
+    // <div className="w-full bg-red-300  h-full">
+    <Line data={chartData} options={options} />
+    // </div>
   );
 };
 

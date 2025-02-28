@@ -4,6 +4,13 @@ import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
+import { FaMoneyBillWave } from "react-icons/fa";
+import {
+  MdAttachMoney,
+  MdEvent,
+  MdNotifications,
+  MdOutlineSchool,
+} from "react-icons/md";
 
 // Helper function to format dashboard data
 const formatDashboardData = (dashboardData) => {
@@ -11,9 +18,10 @@ const formatDashboardData = (dashboardData) => {
     {
       label: "Upcoming Exam",
       value: dashboardData?.upcomingExam,
-      bgColor: "bg-green-100",
+      bgColor: "bg-purple-100",
       textColor: "text-black-500",
-      icon: "📝",
+      pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
+      icon: <MdOutlineSchool className="text-xl text-white" />, // Exam Icon
       url: "/student_dash",
     },
     {
@@ -21,23 +29,26 @@ const formatDashboardData = (dashboardData) => {
       value: dashboardData?.dueFees,
       bgColor: "bg-red-100",
       textColor: "text-black-500",
-      icon: <CiMoneyBill />,
+      pentagonColor: "bg-red-500",
+      icon: <MdAttachMoney className="text-xl text-white" />, // Money Icon
       url: "/student_finance",
     },
     {
-      label: "Event",
+      label: "Upcoming Event",
       value: dashboardData?.events,
       bgColor: "bg-blue-100",
       textColor: "text-black-500",
-      icon: "📅",
+      pentagonColor: "bg-blue-500",
+      icon: <MdEvent className="text-xl text-white" />, // Calendar Event Icon
       url: "/student/noticeboard/events",
     },
     {
-      label: "Notice",
+      label: "Upcoming Notice",
       value: dashboardData?.notices,
-      bgColor: "bg-yellow-100",
+      bgColor: "bg-orange-100",
       textColor: "text-black-500",
-      icon: "🔔",
+      pentagonColor: "bg-orange-500",
+      icon: <MdNotifications className="text-xl text-white" />, // Notification Bell Icon
       url: "/student/noticeboard/announcements",
     },
   ];

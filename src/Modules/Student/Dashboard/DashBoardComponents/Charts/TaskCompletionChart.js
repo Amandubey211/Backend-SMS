@@ -21,9 +21,7 @@ const TaskCompletionChart = () => {
     datasets: [
       {
         data: [completedTask, inCompletedTask],
-        backgroundColor: ["#FAECF0", "#FF7AA5"], // 🔹 Updated with better contrast
-        // borderColor: ["#FAECF0", "#C83B62"], // 🔹 Slightly darker border for depth
-
+        backgroundColor: ["#E9D5FF", "#7C3AED"], // 🔹 Updated with better contrast
         cutout: "70%", // 🔹 Keeps the inner circle cut out for a modern look
       },
     ],
@@ -57,10 +55,10 @@ const TaskCompletionChart = () => {
       {/* Chart and Summary */}
       <div className="flex flex-col items-center justify-center ">
         {/* Task Summary */}
-        <div className="flex flex-row justify-between gap-4 w-full mb-5  text-sm">
+        <div className="flex flex-row justify-between w-full mb-3 px-9 text-sm">
           <p className="text-gray-500  text-left w-[40%]">
             Completed{" "}
-            <span className="text-pink-600 font-bold">
+            <span className="text-purple-500 font-bold">
               {Number(completedTask).toFixed(2)}%
             </span>
           </p>
@@ -73,7 +71,7 @@ const TaskCompletionChart = () => {
         </div>
 
         {/* Chart */}
-        <div className="h-[150px]">
+        <div className="h-[145px]">
           <Doughnut data={data} options={options} />
         </div>
       </div>

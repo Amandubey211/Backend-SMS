@@ -29,6 +29,7 @@ const stdIssueBooksslice = createSlice({
       .addCase(studentIssueBooks.fulfilled, (state, action) => {
         state.loading = false;
         state.issueBooks = action.payload?.booksIssue;
+        console.log("action libra", action);
       })
       .addCase(studentIssueBooks.rejected, (state, action) => {
         state.loading = false;

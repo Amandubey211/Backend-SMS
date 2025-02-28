@@ -46,7 +46,7 @@ const MainSection = () => {
   const iconData =  [
     {
       icon: <SlEyeglass className="text-purple-600" />,
-      text: `My Class Teacher (${classData?.teachersCount || 0})`,
+      text: `My Instructors (${classData?.teachersCount || 0})`,
       url: `/student_class/${classData?.classId}/teachers`,
     },
     {
