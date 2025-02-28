@@ -114,48 +114,10 @@ const SummaryRevenueList = () => {
     }
   };
 
-  const [selectedRecords, setSelectedRecords] = useState([]);
-
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       setSelectedRowIds(selectedRowKeys);
-      if (selectedRows) {
-        const record = selectedRows?.filter(
-          (i) => i.paymentStatus === "unpaid"
-        );
-        const invoiceData = {
-          dueDate: record[0]?.dueDate?.slice(0, 10),
-          receiver: {
-            name:
-              record[0]?.studentDetails?.firstName +
-              " " +
-              record[0]?.studentDetails?.lastName,
-            address: "",
-            contact: record[0]?.studentDetails?.contactNumber,
-            email: record[0]?.studentDetails?.email,
-          },
-          description: record[0]?.description || "",
-          lineItems: [
-            {
-              revenueType: record[0]?.category?.categoryName,
-              revenueReference: record[0]?._id,
-              quantity: 1,
-              amount: record[0]?.total_amount,
-            },
-          ],
-          discountType: record[0]?.discountType,
-          discount: record[0]?.discount,
-          penalty: record[0]?.penalty,
-          tax: record[0]?.tax,
-          totalAmount: 0,
-          finalAmount: record[0]?.final_amount,
-          paymentType: record[0]?.paymentType,
-          paymentStatus: record[0]?.paymentStatus,
-          mode: "create",
-        };
-        setSelectedRecords(record);
-        dispatch(setInvoiceData(invoiceData));
-      }
+
     },
     selectedRowKeys: selectedRowIds,
   };
@@ -504,17 +466,15 @@ const SummaryRevenueList = () => {
                   </ProtectedAction>
                 </div>
                 <div className="flex gap-2 justify-between flex-row">
-                  {selectedRowIds?.length === 1 &&
-                    selectedRecords?.length === 1 && (
+                  {selectedRowIds?.length  > 0 &&
+                    (
                       <Tooltip title="Create an invoice for the selected unpaid record">
                         <Button
                           icon={<DollarCircleOutlined />}
-                          onClick={() => {
-                            navigate("/finance/invoices/add-new-invoice");
-                          }}
+                          onClick={() => {}}
                           className="flex items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white font-lg rounded-lg hover:opacity-90"
                         >
-                          Create Invoice
+                          Create Invoice{selectedRowIds?.length  > 1 && 's'}
                         </Button>
                       </Tooltip>
                     )}
