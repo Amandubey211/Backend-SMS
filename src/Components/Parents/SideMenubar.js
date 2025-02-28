@@ -74,7 +74,6 @@ const SideMenubar = () => {
   };
 
   const navigate = useNavigate();
-  console.log("userDetails", userDetails);
   return (
     <nav
       className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${isOpen ? "w-[15%]" : "w-[7%]"

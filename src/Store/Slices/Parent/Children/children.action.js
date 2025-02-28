@@ -39,7 +39,7 @@ export const fetchAttendance = createAsyncThunk(
       const data = await getData(
         `/parent/api/attendance?studentId=${studentId}&month=${month}&year=${year}`
       );
-      return data?.report?.report;
+      return data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

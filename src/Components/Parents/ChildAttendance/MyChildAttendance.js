@@ -17,14 +17,16 @@ import dayjs from 'dayjs'; // Ensure you are using dayjs
 const MyChildAttendance = () => {
   const { t } = useTranslation('prtChildrens'); // Translation hook
   const dispatch = useDispatch();
-  const { loading, error, children } = useSelector((state) => state.Parent.children);
+  const { loading, error, selectedChild } = useSelector((state) => state.Parent.children);
 
-  const [attendanceData, setAttendanceData] = useState(null); // Store API response directly
+  // Local state for the entire API response
+  const [attendanceData, setAttendanceData] = useState(null);
+
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
 
   // Extract student ID from Redux state
-  const studentId = children?.[0]?.id || null;
+  const studentId = selectedChild?.id || null;
 
   // Fetch attendance data when studentId, month, or year changes
   useEffect(() => {
@@ -32,7 +34,15 @@ const MyChildAttendance = () => {
       if (studentId) {
         try {
           const response = await dispatch(fetchAttendance({ studentId, month, year })).unwrap();
-          setAttendanceData(response); // Store API response directly in local state
+          // response = {
+          //   message: "...",
+          //   AttendanceReportGenerationDate: "...",
+          //   report: {
+          //     attendanceEntries: [...],
+          //     summary: { ... }
+          //   }
+          // }
+          setAttendanceData(response);
         } catch (err) {
           console.error('Error fetching attendance:', err);
         }
@@ -42,6 +52,11 @@ const MyChildAttendance = () => {
   }, [studentId, month, year, dispatch]);
 
   console.log("attendanceData", attendanceData);
+
+  // Because attendanceData.report is an object containing the array we want,
+  // we specifically grab .report.attendanceEntries
+  const attendanceEntries = attendanceData?.report?.attendanceEntries || [];
+  const { presentCount = 0, absentCount = 0, leaveCount = 0 } = attendanceData?.report?.summary || {};
 
   // Handle calendar panel change (month/year)
   const handlePanelChange = (value) => {
@@ -54,14 +69,9 @@ const MyChildAttendance = () => {
 
   useNavHeading(t("My Childs"), t("Attendance"));
 
-  // Extract attendance entries and summary
-  const attendanceEntries = attendanceData?.attendanceEntries || [];
-  const { presentCount = 0, absentCount = 0, leaveCount = 0 } = attendanceData?.summary || {};
-
   // Render attendance icons in each calendar cell
   const dateCellRender = useCallback((value) => {
-    const cellDate = dayjs(value).format('YYYY-MM-DD'); // Use dayjs to ensure exact format
-
+    const cellDate = dayjs(value).format('YYYY-MM-DD');
     const listData = attendanceEntries.filter((entry) => entry.date === cellDate);
 
     return (
@@ -82,7 +92,7 @@ const MyChildAttendance = () => {
               return null;
           }
           return (
-            <li key={item?.date}>
+            <li key={item.date}>
               {icon}
             </li>
           );
@@ -131,7 +141,16 @@ const MyChildAttendance = () => {
         />
       </>
     );
-  }, [loading, error, presentCount, absentCount, leaveCount, handlePanelChange, handleSelect, dateCellRender]);
+  }, [
+    loading,
+    error,
+    presentCount,
+    absentCount,
+    leaveCount,
+    handlePanelChange,
+    handleSelect,
+    dateCellRender,
+  ]);
 
   return (
     <Layout title="Child Attendance | Parent">
