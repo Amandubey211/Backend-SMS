@@ -14,7 +14,7 @@ const StudentGradesAccordion = () => {
   const { studentId } = useParams();
 
   // Identify the child
-  const { children } = useSelector((state) => state.Parent.children || {});
+  const { children, selectedChild } = useSelector((state) => state.Parent.children || {});
   const Child = children?.find((child) => child.id === studentId);
 
   // Redux "grades" slice
@@ -291,7 +291,7 @@ const StudentGradesAccordion = () => {
         className="w-32 h-32 mb-4"
       />
       <p className="text-gray-600 text-lg font-semibold text-center">
-        No Grades Present for {Child?.fullName || "this student"} yet.
+        No Grades Present for {selectedChild?.name?.split(" ")[0] || "this student"} yet.
         <br />
         Kindly check later!
       </p>
