@@ -72,9 +72,8 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
           {/* Dropdown Button */}
           <button
-            className={`p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all ${
-              chapterExpanded ? "rotate-180" : ""
-            }`}
+            className={`p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all ${chapterExpanded ? "rotate-180" : ""
+              }`}
             aria-label="Toggle Chapter"
             onClick={(e) => {
               e.stopPropagation();
@@ -104,26 +103,30 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               <FaChevronDown className={`transition-transform ${focusedSection === "attachments" ? "rotate-180" : ""}`} />
             </div>
 
-            {focusedSection === "attachments" && attachments?.length > 0 && (
+            {focusedSection === "attachments" && (
               <div className="mt-3">
-                {attachments.map((attachment, index) => (
-                  <div
-                    key={index}
-                    className="flex justify-between items-center mb-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
-                  >
-                    <div className="flex items-center space-x-4">
-                      {attachment.type === "application/pdf" && <FaFilePdf className="text-red-500" size={20} />}
-                      <span className="text-gray-700 font-semibold">{attachment.label}</span>
-                    </div>
-                    <button
-                      onClick={() => openPreview(attachment.url)}
-                      className="text-green-500 p-1 border rounded-full transform hover:scale-110 transition"
-                      aria-label="Preview"
+                {attachments?.length > 0 ? (
+                  attachments.map((attachment, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center mb-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
                     >
-                      <FaEye size={18} />
-                    </button>
-                  </div>
-                ))}
+                      <div className="flex items-center space-x-4">
+                        {attachment.type === "application/pdf" && <FaFilePdf className="text-red-500" size={20} />}
+                        <span className="text-gray-700 font-semibold">{attachment.label}</span>
+                      </div>
+                      <button
+                        onClick={() => openPreview(attachment.url)}
+                        className="text-green-500 p-1 border rounded-full transform hover:scale-110 transition"
+                        aria-label="Preview"
+                      >
+                        <FaEye size={18} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic text-center mt-2">No Attachments Available</p>
+                )}
               </div>
             )}
           </div>
@@ -143,11 +146,21 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               <FaChevronDown className={`transition-transform ${focusedSection === "assignments" ? "rotate-180" : ""}`} />
             </div>
 
-            {focusedSection === "assignments" && assignments?.length > 0 && (
+            {focusedSection === "assignments" && (
               <div className="mt-3">
-                {assignments.map((assignment, index) => (
-                  <ChapterItem key={index} type="assignment" title={assignment.title} submitted={assignment.submitted} dueDate={assignment.dueDate}/>
-                ))}
+                {assignments?.length > 0 ? (
+                  assignments.map((assignment, index) => (
+                    <ChapterItem
+                      key={index}
+                      type="assignment"
+                      title={assignment.title}
+                      submitted={assignment.submitted}
+                      dueDate={assignment.dueDate}
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic text-center mt-2">No Assignments Available</p>
+                )}
               </div>
             )}
           </div>
@@ -167,11 +180,21 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
               <FaChevronDown className={`transition-transform ${focusedSection === "quizzes" ? "rotate-180" : ""}`} />
             </div>
 
-            {focusedSection === "quizzes" && quizzes?.length > 0 && (
+            {focusedSection === "quizzes" && (
               <div className="mt-3">
-                {quizzes.map((quiz, index) => (
-                  <ChapterItem key={index} type="quiz" title={quiz.title} submitted={quiz.submitted} dueDate={quiz.dueDate}/>
-                ))}
+                {quizzes?.length > 0 ? (
+                  quizzes.map((quiz, index) => (
+                    <ChapterItem
+                      key={index}
+                      type="quiz"
+                      title={quiz.title}
+                      submitted={quiz.submitted}
+                      dueDate={quiz.dueDate}
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic text-center mt-2">No Quizzes Available</p>
+                )}
               </div>
             )}
           </div>
