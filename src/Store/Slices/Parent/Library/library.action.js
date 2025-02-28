@@ -18,7 +18,7 @@ export const fetchLibraryBooks = createAsyncThunk(
       dispatch(setShowError(false));
       const data = await getData(`/parent/all/bookIssue?say=${say}`);
       console.log('data',data);
-      return data;;
+      return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
     }

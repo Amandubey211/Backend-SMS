@@ -2,13 +2,17 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Table, Select } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchLibraryBooks } from '../../../Store/Slices/Parent/Library/library.action';
-import { FaBookOpen } from "react-icons/fa";
-import { RiSignalWifiErrorFill } from "react-icons/ri";
+import { FaBookOpen } from 'react-icons/fa';
+import { RiSignalWifiErrorFill } from 'react-icons/ri';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { LibraryRowSkeleton } from '../../../Modules/Parents/Skeletons';
+import bookNew from '../../../Assets/ParentAssets/images/book_new.png'; // Import fallback book image
 
 const { Option } = Select;
+
+// Fallback image URL for user profile
+const fallbackProfile = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
 
 const LibraryTable = () => {
   const { t } = useTranslation('prtLibrary');
@@ -41,16 +45,13 @@ const LibraryTable = () => {
     books.forEach((item) => {
       const student = item?.studentId;
       if (student && student._id && !map[student._id]) {
-        const fallbackName = [
-          student?.firstName,
-          student?.lastName
-        ].filter(Boolean).join(' ');
+        const fallbackName = [student?.firstName, student?.lastName]
+          .filter(Boolean)
+          .join(' ');
         map[student._id] = {
           _id: student._id,
-          fullName:
-            student?.fullName ||
-            (fallbackName ? fallbackName : 'Unknown Child'),
-          profile: student?.profile || '/placeholder.png',
+          fullName: student?.fullName || (fallbackName ? fallbackName : 'N/A'),
+          profile: student?.profile || fallbackProfile,
         };
       }
     });
@@ -61,9 +62,7 @@ const LibraryTable = () => {
    * 2. Date Formatting
    */
   const formatDate = (dateString) => {
-    return dateString
-      ? dayjs(dateString).format('DD/MM/YY')
-      : 'N/A';
+    return dateString ? dayjs(dateString).format('DD/MM/YY') : 'N/A';
   };
 
   /**
@@ -102,18 +101,15 @@ const LibraryTable = () => {
       key: 'child',
       render: (_, record) => {
         const student = record?.studentId || {};
-        const fallbackName = [
-          student?.firstName,
-          student?.lastName
-        ].filter(Boolean).join(' ');
+        const fallbackName = [student?.firstName, student?.lastName]
+          .filter(Boolean)
+          .join(' ');
         const displayName =
-          student?.fullName ||
-          (fallbackName ? fallbackName : 'Unknown Child');
-
+          student?.fullName || (fallbackName ? fallbackName : 'N/A');
         return (
           <div className="flex items-center">
             <img
-              src={student?.profile || '/placeholder.png'}
+              src={student?.profile || fallbackProfile}
               alt={displayName}
               className="h-10 w-10 rounded-full mr-2 object-cover"
             />
@@ -128,10 +124,8 @@ const LibraryTable = () => {
       key: 'book',
       render: (_, record) => {
         const book = record?.bookId;
-        // If bookId null => fallback placeholders
-        const bookName = book?.name || 'Unknown Book';
-        const bookImage = book?.image || '/placeholder.png';
-
+        const bookName = book?.name || 'N/A';
+        const bookImage = book?.image || bookNew;
         return (
           <div className="flex items-center">
             <img
@@ -150,12 +144,7 @@ const LibraryTable = () => {
       key: 'author',
       render: (_, record) => {
         const book = record?.bookId;
-        // if bookId is null, fallback to record.author
-        return (
-          <span>
-            {book?.author || record?.author || 'Unknown Author'}
-          </span>
-        );
+        return <span>{book?.author || record?.author || 'N/A'}</span>;
       },
     },
     // Category
@@ -164,11 +153,7 @@ const LibraryTable = () => {
       key: 'category',
       render: (_, record) => {
         const book = record?.bookId;
-        return (
-          <span>
-            {book?.category || 'Unknown Category'}
-          </span>
-        );
+        return <span>{book?.category || 'N/A'}</span>;
       },
     },
     // Issue Date
@@ -217,7 +202,10 @@ const LibraryTable = () => {
       <td colSpan={columns.length}>
         <div
           className="flex flex-col items-center justify-center text-center py-4"
-          style={{ marginTop: '5rem', marginBottom: '10rem' }}
+          style={{
+            width: '100%',
+            height: '200px',
+          }}
         >
           <FaBookOpen className="text-gray-400 text-8xl mb-6" />
           <p className="text-gray-600 text-lg mt-2">
@@ -233,7 +221,10 @@ const LibraryTable = () => {
       <td colSpan={columns.length}>
         <div
           className="flex flex-col items-center justify-center text-center py-4"
-          style={{ marginTop: '5rem', marginBottom: '10rem' }}
+          style={{
+            width: '100%',
+            height: '200px',
+          }}
         >
           <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
           <p className="text-gray-600 text-lg mt-2">
@@ -251,8 +242,6 @@ const LibraryTable = () => {
     <div className="p-6 pt-5">
       {/* Header: Title + Filters */}
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-xl font-bold">{t('Library Status')}</h1>
-
         <div className="flex items-center space-x-6">
           {/* Child Filter */}
           <Select
@@ -278,7 +267,6 @@ const LibraryTable = () => {
           {/* Status Filter */}
           <div className="flex items-center space-x-4">
             <span className="font-medium">{t('Status')}</span>
-
             {/* All */}
             <label style={{ position: 'relative', paddingLeft: '24px', cursor: 'pointer' }}>
               <input

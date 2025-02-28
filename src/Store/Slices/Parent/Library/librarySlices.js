@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchLibraryBooks } from "./library.action";
 
 const initialState = {
-  books: [],
+  books: [], // Store raw data
   loading: false,
   error: null,
 };
@@ -19,17 +19,7 @@ const librarySlice = createSlice({
       })
       .addCase(fetchLibraryBooks.fulfilled, (state, action) => {
         state.loading = false;
-        state.books = action.payload?.books?.map((book) => ({
-          id: book._id,
-          studentName: book.studentId ? `${book.studentId.firstName} ${book.studentId.lastName}` : "Unknown",
-          studentProfile: book.studentId?.profile || "",
-          bookName: book.bookId?.name || "Unknown Book",
-          bookCategory: book.bookId?.category || "Unknown Category",
-          author: book.bookId?.author || "Unknown Author",
-          issueDate: book.issueDate ? new Date(book.issueDate).toLocaleDateString() : "N/A",
-          returnDate: book.returnDate ? new Date(book.returnDate).toLocaleDateString() : "N/A",
-          status: book.status || "Unknown",
-        })) || [];
+        state.books = action.payload?.books || []; // Store raw books array
       })
       .addCase(fetchLibraryBooks.rejected, (state, action) => {
         state.loading = false;
