@@ -49,7 +49,7 @@ const MyChildAttendance = () => {
     setYear(value.year());
   };
 
-  const handleSelect = useCallback(() => {}, []);
+  const handleSelect = useCallback(() => { }, []);
 
   useNavHeading(t("My Childs"), t("Attendance"));
 
@@ -92,7 +92,7 @@ const MyChildAttendance = () => {
         if (yearButton) {
           yearButton.closest('.ant-radio-button-wrapper').remove();
         }
-  
+
         // Remove the "Month" button
         const monthButton = document.querySelector('.ant-radio-button-wrapper input[value="month"]');
         if (monthButton) {
@@ -100,10 +100,10 @@ const MyChildAttendance = () => {
         }
       }, 100); // Small delay to ensure the elements are in the DOM
     };
-  
+
     removeCalendarButtons();
   }, []);
-  
+
 
   const renderContent = useCallback(() => {
     if (loading) {
@@ -131,7 +131,7 @@ const MyChildAttendance = () => {
 
     return (
       <>
-        <div className="attendance-card-wrapper">
+        <div className="attendance-card-wrapper flex justify-center w-full px-4 md:px-8 lg:px-12 py-6">
           <AttendanceCard
             presentCount={presentCount}
             absentCount={absentCount}

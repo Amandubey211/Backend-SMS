@@ -36,10 +36,13 @@ const AllNotice = () => {
   ], []);
 
   const filteredNotices = useMemo(() => {
-    return notices?.filter((notice) =>
-      notice?.title?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    return notices
+      ?.filter((notice) =>
+        notice?.title?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
   }, [notices, searchTerm]);
+  
 
   const toggleAccordion = (index) => {
     setActiveIndex(activeIndex === index ? null : index);
