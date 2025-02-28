@@ -10,6 +10,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { setSubject } from "../../../../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { CiUser } from "react-icons/ci";
+import TeacherDisplay from "./Components/Teacher/TeacherDisplay";
 
 const SubjectCard = ({
   data,
@@ -121,7 +122,7 @@ const SubjectCard = ({
           <div className="flex items-center mt-2  text-white">
             <span className="flex items-center mr-2 gap-1">
               <LuUser />
-              <span>{data?.studentCount || 0}</span>
+              <span>{data?.studentsCount || 0}</span>
             </span>
             <span className="border-r-2 border-white h-5 mr-2"></span>
             <span className="flex items-center gap-1">
@@ -173,14 +174,13 @@ const SubjectCard = ({
             <CiUser className="w-10 h-10 bg-transparent text-white" />
           )}
 
-          <div className="ml-3">
-            <p className="text-white font-semibold">
-              {data?.teacher || "No teacher assigned"}
-            </p>
-            <p className="text-white text-sm">Teacher</p>
-          </div>
+          <TeacherDisplay data={data} />
         </div>
-        <img src={data.subjectIcon ? data.subjectIcon:ClassCardBookImg} alt="icon" className="h-28" />
+        <img
+          src={data.subjectIcon ? data.subjectIcon : ClassCardBookImg}
+          alt="icon"
+          className="h-28"
+        />
       </div>
     </div>
   );

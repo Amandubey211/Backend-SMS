@@ -11,7 +11,11 @@ const initialState = {
   filteredEvents: [],
   isSidebarOpen: false,
   sidebarContent: null,
-  selectedEvent: null,
+  selectedEvent: [],
+  selectedMonthYear: {
+    month: currentDate.getMonth(),
+    year: currentDate.getFullYear(),
+  }, // Added selectedMonthYear
   currentPage: 0,
   itemsPerPage: 4,
 };
@@ -35,6 +39,9 @@ const stdEventsSlice = createSlice({
     },
     setSidebarOpen: (state, action) => {
       state.isSidebarOpen = action.payload;
+    },
+    setSelectedMonthYear: (state, action) => {
+      state.selectedMonthYear = action.payload;
     },
   },
   extraReducers: (builder) => {

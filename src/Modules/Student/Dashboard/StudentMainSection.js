@@ -62,7 +62,7 @@ const StudentMainSection = () => {
     dispatch(fetchStudentGrades());
     dispatch(fetchTasks());
     dispatch(fetchExamResults());
-  }, [dispatch]);
+  }, [dispatch, userDetails?.userId]);
 
   const handlePayNow = () => {
     navigate("/student_finance");

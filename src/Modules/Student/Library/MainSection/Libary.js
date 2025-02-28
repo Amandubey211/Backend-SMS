@@ -197,35 +197,41 @@ const Library = () => {
             >
               {t("Book Issue", gt.stdLibrary)}
             </TabButton>
-            <div className="relative flex items-center max-w-xs w-full mr-4">
-              <input
-                type="text"
-                placeholder="Search here"
-                value={searchQuery}
-                onChange={(event) => handleSearch(event)}
-                className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
-              />
-              <button className="absolute right-3">
-                <CiSearch className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            {/* Search & Priority Filters */}
-            <div className="w-[25%] pr-4">
-              <select
-                value={category}
-                onChange={(e) => dispatch(setCategory(e.target.value))}
-                className="px-3 py-2 border rounded w-full text-md text-gray-500"
-              >
-                <option value="" className="text-gray-500">
-                  Select Category
-                </option>
-                {allCategories?.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {activeTab === "Library" ? (
+              <>
+                <div className="relative flex items-center max-w-xs w-full mr-4">
+                  <input
+                    type="text"
+                    placeholder="Search here"
+                    value={searchQuery}
+                    onChange={(event) => handleSearch(event)}
+                    className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+                  />
+                  <button className="absolute right-3">
+                    <CiSearch className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+                {/* Search & Priority Filters */}
+                <div className="w-[25%] pr-4">
+                  <select
+                    value={category}
+                    onChange={(e) => dispatch(setCategory(e.target.value))}
+                    className="px-3 py-2 border rounded w-full text-md text-gray-500"
+                  >
+                    <option value="" className="text-gray-500">
+                      Select Category
+                    </option>
+                    {allCategories?.map((cat) => (
+                      <option key={cat} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
+            ) : (
+              ""
+            )}
           </div>
 
           {activeTab === "Library" ? libraryContent() : bookIssueContent()}

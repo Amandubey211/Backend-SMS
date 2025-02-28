@@ -43,8 +43,8 @@ const stdLibrarySlice = createSlice({
       .addCase(libraryBooksStudent.fulfilled, (state, action) => {
         state.loading = false;
         state.libararyBooks = action.payload?.books || [];
-        state.totalPages = action.payload.totalPages || 1;
-        state.currentPage = action.payload.currentPage || 1;
+        state.totalPages = action.payload?.totalPages || 1;
+        state.currentPage = action.payload?.currentPage || 1;
       })
       .addCase(libraryBooksStudent.rejected, (state, action) => {
         state.loading = false;

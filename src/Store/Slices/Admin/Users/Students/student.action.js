@@ -1,12 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { baseUrl } from "../../../../../config/Common";
-import { setShowError, setErrorMsg } from "../../../Common/Alerts/alertsSlice";
-import {
-  ErrorMsg,
-  handleError,
-} from "../../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../../Common/Alerts/alertsSlice";
+import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
-import { fetchStudentsByClassAndSection } from "../../Class/Students/studentThunks";
 import {
   customRequest,
   getData,
@@ -106,7 +101,7 @@ export const fetchStudentDocument = createAsyncThunk(
       const response = await getData(
         `/${getRole}/documents/student/${id}?say=${say}`
       );
-      return response.documents?.documents;
+      return response?.documents?.documents;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -177,7 +172,7 @@ export const fetchStudentSubjects = createAsyncThunk(
       const response = await getData(
         `/${getRole}/students/subjects/${id}?say=${say}`
       );
-      return response.subjects;
+      return response?.subjects;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -211,7 +206,7 @@ export const fetchStudentSubjectProgress = createAsyncThunk(
       const response = await getData(
         `/${getRole}/course/subjects/student/${id}?say=${say}`
       );
-      return response.data;
+      return response?.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -229,7 +224,7 @@ export const fetchAttendanceData = createAsyncThunk(
       const response = await getData(
         `/${getRole}/attendance/getYearlyAttendance/${id}?say=${say}`
       );
-      return response.data;
+      return response?.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -246,12 +241,14 @@ export const fetchCourseProgress = createAsyncThunk(
       const say = getAY();
 
       // ✅ Updated: Added semesterId as query parameter
-      const semesterQuery = ids.semesterId ? `&semesterId=${ids.semesterId}` : "";
+      const semesterQuery = ids.semesterId
+        ? `&semesterId=${ids.semesterId}`
+        : "";
 
       const response = await getData(
         `/${getRole}/course/progress/student/${ids.studentId}/subject/${ids.subjectId}?say=${say}${semesterQuery}`
       );
-      return response.data;
+      return response?.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -269,7 +266,7 @@ export const fetchStudentTask = createAsyncThunk(
       const response = await getData(
         `/${getRole}/task/student/${id}?say=${say}`
       );
-      return response.completedTask;
+      return response?.completedTask;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

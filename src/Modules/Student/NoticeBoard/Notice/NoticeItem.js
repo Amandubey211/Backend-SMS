@@ -19,7 +19,7 @@ const NoticeItem = ({ notice, index, formatDate }) => {
   };
 
   return (
-    <div className="border-t bg-green-400">
+    <div className="border-t">
       <div
         className="cursor-pointer p-2 flex flex-col bg-white"
         onClick={() => toggleAccordion(index)}
@@ -41,7 +41,7 @@ const NoticeItem = ({ notice, index, formatDate }) => {
           </div>
           {/* Title and Date */}
           <div className="flex-1 flex flex-col gap-2">
-            <h2 className="font-[500] text-gray-600 text-md leading-5 capitalize">
+            <h2 className="font-[500] text-gray-600 text-md  leading-5 capitalize">
               {notice?.title}
               <span className="ml-2 text-sm text-purple-600">
                 (Posted by{" "}

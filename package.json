@@ -8,7 +8,6 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@handsontable/react": "^15.0.1",
-    "@mobiscroll/react": "npm:@mobiscroll/react-next-trial@^5.33.1",
     "@primer/primitives": "^10.0.0",
     "@reduxjs/toolkit": "^2.2.5",
     "@testing-library/jest-dom": "^5.17.0",

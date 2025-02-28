@@ -46,7 +46,7 @@ const DashboardNoticeBoard = (descriptionLength) => {
   const topNotices = notices;
 
   return (
-    <div className="my-4 h-[75vh] ">
+    <div className={`my-4 ${topNotices?.length === 0 ? "h-auto" : "h-[75vh]"}`}>
       <div className="flex justify-between pb-2 items-center pr-5 mb-2">
         <h2 className="text-lg font-semibold mb-2 text-black">
           Upcoming Notices
@@ -58,9 +58,9 @@ const DashboardNoticeBoard = (descriptionLength) => {
           See All
         </span>
       </div>
-      <div className=" overflow-hidden h-[74vh]">
+      <div className=" overflow-hidden">
         {topNotices?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center my-10 h-full">
+          <div className="flex flex-col items-center justify-center my-10 h-auto">
             <FaCalendarAlt className="text-gray-400 text-3xl mb-4" />
             <p className="text-gray-500 text-md">No noticeboard data found</p>
           </div>

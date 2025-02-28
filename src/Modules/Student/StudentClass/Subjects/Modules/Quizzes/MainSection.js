@@ -437,7 +437,7 @@ const MainSection = () => {
 
       {isModalOpen && (
         <div
-          className={`fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${
+          className={`fixed inset-0 flex items-center justify-center z-50 ${
             (violationModalVisible || resizeModalVisible) &&
             "border-4 border-red-600"
           }`}
@@ -451,9 +451,7 @@ const MainSection = () => {
             </div>
             {violationModalVisible && (
               <div
-                className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ${
-                  violationModalVisible ? "animate-pulse" : ""
-                }`}
+                className={`absolute inset-0 bg-gray-100 opacity-90 flex items-center justify-center z-50`}
               >
                 <div className="bg-white p-6 rounded-lg shadow-lg">
                   <h3 className="text-lg font-semibold text-red-600">

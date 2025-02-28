@@ -9,6 +9,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { gt } from "../../../../Utils/translator/translation";
 import EventDescription from "./EventDescription";
+import "./sidebar.css";
 
 const Sidebar = ({ isOpen, onClose, event }) => {
   const { t } = useTranslation();
@@ -26,8 +27,8 @@ const Sidebar = ({ isOpen, onClose, event }) => {
   const startDateTime = formatDateTime(new Date(event.startDate));
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-end">
-      <div className="bg-white w-1/4 p-6 h-full shadow-lg relative">
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 z-50 flex justify-end capitalize">
+      <div className="bg-white w-1/3 p-6 h-full shadow-lg relative">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -37,43 +38,43 @@ const Sidebar = ({ isOpen, onClose, event }) => {
         </button>
 
         {event && (
-          <div className="flex flex-col gap-2 ">
+          <div className="flex flex-col gap-2  h-full overflow-y-auto custom-scrollbar">
             {/* Event Image */}
             <img
               src={event.image}
               alt={event.title}
-              className="w-full h-[200px] object-cover rounded-lg"
+              className="w-full h-[250px] object-cover rounded-lg"
             />
 
             {/* Event Date and Time */}
             <div>
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-1">
-                  <BiCalendarEvent className="text-gray-400 text-lg" />
+                  <BiCalendarEvent className="text-gray-500 text-lg" />
                   <span className="text-gray-500 font-medium text-sm">
                     {startDateTime.date}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <MdAccessTime className="text-gray-400 text-lg" />
-                  <span className="text-gray-400 text-sm font-medium">
+                  <MdAccessTime className="text-gray-500 text-lg" />
+                  <span className="text-gray-500 text-sm font-medium">
                     {event.time}
                   </span>
                 </div>
               </div>
 
               {/* Event Title */}
-              <h1 className="text-xl py-3 font-semibold bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent ">
+              <h1 className="text-xl py-3 text-wrap break-words font-semibold bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent ">
                 {event.title}
               </h1>
 
               {/* Event Details */}
               <div className="flex flex-col space-y-1">
                 {/* Location */}
-                <div className="flex flex-row items-start gap-2">
-                  <MdLocationOn className="text-gray-400 text-2xl mt-1" />
+                <div className="flex flex-row items-start gap-1">
+                  {/* <MdLocationOn className="text-gray-400 text-2xl mt-1" /> */}
                   <div>
-                    <span className="text-gray-400 block text-sm capitalize">
+                    <span className="text-gray-500 block text-sm capitalize">
                       {t("Location", gt.stdEvents)}
                     </span>
                     <p className="text-black font-medium">{event.location}</p>
@@ -82,9 +83,9 @@ const Sidebar = ({ isOpen, onClose, event }) => {
 
                 {/* Event Director */}
                 <div className="flex  flex-row  items-start gap-2">
-                  <MdPersonOutline className="text-gray-400 text-2xl mt-1" />
+                  {/* <MdPersonOutline className="text-gray-400 text-2xl mt-1" /> */}
                   <div>
-                    <span className="text-gray-400 block  text-sm capitalize">
+                    <span className="text-gray-500 block  text-sm capitalize">
                       {t("Event Director", gt.stdEvents)}
                     </span>
                     <p className="text-black font-medium">{event.director}</p>
@@ -93,9 +94,9 @@ const Sidebar = ({ isOpen, onClose, event }) => {
 
                 {/* Event Type */}
                 <div className="flex flex-row items-start gap-2">
-                  <FaRegBookmark className="text-gray-400 text-md mt-2" />
+                  {/* <FaRegBookmark className="text-gray-400 text-md mt-2" /> */}
                   <div>
-                    <span className="text-gray-400 block text-sm">
+                    <span className="text-gray-500 block text-sm">
                       {t("Event Type", gt.stdEvents)}
                     </span>
                     <p className="text-black font-medium">
@@ -105,13 +106,15 @@ const Sidebar = ({ isOpen, onClose, event }) => {
                 </div>
 
                 {/* Event Name */}
-                <div className="flex  flex-row  items-start gap-2">
-                  <FaRegCalendarAlt className="text-gray-400 text-lg mt-2" />
-                  <div>
-                    <span className="text-gray-400 block text-sm">
+                <div className="flex  flex-row  items-start  gap-2">
+                  {/* <FaRegCalendarAlt className="text-gray-400 text-lg mt-2" /> */}
+                  <div className="w-full">
+                    <span className="text-gray-500 block text-sm">
                       {t("Event name", gt.stdEvents)}
                     </span>
-                    <p className="text-gray-800 font-medium">{event.title}</p>
+                    <p className="text-gray-800  font-medium text-wrap break-words">
+                      {event.title}
+                    </p>
                   </div>
                 </div>
 

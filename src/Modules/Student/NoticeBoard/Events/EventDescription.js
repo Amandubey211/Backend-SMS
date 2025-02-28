@@ -13,9 +13,13 @@ const EventDescription = ({ description }) => {
 
   return (
     <div className="flex flex-row items-start gap-2">
-      <FaRegStickyNote className="text-gray-400 text-lg mt-1" />
+      {/* <FaRegStickyNote className="text-gray-400 text-lg mt-1" /> */}
       <div>
-        <p className={`text-sm text-black ${expanded ? "" : "line-clamp-3"}`}>
+        <p
+          className={`text-sm text-wrap break-words text-black ${
+            expanded ? "" : "line-clamp-3"
+          }`}
+        >
           {description}
         </p>
 

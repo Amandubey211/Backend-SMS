@@ -164,7 +164,7 @@ const StudentAnnounce = () => {
         </div>
 
         {/* Content Handling */}
-        <div className="mt-5 rounded-lg overflow-auto">
+        <div className="mt-5 rounded-lg w-[100%]">
           {loading ? (
             <div className="flex flex-col justify-center items-center text-center min-h-[300px]">
               <Spinner />

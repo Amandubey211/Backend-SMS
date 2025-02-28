@@ -72,7 +72,7 @@ const StudentEvent = () => {
   }, [selectedMonthYear, eventData]);
 
   const filterAndSortEvents = (eventData, selectedMonthYear) => {
-    const filtered = eventData.filter((event) => {
+    const filtered = eventData?.filter((event) => {
       const eventDate = new Date(event.startDate);
       // console.log("event date is: ", eventDate);
       return (
@@ -81,7 +81,7 @@ const StudentEvent = () => {
       );
     });
 
-    const sorted = filtered.sort((a, b) => a.startDate - b.startDate);
+    const sorted = filtered?.sort((a, b) => a.startDate - b.startDate);
     // console.log("sorted event :", sorted);
     dispatch(setFilteredEvents(sorted));
     dispatch(setCurrentPage(0));
@@ -90,7 +90,7 @@ const StudentEvent = () => {
   // calender function
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
-    const dayEvents = filteredEvents.filter(
+    const dayEvents = filteredEvents?.filter(
       (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
     );
 

@@ -49,10 +49,10 @@ const stdNoticeSlice = createSlice({
       })
       .addCase(studentNotice.fulfilled, (state, action) => {
         state.loading = false;
-        state.noticeData = action.payload.notices || [];
-        state.totalNotices = action.payload.totalNotices || 0;
-        state.totalPages = action.payload.totalPages || 1;
-        state.currentPage = action.payload.currentPage || 1;
+        state.noticeData = action.payload?.notices || [];
+        state.totalNotices = action.payload?.totalNotices || 0;
+        state.totalPages = action.payload?.totalPages || 1;
+        state.currentPage = action.payload?.currentPage || 1;
       })
       .addCase(studentNotice.rejected, (state, action) => {
         state.loading = false;

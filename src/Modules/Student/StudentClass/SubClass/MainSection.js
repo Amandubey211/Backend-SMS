@@ -104,7 +104,7 @@ const MainSection = () => {
    
   }, [dispatch]);
 
-  // console.log("std class data : ", classData);
+  console.log("calss data ", classData);
   return (
     <>
    
