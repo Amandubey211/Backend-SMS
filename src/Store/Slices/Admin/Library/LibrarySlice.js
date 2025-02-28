@@ -1,4 +1,3 @@
-// src/Store/Slices/Admin/Library/LibrarySlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchBooksThunk,
@@ -23,9 +22,13 @@ const initialState = {
     classLevel: "",
     section: "",
   },
-  activeTab: "Library", // Moved tab management here
+  activeTab: "Library", // Managed tab switching
   isSidebarOpen: false,
-  editIssueData: null, // Moved edit issue data management here
+  editIssueData: null,
+  // New pagination state
+  totalBooks: 0,
+  totalPages: 0,
+  currentPage: 1,
 };
 
 const librarySlice = createSlice({
@@ -37,15 +40,15 @@ const librarySlice = createSlice({
       state.filters[key] = value;
     },
     setActiveTab(state, action) {
-      state.activeTab = action.payload; // Tab switching managed here
+      state.activeTab = action.payload;
     },
     toggleSidebar(state, action) {
-      state.isSidebarOpen = action.payload; // Sidebar toggling managed here
+      state.isSidebarOpen = action.payload;
     },
     setEditIssueData(state, action) {
-      state.editIssueData = action.payload; // Set edit issue data
+      state.editIssueData = action.payload;
     },
-    resetLibraryState(state) { 
+    resetLibraryState(state) {
       state.addBookSuccess = false;
     },
   },
@@ -67,13 +70,17 @@ const librarySlice = createSlice({
       })
       .addCase(fetchBooksDetailsThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.books = action.payload;
+        // Update state with pagination response
+        state.books = action.payload.books;
+        state.totalBooks = action.payload.totalBooks;
+        state.totalPages = action.payload.totalPages;
+        state.currentPage = action.payload.currentPage;
       })
       .addCase(fetchBooksDetailsThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-
+      // ...other reducers remain unchanged
       .addCase(addBookThunk.pending, (state) => {
         state.addbookloading = true;
         state.addBookSuccess = false;
@@ -137,7 +144,12 @@ const librarySlice = createSlice({
   },
 });
 
-export const { setFilters, setActiveTab, toggleSidebar, setEditIssueData, resetLibraryState  } =
-  librarySlice.actions;
+export const {
+  setFilters,
+  setActiveTab,
+  toggleSidebar,
+  setEditIssueData,
+  resetLibraryState,
+} = librarySlice.actions;
 
 export default librarySlice.reducer;

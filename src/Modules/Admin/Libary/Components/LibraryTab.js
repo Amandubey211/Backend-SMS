@@ -7,12 +7,17 @@ import { setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice"
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../config/permission";
-import { FaBookOpen } from "react-icons/fa"; // Importing relevant icon
+import { FaBookOpen } from "react-icons/fa";
+import { Pagination } from "antd"; // Import Ant Design Pagination
+import { fetchBooksDetailsThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 
 const LibraryTab = ({ handleSidebarOpen }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
-  const { books, filters } = useSelector((state) => state.admin.library);
+  // Destructure new pagination properties from the state
+  const { books, filters, totalBooks, totalPages, currentPage } = useSelector(
+    (state) => state.admin.library
+  );
   const role = useSelector((store) => store.common.auth.role);
 
   const classLevels = [
@@ -25,7 +30,7 @@ const LibraryTab = ({ handleSidebarOpen }) => {
   const filteredBooks = books?.filter((book) => {
     const bookClassName = book?.classId?.className?.toLowerCase() || "";
     const bookCategory = book?.category?.toLowerCase() || "";
-    const selectedClass = filters?.className?.toLowerCase() || "";
+    const selectedClass = filters?.class?.toLowerCase() || "";
     const selectedCategory = filters?.category?.toLowerCase() || "";
 
     if (selectedClass && selectedCategory) {
@@ -46,6 +51,14 @@ const LibraryTab = ({ handleSidebarOpen }) => {
     const { name, value } = e.target;
     dispatch(setFilters({ key: name, value }));
   };
+
+  // Handler for pagination change
+  const handlePageChange = (page) => {
+    dispatch(fetchBooksDetailsThunk(page));
+  };
+
+  // Calculate pageSize (assuming consistent page size from backend)
+  const pageSize = totalPages > 0 ? Math.ceil(totalBooks / totalPages) : 0;
 
   return (
     <>
@@ -68,16 +81,14 @@ const LibraryTab = ({ handleSidebarOpen }) => {
             options={categories}
           />
         </div>
-       
-          <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK}>
-            <button
-              onClick={handleSidebarOpen}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-            >
-              {t("Add Book")}
-            </button>
-          </ProtectedAction>
-       
+        <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK}>
+          <button
+            onClick={handleSidebarOpen}
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+          >
+            {t("Add Book")}
+          </button>
+        </ProtectedAction>
       </div>
 
       <div className="flex justify-center items-center w-full min-h-[70vh]">
@@ -92,13 +103,25 @@ const LibraryTab = ({ handleSidebarOpen }) => {
             <NoDataFound
               title={t("Books")}
               desc={t("Try adjusting your filters or adding new books.")}
-              icon={FaBookOpen} // Proper icon for library context
-              iconColor="text-blue-500" // Icon color for a friendly UI
+              icon={FaBookOpen}
+              iconColor="text-blue-500"
               textColor="text-gray-600"
             />
           </div>
         )}
       </div>
+
+      {/* Pagination Component (only show if there are multiple pages) */}
+      {totalPages > 1 && (
+        <div className="flex justify-end mt-4">
+          <Pagination
+            current={currentPage}
+            total={totalBooks}
+            pageSize={pageSize}
+            onChange={handlePageChange}
+          />
+        </div>
+      )}
     </>
   );
 };

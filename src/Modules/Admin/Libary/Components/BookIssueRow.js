@@ -39,7 +39,9 @@ const BookIssueRow = ({ item, setEditIssueData, role }) => {
       {/* Class & Section Column */}
       <td className="px-5 py-2 border-b border-gray-200">
         <div className="text-base">{item.classId?.className}</div>
-        <div className="text-sm text-green-500">{item.sectionId?.sectionName}</div>
+        <div className="text-sm text-green-500">
+          {item.sectionId?.sectionName}
+        </div>
       </td>
       {/* Book Column */}
       <td className="px-5 py-2 border-b border-gray-200">
@@ -58,7 +60,9 @@ const BookIssueRow = ({ item, setEditIssueData, role }) => {
         </div>
       </td>
       {/* Author Column */}
-      <td className="px-5 py-2 border-b border-gray-200 capitalize">{item.author}</td>
+      <td className="px-5 py-2 border-b border-gray-200 capitalize">
+        {item.author}
+      </td>
       {/* Issue Date Column */}
       <td className="px-5 py-2 border-b border-gray-200">
         <div>
@@ -99,7 +103,9 @@ const BookIssueRow = ({ item, setEditIssueData, role }) => {
               title={t("Edit Book Issue")}
               width="40%"
             >
-              <ProtectedSection requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}>
+              <ProtectedSection
+                requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}
+              >
                 <AddIssue editIssueData={item} onClose={handleSidebarClose} />
               </ProtectedSection>
             </Sidebar>

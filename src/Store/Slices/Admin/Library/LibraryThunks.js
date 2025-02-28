@@ -35,16 +35,19 @@ export const fetchBooksThunk = createAsyncThunk(
 
 export const fetchBooksDetailsThunk = createAsyncThunk(
   "library/fetchBooksDetails",
-  async (_, { rejectWithValue, dispatch, getState }) => {
+  async (page = 1, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       dispatch(setShowError(false)); // Reset error visibility
       const getRole = getUserRole(getState);
       console.log(say, "ddddddddd");
-      const response = await getData(`/${getRole}/all/book?say=${say}`); // Use getData for API calls
-      return response?.books; // Safely access books using optional chaining
+      // Append page parameter to support pagination
+      const response = await getData(
+        `/${getRole}/all/book?say=${say}&page=${page}`
+      );
+      return response; // Return full pagination response from the backend
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue); // Centralized error handling
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
@@ -106,7 +109,8 @@ export const updateBookThunk = createAsyncThunk(
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await customRequest('PUT',
+      const response = await customRequest(
+        "PUT",
         `/${getRole}/update/book/${bookId}?say=${say}`,
         formData,
         {
@@ -141,7 +145,7 @@ export const fetchBookIssuesThunk = createAsyncThunk(
 // Issue Book Thunk
 export const issueBookThunk = createAsyncThunk(
   "library/issueBook",
-  async (issueData, { rejectWithValue, dispatch,getState }) => {
+  async (issueData, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY(); // Replace localStorage.getItem("say") with getAY()
       const getRole = getUserRole(getState);
