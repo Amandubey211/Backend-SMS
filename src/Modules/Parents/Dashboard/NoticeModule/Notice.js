@@ -1,74 +1,76 @@
 import React from "react";
 import { IoCalendarOutline } from "react-icons/io5";
+import { UserOutlined } from "@ant-design/icons";
+import { Tag, Tooltip } from "antd";
 import { format } from "date-fns";
+import { CiBookmarkCheck } from "react-icons/ci";
 import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png";
 
 const priorityClasses = {
-  "High priority": "bg-pink-100 text-pink-700",
-  "Low priority": "bg-gray-100 text-black",
+  "High Priority": "bg-pink-100 text-pink-700",
+  "Low Priority": "bg-gray-100 text-gray-700",
 };
 
-const Notice = ({ title, startDate, endDate, priority, content, image, backgroundColor, authorName }) => {
-  // Format dates using date-fns with optional chaining
-  const formattedStartDate = startDate ? format(new Date(startDate), 'yyyy-MM-dd') : "N/A";
-  const formattedEndDate = endDate ? format(new Date(endDate), 'yyyy-MM-dd') : "N/A";
+const truncateText = (text, length) => {
+  if (!text) return "";
+  return text.length > length ? text.substring(0, length) + "..." : text;
+};
 
-  // Function to render either an image or a fallback image inside a styled div
-  const renderImageOrFallback = (image) => {
-    return (
-      <div
-        className="flex justify-center items-center h-16 w-16 rounded-[10px]"
-        style={{ background: backgroundColor }}
-      >
-        <img
-          src={image || icon1}
-          alt="Notice"
-          className="h-12 w-12 rounded-md"
-        />
-      </div>
-    );
-  };
+const Notice = ({ title, startDate, priority, content, image, backgroundColor, authorName }) => {
+  // Format date using date-fns
+  const formattedStartDate = startDate ? format(new Date(startDate), "dd/MM/yyyy") : "N/A";
 
   return (
-    <div className="p-4 border-t bg-white">
-      <div className="flex gap-2 items-center mb-2">
-        <div className="mr-2">
-          {renderImageOrFallback(image)}
+    <div className="w-[97%] p-3 my-3 border shadow-md border-gray-200 rounded-lg flex min-h-[80px] hover:shadow-lg transition-all duration-300 ease-in-out">
+      {/* Left Icon Box with Background & Hover Effect */}
+      <div className="pr-3 flex-shrink-0">
+        <div
+          className={`h-14 w-14 rounded-md flex items-center justify-center transition-all duration-300 scale-110 shadow-md`}
+          style={{ background: backgroundColor || "#FDE2E4" }} // Apply background color dynamically
+        >
+          <img src={image || icon1} alt="icon" className="h-12 w-12 object-contain" />
         </div>
-        <div className="flex-1 flex flex-col gap-2">
-          {/* Title with Posted By */}
-          <h2 className="font-semibold text-lg gap-2">
-            {title}
-            <span className="ml-4 text-sm text-gray-500">
-              (Posted by{" "}
-              <span className="text-sm text-gray-700">{authorName || "-"}</span>
-              )
-            </span>
-          </h2>
-
-          {/* Date and Priority Label */}
-          <div className="flex items-center text-xs">
-            <IoCalendarOutline className="text-gray-400" />
-            <span className="ml-2 text-sm text-gray-500">
-              {formattedStartDate}
-              {formattedEndDate && ` - ${formattedEndDate}`}
-            </span>
-
-            {/* Priority Label with inherited styles */}
-            <div
-              className={`ml-3 px-3 py-1  rounded-full ${priority === "High priority"
-                  ? "text-pink-500 bg-pink-100"
-                  : "text-gray-500"
-                }`}
-            >
-              {priority}
-            </div>
-          </div>
-        </div>
-
       </div>
 
-      <p className="text-gray-600">{content}</p>
+      {/* Card Content */}
+      <div className="flex flex-col justify-between flex-grow">
+        {/* Upper Section: Title & Priority Label */}
+        <div>
+          <div className="flex items-start justify-between">
+            {/* Title (Truncated with Tooltip) */}
+            <Tooltip title={title}>
+              <h2 className="text-base font-semibold text-gray-700 capitalize m-0 leading-5">
+                {truncateText(title, 50)}
+              </h2>
+            </Tooltip>
+
+            {/* Priority Label */}
+            <span className={`px-2 pt-[2px] text-xs font-medium rounded self-start ${priorityClasses[priority]}`}>
+              {priority}
+            </span>
+          </div>
+
+          {/* "Posted by" and Date Badge */}
+          <div className="mt-1">
+            <Tag
+              color="blue"
+              className="inline-flex items-center text-xs"
+              style={{ width: "auto" }}
+            >
+              <UserOutlined />
+              <span className="mx-1">Posted by {authorName || "-"}</span>
+              <IoCalendarOutline className="mx-1" />
+              <span>{formattedStartDate}</span>
+            </Tag>
+          </div>
+
+          {/* Content Snippet */}
+          <div className="flex items-center gap-1 text-gray-500 mt-2">
+            <CiBookmarkCheck size={15} />
+            <p className="text-xs m-0 leading-4">{truncateText(content, 100)}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
