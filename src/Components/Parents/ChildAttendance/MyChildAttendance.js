@@ -15,24 +15,22 @@ import Layout from '../../Common/Layout.js';
 import dayjs from 'dayjs'; // Ensure you are using dayjs
 
 const MyChildAttendance = () => {
-  const { t } = useTranslation('prtChildrens'); // Translation hook
+  const { t } = useTranslation('prtChildrens');
   const dispatch = useDispatch();
-  const { loading, error, children } = useSelector((state) => state.Parent.children);
+  const { loading, error, selectedChild } = useSelector((state) => state.Parent.children);
 
-  const [attendanceData, setAttendanceData] = useState(null); // Store API response directly
+  const [attendanceData, setAttendanceData] = useState(null);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
 
-  // Extract student ID from Redux state
-  const studentId = children?.[0]?.id || null;
+  const studentId = selectedChild?.id || null;
 
-  // Fetch attendance data when studentId, month, or year changes
   useEffect(() => {
     const fetchData = async () => {
       if (studentId) {
         try {
           const response = await dispatch(fetchAttendance({ studentId, month, year })).unwrap();
-          setAttendanceData(response); // Store API response directly in local state
+          setAttendanceData(response);
         } catch (err) {
           console.error('Error fetching attendance:', err);
         }
@@ -43,25 +41,20 @@ const MyChildAttendance = () => {
 
   console.log("attendanceData", attendanceData);
 
-  // Handle calendar panel change (month/year)
+  const attendanceEntries = attendanceData?.report?.attendanceEntries || [];
+  const { presentCount = 0, absentCount = 0, leaveCount = 0 } = attendanceData?.report?.summary || {};
+
   const handlePanelChange = (value) => {
     setMonth(value.month() + 1);
     setYear(value.year());
   };
 
-  // Prevent calendar from auto-switching months on icon click
-  const handleSelect = useCallback(() => {}, []);
+  const handleSelect = useCallback(() => { }, []);
 
   useNavHeading(t("My Childs"), t("Attendance"));
 
-  // Extract attendance entries and summary
-  const attendanceEntries = attendanceData?.attendanceEntries || [];
-  const { presentCount = 0, absentCount = 0, leaveCount = 0 } = attendanceData?.summary || {};
-
-  // Render attendance icons in each calendar cell
   const dateCellRender = useCallback((value) => {
-    const cellDate = dayjs(value).format('YYYY-MM-DD'); // Use dayjs to ensure exact format
-
+    const cellDate = dayjs(value).format('YYYY-MM-DD');
     const listData = attendanceEntries.filter((entry) => entry.date === cellDate);
 
     return (
@@ -82,7 +75,7 @@ const MyChildAttendance = () => {
               return null;
           }
           return (
-            <li key={item?.date}>
+            <li key={item.date}>
               {icon}
             </li>
           );
@@ -91,7 +84,27 @@ const MyChildAttendance = () => {
     );
   }, [attendanceEntries]);
 
-  // Memoized content rendering
+  useEffect(() => {
+    const removeCalendarButtons = () => {
+      setTimeout(() => {
+        // Remove the "Year" button
+        const yearButton = document.querySelector('.ant-radio-button-wrapper input[value="year"]');
+        if (yearButton) {
+          yearButton.closest('.ant-radio-button-wrapper').remove();
+        }
+
+        // Remove the "Month" button
+        const monthButton = document.querySelector('.ant-radio-button-wrapper input[value="month"]');
+        if (monthButton) {
+          monthButton.closest('.ant-radio-button-wrapper').remove();
+        }
+      }, 100); // Small delay to ensure the elements are in the DOM
+    };
+
+    removeCalendarButtons();
+  }, []);
+
+
   const renderContent = useCallback(() => {
     if (loading) {
       return (
@@ -100,6 +113,7 @@ const MyChildAttendance = () => {
           <AntdCalendar
             onPanelChange={handlePanelChange}
             onSelect={handleSelect}
+            mode="month"
             dateCellRender={() => null}
           />
         </>
@@ -117,7 +131,7 @@ const MyChildAttendance = () => {
 
     return (
       <>
-        <div className="attendance-card-wrapper">
+        <div className="attendance-card-wrapper flex justify-center w-full px-4 md:px-8 lg:px-12 py-6">
           <AttendanceCard
             presentCount={presentCount}
             absentCount={absentCount}
@@ -127,11 +141,21 @@ const MyChildAttendance = () => {
         <AntdCalendar
           onPanelChange={handlePanelChange}
           onSelect={handleSelect}
+          mode="month"
           dateCellRender={dateCellRender}
         />
       </>
     );
-  }, [loading, error, presentCount, absentCount, leaveCount, handlePanelChange, handleSelect, dateCellRender]);
+  }, [
+    loading,
+    error,
+    presentCount,
+    absentCount,
+    leaveCount,
+    handlePanelChange,
+    handleSelect,
+    dateCellRender,
+  ]);
 
   return (
     <Layout title="Child Attendance | Parent">

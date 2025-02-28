@@ -15,7 +15,7 @@ import {
 } from "../../../Store/Slices/Parent/Semesters/parentSemester.action";
 import { setSelectedSemester } from "../../../Store/Slices/Parent/Semesters/parentSemesterSlice.js";
 import Layout from "../../../Components/Common/Layout.js";
-
+import subjectIcon from '../../../Assets/ParentAssets/images/books.png'
 
 const AllSubject = () => {
   const { studentId } = useParams();
@@ -144,10 +144,17 @@ const AllSubject = () => {
                 </div>
               ))
             ) : (
-              <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-xl">
-                <GoAlertFill className="text-[3rem]" />
-                No Data Found
+              <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col">
+                {/* Subject Icon */}
+                <img src={subjectIcon} alt="No Subjects" className="h-20 w-20 object-contain" />
+
+                {/* Message - Separate Styling */}
+                <p className="font-bold text-gray-500 text-2xl mt-2 text-center">
+                  No Subjects are available yet. Kindly check later.
+                </p>
               </div>
+
+
             )}
           </div>
 
