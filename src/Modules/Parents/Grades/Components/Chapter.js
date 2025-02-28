@@ -31,7 +31,8 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
   const handleSectionClick = (section) => {
     setFocusedSection((prev) => (prev === section ? null : section));
   };
-
+  console.log('assignments', assignments);
+  console.log('quizzes', quizzes);
   return (
     <div className="mb-5">
       {/* Module Name */}
@@ -145,7 +146,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
             {focusedSection === "assignments" && assignments?.length > 0 && (
               <div className="mt-3">
                 {assignments.map((assignment, index) => (
-                  <ChapterItem key={index} type="assignment" title={assignment.title} submitted={assignment.submitted} />
+                  <ChapterItem key={index} type="assignment" title={assignment.title} submitted={assignment.submitted} dueDate={assignment.dueDate}/>
                 ))}
               </div>
             )}
@@ -169,7 +170,7 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
             {focusedSection === "quizzes" && quizzes?.length > 0 && (
               <div className="mt-3">
                 {quizzes.map((quiz, index) => (
-                  <ChapterItem key={index} type="quiz" title={quiz.title} submitted={quiz.submitted} />
+                  <ChapterItem key={index} type="quiz" title={quiz.title} submitted={quiz.submitted} dueDate={quiz.dueDate}/>
                 ))}
               </div>
             )}

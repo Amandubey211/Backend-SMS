@@ -9,6 +9,8 @@ import {
 import { MdOutlineBlock } from "react-icons/md";
 import { RiListCheck3, RiFileUnknowLine } from "react-icons/ri";
 import { FiFileText } from "react-icons/fi";
+import { format } from "date-fns"; // Import date formatting
+import { IoCalendarOutline } from "react-icons/io5"; 
 
 // Function to get the correct icon based on the item type
 const getIcon = (type) => {
@@ -22,13 +24,13 @@ const getIcon = (type) => {
     case "discussions":
       return <FaQuestionCircle className="text-green-500" />;
     case "pdf":
-      return <FaFilePdf className="text-red-500" size={24}  />;
+      return <FaFilePdf className="text-red-500" size={24} />;
     default:
       return null;
   }
 };
 
-const ChapterItem = ({ type, title, submitted, attachmentUrl }) => {
+const ChapterItem = ({ type, title, submitted, dueDate, attachmentUrl }) => {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handlePreviewOpen = () => {
@@ -39,12 +41,27 @@ const ChapterItem = ({ type, title, submitted, attachmentUrl }) => {
     setIsPreviewOpen(false);
   };
 
+  // Format due date properly if available (only for quizzes and assignments)
+  const formattedDueDate =
+    dueDate && (type === "quiz" || type === "assignment")
+      ? format(new Date(dueDate), "MMMM dd, yyyy")
+      : null;
+
   return (
     <div className="flex items-center mb-3 gap-3 rounded-lg">
       <div className="p-2 bg-white rounded-full">{getIcon(type)}</div>
       <div className="flex flex-col gap-1 justify-center flex-grow">
         <p className="font-semibold">{title}</p>
+
+        {/* Show Due Date only for Quizzes & Assignments */}
+        {formattedDueDate && (
+          <div className="flex items-center gap-1 text-gray-500 text-sm">
+            <IoCalendarOutline className="text-gray-500" size={16} />
+            <span>{formattedDueDate}</span>
+          </div>
+        )}
       </div>
+
       {type === "pdf" && (
         <button
           className="text-green-500 hover:text-green-600"
@@ -53,6 +70,7 @@ const ChapterItem = ({ type, title, submitted, attachmentUrl }) => {
           <FaEye size={20} />
         </button>
       )}
+
       <div className="flex items-center gap-1 text-gray-500 justify-center">
         Submit: {submitted ? (
           <FaCheckCircle className="text-green-500" />
