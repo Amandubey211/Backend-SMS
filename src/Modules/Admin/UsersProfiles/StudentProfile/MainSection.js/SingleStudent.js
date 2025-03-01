@@ -28,18 +28,19 @@ const SingleStudent = () => {
   useEffect(() => {
     dispatch(fetchAllStudents());
   }, [dispatch]);
-  const student = allStudents.find((s) => s._id === cid);
+  const student = allStudents?.find((s) => s._id === cid);
 
-  if (!loading && !student) {
-    return <div className="text-center my-10">Student not found</div>;
-  }
-  //   "Finance": <StudentFinance student={student} />,
+  // if (!loading && !student) {
+  //   return <div className="text-center my-10">Student not found</div>;
+  // }
+
   const renderContent = () => {
     const menuComponents = {
       "OverView": <StudentOverView student={student} />,
       "Course Progress": <StudentCourseProgress student={student} />,
       "Information": <StudentInformationMenu student={student} />,
       "Parents": <ParentsProfile student={student} />,
+      "Finance": <StudentFinance student={student} />,
       "Grades": <StudentGradesAccordion student={student} />,
       "Attendance": <StudentAttendance  student={student} />,
       "Book Issue": <BookIssue/>
@@ -55,13 +56,13 @@ const SingleStudent = () => {
             <StudentProfile student={student} />
             <NavigationMenu activeItem={activeItem} setActiveItem={setActiveItem} items={role == "admin"?[
               "OverView", "Course Progress",  "Information", 
-              "Parents", "Grades", "Attendance", "Book Issue"
+              "Parents", "Grades", "Finance","Attendance", "Book Issue"
             ]:role == "teacher" ?[
               "OverView", "Course Progress",  "Information", 
               "Parents", "Grades", "Attendance", "Book Issue"
             ]:role == "finance" ?[
                 "Information", 
-              "Parents",
+              "Parents","Finance",
             ]:role == "librarian" ?[
               "Information", 
             "Parents", "Book Issue",

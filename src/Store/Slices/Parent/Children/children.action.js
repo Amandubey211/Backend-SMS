@@ -35,17 +35,17 @@ export const fetchAttendance = createAsyncThunk(
   "children/fetchAttendance",
   async ({ studentId, month, year }, { rejectWithValue, dispatch }) => {
     try {
-      const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(
-        `/api/studentDashboard/myAttendance?studentId=${studentId}&month=${month}&year=${year}&say=${say}`
+        `/parent/api/attendance?studentId=${studentId}&month=${month}&year=${year}`
       );
-      return data.report?.report;
+      return data;
     } catch (error) {
-      handleError(error, dispatch, rejectWithValue);
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 
 // Thunk to fetch teachers
 export const fetchTeachers = createAsyncThunk(
@@ -101,7 +101,7 @@ export const fetchModules = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(`/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}?say=${say}`);
-     // console.log("mmm------->>>",data)
+      // console.log("mmm------->>>",data)
       return data?.data?.modules;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

@@ -13,7 +13,7 @@ import StudentPaymentDetails from "../Component/StudentPaymentDetails";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormData, formData, studentDetail }) => {
+const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormData, formData, studentDetail,discription }) => {
   const formikRef = useRef(null);
   const dispatch = useDispatch();
   const navigate  = useNavigate()
@@ -43,6 +43,8 @@ const StudentFeesForm = ({ selectCategories, allData, setStudentDetail, setFormD
                 studentId: studentDetail.studentId,
                 classId: studentDetail.classId,
                 sectionId: studentDetail.sectionId,
+                discription,
+                document:[imageUrl]
               };
               console.log(`Updated specific category ${subCategory}:`, updatedFormData);
             } else {

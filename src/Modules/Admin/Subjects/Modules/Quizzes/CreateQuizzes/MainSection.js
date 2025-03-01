@@ -23,23 +23,19 @@ import toast from "react-hot-toast";
 
 /**
  * Validation function.
- * If `isPublishing` is true, we require all fields;
+ * If `isPublishing` is true, we require additional fields;
  * if false, we just require name + content.
  */
 function validateQuizForm(quizData, isPublishing) {
   const errors = {};
 
-  // Always require quiz name & instructions
   if (!quizData.name || !quizData.name.trim()) {
-    // Matches the `id="name"` we use in the input
     errors.name = "Quiz name is required.";
   }
   if (!quizData.content || !quizData.content.trim()) {
-    // Matches the `id="content"` we use for the editor container
     errors.content = "Quiz instructions are required.";
   }
 
-  // If user is publishing, check additional fields
   if (isPublishing) {
     if (!quizData.quizType) {
       errors.quizType = "Quiz Type is required when publishing.";
@@ -60,11 +56,17 @@ function validateQuizForm(quizData, isPublishing) {
     if (!quizData.assignTo) {
       errors.assignTo = "You must specify who to assign the quiz to.";
     } else {
-      if (quizData.assignTo === "Section" && !quizData.sectionId) {
-        errors.sectionId = "Please select a Section.";
+      if (
+        quizData.assignTo === "Section" &&
+        (!quizData.sectionId || !quizData.sectionId.length)
+      ) {
+        errors.sectionId = "Please select at least one Section.";
       }
-      if (quizData.assignTo === "Group" && !quizData.groupId) {
-        errors.groupId = "Please select a Group.";
+      if (
+        quizData.assignTo === "Group" &&
+        (!quizData.groupId || !quizData.groupId.length)
+      ) {
+        errors.groupId = "Please select at least one Group.";
       }
     }
 
@@ -79,22 +81,17 @@ function validateQuizForm(quizData, isPublishing) {
   return errors;
 }
 
-/**
- * Smoothly scrolls to the first error field and focuses it.
- */
 function scrollToFirstError(errors) {
   const firstErrorKey = Object.keys(errors)[0];
   if (!firstErrorKey) return;
-
-  // Attempt to find an element with id matching the error key
   const el = document.getElementById(firstErrorKey);
   if (el) {
     el.scrollIntoView({ behavior: "smooth", block: "center" });
-    // optional small timeout before focusing
     setTimeout(() => el.focus({ preventScroll: true }), 400);
   }
 }
 
+// Use singular key names for multi-select arrays
 const initialFormState = {
   points: "",
   quizType: "Practice",
@@ -104,7 +101,7 @@ const initialFormState = {
   assignTo: "Everyone",
   showOneQuestionOnly: false,
   questionType: "",
-  sectionId: null,
+  sectionId: [], // singular key; still an array
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
@@ -113,7 +110,7 @@ const initialFormState = {
   timeLimit: "",
   moduleId: null,
   chapterId: null,
-  groupId: null,
+  groupId: [], // singular key; still an array
   studentSeeAnswer: false,
   showAnswerDate: "",
 };
@@ -147,15 +144,12 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [questionType, setQuestionType] = useState("multiple choice");
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-
-  // formErrors for highlight + scroll
   const [formErrors, setFormErrors] = useState({});
 
   const quizIdFromRedux = useSelector(
     (state) => state.admin.quizzes.quizzDetail?._id || ""
   );
 
-  // Load quiz if editing
   useEffect(() => {
     const quizIdFromState = location.state?.quizId;
     if (quizIdFromState) {
@@ -163,7 +157,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       setIsEditing(true);
       dispatch(fetchQuizByIdThunk(quizIdFromState));
     } else {
-      // Reset if not editing
       setIsEditing(false);
       setQuizId("");
       setFormState(initialFormState);
@@ -174,15 +167,13 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       setRightAnswerComment("");
       setWrongAnswerComment("");
     }
-  }, [location.state, dispatch, setIsEditing, quizIdFromRedux]);
+  }, [location.state, dispatch, quizIdFromRedux, setIsEditing]);
 
-  // Populate form on quiz data load
   useEffect(() => {
     if (isEditing && quiz) {
       setAssignmentName(quiz.name || "");
       setInstruction(quiz.content || "");
       setQuizId(quiz._id || "");
-
       setFormState((prev) => ({
         ...prev,
         points: quiz.points || prev.points,
@@ -194,7 +185,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         showOneQuestionOnly:
           quiz.showOneQuestionOnly || prev.showOneQuestionOnly,
         questionType: quiz.questionType || prev.questionType,
-        sectionId: quiz.sectionId || prev.sectionId,
+        // Ensure we use singular keys; fallback to empty arrays if not provided
+        sectionId: Array.isArray(quiz.sectionId) ? quiz.sectionId : [],
+        groupId: Array.isArray(quiz.groupId) ? quiz.groupId : [],
         allowShuffleAnswers:
           quiz.allowShuffleAnswers ?? prev.allowShuffleAnswers,
         studentSeeAnswer: quiz.studentSeeAnswer ?? prev.studentSeeAnswer,
@@ -207,16 +200,14 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         timeLimit: quiz.timeLimit || prev.timeLimit,
         moduleId: quiz.moduleId || prev.moduleId,
         chapterId: quiz.chapterId || prev.chapterId,
-        groupId: quiz.groupId || prev.groupId,
       }));
       setQuestions(quiz.questions || []);
       setAnswers(quiz.answers || initialAnswersState);
-      setRightAnswerComment(quiz.rightAnswerComment || "");
-      setWrongAnswerComment(quiz.wrongAnswerComment || "");
+      setRightAnswerComment(quiz.correctAnswerComment || "");
+      setWrongAnswerComment(quiz.inCorrectAnswerComment || "");
     }
   }, [isEditing, quiz]);
 
-  // If quiz was created in Redux after first load
   useEffect(() => {
     if (quizIdFromRedux) {
       setQuizId(quizIdFromRedux);
@@ -224,11 +215,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     }
   }, [quizIdFromRedux, setIsEditing]);
 
-  // ========== HANDLERS ==========
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     const finalValue = type === "checkbox" ? checked : value;
-
     if (name === "allowedAttempts" && !checked) {
       setFormState((prev) => ({
         ...prev,
@@ -241,7 +230,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         [name]: finalValue,
       }));
     }
-
     setFormErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
 
@@ -255,7 +243,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     setFormErrors((prev) => ({ ...prev, name: undefined }));
   }, []);
 
-  // QUESTION changes
+  // QUESTION handlers...
   const handleQuestionChange = useCallback(
     (content) => setQuestion(content),
     []
@@ -269,8 +257,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     },
     [answers]
   );
-
-  // Adding a new Question
   const handleAddNewQuestion = () => {
     setQuestion("");
     setAnswers(initialAnswersState);
@@ -316,7 +302,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     wrongAnswerComment,
   ]);
 
-  // Updating existing question
   const updateQuestion = useCallback(async () => {
     const correctOption = answers.find((a) => a.isCorrect);
     const updatedQ = {
@@ -380,7 +365,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     [questions]
   );
 
-  // SAVE QUIZ
   const handleSaveQuiz = useCallback(
     (publish) => {
       const quizData = {
@@ -394,11 +378,11 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         publish,
       };
 
-      // If assignTo is Section or Group, set IDs
+      // Use singular keys in payload (as expected by backend)
       if (formState.assignTo === "Section") {
-        quizData.sectionId = formState.sectionId || null;
+        quizData.sectionId = formState.sectionId;
       } else if (formState.assignTo === "Group") {
-        quizData.groupId = formState.groupId || null;
+        quizData.groupId = formState.groupId;
       }
 
       const allowedAttempts = formState.allowedAttempts === true;
@@ -406,11 +390,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       if (allowedAttempts && formState.allowNumberOfAttempts) {
         allowNumberOfAttempts = Number(formState.allowNumberOfAttempts);
       }
-
       quizData.allowedAttempts = allowedAttempts;
       quizData.allowNumberOfAttempts = allowNumberOfAttempts;
 
-      // VALIDATE
       const errors = validateQuizForm(quizData, publish === true);
       if (Object.keys(errors).length > 0) {
         setFormErrors(errors);
@@ -419,7 +401,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         return;
       }
 
-      // No validation errors => proceed
       if (quizId) {
         dispatch(updateQuizThunk({ quizId, quizData, navigate }));
       } else {
@@ -474,7 +455,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
                       instruction={instruction}
                       handleNameChange={handleNameChange}
                       handleInstructionChange={handleInstructionChange}
-                      // Pass error fields to highlight
                       nameError={formErrors.name}
                       contentError={formErrors.content}
                     />
@@ -511,7 +491,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         )}
       </div>
 
-      {/* SIDEBAR for Add/Edit Question */}
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}

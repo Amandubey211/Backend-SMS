@@ -27,7 +27,7 @@ const CreateNewInvoice = () => {
       email: "",
     },
     description: "",
-    lineItems: [{ revenueType: "", quantity: 1, amount: 0 }],
+    lineItems: [{ revenueType: "", subCatgory:'',selectEarning:'', quantity: 1, amount: 0 }],
     discountType: "percentage",
     discount: 0,
     penalty: 0,
@@ -50,7 +50,9 @@ const CreateNewInvoice = () => {
     // Line items
     lineItems: Yup.array().of(
       Yup.object().shape({
-        revenueType: Yup.string().required("Revenue type is required"), // Required
+        revenueType: Yup.string().required("Revenue type is required"), 
+        subCatgory: Yup.string().required("Revenue type is required"), 
+        selectEarning: Yup.string().required("Revenue type is required"),
         quantity: Yup.number()
           .min(1, "Quantity must be at least 1") // Optional, defaults to 1 if not provided
           .nullable(),
@@ -196,8 +198,8 @@ const CreateNewInvoice = () => {
                     {({ remove, push }) => (
                       <>
                         {values?.lineItems?.map((item, index) => (
-                          <div key={index} className="grid grid-cols-12 gap-4 items-center mb-4">
-                            <div className="col-span-4">
+                          <div key={index} className="grid grid-cols-12 gap-1 items-center mb-4">
+                            <div className="col-span-2">
                               <SelectInput
                                 name={`lineItems.${index}.revenueType`}
                                 label="Revenue Type"
@@ -216,7 +218,45 @@ const CreateNewInvoice = () => {
                               />
 
                             </div>
-                            <div className="col-span-3">
+                            <div className="col-span-2">
+                              <SelectInput
+                                name={`lineItems.${index}.subCategory`}
+                                label="Category"
+                                options={[
+                                  { label: "Student-Based Revenue", value: "Student-Based Revenue" },
+                                  { label: "Facility-Based Revenue", value: "Facility-Based Revenue" },
+                                  { label: "Service-Based Revenue", value: "Service-Based Revenue" },
+                                  { label: "Community and External Revenue", value: "Community and External Revenue" },
+                                  { label: "Financial Investments", value: "Financial Investments" },
+                                  { label: "Penalties", value: "Penalties" },
+                                  { label: "Other", value: "Other" }
+                                ]
+                                }
+                                disabled={isReadonly}
+                                required
+                              />
+
+                            </div>
+                            <div className="col-span-2">
+                              <SelectInput
+                                name={`lineItems.${index}.selectEarning`}
+                                label="Select Earning"
+                                options={[
+                                  { label: "Student-Based Revenue", value: "Student-Based Revenue" },
+                                  { label: "Facility-Based Revenue", value: "Facility-Based Revenue" },
+                                  { label: "Service-Based Revenue", value: "Service-Based Revenue" },
+                                  { label: "Community and External Revenue", value: "Community and External Revenue" },
+                                  { label: "Financial Investments", value: "Financial Investments" },
+                                  { label: "Penalties", value: "Penalties" },
+                                  { label: "Other", value: "Other" }
+                                ]
+                                }
+                                disabled={isReadonly}
+                                required
+                              />
+
+                            </div>
+                            <div className="col-span-2">
                               <TextInput
                                 name={`lineItems.${index}.quantity`}
                                 label="Quantity"
@@ -226,7 +266,7 @@ const CreateNewInvoice = () => {
                               /> {/* Optional field */}
                             </div>
 
-                            <div className="col-span-3">
+                            <div className="col-span-2">
                               <TextInput
                                 name={`lineItems.${index}.amount`}
                                 label="Amount"

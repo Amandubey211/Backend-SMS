@@ -63,19 +63,23 @@ export const createDiscussion = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester?.id; // Ensure safe access
-
+      const semesterId = getState().common.user.classInfo.selectedSemester?.id;
       if (!semesterId) {
         throw new Error("Semester ID is missing");
       }
 
-      // Append all discussion data to FormData
+      // Construct FormData and append array values properly
       const formData = new FormData();
       Object.keys(discussionData).forEach((key) => {
-        formData.append(key, discussionData[key]);
+        const value = discussionData[key];
+        if (Array.isArray(value)) {
+          value.forEach((item) => formData.append(key, item));
+        } else {
+          formData.append(key, value);
+        }
       });
 
-      // Append semesterId to the request body
+      // Append semesterId to the body
       formData.append("semesterId", semesterId);
 
       const response = await customRequest(
@@ -92,7 +96,7 @@ export const createDiscussion = createAsyncThunk(
         return response.data;
       }
     } catch (error) {
-      toast.error(" Discussion Not Created, Try Again!");
+      toast.error("Discussion Not Created, Try Again!");
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -107,14 +111,21 @@ export const updateDiscussion = createAsyncThunk(
     const say = getAY();
     dispatch(setShowError(false));
 
+    // Construct FormData and handle array fields as multiple appends
     const formData = new FormData();
     Object.keys(discussionData).forEach((key) => {
-      formData.append(key, discussionData[key]);
+      const value = discussionData[key];
+      if (Array.isArray(value)) {
+        value.forEach((item) => formData.append(key, item));
+      } else {
+        formData.append(key, value);
+      }
     });
 
     try {
       const getRole = getUserRole(getState);
-      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
+      formData.append("semesterId", semesterId);
 
       const response = await customRequest(
         "put",

@@ -249,20 +249,20 @@ const sidebarData = [
       },
     ],
   },
-  {
-    title: "Time Table",
-    icon: <ImTable2 />,
-    path: "/timetable",
-    roles: [ROLES.ADMIN, ROLES.STAFF],
-    //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
-  },
-  {
-    title: "Time Table",
-    icon: <ImTable2 />,
-    path: "/teacher_timetable",
-    roles: [ROLES.TEACHER],
-    //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
-  },
+  // {
+  //   title: "Time Table",
+  //   icon: <ImTable2 />,
+  //   path: "/timetable",
+  //   roles: [ROLES.ADMIN, ROLES.STAFF],
+  //   //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
+  // },
+  // {
+  //   title: "Time Table",
+  //   icon: <ImTable2 />,
+  //   path: "/teacher_timetable",
+  //   roles: [ROLES.TEACHER],
+  //   //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
+  // },
   {
     title: "Library",
     icon: <BsBook />,

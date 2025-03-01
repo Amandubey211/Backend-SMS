@@ -17,6 +17,8 @@ const CreateAssignmentHolder = ({ isSubmitted, onClose }) => {
     (store) => store?.student?.studentAssignment
   );
 
+  // console.log("aaaaaaaaaa===>",assignmentData)
+
   const [editorContent, setEditorContent] = useState("");
   const [fileUrls, setFileUrls] = useState([]);
   const [activeTab, setActiveTab] = useState("Editor");
@@ -113,6 +115,7 @@ const CreateAssignmentHolder = ({ isSubmitted, onClose }) => {
         assignmentId: assignmentData?._id,
         editorContent: sanitizedContent,
         fileUrls: submissionFiles,
+        type:assignmentData?.submissionType,
         isReattempt: isSubmitted,
       })
     );

@@ -124,7 +124,7 @@ export const ChildCardSkeleton = ({ count }) => {
 
                     {/* Big Button (CHECK SUBJECT PROGRESS) */}
                     <div className="flex justify-center mt-5">
-                        <Skeleton.Button active size="large" shape="round" style={{ width: "85%", height: 48, borderRadius: "12px" }} />
+                        <Skeleton.Button active size="large" shape="round" style={{ width: 190, height: 30, borderRadius: "12px" }} />
                     </div>
                 </div>
             ))}
@@ -438,7 +438,7 @@ export const LibraryRowSkeleton = ({ rows = 3 }) => {
         <>
             {/* Single <tr> so antd Table can display it via `locale.emptyText` */}
             <tr>
-                <td colSpan={6} style={{ width: '88rem' }}>
+                <td colSpan={7} style={{ width: '88rem' }}>
                     <div className="flex flex-col space-y-2">
                         {/* Render multiple skeleton rows */}
                         {Array(rows).fill("").map((_, rowIndex) => (

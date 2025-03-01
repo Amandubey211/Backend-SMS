@@ -67,10 +67,10 @@ const InputComment = ({ addComment, placeholder = "Write Something..." }) => {
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
-          <FaRegSmile className="text-gray-500 text-lg cursor-pointer mx-1" />
-          <FaPaperclip className="text-gray-500 text-lg cursor-pointer mx-1" />
+          {/* <FaRegSmile className="text-gray-500 text-lg cursor-pointer mx-1" />
+          <FaPaperclip className="text-gray-500 text-lg cursor-pointer mx-1" /> */}
         </div>
-        {showEmojis && (
+        {/* {showEmojis && (
           <div
             className="absolute right-10 bottom-full mb-2 flex space-x-2 bg-white p-2 rounded shadow-md transition-opacity duration-300 ease-in-out transform opacity-100 animate-slide-in"
             onMouseEnter={handleEmojiListMouseEnter}
@@ -87,7 +87,7 @@ const InputComment = ({ addComment, placeholder = "Write Something..." }) => {
               </span>
             ))}
           </div>
-        )}
+        )} */}
       </form>
       <button
         onClick={handleAddComment}

@@ -102,7 +102,7 @@ export default function AddStudentFeesForm() {
             </div>
           </div>
           <div className="flex w-full flex-col">
-            <StudentFeesForm selectCategories={selectCategories}  setStudentDetail={setStudentDetail} formData={formData} setFormData={setFormData} allData={allData} studentDetail={studentDetail} />
+            <StudentFeesForm selectCategories={selectCategories}  setStudentDetail={setStudentDetail} formData={formData} setFormData={setFormData} allData={allData} discription={discription} studentDetail={studentDetail} />
           </div>
         </div>
         </ProtectedSection>

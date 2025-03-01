@@ -1,10 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { BsThreeDotsVertical } from "react-icons/bs";
 import { BiBook, BiUser, BiCategoryAlt } from "react-icons/bi";
-import { HiOutlineClipboardList } from "react-icons/hi";
-import { IoLibraryOutline } from "react-icons/io5";
 import { gt } from "../../../../../Utils/translator/translation";
+import { useDispatch, useSelector } from "react-redux";
+import { setCurrentPage } from "../../../../../Store/Slices/Student/Library/libararySlice";
 
 const BookCard = ({
   title,
@@ -17,21 +16,31 @@ const BookCard = ({
   name,
   totalCopies,
   issuedCount,
+  studentIssueStatus,
 }) => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { totalPages, currentPage } = useSelector(
+    (store) => store.student.studentLibraryBooks
+  );
   const availableCopies = totalCopies - issuedCount;
+
+
   return (
-    <div className="relative  shadow-md rounded-xl overflow-hidden hover:shadow-lg transition-shadow duration-300 ">
+    <div className="relative  overflow-hidden rounded-md hover:shadow-md transition-shadow duration-30 m-1 bg-white border border-gray-300">
       {/* Book Cover */}
-      <div className="relative ">
+      <div className="relative">
         <img
           src={coverImageUrl}
           alt={title}
-          className="w-full h-48 object-cover"
+          className="h-40 object-fill w-full"
         />
-        <div className="absolute top-2 right-2 bg-white p-2 rounded-full shadow-md cursor-pointer hover:bg-gray-100">
-          <BsThreeDotsVertical className="text-gray-600" />
-        </div>
+
+        {studentIssueStatus === "Issued" && (
+          <span className="absolute top-2 right-2 bg-white text-green-600 px-2 py-1 rounded-md shadow-md text-xs font-semibold">
+            {studentIssueStatus}
+          </span>
+        )}
       </div>
 
       {/* Book Info */}
@@ -59,7 +68,7 @@ const BookCard = ({
           </span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+        <div className="flex items-center gap-3 text-sm text-gray-600">
           <BiBook className="text-gray-500" />
           <span>
             {t("Available", gt.stdLibrary)}:{" "}
@@ -70,6 +79,9 @@ const BookCard = ({
             >
               {availableCopies > 0 ? availableCopies : "Out of Stock"}
             </span>
+          </span>
+          <span className="text-green-600">
+            {studentIssueStatus === "Issued" ? studentIssueStatus : ""}
           </span>
         </div>
         {/* </div> */}

@@ -49,11 +49,11 @@ const sidebarData = [
     ),
     path: "/parentlibrary",
   },
-  {
-    title: "Time Table",
-    icon: <ImTable2 style={{ width: "20px", height: "20px", color: "gray" }} />,
-    path: "/parent_timetable",
-  },
+  // {
+  //   title: "Time Table",
+  //   icon: <ImTable2 style={{ width: "20px", height: "20px", color: "gray" }} />,
+  //   path: "/parent_timetable",
+  // },
   {
     title: "Notice Board",
     icon: (

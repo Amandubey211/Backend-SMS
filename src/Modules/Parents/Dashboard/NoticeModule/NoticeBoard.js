@@ -27,9 +27,8 @@ const NoticeBoard = ({ textTrimCount }) => {
 
 
   useEffect(() => {
-    if (!notices?.length) {
+    
       dispatch(fetchNotices());
-    }
   }, [dispatch]);
 
   // Handle navigate click using useCallback to prevent re-creation on each render
@@ -89,7 +88,7 @@ const NoticeBoard = ({ textTrimCount }) => {
     return (
       <div className="p-4">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
+          <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-hidden shadow rounded-lg p-4">
           <DashNoticeSkeleton />
@@ -103,7 +102,7 @@ const NoticeBoard = ({ textTrimCount }) => {
     return (
       <div className="p-4 border-l border-gray-300">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
+          <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4">
           <FaBell className="text-gray-400 text-6xl mb-4" />
@@ -116,11 +115,21 @@ const NoticeBoard = ({ textTrimCount }) => {
   // No data available state
   if (!notices?.length) {
     return (
-      <div className="p-4 border-gray-300">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-gray-600">Noticeboard</h2>
+      <div className="p-4 ">
+        <div className="flex justify-between items-center mb-4 flex-row">
+          <h2 className="text-lg font-semibold text-gray-600">Upcoming Notices</h2>
+          <div className="inline-block">
+          <button
+            className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+               text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]
+               hover:bg-gray-100 hover:shadow-md"
+            onClick={handleNavigate}
+          >
+            {t("See All")}
+          </button>
         </div>
-        <div className="border border-gray-300 rounded-lg bg-white shadow-sm">
+        </div>
+        <div className="rounded-lg bg-white">
           <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
             <FaBell className="text-gray-400 text-6xl mb-4" />
             <p className="text-gray-600 text-lg">No Notices Available</p>
@@ -132,8 +141,8 @@ const NoticeBoard = ({ textTrimCount }) => {
 
   return (
     <div className="p-2 ">
-      <div className="flex justify-between p-4 items-center px-6 pt-0">
-        <h2 className="text-lg font-semibold text-gray-600">{t("Noticeboard")}</h2>
+      <div className="flex justify-between p-4 items-center px-6 pl-[0.3rem] pt-0">
+        <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         <div className="inline-block">
           <button
             className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 

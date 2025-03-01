@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../../Components/Common/Layout";
@@ -20,17 +20,27 @@ const CreateAnnouncement = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { announcement } = location.state || {};
+
+  // Basic fields
   const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [file, setFile] = useState(null);
+
+  // Keep sectionId/groupId as arrays in state
   const [formState, setFormState] = useState({
     postTo: "",
     availableFrom: "",
-    sectionId: "",
-    option: "",
+    sectionId: [], // array
+    groupId: [], // array
     author: "",
-    groupId: "",
   });
+
+  // Validation errors
+  const [formErrors, setFormErrors] = useState({});
+
+  // Refs for focusing invalid inputs
+  const titleRef = useRef(null);
+  const authorRef = useRef(null);
 
   const { cid, sid } = useParams();
   const isSidebarOpen = useSelector(
@@ -38,6 +48,7 @@ const CreateAnnouncement = () => {
   );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
+  // Preload announcement data if editing
   useEffect(() => {
     if (announcement) {
       setAssignmentName(announcement.title || "");
@@ -47,16 +58,21 @@ const CreateAnnouncement = () => {
         availableFrom: announcement.delayPosting
           ? new Date(announcement.delayPosting).toISOString().split("T")[0]
           : "",
-        sectionId: announcement.sectionId || "",
-        option: "",
+        sectionId: Array.isArray(announcement.sectionId)
+          ? announcement.sectionId
+          : [],
+        groupId: Array.isArray(announcement.groupId)
+          ? announcement.groupId
+          : [],
         author: announcement.author || "",
-        groupId: announcement.groupId || "",
       });
     }
   }, [announcement]);
 
+  // Handlers for text fields
   const handleNameChange = useCallback((e) => {
     setAssignmentName(e.target.value);
+    setFormErrors((prev) => ({ ...prev, assignmentName: undefined }));
   }, []);
 
   const handleEditorChange = useCallback((content) => {
@@ -69,51 +85,77 @@ const CreateAnnouncement = () => {
 
   const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormState((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormState((prev) => ({ ...prev, [name]: value }));
+    setFormErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
 
-  const handleSave = useCallback(async () => {
-    const announcementData = {
-      title: assignmentName,
-      content: editorContent,
-      sectionId: formState.sectionId,
-      delayPosting: formState.availableFrom,
-      classId: cid,
-      subjectId: sid,
-      ...formState,
-    };
+  /**
+   * Validate fields & build a payload object.
+   * For postTo=Section or Group, directly assign the arrays so the backend receives them correctly.
+   */
+  const handleSave = useCallback(() => {
+    const errors = {};
+    let firstInvalidRef = null;
 
-    const files = {
-      attachment: file,
-    };
+    // Basic required fields
+    if (!assignmentName.trim()) {
+      errors.assignmentName = "Title is required";
+      firstInvalidRef = titleRef;
+    }
+    if (!formState.author.trim()) {
+      errors.author = "Author is required";
+      if (!firstInvalidRef) firstInvalidRef = authorRef;
+    }
+    // Validate selection for Section and Group
+    if (formState.postTo === "Section" && formState.sectionId.length === 0) {
+      errors.sectionId = "Please select at least one Section";
+    }
+    if (formState.postTo === "Group" && formState.groupId.length === 0) {
+      errors.groupId = "Please select at least one Group";
+    }
 
-    if (!formState.author || !assignmentName) {
-      toast.error("Please fill the required Details ");
+    setFormErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      toast.error("Please fix the highlighted fields.");
+      firstInvalidRef?.current?.focus();
       return;
     }
 
+    // Build the payload object
+    const payload = {
+      title: assignmentName,
+      content: editorContent,
+      postTo: formState.postTo,
+      delayPosting: formState.availableFrom,
+      classId: cid,
+      subjectId: sid,
+      author: formState.author,
+    };
+
+    // For Section/Group, assign arrays directly
+    if (formState.postTo === "Section") {
+      payload.sectionId = formState.sectionId;
+    }
+    if (formState.postTo === "Group") {
+      payload.groupId = formState.groupId;
+    }
+
+    const files = file ? { attachment: file } : {};
+
     if (announcement?._id) {
-      // Edit announcement
       dispatch(
-        editAnnouncement({
-          id: announcement._id,
-          data: announcementData,
-          files,
-        })
+        editAnnouncement({ id: announcement._id, data: payload, files })
       );
     } else {
-      // Create announcement
-      dispatch(createAnnouncement({ data: announcementData, files }));
+      dispatch(createAnnouncement({ data: payload, files }));
     }
   }, [
     assignmentName,
-    editorContent,
     formState,
+    editorContent,
     file,
     cid,
+    sid,
     announcement,
     dispatch,
   ]);
@@ -129,9 +171,7 @@ const CreateAnnouncement = () => {
         <SideMenubar />
         <div
           className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
-          style={{
-            marginLeft: sidebarWidth,
-          }}
+          style={{ marginLeft: sidebarWidth }}
         >
           <CreateAnnouncementHeader
             onSave={handleSave}
@@ -142,29 +182,35 @@ const CreateAnnouncement = () => {
             requiredPermission={
               PERMISSIONS.ADD_NEW_ANNOUNCEMENT || PERMISSIONS.EDIT_ANNOUNCEMENT
             }
-            title={""}
+            title=""
           >
             <div className="flex w-full">
+              {/* Left side: Title + Editor */}
               <div className="w-[75%]">
                 <div className="flex flex-col md:flex-row items-center gap-4 px-4 pt-3">
                   <TopicTitleInput
                     value={assignmentName}
                     onChange={handleNameChange}
+                    inputRef={titleRef}
+                    error={formErrors.assignmentName}
                   />
                   <FileInput onChange={handleFileChange} file={file} />
                 </div>
-
                 <EditorComponent
                   hideInput={true}
-                  assignmentLabel="Discussion Name"
+                  assignmentLabel="Announcement Name"
                   editorContent={editorContent}
                   onNameChange={handleNameChange}
                   onEditorChange={handleEditorChange}
                 />
               </div>
+
+              {/* Right side: Additional Form Fields */}
               <div className="w-[25%] border-l min-h-screen px-4 py-2">
                 <CreateAnnouncementForm
                   handleChange={handleFormChange}
+                  formErrors={formErrors}
+                  authorRef={authorRef}
                   {...formState}
                 />
               </div>

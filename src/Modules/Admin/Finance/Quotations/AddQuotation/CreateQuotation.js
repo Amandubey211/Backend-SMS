@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import Layout from "../../../../../Components/Common/Layout";
 import { useNavigate } from "react-router-dom";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading "; // Removed trailing space
+import { Descriptions } from "antd";
 
 /**
  * Inner form component using useFormikContext
@@ -18,15 +19,62 @@ import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading "; // 
  */
 const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
   const { values, setFieldValue, resetForm, isSubmitting } = useFormikContext();
-
+  const subCategories = {
+    studentFee: [
+      { label: "Tuition Fees", value: "tuition_fees" },
+      { label: "Transport Fees", value: "transport_fees" },
+      { label: "Hostel Fees", value: "hostel_fees" },
+      { label: "Exam Fees", value: "exam_fees" },
+      { label: "Event Fees", value: "event_fees" },
+      { label: "Certificate Fees", value: "certificate_fees" },
+      { label: "Meal Fees", value: "meal_fees" },
+      { label: "Application Fees", value: "application_fees" },
+      { label: "Other", value: "other" },
+    ],
+    FacilityRevenue: [
+      { label: "Rent Income", value: "rent_income" },
+      { label: "Exam Center Fees", value: "exam_center_fees" },
+      { label: "Parking Fees", value: "parking_fees" },
+      { label: "Other", value: "other" },
+    ],
+    service_based_revenue: [
+      { label: "Stationery Fees", value: "stationery_fees" },
+      { label: "Other Facility Fees", value: "other_facility_fees" },
+      { label: "Subscription Fees", value: "subscription_fees" },
+      { label: "Workshop/Training Fees", value: "workshop_training_fees" },
+      { label: "Canteen Profit", value: "canteen_profit" },
+      { label: "Other", value: "other" },
+    ],
+    community_externalaffair_revenue: [
+      { label: "Donations", value: "donations" },
+      { label: "Fundraising/Sponsorships", value: "fundraising_sponsorships" },
+      { label: "Other", value: "other" },
+    ],
+    financial_investment_revenue: [
+      { label: "Investments", value: "investments" },
+    ],
+    Penalties: [
+      { label: "Penalties", value: "penalties" },
+    ],
+    Other: [
+      { label: "Other", value: "other" },
+    ],
+  };
+  
   // Auto-calculate sub_amount (total_amount) and final_amount in real-time
   useEffect(() => {
     // Calculate subAmount from lineItems
-    const subAmount = values.lineItems?.reduce((acc, item) => {
+    const updatedLineItems = values.lineItems?.map((item, index) => {
       const quantity = parseFloat(item.quantity) || 0;
-      const amount = parseFloat(item.amount) || 0;
-      return acc +  quantity*amount;
-    }, 0);
+      const rate = parseFloat(item.amount) || 0;
+      const amount = quantity * rate;
+
+      // Update amount in each line item
+      setFieldValue(`lineItems.${index}.quantityAmount`, amount, false);
+      return amount;
+    });
+
+    const subAmount = updatedLineItems?.reduce((acc, curr) => acc + curr, 0) || 0;
 
     // Convert tax and discount to number
     const taxValue = parseFloat(values.tax) || 0;
@@ -51,7 +99,9 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
     // Ensure amounts don’t go below zero
     setFieldValue("total_amount", subAmount < 0 ? 0 : subAmount, false);
     setFieldValue("final_amount", calculatedFinal < 0 ? 0 : calculatedFinal, false);
+
   }, [values.lineItems, values.tax, values.discount, values.discountType, setFieldValue]);
+
 
   return (
     <Form>
@@ -135,7 +185,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
 
       {/* Items Section */}
       <div
-        className="p-6 rounded-md flex flex-col items-center justify-center mb-7"
+        className="p-4 rounded-md flex flex-col items-center justify-center mb-7"
         style={{ backgroundColor: "#ECECEC" }}
       >
         <h2 className="text-lg font-semibold mb-4">Items</h2>
@@ -143,8 +193,8 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
           {({ remove, push }) => (
             <>
               {values.lineItems.map((item, index) => (
-                <div key={index} className="grid grid-cols-12 gap-8 items-center mb-6">
-                  <div className="col-span-3">
+                <div key={index} className="grid grid-cols-12 gap-2 items-center mb-6">
+                  <div className="col-span-2">
                     <SelectInput
                       name={`lineItems.${index}.revenueType`}
                       label="Revenue Type"
@@ -162,8 +212,28 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
                       disabled={readOnly}
                     />
                   </div>
+                  <div className="col-span-2">
+                    <SelectInput
+                      name={`lineItems.${index}.subCategory`}
+                      label="Sub Category"
+                      options={subCategories[item.revenueType] || []} // Dynamically get options based on selected revenue type
+                      required={true}
+                      readOnly={readOnly}
+                      disabled={readOnly}
+                    />
+                  </div>
 
                   <div className="col-span-3">
+                    <TextInput
+                      name={`lineItems.${index}.description`}
+                      label="Description"
+                      type="text"
+                      placeholder="Enter Description"
+                      readOnly={readOnly}
+                      disabled={readOnly}
+                    />
+                  </div>
+                  <div className="col-span-1">
                     <TextInput
                       name={`lineItems.${index}.quantity`}
                       label="Quantity"
@@ -175,10 +245,10 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
                     />
                   </div>
 
-                  <div className="col-span-3">
+                  <div className="col-span-1">
                     <TextInput
                       name={`lineItems.${index}.amount`}
-                      label="Amount"
+                      label="Rate (QAR)"
                       type="number"
                       placeholder="Enter Amount"
                       required={true}
@@ -186,13 +256,24 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
                       disabled={readOnly}
                     />
                   </div>
+                  <div className="col-span-2">
+                    <TextInput
+                      name={`lineItems.${index}.quantityAmount`}
+                      label="Amount  (QAR)"
+                      type="number"
+                      placeholder={0}
+                      required={true}
+                      readOnly={true}
+                      disabled={true}
+                    />
+                  </div>
 
-                  <div className="col-span-3 flex items-center justify-center">
+                  <div className="col-span-1 flex items-center justify-center">
                     {!readOnly && (
                       <button
                         type="button"
                         onClick={() => remove(index)}
-                        className="text-red-500 hover:text-red-700 text-xl"
+                        className="text-red-500 hover:text-red-700 text-lg"
                       >
                         ✖
                       </button>
@@ -312,7 +393,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
         {/* Auto-calculated fields */}
         <TextInput
           name="total_amount"
-          label="Sub Amount"
+          label="Sub Amount (QAR)"
           placeholder="Auto-calculated sub total"
           readOnly={true}
           disabled={true}
@@ -351,8 +432,11 @@ const CreateQuotation = () => {
     lineItems: Yup.array().of(
       Yup.object().shape({
         revenueType: Yup.string().required("Revenue Type is required"),
-        quantity: Yup.number().min(1, "Quantity must be at least 1").required("Quantity is required"),
-        amount: Yup.number().min(0, "Rate must be positive").required("Amount is required"),
+        subCategory: Yup.string().required("Revenue Type is required"),
+        description: Yup.string(),
+        quantity: Yup.number().min(1).required("required"),
+        amount: Yup.number().min(0, "positive").required("required"),
+        quantityAmount: Yup.number().min(0, "positive").required("required"),
       })
     ),
     discountType: Yup.string()
@@ -396,7 +480,7 @@ const CreateQuotation = () => {
     },
     lineItems:
       selectedQuotation?.lineItems || [
-        { revenueType: "", quantity: 1, amount: 0 },
+        { revenueType: "", subCategory: "", description: "", quantity: 1, amount: 0, },
       ],
     date: selectedQuotation?.date
       ? formatDate(selectedQuotation.date)

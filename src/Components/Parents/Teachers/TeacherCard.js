@@ -21,7 +21,7 @@ const TeacherCard = ({ instructor }) => {
 
                 <div className="text-center">
                     <p className="text-gray-900 text-lg font-semibold mb-1">
-                        {truncateText('fdsfsdfdsfdsfdsfdsfdsfsdfsdfsdfds' || 'N/A', 20)}
+                        {truncateText(instructor?.name || 'N/A', 20)}
                     </p>
                     <p className="text-gray-500 font-medium text-sm">
                         {truncateText(instructor?.department || 'N/A', 20)}

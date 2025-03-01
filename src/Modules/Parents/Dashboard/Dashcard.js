@@ -17,7 +17,6 @@ const DashCard = () => {
   const [isLoading, setIsLoading] = useState(true); // Local loading state
 
   useEffect(() => {
-    dispatch(fetchAllNotices());
     dispatch(fetchDashboardCards());
   }, [dispatch]);
 
@@ -30,7 +29,7 @@ const DashCard = () => {
   // Define card data
   const cardData = [
     {
-      label: t("Due Fees", { ns: "stdFinance" }),
+      label: t("Outstanding Fees", { ns: "stdFinance" }),
       value: cardsData?.dueFees?.toString() || "0",
       bgColor: "bg-rose-200",
       textColor: "text-rose-500",
@@ -44,14 +43,14 @@ const DashCard = () => {
       icon: <RiBookOpenLine />,
     },
     {
-      label: t("Notices", { ns: "stdFinance" }),
+      label: t("Upcoming Notices", { ns: "stdFinance" }),
       value: cardsData?.notices?.toString() || "0",
       bgColor: "bg-teal-100",
       textColor: "text-teal-700",
       icon: <RiCalendarCheckLine />,
     },
     {
-      label: t("Total Expense", { ns: "stdFinance" }),
+      label: t("Payable Fees", { ns: "stdFinance" }),
       value: cardsData?.totalExpenses?.toString() || "0",
       bgColor: "bg-purple-200",
       textColor: "text-purple-400",

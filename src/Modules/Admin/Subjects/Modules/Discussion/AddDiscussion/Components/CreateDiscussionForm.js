@@ -7,8 +7,8 @@ const CreateDiscussionForm = ({
   dueDate,
   availableFrom,
   availableUntil,
-  sectionId,
-  groupId,
+  sectionId, // expected to be an array
+  groupId, // expected to be an array
   option,
   handleChange,
   assignError, // error for assignment field
@@ -18,8 +18,8 @@ const CreateDiscussionForm = ({
       <AssignToSection
         assignTo={assignTo}
         sectionId={sectionId}
-        handleChange={handleChange}
         groupId={groupId}
+        handleChange={handleChange}
         isAssignToLabel={true}
         error={assignError}
       />

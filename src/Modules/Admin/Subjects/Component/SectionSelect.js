@@ -2,28 +2,46 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { createSelector } from "reselect";
+import { Select } from "antd";
 
 import {
   fetchGroupsByClass,
   fetchSectionsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
+const { Option } = Select;
+
 const selectSections = createSelector(
   (store) => store.admin.group_section.sectionsList,
   (sectionsList) => sectionsList
 );
 
+/**
+ * SectionSelect component
+ *
+ * @param {Array}  sectionValue - array of selected Section IDs
+ * @param {Array}  groupValue   - array of selected Group IDs
+ * @param {string} assignTo     - "Section" or "Group"
+ * @param {func}   handleChange - function to handle changes in the form
+ * @param {object} formErrors   - validation errors, if any
+ * @param {bool}   multiSelect  - controls single vs multiple selection
+ * @param {string} fieldSection - field name to update for sections (e.g. "sectionId" or "sectionIds")
+ * @param {string} fieldGroup   - field name to update for groups (e.g. "groupId" or "groupIds")
+ */
 const SectionSelect = ({
-  sectionId,
-  handleChange,
-  groupId,
+  sectionValue = [],
+  groupValue = [],
   assignTo,
+  handleChange,
   formErrors = {},
+  multiSelect = false,
+  fieldSection = "sectionIds",
+  fieldGroup = "groupIds",
 }) => {
   const { cid } = useParams();
   const dispatch = useDispatch();
 
-  const AllSections = useSelector(selectSections);
+  const allSections = useSelector(selectSections);
   const groupsList = useSelector(
     (store) => store.admin.group_section.groupsList
   );
@@ -36,71 +54,73 @@ const SectionSelect = ({
     }
   }, [dispatch, cid]);
 
+  const selectMode = multiSelect ? "multiple" : undefined;
+
+  const handleSelectChange = (value, fieldName) => {
+    handleChange({ target: { name: fieldName, value } });
+  };
+
   return (
     <>
       {assignTo === "Section" && (
-        <div className="mt-4">
-          <label className="block mb-2 text-sm font-medium text-gray-700">
-            Section <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="sectionId"
-            value={sectionId || ""}
-            name="sectionId"
-            onChange={handleChange}
-            className={`block w-full mb-4 p-2 border rounded-lg ${
-              formErrors.sectionId
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:ring-blue-500"
-            }`}
-          >
-            <option value="">Choose Section</option>
-            {AllSections?.length > 0 ? (
-              AllSections.map((sec) => (
-                <option key={sec._id} value={sec._id}>
-                  {sec.sectionName}
-                </option>
-              ))
-            ) : (
-              <option disabled>No Section available</option>
-            )}
-          </select>
-          {formErrors.sectionId && (
-            <p className="text-red-500 text-sm mt-1">{formErrors.sectionId}</p>
+        <div>
+          <div className="custom-ant-select">
+            <Select
+              mode={selectMode}
+              style={{ width: "100%", height: "2.6rem" }}
+              className="mb-3"
+              placeholder="Select Sections"
+              value={sectionValue}
+              onChange={(val) => handleSelectChange(val, fieldSection)}
+              loading={loading}
+              allowClear
+            >
+              {allSections && allSections.length > 0 ? (
+                allSections.map((sec) => (
+                  <Option key={sec._id} value={sec._id}>
+                    {sec.sectionName}
+                  </Option>
+                ))
+              ) : (
+                <Option disabled>No Section available</Option>
+              )}
+            </Select>
+          </div>
+          {formErrors[fieldSection] && (
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors[fieldSection]}
+            </p>
           )}
         </div>
       )}
-
       {assignTo === "Group" && (
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Group <span className="text-red-500">*</span>
-          </label>
-          <select
-            id="groupId"
-            value={groupId || ""}
-            name="groupId"
-            onChange={handleChange}
-            className={`block w-full p-2 border rounded-lg ${
-              formErrors.groupId
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300 focus:ring-blue-500"
-            }`}
-            disabled={loading}
-          >
-            <option value="">All Groups</option>
-            {groupsList?.length > 0 ? (
-              groupsList.map((group) => (
-                <option key={group._id} value={group._id}>
-                  {group.groupName}
-                </option>
-              ))
-            ) : (
-              <option disabled>No groups available</option>
-            )}
-          </select>
-          {formErrors.groupId && (
-            <p className="text-red-500 text-sm mt-1">{formErrors.groupId}</p>
+        <div>
+          <div className="custom-ant-select">
+            <Select
+              mode={selectMode}
+              style={{ width: "100%", height: "2.6rem" }}
+              placeholder="Select Groups"
+              value={groupValue}
+              className="mb-3"
+              onChange={(val) => handleSelectChange(val, fieldGroup)}
+              loading={loading}
+              allowClear
+            >
+              {groupsList && groupsList.length > 0 ? (
+                groupsList.map((group) => (
+                  <Option key={group._id} value={group._id}>
+                    {group.groupName}
+                  </Option>
+                ))
+              ) : (
+                <Option disabled>No Group available</Option>
+              )}
+            </Select>
+          </div>
+          {formErrors[fieldGroup] && (
+            <p className="text-red-500 text-sm mt-1">
+              {formErrors[fieldGroup]}
+            </p>
           )}
         </div>
       )}

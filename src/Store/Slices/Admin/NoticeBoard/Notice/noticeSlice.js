@@ -12,7 +12,10 @@ const initialState = {
   editMode: false,
   loading: false,
   error: null,
-  titleToDelete: "", // State to hold the title of the notice to be deleted
+  titleToDelete: "",
+  currentPage: 1, // New: current page number
+  totalPages: 1, // New: total pages available
+  totalNotices: 0, // New: total count of notices
 };
 
 const noticeSlice = createSlice({
@@ -30,10 +33,10 @@ const noticeSlice = createSlice({
       state.selectedNotice = null;
     },
     setTitleToDelete: (state, action) => {
-      state.titleToDelete = action.payload; // Set the title for the delete modal
+      state.titleToDelete = action.payload;
     },
     resetTitleToDelete: (state) => {
-      state.titleToDelete = ""; // Reset the title
+      state.titleToDelete = "";
     },
   },
   extraReducers: (builder) => {
@@ -44,7 +47,10 @@ const noticeSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchNoticesThunk.fulfilled, (state, action) => {
-        state.notices = action.payload;
+        state.notices = action.payload?.notices || [];
+        state.currentPage = action.payload?.currentPage || 1;
+        state.totalPages = action.payload?.totalPages || 1;
+        state.totalNotices = action.payload?.totalNotices || 0;
         state.loading = false;
       })
       .addCase(fetchNoticesThunk.rejected, (state, action) => {
@@ -112,5 +118,4 @@ export const {
   resetTitleToDelete,
 } = noticeSlice.actions;
 
-// Export reducer
 export default noticeSlice.reducer;

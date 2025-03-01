@@ -66,14 +66,14 @@ const LibraryAndBookIssue = () => {
     if (addBookSuccess || addIssueSuccess) {
       setSidebarOpen(false);
       setEditIssueData(null);
-  
+
       // Reset success state after closing sidebar
       setTimeout(() => {
         dispatch(resetLibraryState());
       }, 500); // Ensures smooth transition
     }
   }, [addBookSuccess, addIssueSuccess, dispatch]);
-  
+
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => {
     setSidebarOpen(false);

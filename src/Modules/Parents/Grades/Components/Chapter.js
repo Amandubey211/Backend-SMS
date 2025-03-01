@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEye, FaFilePdf } from "react-icons/fa";
-import { GrAttachment } from "react-icons/gr";
+import { FaChevronDown, FaChevronUp, FaEye, FaFilePdf, FaPaperclip } from "react-icons/fa";
+import { MdAssignment, MdQuiz } from "react-icons/md";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [], moduleName }) => {
   const [chapterExpanded, setChapterExpanded] = useState(false);
+  const [focusedSection, setFocusedSection] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
   const toggleChapter = () => {
@@ -19,158 +20,184 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
     setPreviewUrl(null);
   };
 
-  // Handle the attachment icon click
-  const handleAttachmentClick = () => {
-    if (attachments?.length === 1) {
-      openPreview(attachments[0].url); // Open the PDF if there's only one attachment
-    } else if (attachments?.length > 1) {
-      setChapterExpanded(true); // Expand the chapter if more than one attachment
+  const handleAttachmentClick = (e) => {
+    e.stopPropagation();
+    if (attachments?.length > 0) {
+      setChapterExpanded(true);
+      setFocusedSection("attachments");
     }
   };
 
-  // Function to truncate lengthy filenames
-  const truncateFileName = (name, length = 30) => {
-    if (name?.length > length) {
-      return `${name.substring(0, length)}...`;
-    }
-    return name;
+  const handleSectionClick = (section) => {
+    setFocusedSection((prev) => (prev === section ? null : section));
   };
-
+  console.log('assignments', assignments);
+  console.log('quizzes', quizzes);
   return (
-    <div>
-      {/* Module Name Box */}
+    <div className="mb-5">
+      {/* Module Name */}
       {moduleName && (
         <div className="p-4 bg-gray-100 border border-gray-300 rounded-md mb-4">
           <h1 className="text-lg font-bold text-gray-700">{moduleName}</h1>
         </div>
       )}
 
-      {/* Chapter Row */}
+      {/* Chapter Header */}
       <div
-        className="mb-3 p-2 bg-white rounded-lg border cursor-pointer hover:shadow-lg transition-shadow duration-200 ease-in-out"
-        onClick={toggleChapter} // Clicking anywhere on the row will toggle the chapter
+        className="mb-3 p-3 bg-white rounded-lg border flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow duration-200 ease-in-out"
+        onClick={toggleChapter}
       >
-        {/* Chapter Header */}
-        <div className="flex items-center justify-between m-1">
-          <div className="flex items-center">
-            <img
-              src={imageUrl}
-              alt={`Chapter ${chapterNumber}`}
-              className="w-14 h-14 mr-4 rounded-lg"
-            />
-            <div className="flex flex-col">
-              <h2 className="font-semibold text-md">{title}</h2>
-              <p className="text-gray-500">Chapter {chapterNumber}</p>
-            </div>
+        <div className="flex items-center">
+          <img src={imageUrl} alt={`Chapter ${chapterNumber}`} className="w-14 h-14 mr-4 rounded-lg" />
+          <div className="flex flex-col">
+            <h2 className="font-semibold text-md">{title}</h2>
+            <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
-          <div className="flex items-center space-x-2 relative">
-            {attachments?.length > 0 && (
-              <div className="relative">
-                <button
-                  className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
-                  aria-label="View Attachments"
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent row click when pin is clicked
-                    handleAttachmentClick();
-                  }} // Handle click event
-                >
-                  <GrAttachment />
-                </button>
-                <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {attachments?.length}
-                </span>
-              </div>
-            )}
-            {/* Dropdown Menu */}
+        </div>
+
+        <div className="flex items-center space-x-3 relative">
+          {/* Show Attachment Icon If Attachments Are Available */}
+          {attachments?.length > 0 && (
             <button
-              className="border p-2 rounded-full hover:bg-gray-100"
-              aria-label="Toggle Chapter"
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent row click toggle when button is clicked
-                toggleChapter();
-              }}
+              className="p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all text-red-600 relative"
+              onClick={handleAttachmentClick}
+              title="View Attachments"
             >
-              {chapterExpanded ? <FaChevronUp /> : <FaChevronDown />}
+              <FaPaperclip />
+              <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {attachments?.length}
+              </span>
             </button>
-          </div>
+          )}
+
+          {/* Dropdown Button */}
+          <button
+            className={`p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all ${chapterExpanded ? "rotate-180" : ""
+              }`}
+            aria-label="Toggle Chapter"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleChapter();
+            }}
+          >
+            {chapterExpanded ? <FaChevronUp size={16} /> : <FaChevronDown size={16} />}
+          </button>
         </div>
       </div>
 
-      {/* Chapter Content */}
+      {/* Expanded Chapter Content */}
       {chapterExpanded && (
-        <div className="mt-2">
-            {/* Attachments (PDF Preview) */}
-            {attachments?.length > 0 && (
-            <div className="mt-4">
-              <h3 className="text-sm font-semibold text-green-600 mb-2">Attachments ({attachments?.length})</h3>
-              {attachments?.map((attachment, index) => (
-                <div
-                  key={index}
-                  className="flex justify-between items-center mb-3 p-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
-                >
-                  <div className="flex items-center space-x-4">
-                    {/* Independent PDF Icon */}
-                    {attachment.type === "application/pdf" && (
-                      <div className="flex-shrink-0">
-                        <FaFilePdf className="text-red-500" size={24} />
-                      </div>
-                    )}
-
-                    {/* Name and Label in a Column */}
-                    <div className="flex flex-col">
-                      {/* <span className="text-gray-700 font-semibold">
-                        {truncateFileName(attachment.name)}
-                      </span> */}
-                      {attachment.label && (
-                        <span className="text-gray-500 text-sm italic">
-                          {truncateFileName(attachment.label)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Preview Button */}
-                  <button
-                    onClick={() => openPreview(attachment.url)}
-                    className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                    aria-label="Preview"
-                  >
-                    <FaEye size={20} />
-                  </button>
-
-                </div>
-              ))}
+        <div className="mt-2 space-y-3">
+          {/* Attachments */}
+          <div
+            className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+            onClick={() => handleSectionClick("attachments")}
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <FaPaperclip className="text-red-500" />
+                <span className="font-medium text-gray-700">
+                  Attachments ({attachments?.length})
+                </span>
+              </div>
+              <FaChevronDown className={`transition-transform ${focusedSection === "attachments" ? "rotate-180" : ""}`} />
             </div>
-          )}
-          {/* Assignments and Quizzes */}
-          <div>
-            {assignments?.length > 0 || quizzes?.length > 0 ? (
-              <>
-                {assignments?.map((assignment, index) => (
-                  <ChapterItem
-                    key={index}
-                    type="assignment"
-                    title={assignment.title}
-                    submitted={assignment.submitted}
-                  />
-                ))}
-                {quizzes?.map((quiz, index) => (
-                  <ChapterItem
-                    key={index}
-                    type="quiz"
-                    title={quiz.title}
-                    submitted={quiz.submitted}
-                  />
-                ))}
-              </>
-            ) : (
-              <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-                No Assignment or Quiz
-              </p>
+
+            {focusedSection === "attachments" && (
+              <div className="mt-3">
+                {attachments?.length > 0 ? (
+                  attachments.map((attachment, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center mb-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
+                    >
+                      <div className="flex items-center space-x-4">
+                        {attachment.type === "application/pdf" && <FaFilePdf className="text-red-500" size={20} />}
+                        <span className="text-gray-700 font-semibold">{attachment.label}</span>
+                      </div>
+                      <button
+                        onClick={() => openPreview(attachment.url)}
+                        className="text-green-500 p-1 border rounded-full transform hover:scale-110 transition"
+                        aria-label="Preview"
+                      >
+                        <FaEye size={18} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic text-center mt-2">No Attachments Available</p>
+                )}
+              </div>
             )}
           </div>
 
-        
+          {/* Assignments */}
+          <div
+            className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+            onClick={() => handleSectionClick("assignments")}
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <MdAssignment className="text-blue-500" />
+                <span className="font-medium text-gray-700">
+                  Assignments ({assignments?.length})
+                </span>
+              </div>
+              <FaChevronDown className={`transition-transform ${focusedSection === "assignments" ? "rotate-180" : ""}`} />
+            </div>
+
+            {focusedSection === "assignments" && (
+              <div className="mt-3">
+                {assignments?.length > 0 ? (
+                  assignments.map((assignment, index) => (
+                    <ChapterItem
+                      key={index}
+                      type="assignment"
+                      title={assignment.title}
+                      submitted={assignment.submitted}
+                      dueDate={assignment.dueDate}
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic text-center mt-2">No Assignments Available</p>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Quizzes */}
+          <div
+            className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+            onClick={() => handleSectionClick("quizzes")}
+          >
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <MdQuiz className="text-green-500" />
+                <span className="font-medium text-gray-700">
+                  Quizzes ({quizzes?.length})
+                </span>
+              </div>
+              <FaChevronDown className={`transition-transform ${focusedSection === "quizzes" ? "rotate-180" : ""}`} />
+            </div>
+
+            {focusedSection === "quizzes" && (
+              <div className="mt-3">
+                {quizzes?.length > 0 ? (
+                  quizzes.map((quiz, index) => (
+                    <ChapterItem
+                      key={index}
+                      type="quiz"
+                      title={quiz.title}
+                      submitted={quiz.submitted}
+                      dueDate={quiz.dueDate}
+                    />
+                  ))
+                ) : (
+                  <p className="text-gray-500 italic text-center mt-2">No Quizzes Available</p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -178,21 +205,10 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
       {previewUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-4 relative">
-            <button
-              onClick={closePreview}
-              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
-            >
+            <button onClick={closePreview} className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white">
               ✕
             </button>
-
-
-            <embed
-              src={previewUrl}
-              type="application/pdf"
-              width="100%"
-              height="600px"
-              className="rounded-md"
-            />
+            <embed src={previewUrl} type="application/pdf" width="100%" height="600px" className="rounded-md" />
           </div>
         </div>
       )}

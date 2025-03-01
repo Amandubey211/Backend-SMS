@@ -1,14 +1,14 @@
 import React from "react";
-import { ReactComponent as CalendarIcon } from '../../../../Assets/StudentAssets/calendar-icon.svg';
-import { ReactComponent as ClockIcon } from '../../../../Assets/StudentAssets/clock-icon.svg';
-import { ReactComponent as LocationIcon } from '../../../../Assets/StudentAssets/location-icon.svg';
-import { ReactComponent as PersonIcon } from '../../../../Assets/StudentAssets/person-icon.svg';
+import { ReactComponent as CalendarIcon } from "../../../../Assets/StudentAssets/calendar-icon.svg";
+import { ReactComponent as ClockIcon } from "../../../../Assets/StudentAssets/clock-icon.svg";
+import { ReactComponent as LocationIcon } from "../../../../Assets/StudentAssets/location-icon.svg";
+import { ReactComponent as PersonIcon } from "../../../../Assets/StudentAssets/person-icon.svg";
 import { gt } from "../../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
 
 const ViewEvent = ({ event }) => {
   // console.log("event is ", event);
-  const {t}=useTranslation();
+  const { t } = useTranslation();
   const formatDateTime = (date) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     const timeOptions = { hour: "2-digit", minute: "2-digit", hour12: true };
@@ -19,13 +19,13 @@ const ViewEvent = ({ event }) => {
   };
 
   const formatTime = (timeString) => {
-    const [hour, minute] = timeString.split(':');
+    const [hour, minute] = timeString.split(":");
     const date = new Date();
     date.setHours(hour);
     date.setMinutes(minute);
     const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, "0");
-    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const ampm = hours >= 12 ? "PM" : "AM";
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
     return `${formattedHours}:${minutes} ${ampm}`;
   };
@@ -34,10 +34,14 @@ const ViewEvent = ({ event }) => {
   const endDateTime = formatDateTime(new Date(event.endDate));
 
   return (
-    <div className="px-4 bg-white rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
+    <div className="px-4 bg-white rounded-lg ">
       <div className="flex flex-col gap-2">
         {/* Event Image */}
-        <img className="h-[200px] w-full rounded" src={event.image} alt="Event" />
+        <img
+          className="h-[200px] w-full rounded"
+          src={event.image}
+          alt="Event"
+        />
 
         {/* Grouped Date, Time, Location, and Director */}
         <div className="flex justify-between gap-4 mt-4">
@@ -53,8 +57,12 @@ const ViewEvent = ({ event }) => {
                 <LocationIcon className="text-white" />
               </div>
               <div className="flex flex-col ml-2">
-                <span className="text-gray-400">{t('Location',gt.stdEvents)}</span>
-                <span className="text-lg">{event.location || t('No Location Available',gt.stdEvents)}</span>
+                <span className="text-gray-400">
+                  {t("Location", gt.stdEvents)}
+                </span>
+                <span className="text-lg">
+                  {event.location || t("No Location Available", gt.stdEvents)}
+                </span>
               </div>
             </div>
           </div>
@@ -63,15 +71,21 @@ const ViewEvent = ({ event }) => {
               <div className="bg-orange-500 p-2 rounded-full">
                 <ClockIcon className="text-white" />
               </div>
-              <span className="text-orange-500 ml-2">{formatTime(event.time)}</span>
+              <span className="text-orange-500 ml-2">
+                {formatTime(event.time)}
+              </span>
             </div>
             <div className="flex items-center">
               <div className="bg-blue-500 p-2 rounded-full">
                 <PersonIcon className="text-white" />
               </div>
               <div className="flex flex-col ml-2">
-                <span className="text-gray-400">{t('Event Director',gt.stdEvents)}</span>
-                <span className="text-lg">{event.director || t('No Director Available',gt.stdEvents)}</span>
+                <span className="text-gray-400">
+                  {t("Event Director", gt.stdEvents)}
+                </span>
+                <span className="text-lg">
+                  {event.director || t("No Director Available", gt.stdEvents)}
+                </span>
               </div>
             </div>
           </div>
@@ -85,13 +99,22 @@ const ViewEvent = ({ event }) => {
 
         {/* Event Type */}
         <div className="flex flex-col mt-4">
-          <span className="text-gray-400">{t('Event Type',gt.stdEvents)}</span>
-          <span className="text-lg">{event.type || 'No Type Available'}</span>
+          <span className="text-gray-400">{t("Event Type", gt.stdEvents)}</span>
+          <span className="text-lg">{event.type || "No Type Available"}</span>
         </div>
 
         {/* Event Description */}
-        <div className="text-lg leading-[1.875] mt-4" style={{ color: "#7F7F7F", fontFamily: "", fontSize: "16px", fontStyle: "normal", fontWeight: "400" }}>
-          {event.description || t('No Details Available',gt.stdEvents)}
+        <div
+          className="text-lg leading-[1.875] mt-4"
+          style={{
+            color: "#7F7F7F",
+            fontFamily: "",
+            fontSize: "16px",
+            fontStyle: "normal",
+            fontWeight: "400",
+          }}
+        >
+          {event.description || t("No Details Available", gt.stdEvents)}
         </div>
       </div>
     </div>

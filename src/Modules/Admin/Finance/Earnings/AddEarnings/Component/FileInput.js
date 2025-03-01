@@ -14,9 +14,9 @@ import { useSelector } from "react-redux";
 import useCloudinaryUpload from "../../../../../../Hooks/CommonHooks/useCloudinaryUpload";
 import toast from "react-hot-toast";
 
-const FileInput = ({ label, name, onChange, value, required = false }) => {
+const FileInput = ({ label, name, onChange, value, required = false,disabled =false }) => {
   // Use the earnings.readOnly state for read-only mode
-  const readOnly = useSelector((state) => state.admin.earnings.readOnly);
+  const readOnly = useSelector((state) => state.admin.earnings.readOnly) || disabled;
 
   // Use Formik's useField to get meta
   const [field, meta] = useField(name);

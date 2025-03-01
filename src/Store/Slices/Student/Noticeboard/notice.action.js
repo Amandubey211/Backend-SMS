@@ -6,17 +6,19 @@ import { getAY } from "../../../../Utils/academivYear";
 
 export const studentNotice = createAsyncThunk(
   "announcement/studentNotice",
-  async (_, { rejectWithValue, dispatch }) => {
+  async (
+    { page, limit, search, priority },
+    { rejectWithValue, dispatch }
+  ) => {
     try {
-      const say=getAY();
+
+      const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(`/admin/all/notices?say=${say}`);
-      const formatedData = data?.notices?.map((notice) => ({
-        ...notice,
-        startDate: new Date(notice.startDate),
-        endDate: new Date(notice.endDate),
-      }));
-      return formatedData;
+      const data = await getData(
+        `/admin/all/notices?say=${say}&page=${page}&limit=${limit}&sortBy=startDate&sortOrder=desc&search=${search}&priority=${priority}`
+      );
+      console.log("notices action data", data);
+      return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
     }

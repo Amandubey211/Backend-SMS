@@ -9,7 +9,8 @@ const AssignToSection = ({
   handleChange,
   assignTitle,
   isAssignToLabel,
-  error, // added error prop for validations
+  error,
+  formErrors = {},
 }) => {
   return (
     <div className="mt-5">
@@ -24,9 +25,13 @@ const AssignToSection = ({
       </div>
       <SectionSelect
         assignTo={assignTo}
-        sectionId={sectionId}
-        groupId={groupId}
+        sectionValue={sectionId}
+        groupValue={groupId}
         handleChange={handleChange}
+        multiSelect={true}
+        fieldSection="sectionId"
+        fieldGroup="groupId"
+        formErrors={formErrors}
       />
     </div>
   );

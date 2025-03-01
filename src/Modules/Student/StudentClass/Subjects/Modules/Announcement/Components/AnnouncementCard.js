@@ -26,14 +26,17 @@ const AnnouncementCard = ({ title, date, section, id }) => {
   const bgColor = getRandomColor();
 
   return (
-    <div style={{ backgroundColor: bgColor }} className="ps-1 rounded-md h-36">
-      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4 h-36">
+    <div
+      style={{ backgroundColor: bgColor }}
+      className="ps-1 rounded-md h-auto"
+    >
+      <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4 h-auto">
         <NavLink
           to={`/student_class/${cid}/${sid}/announcements/${id}/view`}
           className="flex flex-col items-start justify-start"
         >
           <h2 className="text-base font-semibold">{title}</h2>
-          <p className="text-base text-green-600">{section}</p>
+          {/* <p className="text-base text-green-600">{section}</p> */}
           <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
             <div className="flex gap-1 items-center">
               <IoCalendarOutline /> <p className="text-md">Post On :</p>

@@ -10,6 +10,7 @@ import "react-circular-progressbar/dist/styles.css";
 import { setSubject } from "../../../../Store/Slices/Student/MyClass/Class/Subjects/subjectSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { CiUser } from "react-icons/ci";
+import TeacherDisplay from "./Components/Teacher/TeacherDisplay";
 
 const SubjectCard = ({
   data,
@@ -34,82 +35,12 @@ const SubjectCard = ({
     navigate(`/student_class/${classId}/${data?.subjectId}/module`);
   };
 
+  console.log("data iss --->", data);
+
   return (
-    // <div
-    //   onClick={handleSubjectClicked}
-    //   className={`relative rounded-xl cursor-pointer p-4 shadow-lg ${backgroundColor} border border-gray-100`}
-    // >
-    //   <div className="flex justify-end items-center mb-4">
-    //     {currentProgress && (
-    //       <div style={{ width: 60, height: 60 }}>
-    //         <CircularProgressbar
-    //           value={percentage}
-    //           text={`${percentage}%`}
-    //           styles={buildStyles({
-    //             rotation: 0,
-    //             strokeLinecap: "round",
-    //             textSize: "20px",
-    //             pathTransitionDuration: 0.5,
-    //             pathColor:
-    //               percentage < 33
-    //                 ? "#FF6347" // Red for < 33%
-    //                 : percentage < 50
-    //                 ? "#FFA500" // Orange for < 50%
-    //                 : percentage < 75
-    //                 ? "#FFD700" // Yellow for < 75%
-    //                 : "#32CD32", // Green for 75% and above
-    //             textColor: "#000", // Black text color for clarity
-    //             trailColor: "#f4e7ff", // Light purple for the empty part
-    //             backgroundColor: "#DA70D6", // Light purple/pinkish background color
-    //           })}
-    //         />
-    //       </div>
-    //     )}
-    //   </div>
-    //   {/* <NavLink to={`/student_class/${classId}/${data.subjectId}/module`}> */}
-    //   <h2 className="text-xl font-bold text-white w-[65%]">
-    //     {data?.subjectName}
-    //   </h2>
-    //   <div className="flex items-center mt-2 text-white">
-    //     <span className="flex items-center mr-2 gap-1">
-    //       <LuUser />
-    //       <span>{data?.studentCount || 0}</span>
-    //     </span>
-    //     <span className="border-r-2 border-white h-5 mr-2"></span>
-    //     <span className="flex items-center gap-1">
-    //       <BsBook />
-    //       <span>{data?.moduleCount || 0} Modules</span>
-    //     </span>
-    //   </div>
-    //   {/* </NavLink> */}
-    //   <div className="flex items-center mt-12">
-    //     {data.teacherProfile ? (
-    //       <img
-    //         src={data.teacherProfile}
-    //         alt="Teacher Profile"
-    //         className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110"
-    //       />
-    //     ) : (
-    //       <CiUser className="w-10 h-10 bg-transparent text-white " />
-    //     )}
-
-    //     <div className="ml-3">
-    //       <p className="text-white font-semibold">
-    //         {data?.teacher || "No teacher assigned"}
-    //       </p>
-    //       <p className="text-white text-sm">Teacher</p>
-    //     </div>
-    //   </div>
-    //   <img
-    //     src={ClassCardBookImg}
-    //     alt="icon"
-    //     className="absolute bottom-6 right-6 h-28"
-    //   />
-    // </div>
-
     <div
       onClick={handleSubjectClicked}
-      className={`relative rounded-xl cursor-pointer p-4 shadow-lg ${backgroundColor} border border-gray-100`}
+      className={`relative rounded-xl cursor-pointer py-2 px-4 shadow-lg ${backgroundColor} border border-gray-100`}
     >
       {/* Subject Name and Progress Bar */}
       <div className="flex justify-between items-start mt-4">
@@ -119,11 +50,11 @@ const SubjectCard = ({
           </h2>
 
           <div className="flex items-center mt-2  text-white">
-            <span className="flex items-center mr-2 gap-1">
+            {/* <span className="flex items-center mr-2 gap-1">
               <LuUser />
-              <span>{data?.studentCount || 0}</span>
-            </span>
-            <span className="border-r-2 border-white h-5 mr-2"></span>
+              <span>{data?.studentsCount || 0}</span>
+            </span> */}
+            <span className=" h-5 mr-2"></span>
             <span className="flex items-center gap-1">
               <BsBook />
               <span>{data?.moduleCount || 0} Modules</span>
@@ -161,26 +92,28 @@ const SubjectCard = ({
       {/* Student Count and Modules Section */}
 
       {/* Teacher Info */}
-      <div className="flex items-end justify-between mt-8">
-        <div className="flex items-center">
-          {data.teacherProfile ? (
+      <div className="flex items-end justify-between py-5">
+        {/* Teacher Profile / Display */}
+        <div className="flex items-end">
+          {data?.teacherProfile ? (
             <img
               src={data.teacherProfile}
               alt="Teacher Profile"
               className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110 object-cover"
             />
           ) : (
-            <CiUser className="w-10 h-10 bg-transparent text-white" />
+            <TeacherDisplay data={data} />
           )}
-
-          <div className="ml-3">
-            <p className="text-white font-semibold">
-              {data?.teacher || "No teacher assigned"}
-            </p>
-            <p className="text-white text-sm">Teacher</p>
-          </div>
         </div>
-        <img src={data.subjectIcon ? data.subjectIcon:ClassCardBookImg} alt="icon" className="h-28" />
+
+        {/* Subject Icon */}
+        <div className="flex items-end">
+          <img
+            src={data.subjectIcon ? data.subjectIcon : ClassCardBookImg}
+            alt="icon"
+            className="h-28 w-28 object-contain"
+          />
+        </div>
       </div>
     </div>
   );

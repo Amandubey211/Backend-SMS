@@ -7,25 +7,23 @@ const AttendanceDashboard = ({ attendanceSummary, error }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data loading
     if (attendanceSummary || error) {
-      setLoading(false); // Stop loading if attendanceSummary exists or if there's an error
+      setLoading(false);
     }
   }, [attendanceSummary, error]);
 
   return (
-    <div className="attendance-dashboard w-[100%]  pt-4 px-5 ">
-      <h1 className="text-xl font-semibold text-gray-600">Attendance</h1>
+    <div className="attendance-dashboard w-[95%] mx-4 rounded-md">
+      <h1 className="text-lg font-semibold text-black mt-3">Attendance</h1>
 
       {loading ? (
         <div className="flex items-center justify-center mt-4">
-          <Spinner /> {/* Show spinner while loading */}
+          <Spinner />
         </div>
       ) : error ? (
         <div className="flex flex-col items-center justify-center text-gray-500 mt-4">
           <FaUserGraduate size={80} />
           <span className="mt-4 text-lg font-semibold">{error}</span>{" "}
-          {/* Show error message */}
         </div>
       ) : !attendanceSummary ||
         (!attendanceSummary.present?.some((day) => day > 0) &&
@@ -38,7 +36,7 @@ const AttendanceDashboard = ({ attendanceSummary, error }) => {
           </span>
         </div>
       ) : (
-        <div className="justify-center text-center w-full">
+        <div className="justify-center text-center w-full h-[330px] my-4 ">
           <AttendanceChart
             data={[
               "January",

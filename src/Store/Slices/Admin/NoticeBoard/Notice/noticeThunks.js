@@ -1,24 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
-import { deleteData, getData, postData, putData } from "../../../../../services/apiEndpoints";
+import {
+  deleteData,
+  getData,
+  postData,
+  putData,
+} from "../../../../../services/apiEndpoints";
 import { getAY } from "../../../../../Utils/academivYear";
 import { getUserRole } from "../../../../../Utils/getRoles";
 import toast from "react-hot-toast";
 
-
-
-
 // Fetch all notices
+// Fetch all notices with pagination support
 export const fetchNoticesThunk = createAsyncThunk(
   "notice/fetchAll",
-  async (_, { rejectWithValue, dispatch, getState }) => {
+  async (page = 1, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/${getRole}/all/notices?say=${say}`);
-      return response?.notices;
+      // Append the page number for pagination
+      const response = await getData(
+        `/${getRole}/all/notices?say=${say}&page=${page}`
+      );
+      console.log(response, "fetched notices");
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -35,7 +42,8 @@ export const createNoticeThunk = createAsyncThunk(
       dispatch(setShowError(false));
       const response = await postData(
         `/${getRole}/create_notice?say=${say}`,
-        noticeData);
+        noticeData
+      );
       dispatch(fetchNoticesThunk());
       return response;
     } catch (error) {
@@ -47,14 +55,18 @@ export const createNoticeThunk = createAsyncThunk(
 // Update notice
 export const updateNoticeThunk = createAsyncThunk(
   "notice/update",
-  async ({ noticeId, updatedData }, { rejectWithValue, dispatch, getState }) => {
+  async (
+    { noticeId, updatedData },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const response = await putData(
         `/${getRole}/update/notice/${noticeId}?say=${say}`,
-        updatedData);
+        updatedData
+      );
       dispatch(fetchNoticesThunk());
       return response;
     } catch (error) {
@@ -72,7 +84,7 @@ export const deleteNoticeThunk = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       await deleteData(`/${getRole}/delete/notice/${noticeId}?say=${say}`);
-      toast.success('Notice Delete successfully')
+      toast.success("Notice Delete successfully");
       dispatch(fetchNoticesThunk());
 
       return noticeId;

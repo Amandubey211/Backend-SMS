@@ -29,11 +29,11 @@ const sidebarData = [
     icon: <MdLocalLibrary />,
     path: "/student_library",
   },
-  {
-    title: "Time Table",
-    icon: <ImTable2 />,
-    path: "/student_timetable",
-  },
+  // {
+  //   title: "Time Table",
+  //   icon: <ImTable2 />,
+  //   path: "/student_timetable",
+  // },
   {
     title: "Notice Board",
     icon: <MdOutlineNotificationsActive />,

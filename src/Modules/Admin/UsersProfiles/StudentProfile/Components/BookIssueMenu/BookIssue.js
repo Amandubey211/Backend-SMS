@@ -8,6 +8,7 @@ import { studentIssueBooks } from "../../../../../../Store/Slices/Admin/Users/St
 import Spinner from "../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import SkeletonLoader from "../../../../../../Utils/SkeletonLoader";
 
 const BookIssue = () => {
   const { cid:id } = useParams();
@@ -74,19 +75,19 @@ const BookIssue = () => {
           </div>
         ))}
       </div>
-      {loading?<div className="flex w-full h-[90vh] flex-col items-center justify-center">
-   <Spinner/>
-    </div>:
+      {loading?
+   <SkeletonLoader/>
+    :
       <div className="overflow-x-auto bg-white shadow rounded-lg">
         <table className="min-w-full">
           <thead>
             <tr className="text-left text-gray-700 bg-gray-100">
-              <th className="px-5 py-3 border-b border-gray-200">Issue Book</th>
-              <th className="px-5 py-3 border-b border-gray-200">Author</th>
-              <th className="px-5 py-3 border-b border-gray-200">Category</th>
-              <th className="px-5 py-3 border-b border-gray-200">Issue Date</th>
-              <th className="px-5 py-3 border-b border-gray-200">Return Date</th>
-              <th className="px-5 py-3 border-b border-gray-200">Status</th>
+              <th className="px-2 py-3 border-b border-gray-200">Issue Book</th>
+              <th className="px-2 py-3 border-b border-gray-200">Author</th>
+              <th className="px-2 py-3 border-b border-gray-200">Category</th>
+              <th className="px-2 py-3 border-b border-gray-200">Issue Date</th>
+              <th className="px-2 py-3 border-b border-gray-200">Return</th>
+              <th className="px-2 py-3 border-b border-gray-200">Status</th>
             </tr>
           </thead>
           {filteredBookIssueData?.length > 0 ?  <tbody>
