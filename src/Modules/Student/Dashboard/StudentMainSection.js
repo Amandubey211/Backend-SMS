@@ -67,11 +67,12 @@ const StudentMainSection = () => {
   const handlePayNow = () => {
     navigate("/student_finance");
   };
+
   return (
-    <div className="flex flex-row bg-gray-100 w-full">
+    <div className="flex flex-row w-full">
       {/* Left Section */}
-      <div className=" w-[65%]">
-        <div className=" flex flex-wrap justify-start gap-4 py-3 w-full  px-4">
+      <div className="w-[65%]">
+        <div className="flex flex-wrap justify-start gap-4 py-3 w-full px-4">
           {(cardData?.length
             ? cardData
             : [
@@ -81,7 +82,7 @@ const StudentMainSection = () => {
                   bgColor: "bg-purple-100",
                   textColor: "text-black-500",
                   pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
-                  icon: <MdOutlineSchool className="text-xl text-white" />, // Exam Icon
+                  icon: <MdOutlineSchool className="text-xl text-white" />,
                   url: "/student_dash",
                 },
                 {
@@ -90,7 +91,7 @@ const StudentMainSection = () => {
                   bgColor: "bg-red-100",
                   textColor: "text-black-500",
                   pentagonColor: "bg-red-500",
-                  icon: <MdAttachMoney className="text-xl text-white" />, // Money Icon
+                  icon: <MdAttachMoney className="text-xl text-white" />,
                   url: "/student_finance",
                 },
                 {
@@ -99,7 +100,7 @@ const StudentMainSection = () => {
                   bgColor: "bg-blue-100",
                   textColor: "text-black-500",
                   pentagonColor: "bg-blue-500",
-                  icon: <MdEvent className="text-xl text-white" />, // Calendar Event Icon
+                  icon: <MdEvent className="text-xl text-white" />,
                   url: "/student/noticeboard/events",
                 },
                 {
@@ -108,7 +109,7 @@ const StudentMainSection = () => {
                   bgColor: "bg-orange-100",
                   textColor: "text-black-500",
                   pentagonColor: "bg-orange-500",
-                  icon: <MdNotifications className="text-xl text-white" />, // Notification Bell Icon
+                  icon: <MdNotifications className="text-xl text-white" />,
                   url: "/student/noticeboard/announcements",
                 },
               ]
@@ -117,44 +118,47 @@ const StudentMainSection = () => {
           ))}
         </div>
 
-        {/* Subjects and task */}
-        <div className="flex flex-1  h-[480px] w-[100%] relative ">
-          {/* subject */}
-          <div className="w-[60%]  flex items-start justify-start pb-4 pl-1 h-full">
+        {/* Subjects and Task */}
+        <div className="flex flex-1 h-[480px] w-[100%] relative">
+          {/* Subject Section */}
+          <div className="w-[60%] flex items-start justify-start pb-4 pl-1 h-full">
             <div className="w-full h-full">
-              <div className="px-4 pt-4 mx-3 rounded-md bg-white">
-                <div className="flex justify-between items-center mb-2 ">
+              {/* Card container with full height and flex layout */}
+              <div className="px-4 pt-4 mx-3 rounded-md bg-white border hover:shadow-sm h-full flex flex-col">
+                <div className="flex justify-between items-center mb-2">
                   <h2 className="text-lg font-semibold text-black">
                     My Subject
                   </h2>
-
                   <span
-                    className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent font-normal cursor-pointer"
+                    className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] bg-clip-text text-transparent font-normal cursor-pointer"
                     onClick={() => navigate("/student_class")}
                   >
                     See All
                   </span>
                 </div>
                 {loading ? (
-                  <div className="flex justify-center items-center py-5 h-[480px] mt-7 mb-5">
+                  <div className="flex justify-center items-center py-5 h-full mt-7 mb-5">
                     <Spinner />
                   </div>
                 ) : subjectError ? (
-                  <div className="text-gray-500 h-[480px] flex flex-col items-center mt-7 mb-5">
+                  <div className="text-gray-500 h-full flex flex-col items-center mt-7 mb-5">
                     <AiOutlineBook size={50} />
                     <span className="mt-4 text-lg font-semibold text-center">
                       {subjectError}
                     </span>
                   </div>
                 ) : subjects?.length > 0 ? (
-                  <div>
+                  // Flex container that fills available height even if there's only one subject
+                  <div className="flex flex-col h-full">
                     <p className="text-sm text-gray-500">
                       A total of {subjects?.length} Courses are in Progress
                     </p>
-                    <AllSubjects subjects={studentSubjectProgress} />
+                    <div className="flex-grow">
+                      <AllSubjects subjects={studentSubjectProgress} />
+                    </div>
                   </div>
                 ) : (
-                  <div className="text-gray-500 flex flex-col items-center mt-7 mb-5">
+                  <div className="text-gray-500 flex flex-col items-center h-full mt-7 mb-5">
                     <AiOutlineBook size={50} />
                     <span className="mt-4 text-lg font-semibold text-center">
                       No Data Found
@@ -164,14 +168,14 @@ const StudentMainSection = () => {
               </div>
             </div>
           </div>
-          {/* task */}
+
+          {/* Task Section */}
           <div className="flex flex-col h-[300px] gap-1 w-[40%] mr-5">
-            <div className="w-full h-full p-4 bg-white rounded-md mb-2">
+            <div className="w-full h-full p-4 bg-white border rounded-md hover:shadow-sm mb-2">
               <h1 className="text-lg font-semibold text-black">Task</h1>
               <TaskCompletionChart />
             </div>
-            <div className="flex w-full h-[300px] justify-between p-2 bg-white rounded-md mb-4">
-              {/* <div className="flex flex-col border-b border-gray-200 p-4"> */}
+            <div className="flex w-full h-[300px] justify-between p-2 bg-white rounded-md border hover:shadow-sm mb-4">
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
                 amount={unpaidFees || 0}
@@ -181,8 +185,8 @@ const StudentMainSection = () => {
             </div>
           </div>
         </div>
-        <div className=" ml-4  mr-5 mb-4">
-          <div className=" flex items-start justify-start w-[100%] rounded-md bg-white">
+        <div className="ml-4 mr-5 mb-4">
+          <div className="flex items-start justify-start w-[100%] border rounded-md bg-white hover:shadow-sm">
             <AttendanceDashboard
               attendanceSummary={dashboardAttendance}
               error={attendanceError}
@@ -193,16 +197,13 @@ const StudentMainSection = () => {
 
       {/* Right Section */}
       <div className="flex flex-col w-[35%] mr-4">
-        {/* event */}
-        <div className="w-full px-4 py-3 h-[510px] bg-white rounded-md mt-3">
-          <h1 className="text-md font-semibold text-black mb-2">
-            Today's Event
-          </h1>
+        {/* Event Section */}
+        <div className="w-full px-4 py-3 h-[510px] bg-white rounded-md mt-3 border hover:shadow-sm">
           <StudentEvents />
         </div>
         {/* Notice Board */}
-        <div className="flex w-full bg-white items-start justify-start px-4 pb-2 mt-3 rounded-md ">
-          <div className="w-full ">
+        <div className="flex w-full bg-white items-start justify-start px-4 pb-2 mt-3 rounded-md border hover:shadow-sm">
+          <div className="w-full h-full">
             <DashboardNoticeBoard descriptionLength={58} />
           </div>
         </div>
