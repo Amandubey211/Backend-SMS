@@ -65,10 +65,8 @@ export const verifyStudent = createAsyncThunk(
         verificationDetails
       );
 
-      if (!verifyResponse?.success) {
-        return rejectWithValue(
-          verifyResponse.data.msg || "Failed to verify student"
-        );
+      if (!verifyResponse.success) {
+        return toast.error(verifyResponse.msg);
       }
 
       // Collect success messages
