@@ -43,6 +43,7 @@ const SummaryTotalRevenue = () => {
       limit: 5, // Limit to 5 records
       sortBy: "earnedDate",
       sortOrder: "desc",
+      search: "",
     };
     debouncedFetch(params);
   }, [debouncedFetch]);

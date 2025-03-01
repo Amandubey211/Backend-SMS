@@ -43,7 +43,7 @@ const FeeTable = ({ feesDetails }) => {
           {!loading && feesDetails?.length === 0 && (
             <tr>
               <td colSpan="5" className="text-center py-10">
-                <NoDataFound title="No Fees Data" />
+                <NoDataFound title=" Fees Data" />
               </td>
             </tr>
           )}
