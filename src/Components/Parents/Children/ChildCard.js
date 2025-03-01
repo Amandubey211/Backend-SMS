@@ -18,7 +18,7 @@ const ChildCard = ({ student }) => {
     transition: 'box-shadow 0.3s ease-in-out',
     textAlign: 'center',
     // Removed width: '100%' so they can shrink if needed
-    minWidth: '120px', // optional: ensures a comfortable button size
+    minWidth: '125px', // optional: ensures a comfortable button size
   };
 
   const primaryButtonTextGradientStyle = {
@@ -43,8 +43,9 @@ const ChildCard = ({ student }) => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: '16px',
-    width: '100%',
+    marginTop: '12px',
+ 
+    width: '78%',
   };
 
   const arrowIconStyle = {
