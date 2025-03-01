@@ -15,6 +15,9 @@ import { fetchAllIncomes } from "../../../../../../Store/Slices/Finance/Earnings
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/Earnings/earningsSlice";
 import EditStudentFeesForm from "../../../../Finance/StudentFees/EditStudentFeesForm";
+import StudentCard from "../../../../Finance/StudentFees/Components/StudentCard";
+import { FaDollarSign, FaExclamationCircle, FaWallet } from "react-icons/fa";
+import SkeletonLoader from "../../../../../../Utils/SkeletonLoader";
 
 
 
@@ -23,7 +26,7 @@ const StudentFinance = ({ student }) => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { incomes, loading, error, totalRecords, totalPages, currentPage } =
+  const { incomes, loading, error, totalRecords, totalPages, currentPage,remainingPartialPaidRevenue,totalRevenue,totalPaidAmount } =
     useSelector((state) => state.admin.earnings);
   const [computedPageSize, setComputedPageSize] = useState(10);
 
@@ -37,6 +40,7 @@ const StudentFinance = ({ student }) => {
     includeDetails: true,
     classId: "",
     sectionId: "",
+    startDate:"",
     studentId:student._id,
     subCategory: "",
     page: currentPage,
@@ -125,7 +129,7 @@ const StudentFinance = ({ student }) => {
       ellipsis: true,
     },
     {
-      title: "Paid Date",
+      title: "Entry Date",
       dataIndex: "paidDate",
       key: "paidDate",
       sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
@@ -161,7 +165,23 @@ const StudentFinance = ({ student }) => {
     setIsEditModalVisible(false);
   };
 
-
+ const studentCardsData = [
+    {
+      title: "Paid Fees",
+      value: `${remainingPartialPaidRevenue.toFixed(2) || 0} QAR`,
+      icon: <FaWallet />, // Appropriate icon for collected fees
+    },
+    {
+      title: "Unpaid Fees",
+      value: `${totalPaidAmount?.toFixed(2) || 0} QAR`,
+      icon:<FaExclamationCircle /> , // Icon for due fees or wallet
+    },
+    {
+      title: "Total Fess",
+      value: `${totalRevenue?.toFixed(2) || 0} QAR`,
+      icon: <FaDollarSign />, // Icon for outstanding balance (exclamation for pending)
+    },
+  ];
 return(
 <>
         <ProtectedSection
@@ -170,10 +190,14 @@ return(
         >
           <div className="p-6 bg-white rounded-lg">
            
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-2 place-items-center">
+      {studentCardsData?.map((item, index) => (
+        <StudentCard key={index} {...item} />
+      ))}
+    </div>
             <div className="mt-6">
               {loading ? (
-                <Spinner />
+                <SkeletonLoader/>
               ) : (
                 <Table
                   dataSource={incomes}
@@ -197,6 +221,7 @@ return(
                           includeDetails: true,
                           classId: "",
                           sectionId: "",
+                          studentId:student._id,
                           subCategory: "",
                           page: page,
                           search: searchText,

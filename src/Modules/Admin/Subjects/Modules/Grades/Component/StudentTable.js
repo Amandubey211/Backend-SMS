@@ -25,7 +25,7 @@ const components = {
  * TableSkeleton renders a custom skeleton UI that mimics the table rows.
  * It uses a flex layout to simulate the columns of the table.
  */
-const TableSkeleton = () => {
+ export const TableSkeleton = () => {
   // Number of skeleton rows to display
   const skeletonRows = 10;
 
