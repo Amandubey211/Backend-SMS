@@ -14,11 +14,28 @@ import { Tooltip } from "antd";
 
 const localizer = momentLocalizer(moment);
 
+// 1) Define a list of light/pastel Tailwind color classes
+const pastelColors = [
+  "bg-pink-100",
+  "bg-blue-100",
+  "bg-green-100",
+  "bg-yellow-100",
+  "bg-purple-100",
+  "bg-indigo-100",
+  "bg-red-100",
+  "bg-orange-100",
+  "bg-teal-100",
+];
+
 const StudentEvents = () => {
   const { eventData, selectedEvent, selectedMonthYear } = useSelector(
     (store) => store.student.studentEvent
   );
   const [eventIndex, setEventIndex] = useState(0);
+
+  // 2) Local state to store the random color class for the selected event(s)
+  const [bgColor, setBgColor] = useState("bg-gray-200");
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -48,6 +65,16 @@ const StudentEvents = () => {
     }
   }, [eventData, dispatch]);
 
+  // 3) Whenever 'selectedEvent' changes, pick a new random pastel color
+  useEffect(() => {
+    if (selectedEvent.length > 0) {
+      const randomIndex = Math.floor(Math.random() * pastelColors.length);
+      setBgColor(pastelColors[randomIndex]);
+    } else {
+      setBgColor("bg-gray-200");
+    }
+  }, [selectedEvent]);
+
   const events = eventData?.map((event) => ({
     title: event.title,
     start: moment(event?.date).toDate(),
@@ -63,7 +90,6 @@ const StudentEvents = () => {
 
   const dayPropGetter = (date) => {
     const formattedDate = moment(date).format("YYYY-MM-DD");
-
     if (eventDates.has(formattedDate)) {
       return {
         className: "event-day",
@@ -82,7 +108,6 @@ const StudentEvents = () => {
         ? selectedMonthYear.year - 1
         : selectedMonthYear.year;
     const adjustedMonth = newMonth > 11 ? 0 : newMonth < 0 ? 11 : newMonth;
-
     dispatch(
       setSelectedMonthYear({
         month: adjustedMonth,
@@ -117,7 +142,7 @@ const StudentEvents = () => {
       {/* Month Navigation */}
       <div className="flex justify-center items-center gap-8 p-4 bg-gray-100 rounded-lg mb-2">
         <button
-          className="p-1 border rounded-full hover:bg-purple-500 hover:text-white"
+          className="p-1 border rounded-full hover:bg-gray-700 hover:text-white"
           onClick={() => handleMonthChange(-1)}
         >
           <IoIosArrowBack />
@@ -129,7 +154,7 @@ const StudentEvents = () => {
           }).format("MMMM YYYY")}
         </h2>
         <button
-          className="p-1 border rounded-full hover:bg-purple-500 hover:text-white"
+          className="p-1 border rounded-full hover:bg-gray-700 hover:text-white"
           onClick={() => handleMonthChange(1)}
         >
           <IoIosArrowForward />
@@ -167,7 +192,8 @@ const StudentEvents = () => {
                 index === eventIndex && (
                   <div
                     key={event.id}
-                    className={`mt-3 p-3 rounded-lg bg-purple-100 flex items-center gap-2 w-full`}
+                    // 4) Apply the dynamic pastel background color here
+                    className={`mt-3 p-3 rounded-lg flex items-center gap-2 w-full ${bgColor}`}
                   >
                     <img
                       src={announcement}
@@ -176,7 +202,7 @@ const StudentEvents = () => {
                     />
                     <div>
                       <Tooltip title={event.title}>
-                        <h3 className="text-md w-[250px] truncate font-semibold text-purple-700">
+                        <h3 className="text-md w-[250px] truncate font-semibold text-gray-900">
                           {event.title}
                         </h3>
                       </Tooltip>
@@ -186,7 +212,7 @@ const StudentEvents = () => {
                         )}{" "}
                         ({event.time})
                       </h3>
-                      <p className="text-gray-500 text-xs">
+                      <p className="text-gray-700 text-xs">
                         {event.description}
                       </p>
                     </div>
@@ -197,24 +223,24 @@ const StudentEvents = () => {
           {selectedEvent.length > 1 && (
             <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between">
               <button
-                className={`p-1 bg-gray-200 rounded-full ${
+                className={`p-1 bg-gray-300 rounded-full ${
                   eventIndex === 0
                     ? "opacity-50 cursor-not-allowed"
                     : "cursor-pointer"
                 }`}
                 onClick={() => handleEventScroll(-1)}
-                disabled={eventIndex === 0} // This can be removed, but kept for extra measure
+                disabled={eventIndex === 0}
               >
                 <IoIosArrowBack />
               </button>
               <button
-                className={`p-1 bg-gray-200 rounded-full ${
+                className={`p-1 bg-gray-300 rounded-full ${
                   eventIndex === selectedEvent.length - 1
                     ? "opacity-50 cursor-not-allowed"
                     : "cursor-pointer"
                 }`}
                 onClick={() => handleEventScroll(1)}
-                disabled={eventIndex === selectedEvent.length - 1} // This can be removed, but kept for extra measure
+                disabled={eventIndex === selectedEvent.length - 1}
               >
                 <IoIosArrowForward />
               </button>
@@ -230,55 +256,55 @@ const StudentEvents = () => {
       {/* Custom Styles */}
       <style>
         {`
-    .event-day {
-      position: relative;
-      text-align: center;
-      cursor: pointer;
-    }
-    .rbc-month-view {
-      border-radius: 10px;
-      background: linear-gradient(to bottom, #ffeff1, #e3f2fd);
-      padding: 10px;
-    }
-    .rbc-header {
-      font-weight: bold;
-      color: #6a0572;
-      font-size: 12px;
-      text-align: center;
-    }
-    .rbc-today {
-      background-color: rgba(255, 182, 193, 0.4) !important;
-      border-radius: 8px;
-    }
-    .rbc-date-cell {
-      display: flex;
-      // top: 16px;
-      // left: 2px;
-      justify-content: center;
-      align-items: center;
-      font-size: 12px;
-      position: relative;
-      padding:0 !important
-    }
-    .event-day::after {
-      content: "";
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 20px;
-      height: 20px;
-      background-color: rgba(128, 0, 128, 0.3);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1; /* Lower z-index */
-    }
-    .event-day span {
-      position: absolute;
-      z-index: 2; 
-      cursor: pointer;
-    }
-  `}
+          .rbc-month-view {
+            border-radius: 4px; /* Reduced rounding */
+            background-color: #ffffff;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+          }
+          .rbc-header {
+            font-weight: bold;
+            color: #333333;
+            font-size: 12px;
+            text-align: center;
+          }
+          .rbc-today {
+            background-color: #f0f0f0 !important;
+            border-radius: 4px; /* Consistent rounding with the month view */
+          }
+          .rbc-date-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+            position: relative;
+            padding: 0 !important;
+            text-align: center; /* Ensures the date number is centered */
+          }
+          .event-day {
+            position: relative;
+            text-align: center;
+            cursor: pointer;
+          }
+          .event-day::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+          }
+          .event-day span {
+            position: absolute;
+            z-index: 2; 
+            cursor: pointer;
+          }
+        `}
       </style>
     </div>
   );
