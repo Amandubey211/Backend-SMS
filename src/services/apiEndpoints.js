@@ -34,7 +34,12 @@ export const putData = async (endpoint, data) => {
     const response = await apiService.put(endpoint, data);
     return response?.data;
   } catch (error) {
-    return error;
+    console.log("error", error);
+    if (error.response && error.response.data) {
+      console.log(error.response.data, "sdf");
+
+      return error.response.data;
+    }
   }
 };
 
