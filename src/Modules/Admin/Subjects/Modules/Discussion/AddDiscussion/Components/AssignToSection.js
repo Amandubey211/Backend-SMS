@@ -22,11 +22,15 @@ const AssignToSection = ({
         />
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>
+      {/* For Discussion, pass singular field names since backend expects "sectionId" and "groupId" */}
       <SectionSelect
         assignTo={assignTo}
-        sectionId={sectionId}
-        groupId={groupId}
+        sectionValue={sectionId} // array of section IDs
+        groupValue={groupId} // array of group IDs
         handleChange={handleChange}
+        multiSelect={true}
+        fieldSection="sectionId"
+        fieldGroup="groupId"
       />
     </div>
   );
