@@ -12,6 +12,7 @@ import { FiLoader } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { GoAlertFill } from "react-icons/go";
 import { fetchStudentSubjects } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import SkeletonLoader from "../../../../../../Utils/SkeletonLoader";
 const GradeAccordionItem = ({  getData }) => {
   const [isOpen, setIsOpen] = useState(null);
 
@@ -85,10 +86,7 @@ dispatch(fetchStudentSubjects(cid))
                 {loading ? (
                   <tr>
                     <td className="text-center text-2xl py-10 text-gray-400" colSpan={6} >
-                      <div className="flex w-full flex-col items-center">
-                        <FiLoader className="animate-spin mr-2 w-[2rem] h-[2rem] " />
-                        <p className="text-gray-800 text-sm">Loading...</p>
-                      </div>
+                      <SkeletonLoader/>
                     </td>
                   </tr>
                 ) : (

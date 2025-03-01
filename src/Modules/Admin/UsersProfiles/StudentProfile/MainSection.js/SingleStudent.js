@@ -30,9 +30,9 @@ const SingleStudent = () => {
   }, [dispatch]);
   const student = allStudents?.find((s) => s._id === cid);
 
-  if (!loading && !student) {
-    return <div className="text-center my-10">Student not found</div>;
-  }
+  // if (!loading && !student) {
+  //   return <div className="text-center my-10">Student not found</div>;
+  // }
 
   const renderContent = () => {
     const menuComponents = {

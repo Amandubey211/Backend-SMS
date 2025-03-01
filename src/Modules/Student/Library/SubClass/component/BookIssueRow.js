@@ -18,7 +18,7 @@ const BookIssueRow = ({ item }) => {
   return (
     <tr className="text-left text-gray-700 capitalize">
       {/* Book Image and Name */}
-      <td className="px-5 py-4 border-b border-gray-200">
+      <td className="px-3 py-4 border-b border-gray-200">
         <div className="flex items-center">
           <div className="rounded-full border border-gray-200 overflow-hidden w-10 h-10 flex items-center justify-center">
             {item?.bookId?.image ? (
@@ -40,31 +40,31 @@ const BookIssueRow = ({ item }) => {
       </td>
 
       {/* Author */}
-      <td className="px-5 py-4 border-b border-gray-200">
+      <td className="px-3 py-4 border-b border-gray-200">
         <span className="text-gray-800">
           {item?.author || t("Unknown Author", gt.stdLibrary)}
         </span>
       </td>
 
       {/* Category */}
-      <td className="px-5 py-4 border-b border-gray-200">
+      <td className="px-3 py-4 border-b border-gray-200">
         <span className="text-gray-800">
           {item?.bookId?.category || t("Unknown Category", gt.stdLibrary)}
         </span>
       </td>
 
       {/* Issue Date */}
-      <td className="px-5 py-4 border-b border-gray-200">
+      <td className="px-3 py-4 border-b border-gray-200">
         <span>{formatDate(item?.issueDate)}</span>
       </td>
 
       {/* Return Date */}
-      <td className="px-5 py-4 border-b border-gray-200">
+      <td className="px-3 py-4 border-b border-gray-200">
         <span>{formatDate(item?.returnDate)}</span>
       </td>
 
       {/* Status */}
-      <td className="px-5 py-4 border-b border-gray-200">
+      <td className="px-3 py-4 border-b border-gray-200">
         <span
           className={`inline-block px-3 py-1 text-md font-semibold rounded-full ${item?.status === "Return"
               ? "bg-green-100 text-green-800"
