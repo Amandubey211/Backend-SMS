@@ -55,8 +55,8 @@ const initialFormState = {
   availableFrom: "",
   until: "",
   thumbnail: null,
-  moduleId: "",
-  chapterId: "",
+  moduleId: null,
+  chapterId: null,
   groupIds: [], // updated from groupId
 };
 
@@ -139,8 +139,8 @@ const MainSection = ({ setIsEditing }) => {
         availableFrom: assignment.availableFrom || "",
         until: assignment.until || "",
         thumbnail: assignment.thumbnail || null,
-        moduleId: assignment.moduleId || "",
-        chapterId: assignment.chapterId || "",
+        moduleId: assignment.moduleId || null,
+        chapterId: assignment.chapterId || null,
         groupIds: assignment.groupIds || [], // updated here
       });
       setExistingRubricId(assignment.rubricId || null);
@@ -191,8 +191,8 @@ const MainSection = ({ setIsEditing }) => {
         thumbnail: formState.thumbnail,
         classId: cid,
         subjectId: sid,
-        moduleId: formState.moduleId,
-        chapterId: formState.chapterId,
+        moduleId: formState.moduleId || null,
+        chapterId: formState.chapterId || null,
         publish,
       };
 
