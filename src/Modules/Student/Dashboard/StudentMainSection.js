@@ -175,7 +175,7 @@ const StudentMainSection = () => {
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
                 amount={unpaidFees || 0}
-                buttonText="Pay Now"
+                buttonText="View More"
                 buttonAction={handlePayNow}
               />
             </div>
