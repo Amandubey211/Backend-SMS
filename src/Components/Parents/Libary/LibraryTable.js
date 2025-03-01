@@ -197,24 +197,6 @@ const LibraryTable = () => {
    */
   const renderLoading = () => <LibraryRowSkeleton rows={3} />;
 
-  const renderNoDataMessage = () => (
-    <tr>
-      <td colSpan={columns.length}>
-        <div
-          className="flex flex-col items-center justify-center text-center py-4"
-          style={{
-            width: '100%',
-            height: '200px',
-          }}
-        >
-          <FaBookOpen className="text-gray-400 text-8xl mb-6" />
-          <p className="text-gray-600 text-lg mt-2">
-            {t('No borrowed books at the moment. Encourage your child to explore the library!')}
-          </p>
-        </div>
-      </td>
-    </tr>
-  );
 
   const renderErrorMessage = () => (
     <tr>
@@ -413,7 +395,18 @@ const LibraryTable = () => {
             ? renderLoading()
             : error
             ? renderErrorMessage()
-            : renderNoDataMessage(),
+           : <div
+           className="flex flex-col items-center justify-center text-center py-4"
+           style={{
+             width: '100%',
+             height: '200px',
+           }}
+         >
+           <FaBookOpen className="text-gray-400 text-8xl mb-6" />
+           <p className="text-gray-600 text-lg mt-2">
+             {t('No borrowed books at the moment. Encourage your child to explore the library!')}
+           </p>
+         </div>,
         }}
       />
     </div>
