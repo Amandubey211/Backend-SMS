@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { gt } from '../../../../../../Utils/translator/translation';
 import { useSelector } from 'react-redux';
 
-
 const getStatusIcon = (status) => {
   switch (status) {
     case 'present':
@@ -20,65 +19,59 @@ const getStatusIcon = (status) => {
   }
 };
 
-const CalendarHeader = ({ attendanceData, onPanelChange, currentDate }) => {
+const CalendarHeader = ({ attendanceData, onPanelChange }) => {
   const { t } = useTranslation();
-  // const {academicYear}=useSelector((store)=>console.log(store));
-  // console.log("123==>",seletedAcademicYear,academicYear);
   const StartAcademicYear = 2024; 
-  const currentYear = moment().year(); // Get the current year dynamically
+  const currentYear = moment().year(); 
   const lastAcademicYear = currentYear + 1; 
 
   const dateCellRender = (value) => {
     const dateStr = value.format('YYYY-MM-DD');
     const status = attendanceData[dateStr];
-    return (
-      status ? (
-        <div className='flex flex-col items-center'>
-          <div className='bg-white border border-gray-300 rounded-full p-2 flex items-center'>
-            {getStatusIcon(status)}
-          </div>
-          <span className='mt-1 text-sm'>{status}</span>
+
+    return status ? (
+      <div className='flex flex-col items-center'>
+        <div className='bg-white border border-gray-300 rounded-full p-2 flex items-center'>
+          {getStatusIcon(status)}
         </div>
-      ) : null
-    );
+        <span className='mt-1 text-sm'>{status}</span>
+      </div>
+    ) : null;
   };
 
-
   const headerRender = ({ value, onChange }) => {
-    const currentYear = value.year();
+    const currentYear = value.format('YYYY'); 
     const currentMonth = value.month();
 
-
-    const monthOptions = moment.monthsShort()?.map((month, index) => (
+    const monthOptions = moment.monthsShort().map((month, index) => (
       <option key={index} value={index}>
-        {t(month.toLowerCase(), gt.month)} {/* Translate the short month */}
+        {t(month.toLowerCase(), gt.month)}
       </option>
     ));
-
 
     const yearOptions = [];
     for (let i = StartAcademicYear; i <= lastAcademicYear; i++) {
       yearOptions.push(
         <option key={i} value={i}>
-          {t(i, gt.month)} {/* No need to translate year */}
+          {i} {/* No translation needed for year */}
         </option>
       );
     }
 
     const handleMonthChange = (event) => {
-      const newMonth = event.target.value;
+      const newMonth = parseInt(event.target.value, 10);
       const newValue = value.clone().month(newMonth);
       onChange(newValue);
     };
 
     const handleYearChange = (event) => {
-      const newYear = event.target.value;
+      const newYear = parseInt(event.target.value, 10);
       const newValue = value.clone().year(newYear);
       onChange(newValue);
     };
 
     return (
-      <div className="flex justify-end items-center mb-4"> {/* Right align */}
+      <div className="flex justify-end items-center mb-4">
         <div className="flex space-x-2">
           <select
             value={currentMonth}
@@ -100,8 +93,13 @@ const CalendarHeader = ({ attendanceData, onPanelChange, currentDate }) => {
     );
   };
 
-
-  return <Calendar dateCellRender={dateCellRender} onPanelChange={onPanelChange} headerRender={headerRender} />;
+  return (
+    <Calendar 
+      dateCellRender={dateCellRender} 
+      onPanelChange={onPanelChange} 
+      headerRender={headerRender} 
+    />
+  );
 };
 
 export default CalendarHeader;

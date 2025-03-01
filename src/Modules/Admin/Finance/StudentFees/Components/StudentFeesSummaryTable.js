@@ -22,7 +22,7 @@ const StudentFeesSummaryTable = () => {
     dispatch(
       fetchAllIncomes({
         page: currentPage,
-        search: "",
+        search: " ",
         limit: 10,
         categoryName: "Student-Based Revenue",
         includeDetails:true
