@@ -4,6 +4,7 @@ import { FaCheckCircle, FaTimesCircle, FaMinusCircle } from 'react-icons/fa';
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 import { gt } from '../../../../../../Utils/translator/translation';
+import { useSelector } from 'react-redux';
 
 
 const getStatusIcon = (status) => {
@@ -21,8 +22,11 @@ const getStatusIcon = (status) => {
 
 const CalendarHeader = ({ attendanceData, onPanelChange, currentDate }) => {
   const { t } = useTranslation();
-  const StartAcademicYear = 2015;
-  const lastAcademicYear = 2050;
+  // const {academicYear}=useSelector((store)=>console.log(store));
+  // console.log("123==>",seletedAcademicYear,academicYear);
+  const StartAcademicYear = 2024; 
+  const currentYear = moment().year(); // Get the current year dynamically
+  const lastAcademicYear = currentYear + 1; 
 
   const dateCellRender = (value) => {
     const dateStr = value.format('YYYY-MM-DD');
@@ -97,7 +101,7 @@ const CalendarHeader = ({ attendanceData, onPanelChange, currentDate }) => {
   };
 
 
-  return <Calendar dateCellRender={dateCellRender} onPanelChange={()=>onPanelChange(currentDate)} headerRender={headerRender} />;
+  return <Calendar dateCellRender={dateCellRender} onPanelChange={onPanelChange} headerRender={headerRender} />;
 };
 
 export default CalendarHeader;

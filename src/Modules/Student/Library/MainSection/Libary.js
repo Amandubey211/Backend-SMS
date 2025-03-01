@@ -36,50 +36,9 @@ const Library = () => {
   } = useSelector((store) => store.student.studentLibraryBooks);
   const { showError } = useSelector((store) => store?.common?.alertMsg);
   const { t } = useTranslation();
-  const [allCategories, setAllCategories] = useState();
+  const [allCategories, setAllCategories] = useState([]);
 
   useNavHeading(`${activeTab === "BookIssue" ? "Book Issue" : "Library"}`);
-
-  const handleSwitchTab = (tab) => {
-    dispatch(setActiveTab(tab));
-  };
-
-  const handleSearch = (e) => {
-    dispatch(setSearchQuery(e.target.value));
-    dispatch(setCurrentPage(1));
-  };
-
-  const filteredBooks = useMemo(() => {
-    return libararyBooks?.filter((book) => {
-      const searchLower = searchQuery?.toLowerCase() || "";
-      return (
-        !searchQuery ||
-        book?.name?.toLowerCase().includes(searchLower) ||
-        book?.author?.toLowerCase().includes(searchLower)
-      );
-    });
-  }, [libararyBooks, searchQuery]);
-  //
-  const handleDismiss = () => {
-    dispatch(setShowError(false));
-  };
-
-  const filteredBooksByCategory = useMemo(() => {
-    if (!category) {
-      return filteredBooks;
-    }
-    return filteredBooks?.filter((book) => book?.category === category);
-  }, [filteredBooks, category]);
-
-  useEffect(() => {
-    const categories = new Set();
-    libararyBooks?.forEach((book) => {
-      if (book?.category) {
-        categories.add(book.category);
-      }
-    });
-    setAllCategories(Array.from(categories));
-  }, [libararyBooks]);
 
   useEffect(() => {
     if (activeTab === "Library") {
@@ -96,11 +55,55 @@ const Library = () => {
     }
   }, [dispatch, activeTab, currentPage, searchQuery, category]);
 
+  useEffect(() => {
+    const categories = new Set(["All"]); // Ensure "All" is included
+    libararyBooks?.forEach((book) => {
+      if (book?.category) {
+        categories.add(book.category);
+      }
+    });
+    setAllCategories(Array.from(categories));
+  }, [libararyBooks]);
+
+  const handleSwitchTab = (tab) => {
+    dispatch(setActiveTab(tab));
+  };
+
+  const handleSearch = (e) => {
+    dispatch(setSearchQuery(e.target.value));
+    dispatch(setCurrentPage(1));
+  };
+
+  const handleDismiss = () => {
+    dispatch(setShowError(false));
+  };
+
+  // Function to filter books based on search query
+  const filteredBooks = () => {
+    return libararyBooks?.filter((book) => {
+      const searchLower = searchQuery?.toLowerCase() || "";
+      return (
+        !searchQuery ||
+        book?.name?.toLowerCase().includes(searchLower) ||
+        book?.author?.toLowerCase().includes(searchLower)
+      );
+    });
+  };
+
+  // Function to filter books by category
+  const filteredBooksByCategory = () => {
+    if (!category || category === "All") {
+      return filteredBooks();
+    }
+    return filteredBooks()?.filter((book) => book?.category === category);
+  };
+
   const handlePageChange = (newPage) => {
     if (newPage > 0 && newPage <= totalPages) {
       dispatch(setCurrentPage(newPage));
     }
   };
+
   const libraryContent = () => {
     if (libraryLoading) {
       return (
@@ -110,11 +113,7 @@ const Library = () => {
       );
     }
 
-    if (
-      !libraryLoading &&
-      filteredBooks?.length === 0 &&
-      activeTab === "Library"
-    ) {
+    if (!libraryLoading && filteredBooks()?.length === 0 && activeTab === "Library") {
       return (
         <div className="text-center py-20">
           <NoDataFound />
@@ -123,9 +122,9 @@ const Library = () => {
     }
 
     return (
-      <div className="bg-gray-100">
-        <div className="grid grid-cols-4 gap-3 px-4 pb-4 bg-gray-100">
-          {filteredBooksByCategory?.reverse()?.map((book) => (
+      <div className="">
+        <div className="grid grid-cols-4 gap-3 px-4 pb-4">
+          {filteredBooksByCategory()?.map((book) => (
             <BookCard
               key={book?._id}
               title={book?.title}
@@ -142,6 +141,7 @@ const Library = () => {
             />
           ))}
         </div>
+
         {/* Pagination Controls */}
         {totalPages > 1 && (
           <div className="flex w-[100%] justify-center p-4">
@@ -172,77 +172,58 @@ const Library = () => {
     );
   };
 
-  const bookIssueContent = () => {
-    return <BookIssue />;
-  };
-
-  console.log("serachquery", searchQuery);
-
   return (
     <Layout title="Library | Student Diwan">
       <StudentDashLayout>
         <div>
           <div className="flex items-center gap-5 p-5">
-            <TabButton
-              isActive={activeTab === "Library"}
-              onClick={() => handleSwitchTab("Library")}
-              aria-label="Library tab"
-            >
+            <TabButton isActive={activeTab === "Library"} onClick={() => handleSwitchTab("Library")}>
               {t("Library", gt.stdLibrary)}
             </TabButton>
-            <TabButton
-              isActive={activeTab === "BookIssue"}
-              onClick={() => handleSwitchTab("BookIssue")}
-              aria-label="Book Issue tab"
-            >
+            <TabButton isActive={activeTab === "BookIssue"} onClick={() => handleSwitchTab("BookIssue")}>
               {t("Book Issue", gt.stdLibrary)}
             </TabButton>
-            {activeTab === "Library" ? (
+
+            {activeTab === "Library" && (
               <>
                 <div className="relative flex items-center max-w-xs w-full mr-4">
                   <input
                     type="text"
                     placeholder="Search here"
                     value={searchQuery}
-                    onChange={(event) => handleSearch(event)}
+                    onChange={handleSearch}
                     className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
                   />
                   <button className="absolute right-3">
                     <CiSearch className="w-5 h-5 text-gray-500" />
                   </button>
                 </div>
-                {/* Search & Priority Filters */}
+
                 <div className="w-[25%] pr-4">
                   <select
                     value={category}
                     onChange={(e) => dispatch(setCategory(e.target.value))}
                     className="px-3 py-2 border rounded w-full text-md text-gray-500"
                   >
-                    <option value="" className="text-gray-500">
-                      Select Category
-                    </option>
                     {allCategories?.map((cat) => (
-                      <option key={cat} value={cat}>
+                      <option key={cat} value={cat === "All" ? "" : cat}>
                         {cat}
                       </option>
                     ))}
                   </select>
                 </div>
               </>
-            ) : (
-              ""
             )}
           </div>
 
-          {activeTab === "Library" ? libraryContent() : bookIssueContent()}
+          {activeTab === "Library" ? libraryContent() : <BookIssue />}
         </div>
 
-        {!libraryLoading && showError && (
-          <OfflineModal error={libraryError} onDismiss={handleDismiss} />
-        )}
+        {!libraryLoading && showError && <OfflineModal error={libraryError} onDismiss={handleDismiss} />}
       </StudentDashLayout>
     </Layout>
   );
 };
 
 export default Library;
+

@@ -29,6 +29,7 @@ const AttendanceMain = () => {
   }, [dispatch, currentDate]);
 
   const onPanelChange = (value) => {
+    console.log("onPanelChange", value);
     dispatch(setCurrentDate(value));
   };
 
