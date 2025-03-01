@@ -1,30 +1,30 @@
 import React from "react";
-import OptionRadios from "../../../Discussion/AddDiscussion/Components/OptionRadios";
 import DateInput from "../../../../Component/DateInput";
 import AssignToSection from "../../../Discussion/AddDiscussion/Components/AssignToSection";
 
 const CreateAnnouncementForm = ({
   postTo,
   availableFrom,
-  sectionId,
-  option,
-  handleChange,
-  groupId,
+  sectionId, // array
+  groupId, // array
   author,
+  handleChange,
+  formErrors = {},
+  authorRef,
 }) => {
   return (
     <div>
-      {/* <OptionRadios option={option} handleChange={handleChange} /> */}
       <AssignToSection
         groupId={groupId}
         assignTitle="Post To"
         assignTo={postTo}
         sectionId={sectionId}
         handleChange={handleChange}
+        formErrors={formErrors}
       />
       <div className="mb-4">
         <label htmlFor="author" className="text-gray-500 mb-1">
-          Author
+          Author <span className="text-red-500">*</span>
         </label>
         <input
           id="author"
@@ -33,10 +33,15 @@ const CreateAnnouncementForm = ({
           onChange={handleChange}
           value={author}
           placeholder="Type Name"
-          className="p-2 border border-gray-300 rounded w-full"
+          ref={authorRef}
+          className={`p-2 rounded w-full border ${
+            formErrors.author ? "border-red-500" : "border-gray-300"
+          }`}
         />
+        {formErrors.author && (
+          <p className="text-red-500 text-sm mt-1">{formErrors.author}</p>
+        )}
       </div>
-
       <DateInput
         label="Scheduled Post"
         name="availableFrom"

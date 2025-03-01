@@ -111,7 +111,15 @@ export const createAnnouncement = createAsyncThunk(
 
       // Construct FormData for multipart/form-data requests
       const formData = new FormData();
-      Object.keys(data).forEach((key) => formData.append(key, data[key]));
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
+        // If value is an array, append each item with the same key
+        if (Array.isArray(value)) {
+          value.forEach((item) => formData.append(key, item));
+        } else {
+          formData.append(key, value);
+        }
+      });
 
       // Append semesterId to the body
       formData.append("semesterId", semesterId);
@@ -124,9 +132,7 @@ export const createAnnouncement = createAsyncThunk(
         "post",
         `/${getRole}/announcement?say=${say}`,
         formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
+        { "Content-Type": "multipart/form-data" }
       );
 
       if (response && response.status) {
@@ -155,7 +161,14 @@ export const editAnnouncement = createAsyncThunk(
 
       // Construct FormData for multipart/form-data requests
       const formData = new FormData();
-      Object.keys(data).forEach((key) => formData.append(key, data[key]));
+      Object.keys(data).forEach((key) => {
+        const value = data[key];
+        if (Array.isArray(value)) {
+          value.forEach((item) => formData.append(key, item));
+        } else {
+          formData.append(key, value);
+        }
+      });
 
       // Append semesterId to the body
       formData.append("semesterId", semesterId);
@@ -168,9 +181,7 @@ export const editAnnouncement = createAsyncThunk(
         "put",
         `/${getRole}/announcement/${id}?say=${say}`,
         formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
+        { "Content-Type": "multipart/form-data" }
       );
 
       if (response && response.status) {
@@ -182,4 +193,3 @@ export const editAnnouncement = createAsyncThunk(
     }
   }
 );
-
