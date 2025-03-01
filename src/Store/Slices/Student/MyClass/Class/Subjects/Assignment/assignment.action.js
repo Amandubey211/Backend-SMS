@@ -29,14 +29,14 @@ export const stdGetAssignment = createAsyncThunk(
 export const stdDoAssignment = createAsyncThunk(
   "assignment/stdDoAssignment",
   async (
-    { assignmentId, editorContent, fileUrls },
+    { assignmentId, editorContent, fileUrls,type },
     { rejectWithValue, dispatch }
   ) => {
     const submissionData = {
       content: editorContent,
       media: fileUrls,
-      type: "Media Upload",
-      comment: "No comments",
+      type,
+      commentText: "No comments",
     };
 
     try {
