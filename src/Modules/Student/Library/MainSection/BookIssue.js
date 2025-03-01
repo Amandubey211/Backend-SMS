@@ -14,7 +14,7 @@ import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice
 import OfflineModal from "../../../../Components/Common/Offline";
 
 const BookIssue = () => {
-  const { loading, error, issueBooks, filters } = useSelector(
+  const { loading, error, issueBooks=[], filters } = useSelector(
     (store) => store?.student?.studentIssueBooks
   );
   const { activeTab } = useSelector(
@@ -126,7 +126,7 @@ const BookIssue = () => {
               )} */}
 
               {/* Display No Data Found */}
-              {!loading && issueBooks?.length == 0 && (
+              {!loading && issueBooks?.length === 0 && (
                 <tr>
                   <td colSpan="6" className="text-center py-20">
                     <NoDataFound />

@@ -41,16 +41,17 @@ const NoticeItem = ({ notice, index, formatDate }) => {
           </div>
           {/* Title and Date */}
           <div className="flex-1 flex flex-col gap-2">
-            <h2 className="font-[500] text-gray-600 text-md  leading-5 capitalize">
-              {notice?.title}
-              <span className="ml-2 text-sm text-purple-600">
+            <h2 className="font-[500] text-gray-600 text-md leading-5 capitalize break-words">
+             {notice?.title}
+            
+            </h2>
+            <p className="text-sm text-purple-600">
                 (Posted by{" "}
                 <span className="text-sm text-purple-600">
                   {notice?.authorName || "-"}
                 </span>
                 )
-              </span>
-            </h2>
+              </p>
             <div className="flex items-center text-sm gap-x-3">
               <div className="flex  gap-1">
                 <IoCalendarOutline

@@ -27,7 +27,7 @@ const BookCard = ({
 
 
   return (
-    <div className="relative  overflow-hidden rounded-md hover:shadow-lg transition-shadow duration-30 m-1 bg-white">
+    <div className="relative  overflow-hidden rounded-md hover:shadow-md transition-shadow duration-30 m-1 bg-white border border-gray-300">
       {/* Book Cover */}
       <div className="relative">
         <img
