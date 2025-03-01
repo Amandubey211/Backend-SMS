@@ -19,15 +19,13 @@ export const createAssignmentThunk = createAsyncThunk(
 
     try {
       const getRole = getUserRole(getState);
-      // Retrieve the current semester ID from the Redux state
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
 
-      // Merge semesterId into the payload without mutating the original assignmentData
+      // Merge semesterId into the payload along with any multi-select values (sectionIds or groupIds)
       const payload = { ...assignmentData, semesterId };
 
       const endpoint = `/${getRole}/create_assignment?say=${say}`;
 
-      // Make the API call with the updated payload
       const response = await postData(endpoint, payload);
 
       if (response.success) {
@@ -40,10 +38,11 @@ export const createAssignmentThunk = createAsyncThunk(
   }
 );
 
+// updateAssignmentThunk snippet in assignmentThunks.js
 export const updateAssignmentThunk = createAsyncThunk(
   "assignment/updateAssignment",
   async (
-    { assignmentId, assignmentData, sectionId },
+    { assignmentId, assignmentData },
     { rejectWithValue, dispatch, getState }
   ) => {
     const say = getAY();
@@ -53,16 +52,11 @@ export const updateAssignmentThunk = createAsyncThunk(
       const getRole = getUserRole(getState);
       const endpoint = `/${getRole}/update_assignment/${assignmentId}?say=${say}`;
 
-      const payload = {
-        ...assignmentData,
-        sectionId,
-      };
-
-      const response = await putData(endpoint, payload);
+      // assignmentData already includes sectionIds or groupIds based on assignTo
+      const response = await putData(endpoint, assignmentData);
 
       if (response.success) {
         toast.success("Assignment updated successfully!");
-        // Optionally, you can dispatch another thunk to fetch the updated assignment
         dispatch(fetchAssignmentByIdThunk(assignmentId));
         return response.assignment;
       }

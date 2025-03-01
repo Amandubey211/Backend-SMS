@@ -18,7 +18,7 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange, error }) => {
         {t("Allowed Attempts")} <span className="text-red-500">*</span>
       </label>
       <select
-        id="allowedAttempts" // ID must match error key
+        id="allowedAttempts"
         name="allowedAttempts"
         value={allowedAttempts ? "true" : "false"}
         onChange={(e) =>
@@ -29,13 +29,11 @@ const AllowedAttemptsSelect = ({ allowedAttempts, handleChange, error }) => {
             },
           })
         }
-        className={`w-full p-3 border rounded-md shadow-sm focus:outline-none
-          ${
-            error
-              ? "border-red-500 focus:ring-red-500"
-              : "border-gray-300 focus:ring-blue-500"
-          }
-        `}
+        className={`w-full p-3 border rounded-md shadow-sm focus:outline-none ${
+          error
+            ? "border-red-500 focus:ring-red-500"
+            : "border-gray-300 focus:ring-blue-500"
+        }`}
       >
         <option value="">{t("Select")}</option>
         <option value="true">{t("Limited")}</option>
@@ -55,7 +53,8 @@ const CreateQuizForm = ({
   allowedAttempts,
   assignTo,
   timeLimit,
-  sectionId,
+  // Use singular keys that the backend expects (but values are arrays)
+  sectionId = [],
   dueDate,
   availableFrom,
   handleChange,
@@ -63,7 +62,7 @@ const CreateQuizForm = ({
   showAnswerDate,
   moduleId,
   chapterId,
-  groupId,
+  groupId = [],
   formErrors = {},
 }) => {
   const dispatch = useDispatch();
@@ -71,6 +70,8 @@ const CreateQuizForm = ({
   const { modules } = useSelector((state) => state.admin.module);
   const { cid, sid } = useParams();
   const { t } = useTranslation("admModule");
+
+  const [showGuidelines, setShowGuidelines] = useState(false);
 
   useEffect(() => {
     dispatch(fetchModules({ cid, sid }));
@@ -89,10 +90,27 @@ const CreateQuizForm = ({
     date ? format(new Date(date), "yyyy-MM-dd") : "";
 
   return (
-    <div className="max-w-md mx-auto p-4 bg-white space-y-2">
-      <h2 className="text-xl font-semibold">{t("Options")}</h2>
+    <div className="max-w-md mx-auto p-4 bg-white space-y-2 relative">
+      {/* Heading + Guidelines Button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold">{t("Options")}</h2>
+        <button
+          onClick={() => setShowGuidelines(true)}
+          className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+            aria-hidden="true"
+          >
+            <path d="M9 2a7 7 0 100 14A7 7 0 109 2zm1 10.93a.75.75 0 01-1.5 0V9a.75.75 0 011.5 0v3.93zM9.25 7a.75.75 0 011.5 0 .75.75 0 01-1.5 0z" />
+          </svg>
+          {t("Guidelines")}
+        </button>
+      </div>
+
       <div className="space-y-4">
-        {/* Quiz Type */}
         <LabeledSelect
           label={
             <>
@@ -108,10 +126,9 @@ const CreateQuizForm = ({
             { value: "Graded", label: t("Graded Quiz") },
           ]}
           error={formErrors.quizType}
-          fieldId="quizType" // pass to LabeledSelect for id
+          fieldId="quizType"
         />
 
-        {/* Shuffle Answers */}
         <div className="p-2">
           <h3 className="text-gray-700">{t("Shuffle Answers")}</h3>
           <div className="flex items-center mt-1">
@@ -148,7 +165,6 @@ const CreateQuizForm = ({
           </div>
         </div>
 
-        {/* Time Limit */}
         <LabeledInput
           label={t("Time Limit in Minutes")}
           name="timeLimit"
@@ -158,14 +174,12 @@ const CreateQuizForm = ({
           fieldId="timeLimit"
         />
 
-        {/* Allowed Attempts */}
         <AllowedAttemptsSelect
           allowedAttempts={allowedAttempts}
           handleChange={handleChange}
           error={formErrors.allowedAttempts}
         />
 
-        {/* # of Attempts (only if allowedAttempts === true) */}
         {allowedAttempts && (
           <LabeledInput
             label={t("Number of Attempts")}
@@ -178,12 +192,10 @@ const CreateQuizForm = ({
           />
         )}
 
-        {/* Quiz Restrictions */}
         <h2 className="text-xl font-semibold mt-6 pt-4 border-t">
           {t("Quiz Restrictions")}
         </h2>
 
-        {/* Students See the Correct Answer */}
         <div className="p-2">
           <h3 className="text-gray-700 mb-1">
             {t("Students See the Correct Answer")}
@@ -226,7 +238,6 @@ const CreateQuizForm = ({
           )}
         </div>
 
-        {/* Show One Question at a Time */}
         <LabeledSelect
           label={t("Show One Question at a Time")}
           name="showOneQuestionOnly"
@@ -240,7 +251,6 @@ const CreateQuizForm = ({
           fieldId="showOneQuestionOnly"
         />
 
-        {/* Lock Question After Answering */}
         <div className="flex items-center">
           <input
             type="checkbox"
@@ -255,7 +265,6 @@ const CreateQuizForm = ({
           </label>
         </div>
 
-        {/* Assign To */}
         <AssignToRadios
           assignTo={assignTo}
           handleChange={handleChange}
@@ -267,29 +276,29 @@ const CreateQuizForm = ({
           </p>
         )}
 
-        {/* Section/Group */}
+        {/* Pass singular keys to SectionSelect; these values are arrays */}
         <SectionSelect
-          sectionId={sectionId}
-          handleChange={handleChange}
-          groupId={groupId}
+          sectionValue={sectionId}
+          groupValue={groupId}
           assignTo={assignTo}
+          handleChange={handleChange}
           formErrors={formErrors}
+          multiSelect={true}
+          fieldSection="sectionId"
+          fieldGroup="groupId"
         />
 
-        {/* Module */}
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="moduleId">
             {t("Module")}
           </label>
           <select
-            id="moduleId" // match potential error key if you want to validate
-            className={`mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none sm:text-sm rounded-md
-              ${
-                formErrors.moduleId
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-blue-500"
-              }
-            `}
+            id="moduleId"
+            className={`mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none sm:text-sm rounded-md ${
+              formErrors.moduleId
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
             value={moduleId || ""}
             name="moduleId"
             onChange={handleChange}
@@ -306,20 +315,17 @@ const CreateQuizForm = ({
           )}
         </div>
 
-        {/* Chapter */}
         <div className="mb-4">
           <label className="block text-gray-700" htmlFor="chapterId">
             {t("Chapter")}
           </label>
           <select
-            id="chapterId" // match potential error key if you want to validate
-            className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none sm:text-sm rounded-md
-              ${
-                formErrors.chapterId
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-blue-500"
-              }
-            `}
+            id="chapterId"
+            className={`mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none sm:text-sm rounded-md ${
+              formErrors.chapterId
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:ring-blue-500"
+            }`}
             value={chapterId || ""}
             name="chapterId"
             onChange={handleChange}
@@ -343,7 +349,6 @@ const CreateQuizForm = ({
           )}
         </div>
 
-        {/* Available From */}
         <DateInput
           label={
             <>
@@ -354,10 +359,9 @@ const CreateQuizForm = ({
           value={formatDate(availableFrom)}
           handleChange={handleChange}
           error={formErrors.availableFrom}
-          fieldId="availableFrom" // must match error key
+          fieldId="availableFrom"
         />
 
-        {/* Due Date */}
         <DateInput
           label={
             <>
@@ -368,9 +372,59 @@ const CreateQuizForm = ({
           value={formatDate(dueDate)}
           handleChange={handleChange}
           error={formErrors.dueDate}
-          fieldId="dueDate" // must match error key
+          fieldId="dueDate"
         />
       </div>
+
+      {/* Guidelines Modal */}
+      {showGuidelines && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white w-full max-w-md mx-4 p-6 rounded shadow-lg relative">
+            <button
+              onClick={() => setShowGuidelines(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            <div className="flex items-center mb-4">
+              <svg
+                className="w-8 h-8 text-blue-600 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                aria-hidden="true"
+              >
+                <path d="M9 2a7 7 0 100 14A7 7 0 109 2zm1 10.93a.75.75 0 01-1.5 0V9a.75.75 0 011.5 0v3.93zM9.25 7a.75.75 0 011.5 0 .75.75 0 01-1.5 0z" />
+              </svg>
+              <h2 className="text-xl font-semibold">
+                Quiz Creation Guidelines
+              </h2>
+            </div>
+            <ul className="list-disc list-inside space-y-2 text-gray-700">
+              <li>Use a descriptive name for the quiz.</li>
+              <li>Provide clear instructions or guidelines for students.</li>
+              <li>
+                Ensure the <strong>Available From</strong> and{" "}
+                <strong>Due Date</strong> are valid and within the academic
+                year.
+              </li>
+              <li>Review your question attempts, time limit, and points.</li>
+              <li>Fill all required fields before submission.</li>
+            </ul>
+          </div>
+        </div>
+      )}
+      {/* End of Guidelines Modal */}
     </div>
   );
 };

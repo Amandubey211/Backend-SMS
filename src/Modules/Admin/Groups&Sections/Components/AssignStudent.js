@@ -27,7 +27,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
 
     // If the student already has a section assigned, preload it in the dropdown
     const sectionToPreload = AllSections.find(
-      (sec) => sec.sectionName === section
+      (sec) => sec?.sectionName === section
     );
     if (sectionToPreload) {
       setSectionId(sectionToPreload._id);
