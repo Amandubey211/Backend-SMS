@@ -626,12 +626,6 @@ const TotalRevenueList = () => {
             </div>
           </div>
 
-          {/* No Data Placeholder */}
-          {!loading && incomes.length === 0 && !error && (
-            <div className="text-center text-gray-500 text-xs py-4">
-              No records found.
-            </div>
-          )}
 
           {/* Table */}
           <div className="overflow-x-auto">
