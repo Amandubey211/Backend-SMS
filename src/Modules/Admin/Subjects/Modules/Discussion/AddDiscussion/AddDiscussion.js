@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../../Components/Common/Layout";
@@ -30,19 +30,16 @@ const AddDiscussion = () => {
   // Determine if editing or creating
   const isEditing = Boolean(currentDiscussion?._id);
 
-  // Component State
-  const [assignmentName, setAssignmentName] = useState(
-    currentDiscussion?.title || ""
-  );
-  const [editorContent, setEditorContent] = useState(
-    currentDiscussion?.content || ""
-  );
-  const [file, setFile] = useState(null);
+  // Component State – ensure sectionId and groupId are arrays
   const [formState, setFormState] = useState({
     assignTo: currentDiscussion?.assignTo || "",
     dueDate: currentDiscussion?.dueDate || "",
-    sectionId: currentDiscussion?.sectionId || "",
-    groupId: currentDiscussion?.groupId || "",
+    sectionId: Array.isArray(currentDiscussion?.sectionId)
+      ? currentDiscussion.sectionId
+      : [],
+    groupId: Array.isArray(currentDiscussion?.groupId)
+      ? currentDiscussion.groupId
+      : [],
     option: currentDiscussion?.allowThreadedReplies
       ? "threadedReplies"
       : currentDiscussion?.mustPostBeforeSeeingReplies
@@ -51,6 +48,14 @@ const AddDiscussion = () => {
     availableFrom: currentDiscussion?.availableFrom || "",
     availableUntil: currentDiscussion?.availableUntil || "",
   });
+
+  const [assignmentName, setAssignmentName] = useState(
+    currentDiscussion?.title || ""
+  );
+  const [editorContent, setEditorContent] = useState(
+    currentDiscussion?.content || ""
+  );
+  const [file, setFile] = useState(null);
 
   // Error states for inline validations
   const [titleError, setTitleError] = useState("");
@@ -98,9 +103,9 @@ const AddDiscussion = () => {
         allowThreadedReplies: formState.option === "threadedReplies",
         mustPostBeforeSeeingReplies: formState.option === "postBeforeReplies",
         assignTo: formState.assignTo,
-        sectionId:
-          formState.assignTo === "Section" ? formState.sectionId : null,
-        groupId: formState.assignTo === "Group" ? formState.groupId : null,
+        // These are arrays now (if assignTo is "Section" or "Group")
+        sectionId: formState.assignTo === "Section" ? formState.sectionId : [],
+        groupId: formState.assignTo === "Group" ? formState.groupId : [],
         dueDate: formState.dueDate,
         availableFrom: formState.availableFrom,
         availableUntil: formState.availableUntil,

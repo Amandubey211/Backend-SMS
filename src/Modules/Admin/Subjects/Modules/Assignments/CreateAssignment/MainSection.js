@@ -16,12 +16,9 @@ import {
 
 import { PERMISSIONS } from "../../../../../../config/permission";
 
-/** Validation function:
- *  When publishing, we require additional fields.
- */
+// Validation function
 function validateAssignment(data, isPublishing) {
   const errors = {};
-
   if (!data.name || !data.name.trim()) {
     errors.name = "Assignment name is required.";
   }
@@ -45,6 +42,7 @@ function validateAssignment(data, isPublishing) {
   return errors;
 }
 
+// Updated initial state with arrays for sectionIds and groupIds
 const initialFormState = {
   points: "",
   displayGrade: false,
@@ -52,14 +50,14 @@ const initialFormState = {
   allowedAttempts: false,
   numberOfAttempts: null,
   assignTo: "Everyone",
-  sectionId: "",
+  sectionIds: [], // updated from sectionId
   dueDate: "",
   availableFrom: "",
   until: "",
   thumbnail: null,
   moduleId: "",
   chapterId: "",
-  groupId: "",
+  groupIds: [], // updated from groupId
 };
 
 const MainSection = ({ setIsEditing }) => {
@@ -81,7 +79,7 @@ const MainSection = ({ setIsEditing }) => {
   const [saveLoading, setSaveLoading] = useState(false);
   const [publishLoading, setPublishLoading] = useState(false);
 
-  // Field-level errors (keys must match input IDs)
+  // Field-level errors
   const [formErrors, setFormErrors] = useState({});
 
   // Refs for validated inputs
@@ -92,7 +90,7 @@ const MainSection = ({ setIsEditing }) => {
   const availableFromRef = useRef(null);
   const dueDateRef = useRef(null);
 
-  // Mapping error keys to refs (fallback if document.getElementById fails)
+  // Mapping error keys to refs
   const errorRefMap = {
     name: nameInputRef,
     moduleId: moduleSelectRef,
@@ -102,7 +100,6 @@ const MainSection = ({ setIsEditing }) => {
     dueDate: dueDateRef,
   };
 
-  // Universal scroll-to-first-error function
   const scrollToFirstError = (errors) => {
     const errorKeys = Object.keys(errors);
     if (errorKeys.length === 0) return;
@@ -137,14 +134,14 @@ const MainSection = ({ setIsEditing }) => {
         allowedAttempts: assignment.allowedAttempts,
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
         assignTo: assignment.assignTo || "",
-        sectionId: assignment.sectionId || "",
+        sectionIds: assignment.sectionIds || [], // updated here
         dueDate: assignment.dueDate || "",
         availableFrom: assignment.availableFrom || "",
         until: assignment.until || "",
         thumbnail: assignment.thumbnail || null,
         moduleId: assignment.moduleId || "",
         chapterId: assignment.chapterId || "",
-        groupId: assignment.groupId || "",
+        groupIds: assignment.groupIds || [], // updated here
       });
       setExistingRubricId(assignment.rubricId || null);
     } else {
@@ -178,6 +175,7 @@ const MainSection = ({ setIsEditing }) => {
           : null;
       }
 
+      // Build the assignment payload with new multi-select keys
       const assignmentData = {
         name: assignmentName,
         content: editorContent,
@@ -198,10 +196,11 @@ const MainSection = ({ setIsEditing }) => {
         publish,
       };
 
+      // Set multi-section or multi-group payload based on assignTo value
       if (formState.assignTo === "Section") {
-        assignmentData.sectionId = formState.sectionId || "";
+        assignmentData.sectionIds = formState.sectionIds;
       } else if (formState.assignTo === "Group") {
-        assignmentData.groupId = formState.groupId || "";
+        assignmentData.groupIds = formState.groupIds;
       }
 
       const errors = validateAssignment(assignmentData, publish === true);
@@ -271,7 +270,7 @@ const MainSection = ({ setIsEditing }) => {
         }
       >
         <div className="w-full flex h-full">
-          {/* Left side: Editor (Assignment Name & content) */}
+          {/* Left side: Editor */}
           <div className="w-[70%]">
             <EditorComponent
               assignmentLabel="Assignment Name"
@@ -280,7 +279,7 @@ const MainSection = ({ setIsEditing }) => {
               onNameChange={handleNameChange}
               onEditorChange={handleEditorChange}
               inputRef={nameInputRef}
-              nameError={formErrors.name} // red outline applied if error exists
+              nameError={formErrors.name}
             />
           </div>
           {/* Right side: Additional Form Fields */}
@@ -291,17 +290,19 @@ const MainSection = ({ setIsEditing }) => {
                 setFormState((prev) => ({ ...prev, displayGrade: grade }))
               }
               handleChange={handleFormChange}
-              // Passing refs for each validated input
+              // Passing refs for validation
               moduleRef={moduleSelectRef}
               pointsRef={pointsInputRef}
               submissionTypeRef={submissionTypeRef}
               availableFromRef={availableFromRef}
               dueDateRef={dueDateRef}
-              moduleError={formErrors.moduleId} // error for module select
-              pointsError={formErrors.points} // error for points
-              submissionTypeError={formErrors.submissionType} // error for submission type
-              availableFromError={formErrors.availableFrom} // error for availableFrom
-              dueDateError={formErrors.dueDate} // error for dueDate
+              moduleError={formErrors.moduleId}
+              pointsError={formErrors.points}
+              submissionTypeError={formErrors.submissionType}
+              availableFromError={formErrors.availableFrom}
+              dueDateError={formErrors.dueDate}
+              // Pass multiSelect flag to use multi-select in section/group component
+              multiSelect={true}
             />
           </div>
         </div>
