@@ -55,8 +55,6 @@ export const fetchDiscussionById = createAsyncThunk(
   }
 );
 
-// discussionThunks.js
-
 export const createDiscussion = createAsyncThunk(
   "discussions/createDiscussion",
   async ({ discussionData, cid }, { rejectWithValue, dispatch, getState }) => {
@@ -66,25 +64,22 @@ export const createDiscussion = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const semesterId = getState().common.user.classInfo.selectedSemester?.id;
-
       if (!semesterId) {
         throw new Error("Semester ID is missing");
       }
 
-      // Build FormData
+      // Construct FormData and append array values properly
       const formData = new FormData();
-
-      // For array fields like sectionId or groupId, send as JSON
       Object.keys(discussionData).forEach((key) => {
-        if (key === "sectionId" || key === "groupId") {
-          // Stringify the array
-          formData.append(key, JSON.stringify(discussionData[key]));
+        const value = discussionData[key];
+        if (Array.isArray(value)) {
+          value.forEach((item) => formData.append(key, item));
         } else {
-          formData.append(key, discussionData[key]);
+          formData.append(key, value);
         }
       });
 
-      // Add semesterId
+      // Append semesterId to the body
       formData.append("semesterId", semesterId);
 
       const response = await customRequest(
@@ -116,21 +111,21 @@ export const updateDiscussion = createAsyncThunk(
     const say = getAY();
     dispatch(setShowError(false));
 
-    // Build FormData
+    // Construct FormData and handle array fields as multiple appends
     const formData = new FormData();
-
-    // For array fields like sectionId or groupId, send as JSON
     Object.keys(discussionData).forEach((key) => {
-      if (key === "sectionId" || key === "groupId") {
-        formData.append(key, JSON.stringify(discussionData[key]));
+      const value = discussionData[key];
+      if (Array.isArray(value)) {
+        value.forEach((item) => formData.append(key, item));
       } else {
-        formData.append(key, discussionData[key]);
+        formData.append(key, value);
       }
     });
 
     try {
       const getRole = getUserRole(getState);
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
+      formData.append("semesterId", semesterId);
 
       const response = await customRequest(
         "put",

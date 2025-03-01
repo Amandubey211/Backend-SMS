@@ -23,16 +23,22 @@ const CreateAnnouncementHeader = ({ onSave, loading, isEditing }) => {
       </div>
       <div className="flex items-center space-x-2">
         <button
+          type="button"
           onClick={() => navigate(-1)}
-          className="flex-grow rounded-md py-2 px-6 text-center border"
+          className="flex-grow rounded-md py-2 px-6 text-center border cursor-pointer"
           disabled={loading}
         >
           <span>{t("Cancel")}</span>
         </button>
-        <ProtectedAction requiredPermission= {PERMISSIONS.ADD_NEW_ANNOUNCEMENT || PERMISSIONS.EDIT_ANNOUNCEMENT}>
+        <ProtectedAction
+          requiredPermission={
+            PERMISSIONS.ADD_NEW_ANNOUNCEMENT || PERMISSIONS.EDIT_ANNOUNCEMENT
+          }
+        >
           <button
+            type="button"
             onClick={onSave}
-            className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+            className="flex-grow rounded-md py-2 px-6 text-center border bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition cursor-pointer"
             disabled={loading}
           >
             <span className="text-gradient">

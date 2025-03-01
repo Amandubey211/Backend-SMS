@@ -9,7 +9,8 @@ const AssignToSection = ({
   handleChange,
   assignTitle,
   isAssignToLabel,
-  error, // added error prop for validations
+  error,
+  formErrors = {},
 }) => {
   return (
     <div className="mt-5">
@@ -22,15 +23,15 @@ const AssignToSection = ({
         />
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>
-      {/* For Discussion, pass singular field names since backend expects "sectionId" and "groupId" */}
       <SectionSelect
         assignTo={assignTo}
-        sectionValue={sectionId} // array of section IDs
-        groupValue={groupId} // array of group IDs
+        sectionValue={sectionId}
+        groupValue={groupId}
         handleChange={handleChange}
         multiSelect={true}
         fieldSection="sectionId"
         fieldGroup="groupId"
+        formErrors={formErrors}
       />
     </div>
   );
