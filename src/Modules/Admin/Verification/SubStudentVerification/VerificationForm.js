@@ -41,7 +41,7 @@ const VerificationForm = ({ email, studentId }) => {
     await dispatch(verifyStudent(verificationDetails));
 
     // Navigate back after the process
-    navigate(-1);
+    // navigate(-1);
   };
 
   return (
