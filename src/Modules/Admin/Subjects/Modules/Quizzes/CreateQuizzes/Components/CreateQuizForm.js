@@ -9,6 +9,9 @@ import { useParams } from "react-router-dom";
 import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { format } from "date-fns";
 import { useTranslation } from "react-i18next";
+import { AnimatePresence, motion } from "framer-motion";
+import { Modal, Button } from "antd";
+import { FiInfo, FiCheck } from "react-icons/fi";
 
 const AllowedAttemptsSelect = ({ allowedAttempts, handleChange, error }) => {
   const { t } = useTranslation("quiz");
@@ -71,6 +74,7 @@ const CreateQuizForm = ({
   const { cid, sid } = useParams();
   const { t } = useTranslation("admModule");
 
+  // State for guidelines modal
   const [showGuidelines, setShowGuidelines] = useState(false);
 
   useEffect(() => {
@@ -96,17 +100,10 @@ const CreateQuizForm = ({
         <h2 className="text-xl font-semibold">{t("Options")}</h2>
         <button
           onClick={() => setShowGuidelines(true)}
-          className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+          className="inline-flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
         >
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path d="M9 2a7 7 0 100 14A7 7 0 109 2zm1 10.93a.75.75 0 01-1.5 0V9a.75.75 0 011.5 0v3.93zM9.25 7a.75.75 0 011.5 0 .75.75 0 01-1.5 0z" />
-          </svg>
-          {t("Guidelines")}
+          <FiInfo className="w-5 h-5" />
+          <span>{t("Guidelines")}</span>
         </button>
       </div>
 
@@ -377,54 +374,104 @@ const CreateQuizForm = ({
       </div>
 
       {/* Guidelines Modal */}
-      {showGuidelines && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white w-full max-w-md mx-4 p-6 rounded shadow-lg relative">
-            <button
-              onClick={() => setShowGuidelines(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      <AnimatePresence>
+        {showGuidelines && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{
+              background: "rgba(0, 0, 0, 0.5)",
+              backdropFilter: "blur(6px)",
+            }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white w-full max-w-[550px] p-6 rounded-xl shadow-lg relative flex flex-col"
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
+              {/* Close Button */}
+              <button
+                onClick={() => setShowGuidelines(false)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-            <div className="flex items-center mb-4">
-              <svg
-                className="w-8 h-8 text-blue-600 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-              >
-                <path d="M9 2a7 7 0 100 14A7 7 0 109 2zm1 10.93a.75.75 0 01-1.5 0V9a.75.75 0 011.5 0v3.93zM9.25 7a.75.75 0 011.5 0 .75.75 0 01-1.5 0z" />
-              </svg>
-              <h2 className="text-xl font-semibold">
-                Quiz Creation Guidelines
-              </h2>
-            </div>
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>Use a descriptive name for the quiz.</li>
-              <li>Provide clear instructions or guidelines for students.</li>
-              <li>
-                Ensure the <strong>Available From</strong> and{" "}
-                <strong>Due Date</strong> are valid and within the academic
-                year.
-              </li>
-              <li>Review your question attempts, time limit, and points.</li>
-              <li>Fill all required fields before submission.</li>
-            </ul>
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  aria-hidden="true"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+              {/* Header */}
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <FiInfo className="text-purple-600 text-4xl" />
+                </div>
+                <h2 className="text-purple-800 text-xl font-semibold">
+                  {t("Quiz Creation Guidelines")}
+                </h2>
+              </div>
+              {/* Guidelines List */}
+              <ul className="list-none text-gray-700 pl-6 space-y-2">
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t("Use a")} <strong>{t("descriptive name")}</strong>{" "}
+                    {t("for the quiz.")}
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t("Provide")} <strong>{t("clear")}</strong> {t("and")}{" "}
+                    <strong>{t("concise instructions")}</strong>{" "}
+                    {t("for students.")}
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t("Ensure the")} <strong>{t("Available From")}</strong>{" "}
+                    {t("and")} <strong>{t("Due Date")}</strong>{" "}
+                    {t("are valid and within the academic year.")}
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t("Review your")} <strong>{t("question pool")}</strong>,{" "}
+                    <strong>{t("time limit")}</strong>, {t("and")}{" "}
+                    <strong>{t("grading criteria")}</strong>.
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    {t("Fill all")} <strong>{t("required fields")}</strong>{" "}
+                    {t("before submission.")}
+                  </span>
+                </li>
+              </ul>
+              {/* Footer */}
+              <div className="flex justify-end mt-6">
+                <Button
+                  onClick={() => setShowGuidelines(false)}
+                  className="border border-gray-300 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-all"
+                >
+                  {t("Close")}
+                </Button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
-      {/* End of Guidelines Modal */}
+        )}
+      </AnimatePresence>
+      {/* End Guidelines Modal */}
     </div>
   );
 };
