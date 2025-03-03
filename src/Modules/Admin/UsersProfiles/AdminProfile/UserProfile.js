@@ -15,6 +15,7 @@ import { LuSchool } from "react-icons/lu";
 import ImageUpload from "../../Libary/Components/ImageUpload";
 import useCloudinaryUpload from "../../../../Hooks/CommonHooks/useCloudinaryUpload";
 import Cookies from "js-cookie";
+import { setLocalCookies } from "../../../../Utils/academivYear";
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation('admProfile');
@@ -74,7 +75,9 @@ const UserProfile = () => {
         setLogo(reader.result);
       };
       reader.readAsDataURL(file);
+      
       setDisabledlogo(false)
+
     }
     
   };
@@ -83,8 +86,10 @@ const UserProfile = () => {
   const CLOUDINARY_FOLDER = "expenses"; // Updated folder name for clarity
   const {uploadFile} = useCloudinaryUpload(CLOUDINARY_UPLOAD_PRESET, CLOUDINARY_FOLDER)
   const handleUploadLogo = async()=>{
+    setDisabledlogo(false)
  const a = await uploadFile(logo);
  const data = {logo:a,schoolId:userDetails.schoolId};
+ Cookies.set('logo',a)
  dispatch(updateSchoolLogo(data))
   }
   useEffect(()=>{

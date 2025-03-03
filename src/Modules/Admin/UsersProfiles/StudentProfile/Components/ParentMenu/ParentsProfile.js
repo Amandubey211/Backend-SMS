@@ -24,7 +24,6 @@ const ParentsProfile = ({ student }) => {
         details={[
           { type: 'phone', label: t('Phone'), value: student?.guardianContactNumber },
           { type: 'email', label: t('Email'), value: student?.guardianEmail },
-          { type: 'child', label: t('Child'), value: '2-child' },
           { type: 'address', label: t('Address'), value: address }
         ]}
       />
@@ -35,7 +34,6 @@ const ParentsProfile = ({ student }) => {
         details={[
           { type: 'phone', label: t('Phone'), value: student?.guardianContactNumber },
           { type: 'email', label: t('Email'), value: student?.guardianEmail },
-          { type: 'child', label: t('Child'), value: '2-child' },
           { type: 'address', label: t('Address'), value: address }
         ]}
       />

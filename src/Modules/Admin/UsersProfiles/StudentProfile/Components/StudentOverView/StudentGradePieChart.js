@@ -70,7 +70,7 @@ const StudentGradePieChart = () => {
   };
 
   return (
-    <div className="flex-1 p-5 flex flex-row justify-start items-start">
+    <div className="flex-1 p-5 flex flex-row justify-start items-start h-[18rem]">
       <Pie data={allZero?Edata:data} options={allZero?{}:options} />
     </div>
   );

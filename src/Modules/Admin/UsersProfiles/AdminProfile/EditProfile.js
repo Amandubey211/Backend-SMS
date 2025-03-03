@@ -30,6 +30,7 @@ const EditAdmin = ({data}) => {
     }));
   };
   const handleImageChange = (e) => {
+    setDisabled(false)
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
@@ -45,6 +46,7 @@ const EditAdmin = ({data}) => {
   };
 
   const handleRemoveImage = () => {
+    setDisabled(false)
     setImagePreview(null);
   };
   

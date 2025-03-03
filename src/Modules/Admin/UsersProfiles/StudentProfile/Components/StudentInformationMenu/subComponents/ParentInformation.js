@@ -14,7 +14,7 @@ const ParentInformation = ({ parents }) => {
       <InformationItem
         icon={MdOutlinePerson}
         title={t("Father Name")}
-        value={parents?.guardianName}
+        value={parents?.fatherName || parents?.guardianName}
       />
       <InformationItem
         icon={MdOutlinePerson}
