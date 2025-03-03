@@ -57,37 +57,39 @@ const MainSection = () => {
   };
 
   return (
-   
     <div className="p-2 w-full">
-      <ProtectedSection requiredPermission={PERMISSIONS.STUDENTS_BY_CLASS_AND_SECTION} title={"Student"}>
-      <NavigationBar
-        setActiveSection={setActiveSection}
-        activeSection={activeSection}
-        totalStudents={students?.length}
-      />
-    
-      {loading ? (
-        <div className="flex justify-center items-center h-64">
-          <Spinner />
-        </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
-          <FaUsers className="text-6xl mb-4" />
-          <p className="italic">Error fetching students: {error}</p>
-        </div>
-      ) : (
-        <DetailedStudentList
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.STUDENTS_BY_CLASS_AND_SECTION}
+        title={"Student"}
+      >
+        <NavigationBar
+          setActiveSection={setActiveSection}
           activeSection={activeSection}
-          onSeeGradeClick={handleSeeGradeClick}
-          students={students}
+          totalStudents={students?.length}
         />
-      )}
-      <StudentGradeModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        student={studentData}
-      />
-       </ProtectedSection>
+
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Spinner />
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
+            <FaUsers className="text-6xl mb-4" />
+            <p className="italic">Error fetching students: {error}</p>
+          </div>
+        ) : (
+          <DetailedStudentList
+            activeSection={activeSection}
+            onSeeGradeClick={handleSeeGradeClick}
+            students={students}
+          />
+        )}
+        <StudentGradeModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          student={studentData}
+        />
+      </ProtectedSection>
     </div>
   );
 };
