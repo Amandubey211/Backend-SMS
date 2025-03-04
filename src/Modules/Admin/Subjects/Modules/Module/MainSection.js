@@ -36,6 +36,7 @@ const MainSection = () => {
     chapterLoading,
   } = useSelector((state) => state.admin.module);
 
+  console.log(modulesData, "modulesDatamodulesData");
   useEffect(() => {
     const fetchAndSetModules = async () => {
       if (cid && sid) {
@@ -173,7 +174,7 @@ const MainSection = () => {
             <div className="w-[60%] bg-white p-2">
               <div className="bg-white p-2 rounded-lg">
                 <div className="flex justify-between px-4 mb-3 items-center">
-                  <h1 className="text-lg font-semibold">
+                  <h1 className="text-lg font-semibold capitalize">
                     {selectedModule?.name
                       ? selectedModule.name
                       : t("Select a Module")}
