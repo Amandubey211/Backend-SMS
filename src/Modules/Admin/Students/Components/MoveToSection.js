@@ -50,8 +50,7 @@ const MoveToSection = ({ student, onClose }) => {
       await dispatch(
         assignStudentToSection({ studentId, sectionId: selectedSection })
       );
-      toast.success("Student moved to section successfully!");
-      onClose();
+      // onClose();
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
     }

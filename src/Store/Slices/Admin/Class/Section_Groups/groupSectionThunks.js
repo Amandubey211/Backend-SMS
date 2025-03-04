@@ -10,6 +10,7 @@ import {
   putData,
 } from "../../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../../Utils/getRoles";
+import { fetchStudentsByClassAndSection } from "../Students/studentThunks";
 
 // Fetch Groups by Class
 export const fetchGroupsByClass = createAsyncThunk(
@@ -287,6 +288,7 @@ export const assignStudentToSection = createAsyncThunk(
   async ({ studentId, sectionId }, { rejectWithValue, dispatch, getState }) => {
     try {
       const getRole = getUserRole(getState);
+      const classId = getState().common.user.classInfo.selectedClassId;
       dispatch(setShowError(false));
       const say = getAY();
       const response = await postData(
@@ -296,6 +298,7 @@ export const assignStudentToSection = createAsyncThunk(
 
       if (response.success) {
         toast.success("Student assigned successfully!");
+        dispatch(fetchStudentsByClassAndSection(classId));
         return response.data;
       } else {
         toast.error(response.message || "Failed to assign student.");

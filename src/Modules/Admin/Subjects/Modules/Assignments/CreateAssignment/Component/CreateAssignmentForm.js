@@ -1,5 +1,3 @@
-// CreateAssignmentForm.jsx
-
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PointsInput from "./PointsInput";
@@ -12,7 +10,9 @@ import GradeOption from "./GradeOption";
 import SubmissionTypeDropdown from "./SubmissionTypeDropdown";
 import { useParams } from "react-router-dom";
 import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { Modal, Button } from "antd";
+import { FiInfo, FiCheck } from "react-icons/fi";
 
 const CreateAssignmentForm = ({
   points,
@@ -77,22 +77,17 @@ const CreateAssignmentForm = ({
       {/* Heading + Guidelines Button */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Options</h3>
+
         <button
           onClick={() => setShowGuidelines(true)}
-          className="text-blue-500 hover:text-blue-600 flex items-center gap-1"
+          className="inline-flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
         >
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-            aria-hidden="true"
-          >
-            <path d="M9 2a7 7 0 100 14A7 7 0 109 2zm1 10.93a.75.75 0 01-1.5 0V9a.75.75 0 011.5 0v3.93zM9.25 7a.75.75 0 011.5 0 .75.75 0 01-1.5 0z" />
-          </svg>
-          Guidelines
+          <FiInfo className="w-5 h-5" />
+          <span>Guidelines</span>
         </button>
       </div>
 
+      {/* Existing form fields remain unchanged */}
       <PointsInput
         id="points"
         points={points}
@@ -101,7 +96,6 @@ const CreateAssignmentForm = ({
         error={pointsError}
       />
 
-      {/* Module Select */}
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="moduleId">
           Module
@@ -137,7 +131,6 @@ const CreateAssignmentForm = ({
         )}
       </div>
 
-      {/* Chapter Select */}
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="chapterId">
           Chapter
@@ -190,7 +183,6 @@ const CreateAssignmentForm = ({
         handleChange={handleChange}
       />
 
-      {/* Updated SectionSelect usage */}
       <SectionSelect
         sectionValue={sectionIds}
         groupValue={groupIds}
@@ -221,56 +213,86 @@ const CreateAssignmentForm = ({
         error={dueDateError}
       />
 
-      {/* Guidelines Modal */}
-      {showGuidelines && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white w-full max-w-md mx-4 p-6 rounded shadow-lg relative">
-            <button
-              onClick={() => setShowGuidelines(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+      {/* Guidelines Modal - Updated text for Assignment context */}
+      <Modal
+        visible={showGuidelines}
+        onCancel={() => setShowGuidelines(false)}
+        footer={null}
+        width={550}
+        className="rounded-xl shadow-lg"
+        maskStyle={{ backdropFilter: "blur(5px)" }}
+      >
+        <AnimatePresence>
+          {showGuidelines && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col p-6"
             >
-              <svg
-                className="w-5 h-5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 011.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+              {/* Header */}
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-purple-100 p-3 rounded-full">
+                  <FiInfo className="text-purple-600 text-4xl" />
+                </div>
+                <h2 className="text-purple-800 text-xl font-semibold">
+                  Assignment Creation Guidelines
+                </h2>
+              </div>
 
-            <div className="flex items-center mb-4">
-              <svg
-                className="w-6 h-6 text-blue-600 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-              >
-                <path d="M9 2a7 7 0 100 14A7 7 0 109 2zm1 10.93a.75.75 0 01-1.5 0V9a.75.75 0 011.5 0v3.93zM9.25 7a.75.75 0 011.5 0 .75.75 0 01-1.5 0z" />
-              </svg>
-              <h2 className="text-xl font-semibold">
-                Assignment Creation Guidelines
-              </h2>
-            </div>
+              {/* Guidelines List */}
+              <ul className="list-none text-gray-700 pl-6 space-y-2">
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    Use a <strong>descriptive title</strong> for the assignment.
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    Provide a <strong>clear</strong> and{" "}
+                    <strong>concise</strong> description.
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    Ensure the <strong>available from</strong> and{" "}
+                    <strong>due date</strong> are valid and within the course
+                    timeframe.
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    The <strong>due date</strong> must be after the{" "}
+                    <strong>available from</strong> date.
+                  </span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>
+                    Fill all <strong>required fields</strong> before submission.
+                  </span>
+                </li>
+              </ul>
 
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>Use a descriptive title for the assignment.</li>
-              <li>Provide a clear and concise description.</li>
-              <li>
-                Ensure start and end dates are valid and within the academic
-                year.
-              </li>
-              <li>End date must be after the start date.</li>
-              <li>Fill all required fields before submission.</li>
-            </ul>
-          </div>
-        </div>
-      )}
-      {/* End of Guidelines Modal */}
+              {/* Footer */}
+              <div className="flex justify-end mt-6">
+                <Button
+                  onClick={() => setShowGuidelines(false)}
+                  className="border border-gray-300 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-all"
+                >
+                  Close
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </Modal>
+      {/* End Guidelines Modal */}
     </div>
   );
 };

@@ -1,38 +1,169 @@
 import React, { useState } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { LuLoader } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
-import { createAcademicYear } from "../../Store/Slices/Common/Auth/actions/staffActions"; // Ensure correct path
+import { createAcademicYear } from "../../Store/Slices/Common/Auth/actions/staffActions";
 import Logo from "../Common/Logo";
+
+// Ant Design imports
+import { Input, DatePicker, Switch, Button, Tooltip } from "antd";
+import dayjs from "dayjs";
+
+// Icons
 import { IoIosArrowRoundBack } from "react-icons/io";
+import {
+  FiInfo,
+  FiCheckCircle,
+  FiXCircle,
+  FiCalendar,
+  FiCheck,
+} from "react-icons/fi";
+import { LuLoader } from "react-icons/lu";
+
+// Reusable guidelines modal
+import ReusableGuidelinesModal from "../Common/Modals/ReusableGuidelinesModal";
+
+// Layout and Background Image for the page layout
+import Layout from "../../Components/Common/Layout";
+import HomeBackground from "../../Assets/HomeAssets/HomeBackground.png";
 
 const CreateAcademicYear = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading } = useSelector((state) => state.common.auth);
+
+  // Form state
   const [yearData, setYearData] = useState({
     year: "",
     startDate: "",
     endDate: "",
-    isActive: true,
+    isActive: true, // Always true (non-editable)
   });
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.common.auth); // Get loading state from Redux store
+  // Error state for validation feedback
+  const [errors, setErrors] = useState({
+    year: "",
+    startDate: "",
+    endDate: "",
+  });
 
-  const handleBack = () => {
-    navigate(-1); // Navigate one step back in history
+  // Guidelines Modal state
+  const [showGuidelines, setShowGuidelines] = useState(false);
+
+  // ------------------
+  // VALIDATION HELPERS
+  // ------------------
+  const isYearValid = () => /^\d{4}-\d{4}$/.test(yearData.year);
+
+  const isDateRangeValid = () => {
+    if (!yearData.startDate || !yearData.endDate) return true;
+    return dayjs(yearData.startDate).isBefore(dayjs(yearData.endDate));
   };
+
+  const validateYear = (value) => {
+    if (!value) return "Year is required.";
+    if (!/^\d{4}-\d{4}$/.test(value)) return "Year format must be YYYY-YYYY.";
+    return "";
+  };
+
+  const validateStartDate = (startVal) => {
+    if (!startVal) return "Start Date is required.";
+    if (
+      yearData.endDate &&
+      !dayjs(startVal).isBefore(dayjs(yearData.endDate))
+    ) {
+      return "Start Date must be earlier than End Date.";
+    }
+    return "";
+  };
+
+  const validateEndDate = (endVal) => {
+    if (!endVal) return "End Date is required.";
+    if (
+      yearData.startDate &&
+      !dayjs(yearData.startDate).isBefore(dayjs(endVal))
+    ) {
+      return "End Date must be after Start Date.";
+    }
+    return "";
+  };
+
+  // ------------------
+  // HANDLERS
+  // ------------------
+  const handleBack = () => {
+    navigate(-1);
+  };
+
+  const handleYearChange = (e) => {
+    const value = e.target.value;
+    setYearData({ ...yearData, year: value });
+    setErrors((prev) => ({ ...prev, year: validateYear(value) }));
+  };
+
+  /**
+   * If user-typed date is invalid or empty, we reset the state
+   * to avoid "Invalid Date" rendering in the calendar cells.
+   */
+  const handleStartDateChange = (date, dateString) => {
+    if (!date || !date.isValid()) {
+      setYearData((prev) => ({ ...prev, startDate: "" }));
+      setErrors((prev) => ({
+        ...prev,
+        startDate: dateString
+          ? "Invalid date format."
+          : "Start Date is required.",
+      }));
+    } else {
+      setYearData({ ...yearData, startDate: dateString });
+      setErrors((prev) => ({
+        ...prev,
+        startDate: validateStartDate(dateString),
+      }));
+    }
+  };
+
+  const handleEndDateChange = (date, dateString) => {
+    if (!date || !date.isValid()) {
+      setYearData((prev) => ({ ...prev, endDate: "" }));
+      setErrors((prev) => ({
+        ...prev,
+        endDate: dateString ? "Invalid date format." : "End Date is required.",
+      }));
+    } else {
+      setYearData({ ...yearData, endDate: dateString });
+      setErrors((prev) => ({
+        ...prev,
+        endDate: validateEndDate(dateString),
+      }));
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!yearData.year || !yearData.startDate || !yearData.endDate) {
-      return toast.error("Please fill all the fields");
+    const finalYearError = validateYear(yearData.year);
+    const finalStartError = validateStartDate(yearData.startDate);
+    const finalEndError = validateEndDate(yearData.endDate);
+
+    if (finalYearError || finalStartError || finalEndError) {
+      setErrors({
+        year: finalYearError,
+        startDate: finalStartError,
+        endDate: finalEndError,
+      });
+      return;
     }
 
-    // Dispatch the createAcademicYear action
+    if (!isDateRangeValid()) {
+      toast.error("Start Date must be earlier than End Date");
+      return;
+    }
+
     dispatch(createAcademicYear(yearData))
       .unwrap()
       .then(() => {
-        navigate("/select_branch"); // Redirect to dashboard on success
+        toast.success("Academic Year Created Successfully!");
+        navigate("/select_branch");
       })
       .catch((error) => {
         toast.error(error);
@@ -40,112 +171,198 @@ const CreateAcademicYear = () => {
   };
 
   return (
-    <div className="relative h-screen bg-gray-100 w-full">
-      <div className="absolute top-0 right-0 p-6">
-        <NavLink to="/" className="text-sm text-gray-500 hover:text-gray-700">
-          <Logo />
-        </NavLink>
-      </div>
-      <div className="flex justify-center items-center w-full h-full">
-        <div className="bg-white border p-8 rounded-lg w-full max-w-md">
-          <div className="flex items-center gap-2 mb-6">
-            <button
-              onClick={handleBack}
-              className="text-sm text-gray-500 hover:text-gray-700  items-center flex gap-2 focus:outline-none"
+    <Layout title="Create Academic Year | Student Diwan">
+      <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
+        {/* Left Section: Form */}
+        <div className="md:col-span-7 flex items-center justify-center relative">
+          {/* Form Container */}
+          <div className="w-full max-w-md">
+            {/* Guidelines Modal */}
+            <ReusableGuidelinesModal
+              visible={showGuidelines}
+              onClose={() => setShowGuidelines(false)}
+              title="Academic Year Creation Guidelines"
+              icon={FiInfo}
             >
-              <div className="rounded-full border-2 text-xl w-6 h-6 flex justify-center items-center">
-                <IoIosArrowRoundBack />
-              </div>
-            </button>
-            <h2 className="text-2xl font-semibold">Create Academic Year</h2>
-          </div>
-          <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-              <label
-                htmlFor="year"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Academic Year (YYYY-YYYY)
-              </label>
-              <input
-                type="text"
-                id="year"
-                value={yearData.year}
-                onChange={(e) =>
-                  setYearData({ ...yearData, year: e.target.value })
-                }
-                placeholder="2024-2025"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
+              <ul className="list-none text-gray-700 pl-6 space-y-2">
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>Use the format YYYY-YYYY (e.g., 2024-2025).</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>Ensure the Start Date is before the End Date.</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>The academic year is always set as active.</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <FiCheck className="text-green-500" />
+                  <span>All fields are required for a valid submission.</span>
+                </li>
+              </ul>
+            </ReusableGuidelinesModal>
+
+            {/* Logo at the top-right of the left section (only visible on larger screens) */}
+            <div className="absolute top-0 right-0 p-6 hidden md:block">
+              <Logo />
             </div>
-            <div className="mb-4">
-              <label
-                htmlFor="startDate"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Start Date
-              </label>
-              <input
-                type="date"
-                id="startDate"
-                value={yearData.startDate}
-                onChange={(e) =>
-                  setYearData({ ...yearData, startDate: e.target.value })
-                }
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label
-                htmlFor="endDate"
-                className="block text-sm font-medium text-gray-700"
-              >
-                End Date
-              </label>
-              <input
-                type="date"
-                id="endDate"
-                value={yearData.endDate}
-                onChange={(e) =>
-                  setYearData({ ...yearData, endDate: e.target.value })
-                }
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={yearData.isActive}
-                  onChange={(e) =>
-                    setYearData({ ...yearData, isActive: e.target.checked })
-                  }
-                />
-                <span className="ml-2 text-sm text-gray-700">
-                  Set as Active Year
-                </span>
-              </label>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
-              disabled={loading}
-            >
-              {loading ? (
-                <div className="flex justify-center">
-                  <LuLoader className="animate-spin text-2xl" />
+
+            <div className="bg-white border p-8 rounded-lg">
+              {/* Header Row: Back Button, Title, and Guidelines Icon */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleBack}
+                    className="text-sm text-gray-500 hover:text-gray-700 flex gap-2 focus:outline-none"
+                  >
+                    <div className="rounded-full border-2 text-xl w-6 h-6 flex justify-center items-center">
+                      <IoIosArrowRoundBack />
+                    </div>
+                  </button>
+                  <h2 className="text-xl font-semibold">
+                    Create Academic Year
+                  </h2>
                 </div>
-              ) : (
-                "Create Academic Year"
-              )}
-            </button>
-          </form>
+                {/* Guidelines Icon Button */}
+                <Tooltip title="Guidelines">
+                  <Button
+                    shape="circle"
+                    icon={<FiInfo />}
+                    onClick={() => setShowGuidelines(true)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white border-none"
+                  />
+                </Tooltip>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Academic Year Input */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Academic Year (YYYY-YYYY)
+                  </label>
+                  <Input
+                    placeholder="2024-2025"
+                    value={yearData.year}
+                    onChange={handleYearChange}
+                    className={`h-12 ${errors.year ? "border-red-500" : ""}`}
+                    suffix={
+                      errors.year ? (
+                        <FiXCircle className="text-red-500" />
+                      ) : yearData.year && isYearValid() ? (
+                        <FiCheckCircle className="text-green-500" />
+                      ) : null
+                    }
+                  />
+                  {errors.year && (
+                    <p className="text-red-500 text-xs mt-1">{errors.year}</p>
+                  )}
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Start Date
+                  </label>
+                  <DatePicker
+                    className={`w-full h-12 ${
+                      errors.startDate ? "border-red-500" : ""
+                    }`}
+                    format="DD-MM-YYYY"
+                    value={
+                      yearData.startDate
+                        ? dayjs(yearData.startDate, "DD-MM-YYYY")
+                        : null
+                    }
+                    onChange={handleStartDateChange}
+                    suffixIcon={
+                      errors.startDate ? (
+                        <FiXCircle className="text-red-500" />
+                      ) : yearData.startDate && isDateRangeValid() ? (
+                        <FiCheckCircle className="text-green-500" />
+                      ) : (
+                        <FiCalendar />
+                      )
+                    }
+                  />
+                  {errors.startDate && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.startDate}
+                    </p>
+                  )}
+                </div>
+
+                {/* End Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    End Date
+                  </label>
+                  <DatePicker
+                    className={`w-full h-12 ${
+                      errors.endDate ? "border-red-500" : ""
+                    }`}
+                    format="DD-MM-YYYY"
+                    value={
+                      yearData.endDate
+                        ? dayjs(yearData.endDate, "DD-MM-YYYY")
+                        : null
+                    }
+                    onChange={handleEndDateChange}
+                    suffixIcon={
+                      errors.endDate ? (
+                        <FiXCircle className="text-red-500" />
+                      ) : yearData.endDate && isDateRangeValid() ? (
+                        <FiCheckCircle className="text-green-500" />
+                      ) : (
+                        <FiCalendar />
+                      )
+                    }
+                  />
+                  {errors.endDate && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.endDate}
+                    </p>
+                  )}
+                </div>
+
+                {/* Active Year (always enabled, non-editable) */}
+                <div className="flex items-center mt-4">
+                  <Switch checked={yearData.isActive} disabled />
+                  <span className="ml-2 text-sm text-gray-700">
+                    Set as Active Year
+                  </span>
+                </div>
+
+                {/* Submit Button */}
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  className="w-full !bg-gradient-to-r !from-pink-500 !to-purple-500 !border-none hover:!from-pink-600 hover:!to-purple-600 h-12"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <LuLoader className="animate-spin text-2xl" />
+                  ) : (
+                    "Create Academic Year"
+                  )}
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Section: Background Image */}
+        <div className="md:col-span-5 relative">
+          <img
+            src={HomeBackground}
+            alt="Background"
+            className="w-full h-full object-cover"
+          />
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
