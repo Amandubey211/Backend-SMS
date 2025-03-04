@@ -33,7 +33,7 @@ const Library = () => {
   };
 
   // Loading state: use shimmer UI that mimics BookItem layout
-  if (!loading) {
+  if (loading) {
     return (
       <div className="p-4 bg-white">
         {/* Header Skeleton */}
