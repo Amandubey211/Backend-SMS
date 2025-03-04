@@ -33,7 +33,9 @@ const EventItem = ({ event, onUpdate }) => {
   };
 
   const truncateText = (text, maxLength) => {
-    return text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    return text?.length > maxLength
+      ? `${text.substring(0, maxLength)}...`
+      : text;
   };
 
   return (
@@ -41,13 +43,14 @@ const EventItem = ({ event, onUpdate }) => {
       <div className="flex items-center">
         <img
           className="w-10 h-10 rounded-full mr-4"
-          src={event.eventImage || "https://img.freepik.com/premium-vector/social-events-icon-vector-image-can-be-used-elderly-care_120816-241693.jpg"|| "https://via.placeholder.com/50"}
+          src={
+            event.eventImage ||
+            "https://img.freepik.com/premium-vector/social-events-icon-vector-image-can-be-used-elderly-care_120816-241693.jpg" ||
+            "https://via.placeholder.com/50"
+          }
           alt={event.eventName}
         />
-        <p
-          className="text-md text-gray-900 truncate"
-          title={event.eventName}
-        >
+        <p className="text-md text-gray-900 truncate" title={event.eventName}>
           {truncateText(event.eventName, 30)}
         </p>
       </div>
