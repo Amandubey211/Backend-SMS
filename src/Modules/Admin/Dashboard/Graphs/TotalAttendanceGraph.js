@@ -3,13 +3,35 @@ import { Bar } from "react-chartjs-2";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAttendanceData } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import { FiCalendar, FiAlertCircle } from "react-icons/fi";
-import Spinner from "../../../../Components/Common/Spinner";
-import { useTranslation } from 'react-i18next';
+import { Skeleton, Select } from "antd";
+import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
+const { Option } = Select;
+
+// Custom skeleton component simulating a bar graph for attendance data
+const BarGraphSkeleton = () => {
+  const numberOfBars = 10;
+  const bars = Array.from({ length: numberOfBars });
+  return (
+    <div className="flex items-end space-x-6 h-72">
+      {bars.map((_, index) => (
+        <div
+          key={index}
+          className="bg-gray-300 rounded animate-pulse"
+          style={{
+            width: "20px",
+            height: `${Math.floor(Math.random() * 60) + 40}%`,
+          }}
+        ></div>
+      ))}
+    </div>
+  );
+};
+
 const TotalAttendanceGraph = () => {
-  const { t } = useTranslation('admDashboad');
+  const { t } = useTranslation("admDashboad");
   const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
 
@@ -19,12 +41,13 @@ const TotalAttendanceGraph = () => {
 
   const dispatch = useDispatch();
 
-  const { attendanceData, loadingAttendance: loading, errorAttendance: error } = useSelector(
-    (state) => state?.admin?.adminDashboard
-  );
+  const {
+    attendanceData,
+    loadingAttendance: loading,
+    errorAttendance: error,
+  } = useSelector((state) => state?.admin?.adminDashboard);
 
   useEffect(() => {
-    // console.log(`Fetching data for: month=${month}, year=${year}`);
     dispatch(fetchAttendanceData({ month, year }));
   }, [month, year, dispatch]);
 
@@ -51,40 +74,35 @@ const TotalAttendanceGraph = () => {
         }
       });
 
-      const labels = sortedAttendance?.map((item) => item.className);
-
-      const femaleAttendance = sortedAttendance?.map(
+      const labels = sortedAttendance.map((item) => item.className);
+      const femaleAttendance = sortedAttendance.map(
         (item) => item.femaleAttendance
       );
-      const maleAttendance = sortedAttendance?.map(
+      const maleAttendance = sortedAttendance.map(
         (item) => item.maleAttendance
       );
 
       const filteredData = {
         labels: labels,
         datasets: [
-          gender === "Female" || gender === "Both"
-            ? {
-              label: t("Female"),
-              data: femaleAttendance,
-              backgroundColor: "#8F77F3",
-              borderRadius: 10,
-              borderWidth: 1,
-              stack: "combined",
-              barThickness: 30,
-            }
-            : null,
-          gender === "Male" || gender === "Both"
-            ? {
-              label: t("Male"),
-              data: maleAttendance,
-              backgroundColor: "#23C55E",
-              borderRadius: 10,
-              borderWidth: 1,
-              stack: "combined",
-              barThickness: 30,
-            }
-            : null,
+          (gender === "Female" || gender === "Both") && {
+            label: t("Female"),
+            data: femaleAttendance,
+            backgroundColor: "#8F77F3",
+            borderRadius: 10,
+            borderWidth: 1,
+            stack: "combined",
+            barThickness: 30,
+          },
+          (gender === "Male" || gender === "Both") && {
+            label: t("Male"),
+            data: maleAttendance,
+            backgroundColor: "#23C55E",
+            borderRadius: 10,
+            borderWidth: 1,
+            stack: "combined",
+            barThickness: 30,
+          },
         ].filter(Boolean),
       };
 
@@ -92,28 +110,20 @@ const TotalAttendanceGraph = () => {
     } else {
       setGraphData(null);
     }
-  }, [attendanceData, gender]);
+  }, [attendanceData, gender, t]);
 
-  const handleMonthChange = (e) => {
-    const newMonth = parseInt(e.target.value);
-    // console.log(`Month changed to: ${newMonth}`);
-    setMonth(newMonth);
-  };
+  // Using Ant Design's Select: onChange receives the value directly
+  const handleMonthChange = (value) => setMonth(value);
 
-  const handleYearChange = (e) => {
-    const selectedValue = e.target.value;
-    if (selectedValue === "Current Year") {
-      // console.log("Year changed to current year");
+  const handleYearChange = (value) => {
+    if (value === "Current Year") {
       setYear(currentYear);
-    } else if (selectedValue === "Past Year") {
-      // console.log("Year changed to past year");
+    } else if (value === "Past Year") {
       setYear(currentYear - 1);
     }
   };
 
-  const handleGenderChange = (e) => {
-    setGender(e.target.value);
-  };
+  const handleGenderChange = (value) => setGender(value);
 
   // Generate array of years dynamically
   const availableYears = [
@@ -125,151 +135,164 @@ const TotalAttendanceGraph = () => {
   const yearLabel = year === currentYear ? t("Current Year") : t("Past Year");
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.GET_GRAPH_STUDENT_ATTENDENCE} 
-    title={t("Attendence")}>
-    <div className="bg-white p-4 h-[100%] ">
-      <div className="flex justify-between items-center mb-4">
-        <div>
-          <h2 className="text-xl font-semibold">{t("Today's Attendance")}</h2>
-          <div className="text-3xl font-bold">
-            {attendanceData
-              ? attendanceData.totalMaleAttendance +
-              attendanceData.totalFemaleAttendance
-              : 0}
+    <ProtectedSection
+      requiredPermission={PERMISSIONS.GET_GRAPH_STUDENT_ATTENDENCE}
+      title={t("Attendence")}
+    >
+      <div className="bg-white p-4 h-[100%]">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            {/* Shortened title text */}
+            <h2 className="text-xl font-semibold">{t("Attendance")}</h2>
+            <div className="text-3xl font-bold">
+              {attendanceData
+                ? attendanceData.totalMaleAttendance +
+                  attendanceData.totalFemaleAttendance
+                : 0}
+            </div>
           </div>
-        </div>
-        <div className="flex space-x-2">
-          <select
-            className="border rounded p-2"
-            onChange={handleMonthChange}
-            value={month}
-          >
-            {[...Array(12).keys()]?.map((i) => (
-              <option key={i} value={i + 1}>
-                {t(new Date(0, i).toLocaleString("default", { month: "long" }))}
-              </option>
-            ))}
-          </select>
+          <div className="flex space-x-2">
+            <Select onChange={handleMonthChange} value={month} className="w-32">
+              {[...Array(12).keys()].map((i) => (
+                <Option key={i} value={i + 1}>
+                  {t(
+                    new Date(0, i).toLocaleString("default", { month: "short" })
+                  )}
+                </Option>
+              ))}
+            </Select>
 
-          <select
-            className="border rounded p-2"
-            onChange={handleYearChange}
-            value={yearLabel}
-          >
-            {availableYears?.map(({ label, value }) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-          <select
-            className="border rounded p-2"
-            onChange={handleGenderChange}
-            value={gender}
-          >
-            <option value="Both">{t("Both")}</option>
-            <option value="Male">{t("Male")}</option>
-            <option value="Female">{t("Female")}</option>
-          </select>
+            <Select
+              onChange={handleYearChange}
+              value={yearLabel}
+              className="w-32"
+            >
+              {availableYears.map(({ label, value }) => (
+                <Option key={value} value={value}>
+                  {label}
+                </Option>
+              ))}
+            </Select>
+
+            <Select
+              onChange={handleGenderChange}
+              value={gender}
+              className="w-32"
+            >
+              <Option value="Both">{t("Both")}</Option>
+              <Option value="Male">{t("Male")}</Option>
+              <Option value="Female">{t("Female")}</Option>
+            </Select>
+          </div>
         </div>
+
+        {loading ? (
+          // Show custom bar graph skeleton UI when loading
+          <div className="bg-white p-4 h-[100%]">
+            <div
+              className="flex justify-center items-center"
+              style={{ height: "300px" }}
+            >
+              <BarGraphSkeleton />
+            </div>
+            <div className="flex justify-around mt-4">
+              <Skeleton.Input style={{ width: 100, height: 20 }} active />
+              <Skeleton.Input style={{ width: 100, height: 20 }} active />
+            </div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center text-gray-400">
+            <FiAlertCircle className="w-12 h-12 mb-2" />
+            <p>{`${t("Error")}: ${error}`}</p>
+          </div>
+        ) : !attendanceData || attendanceData?.attendanceData?.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-gray-400 h-full">
+            <FiCalendar className="w-12 h-12 mb-2" />
+            <p>{t("No Attendance Data Found")}</p>
+          </div>
+        ) : graphData ? (
+          <>
+            <div style={{ height: "300px" }}>
+              <Bar
+                data={graphData}
+                options={{
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      stacked: true,
+                      ticks: {
+                        stepSize: 100,
+                        max: 500,
+                      },
+                    },
+                    x: {
+                      stacked: true,
+                      barPercentage: 0.5,
+                    },
+                  },
+                  plugins: {
+                    tooltip: {
+                      backgroundColor: "rgba(0, 0, 0, 0.8)",
+                      titleFont: {
+                        size: 14,
+                        weight: "bold",
+                      },
+                      bodyFont: {
+                        size: 14,
+                      },
+                      displayColors: true,
+                      usePointStyle: true,
+                      boxWidth: 10,
+                      boxHeight: 10,
+                      callbacks: {
+                        label: function (context) {
+                          const value = context.raw.toLocaleString();
+                          const label = context.dataset.label;
+                          return `${label}: ${value}`;
+                        },
+                        title: function () {
+                          return "";
+                        },
+                      },
+                    },
+                    legend: {
+                      display: false,
+                    },
+                  },
+                  responsive: true,
+                  maintainAspectRatio: false,
+                }}
+              />
+            </div>
+            <div className="flex justify-around mt-4">
+              <div className="flex flex-col items-start">
+                <div
+                  className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"
+                  style={{ alignSelf: "flex-start" }}
+                ></div>
+                <div className="flex items-center">
+                  <div className="text-gray-700">{t("Total Female Att.")}</div>
+                  <div className="ml-2 font-bold">
+                    {attendanceData ? attendanceData.totalFemaleAttendance : 0}
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-start">
+                <div
+                  className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"
+                  style={{ alignSelf: "flex-start" }}
+                ></div>
+                <div className="flex items-center">
+                  <div className="text-gray-700">{t("Total Male Att.")}</div>
+                  <div className="ml-2 font-bold">
+                    {attendanceData ? attendanceData.totalMaleAttendance : 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        ) : null}
       </div>
-      {loading ? (
-        <div className="flex flex-col items-center justify-center">
-          <Spinner />
-        </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center text-gray-400">
-          <FiAlertCircle className="w-12 h-12 mb-2" />
-          <p>{`${t("Error")}: ${error}`}</p>
-        </div>
-      ) : !attendanceData || attendanceData?.attendanceData?.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-gray-400 h-full">
-          <FiCalendar className="w-12 h-12 mb-2" />
-          <p>{t("No Attendance Data Found")}</p>
-        </div>
-      ) : graphData ? (
-        <>
-          <div style={{ height: "300px" }}>
-            <Bar
-              data={graphData}
-              options={{
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    stacked: true,
-                    ticks: {
-                      stepSize: 100,
-                      max: 500,
-                    },
-                  },
-                  x: {
-                    stacked: true,
-                    barPercentage: 0.5,
-                  },
-                },
-                plugins: {
-                  tooltip: {
-                    backgroundColor: "rgba(0, 0, 0, 0.8)",
-                    titleFont: {
-                      size: 14,
-                      weight: "bold",
-                    },
-                    bodyFont: {
-                      size: 14,
-                    },
-                    displayColors: true,
-                    usePointStyle: true,
-                    boxWidth: 10,
-                    boxHeight: 10,
-                    callbacks: {
-                      label: function (context) {
-                        const value = context.raw.toLocaleString();
-                        const label = context.dataset.label;
-                        return `${label}: ${value}`;
-                      },
-                      title: function () {
-                        return "";
-                      },
-                    },
-                  },
-                  legend: {
-                    display: false,
-                  },
-                },
-                responsive: true,
-                maintainAspectRatio: false,
-              }}
-            />
-          </div>
-          <div className="flex justify-around mt-4">
-            <div className="flex flex-col items-start">
-              <div
-                className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"
-                style={{ alignSelf: "flex-start" }}
-              ></div>
-              <div className="flex items-center">
-                <div className="text-gray-700">{t("Total Female Att.")}</div>
-                <div className="ml-2 font-bold">
-                  {attendanceData ? attendanceData.totalFemaleAttendance : 0}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-start">
-              <div
-                className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"
-                style={{ alignSelf: "flex-start" }}
-              ></div>
-              <div className="flex items-center">
-                <div className="text-gray-700">{t("Total Male Att.")}</div>
-                <div className="ml-2 font-bold">
-                  {attendanceData ? attendanceData.totalMaleAttendance : 0}
-                </div>
-              </div>
-            </div>
-          </div>
-        </>
-      ) : null}
-    </div>
     </ProtectedSection>
   );
 };

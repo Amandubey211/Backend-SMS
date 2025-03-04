@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback, memo } from "react";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { FaCalendarAlt } from "react-icons/fa";
-import Spinner from "../../../../Components/Common/Spinner";
 import EventItem from "./EventItem";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
-import { fetchFilteredEvents } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import the action
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFilteredEvents } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import { Skeleton } from "antd";
 
 const monthNames = [
   "JANUARY",
@@ -28,17 +28,14 @@ const monthNames = [
 const Events = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // Extract events, loading, and error from the Redux store
-  const { events, loadingEvents: loading, errorEvents: error } = useSelector(
-    (state) => state.admin.adminDashboard
-  );
-
+  const {
+    events,
+    loadingEvents: loading,
+    errorEvents: error,
+  } = useSelector((state) => state.admin.adminDashboard);
   const { t } = useTranslation("admEvent");
-
-  const currentMonth = new Date().getMonth() + 1; // Months are zero-indexed
+  const currentMonth = new Date().getMonth() + 1;
   const currentYear = new Date().getFullYear();
-
   const [date, setDate] = useState({ month: currentMonth, year: currentYear });
 
   const fetchEvents = useCallback(() => {
@@ -51,14 +48,14 @@ const Events = () => {
 
   const handleMonthChange = (newMonth, newYear) => {
     setDate({ month: newMonth, year: newYear });
-    dispatch(fetchFilteredEvents({ month: newMonth, year: newYear })); // Dispatch API request immediately after date update
+    dispatch(fetchFilteredEvents({ month: newMonth, year: newYear }));
   };
 
   const handlePreviousMonth = () => {
     setDate((prevDate) => {
       const newMonth = prevDate.month === 1 ? 12 : prevDate.month - 1;
       const newYear = prevDate.month === 1 ? prevDate.year - 1 : prevDate.year;
-      handleMonthChange(newMonth, newYear); // Update state and fetch events
+      handleMonthChange(newMonth, newYear);
       return { month: newMonth, year: newYear };
     });
   };
@@ -67,7 +64,7 @@ const Events = () => {
     setDate((prevDate) => {
       const newMonth = prevDate.month === 12 ? 1 : prevDate.month + 1;
       const newYear = prevDate.month === 12 ? prevDate.year + 1 : prevDate.year;
-      handleMonthChange(newMonth, newYear); // Update state and fetch events
+      handleMonthChange(newMonth, newYear);
       return { month: newMonth, year: newYear };
     });
   };
@@ -80,10 +77,13 @@ const Events = () => {
     // Placeholder: Events will be re-fetched on update
   };
 
-  const top5Events = events?.slice?.(0, 5) || [];
+  const top5Events = events?.slice?.(0, 4) || [];
 
   return (
-    <ProtectedSection requiredPermission={PERMISSIONS.DASH_VIEW_EVENTS} title={t("Events")}>
+    <ProtectedSection
+      requiredPermission={PERMISSIONS.DASH_VIEW_EVENTS}
+      title={t("Events")}
+    >
       <div className="max-w-4xl mx-auto text-gray-600 bg-white p-4">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-medium">{t("Event")}</h2>
@@ -97,11 +97,13 @@ const Events = () => {
             <h3 className="text-lg font-medium">
               {monthNames?.[date?.month - 1]} {date?.year}
             </h3>
-            <button className="p-1 border rounded-full" onClick={handleNextMonth}>
+            <button
+              className="p-1 border rounded-full"
+              onClick={handleNextMonth}
+            >
               <IoIosArrowForward />
             </button>
           </div>
-
           <button
             className="text-black border border-gray-300 px-4 py-2 rounded-md hover:shadow-md transition duration-300 ease-in-out"
             onClick={handleViewAll}
@@ -116,8 +118,29 @@ const Events = () => {
         </div>
         <div className="divide-y divide-gray-200">
           {loading ? (
-            <div className="flex justify-center items-center my-10">
-              <Spinner />
+            <div className="divide-y divide-gray-200">
+              {Array.from({ length: 4 }).map((_, idx) => (
+                <div
+                  key={`event-skeleton-${idx}`}
+                  className="grid grid-cols-3 items-center py-4 gap-4"
+                >
+                  <div className="flex items-center">
+                    <Skeleton.Avatar
+                      active
+                      size={40}
+                      shape="circle"
+                      className="mr-4"
+                    />
+                    <Skeleton.Input active style={{ width: 50, height: 20 }} />
+                  </div>
+                  <div className="ml-7">
+                    <Skeleton.Input active style={{ width: 120, height: 20 }} />
+                  </div>
+                  <div>
+                    <Skeleton.Input active style={{ width: 100, height: 20 }} />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : error ? (
             <div className="flex flex-col items-center justify-center my-10">
