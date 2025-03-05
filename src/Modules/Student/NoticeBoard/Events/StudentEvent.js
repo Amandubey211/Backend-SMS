@@ -6,11 +6,9 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
 import { format, parse, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { IoCalendarOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { stdEvent } from "../../../../Store/Slices/Student/Noticeboard/events.action";
 import {
-  setCurrentPage,
   setFilteredEvents,
   setSelectedEvent,
   setSidebarContent,
@@ -24,21 +22,22 @@ import { gt } from "../../../../Utils/translator/translation";
 import OfflineModal from "../../../../Components/Common/Offline";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import Spinner from "../../../../Components/Common/Spinner";
+import NoEventFound from "../../../../Assets/StudentAssets/no-event-found.avif";
 
 const StudentEvent = () => {
   const {
     eventData,
     filteredEvents,
-    currentPage,
     selectedEvent,
     sidebarContent,
     isSidebarOpen,
-    itemsPerPage,
     currentDate,
     loading,
     error,
   } = useSelector((store) => store.student.studentEvent);
   const { showError } = useSelector((store) => store?.common?.alertMsg);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -46,10 +45,7 @@ const StudentEvent = () => {
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
-  // console.log("I am in inside1 :", eventData);
 
-  // console.log("I am in inside :", filteredEvents);
-  // card colour
   const bgColors = [
     "bg-pink-500",
     "bg-purple-500",
@@ -65,7 +61,7 @@ const StudentEvent = () => {
 
   useEffect(() => {
     dispatch(stdEvent());
-  }, [dispatch, stdEvent]);
+  }, [dispatch]);
 
   useEffect(() => {
     filterAndSortEvents(eventData, selectedMonthYear);
@@ -74,47 +70,38 @@ const StudentEvent = () => {
   const filterAndSortEvents = (eventData, selectedMonthYear) => {
     const filtered = eventData?.filter((event) => {
       const eventDate = new Date(event.startDate);
-      // console.log("event date is: ", eventDate);
       return (
         eventDate.getMonth() === selectedMonthYear?.month &&
         eventDate?.getFullYear() === selectedMonthYear.year
       );
     });
 
-    const sorted = filtered?.sort((a, b) => a.startDate - b.startDate);
-    // console.log("sorted event :", sorted);
+    const sorted = filtered?.sort(
+      (a, b) => new Date(a.startDate) - new Date(b.startDate)
+    );
     dispatch(setFilteredEvents(sorted));
-    dispatch(setCurrentPage(0));
+    setCurrentIndex(0); // Reset currentIndex when month changes
   };
 
-  // calender function
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
     const dayEvents = filteredEvents?.filter(
       (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
     );
 
-    const bgColors = [
-      "bg-pink-500",
-      "bg-purple-500",
-      "bg-blue-500",
-      "bg-indigo-500",
-    ];
-
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
         {dayEvents?.map((event, index) => {
-          // Parse time from event, support both 24-hour and 12-hour formats
           let eventTime = event?.time
-            ? parse(event?.time, "hh:mm a", new Date()) // Try parsing as 12-hour format first
+            ? parse(event?.time, "hh:mm a", new Date())
             : event?.startDate;
 
           if (!isValid(eventTime)) {
-            eventTime = parse(event?.time, "HH:mm", new Date()); // Fallback for 24-hour format
+            eventTime = parse(event?.time, "HH:mm", new Date());
           }
 
           const timeString = isValid(eventTime)
-            ? format(eventTime, "hh:mm a") // Always display in 12-hour format
+            ? format(eventTime, "hh:mm a")
             : "Invalid Time";
 
           return (
@@ -133,14 +120,12 @@ const StudentEvent = () => {
     );
   };
 
-  // event card function
   const handleStickerClick = (event) => {
     dispatch(setSelectedEvent(event));
     dispatch(setSidebarContent("viewEvent"));
     dispatch(setSidebarOpen(true));
   };
 
-  // View event function
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewEvent":
@@ -150,74 +135,74 @@ const StudentEvent = () => {
     }
   };
 
-  // sidebar function
   const handleSidebarView = () => {
     dispatch(setSidebarOpen(false));
   };
 
-  // pagination
-  const paginatedEvents = filteredEvents?.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
-  );
-  // console.log("pagination event is :", paginatedEvents);
-  const handlePagination = () => {
-    dispatch(setCurrentPage((prev) => Math.max(prev - 1, 0)));
+  const paginatedEvents = filteredEvents.slice(currentIndex, currentIndex + 4); // Use filteredEvents
+
+  const handlePrev = () => {
+    if (currentIndex - 4 >= 0) {
+      setCurrentIndex((prev) => prev - 4);
+    }
   };
 
-  const handleFilterPage = () => {
-    dispatch(setCurrentPage((prev) => prev + 1));
+  const handleNext = () => {
+    if (currentIndex + 4 < filteredEvents.length) {
+      // Use filteredEvents length
+      setCurrentIndex((prev) => prev + 4);
+    }
   };
 
-  // selected Month and Year
-  // console.log("dsdfasasasa",paginatedEvents)
   return (
     <>
-      <Layout title="Event">
+      <Layout title="Events">
         <StudentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50 w-full">
-            <div className="flex flex-row justify-between">
-              <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                {t("Student Events", gt.stdEvents)}
-              </h1>
-            </div>
-
-            <div className="my-4 w-full h-auto flex rounded-sm gap- relative">
-              {currentPage > 0 && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
-                  onClick={handlePagination}
+            <div className="my-4 w-full h-auto flex items-baseline relative">
+              {currentIndex > 0 && (
+                <button
+                  className="p-1 border rounded-full hover:bg-gray-700 hover:text-white absolute left-[-10px] top-1/2 transform -translate-y-1/2 text-gray-500 bg-gray-100 shadow-md transition-all z-10"
+                  onClick={handlePrev}
                 >
-                  <IoIosArrowBack />
-                </div>
+                  <IoIosArrowBack size={20} />
+                </button>
               )}
               {loading && !error ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500 ">
                   <Spinner />
                 </div>
-              ) : !loading && paginatedEvents?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
-                  <IoCalendarOutline className="text-6xl" />
-                  <span>{t("No Events in this Month", gt.stdEvents)}</span>
+              ) : paginatedEvents?.length > 0 ? (
+                <div className="grid grid-cols-4 gap-4">
+                  {paginatedEvents.map((event, index) => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      color={bgColors[index % bgColors.length]}
+                      onClick={handleStickerClick}
+                      className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
+                    />
+                  ))}
                 </div>
               ) : (
-                paginatedEvents?.map((event, index) => (
-                  <EventCard
-                    key={event?.id}
-                    event={event}
-                    color={bgColors[index % bgColors?.length]}
-                    onClick={handleStickerClick}
-                    className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
-                  />
-                ))
-              )}
-              {(currentPage + 1) * itemsPerPage < filteredEvents?.length && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
-                  onClick={handleFilterPage}
-                >
-                  <IoIosArrowForward />
+                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
+                  <img
+                    src={NoEventFound}
+                    className="h-[200px] w-[300px]"
+                    alt="event"
+                  ></img>
+                  {/* <IoCalendarOutline className="text-6xl" /> */}
+                  <span>{t("No Events in this Month", gt.stdEvents)}</span>
                 </div>
+              )}
+
+              {currentIndex + 4 < filteredEvents.length && (
+                <button
+                  className="p-1 border rounded-full hover:bg-gray-700 hover:text-white absolute right-[-10px] top-1/2 transform -translate-y-1/2 p text-gray-500 bg-gray-100 shadow-md transition-all z-10"
+                  onClick={handleNext}
+                >
+                  <IoIosArrowForward size={20} />
+                </button>
               )}
             </div>
 

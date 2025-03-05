@@ -27,7 +27,7 @@ const MainSection = () => {
         requiredPermission={PERMISSIONS.ANNOUNCEMENT_BY_ID}
         title="Announcement "
       >
-        <div className="border-l w-full">
+        <div className="border-l w-full  ">
           <AnnouncementViewHeader />
           <div className="p-4 bg-white ">
             {loading ? (
@@ -44,7 +44,7 @@ const MainSection = () => {
                   />
                 )}
                 <div
-                  className="text-gray-700 mb-6"
+                  className="text-gray-700 mb-6 "
                   dangerouslySetInnerHTML={{ __html: announcement.content }}
                 />
               </>

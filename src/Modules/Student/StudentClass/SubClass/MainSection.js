@@ -104,7 +104,6 @@ const MainSection = () => {
    
   }, [dispatch]);
 
-  console.log("calss data ", classData);
   return (
     <>
    

@@ -4,7 +4,7 @@ import {
   fetchSubjects,
   fetchTasks,
   fetchStudentGrades,
-  fetchExamResults
+  fetchExamResults,
 } from "./studentDashboard.action";
 
 const initialState = {
@@ -40,6 +40,8 @@ const studentDashboardSlice = createSlice({
         state.attendanceError = false;
       })
       .addCase(fetchDashboardDetails.fulfilled, (state, action) => {
+        console.log("card payload", action.payload);
+
         state.loading = false;
         state.cardData = action.payload?.cardData;
         state.paidFees = action.payload?.paidFees;
@@ -90,21 +92,20 @@ const studentDashboardSlice = createSlice({
         state.error = action.payload || true;
       });
 
-
-      // Handling Exam Results Fetching
+    // Handling Exam Results Fetching
     builder
-    .addCase(fetchExamResults.pending, (state) => {
-      state.loading = true;
-      state.error = false;
-    })
-    .addCase(fetchExamResults.fulfilled, (state, action) => {
-      state.loading = false;
-      state.examResults = action.payload; // Update state with fetched results
-    })
-    .addCase(fetchExamResults.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload || "Failed to fetch exam results.";
-    });
+      .addCase(fetchExamResults.pending, (state) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(fetchExamResults.fulfilled, (state, action) => {
+        state.loading = false;
+        state.examResults = action.payload; // Update state with fetched results
+      })
+      .addCase(fetchExamResults.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch exam results.";
+      });
   },
 });
 

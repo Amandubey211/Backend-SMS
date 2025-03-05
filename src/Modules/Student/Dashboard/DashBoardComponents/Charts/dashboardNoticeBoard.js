@@ -60,7 +60,7 @@ const DashboardNoticeBoard = (descriptionLength) => {
       </div>
       <div className=" overflow-hidden">
         {topNotices?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center my-10 h-auto">
+          <div className="flex flex-col items-center justify-center my-20 h-auto">
             <FaCalendarAlt className="text-gray-400 text-3xl mb-4" />
             <p className="text-gray-500 text-md">No noticeboard data found</p>
           </div>

@@ -11,8 +11,7 @@ import {
 
 export const fetchStudentAnnounce = createAsyncThunk(
   "announce/fetchStudentAnnounce",
-  async ({ cid, sid }, { rejectWithValue, dispatch,getState }) => {
-    
+  async ({ cid, sid }, { rejectWithValue, dispatch, getState }) => {
     try {
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
@@ -30,13 +29,14 @@ export const fetchStudentAnnounce = createAsyncThunk(
 
 export const fetchStudentAnnounceById = createAsyncThunk(
   "announce/fetchStudentAnnounceById",
-  async (aid, { rejectWithValue, dispatch }) => {
+  async ({aid, cid, sid}, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
       const response = await getData(`/admin/announcement/${aid}?say=${say}`);
       const data = response?.data;
       // console.log("response data---", data);
+      dispatch(fetchStudentAnnounce({ cid, sid }));
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);
@@ -46,15 +46,18 @@ export const fetchStudentAnnounceById = createAsyncThunk(
 
 export const markAsReadStudentAnnounce = createAsyncThunk(
   "announce/markAsReadStudentAnnounce",
-  async (id, { rejectWithValue, dispatch }) => {
+  async ({ id, cid, sid }, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
       const response = await putData(
         `/admin/markAsRead/announcement/${id}?say=${say}`
       );
-      const data = response?.data;
-      // console.log("response data---", data);
+      console.log("mark data---", response);
+      const data = response;
+      console.log("fetch again");
+
+      dispatch(fetchStudentAnnounce({ cid, sid }));
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

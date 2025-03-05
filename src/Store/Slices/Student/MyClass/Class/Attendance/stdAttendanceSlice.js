@@ -11,7 +11,7 @@ const initialState = {
     absentCount: 0,
     leaveCount: 0,
   },
-  currentDate: moment(),
+  currentDate: moment(), // Ensure moment instance
 };
 
 const stdAttendanceSlice = createSlice({
@@ -19,7 +19,7 @@ const stdAttendanceSlice = createSlice({
   initialState,
   reducers: {
     setCurrentDate: (state, action) => {
-      state.currentDate = action.payload;
+      state.currentDate = moment(action.payload); // Ensure moment object
     },
   },
   extraReducers: (builder) => {
@@ -30,11 +30,26 @@ const stdAttendanceSlice = createSlice({
       })
       .addCase(stdAttendance.fulfilled, (state, action) => {
         state.loading = false;
-        state.summary = action.payload.summary;
-        state.attendanceData = action.payload?.report?.reduce((acc, entry) => {
-          acc[entry?.date] = entry.status;
-          return acc;
-        }, {});
+        state.error = false;
+
+        // Ensure payload structure is valid
+        const { summary, report } = action.payload || {};
+        state.summary = summary || {
+          presentCount: 0,
+          absentCount: 0,
+          leaveCount: 0,
+        };
+
+        // Convert report array to an object mapping dates to status
+        state.attendanceData =
+          Array.isArray(report) && report.length > 0
+            ? report.reduce((acc, entry) => {
+                if (entry?.date && entry?.status) {
+                  acc[entry.date] = entry.status;
+                }
+                return acc;
+              }, {})
+            : {};
       })
       .addCase(stdAttendance.rejected, (state, action) => {
         state.loading = false;

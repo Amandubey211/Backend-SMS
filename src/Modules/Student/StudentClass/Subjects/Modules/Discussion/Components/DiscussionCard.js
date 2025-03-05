@@ -1,18 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaEllipsisV } from "react-icons/fa";
 import { IoCalendarOutline } from "react-icons/io5";
-import { TbBookmark, TbBookmarkFilled } from "react-icons/tb";
+import { TbBookmark, TbBookmarkFilled, TbPin } from "react-icons/tb";
 import { GoDiscussionClosed } from "react-icons/go";
 import { MdMarkEmailRead } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchStudentDiscussion, markAsReadStudentDiscussion, updateStudentPinStatus } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import {
+  fetchStudentDiscussion,
+  markAsReadStudentDiscussion,
+  updateStudentPinStatus,
+} from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
 import { setIsMenuOpen } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussionSlice";
 
 const DiscussionCard = ({ discussion }) => {
-
   const dispatch = useDispatch();
-  const { loading } = useSelector((store) => store?.student?.studentDiscussion)
+  const { loading } = useSelector((store) => store?.student?.studentDiscussion);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { sid, cid } = useParams();
@@ -26,22 +29,26 @@ const DiscussionCard = ({ discussion }) => {
   const menuRef = useRef(null);
 
   const handlePinClick = () => {
-    dispatch(updateStudentPinStatus({ discussionId: discussion._id, isPinned: !isPinned }))
-      .then(() => {
-        dispatch(fetchStudentDiscussion({cid,sid}))
+    dispatch(
+      updateStudentPinStatus({
+        discussionId: discussion._id,
+        isPinned: !isPinned,
       })
+    ).then(() => {
+      dispatch(fetchStudentDiscussion({ cid, sid }));
+    });
   };
 
   const handleMarkAsReadClick = () => {
-    dispatch(markAsReadStudentDiscussion(discussion._id)).then(() => {
-      setIsMenuOpen(false);
-      dispatch(fetchStudentDiscussion({cid,sid}))
-    })
+    dispatch(
+      markAsReadStudentDiscussion({ discussionId: discussion._id, cid, sid })
+    );
+    setIsMenuOpen(false);
   };
 
   const handleClickOutside = (event) => {
     if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setIsMenuOpen(false)
+      setIsMenuOpen(false);
     }
   };
 
@@ -72,9 +79,9 @@ const DiscussionCard = ({ discussion }) => {
           aria-label={isPinned ? "Unpin discussion" : "Pin discussion"}
         >
           {isPinned ? (
-            <TbBookmarkFilled className="text-green-600 w-6 h-6" />
+            <TbPin className="text-green-600 w-6 h-6" />
           ) : (
-            <TbBookmark className="text-gray-400 w-6 h-6" />
+            <TbPin className="text-gray-400 w-6 h-6" />
           )}
         </button>
 
@@ -128,8 +135,8 @@ const DiscussionCard = ({ discussion }) => {
           />
           <span>
             Last Post at:{" "}
-            {lastReply
-              ? new Date(lastReply.updatedAt).toLocaleDateString()
+            {discussion.updatedAt
+              ? new Date(discussion.updatedAt).toLocaleDateString()
               : "N/A"}
           </span>
         </div>

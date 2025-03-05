@@ -124,7 +124,7 @@ const TotalStudentsGraphjs = () => {
                   responsive: true,
                   plugins: {
                     legend: {
-                      display: false,
+                      display: true,
                     },
                     tooltip: {
                       callbacks: {

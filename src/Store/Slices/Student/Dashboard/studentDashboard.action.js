@@ -14,6 +14,8 @@ import {
 
 // Helper function to format dashboard data
 const formatDashboardData = (dashboardData) => {
+  console.log("dashdata", dashboardData);
+
   return [
     {
       label: "Upcoming Exam",
@@ -65,7 +67,7 @@ export const fetchDashboardDetails = createAsyncThunk(
 
       const { attendanceSummary } = data?.data;
       // const { student } = await getState();
-      // // console.log("std----?>>>>",student)
+      console.log("std----?>>>>", data.data);
       // const notices = student?.studentAnnouncement?.noticeData?.length || 0;
       return {
         cardData: formatDashboardData(data?.data),

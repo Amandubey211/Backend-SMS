@@ -1,6 +1,4 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { baseUrl } from "../../../../../../config/Common";
 import { ErrorMsg } from "../../../../Common/Alerts/errorhandling.action";
 import {
   setErrorMsg,
