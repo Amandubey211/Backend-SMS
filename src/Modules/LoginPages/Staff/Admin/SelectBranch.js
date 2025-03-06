@@ -7,13 +7,29 @@ import {
 import Layout from "../../../../Components/Common/Layout";
 import Logo from "../../../../Components/Common/Logo";
 import { CiSearch } from "react-icons/ci";
-import { LuSchool } from "react-icons/lu";
-import { FaSearchLocation } from "react-icons/fa"; // For "No branches found" placeholder
-import { AiOutlineBank } from "react-icons/ai"; // Modern icon for "Choose Branch"
+import { FaSearchLocation } from "react-icons/fa";
+import { AiOutlineBank, AiOutlineArrowRight } from "react-icons/ai";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { setLocalCookies } from "../../../../Utils/academivYear";
-import { Tooltip, Spin } from "antd";
+import { Tooltip, Spin, Skeleton } from "antd";
+import DefaultBranchLogo from "../../../../Assets/HomeAssets/TeacherBtnLogo.png";
+
+// Reusable Skeleton component to mimic branch card UI
+const BranchCardSkeleton = () => {
+  return (
+    <div className="bg-gray-100 p-3 rounded-lg text-white h-40 relative">
+      <div className="mb-7">
+        {/* Simulate branch name and city */}
+        <Skeleton.Input style={{ width: "50%" }} active size="small" />
+      </div>
+      <div className="flex items-center justify-center">
+        {/* Simulate branch logo */}
+        <Skeleton.Avatar active size={60} shape="circle" />
+      </div>
+    </div>
+  );
+};
 
 const SelectBranch = () => {
   const dispatch = useDispatch();
@@ -29,26 +45,25 @@ const SelectBranch = () => {
   // Hash function to generate a unique number from the branchId
   const hashCode = (str) => {
     let hash = 0;
-    if (str?.length === 0) return hash;
-    for (let i = 0; i < str?.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = (hash << 5) - hash + char;
-      hash = hash & hash; // Convert to 32-bit integer
+    if (!str) return hash;
+    for (let i = 0; i < str.length; i++) {
+      hash = (hash << 5) - hash + str.charCodeAt(i);
+      hash &= hash; // Convert to 32-bit integer
     }
     return Math.abs(hash);
   };
 
   const HandleBranch = () => {
+    if (!selectedBranch) return;
     const data = {
       schoolId: selectedBranch?._id,
-      logo: selectedBranch.logo || "",
+      logo: selectedBranch?.logo || "",
     };
     dispatch(updateBranch({ navigate, data })).then(() => {
       setLocalCookies("SelectedschoolId", selectedBranch?._id);
     });
   };
 
-  // Handle branch selection
   const handleBranchSelect = (branch) => {
     setSelectedBranch(branch);
   };
@@ -80,16 +95,15 @@ const SelectBranch = () => {
       <div className="grid grid-cols-1 md:grid-cols-12 h-screen">
         {/* Left Section */}
         <div className="md:col-span-7 flex flex-col p-4 bg-transparent relative">
-          {/* Header section - Logo, Title, and Search */}
           <div className="sticky top-0 z-10 bg-white p-6 flex justify-end items-center">
             <Logo />
           </div>
-
-          {/* Search Input */}
           <div className="flex justify-between items-center w-full my-6">
             <h2 className="text-xl ps-3 flex items-center gap-2">
-              <AiOutlineBank className="text-2xl" />
-              Choose Branch
+              <div className="bg-pink-100 p-2 rounded-full">
+                <AiOutlineBank className="text-pink-500 text-2xl" />
+              </div>
+              <span className="text-gray-800">Choose Branch</span>
             </h2>
             <div className="relative flex items-center max-w-xs w-full mr-4">
               <label htmlFor="branchSearch" className="sr-only">
@@ -109,31 +123,23 @@ const SelectBranch = () => {
               </button>
             </div>
           </div>
-
-          {/* Scrollable Branch Cards */}
           <div className="overflow-y-scroll p-2 max-h-[calc(100vh-220px)]">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mb-10">
-                {Array.from({ length: 3 }).map((_, idx) => (
-                  <div
-                    key={idx}
-                    className="w-full h-24 bg-gray-200 animate-pulse rounded-lg"
-                  />
+                {[...Array(6)].map((_, idx) => (
+                  <BranchCardSkeleton key={idx} />
                 ))}
               </div>
             ) : filteredBranches?.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 justify-center mb-10">
-                {filteredBranches?.map((branch) => {
-                  const isActive = selectedBranch?._id === branch?._id;
-                  const branchColor = getBranchColor(branch?._id);
-
+                {filteredBranches.map((branch) => {
+                  const isActive = selectedBranch?._id === branch._id;
+                  const branchColor = getBranchColor(branch._id);
                   return (
                     <motion.div
-                      key={branch?._id}
+                      key={branch._id}
                       className={`${branchColor} p-3 rounded-lg text-white h-40 relative cursor-pointer transform transition-all duration-300 ${
-                        isActive
-                          ? "border border-pink-500 shadow-[0_0_15px_3px_rgba(236,72,153,0.5)]"
-                          : "shadow-lg"
+                        isActive ? "border-2 border-pink-500" : "shadow-lg"
                       }`}
                       onClick={() => handleBranchSelect(branch)}
                       initial={{ opacity: 0 }}
@@ -162,18 +168,13 @@ const SelectBranch = () => {
                       </div>
                       <div className="flex items-center justify-center">
                         <div className="w-16 h-16 mb-1 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-white text-gray-800">
-                          {!branch.logo ? (
-                            <LuSchool
-                              size={30}
-                              aria-label="Default branch logo placeholder"
-                            />
-                          ) : (
-                            <img
-                              src={branch.logo}
-                              alt={`Logo of ${branch?.nameOfSchool}`}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
+                          <img
+                            src={branch.logo || DefaultBranchLogo}
+                            alt={`Logo of ${
+                              branch?.nameOfSchool || "Default branch"
+                            }`}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
                       </div>
                     </motion.div>
@@ -205,32 +206,24 @@ const SelectBranch = () => {
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Top-Left Info */}
               <div>
                 <h3 className="text-2xl font-semibold">
                   {selectedBranch?.nameOfSchool}
                 </h3>
                 <p className="text-lg text-gray-700">{selectedBranch?.city}</p>
-                {/* Centered Logo */}
                 <div className="flex items-center justify-center mt-6">
-                  {!selectedBranch?.logo ? (
-                    <LuSchool
-                      size={80}
-                      aria-label="Selected branch default logo placeholder"
-                    />
-                  ) : (
-                    <img
-                      src={selectedBranch?.logo}
-                      alt={`Logo of ${selectedBranch?.nameOfSchool}`}
-                      className="w-60 h-60 object-contain rounded-full border-4 border-pink-500"
-                    />
-                  )}
+                  <img
+                    src={selectedBranch.logo || DefaultBranchLogo}
+                    alt={`Logo of ${
+                      selectedBranch?.nameOfSchool || "Default branch"
+                    }`}
+                    className="w-60 h-60 object-contain rounded-full border-4 border-pink-500"
+                  />
                 </div>
               </div>
-              {/* Next Button pinned at bottom */}
               <div className="flex justify-center w-full mt-6">
                 <motion.button
-                  type="submit"
+                  type="button"
                   className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md transition-all duration-300 hover:brightness-110 hover:shadow-md ${
                     loading || !selectedBranch
                       ? "opacity-50 cursor-not-allowed"
@@ -244,7 +237,10 @@ const SelectBranch = () => {
                       <Spin size="small" />
                     </div>
                   ) : (
-                    "Next"
+                    <span className="flex items-center justify-center gap-2">
+                      Next
+                      <AiOutlineArrowRight className="text-white" />
+                    </span>
                   )}
                 </motion.button>
               </div>
