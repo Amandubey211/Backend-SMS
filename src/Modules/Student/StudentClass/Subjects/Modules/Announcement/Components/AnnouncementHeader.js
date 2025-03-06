@@ -1,12 +1,12 @@
-import React, { useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import { NavLink } from "react-router-dom";
+import { setIsRead } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
+import { useSelector } from "react-redux";
 
 const AnnouncementHeader = ({ onSearch }) => {
-  const [filter, setFilter] = useState("all");
+  const { isRead } = useSelector((store) => store?.student?.studentAnnounce);
 
   const handleFilterChange = (event) => {
-    setFilter(event.target.value);
+    setIsRead(event.target.value);
   };
 
   const handleSearchChange = (event) => {
@@ -37,9 +37,9 @@ const AnnouncementHeader = ({ onSearch }) => {
               type="radio"
               name="filter"
               value="all"
-              checked={filter === "all"}
+              checked={isRead === "all"}
               onChange={handleFilterChange}
-              className="custom-radio"
+              className="custom-radio cursor-pointer"
             />
             <span className="ml-2">All</span>
           </label>
@@ -48,9 +48,9 @@ const AnnouncementHeader = ({ onSearch }) => {
               type="radio"
               name="filter"
               value="unread"
-              checked={filter === "unread"}
+              checked={isRead === "unread"}
               onChange={handleFilterChange}
-              className="custom-radio"
+              className="custom-radio cursor-pointer"
             />
             <span className="ml-2">Unread</span>
           </label>

@@ -7,6 +7,7 @@ import {
   fetchStudentAnnounce,
   fetchStudentAnnounceById,
   fetchStudentAnnounceComments,
+  markAsReadStudentAnnounce,
 } from "./announcement.action";
 
 const initialState = {
@@ -18,6 +19,7 @@ const initialState = {
   comments: [],
   loadingComments: false,
   errorComments: null,
+  isRead: "all",
 };
 
 const announcementSlice = createSlice({
@@ -26,6 +28,9 @@ const announcementSlice = createSlice({
   reducers: {
     setSidebarOpen: (state, action) => {
       state.isSidebarOpen = action.payload;
+    },
+    setIsRead: (state, action) => {
+      state.isRead = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -56,6 +61,18 @@ const announcementSlice = createSlice({
         state.error = action.payload;
       });
 
+    builder
+      .addCase(markAsReadStudentAnnounce.pending, (state, action) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(markAsReadStudentAnnounce.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(markAsReadStudentAnnounce.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
     builder
       .addCase(fetchStudentAnnounceComments.pending, (state) => {
         state.loadingComments = true;
@@ -128,5 +145,5 @@ const findCommentOrReply = (comments, parentId) => {
   return null;
 };
 
-export const { setSidebarOpen } = announcementSlice.actions;
+export const { setSidebarOpen, setIsRead } = announcementSlice.actions;
 export default announcementSlice.reducer;

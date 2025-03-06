@@ -6,7 +6,14 @@ import toast from "react-hot-toast";
 import Reply from "./Reply";
 import InputComment from "./InputComment";
 import { useDispatch, useSelector } from "react-redux";
-import { createStudentDiscussionReply, deleteStudentDiscussionComment, deleteStudentDiscussionReply, editStudentDiscussionComment, fetchStudentCommentsByDiscussion, toggleLikeStudentDiscussion } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import {
+  createStudentDiscussionReply,
+  deleteStudentDiscussionComment,
+  deleteStudentDiscussionReply,
+  editStudentDiscussionComment,
+  fetchStudentCommentsByDiscussion,
+  toggleLikeStudentDiscussion,
+} from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
 import { FcLike } from "react-icons/fc";
 
 const Comment = ({
@@ -21,7 +28,9 @@ const Comment = ({
 }) => {
   const { userId } = useSelector((store) => store?.common?.user?.userDetails);
   const currentUserId = userId;
-  const { discussion } = useSelector((store) => store?.student?.studentDiscussion)
+  const { discussion } = useSelector(
+    (store) => store?.student?.studentDiscussion
+  );
   const dispatch = useDispatch();
 
   const [showReplies, setShowReplies] = useState(false);
@@ -39,7 +48,12 @@ const Comment = ({
   const handleEditComment = async () => {
     if (editText.trim() && editText !== comment.content) {
       //await editComment(comment.id, editText);
-      dispatch(editStudentDiscussionComment({ commentId: comment._id, newText: editText }))
+      dispatch(
+        editStudentDiscussionComment({
+          commentId: comment._id,
+          newText: editText,
+        })
+      );
       setIsEditing(false);
     } else {
       setIsEditing(false);
@@ -52,24 +66,47 @@ const Comment = ({
   };
 
   const handleDeleteComment = () => {
-    dispatch(deleteStudentDiscussionComment({ commentId: comment._id })).then(() => {
-      dispatch(fetchStudentCommentsByDiscussion({ discussionId: discussion._id }))
-    })
+    dispatch(deleteStudentDiscussionComment({ commentId: comment._id })).then(
+      () => {
+        dispatch(
+          fetchStudentCommentsByDiscussion({ discussionId: discussion._id })
+        );
+      }
+    );
   };
 
   const handleDeleteReply = (commentID, replyId) => {
     //deleteReply(commentID, replyId);
-    dispatch(deleteStudentDiscussionReply(replyId))
+    dispatch(deleteStudentDiscussionReply(replyId));
   };
 
   const handleReplyClick = () => {
+    // Prevent replying to replies beyond level 1
+    if (comment?.parentId && comment?.parentId !== discussion._id) {
+      toast.error("Only one level of nested replies is allowed.");
+      return;
+    }
+
     setShowReplyForm(!showReplyForm);
     setActiveReplyParentId(comment._id);
   };
 
   const handleAddReply = (text) => {
     if (text.trim()) {
-      dispatch(createStudentDiscussionReply({ discussionId: discussion._id, replyId: comment._id, text: text }))
+      // Allow replies only for top-level comments and first-level replies
+      if (activeReplyParentId && comment?.parentId) {
+        toast.error("Only one level of nested replies is allowed.");
+        return;
+      }
+
+      dispatch(
+        createStudentDiscussionReply({
+          discussionId: discussion._id,
+          replyId: comment._id, // This will be the parent comment
+          text: text,
+        })
+      );
+
       setShowReplyForm(false);
     }
   };
@@ -78,14 +115,15 @@ const Comment = ({
     const originalIsLiked = isLiked;
     const originalLikesCount = likesCount;
 
-    dispatch(toggleLikeStudentDiscussion({ id: comment._id })).then(() => {
-      setIsLiked(!isLiked);
-      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-    }).catch(() => {
-      setIsLiked(originalIsLiked);
-      setLikesCount(originalLikesCount);
-    })
-
+    dispatch(toggleLikeStudentDiscussion({ id: comment._id }))
+      .then(() => {
+        setIsLiked(!isLiked);
+        setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+      })
+      .catch(() => {
+        setIsLiked(originalIsLiked);
+        setLikesCount(originalLikesCount);
+      });
   };
 
   const formatDate = (dateString) => {
@@ -195,20 +233,20 @@ const Comment = ({
           <div className="mt-4">
             {showReplies ? (
               <>
-                {comment.replies?.map((reply) => (
-                  <Reply
-                    key={reply._id}
-                    reply={reply}
-                    commentId={comment?._id}
-                    //deleteReply={handleDeleteReply}
-                    //addNestedReply={addNestedReply}
-                    activeReplyId={activeReplyId}
-                    setActiveReplyId={setActiveReplyId}
-                    //toggleLike={toggleLike}
-                    //editReply={editReply}
-                    currentUserId={currentUserId}
-                  />
-                ))}
+                {comment.replies
+                  ?.filter(
+                    (reply) => !reply.parentId || reply.parentId === comment._id
+                  ) // Ensure replies are only one level deep
+                  .map((reply) => (
+                    <Reply
+                      key={reply._id}
+                      reply={reply}
+                      commentId={comment?._id}
+                      activeReplyId={activeReplyId}
+                      setActiveReplyId={setActiveReplyId}
+                      currentUserId={currentUserId}
+                    />
+                  ))}
                 <div
                   className="text-blue-500 cursor-pointer mt-2"
                   onClick={() => setShowReplies(false)}

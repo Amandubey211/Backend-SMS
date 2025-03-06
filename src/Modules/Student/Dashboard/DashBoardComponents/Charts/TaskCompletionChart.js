@@ -20,16 +20,25 @@ const TaskCompletionChart = () => {
   const data = {
     datasets: [
       {
-        data: [completedTask, inCompletedTask],
-        backgroundColor: ["#E9D5FF", "#7C3AED"], // 🔹 Updated with better contrast
+        data: [completedTask || 0, inCompletedTask || 0],
+        backgroundColor: ["#7C3AED", "#E9D5FF"], // 🔹 Updated with better contrast
         cutout: "70%", // 🔹 Keeps the inner circle cut out for a modern look
+        borderRadius: 10,
+        spacing: 1,
+        borderWidth: 0,
+        hoverOffset: 10,
       },
     ],
+    // labels: ["Remaining", "Completed"],
   };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
+    hover: {
+      mode: "nearest",
+      intersect: true,
+    },
     plugins: {
       legend: {
         display: true,

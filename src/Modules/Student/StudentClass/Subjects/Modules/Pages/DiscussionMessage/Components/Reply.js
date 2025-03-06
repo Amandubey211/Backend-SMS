@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaRegHeart, FaRegComment, FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { FaRegHeart, FaRegComment } from 'react-icons/fa';
 import InputComment from './InputComment';
 import toast from 'react-hot-toast';
 import { MdOutlineEdit } from "react-icons/md";

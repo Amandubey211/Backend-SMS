@@ -62,7 +62,9 @@ const Library = () => {
         categories.add(book.category);
       }
     });
-    setAllCategories(Array.from(categories));
+    if (allCategories.length === 0) {
+      setAllCategories(Array.from(categories));
+    }
   }, [libararyBooks]);
 
   const handleSwitchTab = (tab) => {
@@ -113,7 +115,11 @@ const Library = () => {
       );
     }
 
-    if (!libraryLoading && filteredBooks()?.length === 0 && activeTab === "Library") {
+    if (
+      !libraryLoading &&
+      filteredBooks()?.length === 0 &&
+      activeTab === "Library"
+    ) {
       return (
         <div className="text-center py-20">
           <NoDataFound />
@@ -177,10 +183,16 @@ const Library = () => {
       <StudentDashLayout>
         <div>
           <div className="flex items-center gap-5 p-5">
-            <TabButton isActive={activeTab === "Library"} onClick={() => handleSwitchTab("Library")}>
+            <TabButton
+              isActive={activeTab === "Library"}
+              onClick={() => handleSwitchTab("Library")}
+            >
               {t("Library", gt.stdLibrary)}
             </TabButton>
-            <TabButton isActive={activeTab === "BookIssue"} onClick={() => handleSwitchTab("BookIssue")}>
+            <TabButton
+              isActive={activeTab === "BookIssue"}
+              onClick={() => handleSwitchTab("BookIssue")}
+            >
               {t("Book Issue", gt.stdLibrary)}
             </TabButton>
 
@@ -219,11 +231,12 @@ const Library = () => {
           {activeTab === "Library" ? libraryContent() : <BookIssue />}
         </div>
 
-        {!libraryLoading && showError && <OfflineModal error={libraryError} onDismiss={handleDismiss} />}
+        {!libraryLoading && showError && (
+          <OfflineModal error={libraryError} onDismiss={handleDismiss} />
+        )}
       </StudentDashLayout>
     </Layout>
   );
 };
 
 export default Library;
-

@@ -19,6 +19,7 @@ export const fetchModules = createAsyncThunk(
     dispatch(setShowError(false));
     const semesterId = getState().common.user.classInfo.selectedSemester.id;
     try {
+
       const getRole = getUserRole(getState);
       // API Call using service function with query parameter
       const response = await getData(

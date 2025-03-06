@@ -1,8 +1,7 @@
-import React from 'react';
-import { FaCheckCircle, FaTimesCircle, FaDoorOpen } from 'react-icons/fa';
-import { useSelector } from 'react-redux';
+import React from "react";
+import { FaCheckCircle, FaTimesCircle, FaDoorOpen } from "react-icons/fa";
+import { useSelector } from "react-redux";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
-
 
 const AttendanceSummary = () => {
   const { classData } = useSelector((store) => store?.student?.studentClass);
@@ -10,14 +9,16 @@ const AttendanceSummary = () => {
   const className = classData?.className;
 
   useNavHeading(` ${className}`, "Attendance");
-  const { loading, error, summary, currentDate } = useSelector((store) => store?.student?.studentAttendance);
-  const present=summary?.presentCount;
-  const absent=summary?.absentCount;
-  const leave=summary?.leaveCount;
+  const { summary } = useSelector(
+    (store) => store?.student?.studentAttendance
+  );
+  const present = summary?.presentCount;
+  const absent = summary?.absentCount;
+  const leave = summary?.leaveCount;
   return (
     <div className="flex justify-around px-4  space-x-4">
       <div className="flex items-center bg-green-100 p-4 pl-10 rounded-lg w-1/3">
-        <div className='bg-white rounded-full p-4'>
+        <div className="bg-white rounded-full p-4">
           <FaCheckCircle className="text-3xl text-green-500" />
         </div>
         <div className="flex flex-col items-start ml-4">
@@ -26,7 +27,7 @@ const AttendanceSummary = () => {
         </div>
       </div>
       <div className="flex items-center bg-red-100 p-4 rounded-lg w-1/3">
-        <div className='bg-white rounded-full p-4'>
+        <div className="bg-white rounded-full p-4">
           <FaTimesCircle className="text-3xl text-red-500" />
         </div>
         <div className="flex flex-col items-start ml-4">
@@ -35,7 +36,7 @@ const AttendanceSummary = () => {
         </div>
       </div>
       <div className="flex items-center bg-purple-100 p-4 rounded-lg w-1/3">
-        <div className='bg-white rounded-full p-4'>
+        <div className="bg-white rounded-full p-4">
           <FaDoorOpen className="text-3xl text-purple-500" />
         </div>
         <div className="flex flex-col items-start ml-4">

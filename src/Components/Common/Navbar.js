@@ -38,6 +38,7 @@ const Navbar = () => {
     }
   }, []);
 
+
   // Fetch notifications from IndexedDB
   const getNotificationsFromIndexedDB = () => {
     return new Promise((resolve, reject) => {
