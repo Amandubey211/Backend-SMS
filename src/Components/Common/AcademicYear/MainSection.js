@@ -26,7 +26,6 @@ const MainSection = () => {
   );
   const handleCheckboxChange = async (selectedYear) => {
     //need custom popup
-    // alert("After select the year need to reload the page");
     setLocalCookies("say", selectedYear._id);
 
     dispatch(setSeletedAcademicYear(selectedYear));
