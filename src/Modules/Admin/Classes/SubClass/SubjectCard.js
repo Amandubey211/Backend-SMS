@@ -4,7 +4,7 @@ import { MdOutlineModeEdit, MdMenuBook } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
 import { BsBook } from "react-icons/bs";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import {
@@ -24,18 +24,42 @@ function SubjectCard({
   role,
   subjectId,
   onEdit,
-  onClick, // Parent function to handle navigation checks
+  onClick,
 }) {
   const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [ignoreNextClick, setIgnoreNextClick] = useState(false);
-  const [currentTeacherIndex, setCurrentTeacherIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
   const { t } = useTranslation("admClass");
 
   const teachers = data.teacherIds ?? [];
   const teacherCount = teachers.length;
+  // Define window size; if teacherCount > windowSize, we show sliding avatars.
+  const windowSize = 5;
+
+  // For sliding: when teacherCount > windowSize, we slide only the first (windowSize - 1) avatars.
+  const slidingCount =
+    teacherCount > windowSize ? windowSize - 1 : teacherCount;
+  // currentStartIndex slides among teacher avatars.
+  const [currentStartIndex, setCurrentStartIndex] = useState(0);
+  // isPulsing indicates that the new avatar in the sliding window should pulse.
+  const [isPulsing, setIsPulsing] = useState(false);
+
+  // Set up slider only if teacherCount > windowSize.
+  useEffect(() => {
+    if (true) {
+      // if (teacherCount > windowSize) {
+
+      const interval = setInterval(() => {
+        setIsPulsing(true);
+        setTimeout(() => {
+          setCurrentStartIndex((prevIndex) => (prevIndex + 1) % teacherCount);
+          setIsPulsing(false);
+        }, 500); // Pulse duration
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [teacherCount, windowSize]);
 
   // Prevent card navigation if the teacher modal was just closed.
   const handleCardClick = () => {
@@ -50,26 +74,6 @@ function SubjectCard({
     dispatch(deleteSubject({ subjectId, classId: Class }));
     setIsDeleteModalOpen(false);
   };
-
-  // Auto-slide teacher info every 2 seconds if multiple teachers exist.
-  useEffect(() => {
-    let timer;
-    if (teacherCount > 1) {
-      timer = setInterval(() => {
-        setCurrentTeacherIndex((prevIndex) => (prevIndex + 1) % teacherCount);
-      }, 2000);
-    }
-    return () => timer && clearInterval(timer);
-  }, [teacherCount]);
-
-  // Trigger slide-in animation whenever the teacher index changes.
-  useEffect(() => {
-    if (teacherCount > 0) {
-      setIsAnimating(true);
-      const timeout = setTimeout(() => setIsAnimating(false), 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentTeacherIndex, teacherCount]);
 
   // Calculate total chapter count across all modules.
   const chapterCount = data.modules
@@ -153,45 +157,88 @@ function SubjectCard({
         </div>
       </div>
 
-      {/* Teacher Section (bottom-left) */}
+      {/* Teacher Section (Overlapped Avatars with Sliding and Fixed Badge) */}
       {teacherCount > 0 ? (
         <div
-          className="relative mt-12 h-16 overflow-hidden cursor-pointer"
+          className="flex items-center mt-12 cursor-pointer overflow-hidden"
           onClick={(e) => {
             e.stopPropagation();
             setIsTeacherModalOpen(true);
           }}
         >
-          <div
-            className={`flex items-center transition-transform duration-500 ease-out ${
-              isAnimating ? "slide-in" : ""
-            }`}
-          >
-            {teachers[currentTeacherIndex].profile ? (
-              <img
-                src={teachers[currentTeacherIndex].profile}
-                alt={t("Teacher profile picture")}
-                className="w-12 h-12 rounded-full"
-              />
+          <div className="flex -space-x-3">
+            {teacherCount > windowSize ? (
+              <>
+                {/* Render sliding teacher avatars */}
+                {Array.from({ length: slidingCount }).map((_, i) => {
+                  const teacherIndex = (currentStartIndex + i) % teacherCount;
+                  // Apply pulse on the rightmost avatar in the sliding window
+                  const pulseClass =
+                    i === slidingCount - 1 && isPulsing ? "animate-pulse" : "";
+                  return (
+                    <Tooltip
+                      key={teacherIndex}
+                      title={`${teachers[teacherIndex].firstName} ${teachers[teacherIndex].lastName}`}
+                      placement="top"
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-full border-2 border-white overflow-hidden ${pulseClass}`}
+                      >
+                        {teachers[teacherIndex].profile ? (
+                          <img
+                            src={teachers[teacherIndex].profile}
+                            alt={t("Teacher profile picture")}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center w-full h-full bg-gray-300">
+                            <CiUser className="text-white w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
+                    </Tooltip>
+                  );
+                })}
+                {/* Fixed badge always at the end */}
+                <Tooltip title={t("Click to see more")} placement="top">
+                  <div className="relative w-12 h-12 p-[2px] bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full">
+                    <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-sm font-medium">
+                      <span className="bg-gradient-to-tr from-pink-500 to-purple-500 bg-clip-text text-transparent text-xl">
+                        +{teacherCount - slidingCount}
+                      </span>
+                    </div>
+                  </div>
+                </Tooltip>
+              </>
             ) : (
-              <CiUser className="w-10 h-10 text-white" />
+              // Render all teacher avatars when teacherCount <= windowSize
+              teachers.map((teacher, index) => (
+                <Tooltip
+                  key={index}
+                  title={`${teacher.firstName} ${teacher.lastName}`}
+                  placement="top"
+                >
+                  <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden">
+                    {teacher.profile ? (
+                      <img
+                        src={teacher.profile}
+                        alt={t("Teacher profile picture")}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full bg-gray-300">
+                        <CiUser className="text-white w-6 h-6" />
+                      </div>
+                    )}
+                  </div>
+                </Tooltip>
+              ))
             )}
-            <div className="ml-3 capitalize z-10">
-              <p className="text-white font-semibold">
-                {`${teachers[currentTeacherIndex].firstName} ${teachers[currentTeacherIndex].lastName}`}
-                {teacherCount > 1 && (
-                  <span className="ml-2 text-sm">({teacherCount})</span>
-                )}
-              </p>
-              <p className="text-white text-sm">
-                {teachers[currentTeacherIndex].role || t("Teacher")}
-              </p>
-            </div>
           </div>
         </div>
       ) : (
         <div className="flex items-center mt-12">
-          <CiUser className="w-10 h-10 bg-transparent text-white" />
+          <CiUser className="w-12 h-12 bg-transparent text-white" />
           <div className="ml-3 capitalize z-10">
             <p className="text-white font-semibold">
               {t("No Instructor Assigned")}
@@ -204,14 +251,21 @@ function SubjectCard({
       <Modal
         title={t("Teacher List")}
         open={isTeacherModalOpen}
-        onCancel={() => {
-          // Prevent the subsequent click from triggering subject navigation
+        onCancel={(e) => {
+          if (e && e.stopPropagation) {
+            e.stopPropagation();
+            e.preventDefault();
+          }
+          if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+            e.nativeEvent.stopImmediatePropagation();
+          }
           setIsTeacherModalOpen(false);
           setIgnoreNextClick(true);
-          setTimeout(() => setIgnoreNextClick(false), 300);
+          setTimeout(() => setIgnoreNextClick(false), 500);
         }}
         footer={null}
-        maskClosable={false}
+        maskClosable={true}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
           {teachers.map((teacher, index) => (
@@ -245,17 +299,6 @@ function SubjectCard({
         className="absolute bottom-6 right-6 h-20 w-20 transition-transform z-40 duration-300 transform hover:scale-110 object-contain"
         onClick={(e) => e.stopPropagation()}
       />
-
-      {/* Inline styles for slide-in animation */}
-      <style>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        .slide-in {
-          animation: slideIn 0.5s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

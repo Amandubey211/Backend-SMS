@@ -13,7 +13,6 @@ import {
   FaClipboardList,
   FaRegFileAlt,
 } from "react-icons/fa";
-import { ImSpinner3 } from "react-icons/im";
 import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
@@ -156,6 +155,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     }
   };
 
+  // Open preview modal by setting URL and type.
   const openPreviewModal = (url, type) => {
     setPreviewUrl(url);
     setPreviewType(type);
@@ -167,10 +167,14 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
   };
 
   const filteredAttachments = attachments
-    ? attachments.filter((item) =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ? attachments.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (item.label &&
+            item.label.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : [];
+
   const filteredAssignments = assignments
     ? assignments.filter((item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -186,10 +190,71 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     filteredAssignments.length +
     filteredQuizzes.length;
 
+  // Always show the header if items exist or if a search query is present.
+  const renderHeader = () => (
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+      <div className="w-full sm:w-1/3 mb-2 sm:mb-0">
+        <Input.Search
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          allowClear
+        />
+      </div>
+      <div
+        className="flex gap-1 justify-end"
+        role="group"
+        aria-label="Filter options"
+      >
+        <Tag
+          onClick={() => setActiveSection("all")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "all"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          All ({totalCount})
+        </Tag>
+        <Tag
+          onClick={() => setActiveSection("attachments")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "attachments"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          Attachments ({filteredAttachments.length})
+        </Tag>
+        <Tag
+          onClick={() => setActiveSection("assignments")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "assignments"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          Assignments ({filteredAssignments.length})
+        </Tag>
+        <Tag
+          onClick={() => setActiveSection("quizzes")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "quizzes"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          Quiz ({filteredQuizzes.length})
+        </Tag>
+      </div>
+    </div>
+  );
+
+  // Smaller "No items found" placeholder.
   const renderPlaceholder = () => (
-    <div className="flex flex-col items-center justify-center py-4">
+    <div className="flex flex-col items-center justify-center py-2">
       <Empty description="No items found" />
-      <div className="mt-4 flex space-x-4">
+      <div className="mt-2 flex space-x-4">
         <Button
           type="primary"
           onClick={handleAddAttachment}
@@ -210,11 +275,6 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
       </div>
     </div>
   );
-
-  const getBadgeClass = (section) =>
-    activeSection === section
-      ? "bg-pink-100 text-pink-800"
-      : "bg-transparent text-gray-500";
 
   const handleRetry = () => setErrorLoading(null);
 
@@ -283,58 +343,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
           className="mt-2 transition-all duration-300 ease-in-out"
         >
           <div className="flex flex-col space-y-4">
-            {/* Filter Header: Only show if there is data */}
-            {totalCount > 0 && (
-              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
-                <div className="w-full sm:w-1/3 mb-2 sm:mb-0">
-                  <Input.Search
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    allowClear
-                  />
-                </div>
-                <div
-                  className="flex gap-1 justify-end"
-                  role="group"
-                  aria-label="Filter options"
-                >
-                  <Tag
-                    onClick={() => setActiveSection("all")}
-                    className={`cursor-pointer rounded-full border px-2 py-1 ${getBadgeClass(
-                      "all"
-                    )}`}
-                  >
-                    All ({totalCount})
-                  </Tag>
-                  <Tag
-                    onClick={() => setActiveSection("attachments")}
-                    className={`cursor-pointer rounded-full border px-2 py-1 ${getBadgeClass(
-                      "attachments"
-                    )}`}
-                  >
-                    Attachments ({filteredAttachments.length})
-                  </Tag>
-                  <Tag
-                    onClick={() => setActiveSection("assignments")}
-                    className={`cursor-pointer rounded-full border px-2 py-1 ${getBadgeClass(
-                      "assignments"
-                    )}`}
-                  >
-                    Assignments ({filteredAssignments.length})
-                  </Tag>
-                  <Tag
-                    onClick={() => setActiveSection("quizzes")}
-                    className={`cursor-pointer rounded-full border px-2 py-1 ${getBadgeClass(
-                      "quizzes"
-                    )}`}
-                  >
-                    Quiz ({filteredQuizzes.length})
-                  </Tag>
-                </div>
-              </div>
-            )}
-
+            {(totalCount > 0 || searchQuery !== "") && renderHeader()}
             {/* Scrollable Container */}
             <div className="max-h-48 overflow-y-auto">
               {errorLoading ? (
@@ -356,8 +365,81 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                   {(activeSection === "all" ||
                     activeSection === "attachments") &&
                     filteredAttachments.length > 0 && (
-                      <div>
-                        {/* Render attachments (existing mapping logic) */}
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">Attachments</h3>
+                        {filteredAttachments.map((attachment, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center p-2 border rounded-md"
+                          >
+                            {attachment.type === "application/pdf" ? (
+                              <FaFilePdf
+                                className="text-red-500 mr-2"
+                                size={24}
+                              />
+                            ) : attachment.type === "application/msword" ||
+                              attachment.type ===
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
+                              <FaFileWord
+                                className="text-blue-500 mr-2"
+                                size={24}
+                              />
+                            ) : attachment.type ===
+                                "application/vnd.ms-powerpoint" ||
+                              attachment.type ===
+                                "application/vnd.openxmlformats-officedocument.presentationml.presentation" ? (
+                              <FaFilePowerpoint
+                                className="text-orange-500 mr-2"
+                                size={24}
+                              />
+                            ) : attachment.type.startsWith("image/") ? (
+                              <img
+                                src={attachment.url}
+                                alt={attachment.name}
+                                className="w-10 h-10 mr-2 object-cover rounded"
+                              />
+                            ) : (
+                              <FaRegFileAlt
+                                className="text-gray-500 mr-2"
+                                size={24}
+                              />
+                            )}
+                            <div>
+                              <p className="font-medium capitalize">
+                                {attachment.label}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {attachment.name}
+                              </p>
+                            </div>
+                            <div className="ml-auto flex items-center space-x-2">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openPreviewModal(
+                                    attachment.url,
+                                    attachment.type
+                                  );
+                                }}
+                                className="p-1 text-blue-500 hover:text-blue-700"
+                                aria-label="View Attachment"
+                              >
+                                <FaEye size={20} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setAttachmentToDelete(attachment);
+                                  setDeleteModalOpen(true);
+                                }}
+                                className="p-1 text-red-500 hover:text-red-700"
+                                aria-label="Delete Attachment"
+                              >
+                                <FaTrashAlt size={20} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     )}
                   {(activeSection === "all" ||
