@@ -249,13 +249,13 @@ const sidebarData = [
       },
     ],
   },
-  // {
-  //   title: "Time Table",
-  //   icon: <ImTable2 />,
-  //   path: "/timetable",
-  //   roles: [ROLES.ADMIN, ROLES.STAFF],
-  //   //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
-  // },
+  {
+    title: "Time Table",
+    icon: <ImTable2 />,
+    path: "/timetable",
+    roles: [ROLES.ADMIN, ROLES.STAFF],
+    //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
+  },
   // {
   //   title: "Time Table",
   //   icon: <ImTable2 />,
