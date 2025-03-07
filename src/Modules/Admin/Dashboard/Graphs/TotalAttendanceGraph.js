@@ -140,19 +140,28 @@ const TotalAttendanceGraph = () => {
       title={t("Attendence")}
     >
       <div className="bg-white p-4 h-[100%]">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            {/* Shortened title text */}
-            <h2 className="text-xl font-semibold">{t("Attendance")}</h2>
-            <div className="text-3xl font-bold">
-              {attendanceData
-                ? attendanceData.totalMaleAttendance +
-                  attendanceData.totalFemaleAttendance
-                : 0}
+        <div className="flex justify-between items-center mb-1">
+          <div className="flex items-center gap-2 p-2 rounded-md">
+            {/* Icon with circular background */}
+            <div className="bg-blue-100 p-1 rounded-full">
+              <FiCalendar className="text-blue-500" size={20} />
+            </div>
+            {/* Textual Information in a single row */}
+            <div className="flex items-center gap-1 whitespace-nowrap">
+              <span className="text-base font-semibold">
+                {t("Total Attendance")} : 
+              </span>
+              <span className="text-xl font-bold">
+                {attendanceData
+                  ? attendanceData.totalMaleAttendance +
+                    attendanceData.totalFemaleAttendance
+                  : 0}
+              </span>
             </div>
           </div>
+
           <div className="flex space-x-2">
-            <Select onChange={handleMonthChange} value={month} className="w-32">
+            <Select onChange={handleMonthChange} value={month} className="w-28">
               {[...Array(12).keys()].map((i) => (
                 <Option key={i} value={i + 1}>
                   {t(
@@ -177,7 +186,7 @@ const TotalAttendanceGraph = () => {
             <Select
               onChange={handleGenderChange}
               value={gender}
-              className="w-32"
+              className="w-28"
             >
               <Option value="Both">{t("Both")}</Option>
               <Option value="Male">{t("Male")}</Option>
@@ -191,11 +200,11 @@ const TotalAttendanceGraph = () => {
           <div className="bg-white p-4 h-[100%]">
             <div
               className="flex justify-center items-center"
-              style={{ height: "300px" }}
+              style={{ height: "350px" }}
             >
               <BarGraphSkeleton />
             </div>
-            <div className="flex justify-around mt-4">
+            <div className="flex justify-around mt-6">
               <Skeleton.Input style={{ width: 100, height: 20 }} active />
               <Skeleton.Input style={{ width: 100, height: 20 }} active />
             </div>
@@ -212,7 +221,7 @@ const TotalAttendanceGraph = () => {
           </div>
         ) : graphData ? (
           <>
-            <div style={{ height: "300px" }}>
+            <div style={{ height: "350px" }}>
               <Bar
                 data={graphData}
                 options={{
@@ -264,30 +273,30 @@ const TotalAttendanceGraph = () => {
                 }}
               />
             </div>
-            <div className="flex justify-around mt-4">
+            <div className="flex justify-around mt-6">
               <div className="flex flex-col items-start">
-                <div
-                  className="w-16 h-1 bg-[#8F77F3] rounded-full mb-1"
-                  style={{ alignSelf: "flex-start" }}
-                ></div>
                 <div className="flex items-center">
                   <div className="text-gray-700">{t("Total Female Att.")}</div>
                   <div className="ml-2 font-bold">
                     {attendanceData ? attendanceData.totalFemaleAttendance : 0}
                   </div>
                 </div>
-              </div>
-              <div className="flex flex-col items-start">
                 <div
-                  className="w-16 h-1 bg-[#23C55E] rounded-full mb-1"
+                  className="w-16 h-1 mt-2 bg-[#8F77F3] rounded-full mb-1"
                   style={{ alignSelf: "flex-start" }}
                 ></div>
+              </div>
+              <div className="flex flex-col items-start">
                 <div className="flex items-center">
                   <div className="text-gray-700">{t("Total Male Att.")}</div>
                   <div className="ml-2 font-bold">
                     {attendanceData ? attendanceData.totalMaleAttendance : 0}
                   </div>
                 </div>
+                <div
+                  className="w-16 h-1 mt-2 bg-[#23C55E] rounded-full mb-1"
+                  style={{ alignSelf: "flex-start" }}
+                ></div>
               </div>
             </div>
           </>

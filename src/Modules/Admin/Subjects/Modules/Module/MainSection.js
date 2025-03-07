@@ -226,7 +226,7 @@ const MainSection = () => {
             </div>
 
             {/* Right Section: Modules List */}
-            <div className="w-[35%] p-2 border-l">
+            <div className="w-[35%] min-h-screen p-2 border-l">
               <div className="bg-white p-4 rounded-lg">
                 <div className="flex items-center gap-1 mb-2">
                   <h1 className="text-xl font-semibold">{t("All Modules")}</h1>

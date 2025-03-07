@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect, memo } from "react";
+import React, { useRef, useState, useEffect, memo, useMemo } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, registerables } from "chart.js";
-import { FiCalendar } from "react-icons/fi";
+import { FiCalendar, FiTrendingUp, FiTrendingDown } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { Skeleton } from "antd";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,7 @@ ChartJS.register(...registerables);
 const BarGraphSkeleton = () => {
   const bars = Array.from({ length: 10 });
   return (
-    <div className="flex items-end space-x-4 h-72">
+    <div className="flex items-end space-x-2 h-72">
       {bars.map((_, index) => (
         <div
           key={index}
@@ -24,6 +24,26 @@ const BarGraphSkeleton = () => {
     </div>
   );
 };
+
+// Extracted Tooltip component for clarity
+const ChartTooltip = ({ tooltipData }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: tooltipData.left,
+      top: tooltipData.top,
+      transform: "translate(-50%, -100%)",
+      backgroundColor: "rgba(0, 0, 0, 0.8)",
+      color: "#fff",
+      padding: "8px",
+      borderRadius: "4px",
+      pointerEvents: "none",
+    }}
+  >
+    <div>{tooltipData.value} QR</div>
+    <div>{tooltipData.label}</div>
+  </div>
+);
 
 const TotalEarningsGraph = () => {
   const chartRef = useRef(null);
@@ -40,16 +60,26 @@ const TotalEarningsGraph = () => {
     dispatch(fetchIncomesGraph());
   }, [dispatch]);
 
-  // Group data by month and category
-  const groupedData = incomeGraphData.reduce(
-    (acc, { time, totalRevenue, category }) => {
+  // Memoize grouped data for performance
+  const groupedData = useMemo(() => {
+    return incomeGraphData.reduce((acc, { time, totalRevenue, category }) => {
       if (!acc[time]) {
         acc[time] = { Earning: 0, Expense: 0 };
       }
       acc[time][category] += totalRevenue;
       return acc;
-    },
-    {}
+    }, {});
+  }, [incomeGraphData]);
+
+  const totalEarnings = useMemo(
+    () =>
+      Object.values(groupedData).reduce((sum, data) => sum + data.Earning, 0),
+    [groupedData]
+  );
+  const totalExpenses = useMemo(
+    () =>
+      Object.values(groupedData).reduce((sum, data) => sum + data.Expense, 0),
+    [groupedData]
   );
 
   const chartData = {
@@ -60,9 +90,8 @@ const TotalEarningsGraph = () => {
         label: t("Earnings"),
         data: Object.values(groupedData).map((data) => data.Earning),
         borderColor: "#7C3AED",
-        backgroundColor: "rgba(124, 58, 237, 0.2)", // Light purple fill
+        backgroundColor: "rgba(124, 58, 237, 0.2)",
         borderWidth: 2,
-        fill: true,
         tension: 0.4,
         pointBackgroundColor: "#7C3AED",
         pointBorderColor: "#fff",
@@ -74,9 +103,8 @@ const TotalEarningsGraph = () => {
         label: t("Expenses"),
         data: Object.values(groupedData).map((data) => data.Expense),
         borderColor: "#EA580C",
-        backgroundColor: "rgba(234, 88, 12, 0.2)", // Light orange fill
+        backgroundColor: "rgba(234, 88, 12, 0.2)",
         borderWidth: 2,
-        fill: true,
         tension: 0.4,
         pointBackgroundColor: "#EA580C",
         pointBorderColor: "#fff",
@@ -88,6 +116,7 @@ const TotalEarningsGraph = () => {
   };
 
   const options = {
+    maintainAspectRatio: false,
     plugins: {
       tooltip: {
         enabled: false,
@@ -132,29 +161,17 @@ const TotalEarningsGraph = () => {
     },
   };
 
-  const totalEarnings = Object.values(groupedData).reduce(
-    (sum, data) => sum + data.Earning,
-    0
-  );
-  const totalExpenses = Object.values(groupedData).reduce(
-    (sum, data) => sum + data.Expense,
-    0
-  );
-
   if (loading) {
     return (
       <div className="p-4 bg-white flex flex-col min-h-[400px]">
-        {/* Header Skeleton */}
         <div className="flex justify-between items-center mb-4">
           <Skeleton.Input active style={{ width: 150, height: 24 }} />
           <Skeleton.Input active style={{ width: 100, height: 32 }} />
         </div>
-        {/* Custom Bar Graph Skeleton */}
         <div className="relative flex-1 flex items-center justify-center">
           <BarGraphSkeleton />
         </div>
-        {/* Legend Skeleton */}
-        <div className="flex items-center justify-around flex-row mt-16 pt-4 w-full">
+        <div className="flex items-center justify-around flex-row mt-4 pt-4 w-full">
           <Skeleton.Input active style={{ width: 100, height: 20 }} />
           <Skeleton.Input active style={{ width: 100, height: 20 }} />
         </div>
@@ -189,41 +206,34 @@ const TotalEarningsGraph = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">{t("Earnings")}</h2>
       </div>
-      <div className="relative flex-1">
+      <div className="relative" style={{ height: "350px" }}>
         <Line ref={chartRef} data={chartData} options={options} />
-        {tooltipData && (
-          <div
-            style={{
-              position: "absolute",
-              left: tooltipData.left,
-              top: tooltipData.top,
-              transform: "translate(-50%, -100%)",
-              backgroundColor: "rgba(0, 0, 0, 0.8)",
-              color: "#fff",
-              padding: "8px",
-              borderRadius: "4px",
-              pointerEvents: "none",
-            }}
-          >
-            <div>{tooltipData.value} QR</div>
-            <div>{tooltipData.label}</div>
-          </div>
-        )}
+        {tooltipData && <ChartTooltip tooltipData={tooltipData} />}
       </div>
-      <div className="flex items-center justify-around flex-row mt-16 pt-4 w-full">
-        <div className="flex items-center">
-          <div className="text-gray-700">{t("Total Earnings")}</div>
-          <div className="ml-2 font-bold mr-1">
-            {totalEarnings?.toLocaleString()}
+
+      {/* Compact bottom stats with icon circle backgrounds */}
+      <div className="grid grid-cols-2 gap-2 pt-2">
+        <div className="bg-green-100 rounded shadow p-2 flex items-center">
+          <div className="bg-green-200 rounded-full p-2 mr-2">
+            <FiTrendingUp size={24} className="text-green-500" />
           </div>
-          <div className="text-gray-700">QR</div>
+          <div>
+            <div className="text-sm text-gray-700">{t("Total Earnings")}</div>
+            <div className="text-lg font-bold text-green-600">
+              {totalEarnings?.toLocaleString()} QR
+            </div>
+          </div>
         </div>
-        <div className="flex items-center">
-          <div className="text-gray-700">{t("Total Expenses")}</div>
-          <div className="ml-2 font-bold mr-1">
-            {totalExpenses?.toLocaleString()}
+        <div className="bg-red-100 rounded shadow p-2 flex items-center">
+          <div className="bg-red-200 rounded-full p-2 mr-2">
+            <FiTrendingDown size={24} className="text-red-500" />
           </div>
-          <div className="text-gray-700">QR</div>
+          <div>
+            <div className="text-sm text-gray-700">{t("Total Expenses")}</div>
+            <div className="text-lg font-bold text-red-600">
+              {totalExpenses?.toLocaleString()} QR
+            </div>
+          </div>
         </div>
       </div>
     </div>
