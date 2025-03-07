@@ -36,7 +36,6 @@ const MainSection = () => {
     chapterLoading,
   } = useSelector((state) => state.admin.module);
 
-  console.log(modulesData, "modulesDatamodulesData");
   useEffect(() => {
     const fetchAndSetModules = async () => {
       if (cid && sid) {

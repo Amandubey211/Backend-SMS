@@ -1,3 +1,4 @@
+// AddModule.jsx
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import { FiLoader } from "react-icons/fi"; // For loader icon
@@ -12,6 +13,7 @@ import {
 import { setSelectedModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import AudienceSelector from "../../../Component/AudienceSelector";
 
 const AddModule = ({ data, onClose }) => {
   const { t } = useTranslation("admModule");
@@ -22,7 +24,12 @@ const AddModule = ({ data, onClose }) => {
   const [preview, setPreview] = useState(null);
   const [moduleTitle, setModuleTitle] = useState("");
 
-  // Access selected module from the Redux store
+  // New state for audience selection now holds groupIds and sectionIds.
+  const [recipient, setRecipient] = useState({
+    groupIds: [],
+    sectionIds: [],
+  });
+
   const { selectedModule, moduleLoading, error } = useSelector(
     (state) => state.admin.module
   );
@@ -31,6 +38,10 @@ const AddModule = ({ data, onClose }) => {
     if (data) {
       setModuleTitle(data.moduleName);
       setPreview(data.thumbnail);
+      setRecipient({
+        groupIds: data.groupIds || [],
+        sectionIds: data.sectionIds || [],
+      });
     }
   }, [data]);
 
@@ -54,6 +65,7 @@ const AddModule = ({ data, onClose }) => {
   const clearForm = () => {
     setModuleTitle("");
     clearImage();
+    setRecipient({ groupIds: [], sectionIds: [] });
   };
 
   const handleSubmit = async () => {
@@ -71,18 +83,19 @@ const AddModule = ({ data, onClose }) => {
       name: moduleTitle,
       thumbnail: selectedFile || preview,
       subjectId: sid,
+      groupIds: recipient.groupIds,
+      sectionIds: recipient.sectionIds,
     };
 
     if (data) {
       // Editing existing module
       await dispatch(editModule({ ...moduleData, moduleId: data._id }));
-      // If the edited module is the currently selected module, update it
       if (selectedModule && selectedModule.moduleId === data._id) {
         dispatch(
           setSelectedModule({
             moduleId: data._id,
             name: moduleTitle,
-            chapters: selectedModule.chapters, // Keep chapters intact
+            chapters: selectedModule.chapters,
           })
         );
       }
@@ -91,7 +104,6 @@ const AddModule = ({ data, onClose }) => {
       await dispatch(addModule(moduleData));
     }
 
-    // After successful submission, clear form and close modal
     if (!moduleLoading && !error) {
       clearForm();
       onClose();
@@ -204,6 +216,8 @@ const AddModule = ({ data, onClose }) => {
               className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:shadow-outline"
             />
           </div>
+          {/* Render the AudienceSelector */}
+          <AudienceSelector value={recipient} onChange={setRecipient} />
         </div>
         <div className="mt-auto mb-8">
           <button

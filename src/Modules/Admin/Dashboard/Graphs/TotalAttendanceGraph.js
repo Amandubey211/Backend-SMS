@@ -143,15 +143,15 @@ const TotalAttendanceGraph = () => {
         <div className="flex justify-between items-center mb-1">
           <div className="flex items-center gap-2 p-2 rounded-md">
             {/* Icon with circular background */}
-            <div className="bg-blue-100 p-1 rounded-full">
+            {/* <div className="bg-blue-100 p-1 rounded-full">
               <FiCalendar className="text-blue-500" size={20} />
-            </div>
+            </div> */}
             {/* Textual Information in a single row */}
             <div className="flex items-center gap-1 whitespace-nowrap">
               <span className="text-base font-semibold">
-                {t("Total Attendance")} : 
+                {t("Total Attendance")} :
               </span>
-              <span className="text-xl font-bold">
+              <span className="text-lg font-semibold">
                 {attendanceData
                   ? attendanceData.totalMaleAttendance +
                     attendanceData.totalFemaleAttendance
