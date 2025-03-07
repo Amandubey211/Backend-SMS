@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 import { FaCrown } from "react-icons/fa6";
 import { FaSync } from "react-icons/fa";
-import { Tooltip, Skeleton, Empty, Select } from "antd"; // Import Select from antd
+import { Tooltip, Skeleton, Empty, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
@@ -18,7 +18,6 @@ const TopRankingStudents = () => {
   const { t } = useTranslation("admTopRanking");
   const dispatch = useDispatch();
 
-  // Safe optional access to Redux states
   const {
     topStudents = [],
     loadingTopStudents,
@@ -39,7 +38,7 @@ const TopRankingStudents = () => {
 
   // Fetch classes if not done; fetch top students once classes load
   useEffect(() => {
-    // If you need to ensure classes are fetched, uncomment below:
+    // If needed, uncomment to fetch classes:
     // dispatch(fetchAllClasses());
 
     if (classes?.length > 0) {
@@ -122,6 +121,15 @@ const TopRankingStudents = () => {
     </div>
   );
 
+  // Utility to safely display score
+  const getDisplayScore = (rawScore) => {
+    // Use Number.isFinite to avoid Infinity or NaN
+    if (Number.isFinite(rawScore)) {
+      return `${rawScore} %`;
+    }
+    return t("N/A"); // fallback if rawScore is Infinity, NaN, or undefined
+  };
+
   return (
     <ProtectedSection
       requiredPermission={PERMISSIONS.GET_TOP_STUDENTS}
@@ -134,7 +142,7 @@ const TopRankingStudents = () => {
             {t("Top Ranking Students")}
           </h2>
 
-          {/* Class Selector using Ant Design Select with a light pink background */}
+          {/* Class Selector using Ant Design Select */}
           <Select
             value={selectedClass}
             onChange={handleSelectChange}
@@ -161,14 +169,6 @@ const TopRankingStudents = () => {
                 </span>
               }
             />
-            {/* Spinning icon to reset filter */}
-            {/* <button
-              onClick={handleResetFilter}
-              className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
-            >
-              <FaSync className="animate-spin" />
-              <span className="font-medium">{t("Reset Filter")}</span>
-            </button> */}
           </div>
         ) : isLoading ? (
           <>
@@ -232,7 +232,7 @@ const TopRankingStudents = () => {
                       </Tooltip>
                     </p>
 
-                    {/* Score */}
+                    {/* Score with fallback */}
                     <span
                       style={{
                         background:
@@ -248,8 +248,7 @@ const TopRankingStudents = () => {
                           WebkitTextFillColor: "transparent",
                         }}
                       >
-                        {t("Score")}:{" "}
-                        {student?.score ? `${student.score} %` : t("0")}
+                        {t("Score")}: {getDisplayScore(student?.score)}
                       </span>
                     </span>
                   </div>
@@ -287,7 +286,7 @@ const TopRankingStudents = () => {
                         </span>
                       </div>
 
-                      {/* Score */}
+                      {/* Score with fallback */}
                       <div
                         className="rounded-sm w-auto"
                         style={{
@@ -304,8 +303,7 @@ const TopRankingStudents = () => {
                           }}
                           className="px-3"
                         >
-                          {t("Score")}:{" "}
-                          {student?.score ? `${student.score} %` : t("0")}
+                          {t("Score")}: {getDisplayScore(student?.score)}
                         </span>
                       </div>
 
