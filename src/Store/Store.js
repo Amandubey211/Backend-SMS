@@ -84,6 +84,7 @@ import studentDiscussionReducer from "../Store/Slices/Student/MyClass/Class/Subj
 import studentAnnounceReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcementSlice";
 import studentTimeTableReducer from "../Store/Slices/Student/TimeTable/studentTimeTableSlice";
 import studentSemesterReducer from "../Store/Slices/Student/MyClass/Class/semester/semesterSlice";
+import studentRubricReducer from "../Store/Slices/Student/MyClass/Class/Subjects/Rubric/rubricSlice";
 // parent
 import dashboardReducer from "../Store/Slices/Parent/Dashboard/dashboardSlice";
 import financeReducer from "../Store/Slices/Parent/Finance/financeSlice";
@@ -241,6 +242,7 @@ const studentReducer = combineReducers({
   studentAnnounce: studentAnnounceReducer,
   studentTimetable: studentTimeTableReducer,
   semesters: persistReducer(semesterPersistConfig, studentSemesterReducer),
+  studentRubric: studentRubricReducer,
 });
 
 const ParentReducer = combineReducers({

@@ -34,6 +34,7 @@ export const fetchAllOfflineExam = createAsyncThunk(
   }
 );
 
+// oflineExam.action.js (excerpt)
 export const createOfflineExam = createAsyncThunk(
   "subject/offline_create_exam",
   async ({ payload, cid, sid }, { rejectWithValue, dispatch, getState }) => {
@@ -47,6 +48,9 @@ export const createOfflineExam = createAsyncThunk(
         schoolId,
         semesterId,
         academicYearId: say,
+        // New fields added to the payload
+        resultsPublished: payload.resultsPublished,
+        resultsPublishDate: payload.resultsPublishDate,
       };
 
       dispatch(setShowError(false));
@@ -69,6 +73,15 @@ export const UploadOfflineExamSheet = createAsyncThunk(
     try {
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       formData.append("semesterId", semesterId);
+
+      // Append new results fields if they are not already present
+      if (!formData.has("resultsPublished")) {
+        formData.append("resultsPublished", false);
+      }
+      if (!formData.has("resultsPublishDate")) {
+        formData.append("resultsPublishDate", null);
+      }
+
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));

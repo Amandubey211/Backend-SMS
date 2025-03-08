@@ -1,9 +1,7 @@
 import React, { memo, useEffect, useState } from "react";
 import { FaCrown } from "react-icons/fa6";
-import { IoPeople } from "react-icons/io5";
-import { FaSync } from "react-icons/fa"; // React Icons for refresh icon
-import { Tooltip, Skeleton, Empty } from "antd";
-
+import { FaSync } from "react-icons/fa";
+import { Tooltip, Skeleton, Empty, Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
@@ -14,11 +12,12 @@ import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 
+const { Option } = Select;
+
 const TopRankingStudents = () => {
   const { t } = useTranslation("admTopRanking");
   const dispatch = useDispatch();
 
-  // Safe optional access to Redux states
   const {
     topStudents = [],
     loadingTopStudents,
@@ -39,7 +38,8 @@ const TopRankingStudents = () => {
 
   // Fetch classes if not done; fetch top students once classes load
   useEffect(() => {
-    // dispatch(fetchAllClasses()); // Optionally ensure classes are fetched
+    // If needed, uncomment to fetch classes:
+    // dispatch(fetchAllClasses());
 
     if (classes?.length > 0) {
       const initialClassId = classes[0]?._id ?? "";
@@ -48,8 +48,8 @@ const TopRankingStudents = () => {
     }
   }, [dispatch, classes]);
 
-  const handleChange = (e) => {
-    const { value } = e.target;
+  // Handler for changing the class in AntD Select
+  const handleSelectChange = (value) => {
     setSelectedClass(value);
     dispatch(fetchTopStudents(value));
   };
@@ -65,6 +65,7 @@ const TopRankingStudents = () => {
 
   // Combine loading states
   const isLoading = loadingTopStudents || loadingClasses;
+
   // Check if there's no data or an error
   const noData = (topStudents?.length ?? 0) === 0 || errorTopStudents;
 
@@ -77,7 +78,6 @@ const TopRankingStudents = () => {
           className="text-center p-4 border rounded-lg relative w-[30%]"
         >
           <div className="relative mt-10 flex flex-col items-center">
-            {/* Skeleton for 'crown', 'avatar', and text lines */}
             <Skeleton.Avatar active size={56} shape="circle" />
             <Skeleton
               active
@@ -105,11 +105,13 @@ const TopRankingStudents = () => {
           {/* The left portion: rank + avatar + name */}
           <div className="flex items-center w-[40%]">
             <Skeleton.Input active style={{ width: 24 }} />
-            <Skeleton.Avatar active size={40} shape="circle" className="ml-3" />
+            <Skeleton.Avatar active size={40} shape="circle" className="ml-6" />
             <Skeleton.Input active style={{ width: 80, marginLeft: 8 }} />
           </div>
           {/* Score */}
-          <Skeleton.Input active style={{ width: 80 }} />
+          <div className="ml-20">
+            <Skeleton.Input active style={{ width: 80 }} />
+          </div>
           {/* Admission Number */}
           <div className="w-[30%] ml-2">
             <Skeleton.Input active style={{ width: 80 }} />
@@ -118,6 +120,15 @@ const TopRankingStudents = () => {
       ))}
     </div>
   );
+
+  // Utility to safely display score
+  const getDisplayScore = (rawScore) => {
+    // Use Number.isFinite to avoid Infinity or NaN
+    if (Number.isFinite(rawScore)) {
+      return `${rawScore} %`;
+    }
+    return t("N/A"); // fallback if rawScore is Infinity, NaN, or undefined
+  };
 
   return (
     <ProtectedSection
@@ -131,22 +142,18 @@ const TopRankingStudents = () => {
             {t("Top Ranking Students")}
           </h2>
 
-          {/* Class Selector */}
-          <div className="relative">
-            <select
-              name="classId"
-              value={selectedClass}
-              onChange={handleChange}
-              disabled={isLoading} // optional: disable selector while loading
-              className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            >
-              {classes?.map((c) => (
-                <option key={c?._id} value={c?._id}>
-                  {c?.className || t("N/A")}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Class Selector using Ant Design Select */}
+          <Select
+            value={selectedClass}
+            onChange={handleSelectChange}
+            disabled={isLoading}
+          >
+            {classes?.map((c) => (
+              <Option key={c?._id} value={c?._id}>
+                {c?.className || t("N/A")}
+              </Option>
+            ))}
+          </Select>
         </div>
 
         {/* Content: Loading / Error / No Data / Actual Data */}
@@ -162,15 +169,6 @@ const TopRankingStudents = () => {
                 </span>
               }
             />
-
-            {/* Spinning icon to reset filter */}
-            <button
-              onClick={handleResetFilter}
-              className="flex items-center gap-2 text-blue-500 hover:text-blue-700"
-            >
-              <FaSync className="animate-spin" />
-              <span className="font-medium">{t("Reset Filter")}</span>
-            </button>
           </div>
         ) : isLoading ? (
           <>
@@ -234,7 +232,7 @@ const TopRankingStudents = () => {
                       </Tooltip>
                     </p>
 
-                    {/* Score */}
+                    {/* Score with fallback */}
                     <span
                       style={{
                         background:
@@ -250,8 +248,7 @@ const TopRankingStudents = () => {
                           WebkitTextFillColor: "transparent",
                         }}
                       >
-                        {t("Score")}:{" "}
-                        {student?.score ? `${student.score} %` : t("0")}
+                        {t("Score")}: {getDisplayScore(student?.score)}
                       </span>
                     </span>
                   </div>
@@ -289,7 +286,7 @@ const TopRankingStudents = () => {
                         </span>
                       </div>
 
-                      {/* Score */}
+                      {/* Score with fallback */}
                       <div
                         className="rounded-sm w-auto"
                         style={{
@@ -306,8 +303,7 @@ const TopRankingStudents = () => {
                           }}
                           className="px-3"
                         >
-                          {t("Score")}:{" "}
-                          {student?.score ? `${student.score} %` : t("0")}
+                          {t("Score")}: {getDisplayScore(student?.score)}
                         </span>
                       </div>
 

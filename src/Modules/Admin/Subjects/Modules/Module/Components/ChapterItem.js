@@ -39,13 +39,14 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const optionsRef = useRef(null);
-
   const { loading: deleteAssignmentLoading } = useSelector(
     (store) => store.admin?.assignments
   );
   const { loading: deleteQuizLoading } = useSelector(
     (store) => store.admin?.quizzes
   );
+  const dispatch = useDispatch();
+
   const toggleMenu = (event) => {
     event.preventDefault();
     setMenuOpen((prev) => !prev);
@@ -63,12 +64,9 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
     } else {
       document.removeEventListener("mousedown", closeMenu);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", closeMenu);
-    };
+    return () => document.removeEventListener("mousedown", closeMenu);
   }, [menuOpen]);
-  const dispatch = useDispatch();
+
   const handleDelete = async () => {
     try {
       if (type === "assignment") {
@@ -97,9 +95,9 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
       >
         <div className="p-2 bg-white rounded-full">{getIcon(type)}</div>
         <div className="flex flex-col gap-1 justify-center">
-          <p className="font-semibold">{title}</p>
-          <p className="text-green-500 text-sm ">
-            {type?.charAt(0)?.toUpperCase() + type?.slice(1)}
+          <p className="font-semibold capitalize">{title}</p>
+          <p className="text-green-500 text-sm">
+            {type.charAt(0).toUpperCase() + type.slice(1)}
           </p>
         </div>
       </NavLink>
@@ -111,7 +109,7 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
           />
         ) : (
           <MdOutlineBlock
-            className="text-gray-600  p-1 border rounded-full h-7 w-7"
+            className="text-gray-600 p-1 border rounded-full h-7 w-7"
             aria-label="Not Published"
           />
         )}
@@ -126,16 +124,14 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
             <FaEllipsisV className="text-green-500" />
           </button>
         </ProtectedAction>
-
         {menuOpen && (
           <div
             ref={optionsRef}
-            className="absolute right-0 mt-8 w-32 bg-white shadow-lg border rounded-md z-10"
+            className="absolute right-0 mt-8 w-40 bg-white shadow-lg border rounded-md z-10"
             role="menu"
             aria-label="Options Menu"
           >
             <ProtectedAction requiredPermission={""}>
-              {/* Assignment and  quiz  */}
               <button
                 onClick={openDeleteModal}
                 className="flex items-center gap-2 w-full p-2 hover:bg-gray-100"
@@ -150,7 +146,6 @@ const ChapterItem = ({ type, title, id, isPublished, fetchModules }) => {
           </div>
         )}
       </div>
-
       <DeleteModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}

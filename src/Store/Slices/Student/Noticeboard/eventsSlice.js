@@ -51,7 +51,6 @@ const stdEventsSlice = createSlice({
         state.error = false;
       })
       .addCase(stdEvent.fulfilled, (state, action) => {
-
         state.loading = false;
         // // console.log("hi i am std event:", action.payload)
         state.eventData = action.payload;

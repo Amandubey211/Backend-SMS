@@ -1,3 +1,4 @@
+// AddChapter.jsx
 import React, { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
 import { FiLoader } from "react-icons/fi"; // For loading spinner icon
@@ -10,14 +11,22 @@ import {
 import { useParams } from "react-router-dom";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import AudienceSelector from "../../../Component/AudienceSelector";
 
 const AddChapter = ({ chapterData, isEditing, onClose }) => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [chapterTitle, setChapterTitle] = useState("");
+
+  // New state for audience selection (holds groupIds and sectionIds)
+  const [recipient, setRecipient] = useState({
+    groupIds: [],
+    sectionIds: [],
+  });
+
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
-  const { selectedModule, loading, modules } = useSelector(
+  const { selectedModule, chapterLoading: loading } = useSelector(
     (state) => state.admin.module
   );
 
@@ -25,6 +34,10 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
     if (isEditing && chapterData) {
       setChapterTitle(chapterData.name);
       setPreview(chapterData.thumbnail);
+      setRecipient({
+        groupIds: chapterData.groupIds || [],
+        sectionIds: chapterData.sectionIds || [],
+      });
     }
   }, [isEditing, chapterData]);
 
@@ -62,7 +75,6 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
 
     try {
       if (isEditing) {
-        // Dispatching edit chapter action
         await dispatch(
           editChapter({
             name: chapterTitle,
@@ -70,26 +82,27 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
             moduleId: selectedModule?.moduleId,
             chapterId: chapterData._id,
             sid,
+            groupIds: recipient.groupIds,
+            sectionIds: recipient.sectionIds,
           })
-        ).unwrap(); // Unwrap the promise to handle errors
+        ).unwrap();
       } else {
-        // Dispatching add chapter action
         await dispatch(
           addChapter({
             name: chapterTitle,
             thumbnail,
             moduleId: selectedModule?.moduleId,
             sid,
+            groupIds: recipient.groupIds,
+            sectionIds: recipient.sectionIds,
           })
-        ).unwrap(); // Unwrap the promise to handle errors
+        ).unwrap();
       }
 
       setChapterTitle("");
       clearImage();
       onClose();
-      // dispatch(fetchModules({ cid, sid }));
     } catch (error) {
-      // console.log(error, "////////");
       toast.error(error);
     }
   };
@@ -203,6 +216,9 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
               className="w-full px-3 py-2 border rounded-lg text-gray-700 focus:outline-none focus:shadow-outline"
             />
           </div>
+
+          {/* Render the AudienceSelector */}
+          <AudienceSelector value={recipient} onChange={setRecipient} />
         </div>
 
         {/* Submit Button */}

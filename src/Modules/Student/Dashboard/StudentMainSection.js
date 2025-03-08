@@ -185,8 +185,8 @@ const StudentMainSection = () => {
             </div>
           </div>
         </div>
-        <div className="ml-4 mr-5 mb-4">
-          <div className="flex items-start justify-start w-[100%] border rounded-md bg-white hover:shadow-sm">
+        <div className="ml-4 mr-5 mb-4 h-[405px]">
+          <div className="flex items-start justify-start w-[100%] border rounded-md bg-white hover:shadow-sm h-full">
             <AttendanceDashboard
               attendanceSummary={dashboardAttendance}
               error={attendanceError}
@@ -202,7 +202,7 @@ const StudentMainSection = () => {
           <StudentEvents />
         </div>
         {/* Notice Board */}
-        <div className="flex w-full bg-white items-start justify-start px-4 pb-2 mt-3 rounded-md border hover:shadow-sm">
+        <div className="flex w-full bg-white mb-5 h-full items-start justify-start px-4 pb-2 mt-3 rounded-md border hover:shadow-sm">
           <div className="w-full h-full">
             <DashboardNoticeBoard descriptionLength={58} />
           </div>

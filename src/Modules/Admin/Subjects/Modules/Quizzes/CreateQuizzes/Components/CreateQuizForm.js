@@ -1,3 +1,4 @@
+// CreateQuizForm.jsx
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import DateInput from "../../../../Component/DateInput";
@@ -12,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { AnimatePresence, motion } from "framer-motion";
 import { Modal, Button } from "antd";
 import { FiInfo, FiCheck } from "react-icons/fi";
+import ResultsPublishInput from "../../../Assignments/CreateAssignment/Component/ResultsPublishInput";
 
 const AllowedAttemptsSelect = ({ allowedAttempts, handleChange, error }) => {
   const { t } = useTranslation("quiz");
@@ -66,6 +68,9 @@ const CreateQuizForm = ({
   chapterId,
   groupId = [],
   formErrors = {},
+  // New fields from formState
+  resultsPublished,
+  resultsPublishDate,
 }) => {
   const dispatch = useDispatch();
   const [chapters, setChapters] = useState([]);
@@ -106,7 +111,7 @@ const CreateQuizForm = ({
         </button>
       </div>
 
-      {/* Other form fields remain unchanged */}
+      {/* Quiz Type */}
       <LabeledSelect
         label={
           <>
@@ -368,7 +373,15 @@ const CreateQuizForm = ({
         fieldId="dueDate"
       />
 
-      {/* Updated Guidelines Modal – matching Assignment modal UI */}
+      {/* New Results Publish Fields */}
+      <ResultsPublishInput
+        resultsPublished={resultsPublished}
+        resultsPublishDate={resultsPublishDate}
+        handleChange={handleChange}
+        errorResultsPublishDate={formErrors.resultsPublishDate}
+      />
+
+      {/* Guidelines Modal */}
       <Modal
         visible={showGuidelines}
         onCancel={() => setShowGuidelines(false)}
@@ -395,7 +408,7 @@ const CreateQuizForm = ({
                   {t("Quiz Creation Guidelines")}
                 </h2>
               </div>
-              {/* Guidelines List with updated bullet points */}
+              {/* Guidelines List */}
               <ul className="list-none text-gray-700 pl-6 space-y-2">
                 <li className="flex items-center space-x-2">
                   <FiCheck className="text-green-500" />

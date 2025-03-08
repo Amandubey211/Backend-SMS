@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar,
   Radio,
@@ -17,6 +17,8 @@ import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchTimetableList } from "../../../Store/Slices/Admin/TimeTable/timetable.action";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 dayjs.extend(isSameOrBefore);
@@ -81,8 +83,53 @@ export default function TimeTableDash() {
   // ----------------------------------------------------------------
   // 1. LOCAL STATE
   // ----------------------------------------------------------------
+  const [formType, setFormType] = useState(null); // Track timetable type
+
+  const {timetables=[]}=useSelector((store)=>store?.admin?.timetable);
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+    dispatch(fetchTimetableList());
+  },[])
+
+  const classes = [
+    { _id: "class1", name: "Class 10" },
+    { _id: "class2", name: "Class 12" }
+  ];
+  
+  const sections = [
+    { _id: "sectionA", name: "Section A" },
+    { _id: "sectionB", name: "Section B" }
+  ];
+  
+  const groups = [
+    { _id: "group1", name: "Science" },
+    { _id: "group2", name: "Commerce" }
+  ];
+  
+  const academicYears = [
+    { _id: "year2025", name: "2024-2025" },
+    { _id: "year2026", name: "2025-2026" }
+  ];
+  
+  const semesters = [
+    { _id: "sem1", name: "Semester 1" },
+    { _id: "sem2", name: "Semester 2" }
+  ];
+  
+  const schools = [
+    { _id: "school1", name: "Springfield High" },
+    { _id: "school2", name: "Riverdale Academy" }
+  ];
+  
+  const subjects = [
+    { _id: "subj1", name: "Math" },
+    { _id: "subj2", name: "Physics" }
+  ];
+  
+
   // We store timetables as plain objects/strings
-  const [timetables, setTimetables] = useState(initialTimetables);
+  // const [timetables, setTimetables] = useState(initialTimetables);
 
   // Store a JS Date for the “selected date”
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -154,12 +201,12 @@ export default function TimeTableDash() {
 
     if (editingTimetable) {
       // Update existing timetable
-      setTimetables((prev) =>
-        prev.map((itm) => (itm._id === editingTimetable._id ? newItem : itm))
-      );
+      // setTimetables((prev) =>
+      //   prev.map((itm) => (itm._id === editingTimetable._id ? newItem : itm))
+      // );
     } else {
       // Create new timetable
-      setTimetables((prev) => [...prev, newItem]);
+      // setTimetables((prev) => [...prev, newItem]);
     }
 
     closeDrawer();
@@ -189,9 +236,9 @@ export default function TimeTableDash() {
 
   const confirmDelete = () => {
     if (editingTimetable) {
-      setTimetables((prev) =>
-        prev.filter((tt) => tt._id !== editingTimetable._id)
-      );
+      // setTimetables((prev) =>
+      //   prev.filter((tt) => tt._id !== editingTimetable._id)
+      // );
     }
     setEditingTimetable(null);
     setDeleteModalVisible(false);
@@ -512,52 +559,223 @@ export default function TimeTableDash() {
       <Drawer
         title={editingTimetable ? "Edit Timetable" : "Create Timetable"}
         placement="right"
-        width={400}
+        width={"100%"}
         visible={drawerVisible}
         onClose={closeDrawer}
       >
-        <Form layout="vertical" form={form} onFinish={onFinish}>
-          <Form.Item
-            label="Name"
-            name="name"
-            rules={[{ required: true, message: "Please enter a name" }]}
-          >
-            <Input placeholder="e.g. Monday Lectures" />
-          </Form.Item>
+<Form layout="vertical" form={form} onFinish={onFinish}>
+  {/* Timetable Name */}
+  <Form.Item
+    label="Timetable Name"
+    name="name"
+    rules={[{ required: true, message: "Please enter a name" }]}
+  >
+    <Input placeholder="e.g. Midterm Exam Schedule" />
+  </Form.Item>
 
-          <Form.Item label="Type" name="type">
-            <Select>
-              <Option value="weekly">Weekly</Option>
-              <Option value="exam">Exam</Option>
-              <Option value="event">Event</Option>
-              <Option value="others">Others</Option>
-            </Select>
-          </Form.Item>
+  {/* Timetable Type */}
+  <Form.Item label="Type" name="type" rules={[{ required: true }]}>
+    <Select onChange={(val) => setFormType(val)}>
+      <Option value="weekly">Weekly</Option>
+      <Option value="exam">Exam</Option>
+      <Option value="event">Event</Option>
+      <Option value="others">Others</Option>
+    </Select>
+  </Form.Item>
 
-          <Form.Item
-            label="Validity (Start / End)"
-            name="validity"
-            rules={[{ required: true, message: "Please select a date range" }]}
-          >
-            <RangePicker />
-          </Form.Item>
+  {/* Validity Start & End Date */}
+  <Form.Item
+    label="Validity Period"
+    name="validity"
+    rules={[{ required: true, message: "Please select the date range" }]}
+  >
+    <RangePicker />
+  </Form.Item>
 
-          <div className="flex justify-between mt-4">
-            <Button
-              type="primary"
-              htmlType="submit"
-              style={{ backgroundColor: "#FF69B4", borderColor: "#FF69B4" }}
-            >
-              {editingTimetable ? "Update" : "Save"}
-            </Button>
-            {editingTimetable && (
-              <Button danger onClick={() => onDeleteClick(editingTimetable)}>
-                <AiOutlineDelete className="mr-1" />
-                Delete
-              </Button>
+  {/* Class Selection */}
+  <Form.Item label="Class" name="classId">
+    <Select placeholder="Select Class" allowClear>
+      {classes.map((cls) => (
+        <Option key={cls._id} value={cls._id}>
+          {cls.name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+
+  {/* Section Selection */}
+  <Form.Item label="Section" name="sectionId">
+    <Select placeholder="Select Section" allowClear>
+      {sections.map((sec) => (
+        <Option key={sec._id} value={sec._id}>
+          {sec.name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+
+  {/* Group Selection */}
+  <Form.Item label="Group" name="groupId">
+    <Select placeholder="Select Group" allowClear>
+      {groups.map((grp) => (
+        <Option key={grp._id} value={grp._id}>
+          {grp.name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+
+  {/* Academic Year Selection */}
+  <Form.Item
+    label="Academic Year"
+    name="academicYear"
+    rules={[{ required: true, message: "Select an academic year" }]}
+  >
+    <Select>
+      {academicYears.map((year) => (
+        <Option key={year._id} value={year._id}>
+          {year.name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+
+  {/* Semester Selection (Optional) */}
+  <Form.Item label="Semester" name="semesterId">
+    <Select placeholder="Select Semester" allowClear>
+      {semesters.map((sem) => (
+        <Option key={sem._id} value={sem._id}>
+          {sem.name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+
+  {/* School Selection */}
+  <Form.Item
+    label="School"
+    name="schoolId"
+    rules={[{ required: true, message: "Select school" }]}
+  >
+    <Select>
+      {schools.map((school) => (
+        <Option key={school._id} value={school._id}>
+          {school.name}
+        </Option>
+      ))}
+    </Select>
+  </Form.Item>
+
+  {/* Timetable Slots (For Weekly, Exam, Events) */}
+  <Form.List name="days">
+    {(fields, { add, remove }) => (
+      <>
+        {fields.map(({ key, name, ...restField }) => (
+          <div key={key} className="border p-2 mb-2 rounded bg-gray-100">
+            {/* Day or Date Input Based on Type */}
+            {formType === "weekly" ? (
+              <Form.Item
+                {...restField}
+                name={[name, "day"]}
+                label="Day"
+                rules={[{ required: true, message: "Select a day" }]}
+              >
+                <Select placeholder="Select Day">
+                  <Option value="Monday">Monday</Option>
+                  <Option value="Tuesday">Tuesday</Option>
+                  <Option value="Wednesday">Wednesday</Option>
+                  <Option value="Thursday">Thursday</Option>
+                  <Option value="Friday">Friday</Option>
+                  <Option value="Saturday">Saturday</Option>
+                  <Option value="Sunday">Sunday</Option>
+                </Select>
+              </Form.Item>
+            ) : (
+              <Form.Item
+                {...restField}
+                name={[name, "date"]}
+                label="Date"
+                rules={[{ required: true, message: "Select a date" }]}
+              >
+                <DatePicker />
+              </Form.Item>
             )}
+
+            {/* Time Slot (Start & End) */}
+            <Form.Item
+              {...restField}
+              name={[name, "slots"]}
+              label="Time Slots"
+            >
+              <Form.List name={[name, "slots"]}>
+                {(slotFields, { add: addSlot, remove: removeSlot }) => (
+                  <>
+                    {slotFields.map(({ key: slotKey, name: slotName, ...restSlot }) => (
+                      <div key={slotKey} className="flex items-center gap-2">
+                        <Form.Item
+                          {...restSlot}
+                          name={[slotName, "startTime"]}
+                          rules={[{ required: true, message: "Start time required" }]}
+                        >
+                          <Input placeholder="Start Time (HH:MM)" />
+                        </Form.Item>
+                        <Form.Item
+                          {...restSlot}
+                          name={[slotName, "endTime"]}
+                          rules={[{ required: true, message: "End time required" }]}
+                        >
+                          <Input placeholder="End Time (HH:MM)" />
+                        </Form.Item>
+
+                        {/* Subject or Event Name Based on Type */}
+                        {formType === "weekly" || formType === "exam" ? (
+                          <Form.Item
+                            {...restSlot}
+                            name={[slotName, "subjectId"]}
+                            rules={[{ required: true, message: "Subject required" }]}
+                          >
+                            <Select placeholder="Select Subject">
+                              {subjects.map((sub) => (
+                                <Option key={sub._id} value={sub._id}>
+                                  {sub.name}
+                                </Option>
+                              ))}
+                            </Select>
+                          </Form.Item>
+                        ) : (
+                          <Form.Item
+                            {...restSlot}
+                            name={[slotName, "eventName"]}
+                            rules={[{ required: true, message: "Event Name required" }]}
+                          >
+                            <Input placeholder="Event Name" />
+                          </Form.Item>
+                        )}
+
+                        <Button danger onClick={() => removeSlot(slotKey)}>Remove</Button>
+                      </div>
+                    ))}
+                    <Button type="dashed" onClick={() => addSlot()}>
+                      + Add Slot
+                    </Button>
+                  </>
+                )}
+              </Form.List>
+            </Form.Item>
+
+            <Button danger onClick={() => remove(name)}>Remove Day</Button>
           </div>
-        </Form>
+        ))}
+        <Button type="dashed" onClick={() => add()}>
+          + Add Day
+        </Button>
+      </>
+    )}
+  </Form.List>
+
+  <Button type="primary" htmlType="submit">Save Timetable</Button>
+</Form>
+
       </Drawer>
 
       {/* TIMETABLE DETAILS DRAWER */}

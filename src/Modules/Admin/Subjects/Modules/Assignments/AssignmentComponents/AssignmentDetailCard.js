@@ -26,46 +26,55 @@ const AssignmentDetailCard = () => {
   if (loading) return <Spinner />;
   if (error || !assignment) return <NoDataFound />;
 
-  const assignmentDetails = [
-    {
-      label: "Assignment Points",
-      value: `${assignment?.points || "N/A"} Points`,
-      type: "assignment",
-    },
-    {
-      label: "Allowed Attempts",
-      value: `${
-        assignment?.allowNumberOfAttempts
-          ? assignment.allowNumberOfAttempts
-          : "Unlimited"
-      } Times`,
-      type: "assignment",
-    },
-    {
-      label: "Submitting By",
-      value: assignment?.submissionType || "N/A",
-      type: "assignment",
-    },
-    {
-      label: "This Assignment For",
-      value: assignment?.assignTo || "N/A",
-      type: "assignment",
-    },
-    {
+  // Build the assignment details array conditionally
+  const assignmentDetails = [];
+
+  // Always render basic details
+  assignmentDetails.push({
+    label: "Assignment Points",
+    value: assignment.points ? `${assignment.points} Points` : "N/A",
+    type: "assignment",
+  });
+  assignmentDetails.push({
+    label: "Allowed Attempts",
+    value: assignment.allowNumberOfAttempts
+      ? `${assignment.allowNumberOfAttempts} Times`
+      : "Unlimited",
+    type: "assignment",
+  });
+  assignmentDetails.push({
+    label: "Submitting By",
+    value: assignment.submissionType || "N/A",
+    type: "assignment",
+  });
+  assignmentDetails.push({
+    label: "This Assignment For",
+    value: assignment.assignTo || "N/A",
+    type: "assignment",
+  });
+
+  // Conditionally add date details only if they exist
+  if (assignment.availableFrom) {
+    assignmentDetails.push({
       label: "Available From",
-      value: assignment?.availableFrom
-        ? new Date(assignment.availableFrom).toLocaleDateString()
-        : "DD/MM/YY",
+      value: new Date(assignment.availableFrom).toLocaleDateString(),
       type: "date",
-    },
-    {
+    });
+  }
+  if (assignment.dueDate) {
+    assignmentDetails.push({
       label: "Due Date",
-      value: assignment?.dueDate
-        ? new Date(assignment.dueDate).toLocaleDateString()
-        : "DD/MM/YY",
+      value: new Date(assignment.dueDate).toLocaleDateString(),
       type: "date",
-    },
-  ];
+    });
+  }
+  if (assignment.resultsPublishDate) {
+    assignmentDetails.push({
+      label: "Results Publish Date",
+      value: new Date(assignment.resultsPublishDate).toLocaleDateString(),
+      type: "date",
+    });
+  }
 
   return (
     <div className="max-w-sm p-4 bg-white" aria-label="Assignment Card">
@@ -87,12 +96,12 @@ const AssignmentDetailCard = () => {
           type="Assignment"
           sgid={assignment._id}
           name={assignment.name}
-          isPublish={assignment?.publish}
+          isPublish={assignment.publish}
         />
       </ProtectedAction>
 
-      <div className="ps-3 ">
-        {assignmentDetails?.map((detail, index) => {
+      <div className="ps-3">
+        {assignmentDetails.map((detail, index) => {
           if (detail.type === "assignment") {
             return (
               <AssignmentDetail
@@ -114,8 +123,8 @@ const AssignmentDetailCard = () => {
         })}
       </div>
 
+      {/* Optionally, you can render the Rubric modal if needed */}
       {/* <RubricButton onClick={handleViewRubric} /> */}
-
       {/* {isModalOpen && <AddRubricModal readonly={true} />} */}
     </div>
   );

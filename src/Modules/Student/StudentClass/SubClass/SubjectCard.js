@@ -35,15 +35,15 @@ const SubjectCard = ({
     navigate(`/student_class/${classId}/${data?.subjectId}/module`);
   };
 
-  console.log("data iss --->", data);
-
   return (
     <div
-      onClick={handleSubjectClicked}
-      className={`relative rounded-xl cursor-pointer py-2 px-4 shadow-lg ${backgroundColor} border border-gray-100`}
+      className={`relative rounded-xl py-2 px-4 shadow-lg ${backgroundColor} border border-gray-100`}
     >
       {/* Subject Name and Progress Bar */}
-      <div className="flex justify-between items-start mt-4">
+      <div
+        className="flex justify-between items-start mt-4 cursor-pointer "
+        onClick={handleSubjectClicked}
+      >
         <div className="flex flex-col items-start justify-start">
           <h2 className="text-xl capitalize font-bold text-white">
             {data?.subjectName}
@@ -63,7 +63,7 @@ const SubjectCard = ({
         </div>
 
         {currentProgress && (
-          <div style={{ width: 70, height: 70 }} className="ml-2">
+          <div style={{ width: 60, height: 60 }} className="ml-2">
             <CircularProgressbar
               value={percentage}
               text={`${percentage}%`}
@@ -92,26 +92,19 @@ const SubjectCard = ({
       {/* Student Count and Modules Section */}
 
       {/* Teacher Info */}
-      <div className="flex items-end justify-between py-5">
-        {/* Teacher Profile / Display */}
-        <div className="flex items-end">
-          {data?.teacherProfile ? (
-            <img
-              src={data.teacherProfile}
-              alt="Teacher Profile"
-              className="w-12 h-12 rounded-full transition-transform duration-300 transform hover:scale-110 object-cover"
-            />
-          ) : (
-            <TeacherDisplay data={data} />
-          )}
-        </div>
+      <div className="flex items-end justify-between py-4 ">
+        <TeacherDisplay data={data} classId={classId} />
 
         {/* Subject Icon */}
-        <div className="flex items-end">
+        <div className="flex items-end pr-2">
           <img
-            src={data.subjectIcon ? data.subjectIcon : ClassCardBookImg}
+            src={
+              currentProgress?.subjectIcon
+                ? currentProgress?.subjectIcon
+                : ClassCardBookImg
+            }
             alt="icon"
-            className="h-28 w-28 object-contain"
+            className="h-12 w-12 object-contain"
           />
         </div>
       </div>

@@ -1,3 +1,4 @@
+// MainSection.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,20 +23,16 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 import toast from "react-hot-toast";
 
 /**
- * Validation function.
- * If `isPublishing` is true, we require additional fields;
- * if false, we just require name + content.
+ * Validation function for the quiz form.
  */
 function validateQuizForm(quizData, isPublishing) {
   const errors = {};
-
   if (!quizData.name || !quizData.name.trim()) {
     errors.name = "Quiz name is required.";
   }
   if (!quizData.content || !quizData.content.trim()) {
     errors.content = "Quiz instructions are required.";
   }
-
   if (isPublishing) {
     if (!quizData.quizType) {
       errors.quizType = "Quiz Type is required when publishing.";
@@ -52,7 +49,6 @@ function validateQuizForm(quizData, isPublishing) {
       errors.allowNumberOfAttempts =
         "Number of Attempts is required when attempts are limited.";
     }
-
     if (!quizData.assignTo) {
       errors.assignTo = "You must specify who to assign the quiz to.";
     } else {
@@ -69,15 +65,15 @@ function validateQuizForm(quizData, isPublishing) {
         errors.groupId = "Please select at least one Group.";
       }
     }
-
     if (!quizData.availableFrom) {
       errors.availableFrom = "Available From date is required when publishing.";
     }
     if (!quizData.dueDate) {
       errors.dueDate = "Due Date is required when publishing.";
     }
+    // Optionally add validation for results fields if needed:
+    // For example, if not publishing immediately, ensure a valid date.
   }
-
   return errors;
 }
 
@@ -91,7 +87,7 @@ function scrollToFirstError(errors) {
   }
 }
 
-// Use singular key names for multi-select arrays
+// Use singular key names for multi-select arrays; also add new results fields
 const initialFormState = {
   points: "",
   quizType: "Practice",
@@ -101,7 +97,7 @@ const initialFormState = {
   assignTo: "Everyone",
   showOneQuestionOnly: false,
   questionType: "",
-  sectionId: [], // singular key; still an array
+  sectionId: [],
   allowShuffleAnswers: false,
   dueDate: "",
   availableFrom: "",
@@ -110,17 +106,13 @@ const initialFormState = {
   timeLimit: "",
   moduleId: null,
   chapterId: null,
-  groupId: [], // singular key; still an array
+  groupId: [],
   studentSeeAnswer: false,
   showAnswerDate: "",
+  // New fields:
+  resultsPublished: false,
+  resultsPublishDate: "",
 };
-
-const initialAnswersState = [
-  { text: "", isCorrect: false },
-  { text: "", isCorrect: false },
-  { text: "", isCorrect: false },
-  { text: "", isCorrect: false },
-];
 
 const MainSection = ({ setIsEditing, isEditing }) => {
   const { cid, sid } = useParams();
@@ -129,6 +121,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const navigate = useNavigate();
 
   const { quizzDetail: quiz } = useSelector((state) => state.admin.quizzes);
+  const quizIdFromRedux = useSelector(
+    (state) => state.admin.quizzes.quizzDetail?._id || ""
+  );
 
   const [activeTab, setActiveTab] = useState("instructions");
   const [assignmentName, setAssignmentName] = useState("");
@@ -137,7 +132,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [quizId, setQuizId] = useState("");
   const [questions, setQuestions] = useState([]);
   const [question, setQuestion] = useState("");
-  const [answers, setAnswers] = useState(initialAnswersState);
+  const [answers, setAnswers] = useState([]);
   const [rightAnswerComment, setRightAnswerComment] = useState("");
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
   const [questionPoint, setQuestionPoint] = useState(1);
@@ -145,10 +140,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [formErrors, setFormErrors] = useState({});
-
-  const quizIdFromRedux = useSelector(
-    (state) => state.admin.quizzes.quizzDetail?._id || ""
-  );
 
   useEffect(() => {
     const quizIdFromState = location.state?.quizId;
@@ -163,7 +154,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       setAssignmentName("");
       setInstruction("");
       setQuestions([]);
-      setAnswers(initialAnswersState);
+      setAnswers([]);
       setRightAnswerComment("");
       setWrongAnswerComment("");
     }
@@ -185,7 +176,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         showOneQuestionOnly:
           quiz.showOneQuestionOnly || prev.showOneQuestionOnly,
         questionType: quiz.questionType || prev.questionType,
-        // Ensure we use singular keys; fallback to empty arrays if not provided
         sectionId: Array.isArray(quiz.sectionId) ? quiz.sectionId : [],
         groupId: Array.isArray(quiz.groupId) ? quiz.groupId : [],
         allowShuffleAnswers:
@@ -200,9 +190,12 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         timeLimit: quiz.timeLimit || prev.timeLimit,
         moduleId: quiz.moduleId || prev.moduleId,
         chapterId: quiz.chapterId || prev.chapterId,
+        // New fields
+        resultsPublished: quiz.resultsPublished || false,
+        resultsPublishDate: quiz.resultsPublishDate || "",
       }));
       setQuestions(quiz.questions || []);
-      setAnswers(quiz.answers || initialAnswersState);
+      // Optionally load answers from quiz if applicable
       setRightAnswerComment(quiz.correctAnswerComment || "");
       setWrongAnswerComment(quiz.inCorrectAnswerComment || "");
     }
@@ -243,7 +236,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     setFormErrors((prev) => ({ ...prev, name: undefined }));
   }, []);
 
-  // QUESTION handlers...
+  // QUESTION handlers (unchanged)...
   const handleQuestionChange = useCallback(
     (content) => setQuestion(content),
     []
@@ -259,7 +252,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   );
   const handleAddNewQuestion = () => {
     setQuestion("");
-    setAnswers(initialAnswersState);
+    setAnswers([]);
     setRightAnswerComment("");
     setWrongAnswerComment("");
     setQuestionPoint(1);
@@ -376,9 +369,12 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         classId: cid,
         subjectId: sid,
         publish,
+        // New results fields included
+        resultsPublished: formState.resultsPublished,
+        resultsPublishDate: formState.resultsPublishDate,
       };
 
-      // Use singular keys in payload (as expected by backend)
+      // Use singular keys in payload for multi-select assignments
       if (formState.assignTo === "Section") {
         quizData.sectionId = formState.sectionId;
       } else if (formState.assignTo === "Group") {

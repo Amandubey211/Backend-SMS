@@ -109,6 +109,7 @@ function CreateExam() {
                 setIsOpen={setIsOpen}
                 cid={cid}
                 sid={sid}
+                f
               />
             ) : (
               <UploadExcel
