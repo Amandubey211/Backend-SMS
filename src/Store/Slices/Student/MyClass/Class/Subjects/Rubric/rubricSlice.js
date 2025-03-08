@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { stdRubric } from "./rubric.action";
+import { getStudentRubricByIdThunk, stdRubric } from "./rubric.action";
 
 const initialState = {
   loading: false,
@@ -7,6 +7,8 @@ const initialState = {
   RubricData: [],
   isModalOpen: false,
   readonlyMode: false,
+  rubricLoading: false,
+  selectedRubric: null,
 };
 
 const stdRubricSlice = createSlice({
@@ -36,6 +38,23 @@ const stdRubricSlice = createSlice({
         state.loading = false;
         state.error = action.payload || true;
       });
+
+    builder
+      .addCase(getStudentRubricByIdThunk.pending, (state) => {
+        state.rubricLoading = true;
+        state.error = null;
+      })
+      .addCase(getStudentRubricByIdThunk.fulfilled, (state, action) => {
+        state.rubricLoading = false;
+        console.log('selected--',action.payload)
+        state.selectedRubric = action.payload;
+      })
+      .addCase(getStudentRubricByIdThunk.rejected, (state, action) => {
+        state.rubricLoading = false;
+        state.error = action.payload || "Failed to load rubric";
+      });
+
+
   },
 });
 

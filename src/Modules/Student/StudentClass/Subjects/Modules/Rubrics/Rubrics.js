@@ -1,9 +1,9 @@
 import React from "react";
 import Layout from "../../../../../../Components/Common/Layout";
-import DashLayout from "../../../../../../Components/Admin/AdminDashLayout";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
 import MainSection from "./MainSection";
+import StudentDashLayout from "../../../../../../Components/Student/StudentDashLayout";
 
 const Rubric = () => {
   const className = useSelector(
@@ -16,7 +16,9 @@ const Rubric = () => {
   useNavHeading(className, subjectName);
   return (
     <Layout title="Rubric | Student Diwan">
-      <DashLayout children={<MainSection />} hideSearchbar={true} />
+      <StudentDashLayout>
+        <MainSection />
+      </StudentDashLayout>
     </Layout>
   );
 };

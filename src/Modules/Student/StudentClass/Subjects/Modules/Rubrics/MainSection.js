@@ -4,7 +4,8 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
-  stdRubric
+  stdRubric,
+  getStudentRubricByIdThunk
 } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Rubric/rubric.action";
 import {
   setRubricField,
@@ -16,6 +17,7 @@ import SubjectSideBar from "../../Component/SubjectSideBar";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useTranslation } from "react-i18next";
 import { FaClipboardList } from "react-icons/fa";
+import RubricModal from "./Components/RubricModal";
 
 
 const MainSection = () => {
@@ -28,7 +30,7 @@ const MainSection = () => {
 
   console.log("Student Rubric State:", studentRubricState); // Debugging line
 
-  const { RubricData = [], loading, isModalOpen } = studentRubricState;
+  const { RubricData = [], loading, isModalOpen, readonlyMode, criteria, rubricName, totalPoints, rubricLoading } = studentRubricState;
 
   useEffect(() => {
     if (sid) {
@@ -36,10 +38,18 @@ const MainSection = () => {
     }
   }, [sid, dispatch]);
 
-  const handleViewRubric = (id) => {
+  const handleViewRubric = (rubric) => {
     dispatch(resetRubricState());
     dispatch(setRubricField({ field: "readonlyMode", value: true }));
     dispatch(setRubricField({ field: "isModalOpen", value: true }));
+    console.log('rubric--', rubric);
+
+    const rubricId = rubric.assignmentId?._id || rubric.quizId?._id;
+    if (rubricId) {
+      dispatch(getStudentRubricByIdThunk({id:rubricId}));
+    } else {
+      console.error("No valid ID found for rubric");
+    }
   };
 
   return (
@@ -48,8 +58,8 @@ const MainSection = () => {
       <div className="w-full p-3 border-l">
         {RubricData?.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            {RubricData.map((rubric) => (
-              <RubricCard key={rubric._id} rubric={rubric} onView={handleViewRubric} />
+            {RubricData?.map((rubric) => (
+              <RubricCard key={rubric?._id} rubric={rubric} onView={() => handleViewRubric(rubric)} />
             ))}
           </div>
         ) : (
@@ -62,8 +72,14 @@ const MainSection = () => {
             bgColor="bg-gray-100"
           />
         )}
-        {/* Fix: Conditionally rendering modal instead of just showing isModalOpen */}
-        {/* {isModalOpen && <YourModalComponent />} */}
+        {isModalOpen && (
+          <RubricModal
+          isOpen={isModalOpen}
+          rubric={studentRubricState.selectedRubric}
+          onClose={() => dispatch(setRubricField({ field: "isModalOpen", value: false }))}
+          loading={rubricLoading}
+          />
+        )}
       </div>
     </div>
   );
