@@ -37,7 +37,7 @@ const SubjectSideBar = () => {
     { name: "Grades", path: "grades" },
     { name: "Announcements", path: "announcements" },
     { name: "Syllabus", path: "syllabus" },
-    // { name: "Rubric", path: "rubric" },
+    { name: "Rubric", path: "rubric" },
   ];
 
   const getBasePath = (item) => `/student_class/${cid}/${sid}/${item?.path}`;
