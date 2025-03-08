@@ -1,6 +1,13 @@
-import { DatePicker, Select } from "antd";
 import React from "react";
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { DatePicker, Tooltip } from "antd";
+
+// Ant Design Icons
+import {
+  DeleteOutlined,
+  CheckCircleFilled,
+  CloseCircleFilled,
+  InfoCircleFilled,
+} from "@ant-design/icons";
 
 function CreateTable({
   headers,
@@ -20,6 +27,14 @@ function CreateTable({
   handleCellChange,
   inputClassName = () => "",
 }) {
+  // Decide row background color based on status
+  const getStatusBgClass = (status) => {
+    if (status === "present") return "bg-green-50";
+    if (status === "absent") return "bg-red-50";
+    if (status === "excused") return "bg-orange-50";
+    return "";
+  };
+
   return (
     <div>
       <div className="flex flex-col justify-between">
@@ -29,44 +44,55 @@ function CreateTable({
         >
           <table className="w-full border-collapse border table-auto mb-5">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-gray-100 text-sm">
                 {headers.map((header, colIdx) => (
                   <th
                     key={colIdx}
-                    className="border px-2 pt-2 text-center font-medium text-sm cursor-pointer align-top"
+                    className="border text-center font-medium align-top"
                     style={{
-                      minWidth: "150px",
+                      minWidth:
+                        header === "Actions"
+                          ? "50px"
+                          : header === "Max Score" ||
+                            header === "Obtained Score"
+                          ? "60px"
+                          : "120px",
                       whiteSpace: "nowrap",
+                      padding: "8px",
                     }}
                   >
-                    <div className="flex flex-col items-center w-full">
+                    <div className="flex items-center justify-center gap-2">
                       <span>{header}</span>
-                      {/* For entire exam fields in the header */}
                       {header === "Exam Type" && (
                         <input
                           type="text"
-                          placeholder="Enter Type"
+                          placeholder="Type"
                           value={selectedExamType}
                           onChange={(e) => setSelectedExamType(e.target.value)}
-                          className="w-full text-pink-700 align-middle focus:outline-none focus:ring p-1 border border-gray-200 rounded-md m-2 text-xs font-medium capitalize text-center"
+                          className="w-[80px] focus:outline-none focus:ring p-1 border border-gray-200 rounded-md text-xs text-center"
                         />
                       )}
                       {header === "Exam Name" && (
                         <input
                           type="text"
-                          placeholder="Enter Exam"
+                          placeholder="Exam"
                           value={selectedExamName}
                           onChange={(e) => setSelectedExamName(e.target.value)}
-                          className={inputClassName(selectedExamName)}
+                          className={`w-[80px] focus:outline-none focus:ring p-1 border border-gray-200 rounded-md text-xs text-center ${inputClassName(
+                            selectedExamName
+                          )}`}
                         />
                       )}
                       {header === "Max Score" && (
                         <input
                           type="number"
-                          placeholder="Enter Max Score"
+                          placeholder="Max"
                           value={enteredMaxScore}
                           onChange={(e) => setEnteredMaxScore(e.target.value)}
-                          className={inputClassName(enteredMaxScore)}
+                          className={`focus:outline-none focus:ring p-1 border border-gray-200 rounded-md text-xs text-center ${inputClassName(
+                            enteredMaxScore
+                          )}`}
+                          style={{ width: "60px" }}
                         />
                       )}
                       {header === "Start Date" && (
@@ -75,8 +101,8 @@ function CreateTable({
                           onChange={(date) =>
                             setSelectedStartDate(date ? new Date(date) : null)
                           }
-                          className="w-full h-6 text-pink-700 p-1 border border-gray-200 rounded-md m-2 font-medium text-xs text-center"
-                          placeholderText="Select Start Date"
+                          className="h-6 text-pink-700 p-1 border border-gray-200 rounded-md text-xs text-center"
+                          placeholderText="Start"
                         />
                       )}
                       {header === "End Date" && (
@@ -85,8 +111,8 @@ function CreateTable({
                           onChange={(date) =>
                             setSelectedEndDate(date ? new Date(date) : null)
                           }
-                          className="w-full h-6 text-pink-700 p-1 border border-gray-200 rounded-md m-2 font-medium text-xs text-center"
-                          placeholderText="Select End Date"
+                          className="h-6 text-pink-700 p-1 border border-gray-200 rounded-md text-xs text-center"
+                          placeholderText="End"
                         />
                       )}
                     </div>
@@ -95,194 +121,233 @@ function CreateTable({
               </tr>
             </thead>
             <tbody>
-              {tableData.map((row, rowIdx) => (
-                <tr key={rowIdx} className="border">
-                  {row.map((cell, colIdx) => {
-                    const header = headers[colIdx];
+              {tableData.map((row, rowIdx) => {
+                const rowStatus = row[8];
+                const rowBgClass = getStatusBgClass(rowStatus);
 
-                    if (header === "Exam Type") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedExamType}
-                          </div>
-                        </td>
-                      );
-                    }
+                return (
+                  <tr key={rowIdx} className={`border ${rowBgClass}`}>
+                    {row.map((cell, colIdx) => {
+                      const header = headers[colIdx];
 
-                    if (header === "Exam Name") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedExamName}
-                          </div>
-                        </td>
-                      );
-                    }
+                      // Pre-Filled for entire exam
+                      if (header === "Exam Type") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                          >
+                            <div className="text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+                              {selectedExamType}
+                            </div>
+                          </td>
+                        );
+                      }
+                      if (header === "Exam Name") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                          >
+                            <div className="text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+                              {selectedExamName}
+                            </div>
+                          </td>
+                        );
+                      }
+                      if (header === "Max Score") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                            style={{ width: "60px" }}
+                          >
+                            <div className="text-gray-600 text-xs font-semibold rounded-full px-2 py-1">
+                              {enteredMaxScore}
+                            </div>
+                          </td>
+                        );
+                      }
+                      if (header === "Start Date") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                          >
+                            <div className="text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+                              {selectedStartDate
+                                ? formatDate(selectedStartDate)
+                                : ""}
+                            </div>
+                          </td>
+                        );
+                      }
+                      if (header === "End Date") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                          >
+                            <div className="text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
+                              {selectedEndDate
+                                ? formatDate(selectedEndDate)
+                                : ""}
+                            </div>
+                          </td>
+                        );
+                      }
 
-                    if (header === "Max Score") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {enteredMaxScore}
-                          </div>
-                        </td>
-                      );
-                    }
-
-                    if (header === "Start Date") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedStartDate
-                              ? formatDate(selectedStartDate)
-                              : ""}
-                          </div>
-                        </td>
-                      );
-                    }
-
-                    if (header === "End Date") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <div className="bg-gray-100 text-gray-600 text-xs font-semibold rounded-full px-2 py-1 capitalize">
-                            {selectedEndDate ? formatDate(selectedEndDate) : ""}
-                          </div>
-                        </td>
-                      );
-                    }
-
-                    if (header === "Actions") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                          style={{ minWidth: "80px" }}
-                        >
-                          <div className="w-full flex justify-center">
-                            <RiDeleteBin6Line
+                      // Delete action
+                      if (header === "Actions") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                            style={{ width: "50px" }}
+                          >
+                            <DeleteOutlined
                               onClick={() => removeRow(rowIdx)}
-                              className="w-5 h-5 text-red-500 cursor-pointer"
+                              className="w-5 h-5 text-red-500 cursor-pointer mx-auto"
                             />
-                          </div>
-                        </td>
-                      );
-                    }
+                          </td>
+                        );
+                      }
 
-                    if (header === "Name" && typeof cell === "object") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <div className="flex items-center gap-2 justify-center">
-                            {cell.avatar && (
-                              <img
-                                src={cell.avatar}
-                                alt="avatar"
-                                className="w-6 h-6 rounded-full object-cover"
+                      // Student name (with avatar)
+                      if (header === "Name" && typeof cell === "object") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                          >
+                            <div className="flex items-center gap-2 justify-center">
+                              {cell.avatar && (
+                                <img
+                                  src={cell.avatar}
+                                  alt="avatar"
+                                  className="w-6 h-6 rounded-full object-cover"
+                                />
+                              )}
+                              <span className="text-xs font-medium">
+                                {cell.name}
+                              </span>
+                            </div>
+                          </td>
+                        );
+                      }
+
+                      // Status icons (Present, Absent, Excused)
+                      if (header === "Status") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                          >
+                            <div className="flex items-center gap-2 justify-center">
+                              <Tooltip title="Present">
+                                <CheckCircleFilled
+                                  onClick={() =>
+                                    handleCellChange(rowIdx, colIdx, "present")
+                                  }
+                                  style={{ fontSize: "1.25rem" }}
+                                  className={`cursor-pointer ${
+                                    cell === "present"
+                                      ? "text-green-600"
+                                      : "text-gray-400"
+                                  }`}
+                                />
+                              </Tooltip>
+                              <Tooltip title="Absent">
+                                <CloseCircleFilled
+                                  onClick={() =>
+                                    handleCellChange(rowIdx, colIdx, "absent")
+                                  }
+                                  style={{ fontSize: "1.25rem" }}
+                                  className={`cursor-pointer ${
+                                    cell === "absent"
+                                      ? "text-red-600"
+                                      : "text-gray-400"
+                                  }`}
+                                />
+                              </Tooltip>
+                              <Tooltip title="Excused">
+                                <InfoCircleFilled
+                                  onClick={() =>
+                                    handleCellChange(rowIdx, colIdx, "excused")
+                                  }
+                                  style={{ fontSize: "1.25rem" }}
+                                  className={`cursor-pointer ${
+                                    cell === "excused"
+                                      ? "text-orange-600"
+                                      : "text-gray-400"
+                                  }`}
+                                />
+                              </Tooltip>
+                            </div>
+                          </td>
+                        );
+                      }
+
+                      // Obtained Score
+                      if (header === "Obtained Score") {
+                        return (
+                          <td
+                            key={colIdx}
+                            className="border px-2 py-2 text-center"
+                            style={{ width: "60px" }}
+                          >
+                            <Tooltip
+                              title={
+                                cell && cell.toString().length > 4
+                                  ? cell
+                                  : undefined
+                              }
+                            >
+                              <input
+                                type="number"
+                                className="w-full px-1 text-center focus:outline-none focus:ring text-xs"
+                                value={cell}
+                                onChange={(e) =>
+                                  handleCellChange(
+                                    rowIdx,
+                                    colIdx,
+                                    e.target.value
+                                  )
+                                }
                               />
-                            )}
-                            <span className="text-sm font-medium">
-                              {cell.name}
-                            </span>
-                          </div>
-                        </td>
-                      );
-                    }
+                            </Tooltip>
+                          </td>
+                        );
+                      }
 
-                    if (header === "Status") {
+                      // Default text inputs (e.g. "Admission Number")
                       return (
                         <td
                           key={colIdx}
-                          className="border px-4 py-2 text-center"
+                          className="border px-2 py-2 text-center"
                         >
-                          <Select
-                            style={{ width: 90 }}
-                            value={cell || "present"}
-                            onChange={(value) =>
-                              handleCellChange(rowIdx, colIdx, value)
+                          <Tooltip
+                            title={
+                              cell && cell.toString().length > 7
+                                ? cell
+                                : undefined
                             }
-                            options={[
-                              {
-                                value: "present",
-                                label: (
-                                  <span className="text-green-600 text-xs font-medium bg-green-100 px-3 rounded-3xl">
-                                    Present
-                                  </span>
-                                ),
-                              },
-                              {
-                                value: "absent",
-                                label: (
-                                  <span className="text-red-600 text-xs font-medium bg-red-100 px-3 rounded-3xl">
-                                    Absent
-                                  </span>
-                                ),
-                              },
-                              {
-                                value: "excused",
-                                label: (
-                                  <span className="text-orange-600 text-xs font-medium bg-orange-100 px-3 rounded-3xl">
-                                    Excused
-                                  </span>
-                                ),
-                              },
-                            ]}
-                          />
+                          >
+                            <input
+                              type="text"
+                              className="w-full px-1 text-center focus:outline-none focus:ring text-xs"
+                              value={cell}
+                              onChange={(e) =>
+                                handleCellChange(rowIdx, colIdx, e.target.value)
+                              }
+                            />
+                          </Tooltip>
                         </td>
                       );
-                    }
-
-                    if (header === "Obtained Score") {
-                      return (
-                        <td
-                          key={colIdx}
-                          className="border px-4 py-2 text-center"
-                        >
-                          <input
-                            type="number"
-                            className="w-full px-2 py-1 text-center focus:outline-none focus:ring text-sm"
-                            value={cell}
-                            onChange={(e) =>
-                              handleCellChange(rowIdx, colIdx, e.target.value)
-                            }
-                          />
-                        </td>
-                      );
-                    }
-
-                    // Default (e.g. "Admission Number")
-                    return (
-                      <td key={colIdx} className="border px-4 py-2 text-center">
-                        <input
-                          type="text"
-                          className="w-full px-2 py-1 text-center focus:outline-none focus:ring text-sm"
-                          value={cell}
-                          onChange={(e) =>
-                            handleCellChange(rowIdx, colIdx, e.target.value)
-                          }
-                        />
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
+                    })}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

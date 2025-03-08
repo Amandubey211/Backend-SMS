@@ -19,6 +19,7 @@ import { clearGroupsList } from "../../../Store/Slices/Admin/Class/Section_Group
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../config/permission";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
+import toast from "react-hot-toast";
 
 const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
@@ -56,7 +57,7 @@ const MainSection = () => {
   const handleSectionChange = useCallback((section, sectionId) => {
     setActiveSection(section);
     setActiveSectionId(sectionId);
-    // dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
+    dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
   }, []);
 
   const onSeeGradeClick = (student) => {

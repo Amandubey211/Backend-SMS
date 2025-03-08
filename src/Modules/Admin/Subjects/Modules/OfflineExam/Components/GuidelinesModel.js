@@ -16,40 +16,33 @@ function GuidelinesModel({
   setGuidelinesModalVisible,
   activeSegment,
 }) {
-  const renderManualGuidelines = () => (
-    <>
-      <Title level={4} className="text-purple-800">
-        Manual Creation Guidelines
-      </Title>
-      <ul className="list-none text-gray-700 pl-6 space-y-2 mt-4">
-        <li className="flex items-center space-x-2">
-          <FiCheck className="text-green-500" />
-          <span>Ensure each student's data is accurate.</span>
-        </li>
-        <li className="flex items-center space-x-2">
-          <FiCheck className="text-green-500" />
-          <span>Exam Name and Max Score fields are required.</span>
-        </li>
-        <li className="flex items-center space-x-2">
-          <FiCheck className="text-green-500" />
-          <span>
-            Optional: You can set a start and end date for the exam if
-            applicable.
-          </span>
-        </li>
-        <li className="flex items-center space-x-2">
-          <FiCheck className="text-green-500" />
-          <span>Choose the student sections appropriately.</span>
-        </li>
-      </ul>
-    </>
+  // Render only the list content for manual guidelines
+  const renderManualContent = () => (
+    <ul className="list-none text-gray-700 pl-6 space-y-2 mt-4">
+      <li className="flex items-center space-x-2">
+        <FiCheck className="text-green-500" />
+        <span>Ensure each student's data is accurate.</span>
+      </li>
+      <li className="flex items-center space-x-2">
+        <FiCheck className="text-green-500" />
+        <span>Exam Name and Max Score fields are required.</span>
+      </li>
+      <li className="flex items-center space-x-2">
+        <FiCheck className="text-green-500" />
+        <span>
+          Optional: You can set a start and end date for the exam if applicable.
+        </span>
+      </li>
+      <li className="flex items-center space-x-2">
+        <FiCheck className="text-green-500" />
+        <span>Choose the student sections appropriately.</span>
+      </li>
+    </ul>
   );
 
-  const renderExcelGuidelines = () => (
+  // Render only the list content for excel guidelines
+  const renderExcelContent = () => (
     <>
-      <Title level={4} className="text-purple-800">
-        Excel Upload Guidelines
-      </Title>
       <ul className="list-none text-gray-700 pl-6 space-y-2 mt-4">
         <li className="flex items-center space-x-2">
           <FiCheck className="text-green-500" />
@@ -102,17 +95,26 @@ function GuidelinesModel({
             transition={{ duration: 0.3 }}
             className="flex flex-col p-6"
           >
-            {/* Header with Icon */}
+            {/* Header with Icon and Title in one row */}
             <div className="flex items-center space-x-4 mb-4">
               <div className="bg-purple-100 p-3 rounded-full">
                 <FiInfo className="text-purple-600 text-4xl" />
               </div>
+              {activeSegment === "manual" ? (
+                <Title level={4} className="text-purple-800">
+                  Manual Creation Guidelines
+                </Title>
+              ) : (
+                <Title level={4} className="text-purple-800">
+                  Excel Upload Guidelines
+                </Title>
+              )}
             </div>
 
-            {/* Conditionally Render Guidelines */}
+            {/* Conditionally Render Guidelines Content */}
             {activeSegment === "manual"
-              ? renderManualGuidelines()
-              : renderExcelGuidelines()}
+              ? renderManualContent()
+              : renderExcelContent()}
           </motion.div>
         )}
       </AnimatePresence>
