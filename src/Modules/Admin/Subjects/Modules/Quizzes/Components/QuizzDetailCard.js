@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import DateDetail from "../../../Component/DateDetail";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import ButtonsGroup from "../../../Component/ButtonsGroup";
 import SpeedGradeButton from "../../../Component/SpeedGradeButton";
-import RubricButton from "../../Assignments/AssignmentComponents/RubricButton";
 import AddRubricModal from "../../Rubric/Components/AddRubricModal";
 import { useSelector } from "react-redux";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
@@ -17,64 +16,87 @@ const QuizzDetailCard = () => {
     (store) => store.admin.quizzes
   );
 
-  const quizDetails = [
-    {
+  // Build quizDetails conditionally
+  const quizDetails = [];
+  if (quiz) {
+    quizDetails.push({
       label: "Quiz Point",
-      value: `${quiz?.totalPoints || 0} Points`,
+      value: `${quiz.totalPoints || 0} Points`,
       type: "quizz",
-    },
-    { label: "Quiz Type", value: quiz?.quizType || "N/A", type: "quizz" },
-    { label: "Quiz Score", value: "0 out of 10", type: "quizz" },
-    {
+    });
+    quizDetails.push({
+      label: "Quiz Type",
+      value: quiz.quizType || "N/A",
+      type: "quizz",
+    });
+    quizDetails.push({
+      label: "Quiz Score",
+      value: "0 out of 10",
+      type: "quizz",
+    });
+    quizDetails.push({
       label: "Allowed Attempts",
-      value: quiz?.allowNumberOfAttempts
-        ? quiz?.allowNumberOfAttempts
+      value: quiz.allowNumberOfAttempts
+        ? quiz.allowNumberOfAttempts
         : "Unlimited",
       type: "quizz",
-    },
-    { label: "Submitting date", value: "20-5-2024", type: "quizz" },
-    {
+    });
+    quizDetails.push({
+      label: "Submitting date",
+      value: "20-5-2024",
+      type: "quizz",
+    });
+    quizDetails.push({
       label: "One Question at a time",
-      value: quiz?.showOneQuestionOnly ? "Yes" : "No",
+      value: quiz.showOneQuestionOnly ? "Yes" : "No",
       type: "quizz",
-    },
-    {
+    });
+    quizDetails.push({
       label: "Time Limit",
-      value: quiz?.timeLimit ? `${quiz.timeLimit} Minutes` : "No Time Limit",
+      value: quiz.timeLimit ? `${quiz.timeLimit} Minutes` : "No Time Limit",
       type: "quizz",
-    },
-    {
+    });
+    quizDetails.push({
       label: "This Quiz Is For",
-      value: quiz?.assignTo || "N/A",
+      value: quiz.assignTo || "N/A",
       type: "quizz",
-    },
-    {
-      label: "Student See The correct Answer",
-      value: quiz?.showAnswerDate
-        ? new Date(quiz?.showAnswerDate).toLocaleDateString()
-        : "DD/MM/YYYY",
-      type: "quizz",
-    },
-    {
-      label: "Available From",
-      value: quiz?.availableFrom
-        ? new Date(quiz?.availableFrom).toLocaleDateString()
-        : "DD/MM/YYY",
-      type: "date",
-    },
-    {
-      label: "Due Date",
-      value: quiz?.dueDate
-        ? new Date(quiz?.dueDate).toLocaleDateString()
-        : "DD/MM/YYY",
-      type: "date",
-    },
-  ];
+    });
+    if (quiz.showAnswerDate) {
+      quizDetails.push({
+        label: "Student See The correct Answer",
+        value: new Date(quiz.showAnswerDate).toLocaleDateString(),
+        type: "quizz",
+      });
+    }
+    if (quiz.availableFrom) {
+      quizDetails.push({
+        label: "Available From",
+        value: new Date(quiz.availableFrom).toLocaleDateString(),
+        type: "date",
+      });
+    }
+    if (quiz.dueDate) {
+      quizDetails.push({
+        label: "Due Date",
+        value: new Date(quiz.dueDate).toLocaleDateString(),
+        type: "date",
+      });
+    }
+    if (quiz.resultsPublishDate) {
+      quizDetails.push({
+        label: "Results Publish Date",
+        value: new Date(quiz.resultsPublishDate).toLocaleDateString(),
+        type: "date",
+      });
+    }
+  }
+
   const handleViewRubric = () => {
     setModalOpen(true);
   };
+
   return (
-    <div className="p-3 bg-white" aria-label="Quiz Card">
+    <div className="p-3 bg-white border-l" aria-label="Quiz Card">
       <ButtonsGroup
         type="Quiz"
         data={quiz}
@@ -83,11 +105,8 @@ const QuizzDetailCard = () => {
           PERMISSIONS.UPDATE_QUIZ,
           PERMISSIONS.UPDATE_QUIZ,
           PERMISSIONS.DELETE_QUIZ,
-        ]} //Aman
+        ]}
       />
-      {/* <p className="text-center text-green-500 italic font-semibold pb-3 border-b">
-        Submitted Students : 50/100{" "}
-      </p> */}
       <ProtectedAction requiredPermission={PERMISSIONS.ASSIGN_QUIZ_GRADE}>
         <SpeedGradeButton
           type="Quiz"
@@ -97,8 +116,8 @@ const QuizzDetailCard = () => {
         />
       </ProtectedAction>
 
-      <div className="ps-3 ">
-        {quizDetails?.map((detail, index) => {
+      <div className="ps-3">
+        {quizDetails.map((detail, index) => {
           if (detail.type === "quizz") {
             return (
               <AssignmentDetail
@@ -119,7 +138,7 @@ const QuizzDetailCard = () => {
           return null;
         })}
       </div>
-      <RubricButton onClick={handleViewRubric} />
+
       <AddRubricModal
         type="quiz"
         QuizId={quiz?._id}
@@ -128,7 +147,7 @@ const QuizzDetailCard = () => {
         criteriaList={criteriaList}
         setCriteriaList={setCriteriaList}
         setExistingRubricId={setExistingRubricId}
-        readonly={true} // Set readonly to true
+        readonly={true}
       />
     </div>
   );
