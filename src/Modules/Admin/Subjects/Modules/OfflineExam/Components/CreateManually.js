@@ -1,6 +1,6 @@
 // CreateManually.js
 import React, { useEffect, useState } from "react";
-import { Button, Select, message } from "antd";
+import { Button, Select, Checkbox, DatePicker, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { createOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { fetchStudentsByClassAndSectionNames } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
@@ -25,7 +25,6 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
     "Status",
     "Actions",
   ]);
-
   const [tableData, setTableData] = useState([]);
 
   // Exam-level fields
@@ -34,6 +33,10 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
   const [enteredMaxScore, setEnteredMaxScore] = useState("");
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
+
+  // New fields for results publishing
+  const [resultsPublished, setResultsPublished] = useState(false);
+  const [resultsPublishDate, setResultsPublishDate] = useState(null);
 
   // Multiple section selection
   const [selectedSections, setSelectedSections] = useState([]);
@@ -138,6 +141,11 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
       subjectId: sid,
       startDate: selectedStartDate ? selectedStartDate.toISOString() : null,
       endDate: selectedEndDate ? selectedEndDate.toISOString() : null,
+      // New results publishing fields added to payload
+      resultsPublished: resultsPublished,
+      resultsPublishDate: resultsPublishDate
+        ? resultsPublishDate.toISOString()
+        : null,
       students: tableData.map((row) => {
         const fullName = typeof row[0] === "object" ? row[0].name : row[0];
         const [firstName, lastName = ""] = fullName.split(" ");
@@ -145,7 +153,6 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
           studentsList.find(
             (st) => st.firstName === firstName && st.lastName === lastName
           ) || {};
-
         return {
           studentId: matchedStudent?._id || "",
           score: row[4] || 0,
@@ -177,6 +184,9 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
     setSelectedEndDate(null);
     setSelectedSections([]);
     setTableData([]);
+    // Reset new results fields
+    setResultsPublished(false);
+    setResultsPublishDate(null);
   };
 
   const handleClear = () => {
@@ -187,7 +197,7 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
   const purpleColor = "#AB47BC";
   const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
-  // We'll add a basic red border style if fields are missing
+  // Basic red border style if fields are missing
   const inputClassName = (fieldValue) =>
     `w-full p-1 border rounded-md m-2 font-medium text-xs capitalize text-center focus:outline-none focus:ring 
     ${fieldValue ? "border-gray-200" : "border-red-500"}`;
@@ -233,6 +243,25 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
         handleCellChange={handleCellChange}
         inputClassName={inputClassName}
       />
+
+      {/* New Results Publish Options */}
+      <div className="mb-4">
+        <Checkbox
+          checked={resultsPublished}
+          onChange={(e) => setResultsPublished(e.target.checked)}
+        >
+          Publish Results Immediately
+        </Checkbox>
+      </div>
+      <div className="mb-4">
+        <label className="block font-semibold mb-1">Results Publish Date</label>
+        <DatePicker
+          value={resultsPublishDate}
+          onChange={(date, dateString) => setResultsPublishDate(date)}
+          disabled={resultsPublished}
+          style={{ width: "100%" }}
+        />
+      </div>
 
       {/* Submit / Cancel Buttons */}
       <div className="bottom-5 right-5 fixed flex justify-end space-x-4">
