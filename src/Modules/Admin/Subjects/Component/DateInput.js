@@ -3,7 +3,7 @@ import React, { forwardRef } from "react";
 import { format } from "date-fns";
 
 const DateInput = forwardRef(
-  ({ label, name, value, handleChange, error, fieldId }, ref) => {
+  ({ label, name, value, handleChange, error, fieldId, disabled }, ref) => {
     const formattedValue = value ? format(new Date(value), "yyyy-MM-dd") : "";
     return (
       <div className="mb-4">
@@ -20,6 +20,7 @@ const DateInput = forwardRef(
           value={formattedValue}
           onChange={handleChange}
           ref={ref}
+          disabled={disabled}
           className={`w-full p-3 border rounded-md shadow-sm focus:outline-none ${
             error
               ? "border-red-500 focus:ring-red-500"
