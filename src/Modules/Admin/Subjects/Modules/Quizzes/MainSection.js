@@ -26,7 +26,7 @@ const MainSection = () => {
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
-      <div className="w-[65%] border-x">
+      <div className="w-[65%] border-l min-h-screen">
         <Tabs
           onTabChange={setActiveTab}
           setActiveTab={setActiveTab}
@@ -60,7 +60,7 @@ const MainSection = () => {
           )}
         </Tabs>
       </div>
-      <div className="w-[30%]">
+      <div className="w-[30%] ">
         <ProtectedSection
           title="Quiz Detail"
           requiredPermission={PERMISSIONS.QUIZ_BY_ID}
