@@ -44,7 +44,7 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
       const response = await getData(
         `/${getRole}/group/class/${classId}/section/${sectionId}?say=${say}`
       );
-      if (response.success) {
+      if (response.status) {
         return response.data;
       } else {
         return rejectWithValue(response);
