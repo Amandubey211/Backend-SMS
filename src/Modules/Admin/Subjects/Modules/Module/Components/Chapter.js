@@ -192,7 +192,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
   // Always show the header if items exist or if a search query is present.
   const renderHeader = () => (
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center ">
       <div className="w-full sm:w-1/3 mb-2 sm:mb-0">
         <Input.Search
           placeholder="Search..."
@@ -258,17 +258,22 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
         <Button
           type="primary"
           onClick={handleAddAttachment}
-          icon={<GrAttachment size={16} />}
+          icon={<GrAttachment size={12} />}
+          size="small"
         >
           Add Attachment
         </Button>
         <Link to={`/class/${cid}/${sid}/create_quiz`}>
-          <Button type="primary" icon={<FaClipboardList size={16} />}>
+          <Button
+            type="primary"
+            icon={<FaClipboardList size={12} />}
+            size="small"
+          >
             Create Quiz
           </Button>
         </Link>
         <Link to={`/class/${cid}/${sid}/createassignment`}>
-          <Button type="primary" icon={<FaRegFileAlt size={16} />}>
+          <Button type="primary" icon={<FaRegFileAlt size={12} />} size="small">
             Create Assignment
           </Button>
         </Link>
