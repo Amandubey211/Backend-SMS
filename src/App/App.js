@@ -300,7 +300,7 @@ const StudentPageView = lazy(() =>
 );
 const StudentRubric = lazy(() =>
   import("../Modules/Student/StudentClass/Subjects/Modules/Rubrics/Rubrics.js")
-)
+);
 const Attendance = lazy(() =>
   import("../Modules/Admin/Attendance/Attendance.js")
 );
@@ -1471,7 +1471,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/users/student/profile",
+      path: "/student_dash/profile",
       element: (
         <ProtectRoute Component={StudentProfile} allowedRoles={["student"]} />
       ),

@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import profileIcon from '../../Assets/DashboardAssets/profileIcon.png';
+import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ParentDashLayout from "./ParentDashLayout";
 import Layout from "../Common/ParentLayout";
-import { useTranslation } from 'react-i18next'; // Import i18next hook
+import { useTranslation } from "react-i18next"; // Import i18next hook
 import { updatePasswordThunk } from "../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
 import { LuSchool } from "react-icons/lu";
 
 const ParentProfile = () => {
-  const { t } = useTranslation('prtProfile'); // Initialize i18next hook
+  const { t } = useTranslation("prtProfile"); // Initialize i18next hook
   const { userDetails } = useSelector((store) => store.common.user);
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -29,23 +29,22 @@ const ParentProfile = () => {
     // console.log("Profile updated:");
   };
 
-
   const dispatch = useDispatch();
   const updatePassword = () => {
-    setLoading(true)
+    setLoading(true);
     if (passwordData.newPassword === passwordData.confirmPassword) {
       dispatch(updatePasswordThunk(passwordData)).then(() => {
-        setLoading(false); setPasswordData({
+        setLoading(false);
+        setPasswordData({
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
-      })
+      });
     } else {
       toast.error("confirm Password must be same ");
-      setLoading(false)
+      setLoading(false);
     }
-
   };
   const cancelUpdatePassword = () => {
     setPasswordData({
@@ -62,7 +61,7 @@ const ParentProfile = () => {
   console.log("userDetails", userDetails);
   return (
     <>
-      <Layout title={t('My Profile')}>
+      <Layout title={t("My Profile")}>
         <ParentDashLayout>
           <div className="flex flex-col w-full p-4 gap-3 ">
             <div className="flex items-center px-6 py-4 gap-3 border rounded-md">
@@ -72,39 +71,58 @@ const ParentProfile = () => {
                 className="w-20 h-20 rounded-full shadow-lg border"
               />
               <div className="flex flex-col justify-between w-full">
-                <h2 className="text-xl font-semibold">{userDetails?.fatherName || userDetails?.guardianName}</h2>
-                <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool /></span>{userDetails?.schoolName}</h2>
+                <h2 className="text-xl font-semibold">
+                  {userDetails?.fatherName || userDetails?.guardianName}
+                </h2>
+                <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2">
+                  {" "}
+                  <span>
+                    <LuSchool />
+                  </span>
+                  {userDetails?.schoolName}
+                </h2>
               </div>
             </div>
-            <h3 className="text-lg font-semibold mb-4">{t('Personal Information')}</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {t("Personal Information")}
+            </h3>
             <div className="flex flex-row gap-28 px-6 py-8 border items-start rounded-md">
               {/* Left Column (Father's Name & Email) */}
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">{t("Father's Name")}</span>
+                  <span className="font-normal text-gray-500">
+                    {t("Father's Name")}
+                  </span>
                   <span className="font-medium text-gray-800">
                     {userDetails?.fatherName || userDetails?.guardianName}
                   </span>
                 </div>
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">{t("Email")}</span>
-                  <span className="font-medium text-gray-800">{userDetails?.email}</span>
+                  <span className="font-normal text-gray-500">
+                    {t("Email")}
+                  </span>
+                  <span className="font-medium text-gray-800">
+                    {userDetails?.email}
+                  </span>
                 </div>
               </div>
 
               {/* Right Column (Wife's Name) */}
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col">
-                  <span className="font-normal text-gray-500">{t("Wife's Name")}</span>
+                  <span className="font-normal text-gray-500">
+                    {t("Wife's Name")}
+                  </span>
                   <span className="font-medium text-gray-800">
-                    {userDetails?.motherName || '-'}
+                    {userDetails?.motherName || "-"}
                   </span>
                 </div>
               </div>
             </div>
 
-
-            <h3 className="text-lg font-semibold mb-4">{t('Reset Your Password')}</h3>
+            <h3 className="text-lg font-semibold mb-4">
+              {t("Reset Your Password")}
+            </h3>
             <div className="flex flex-col gap-10 p-6 py-13 border rounded-md">
               <input
                 type="password"
@@ -116,7 +134,7 @@ const ParentProfile = () => {
               />
               <div className="flex flex-row items-center gap-2">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   name="newPassword"
                   value={passwordData.newPassword}
                   onChange={(e) => handleInputChange(e, setPasswordData)}
@@ -124,7 +142,11 @@ const ParentProfile = () => {
                   placeholder={t("New Password")}
                 />
                 <span className="text-2xl cursor-pointer">
-                  {!showPassword ? <FaEye onClick={() => setShowPassword(true)} /> : <FaEyeSlash onClick={() => setShowPassword(false)} />}
+                  {!showPassword ? (
+                    <FaEye onClick={() => setShowPassword(true)} />
+                  ) : (
+                    <FaEyeSlash onClick={() => setShowPassword(false)} />
+                  )}
                 </span>
               </div>
               <input
@@ -141,7 +163,11 @@ const ParentProfile = () => {
                   onClick={updatePassword}
                   className="px-4 w-[150px] h-12 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600 justify-center"
                 >
-                  {loading ? <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" /> : t("Update Password")}
+                  {loading ? (
+                    <ImSpinner3 className="w-8 h-8 animate-spin mb-3 text-white" />
+                  ) : (
+                    t("Update Password")
+                  )}
                 </button>
                 <button
                   onClick={cancelUpdatePassword}

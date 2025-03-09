@@ -204,12 +204,16 @@ const SideMenubar = () => {
             className={`${
               isOpen ? "w-10 h-10" : "w-8 h-8"
             } rounded-full cursor-pointer`}
-            onClick={() => navigate("/users/student/profile")}
+            onClick={() => navigate("/student_dash/profile")}
           />
           {isOpen && (
             <div className="ml-4">
               <h2 className="text-sm font-semibold">
-                {userDetails?.fullName?.charAt(0)?.toUpperCase() + userDetails?.fullName?.split(' ')[1]?.charAt(0)?.toUpperCase() || "User"}
+                {userDetails?.fullName?.charAt(0)?.toUpperCase() +
+                  userDetails?.fullName
+                    ?.split(" ")[1]
+                    ?.charAt(0)
+                    ?.toUpperCase() || "User"}
               </h2>
               <p className="text-gray-500 capitalize">{role}</p>
             </div>
