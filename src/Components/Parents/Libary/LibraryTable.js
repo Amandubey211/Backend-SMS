@@ -141,7 +141,9 @@ const LibraryTable = () => {
             >
               <FaBookOpen className="text-gray-400 text-8xl mb-6" />
               <p className="text-gray-600 text-lg mt-2">
-                {t("No borrowed books at the moment. Encourage your child to explore the library!")}
+                {t(
+                  "No borrowed books at the moment. Encourage your child to explore the library!"
+                )}
               </p>
             </div>
           </td>
@@ -166,7 +168,7 @@ const LibraryTable = () => {
       const isReturned = status.toLowerCase() === "returned";
 
       return (
-        <tr key={record._id} className="border-b hover:bg-gray-50">
+        <tr key={record._id} className="border-b hover:bg-gray-50 text-center">
           {/* Child */}
           <td className="px-4 py-3">
             <div className="flex items-center">
@@ -180,11 +182,11 @@ const LibraryTable = () => {
           </td>
           {/* Issue Book with truncation and tooltip */}
           <td
-            className="px-4 py-3 w-40 overflow-hidden whitespace-nowrap text-ellipsis"
+            className="px-4 py-3  overflow-hidden whitespace-nowrap text-ellipsis"
             title={bookName}
           >
             <span
-              className="cursor-pointer text-blue-600 underline"
+              className="cursor-pointer text-blue-600 "
               onMouseEnter={(e) => handleMouseEnter(e, bookName, bookImage)}
               onMouseLeave={handleMouseLeave}
             >
@@ -212,7 +214,7 @@ const LibraryTable = () => {
           {/* Status */}
           <td className="px-4 py-3">
             <span
-              className={`inline-block px-3 py-1 text-sm rounded-md border ${
+              className={`inline-flex items-center justify-center w-24 h-7 text-sm font-medium rounded-md border whitespace-nowrap ${
                 isReturned
                   ? "border-green-700 bg-green-50 text-green-700"
                   : "border-yellow-700 bg-yellow-50 text-yellow-700"
@@ -249,7 +251,9 @@ const LibraryTable = () => {
         {/* Filters & Reset on the right */}
         <div className="flex items-center space-x-4">
           <div className="flex flex-col">
-            <label className="text-sm text-gray-600 mb-1">{t("Select Your Children")}</label>
+            <label className="text-sm text-gray-600 mb-1">
+              {t("Select Your Children")}
+            </label>
             <select
               className="border border-gray-300 rounded px-3 py-1 w-56 focus:outline-none focus:border-blue-500"
               value={childFilter}
@@ -282,7 +286,9 @@ const LibraryTable = () => {
             </select>
           </div>
           <div className="flex flex-col">
-            <label className="text-sm text-gray-600 mb-1">{t("Hard Reset")}</label>
+            <label className="text-sm text-gray-600 mb-1">
+              {t("Hard Reset")}
+            </label>
             <button
               onClick={handleReset}
               className="px-4 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-100"
@@ -296,7 +302,7 @@ const LibraryTable = () => {
       <div className="overflow-x-auto border border-gray-200 rounded-md">
         <table className="min-w-full table-fixed text-left">
           <thead className="bg-gray-100">
-            <tr className="border-b">
+            <tr className="border-b text-center">
               <th className="px-4 py-2 text-sm font-semibold text-gray-700">
                 {t("Child")}
               </th>
