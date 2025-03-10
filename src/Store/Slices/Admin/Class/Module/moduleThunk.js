@@ -111,16 +111,22 @@ export const editModule = createAsyncThunk(
       formData.append("name", name);
       formData.append("semesterId", semesterId);
 
-      // Append each groupId and sectionId individually
+      // Append each groupId if provided; otherwise, send an empty array
       if (groupIds && groupIds.length > 0) {
         groupIds.forEach((id) => {
           formData.append("groupIds", id);
         });
+      } else {
+        formData.append("groupIds", JSON.stringify([]));
       }
+
+      // Append each sectionId if provided; otherwise, send an empty array
       if (sectionIds && sectionIds.length > 0) {
         sectionIds.forEach((id) => {
           formData.append("sectionIds", id);
         });
+      } else {
+        formData.append("sectionIds", JSON.stringify([]));
       }
 
       if (thumbnail) {
