@@ -154,6 +154,8 @@ const ParentEvent = () => {
     "bg-indigo-500",
   ];
 
+  const selectedAcademicYear=2025;
+
   return (
     <Layout title="Parent | Event">
       <ParentDashLayout>
@@ -247,10 +249,10 @@ const ParentEvent = () => {
                   );
                 }
 
-                const year = value.year();
+                const year = selectedAcademicYear;
                 const month = value.month();
                 const options = [];
-                for (let i = year - 10; i < year + 10; i += 1) {
+                for (let i = year; i <= year; i += 1) {
                   options.push(
                     <option className="bg-white" key={i} value={i}>
                       {i}
@@ -259,6 +261,21 @@ const ParentEvent = () => {
                 }
                 return (
                   <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
+                          <select
+                      className="border rounded px-2 py-1"
+                      value={month}
+                      onChange={(event) => {
+                        const newMonth = parseInt(event.target.value, 10);
+                        const now = value.clone().month(newMonth);
+                        setSelectedMonthYear((prev) => ({
+                          ...prev,
+                          month: newMonth,
+                        }));
+                        onChange(now);
+                      }}
+                    >
+                      {monthOptions}
+                    </select>
                     <select
                       className="border rounded px-2 py-1"
                       value={year}
@@ -274,21 +291,7 @@ const ParentEvent = () => {
                     >
                       {options}
                     </select>
-                    <select
-                      className="border rounded px-2 py-1"
-                      value={month}
-                      onChange={(event) => {
-                        const newMonth = parseInt(event.target.value, 10);
-                        const now = value.clone().month(newMonth);
-                        setSelectedMonthYear((prev) => ({
-                          ...prev,
-                          month: newMonth,
-                        }));
-                        onChange(now);
-                      }}
-                    >
-                      {monthOptions}
-                    </select>
+              
                   </div>
                 );
               }}
