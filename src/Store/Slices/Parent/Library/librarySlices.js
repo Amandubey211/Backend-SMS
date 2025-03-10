@@ -5,6 +5,9 @@ const initialState = {
   books: [], // Store raw data
   loading: false,
   error: null,
+  currentPage: 1,
+  totalPages: 1,
+  totalBookIsuued: 0,
 };
 
 const librarySlice = createSlice({
@@ -20,6 +23,9 @@ const librarySlice = createSlice({
       .addCase(fetchLibraryBooks.fulfilled, (state, action) => {
         state.loading = false;
         state.books = action.payload?.books || []; // Store raw books array
+        state.totalPages = action.payload?.totalPages;
+        state.totalBookIsuued = action.payload?.totalBookIsuued; 
+        state.currentPage = action.payload?.currentPage;
       })
       .addCase(fetchLibraryBooks.rejected, (state, action) => {
         state.loading = false;

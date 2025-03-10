@@ -137,7 +137,7 @@ const AllNotice = () => {
           {/* Notice List */}
           <div className="mt-5 overflow-auto">
             {loading ? (
-              <NoticeSkeleton count={5} />
+              <NoticeSkeleton count={limit || 5} />
             ) : error ? (
               <div className="flex flex-col items-center justify-center mt-6">
                 <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
@@ -204,7 +204,7 @@ const AllNotice = () => {
                     {/* Description */}
                     {activeIndex === index && (
                       <div className="p-4 text-sm text-gray-700">
-                        <pre className="whitespace-pre-wrap">
+                        <pre className="whitespace-pre-wrap font-sans">
                           {notice?.description || t("No description available")}
                         </pre>
                       </div>
