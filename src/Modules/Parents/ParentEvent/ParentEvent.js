@@ -16,11 +16,12 @@ import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
 import { EventCardSkeleton } from "../../../Modules/Parents/Skeletons.js";
 
-
 const ParentEvent = () => {
-  const { t } = useTranslation('prtEvents'); // Initialize translation hook
+  const { t } = useTranslation("prtEvents"); // Initialize translation hook
   const dispatch = useDispatch();
-  const { events, loading, error } = useSelector((state) => state?.Parent?.events );
+  const { events, loading, error } = useSelector(
+    (state) => state?.Parent?.events
+  );
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -32,10 +33,10 @@ const ParentEvent = () => {
     year: currentDate.getFullYear(),
   });
 
-  useNavHeading(t("Parent All Events"));
+  useNavHeading(t("Events"));
 
   const itemsPerPage = 4;
-
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
   // Fetch events using Redux on component mount
   useEffect(() => {
     dispatch(fetchAllEvents());
@@ -67,31 +68,37 @@ const ParentEvent = () => {
   };
 
   const handleDateCellRender = (value) => {
-    const formattedDate = format(value.toDate(), 'yyyy-MM-dd');
+    const formattedDate = format(value.toDate(), "yyyy-MM-dd");
     const dayEvents = filteredEvents.filter(
-      (event) => format(event?.startDate, 'yyyy-MM-dd') === formattedDate
+      (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
     );
 
-    const bgColors = ['bg-pink-500', 'bg-purple-500', 'bg-blue-500', 'bg-indigo-500'];
+    const bgColors = [
+      "bg-pink-500",
+      "bg-purple-500",
+      "bg-blue-500",
+      "bg-indigo-500",
+    ];
 
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
         {dayEvents?.map((event, index) => {
           let eventTime = event?.time
-            ? parse(event?.time, 'hh:mm a', new Date())
+            ? parse(event?.time, "hh:mm a", new Date())
             : event?.startDate;
           if (!isValid(eventTime)) {
-            eventTime = parse(event?.time, 'HH:mm', new Date()); // 24-hour fallback
+            eventTime = parse(event?.time, "HH:mm", new Date()); // 24-hour fallback
           }
           const timeString = isValid(eventTime)
-            ? format(eventTime, 'hh:mm a')
-            : 'Invalid Time';
+            ? format(eventTime, "hh:mm a")
+            : "Invalid Time";
 
           return (
             <li
               key={event?.id}
-              className={`inline-block px-2 py-1 rounded text-white ${bgColors[index % bgColors?.length]
-                } shadow-md cursor-pointer`}
+              className={`inline-block px-2 py-1 rounded text-white ${
+                bgColors[index % bgColors?.length]
+              } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
               {event?.title} - {timeString}
@@ -177,46 +184,51 @@ const ParentEvent = () => {
           ) : (
             <>
               {/* Events display */}
-              <div className="flex flex-row justify-between">
-                <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                  Events
-                </h1>
+
+              <div className="relative flex items-center justify-center">
+                <button
+                  className={`absolute left-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                    currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 0))
+                  }
+                  disabled={currentPage === 0}
+                >
+                  <IoIosArrowBack size={24} className="text-purple-500" />
+                </button>
+
+                <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide">
+                  {paginatedEvents.map((event, index) => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      color={bgColors[index % bgColors.length]}
+                      onClick={() => handleStickerClick(event)}
+                      className="min-w-72 transform transition duration-300 ease-in-out hover:scale-110 hover:shadow-2xl rounded-lg"
+                    />
+                  ))}
+                </div>
+
+                <button
+                  className={`absolute right-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                    currentPage + 1 >= totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  disabled={currentPage + 1 >= totalPages}
+                >
+                  <IoIosArrowForward size={24} className="text-purple-500" />
+                </button>
               </div>
 
-              <div className="my-4 w-full h-40 flex rounded-sm gap-8 pl-8 relative ">
-                {currentPage > 0 && (
-                  <div
-                    className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-                  >
-                    <IoIosArrowBack />
-                  </div>
-                )}
-                {paginatedEvents?.map((event, index) => (
-                  <EventCard
-                    key={event?.id}
-                    event={event}
-                    color={bgColors[index % bgColors?.length]}
-                    onClick={handleStickerClick}
-                    className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
-                  />
-                ))}
-                {(currentPage + 1) * itemsPerPage < filteredEvents?.length && (
-                  <div
-                    className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
-                    onClick={() => setCurrentPage((prev) => prev + 1)}
-                  >
-                    <IoIosArrowForward />
-                  </div>
-                )}
-              </div>
-
-              <hr className="my-6 border-t-2 mt-12 " />
+              {/* <hr className="my-6 border-t-2 mt-12 " /> */}
             </>
           )}
 
           {/* Calendar always visible */}
-          <div className="py-7">
+          <div className="py-3">
             <Calendar
               dateCellRender={handleDateCellRender}
               headerRender={({ value, type, onChange, onTypeChange }) => {

@@ -180,11 +180,11 @@ const LibraryTable = () => {
           </td>
           {/* Issue Book with truncation and tooltip */}
           <td
-            className="px-4 py-3 w-40 overflow-hidden whitespace-nowrap text-ellipsis"
+            className="px-4 py-3  overflow-hidden whitespace-nowrap text-ellipsis"
             title={bookName}
           >
             <span
-              className="cursor-pointer text-blue-600 underline"
+              className="cursor-pointer text-blue-600 "
               onMouseEnter={(e) => handleMouseEnter(e, bookName, bookImage)}
               onMouseLeave={handleMouseLeave}
             >
