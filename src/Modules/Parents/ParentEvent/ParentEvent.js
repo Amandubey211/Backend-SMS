@@ -20,7 +20,7 @@ import { EventCardSkeleton } from "../../../Modules/Parents/Skeletons.js";
 const ParentEvent = () => {
   const { t } = useTranslation('prtEvents'); // Initialize translation hook
   const dispatch = useDispatch();
-  const { events, loading, error } = useSelector((state) => state?.Parent?.events || {});
+  const { events, loading, error } = useSelector((state) => state?.Parent?.events );
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
