@@ -4,25 +4,22 @@ import toast, { Toaster } from "react-hot-toast";
 import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
-import { updatePasswordThunk } from "../../../Store/Slices/Common/User/actions/userActions";
+import {
+  updatePasswordThunk,
+  updateStudentInfoThunk,
+} from "../../../Store/Slices/Common/User/actions/userActions";
 import { ImSpinner3 } from "react-icons/im";
 import { LuSchool } from "react-icons/lu";
 import Cookies from "js-cookie";
-
-// Ant Design components
 import { Modal, Button, Tag } from "antd";
-// Using sleek pencil icon from Remix Icons for a modern edit icon
 import { RiEditLine } from "react-icons/ri";
 import { IdcardOutlined } from "@ant-design/icons";
-
-// Framer Motion
 import { motion } from "framer-motion";
-
-// ImageUpload component for editing profile image
 import ImageUpload from "../../Admin/Addmission/Components/ImageUpload";
+import { setUserDetails } from "../../../Store/Slices/Common/User/reducers/userSlice";
 
 const StudentProfile = () => {
-  const { userDetails } = useSelector((store) => store.common.user);
+  const { userDetails, status } = useSelector((store) => store.common.user);
   const dispatch = useDispatch();
 
   // ---------------------------
@@ -34,8 +31,6 @@ const StudentProfile = () => {
     newPassword: "",
     confirmPassword: "",
   });
-
-  // Individual show/hide toggles for each password field
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -72,42 +67,34 @@ const StudentProfile = () => {
   // ---------------------------
   // Profile Image Editing Logic
   // ---------------------------
-  // Set initial image (from userDetails or default)
   const [profileImage, setProfileImage] = useState(
     userDetails?.profile || profileIcon
   );
-  // Temp image state for editing (so changes can be canceled)
   const [tempImage, setTempImage] = useState(profileImage);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [imageError, setImageError] = useState("");
 
-  // Modal visibility states
   const [previewModalVisible, setPreviewModalVisible] = useState(false);
   const [editModalVisible, setEditModalVisible] = useState(false);
 
-  // Update image states if userDetails changes
   useEffect(() => {
     const initialImage = userDetails?.profile || profileIcon;
     setProfileImage(initialImage);
     setTempImage(initialImage);
   }, [userDetails]);
 
-  // Handlers for preview modal
   const openPreviewModal = () => setPreviewModalVisible(true);
   const closePreviewModal = () => setPreviewModalVisible(false);
-
-  // Handlers for edit modal
   const openEditModal = (e) => {
     e?.stopPropagation();
     setEditModalVisible(true);
     setPreviewModalVisible(false);
   };
-
   const closeEditModal = () => {
     setTempImage(profileImage);
     setEditModalVisible(false);
   };
 
-  // Image upload handlers
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -116,6 +103,7 @@ const StudentProfile = () => {
         return;
       }
       setImageError("");
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setTempImage(reader.result);
@@ -126,16 +114,37 @@ const StudentProfile = () => {
 
   const handleRemoveImage = () => {
     setTempImage("");
+    setSelectedFile(null);
   };
 
-  const handleSaveImage = () => {
-    setProfileImage(tempImage);
-    setEditModalVisible(false);
-    toast.success("Profile image updated!");
-    // call the thunk here update image of the student
+  // Only update the profile image link in the userDetails object.
+  // Append default empty JSON strings for addresses to satisfy the backend.
+  const handleSaveImage = async () => {
+    if (!selectedFile) {
+      toast.error("No new image selected.");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("id", userDetails?.userId); // Adjust if your backend expects _id
+    formData.append("profile", selectedFile);
+    formData.append("permanentAddress", JSON.stringify({}));
+    formData.append("residentialAddress", JSON.stringify({}));
+
+    dispatch(updateStudentInfoThunk(formData))
+      .unwrap()
+      .then((res) => {
+        // Update only the profile field in the existing userDetails object.
+        dispatch(
+          setUserDetails({ ...userDetails, profile: res.student.profile })
+        );
+        setProfileImage(tempImage);
+        setEditModalVisible(false);
+      })
+      .catch(() => {
+        toast.error("Failed to update profile image");
+      });
   };
 
-  // Retrieve school logo from cookies
   const schoolLogo = Cookies.get("logo");
 
   return (
@@ -144,7 +153,6 @@ const StudentProfile = () => {
       <div className="flex flex-col w-full gap-6">
         {/* Profile Header Section */}
         <div className="relative bg-white shadow rounded-lg p-6 m-2">
-          {/* Enrollment Badge at Top Right */}
           <div className="absolute top-2 right-2">
             <Tag
               icon={<IdcardOutlined style={{ fontSize: "1.2em" }} />}
@@ -155,7 +163,6 @@ const StudentProfile = () => {
             </Tag>
           </div>
           <div className="flex flex-col md:flex-row items-center gap-4">
-            {/* Avatar with circular shape and Framer Motion hover effect */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="relative cursor-pointer"
@@ -176,7 +183,6 @@ const StudentProfile = () => {
                 />
               </div>
             </motion.div>
-            {/* Personal Info Header */}
             <div>
               <h2 className="text-2xl font-bold uppercase text-gray-800">
                 {userDetails?.fullName}
@@ -196,7 +202,6 @@ const StudentProfile = () => {
                     {userDetails?.schoolName}
                   </span>
                 </div>
-                {/* Class badge below the school name */}
                 {userDetails?.className && (
                   <Tag color="magenta" className="text-xs mt-2 w-fit">
                     {userDetails.className}
@@ -240,8 +245,18 @@ const StudentProfile = () => {
             <Button key="cancel" onClick={closeEditModal}>
               Cancel
             </Button>,
-            <Button key="save" type="primary" onClick={handleSaveImage}>
-              Save
+            <Button
+              key="save"
+              type="primary"
+              onClick={handleSaveImage}
+              disabled={status.loading}
+            >
+              <span className="flex items-center justify-center">
+                {status.loading
+                  ? // <ImSpinner3 className="w-5 h-5 animate-spin" />
+                    "saving..."
+                  : "Save"}
+              </span>
             </Button>,
           ]}
         >
@@ -258,7 +273,7 @@ const StudentProfile = () => {
         </Modal>
 
         {/* Personal Information Section */}
-        <div className="bg-white  rounded-lg p-6">
+        <div className="bg-white rounded-lg p-6">
           <h3 className="text-xl font-semibold mb-4 text-gray-800">
             Personal Information
           </h3>
@@ -320,7 +335,6 @@ const StudentProfile = () => {
             Reset Your Password
           </h3>
           <div className="max-w-md space-y-4">
-            {/* Current Password */}
             <div className="relative">
               <input
                 type={showCurrentPassword ? "text" : "password"}
@@ -337,8 +351,6 @@ const StudentProfile = () => {
                 {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-
-            {/* New Password */}
             <div className="relative">
               <input
                 type={showNewPassword ? "text" : "password"}
@@ -355,8 +367,6 @@ const StudentProfile = () => {
                 {showNewPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-
-            {/* Re-enter Password */}
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
@@ -373,8 +383,6 @@ const StudentProfile = () => {
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
-
-            {/* Buttons */}
             <div className="mt-6 flex items-center justify-end gap-4">
               <button
                 onClick={cancelUpdatePassword}
