@@ -45,7 +45,7 @@ const UnAssignedStudentList = () => {
     <div className="w-80 p-4 bg-white">
       <div className="mb-4">
         <h2 className="text-md font-semibold">
-          {t("Unassigned Students")}{" "}
+          {t("Students without group or section")}{" "}
           <span className="text-gray-500">({filteredStudents?.length})</span>
         </h2>
         <input
@@ -57,7 +57,6 @@ const UnAssignedStudentList = () => {
         />
       </div>
 
-      {/* Check if there are no students */}
       {filteredStudents?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
           <PiStudentThin className="text-5xl mb-2" />
