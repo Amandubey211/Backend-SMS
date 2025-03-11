@@ -170,8 +170,8 @@ const LibraryTable = () => {
       return (
         <tr key={record._id} className="border-b hover:bg-gray-50 text-center">
           {/* Child */}
-          <td className="px-4 py-3">
-            <div className="flex items-center">
+          <td className="px-4 py-3  text-center">
+            <div className="flex items-center justify-center">
               <img
                 src={student?.profile || fallbackProfile}
                 alt={displayName}
@@ -216,8 +216,8 @@ const LibraryTable = () => {
             <span
               className={`inline-flex items-center justify-center w-24 h-7 text-sm font-medium rounded-md border whitespace-nowrap ${
                 isReturned
-                  ? "border-green-700 bg-green-50 text-green-700"
-                  : "border-yellow-700 bg-yellow-50 text-yellow-700"
+                  ? "border-green-700 bg-green-50 text-green-600"
+                  : "border-yellow-700 bg-yellow-50 text-yellow-600"
               }`}
             >
               {status}

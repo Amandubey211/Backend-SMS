@@ -1,20 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDashboardCards } from "../../../Store/Slices/Parent/Dashboard/dashboard.action.js";
-import { RiBookOpenLine, RiMoneyDollarBoxFill, RiCalendarCheckLine } from "react-icons/ri";
+import { RiBookOpenLine, RiCalendarCheckLine } from "react-icons/ri";
 import { CiMoneyBill } from "react-icons/ci";
-import { useTranslation } from "react-i18next"; // Import i18next hook
-import { fetchAllNotices } from "../../../Store/Slices/Parent/NoticeBoard/notice.action.js";
+import { FaBell } from "react-icons/fa"; // for the bell icon
+import { useTranslation } from "react-i18next";
 import { ParentDashcard } from "../Skeletons.js";
-
 
 const DashCard = () => {
   const dispatch = useDispatch();
-  const { t } = useTranslation(); // Initialize translation function
+  const { t } = useTranslation();
 
   // Get data from Redux store
-  const { cardsData = {}, loading } = useSelector((state) => state?.Parent?.dashboard || {}); // Ensure loading state exists
-  const [isLoading, setIsLoading] = useState(true); // Local loading state
+  const { cardsData = {}, loading } = useSelector((state) => state?.Parent?.dashboard || {});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     dispatch(fetchDashboardCards());
@@ -22,64 +21,71 @@ const DashCard = () => {
 
   useEffect(() => {
     if (!loading) {
-      setTimeout(() => setIsLoading(false), 1000); // Simulate loading delay for smoother UX
+      setTimeout(() => setIsLoading(false), 1000);
     }
   }, [loading]);
 
-  // Define card data
+  // Card configuration for the UI
   const cardData = [
     {
-      label: t("Outstanding Fees", { ns: "stdFinance" }),
-      value: cardsData?.dueFees?.toString() || "0",
-      bgColor: "bg-rose-200",
-      textColor: "text-rose-500",
-      icon: <CiMoneyBill />,
-    },
-    {
-      label: t("Upcoming Exams", { ns: "stdFinance" }),
+      label: t("Upcoming Exam", { ns: "stdFinance" }),
       value: cardsData?.upcomingExamsCount?.toString() || "0",
-      bgColor: "bg-green-200",
-      textColor: "text-green-500",
+      cardBg: "bg-violet-100",  // Pastel background
+      hexBg: "bg-violet-500",   // Darker color for hex shape
       icon: <RiBookOpenLine />,
     },
     {
-      label: t("Upcoming Notices", { ns: "stdFinance" }),
-      value: cardsData?.notices?.toString() || "0",
-      bgColor: "bg-teal-100",
-      textColor: "text-teal-700",
+      label: t("Due Fees", { ns: "stdFinance" }),
+      value: cardsData?.dueFees?.toString() || "0",
+      cardBg: "bg-rose-100",
+      hexBg: "bg-rose-500",
+      icon: <CiMoneyBill />,
+    },
+    {
+      label: t("Upcoming Event", { ns: "stdFinance" }),
+      value: cardsData?.eventsCount?.toString() || "0",
+      cardBg: "bg-blue-100",
+      hexBg: "bg-blue-500",
       icon: <RiCalendarCheckLine />,
     },
     {
-      label: t("Payable Fees", { ns: "stdFinance" }),
-      value: cardsData?.totalExpenses?.toString() || "0",
-      bgColor: "bg-purple-200",
-      textColor: "text-purple-400",
-      icon: <RiMoneyDollarBoxFill />,
+      label: t("Upcoming Notice", { ns: "stdFinance" }),
+      value: cardsData?.notices?.toString() || "0",
+      cardBg: "bg-orange-100",
+      hexBg: "bg-orange-500",
+      icon: <FaBell />,
     },
   ];
 
   return (
-    <div className="flex justify-around py-4 gap-1 w-full px-2">
+    <div className="flex justify-around gap-4  w-full ">
       {cardData.map((item, index) => (
         <div
           key={index}
-          className={`p-4 px-6 flex-none w-[24%] rounded-lg border ${item.bgColor} hover:shadow-lg transition-shadow duration-200`}
+          className={`relative flex flex-col items-center justify-center w-[200px] p-4 rounded-lg shadow-sm ${item.cardBg}`}
         >
           {isLoading ? (
             <ParentDashcard />
           ) : (
-            <div className="flex gap-4 items-center">
-              {/* Icon */}
-              <div className={`p-3 bg-white ${item.textColor} rounded-full shadow-xl text-3xl`}>
+            <>
+              {/* Hex-shaped icon container */}
+              <div
+                className={`w-12 h-12 flex items-center justify-center text-white mb-2 ${item.hexBg}`}
+                style={{
+                  clipPath:
+                    "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+                }}
+              >
                 {item.icon}
               </div>
-
-              {/* Number and Label */}
-              <div className="flex flex-col">
-                <div className="text-xl font-bold">{item?.value}</div>
-                <div className={`mt-2 text-md ${item?.textColor}`}>{item?.label}</div>
+              {/* Label and Value */}
+              <div className="text-gray-800 font-semibold text-sm">
+                {item.label}
               </div>
-            </div>
+              <div className="text-xl font-bold text-gray-700">
+                {item.value}
+              </div>
+            </>
           )}
         </div>
       ))}
