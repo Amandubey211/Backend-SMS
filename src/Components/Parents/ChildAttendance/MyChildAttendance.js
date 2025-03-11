@@ -1,109 +1,135 @@
-import React, { useEffect, useCallback, useState } from 'react';
-import { Calendar as AntdCalendar } from 'antd';
-import AttendanceCard from '../../../Modules/Parents/Attendance/AttendanceCard.js';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchAttendance } from '../../../Store/Slices/Parent/Children/children.action.js';
-import { FaExclamationTriangle } from 'react-icons/fa';
-import presentIcon from '../../../Assets/ParentAssets/svg/checkbox.svg';
-import absentIcon from '../../../Assets/ParentAssets/svg/cross.svg';
-import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
-import './ChildrenAttendance.css';
+import React, { useEffect, useCallback, useState } from "react";
+import { Calendar as AntdCalendar } from "antd";
+import AttendanceCard from "../../../Modules/Parents/Attendance/AttendanceCard.js";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAttendance } from "../../../Store/Slices/Parent/Children/children.action.js";
+import { FaExclamationTriangle } from "react-icons/fa";
+import presentIcon from "../../../Assets/ParentAssets/svg/checkbox.svg";
+import absentIcon from "../../../Assets/ParentAssets/svg/cross.svg";
+import leaveIcon from "../../../Assets/ParentAssets/svg/leave.png";
+import "./ChildrenAttendance.css";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
-import { ThreeRectCardSkeleton } from '../../../Modules/Parents/Skeletons.js';
+import { ThreeRectCardSkeleton } from "../../../Modules/Parents/Skeletons.js";
 import { useTranslation } from "react-i18next";
-import Layout from '../../Common/Layout.js';
-import dayjs from 'dayjs'; // Ensure you are using dayjs
+import Layout from "../../Common/Layout.js";
+import dayjs from "dayjs"; // Ensure you are using dayjs
+import { useParams } from "react-router-dom";
 
 const MyChildAttendance = () => {
-  const { t } = useTranslation('prtChildrens');
+  const { t } = useTranslation("prtChildrens");
   const dispatch = useDispatch();
-  const { loading, error, selectedChild } = useSelector((state) => state.Parent.children);
+  const { loading, error, selectedChild } = useSelector(
+    (state) => state?.Parent?.children
+  );
 
   const [attendanceData, setAttendanceData] = useState(null);
   const [month, setMonth] = useState(new Date().getMonth() + 1);
   const [year, setYear] = useState(new Date().getFullYear());
 
-  const studentId = selectedChild?.id || null;
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
-      if (studentId) {
+      if (id) {
         try {
-          const response = await dispatch(fetchAttendance({ studentId, month, year })).unwrap();
+          const response = await dispatch(
+            fetchAttendance({ id, month, year })
+          ).unwrap();
           setAttendanceData(response);
         } catch (err) {
-          console.error('Error fetching attendance:', err);
+          console.error("Error fetching attendance:", err);
         }
       }
     };
     fetchData();
-  }, [studentId, month, year, dispatch]);
+  }, [id, month, year, dispatch]);
 
   console.log("attendanceData", attendanceData);
 
   const attendanceEntries = attendanceData?.report?.attendanceEntries || [];
-  const { presentCount = 0, absentCount = 0, leaveCount = 0 } = attendanceData?.report?.summary || {};
+  const {
+    presentCount = 0,
+    absentCount = 0,
+    leaveCount = 0,
+  } = attendanceData?.report?.summary || {};
 
   const handlePanelChange = (value) => {
     setMonth(value.month() + 1);
     setYear(value.year());
   };
 
-  const handleSelect = useCallback(() => { }, []);
+  const handleSelect = useCallback(() => {}, []);
 
   useNavHeading(t("My Childs"), t("Attendance"));
+  const dateCellRender = useCallback(
+    (value) => {
+      const cellDate = dayjs(value).format("YYYY-MM-DD");
+      const listData = attendanceEntries.filter(
+        (entry) => entry.date === cellDate
+      );
 
-  const dateCellRender = useCallback((value) => {
-    const cellDate = dayjs(value).format('YYYY-MM-DD');
-    const listData = attendanceEntries.filter((entry) => entry.date === cellDate);
+      return (
+        <ul className="events">
+          {listData.map((item) => {
+            let icon;
+            // Create a title from the status, capitalizing the first letter.
+            const title =
+              item.status.charAt(0).toUpperCase() + item.status.slice(1);
 
-    return (
-      <ul className="events">
-        {listData.map((item) => {
-          let icon;
-          switch (item.status) {
-            case 'present':
-              icon = <img src={presentIcon} alt="Present" className="icon-class" />;
-              break;
-            case 'absent':
-              icon = <img src={absentIcon} alt="Absent" className="icon-class" />;
-              break;
-            case 'leave':
-              icon = <img src={leaveIcon} alt="Leave" className="icon-class" />;
-              break;
-            default:
-              return null;
-          }
-          return (
-            <li key={item.date}>
-              {icon}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }, [attendanceEntries]);
+            switch (item.status) {
+              case "present":
+                icon = (
+                  <img src={presentIcon} alt="Present" className="icon-class" />
+                );
+                break;
+              case "absent":
+                icon = (
+                  <img src={absentIcon} alt="Absent" className="icon-class" />
+                );
+                break;
+              case "leave":
+                icon = (
+                  <img src={leaveIcon} alt="Leave" className="icon-class" />
+                );
+                break;
+              default:
+                return null;
+            }
+            return (
+              <li key={item.date} className="flex items-center">
+                {icon}
+                <span className="ml-1 text-xs">{title}</span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+    },
+    [attendanceEntries]
+  );
 
   useEffect(() => {
     const removeCalendarButtons = () => {
       setTimeout(() => {
-        // Remove the "Year" button
-        const yearButton = document.querySelector('.ant-radio-button-wrapper input[value="year"]');
-        if (yearButton) {
-          yearButton.closest('.ant-radio-button-wrapper').remove();
-        }
-
         // Remove the "Month" button
-        const monthButton = document.querySelector('.ant-radio-button-wrapper input[value="month"]');
+        const monthButton = document.querySelector(
+          '.ant-radio-button-wrapper input[value="month"]'
+        );
         if (monthButton) {
-          monthButton.closest('.ant-radio-button-wrapper').remove();
+          monthButton.closest(".ant-radio-button-wrapper").remove();
+        }
+        // Remove the "Year" button
+        const yearButton = document.querySelector(
+          '.ant-radio-button-wrapper input[value="year"]'
+        );
+        if (yearButton) {
+          yearButton.closest(".ant-radio-button-wrapper").remove();
         }
       }, 100); // Small delay to ensure the elements are in the DOM
     };
 
     removeCalendarButtons();
   }, []);
-
 
   const renderContent = useCallback(() => {
     if (loading) {
@@ -131,7 +157,7 @@ const MyChildAttendance = () => {
 
     return (
       <>
-        <div className="attendance-card-wrapper flex justify-center w-full px-4 md:px-8 lg:px-12 py-6">
+        <div className="attendance-card-wrapper flex justify-center w-full py-4 px-2">
           <AttendanceCard
             presentCount={presentCount}
             absentCount={absentCount}

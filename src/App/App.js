@@ -1549,7 +1549,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/attendance",
+      path: "/attendance/:id",
       element: <ProtectRoute Component={Calendar} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
