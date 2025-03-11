@@ -4,48 +4,49 @@ import AccountingSection from "../Accounting/MainSection/ParentAccounts.js";
 import StudentParentCard from "../Dashboard/DashboardData/Students.js";
 import NoticeBoard from "../Dashboard/NoticeModule/NoticeBoard.js";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
+import ParentEventDash from "./NoticeModule/ParentEventsDash.js";
 
 const ParentSection = () => {
   useNavHeading("Dashboard");
 
   return (
-      <div className="h-full w-full">
-        {/* Dashboard Cards */}
-        <div className="w-full">
-          <div className="flex flex-wrap justify-center gap-3 py-4 w-full">
-            <DashCard />
-          </div>
-
-          {/* First Row: StudentParentCard and NoticeBoard */}
-          <div className="flex w-full border-y h-auto relative">
-            {/* StudentParentCard Section */}
-            <div className="w-2/5 p-4">
-              <div className="w-full">
-                <StudentParentCard />
-              </div>
-            </div>
-
-            {/* Vertical Divider */}
-            <div className="absolute h-full top-0 bottom-0 left-[40%] w-[1px] bg-gray-300"></div>
-
-            {/* NoticeBoard Section */}
-            <div className="w-3/5 p-4">
-              <div className="w-full">
-                <NoticeBoard textTrimCount={74} />
-              </div>
-            </div>
-          </div>
-
-          {/* Second Row: Accounting Section */}
-          <div className="flex border-y h-[auto]">
-            <div className="w-full h-full flex items-center justify-center p-4">
-              <div className="w-full h-full">
-                <AccountingSection />
-              </div>
-            </div>
-          </div>
+    <div className="flex h-auto w-full py-2">
+    {/* Left Side */}
+    <div className="w-2/3 px-4 py-1">
+      {/* Top: Cards */}
+      <div className="mb-4">
+        <DashCard />
+      </div>
+  
+      {/* Middle: Children & Finance Side by Side */}
+      <div className="mb-4 flex gap-4">
+        {/* Children */}
+        <div className="w-1/2 border border-red">
+          <StudentParentCard />
+        </div>
+        {/* Finance */}
+        <div className="w-1/2 border border-green">
+          <AccountingSection />
         </div>
       </div>
+      <div className="border">
+      {/* <AccountingSection /> */}
+      </div>
+    </div>
+  
+    {/* Right Side */}
+    <div className="w-1/3">
+      {/* Top: Events Section */}
+      <div className="">
+        <ParentEventDash />
+      </div>
+      {/* Bottom: Notices Section */}
+      <div className="border mt-4">
+        <NoticeBoard textTrimCount={74} />
+      </div>
+    </div>
+  </div>
+  
   );
 };
 

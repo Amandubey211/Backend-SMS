@@ -132,17 +132,33 @@ export const ChildCardSkeleton = ({ count }) => {
     );
 };
 
+
+
 export const ParentDashcard = () => {
-    return (
-        <Skeleton
-            active
-            avatar={{ shape: "circle", size: 50 }} // Added Circle Skeleton
-            title={false}
-            paragraph={{ rows: 2, width: ["60%", "80%"] }} // Matching text layout
-            className="h-[80px]" // Ensure Skeleton matches card height
-        />
-    )
-}
+  return (
+    <div className="relative flex flex-col items-center justify-center w-[150px] p-2 rounded-lg shadow-sm bg-gray-100 animate-pulse">
+      {/* Hex-shaped placeholder for icon */}
+      <div
+        className="w-10 h-10 mb-2 bg-gray-300"
+        style={{
+          clipPath:
+            "polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)",
+        }}
+      />
+      {/* Skeleton text lines */}
+      <Skeleton
+        active
+        title={false}
+        paragraph={{
+          rows: 2,
+          width: ["60%", "80%"],
+        }}
+        className="w-full"
+      />
+    </div>
+  );
+};
+
 
 export const DashMyChildrenSkeleton = () => (
     <div className="relative p-4 pb-4 pt-6 text-center border border-gray-200 rounded-lg w-full max-w-md mx-auto bg-white">
@@ -460,9 +476,9 @@ export const LibraryRowSkeleton = ({ rows = 3 }) => {
 
 export const NoticeSkeleton = ({ count = 3 }) => {
     return (
-        <div className="mt-5 rounded-lg overflow-auto">
+        <div className="mt-5 rounded-md overflow-auto">
             {[...Array(count)].map((_, i) => (
-                <div key={i} className="border mb-4 bg-white p-2 rounded-md shadow-sm">
+                <div key={i} className="border mb-4 bg-white rounded-md shadow-sm">
                     <div className="flex gap-6 px-3 py-2">
                         {/* Left Icon Skeleton */}
                         <Skeleton.Avatar active size={60} shape="square" />

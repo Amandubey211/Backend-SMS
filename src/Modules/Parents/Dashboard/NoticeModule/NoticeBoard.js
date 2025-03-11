@@ -25,9 +25,7 @@ const NoticeBoard = ({ textTrimCount }) => {
   // Get the notices, loading, and error states from Redux
   const { notices, loadingNotices, errorNotices } = useSelector((state) => state?.Parent?.dashboard);
 
-
-  useEffect(() => {
-    
+  useEffect(() => {    
       dispatch(fetchNotices());
   }, [dispatch]);
 
@@ -65,28 +63,22 @@ const NoticeBoard = ({ textTrimCount }) => {
     });
   }, [notices]);
 
-
-
-  // Get the number of notices to show based on the number of children
-  const numberOfNoticesToShow = 2
-
-  // Memoize latest notices filtering and sorting
+  // Instead of slicing, we sort and show all data.
   const latestNotices = useMemo(() => {
     return formattedNotices
       ?.filter((notice) => notice?.startDate !== "Invalid Date")
-      ?.sort((a, b) => new Date(b?.startDate) - new Date(a?.startDate))
-      ?.slice(0, 2);
-  }, [formattedNotices, numberOfNoticesToShow]);
+      ?.sort((a, b) => new Date(b?.startDate) - new Date(a?.startDate));
+  }, [formattedNotices]);
 
   // Utility function to truncate text
   const truncateText = useCallback((text, maxLength) => {
-    return text && text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+    return text && text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
   }, []);
 
   // Loading state with spinner displayed at the center
   if (loadingNotices) {
     return (
-      <div className="p-4">
+      <div className="p-2">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         </div>
@@ -100,8 +92,8 @@ const NoticeBoard = ({ textTrimCount }) => {
   // Error state handling
   if (errorNotices) {
     return (
-      <div className="p-4 border-l border-gray-300">
-        <div className="flex justify-between items-center mb-4">
+      <div className="p-2 border-l border-gray-300">
+        <div className="flex justify-between items-center mb-2">
           <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         </div>
         <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto shadow rounded-lg p-4">
@@ -115,19 +107,19 @@ const NoticeBoard = ({ textTrimCount }) => {
   // No data available state
   if (!notices?.length) {
     return (
-      <div className="p-4 ">
-        <div className="flex justify-between items-center mb-4 flex-row">
+      <div className=" ">
+        <div className="flex justify-between items-center mb-2 flex-row">
           <h2 className="text-lg font-semibold text-gray-600">Upcoming Notices</h2>
           <div className="inline-block">
-          <button
-            className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
-               text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]
-               hover:bg-gray-100 hover:shadow-md"
-            onClick={handleNavigate}
-          >
-            {t("See All")}
-          </button>
-        </div>
+            <button
+              className="px-4 py-2 border border-gray-300 rounded-lg transition-all duration-300 ease-in-out 
+                 text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]
+                 hover:bg-gray-100 hover:shadow-md"
+              onClick={handleNavigate}
+            >
+              {t("View All")}
+            </button>
+          </div>
         </div>
         <div className="rounded-lg bg-white">
           <div className="flex flex-col items-center justify-center h-64 text-center overflow-x-auto rounded-lg p-4">
@@ -141,7 +133,7 @@ const NoticeBoard = ({ textTrimCount }) => {
 
   return (
     <div className="p-2 ">
-      <div className="flex justify-between p-4 items-center px-6 pl-[0.3rem] pt-0">
+      <div className="flex justify-between items-center px-2 pr-4 pt-0">
         <h2 className="text-lg font-semibold text-gray-600">{t("Upcoming Notices")}</h2>
         <div className="inline-block">
           <button
@@ -150,32 +142,35 @@ const NoticeBoard = ({ textTrimCount }) => {
                hover:bg-gray-100 hover:shadow-md"
             onClick={handleNavigate}
           >
-            {t("See All")}
+            {t("View All")}
           </button>
         </div>
-
       </div>
-      {latestNotices?.map((notice, index) => (
-        <Notice
-          key={index}
-          image={notice?.image || ""}
-          title={notice?.title || t("Untitled")}
-          startDate={notice?.startDate || "N/A"}
-          endDate={notice?.endDate || "N/A"}
-          authorName={notice?.authorName}
-          priority={
-            <span
-              className={notice?.priority === "High priority"
-                ? "bg-pink-200 text-pink-600 font-semibold px-2 py-1 rounded-md"
-                : "bg-gray-200 text-gray-600 font-semibold px-2 py-1 rounded-md"}
-            >
-              {t(notice?.priority === "High priority" ? "High Priority" : "Low Priority")}
-            </span>
-          }
-          content={truncateText(notice?.description || "", textTrimCount)}
-          backgroundColor={gradientBackgrounds[index % gradientBackgrounds?.length]}
-        />
-      ))}
+      {/* Notice list container with fixed height to show roughly 3 notices.
+          On hover, the container scrolls if there is more content */}
+      <div className="group relative overflow-y-hidden hover:overflow-y-auto" style={{ maxHeight: '16rem' }}>
+        {latestNotices?.map((notice, index) => (
+          <Notice
+            key={index}
+            image={notice?.image || ""}
+            title={notice?.title || t("Untitled")}
+            startDate={notice?.startDate || "N/A"}
+            endDate={notice?.endDate || "N/A"}
+            authorName={notice?.authorName}
+            priority={
+              <span
+                className={notice?.priority === "High priority"
+                  ? "bg-pink-200 text-pink-600 font-semibold px-2 py-1 rounded-md"
+                  : "bg-gray-200 text-gray-600 font-semibold px-2 py-1 rounded-md"}
+              >
+                {t(notice?.priority === "High priority" ? "High Priority" : "Low Priority")}
+              </span>
+            }
+            content={truncateText(notice?.description || "", textTrimCount)}
+            backgroundColor={gradientBackgrounds[index % gradientBackgrounds.length]}
+          />
+        ))}
+      </div>
     </div>
   );
 };
