@@ -91,9 +91,9 @@ const LibraryTab = ({ handleSidebarOpen }) => {
         </ProtectedAction>
       </div>
 
-      <div className="flex justify-center items-center w-full min-h-[70vh]">
+      <div className="flex justify-center  w-full p-3 mt-4">
         {filteredBooks?.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4 w-full p-4">
+          <div className="grid grid-cols-3 gap-4 w-full ">
             {filteredBooks?.map((book) => (
               <BookCard key={book._id} book={book} />
             ))}
