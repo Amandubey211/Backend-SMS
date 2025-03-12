@@ -188,7 +188,7 @@ const AdminNotice = () => {
 
               {/* Date Filter (Rounded Full) */}
               <RangePicker
-                style={{ height: "40px", borderRadius: "9999px" }}
+                style={{ height: "40px" }}
                 onChange={handleDateFilter}
                 value={dateFilterValue}
               />
@@ -245,6 +245,8 @@ const AdminNotice = () => {
                   <ShimmerNoticeItem />
                   <ShimmerNoticeItem />
                   <ShimmerNoticeItem />
+                  <ShimmerNoticeItem />
+                  <ShimmerNoticeItem />
                 </>
               ) : error ? (
                 <NoDataFound
@@ -293,6 +295,7 @@ const AdminNotice = () => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
             title={editMode ? t("Edit Notice") : t("Add Notice")}
+            width="70%"
           >
             <AddNotice isEditing={editMode} onClose={handleSidebarClose} />
           </Sidebar>
