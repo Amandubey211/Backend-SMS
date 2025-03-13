@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import Layout from "../../../../Components/Common/Layout";
+import Layout from "../../../../Components/Common/Layout.js";
 import ParentDashLayout from "../../../../Components/Parents/ParentDashLayout.js";
 import { MdExpandMore } from "react-icons/md";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
