@@ -118,7 +118,7 @@ const AccountingSection = () => {
   };
 
   return (
-    <Layout title={t("Finance")}>
+    // <Layout title={t("Parents | Finance")}>
       <div className="py-1 px-2 pt-0 w-full">
         {/* Header: Title and conditional button */}
         <div className="flex justify-between items-center mt-5">
@@ -185,7 +185,7 @@ const AccountingSection = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    // </Layout>
   );
 };
 

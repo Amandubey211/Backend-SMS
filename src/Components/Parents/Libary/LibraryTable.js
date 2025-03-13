@@ -10,6 +10,7 @@ import bookNew from "../../../Assets/ParentAssets/images/book_new.png"; // Fallb
 import Pagination from "../../Common/pagination";
 import { CiSearch } from "react-icons/ci";
 import BookPreviewPortal from "../../Common/BookPreviewPortal"; // adjust the path as needed
+import { Popover } from "antd";
 
 const fallbackProfile = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
@@ -21,7 +22,7 @@ const LibraryTable = () => {
     books = [],
     loading = false,
     error = null,
-    currentPage: serverPage = 1,
+    currentPage = 1,
     totalPages = 1,
     totalBookIsuued = 0,
   } = useSelector((state) => state?.Parent?.library);
@@ -30,7 +31,7 @@ const LibraryTable = () => {
   const [childFilter, setChildFilter] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
   const [search, setSearch] = useState("");
-  const [page, setPage] = useState(serverPage);
+  const [page, setPage] = useState(currentPage);
   const [pageSize, setPageSize] = useState(10);
 
   // State for preview popover
@@ -42,8 +43,8 @@ const LibraryTable = () => {
   });
 
   useEffect(() => {
-    setPage(serverPage);
-  }, [serverPage]);
+    setPage(page);
+  }, [page]);
 
   useEffect(() => {
     const query = {
@@ -59,7 +60,7 @@ const LibraryTable = () => {
   const childrenOptions = useMemo(() => {
     const map = {};
     books.forEach((item) => {
-      const student = item?.studentId;
+      const student = item?.issuedTo?.userId;
       if (student && student._id && !map[student._id]) {
         const fallbackName = [student?.firstName, student?.lastName]
           .filter(Boolean)
@@ -152,28 +153,36 @@ const LibraryTable = () => {
     }
 
     return paginatedData.map((record) => {
-      const student = record?.studentId || {};
-      const fallbackName = [student?.firstName, student?.lastName]
+      const studentInfo = record?.issuedTo?.userId;
+      const fallbackName = [studentInfo?.firstName, studentInfo?.lastName]
         .filter(Boolean)
         .join(" ");
       const displayName =
-        student?.fullName || (fallbackName ? fallbackName : "N/A");
+        studentInfo?.fullName || (fallbackName ? fallbackName : "N/A");
 
       const book = record?.bookId;
       const bookName = book?.name || "N/A";
       const bookImage = book?.image || bookNew;
       const authorName = book?.author || record?.author || "N/A";
-      const category = book?.category || "N/A";
-      const status = record?.status || "N/A";
-      const isReturned = status.toLowerCase() === "returned";
+
+      // Extract category names from the category objects
+      const categories = book?.categories || [];
+      const categoryNames = categories.map((cat) => cat.name || "N/A");
+
+      // Determine what to display and the preview text
+      const categoryDisplay =
+        categoryNames.length > 0 ? categoryNames[0] : "N/A";
+      const additionalCategoriesCount =
+        categoryNames.length > 1 ? categoryNames.length - 1 : 0;
+      const categoryPreview = categoryNames.join(", ");
 
       return (
         <tr key={record._id} className="border-b hover:bg-gray-50 text-center">
           {/* Child */}
-          <td className="px-4 py-3  text-center">
+          <td className="px-4 py-3 text-center">
             <div className="flex items-center justify-center">
               <img
-                src={student?.profile || fallbackProfile}
+                src={studentInfo?.profile || fallbackProfile}
                 alt={displayName}
                 className="h-10 w-10 rounded-full mr-2 object-cover"
               />
@@ -182,11 +191,11 @@ const LibraryTable = () => {
           </td>
           {/* Issue Book with truncation and tooltip */}
           <td
-            className="px-4 py-3  overflow-hidden whitespace-nowrap text-ellipsis"
+            className="px-4 py-3 overflow-hidden whitespace-nowrap text-ellipsis"
             title={bookName}
           >
             <span
-              className="cursor-pointer text-blue-600 "
+              className="cursor-pointer text-blue-600"
               onMouseEnter={(e) => handleMouseEnter(e, bookName, bookImage)}
               onMouseLeave={handleMouseLeave}
             >
@@ -200,12 +209,21 @@ const LibraryTable = () => {
           >
             {authorName}
           </td>
-          {/* Category with truncation */}
+          {/* Category with conditional display */}
           <td
             className="px-4 py-3 w-32 overflow-hidden whitespace-nowrap text-ellipsis"
-            title={category}
+            title={categoryPreview}
           >
-            {category}
+            <div className="inline-flex items-center">
+              <span>{categoryDisplay}</span>
+              {additionalCategoriesCount > 0 && (
+                <Popover content={categoryPreview} trigger="hover">
+                  <span className="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs">
+                    +{additionalCategoriesCount}
+                  </span>
+                </Popover>
+              )}
+            </div>
           </td>
           {/* Issue Date */}
           <td className="px-4 py-3">{formatDate(record.issueDate)}</td>
@@ -215,12 +233,12 @@ const LibraryTable = () => {
           <td className="px-4 py-3">
             <span
               className={`inline-flex items-center justify-center w-24 h-7 text-sm font-medium rounded-md border whitespace-nowrap ${
-                isReturned
+                record.status?.toLowerCase() === "returned"
                   ? "border-green-700 bg-green-50 text-green-600"
                   : "border-yellow-700 bg-yellow-50 text-yellow-600"
               }`}
             >
-              {status}
+              {record.status || "N/A"}
             </span>
           </td>
         </tr>

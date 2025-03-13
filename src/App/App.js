@@ -1607,7 +1607,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/checkprogress/:studentId",
+      path: "/checkprogress/:cid/:studentId",
       element: (
         <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />
       ),

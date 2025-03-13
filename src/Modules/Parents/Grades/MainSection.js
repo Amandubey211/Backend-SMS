@@ -4,16 +4,16 @@ import { GoAlertFill } from "react-icons/go";
 import Chapter from "./Components/Chapter";
 import ModuleCard from "./Components/ModuleCard";
 import { ChapterSkeleton, ModuleSkeleton } from "../Skeletons";
-import ChapterImage from "../../../Assets/ParentAssets/images/ChapterImage.jpeg";
-import ModuleImage from "../../../Assets/ParentAssets/images/ModuleImage.jpeg";
+import { FaBookOpen, FaFolderOpen } from "react-icons/fa";
 
 const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
   const [modules, setModules] = useState([]);
   const [expandedChapters, setExpandedChapters] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
-
-  // Pull courseProgress, loading, error from store
-  const { courseProgress, loading, error } = useSelector(
+  
+   console.log("Selected module", selectedModule);
+  // Pull courseProgress and error from the store
+  const { courseProgress, error } = useSelector(
     (store) => store.admin.all_students
   );
 
@@ -21,9 +21,11 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
   useEffect(() => {
     if (courseProgress && courseProgress.module) {
       setModules(courseProgress.module);
-
       // Optionally set the first module as selected if none is selected yet
-      if (!selectedModule || selectedModule.moduleId !== courseProgress.module[0]?.moduleId) {
+      if (
+        !selectedModule ||
+        selectedModule.moduleId !== courseProgress.module[0]?.moduleId
+      ) {
         setSelectedModule(courseProgress.module[0] || null);
       }
     } else {
@@ -54,8 +56,20 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
     );
   }
 
+  // If module loading is complete and there are no modules, show full-panel "No Modules Found"
+  if (!moduleLoading && modules.length === 0) {
+    return (
+      <div className="flex justify-center items-center my-20 h-full w-full">
+        <div className="flex flex-col items-center justify-center text-2xl text-center">
+          <FaFolderOpen className="text-6xl mb-4" />
+          <p>No modules foundfor this Subject</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex border-b border-gray-300">
+    <div className="flex">
       {/* Middle: Chapters */}
       <div className="w-[65%] bg-white p-2">
         <div className="bg-white p-2 rounded-lg">
@@ -63,26 +77,33 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
             // Show skeleton if modules are being fetched
             <ChapterSkeleton />
           ) : selectedModule ? (
-            selectedModule.chapters?.map((chapter, index) => (
-              <Chapter
-                key={chapter.chapterId}
-                id={chapter.chapterId}
-                title={chapter.name}
-                chapterNumber={index + 1}
-                imageUrl={chapter.thumbnail}
-                assignments={chapter.assignments || []}
-                quizzes={chapter.quizzes || []}
-                attachments={chapter.attachments || []}
-                isExpanded={expandedChapters === chapter.chapterId}
-                onToggle={() => handleToggle(chapter.chapterId)}
-              />
-            ))
+            selectedModule.chapters && selectedModule.chapters.length > 0 ? (
+              selectedModule?.chapters?.map((chapter, index) => (
+                <Chapter
+                  key={chapter.chapterId}
+                  id={chapter.chapterId}
+                  title={chapter.name}
+                  chapterNumber={index + 1}
+                  imageUrl={chapter.thumbnail}
+                  assignments={chapter.assignments || []}
+                  quizzes={chapter.quizzes || []}
+                  attachments={chapter.attachments || []}
+                  isExpanded={expandedChapters === chapter.chapterId}
+                  onToggle={() => handleToggle(chapter.chapterId)}
+                />
+              ))
+            ) : (
+              <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
+                <div className="flex flex-col items-center justify-center text-2xl text-center">
+                  <FaBookOpen className="text-6xl mb-4" />
+                  <p>No chapters found for this module.</p>
+                </div>
+              </div>
+            )
           ) : (
             <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
-              <div className="flex items-center justify-center flex-col text-2xl">
-                {/* Replace icon with the Module image */}
-                <img src={ChapterImage} alt="Module" className="w-[15rem] h-[15rem] mb-4" />
-                Please select a module to view its chapters.
+              <div className="flex flex-col items-center justify-center text-2xl text-center">
+                <p>Please select a module to view its chapters.</p>
               </div>
             </div>
           )}
@@ -90,23 +111,33 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
       </div>
 
       {/* Right: All Modules */}
-      <div className="w-[35%] p-2 border-l-2">
-        <div className="bg-white p-4 rounded-lg">
-          <div className="flex justify-between items-center mb-2">
+      <div className="w-[35%] p-2 border-l border-gray-300 min-h-[100vh]">
+        <div className="bg-white p-2 rounded-lg">
+          <div className="flex items-center space-x-2 mb-4">
             <h2 className="text-lg font-semibold">All Modules</h2>
+            <div className="bg-gradient-to-r from-pink-100 to-purple-200 text-pink-600 font-bold rounded-full px-3 py-1 text-sm">
+              {modules.length}
+            </div>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {moduleLoading ? (
               <ModuleSkeleton />
-            ) : modules?.length > 0 ? (
+            ) : modules.length > 0 ? (
               modules.map((module, index) => (
                 <div
                   key={module.moduleId}
                   onClick={() => selectModule(module)}
-                  className={`cursor-pointer p-2 rounded-lg shadow-md transition-all duration-200 ${selectedModule?.moduleId === module.moduleId
-                    ? "bg-purple-100"
-                    : "hover:bg-gray-50"
-                    }`}
+                  className={`
+                    cursor-pointer
+                    rounded-lg
+                    mb-2
+                    transition-all duration-200
+                    ${
+                      selectedModule?.moduleId === module.moduleId
+                        ? "border-2 border-red-500"
+                        : "border border-gray-200 hover:shadow-sm"
+                    }
+                  `}
                 >
                   <ModuleCard
                     title={module.name}
@@ -118,12 +149,11 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
               ))
             ) : (
               <div className="flex justify-center items-center font-bold text-gray-500 h-full w-full py-20">
-                <div className="flex items-center justify-center flex-col text-2xl text-center">
-                  <img src={ModuleImage} alt="Module" className="w-[15rem] h-[15rem] mb-4 mx-auto" />
+                <div className="flex flex-col items-center justify-center text-2xl text-center">
+                  <FaFolderOpen className="text-6xl mb-4" />
                   <p>No modules are currently available.</p>
                 </div>
               </div>
-
             )}
           </div>
         </div>

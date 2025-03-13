@@ -1,13 +1,27 @@
 import React, { useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEye, FaFilePdf, FaPaperclip } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaEye,
+  FaFilePdf,
+  FaPaperclip,
+} from "react-icons/fa";
 import { MdAssignment, MdQuiz } from "react-icons/md";
 import ChapterItem from "./ChapterItem";
 
-const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachments = [], moduleName }) => {
+const Chapter = ({
+  title,
+  chapterNumber,
+  imageUrl,
+  assignments,
+  quizzes,
+  attachments = [],
+  moduleName,
+}) => {
   const [chapterExpanded, setChapterExpanded] = useState(false);
   const [focusedSection, setFocusedSection] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
-
+  // console.log("attachments:-->", attachments);
   const toggleChapter = () => {
     setChapterExpanded((prev) => !prev);
   };
@@ -31,8 +45,8 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
   const handleSectionClick = (section) => {
     setFocusedSection((prev) => (prev === section ? null : section));
   };
-  console.log('assignments', assignments);
-  console.log('quizzes', quizzes);
+  console.log("assignments", assignments);
+  console.log("quizzes", quizzes);
   return (
     <div className="mb-5">
       {/* Module Name */}
@@ -48,7 +62,11 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
         onClick={toggleChapter}
       >
         <div className="flex items-center">
-          <img src={imageUrl} alt={`Chapter ${chapterNumber}`} className="w-14 h-14 mr-4 rounded-lg" />
+          <img
+            src={imageUrl}
+            alt={`Chapter ${chapterNumber}`}
+            className="w-14 h-14 mr-4 rounded-lg"
+          />
           <div className="flex flex-col">
             <h2 className="font-semibold text-md">{title}</h2>
             <p className="text-gray-500">Chapter {chapterNumber}</p>
@@ -72,15 +90,20 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
 
           {/* Dropdown Button */}
           <button
-            className={`p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all ${chapterExpanded ? "rotate-180" : ""
-              }`}
+            className={`p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all ${
+              chapterExpanded ? "rotate-180" : ""
+            }`}
             aria-label="Toggle Chapter"
             onClick={(e) => {
               e.stopPropagation();
               toggleChapter();
             }}
           >
-            {chapterExpanded ? <FaChevronUp size={16} /> : <FaChevronDown size={16} />}
+            {chapterExpanded ? (
+              <FaChevronUp size={16} />
+            ) : (
+              <FaChevronDown size={16} />
+            )}
           </button>
         </div>
       </div>
@@ -100,7 +123,11 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                   Attachments ({attachments?.length})
                 </span>
               </div>
-              <FaChevronDown className={`transition-transform ${focusedSection === "attachments" ? "rotate-180" : ""}`} />
+              <FaChevronDown
+                className={`transition-transform ${
+                  focusedSection === "attachments" ? "rotate-180" : ""
+                }`}
+              />
             </div>
 
             {focusedSection === "attachments" && (
@@ -112,8 +139,12 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                       className="flex justify-between items-center mb-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
                     >
                       <div className="flex items-center space-x-4">
-                        {attachment.type === "application/pdf" && <FaFilePdf className="text-red-500" size={20} />}
-                        <span className="text-gray-700 font-semibold">{attachment.label}</span>
+                        {attachment.type === "application/pdf" && (
+                          <FaFilePdf className="text-red-500" size={20} />
+                        )}
+                        <span className="text-gray-700 font-semibold">
+                          {attachment?.label || attachment?.name}
+                        </span>
                       </div>
                       <button
                         onClick={() => openPreview(attachment.url)}
@@ -125,7 +156,9 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 italic text-center mt-2">No Attachments Available</p>
+                  <p className="text-gray-500 italic text-center mt-2">
+                    No Attachments Available
+                  </p>
                 )}
               </div>
             )}
@@ -143,7 +176,11 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                   Assignments ({assignments?.length})
                 </span>
               </div>
-              <FaChevronDown className={`transition-transform ${focusedSection === "assignments" ? "rotate-180" : ""}`} />
+              <FaChevronDown
+                className={`transition-transform ${
+                  focusedSection === "assignments" ? "rotate-180" : ""
+                }`}
+              />
             </div>
 
             {focusedSection === "assignments" && (
@@ -159,7 +196,9 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                     />
                   ))
                 ) : (
-                  <p className="text-gray-500 italic text-center mt-2">No Assignments Available</p>
+                  <p className="text-gray-500 italic text-center mt-2">
+                    No Assignments Available
+                  </p>
                 )}
               </div>
             )}
@@ -177,7 +216,11 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                   Quizzes ({quizzes?.length})
                 </span>
               </div>
-              <FaChevronDown className={`transition-transform ${focusedSection === "quizzes" ? "rotate-180" : ""}`} />
+              <FaChevronDown
+                className={`transition-transform ${
+                  focusedSection === "quizzes" ? "rotate-180" : ""
+                }`}
+              />
             </div>
 
             {focusedSection === "quizzes" && (
@@ -193,7 +236,9 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
                     />
                   ))
                 ) : (
-                  <p className="text-gray-500 italic text-center mt-2">No Quizzes Available</p>
+                  <p className="text-gray-500 italic text-center mt-2">
+                    No Quizzes Available
+                  </p>
                 )}
               </div>
             )}
@@ -205,10 +250,19 @@ const Chapter = ({ title, chapterNumber, imageUrl, assignments, quizzes, attachm
       {previewUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-4 relative">
-            <button onClick={closePreview} className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white">
+            <button
+              onClick={closePreview}
+              className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white"
+            >
               ✕
             </button>
-            <embed src={previewUrl} type="application/pdf" width="100%" height="600px" className="rounded-md" />
+            <embed
+              src={previewUrl}
+              type="application/pdf"
+              width="100%"
+              height="600px"
+              className="rounded-md"
+            />
           </div>
         </div>
       )}

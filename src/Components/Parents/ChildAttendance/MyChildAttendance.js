@@ -60,7 +60,7 @@ const MyChildAttendance = () => {
 
   const handleSelect = useCallback(() => {}, []);
 
-  useNavHeading(t("My Childs"), t("Attendance"));
+  useNavHeading(t("My Child"), t("Attendance"));
   const dateCellRender = useCallback(
     (value) => {
       const cellDate = dayjs(value).format("YYYY-MM-DD");
@@ -184,9 +184,9 @@ const MyChildAttendance = () => {
   ]);
 
   return (
-    <Layout title="Child Attendance | Parent">
+    // <Layout title="Child Attendance | Parent">
       <div className="calendar-container">{renderContent()}</div>
-    </Layout>
+    // </Layout>
   );
 };
 

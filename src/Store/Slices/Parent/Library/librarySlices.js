@@ -24,7 +24,7 @@ const librarySlice = createSlice({
         state.loading = false;
         state.books = action.payload?.books || []; // Store raw books array
         state.totalPages = action.payload?.totalPages;
-        state.totalBookIsuued = action.payload?.totalBookIsuued; 
+        state.totalBookIsuued = action.payload?.totalRecords; 
         state.currentPage = action.payload?.currentPage;
       })
       .addCase(fetchLibraryBooks.rejected, (state, action) => {

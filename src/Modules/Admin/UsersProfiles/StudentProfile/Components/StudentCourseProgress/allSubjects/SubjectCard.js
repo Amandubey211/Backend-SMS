@@ -25,9 +25,9 @@ const SubjectCard = ({ subject, i }) => {
 
   return (
     <div
-      className="bg-white shadow-lg hover:shadow-2xl cursor-pointer 
-       rounded-lg p-4  flex-none border border-gray-300 flex flex-col gap-3"
-      style={{ width: "265px" }}
+      className="bg-white shadow-md cursor-pointer 
+       rounded-lg  flex-none flex flex-col gap-3 p-4"
+      
     >
       <div className="flex items-center gap-2">
         <FaBook className="text-[2.2rem] text-pink-400" />

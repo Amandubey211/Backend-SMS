@@ -62,10 +62,9 @@ const StudentParentCard = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    if (!students?.length) {
       dispatch(fetchChildren());
-    }
-  }, [dispatch, students]);
+    
+  }, [dispatch]);
 
   // Reset index if students change
   useEffect(() => {
@@ -87,17 +86,17 @@ const StudentParentCard = () => {
     navigate("/children");
   }, [navigate]);
 
-  const renderErrorMessage = useCallback(
-    () => (
-      <div className="flex flex-col items-center justify-center mt-6">
-        <FaChild className="text-gray-400 text-8xl mb-4" />
-        <p className="text-gray-600 text-lg text-center mt-2">
-          {errorChildren || "Error"}: Unable to fetch Child Data
-        </p>
-      </div>
-    ),
-    [errorChildren]
-  );
+  // const renderErrorMessage = useCallback(
+  //   () => (
+  //     <div className="flex flex-col items-center justify-center mt-6">
+  //       <FaChild className="text-gray-400 text-8xl mb-4" />
+  //       <p className="text-gray-600 text-lg text-center mt-2">
+  //         {errorChildren || "Error"}: Unable to fetch Child Data
+  //       </p>
+  //     </div>
+  //   ),
+  //   [errorChildren]
+  // );
 
   // Navigation handlers for multiple children
   const handleNext = () => {
@@ -183,8 +182,7 @@ const StudentParentCard = () => {
         {!loadingChildren &&
           errorChildren &&
           !errorChildren?.includes("404") &&
-          errorChildren !== "No children found for this guardian." &&
-          renderErrorMessage()}
+          errorChildren !== "No children found for this guardian."}
 
         {/* Render children if available */}
         {!loadingChildren && !errorChildren && students?.length > 0 && (

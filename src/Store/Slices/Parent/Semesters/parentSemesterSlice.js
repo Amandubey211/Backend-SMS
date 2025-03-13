@@ -4,7 +4,7 @@ import { fetchSemestersByClass } from "./parentSemester.action";
 
 const initialState = {
   semesters: [],
-  selectedSemester: null,
+  selectedSemester: {},
   loading: false,
   error: null,
 };
@@ -13,13 +13,14 @@ const parentSemesterSlice = createSlice({
   name: "parentSemester",
   initialState,
   reducers: {
-    resetSemesters(state) {
+    resetSemesters:(state)=> {
       state.semesters = [];
       state.error = null;
       state.loading = false;
     },
-    setSelectedSemester(state, action) {
-      state.selectedSemester = action.payload;
+    setSelectedSemester:(state, action)=> {
+      console.log("setSelectedSemester=====>",action.payload);
+      state.selectedSemester = action.payload || {};
     },
   },
   extraReducers: (builder) => {
