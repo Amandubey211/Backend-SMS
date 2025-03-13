@@ -157,7 +157,7 @@ const ParentEvent = () => {
   const selectedAcademicYear=2025;
 
   return (
-    <Layout title="Parent | Event">
+    <Layout title="Parents | Event">
       <ParentDashLayout>
         <div className="min-h-screen p-4 bg-gray-50">
           {loading ? (

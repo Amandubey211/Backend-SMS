@@ -55,7 +55,7 @@ const MyChildren = () => {
 
   const renderContent = () => {
     if (loading) {
-      return <ChildCardSkeleton count={children?.length || 2} />;
+      return <ChildCardSkeleton count={children?.length || 3} />;
     }
 
     if (error) {

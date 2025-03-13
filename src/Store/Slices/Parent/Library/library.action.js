@@ -16,13 +16,13 @@ export const fetchLibraryBooks = createAsyncThunk(
     page = 1,
     limit = 5,
     search = "",
-    sortOrder = "desc",
-    sortBy = "startDate",
+    childId,
+    status="All"
   }, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(`/parent/all/bookIssue?say=${say}&page=${page}&limit=${limit}&search=${search}&sortBy=${sortBy}&sortOrder=${sortOrder}`);
+      const data = await getData(`/parent/all/bookIssue?say=${say}&page=${page}&limit=${limit}&search=${search}&studentId=${childId}&status=${status}`);
       console.log('data',data);
       return data;
     } catch (error) {

@@ -108,7 +108,7 @@ const NoticeBoard = ({ textTrimCount }) => {
   if (!notices?.length) {
     return (
       <div className=" ">
-        <div className="flex justify-between items-center mb-2 flex-row">
+        <div className="flex justify-between items-center mb-2 flex-row p-2">
           <h2 className="text-lg font-semibold text-gray-600">Upcoming Notices</h2>
           <div className="inline-block">
             <button

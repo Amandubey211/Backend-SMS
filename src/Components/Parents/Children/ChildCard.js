@@ -17,6 +17,7 @@ export const ChildCard = ({ student }) => {
     section = "N/A",
     group = "N/A",
     profile = profileIcon,
+    classId
   } = student || {};
 
   return (
@@ -47,7 +48,6 @@ export const ChildCard = ({ student }) => {
       <div className="grid grid-cols-2 gap-2 mt-4">
         <button
           onClick={(e) => {
-            e.stopPropagation();
             navigate(`/teacher/${student.id}`);
           }}
           className="flex items-center justify-center space-x-2 py-2 rounded bg-blue-100 hover:bg-blue-200 transition"
@@ -57,7 +57,6 @@ export const ChildCard = ({ student }) => {
         </button>
         <button
           onClick={(e) => {
-            e.stopPropagation();
             navigate(`/childgrade/${student.id}`);
           }}
           className="flex items-center justify-center space-x-2 py-2 rounded bg-pink-100 hover:bg-pink-200 transition"
@@ -67,7 +66,6 @@ export const ChildCard = ({ student }) => {
         </button>
         <button
           onClick={(e) => {
-            e.stopPropagation();
             navigate(`/attendance/${student.id}`);
           }}
           className="flex items-center justify-center space-x-2 py-2 rounded bg-green-100 hover:bg-green-200 transition"
@@ -77,8 +75,7 @@ export const ChildCard = ({ student }) => {
         </button>
         <button
           onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/checkprogress/${student.id}`);
+            navigate(`/checkprogress/${student.classId}/${student.id}`);
           }}
           className="flex items-center justify-center space-x-2 py-2 rounded bg-purple-100 hover:bg-purple-200 transition"
         >

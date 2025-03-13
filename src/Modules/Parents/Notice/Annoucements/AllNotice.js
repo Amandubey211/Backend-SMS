@@ -72,7 +72,7 @@ const AllNotice = () => {
   };
 
   return (
-    <Layout title={t("Noticeboard")}>
+    <Layout title={t("Parents | Noticeboard")}>
       <ParentDashLayout hideAvatarList={true}>
         <div className="p-4">
           {/* Search, Filter, Sort Controls and Reset Button */}
