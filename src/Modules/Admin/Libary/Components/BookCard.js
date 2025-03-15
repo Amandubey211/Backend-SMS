@@ -1,18 +1,21 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom"; // Import for portal usage
-import { useDispatch, useSelector } from "react-redux";
-import { FiEdit, FiTrash2 } from "react-icons/fi"; // Icons for edit and delete
-import EditBook from "./EditBook";
+import ReactDOM from "react-dom";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
+import BookForm from "./BookForm"; // Our unified BookForm for add/edit
 import { deleteBookThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import { useTranslation } from "react-i18next";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../config/permission";
+import { useDispatch, useSelector } from "react-redux";
 
 const BookCard = ({ book }) => {
   const { t } = useTranslation("admLibrary");
-  // Destructure properties from book. If TotalCopies is missing, we'll fallback later.
+  const dispatch = useDispatch();
+  const role = useSelector((store) => store.common.auth.role);
+
+  // Destructure book properties; use fallback for TotalCopies
   const {
     _id,
     name,
@@ -22,12 +25,11 @@ const BookCard = ({ book }) => {
     copies,
     image,
     issuedCount,
-    TotalCopies, // This is expected from your API (case sensitive)
+    TotalCopies,
   } = book;
-  const dispatch = useDispatch();
+
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
-  const role = useSelector((store) => store.common.auth.role);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => setSidebarOpen(false);
@@ -43,7 +45,7 @@ const BookCard = ({ book }) => {
     <>
       <div
         className="border p-2 bg-white rounded-lg shadow capitalize overflow-hidden relative 
-       hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+         hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
       >
         <div className="w-full h-40 flex">
           <img
@@ -70,7 +72,7 @@ const BookCard = ({ book }) => {
           <h3 className="text-lg font-bold text-[#333333]">{name}</h3>
           <p className="text-base font-semibold">{category}</p>
           <div className="flex gap-2">
-            <p className="text-sm font-medium text-gray-500">{t("Author")}: </p>
+            <p className="text-sm font-medium text-gray-500">{t("Author")}:</p>
             <p className="text-sm font-medium text-gray-600">{author}</p>
           </div>
           {role !== "teacher" && (
@@ -98,7 +100,7 @@ const BookCard = ({ book }) => {
         </div>
       </div>
 
-      {/* Render Sidebar in a Portal */}
+      {/* Sidebar for editing the book */}
       {isSidebarOpen &&
         ReactDOM.createPortal(
           <Sidebar
@@ -106,12 +108,12 @@ const BookCard = ({ book }) => {
             onClose={handleSidebarClose}
             title={t("Edit Book")}
           >
-            <EditBook book={book} onClose={handleSidebarClose} />
+            <BookForm book={book} onClose={handleSidebarClose} />
           </Sidebar>,
           document.body
         )}
 
-      {/* Render DeleteModal in a Portal */}
+      {/* Delete confirmation modal */}
       {isDeleteModalOpen &&
         ReactDOM.createPortal(
           <DeleteModal
