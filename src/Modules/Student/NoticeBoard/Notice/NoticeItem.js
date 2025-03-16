@@ -22,7 +22,7 @@ const NoticeItem = ({ notice, index, formatDate }) => {
     <div className="border-t">
       <div
         className={`cursor-pointer p-2 flex flex-col ${
-          activeIndex === index ? "bg-pink-50" : "bg-white"
+          activeIndex === index && "bg-white"
         }`}
         onClick={() => toggleAccordion(index)}
         aria-expanded={activeIndex === index ? "true" : "false"}
@@ -53,25 +53,21 @@ const NoticeItem = ({ notice, index, formatDate }) => {
               </span>
               )
             </p>
-            <div className="flex items-center text-sm gap-x-3">
-              <div className="flex gap-1">
-                <IoCalendarOutline
-                  className="text-gray-400 text-lg"
-                  aria-hidden="true"
-                />
-                <span className="font-[400] text-[#7F7F7F]">
-                  {formatDate(notice.startDate)}
-                </span>
-              </div>
-              <div className="flex gap-1">
-                <IoCalendarOutline
-                  className="text-gray-400 text-lg"
-                  aria-hidden="true"
-                />
-                <span className="font-[400] text-[#7F7F7F]">
-                  {formatDate(notice.endDate)}
-                </span>
-              </div>
+            <div className="flex items-center text-xs">
+              <span className="inline-block mr-2 px-2 py-1 bg-indigo-100 text-indigo-600 rounded-full">
+                From :
+              </span>
+              <IoCalendarOutline className="text-gray-400" />
+              <span className="ml-2 text-sm text-gray-500 mr-4">
+                {formatDate(notice?.startDate)}
+              </span>
+              <span className="inline-block mr-2 px-2 py-1 bg-purple-100 text-purple-600 rounded-full">
+                To :
+              </span>
+              <IoCalendarOutline className="text-gray-400" />
+              <span className="ml-2 text-sm text-gray-500">
+                {formatDate(notice?.endDate)}
+              </span>
               <div className="px-3 py-[2px] text-center flex justify-center items-center rounded-full">
                 <span
                   className={`text-xs capitalize ${
@@ -106,7 +102,9 @@ const NoticeItem = ({ notice, index, formatDate }) => {
             className="p-4 text-sm text-gray-600 bg-white"
             onClick={(e) => e.stopPropagation()}
           >
-            <div dangerouslySetInnerHTML={{ __html: notice.description }} />
+            <pre className="whitespace-pre-wrap font-sans">
+              {notice?.description || t("No description available")}
+            </pre>
           </div>
         )}
       </div>
