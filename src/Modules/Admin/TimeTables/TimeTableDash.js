@@ -91,6 +91,22 @@ function getIconForType(type) {
   }
 }
 
+// Helper to get a light background based on type
+function getLightBgByType(type) {
+  switch (type) {
+    case "weekly":
+      return "rgba(255,153,204,0.2)";
+    case "exam":
+      return "rgba(41,171,226,0.2)";
+    case "event":
+      return "rgba(119,221,119,0.2)";
+    case "others":
+      return "rgba(255,215,0,0.2)";
+    default:
+      return "#f0f0f0";
+  }
+}
+
 // --------------------------------------------
 // MAIN COMPONENT
 // --------------------------------------------
@@ -409,7 +425,7 @@ export default function TimeTableDash() {
   // 12) Render
   // --------------------------------------------
   return (
-    <div className="w-full min-h-screen flex bg-gray-50">
+    <div className="w-full min-h-screen flex ">
       {/* MAIN SECTION */}
       <div className="flex-1 p-4">
         {/* HEADER */}
@@ -563,6 +579,8 @@ export default function TimeTableDash() {
         width={650}
         visible={drawerVisible}
         onClose={closeDrawer}
+        // We keep Drawer at a lower zIndex than the Modal
+        zIndex={1000}
       >
         {drawerVisible && (
           <motion.div
@@ -583,205 +601,230 @@ export default function TimeTableDash() {
 
       {/* TIMETABLE DETAILS DRAWER */}
       <Drawer
-        title={
-          <div className="flex items-center justify-between w-full">
-            <span className="text-xl font-bold">Timetable Details</span>
-            <Button
-              type="text"
-              onClick={closeDetailsDrawer}
-              icon={<CloseOutlined style={{ fontSize: "16px" }} />}
-            />
-          </div>
-        }
+        title="Timetable Details"
         placement="right"
         width={650}
         closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
+        // Keep at a lower zIndex than the modal as well
+        zIndex={1000}
       >
-        <AnimatePresence>
-          {detailsTimetable && (
-            <motion.div
-              key="detailsDrawer"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
-              {/* Top: Timetable Name, Type Icon, & Badge */}
-              <div className="flex flex-col space-y-1">
-                <h4 className="font-bold text-lg text-gray-900">
-                  {detailsTimetable.name || "Untitled Timetable"}
-                </h4>
-                <div className="flex items-center space-x-2">
-                  {getIconForType(detailsTimetable.type)}
-                  <Badge
-                    text={detailsTimetable.type?.toUpperCase() || "UNKNOWN"}
-                    style={{
-                      backgroundColor: getColorByType(detailsTimetable.type),
-                      color: "#fff",
-                      fontWeight: "bold",
-                      fontSize: "0.85rem",
-                    }}
-                  />
-                </div>
-              </div>
-
-              {/* Display Class, Section, Group in tags */}
-              <div>
-                <h5 className="text-gray-600 text-sm">This Timetable For:</h5>
-                <div className="mt-1 space-x-1">
-                  {detailsTimetable.classId && (
-                    <Tag color="blue">
-                      {detailsTimetable.classId.className || "No Class Name"}
-                    </Tag>
-                  )}
-                  {detailsTimetable.sectionId && (
-                    <Tag color="purple">
-                      {detailsTimetable.sectionId.sectionName ||
-                        "No Section Name"}
-                    </Tag>
-                  )}
-                  {detailsTimetable.groupId && (
-                    <Tag color="cyan">
-                      {detailsTimetable.groupId.groupName || "No Group Name"}
-                    </Tag>
-                  )}
-                </div>
-              </div>
-
-              {/* Status Tag */}
-              <div>
-                <h5 className="text-gray-600 text-sm">Status:</h5>
-                <Tag
-                  color={detailsTimetable.status === "active" ? "green" : "red"}
-                  className="mt-1"
+        <div className="h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto p-4">
+            <AnimatePresence>
+              {detailsTimetable && (
+                <motion.div
+                  key="detailsDrawer"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="space-y-4"
                 >
-                  {detailsTimetable.status || "inactive"}
-                </Tag>
-              </div>
+                  {/* Title and Big Icon container in body */}
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-bold text-2xl text-gray-900">
+                      {detailsTimetable.name || "Untitled Timetable"}
+                    </h4>
+                    <div className="flex flex-col items-center">
+                      <div
+                        className="w-16 h-16 flex items-center justify-center rounded mb-1"
+                        style={{
+                          backgroundColor: getLightBgByType(
+                            detailsTimetable.type
+                          ),
+                        }}
+                      >
+                        <div className="text-4xl text-gray-800">
+                          {getIconForType(detailsTimetable.type)}
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-700">
+                        {detailsTimetable?.type?.toUpperCase() || "UNKNOWN"}
+                      </span>
+                    </div>
+                  </div>
 
-              {/* Semester */}
-              <div>
-                <h5 className="text-gray-600 text-sm">Semester:</h5>
-                <p className="text-sm text-gray-800">
-                  {detailsTimetable.semesterId?.title || "No Semester"}
-                </p>
-              </div>
-
-              {/* "Available From" & "Due Date" style */}
-              <div className="flex items-center space-x-2">
-                <Card className="flex-1 border p-2 rounded">
-                  <p className="text-sm text-gray-500">Available From :</p>
-                  <p className="text-sm text-gray-800 font-semibold">
-                    {detailsTimetable.validity?.startDate
-                      ? format(
-                          new Date(detailsTimetable.validity.startDate),
-                          "M/d/yyyy"
-                        )
-                      : "N/A"}
-                  </p>
-                </Card>
-                <Card className="flex-1 border p-2 rounded">
-                  <p className="text-sm text-gray-500">Due Date :</p>
-                  <p className="text-sm text-gray-800 font-semibold">
-                    {detailsTimetable.validity?.endDate
-                      ? format(
-                          new Date(detailsTimetable.validity.endDate),
-                          "M/d/yyyy"
-                        )
-                      : "No End Date"}
-                  </p>
-                </Card>
-              </div>
-
-              {/* Days & Slots */}
-              {detailsTimetable.days && detailsTimetable.days.length > 0 && (
-                <div>
-                  <h5 className="font-medium text-gray-800 mt-4">Schedule:</h5>
-                  {detailsTimetable.days.map((dayItem) => (
-                    <div key={dayItem._id} className="mb-3 border p-2 rounded">
-                      {dayItem.date ? (
-                        <p className="text-sm text-gray-700 font-semibold">
-                          {format(new Date(dayItem.date), "dd MMM yyyy")}
-                        </p>
-                      ) : (
-                        <p className="text-sm text-gray-700 font-semibold">
-                          {dayItem.day || "Day Not Specified"}
-                        </p>
+                  {/* Display Class, Section, Group */}
+                  <div>
+                    <h5 className="text-gray-600 text-sm">
+                      This Timetable For:
+                    </h5>
+                    <div className="mt-1 space-x-1">
+                      {detailsTimetable.classId && (
+                        <Tag color="blue">
+                          {detailsTimetable.classId.className ||
+                            "No Class Name"}
+                        </Tag>
                       )}
-                      {dayItem.slots && dayItem.slots.length > 0 ? (
-                        dayItem.slots.map((slot) => (
-                          <Card
-                            key={slot._id}
-                            size="small"
-                            className="mb-2"
-                            bodyStyle={{ padding: "8px" }}
-                          >
-                            <div className="flex justify-between items-center">
-                              <div>
-                                <p className="text-xs text-gray-600">
-                                  {dayjs(slot.startTime).format("HH:mm")} -{" "}
-                                  {dayjs(slot.endTime).format("HH:mm")}
-                                </p>
-                                {slot.subjectId ? (
-                                  <Tooltip
-                                    title={slot.subjectId.name || "No Subject"}
-                                  >
-                                    <p className="text-xs font-semibold text-gray-800">
-                                      {slot.subjectId.name || "No Subject"}
-                                    </p>
-                                  </Tooltip>
-                                ) : (
-                                  <p className="text-xs font-semibold text-gray-800">
-                                    {slot.eventName || "No Event Name"}
-                                  </p>
-                                )}
-                              </div>
-                              {slot.description && (
-                                <Tooltip title={slot.description}>
-                                  <span className="text-[10px] text-gray-500">
-                                    Info
-                                  </span>
-                                </Tooltip>
-                              )}
-                            </div>
-                          </Card>
-                        ))
-                      ) : (
-                        <p className="text-xs text-gray-500">
-                          No slots available.
-                        </p>
+                      {detailsTimetable.sectionId && (
+                        <Tag color="purple">
+                          {detailsTimetable.sectionId.sectionName ||
+                            "No Section Name"}
+                        </Tag>
+                      )}
+                      {detailsTimetable.groupId && (
+                        <Tag color="cyan">
+                          {detailsTimetable.groupId.groupName ||
+                            "No Group Name"}
+                        </Tag>
                       )}
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
 
-              <div className="flex space-x-2 mt-4">
-                <Button
-                  type="default"
-                  icon={<AiOutlineEdit />}
-                  style={{ borderColor: "#FF69B4", color: "#FF69B4" }}
-                  onClick={() => {
-                    closeDetailsDrawer();
-                    openDrawer(detailsTimetable);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  danger
-                  icon={<AiOutlineDelete />}
-                  onClick={() => onDeleteClick(detailsTimetable)}
-                >
-                  Delete
-                </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  {/* Status Tag */}
+                  <div>
+                    <h5 className="text-gray-600 text-sm">Status:</h5>
+                    <Tag
+                      color={
+                        detailsTimetable.status === "active" ? "green" : "red"
+                      }
+                      className="mt-1"
+                    >
+                      {detailsTimetable.status || "inactive"}
+                    </Tag>
+                  </div>
+
+                  {/* Semester */}
+                  <div>
+                    <h5 className="text-gray-600 text-sm">Semester:</h5>
+                    <p className="text-sm text-gray-800">
+                      {detailsTimetable.semesterId?.title || "No Semester"}
+                    </p>
+                  </div>
+
+                  {/* Schedule */}
+                  {detailsTimetable.days &&
+                    detailsTimetable.days.length > 0 && (
+                      <div>
+                        <h5 className="font-medium text-gray-800 mt-4">
+                          Schedule:
+                        </h5>
+                        {detailsTimetable.days.map((dayItem) => (
+                          <div
+                            key={dayItem._id}
+                            className="mb-3 border p-2 rounded"
+                          >
+                            {dayItem.date ? (
+                              <p className="text-sm text-gray-700 font-semibold">
+                                {format(new Date(dayItem.date), "dd MMM yyyy")}
+                              </p>
+                            ) : (
+                              <p className="text-sm text-gray-700 font-semibold">
+                                {dayItem.day || "Day Not Specified"}
+                              </p>
+                            )}
+                            {dayItem.slots && dayItem.slots.length > 0 ? (
+                              dayItem.slots.map((slot) => (
+                                <Card
+                                  key={slot._id}
+                                  size="small"
+                                  className="mb-2"
+                                  bodyStyle={{ padding: "8px" }}
+                                >
+                                  <div className="flex justify-between items-center">
+                                    <div>
+                                      <p className="text-xs text-gray-600">
+                                        {dayjs(slot.startTime).format("HH:mm")}{" "}
+                                        - {dayjs(slot.endTime).format("HH:mm")}
+                                      </p>
+                                      {slot.subjectId ? (
+                                        <Tooltip
+                                          title={
+                                            slot.subjectId.name || "No Subject"
+                                          }
+                                        >
+                                          <p className="text-xs font-semibold text-gray-800">
+                                            {slot.subjectId.name ||
+                                              "No Subject"}
+                                          </p>
+                                        </Tooltip>
+                                      ) : (
+                                        <p className="text-xs font-semibold text-gray-800">
+                                          {slot.eventName || "No Event Name"}
+                                        </p>
+                                      )}
+                                    </div>
+                                    {slot.description && (
+                                      <Tooltip title={slot.description}>
+                                        <span className="text-[10px] text-gray-500">
+                                          Info
+                                        </span>
+                                      </Tooltip>
+                                    )}
+                                  </div>
+                                </Card>
+                              ))
+                            ) : (
+                              <p className="text-xs text-gray-500">
+                                No slots available.
+                              </p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                  {/* "Available From" & "Due Date" */}
+                  <div className="flex items-center space-x-2">
+                    <Card
+                      className="flex-1 border p-2 rounded"
+                      style={{ backgroundColor: "#f7f7f7" }}
+                    >
+                      <p className="text-sm text-gray-500">Available From :</p>
+                      <p className="text-sm text-gray-800 font-semibold">
+                        {detailsTimetable.validity?.startDate
+                          ? format(
+                              new Date(detailsTimetable.validity.startDate),
+                              "M/d/yyyy"
+                            )
+                          : "N/A"}
+                      </p>
+                    </Card>
+                    <Card
+                      className="flex-1 border p-2 rounded"
+                      style={{ backgroundColor: "#f7f7f7" }}
+                    >
+                      <p className="text-sm text-gray-500">Due Date :</p>
+                      <p className="text-sm text-gray-800 font-semibold">
+                        {detailsTimetable.validity?.endDate
+                          ? format(
+                              new Date(detailsTimetable.validity.endDate),
+                              "M/d/yyyy"
+                            )
+                          : "No End Date"}
+                      </p>
+                    </Card>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+          {/* Sticky Footer for Edit and Delete */}
+          <div className="sticky bottom-0 bg-white py-4 border-t">
+            <div className="flex space-x-2 justify-center">
+              <Button
+                type="default"
+                icon={<AiOutlineEdit />}
+                style={{ borderColor: "#FF69B4", color: "#FF69B4" }}
+                onClick={() => {
+                  closeDetailsDrawer();
+                  openDrawer(detailsTimetable);
+                }}
+              >
+                Edit
+              </Button>
+              <Button
+                danger
+                icon={<AiOutlineDelete />}
+                onClick={() => onDeleteClick(detailsTimetable)}
+              >
+                Delete
+              </Button>
+            </div>
+          </div>
+        </div>
       </Drawer>
 
       {/* DELETE CONFIRMATION MODAL */}
@@ -792,6 +835,8 @@ export default function TimeTableDash() {
         onCancel={() => setDeleteModalVisible(false)}
         okButtonProps={{ danger: true }}
         okText="Delete"
+        // Set higher zIndex so the modal is above both drawers
+        zIndex={2000}
       >
         <p>Are you sure you want to delete this timetable?</p>
       </Modal>
