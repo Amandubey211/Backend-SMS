@@ -135,13 +135,13 @@ const librarySlice = createSlice({
 
       // UPDATE BOOK
       .addCase(updateBookThunk.pending, (state) => {
-        state.loading = true;
+        state.addbookloading = true;
       })
       .addCase(updateBookThunk.fulfilled, (state, action) => {
-        state.loading = false;
+        state.addbookloading = false;
       })
       .addCase(updateBookThunk.rejected, (state, action) => {
-        state.loading = false;
+        state.addbookloading = false;
         state.error = action.payload;
       })
 
