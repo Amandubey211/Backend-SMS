@@ -5,240 +5,176 @@ import {
   Badge,
   Drawer,
   Button,
-  Form,
-  Input,
-  Select,
-  DatePicker,
   Modal,
+  Skeleton,
+  Card,
+  Tooltip,
+  Tag,
 } from "antd";
 import { format } from "date-fns";
-import { Doughnut } from "react-chartjs-2";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import { Doughnut } from "react-chartjs-2";
+import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTimetableList } from "../../../Store/Slices/Admin/TimeTable/timetable.action";
+import {
+  CloseOutlined,
+  CalendarOutlined,
+  BookOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
+import { motion, AnimatePresence } from "framer-motion";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Chart.js core + plugin for a 3D-like effect
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip as ChartTooltip,
+  Legend,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+
+// Timetable Thunks
+import {
+  fetchTimetableList,
+  createTimetable as createTT,
+  updateTimetable as updateTT,
+  deleteTimetable as deleteTT,
+} from "../../../Store/Slices/Admin/TimeTable/timetable.action";
+// Additional Thunks
+import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semester/semesterThunks";
+import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
+
+// Child components
+import TimeTableForm from "./Components/TimeTableForm";
+
 dayjs.extend(isSameOrBefore);
 
-const { Option } = Select;
-const { RangePicker } = DatePicker;
+// --------------------------------------------
+// 1) Chart.js Register
+// --------------------------------------------
+ChartJS.register(ArcElement, ChartTooltip, Legend, ChartDataLabels);
 
-// DEMO: Some initial timetables stored as ISO date strings
-const initialTimetables = [
-  {
-    _id: "1",
-    name: "Weekly Timetable",
-    type: "weekly",
-    days: [
-      { day: "Monday", slots: [{ startTime: "09:00", endTime: "10:00" }] },
-      { day: "Wednesday", slots: [{ startTime: "11:00", endTime: "12:00" }] },
-    ],
-    validity: {
-      startDate: "2025-01-01T00:00:00.000Z",
-      endDate: "2025-06-01T00:00:00.000Z",
-    },
-  },
-  {
-    _id: "2",
-    name: "Exam Timetable",
-    type: "exam",
-    days: [
-      {
-        date: "2025-03-09T00:00:00.000Z",
-        slots: [{ startTime: "09:00", endTime: "11:00", subjectId: "Physics" }],
-      },
-      {
-        date: "2025-03-15T00:00:00.000Z",
-        slots: [{ startTime: "10:00", endTime: "12:00", subjectId: "Math" }],
-      },
-    ],
-    validity: {
-      startDate: "2025-03-01T00:00:00.000Z",
-      endDate: "2025-03-31T00:00:00.000Z",
-    },
-  },
-  {
-    _id: "3",
-    name: "Cultural Event",
-    type: "event",
-    days: [
-      {
-        date: "2025-04-10T00:00:00.000Z",
-        slots: [
-          { startTime: "13:00", endTime: "15:00", eventName: "Music Fest" },
-        ],
-      },
-    ],
-    validity: {
-      startDate: "2025-04-05T00:00:00.000Z",
-      endDate: "2025-04-10T00:00:00.000Z",
-    },
-  },
-];
+// --------------------------------------------
+// 2) Helper: getColorByType
+// --------------------------------------------
+function getColorByType(type) {
+  switch (type) {
+    case "weekly":
+      return "#FF99CC"; // pinkish
+    case "exam":
+      return "#29ABE2"; // aqua
+    case "event":
+      return "#77DD77"; // green
+    case "others":
+      return "#FFD700"; // gold
+    default:
+      return "#D3D3D3";
+  }
+}
 
+// --------------------------------------------
+// 3) Helper: getIconForType
+// --------------------------------------------
+function getIconForType(type) {
+  switch (type) {
+    case "weekly":
+      return <CalendarOutlined className="text-lg text-gray-800" />;
+    case "exam":
+      return <BookOutlined className="text-lg text-gray-800" />;
+    case "event":
+      return <CalendarOutlined className="text-lg text-gray-800" />;
+    case "others":
+      return <TeamOutlined className="text-lg text-gray-800" />;
+    default:
+      return null;
+  }
+}
+
+// --------------------------------------------
+// MAIN COMPONENT
+// --------------------------------------------
 export default function TimeTableDash() {
-  // ----------------------------------------------------------------
-  // 1. LOCAL STATE
-  // ----------------------------------------------------------------
-  const [formType, setFormType] = useState(null); // Track timetable type
-
-  const {timetables=[]}=useSelector((store)=>store?.admin?.timetable);
   const dispatch = useDispatch();
 
-  useEffect(()=>{
+  // Redux store: Timetables
+  const { timetables = [], loadingFetch } = useSelector(
+    (store) => store.admin.timetable
+  );
+
+  // On mount, fetch data
+  useEffect(() => {
     dispatch(fetchTimetableList());
-  },[])
+    dispatch(fetchAllClasses());
+    dispatch(fetchSemestersByClass());
+  }, [dispatch]);
 
-  const classes = [
-    { _id: "class1", name: "Class 10" },
-    { _id: "class2", name: "Class 12" }
-  ];
-  
-  const sections = [
-    { _id: "sectionA", name: "Section A" },
-    { _id: "sectionB", name: "Section B" }
-  ];
-  
-  const groups = [
-    { _id: "group1", name: "Science" },
-    { _id: "group2", name: "Commerce" }
-  ];
-  
-  const academicYears = [
-    { _id: "year2025", name: "2024-2025" },
-    { _id: "year2026", name: "2025-2026" }
-  ];
-  
-  const semesters = [
-    { _id: "sem1", name: "Semester 1" },
-    { _id: "sem2", name: "Semester 2" }
-  ];
-  
-  const schools = [
-    { _id: "school1", name: "Springfield High" },
-    { _id: "school2", name: "Riverdale Academy" }
-  ];
-  
-  const subjects = [
-    { _id: "subj1", name: "Math" },
-    { _id: "subj2", name: "Physics" }
-  ];
-  
-
-  // We store timetables as plain objects/strings
-  // const [timetables, setTimetables] = useState(initialTimetables);
-
-  // Store a JS Date for the “selected date”
+  // Local state
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // Active view: "day" | "week" | "month"
   const [viewMode, setViewMode] = useState("month");
 
-  // ----------------------------------------------------------------
-  // 2. CREATE/EDIT DRAWER STATE
-  // ----------------------------------------------------------------
+  // Drawer states for create/edit
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
-  const [form] = Form.useForm();
 
-  // ----------------------------------------------------------------
-  // 3. DETAILS DRAWER STATE
-  // ----------------------------------------------------------------
+  // For viewing details
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
   const [detailsTimetable, setDetailsTimetable] = useState(null);
 
-  // ----------------------------------------------------------------
-  // 4. DELETE MODAL STATE
-  // ----------------------------------------------------------------
+  // Deletion confirm
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  // ----------------------------------------------------------------
-  // 5. OPEN/CLOSE CREATE-EDIT DRAWER
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 4) Open/Close Drawer for Create/Edit
+  // --------------------------------------------
   const openDrawer = (timetable = null) => {
     setEditingTimetable(timetable);
-
-    if (timetable) {
-      // Convert stored ISO strings into Day.js objects for RangePicker
-      const { startDate, endDate } = timetable.validity;
-      form.setFieldsValue({
-        name: timetable.name,
-        type: timetable.type,
-        validity: [dayjs(startDate), dayjs(endDate)],
-      });
-    } else {
-      form.resetFields();
-    }
     setDrawerVisible(true);
   };
-
   const closeDrawer = () => {
     setEditingTimetable(null);
     setDrawerVisible(false);
   };
 
-  // ----------------------------------------------------------------
-  // 6. FORM SUBMIT (CREATE OR UPDATE)
-  // ----------------------------------------------------------------
-  const onFinish = (values) => {
-    // values.validity => array of Day.js objects
-    const [startDayjs, endDayjs] = values.validity || [];
-
-    const newItem = {
-      _id: editingTimetable?._id || String(Date.now()),
-      name: values.name,
-      type: values.type,
-      validity: {
-        startDate: startDayjs?.toISOString() || null,
-        endDate: endDayjs?.toISOString() || null,
-      },
-      // Keep existing days if editing; empty array for new entries
-      days: editingTimetable?.days || [],
-    };
-
-    if (editingTimetable) {
-      // Update existing timetable
-      // setTimetables((prev) =>
-      //   prev.map((itm) => (itm._id === editingTimetable._id ? newItem : itm))
-      // );
+  // --------------------------------------------
+  // 5) CREATE or UPDATE Timetable
+  // --------------------------------------------
+  const handleFormSubmit = (values, isEdit) => {
+    if (isEdit && editingTimetable?._id) {
+      dispatch(updateTT({ id: editingTimetable._id, data: values })).then(
+        () => {
+          closeDrawer();
+        }
+      );
     } else {
-      // Create new timetable
-      // setTimetables((prev) => [...prev, newItem]);
+      dispatch(createTT(values)).then(() => {
+        closeDrawer();
+      });
     }
-
-    closeDrawer();
   };
 
-  // ----------------------------------------------------------------
-  // 7. EVENT DETAILS HANDLER
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 6) Show Timetable Details
+  // --------------------------------------------
   const onEventClick = (timetable) => {
-    // Show timetable details in a drawer
     setDetailsTimetable(timetable);
     setDetailsDrawerVisible(true);
   };
-
   const closeDetailsDrawer = () => {
     setDetailsDrawerVisible(false);
     setDetailsTimetable(null);
   };
 
-  // ----------------------------------------------------------------
-  // 8. DELETE HANDLER
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 7) Deletion
+  // --------------------------------------------
   const onDeleteClick = (timetable) => {
     setEditingTimetable(timetable);
     setDeleteModalVisible(true);
   };
-
   const confirmDelete = () => {
     if (editingTimetable) {
-      // setTimetables((prev) =>
-      //   prev.filter((tt) => tt._id !== editingTimetable._id)
-      // );
+      dispatch(deleteTT(editingTimetable._id));
     }
     setEditingTimetable(null);
     setDeleteModalVisible(false);
@@ -246,147 +182,143 @@ export default function TimeTableDash() {
     closeDrawer();
   };
 
-  // ----------------------------------------------------------------
-  // 9. MONTH VIEW: dateCellRender
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 8) Month View: dateCellRender
+  // --------------------------------------------
   const dateCellRender = (currentDayjs) => {
-    // Convert Day.js to JS Date for date-fns
-    const jsDate = currentDayjs.toDate();
-    const dateString = format(jsDate, "yyyy-MM-dd");
-
-    // Gather timetables that match this date
+    const dateString = currentDayjs.format("YYYY-MM-DD");
     const matched = timetables.flatMap((tt) => {
-      if (tt.type !== "weekly") {
-        // For exam/event, match date
-        return tt.days
-          ?.filter((d) => {
-            if (!d.date) return false;
-            const dayDateString = format(new Date(d.date), "yyyy-MM-dd");
-            return dayDateString === dateString;
-          })
-          .map(() => tt);
+      if (tt.type === "weekly") {
+        const dayName = currentDayjs.format("dddd");
+        return tt.days.find((d) => d.day === dayName) ? [tt] : [];
       } else {
-        // For weekly, match day of week (e.g., "Monday")
-        const dayName = format(jsDate, "EEEE");
-        const found = tt.days.find((d) => d.day === dayName);
-        return found ? [tt] : [];
+        return tt.days.find((d) => {
+          if (!d.date) return false;
+          const dStr = dayjs(d.date).format("YYYY-MM-DD");
+          return dStr === dateString;
+        })
+          ? [tt]
+          : [];
       }
     });
-
-    const valid = matched.filter(Boolean);
-    if (valid.length === 0) return null;
-
+    if (matched.length === 0) return null;
     return (
-      <>
-        {valid.map((evt) => (
-          <div
+      <div className="space-y-1">
+        {matched.map((evt) => (
+          <Tooltip
             key={evt._id}
-            className="my-1 cursor-pointer"
-            onClick={() => onEventClick(evt)}
+            title={evt.name}
+            color={getColorByType(evt.type)}
+            placement="bottom"
           >
-            <Badge color={getColorByType(evt.type)} text={evt.name} />
-          </div>
+            <div
+              className="px-2 py-1 rounded text-white text-xs cursor-pointer"
+              style={{ backgroundColor: getColorByType(evt.type) }}
+              onClick={() => onEventClick(evt)}
+            >
+              {evt.name}
+            </div>
+          </Tooltip>
         ))}
-      </>
+      </div>
     );
   };
 
-  // ----------------------------------------------------------------
-  // 10. DAY VIEW RENDER
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 9) Day View
+  // --------------------------------------------
   const renderDayView = () => {
     const dayName = format(selectedDate, "EEEE");
     const dateString = format(selectedDate, "yyyy-MM-dd");
 
-    // For weekly timetables, match by day name
     const weekly = timetables
       .filter((t) => t.type === "weekly")
-      .flatMap((t) => {
-        const found = t.days.find((d) => d.day === dayName);
-        return found ? [t] : [];
-      });
-
-    // For exam/event timetables, match by date
-    const others = timetables
+      .filter((t) => t.days.some((d) => d.day === dayName));
+    const nonWeekly = timetables
       .filter((t) => t.type !== "weekly")
-      .flatMap((t) => {
-        const found = t.days.find((d) => {
+      .filter((t) =>
+        t.days.some((d) => {
           if (!d.date) return false;
           return format(new Date(d.date), "yyyy-MM-dd") === dateString;
-        });
-        return found ? [t] : [];
-      });
-
-    const allEvents = [...weekly, ...others];
+        })
+      );
+    const allEvents = [...weekly, ...nonWeekly];
 
     return (
-      <div className="p-4">
-        <h3 className="text-xl font-bold text-pink-600 mb-4">
+      <motion.div
+        key="dayView"
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{ duration: 0.3 }}
+        className="p-4"
+      >
+        <h3 className="text-xl font-bold mb-4">
           Day View — {format(selectedDate, "dd MMM yyyy")}
         </h3>
         {allEvents.length === 0 ? (
           <p className="text-gray-500">No events for this day.</p>
         ) : (
           allEvents.map((evt) => (
-            <div
+            <Card
               key={evt._id}
-              className="bg-white p-3 rounded shadow-sm mb-3 flex items-center justify-between cursor-pointer border-l-4"
-              style={{ borderColor: getColorByType(evt.type) }}
+              className="mb-3 border-l-4 cursor-pointer"
+              style={{ borderLeftColor: getColorByType(evt.type) }}
               onClick={() => onEventClick(evt)}
             >
-              <span className="font-medium">{evt.name}</span>
-              <AiOutlineEdit className="text-gray-400" />
-            </div>
+              <div className="flex items-center justify-between">
+                <span className="font-medium text-gray-800">{evt.name}</span>
+                <AiOutlineEdit className="text-gray-400" />
+              </div>
+            </Card>
           ))
         )}
-      </div>
+      </motion.div>
     );
   };
 
-  // ----------------------------------------------------------------
-  // 11. WEEK VIEW RENDER
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 10) Week View
+  // --------------------------------------------
   const renderWeekView = () => {
-    // Calculate Monday of the week from selectedDate
-    const dayOfWeek = +format(selectedDate, "i"); // Monday = 1 in date-fns
+    const dayOfWeek = +format(selectedDate, "i"); // Monday=1, Sunday=7
     const monday = new Date(selectedDate);
     monday.setDate(monday.getDate() - (dayOfWeek - 1));
 
-    // Create an array for the 7 days (Monday to Sunday)
-    const daysInWeek = [...Array(7)].map((_, i) => {
-      const day = new Date(monday);
-      day.setDate(monday.getDate() + i);
-      return day;
+    const daysInWeek = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      return d;
     });
 
-    // For each day, gather events
     const getEventsForDate = (dateObj) => {
       const dayName = format(dateObj, "EEEE");
       const dateStr = format(dateObj, "yyyy-MM-dd");
 
-      const weeklyList = timetables
+      const w = timetables
         .filter((t) => t.type === "weekly")
-        .flatMap((t) => {
-          const found = t.days.find((d) => d.day === dayName);
-          return found ? [t] : [];
-        });
-
+        .filter((t) => t.days.some((d) => d.day === dayName));
       const others = timetables
         .filter((t) => t.type !== "weekly")
-        .flatMap((t) => {
-          const found = t.days.find((d) => {
+        .filter((t) =>
+          t.days.some((d) => {
             if (!d.date) return false;
             return format(new Date(d.date), "yyyy-MM-dd") === dateStr;
-          });
-          return found ? [t] : [];
-        });
-
-      return [...weeklyList, ...others];
+          })
+        );
+      return [...w, ...others];
     };
 
     return (
-      <div className="p-4">
-        <h3 className="text-xl font-bold text-pink-600 mb-4">
+      <motion.div
+        key="weekView"
+        initial={{ opacity: 0, x: 30 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -30 }}
+        transition={{ duration: 0.3 }}
+        className="p-4"
+      >
+        <h3 className="text-xl font-bold mb-4">
           Week View ({format(daysInWeek[0], "dd MMM")} -{" "}
           {format(daysInWeek[6], "dd MMM")})
         </h3>
@@ -396,7 +328,7 @@ export default function TimeTableDash() {
             return (
               <div
                 key={day.toString()}
-                className="bg-white rounded shadow-sm p-2"
+                className="bg-white rounded shadow-sm p-2 min-h-[150px]"
               >
                 <h4 className="font-semibold border-b pb-1 mb-2 text-gray-600">
                   {format(day, "EEE dd")}
@@ -405,30 +337,32 @@ export default function TimeTableDash() {
                   <p className="text-xs text-gray-400">No Timetable</p>
                 ) : (
                   events.map((evt) => (
-                    <div
+                    <Card
                       key={evt._id}
-                      className="bg-gray-50 p-2 mb-2 rounded cursor-pointer border-l-4"
-                      style={{ borderColor: getColorByType(evt.type) }}
+                      className="mb-2 border-l-4 cursor-pointer"
+                      style={{ borderLeftColor: getColorByType(evt.type) }}
                       onClick={() => onEventClick(evt)}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm">{evt.name}</span>
+                        <span className="text-sm text-gray-800">
+                          {evt.name}
+                        </span>
                         <AiOutlineEdit className="text-gray-400" />
                       </div>
-                    </div>
+                    </Card>
                   ))
                 )}
               </div>
             );
           })}
         </div>
-      </div>
+      </motion.div>
     );
   };
 
-  // ----------------------------------------------------------------
-  // 12. DOUGHNUT CHART DATA
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 11) Doughnut Chart
+  // --------------------------------------------
   const chartData = {
     labels: ["Weekly", "Exam", "Event", "Others"],
     datasets: [
@@ -440,24 +374,50 @@ export default function TimeTableDash() {
           timetables.filter((t) => t.type === "others").length,
         ],
         backgroundColor: ["#FF99CC", "#29ABE2", "#77DD77", "#FFD700"],
-        hoverBackgroundColor: ["#FF80B3", "#19A0D9", "#44CF44", "#FFC300"],
+        borderColor: "#fff",
+        borderWidth: 4,
+        hoverOffset: 20,
       },
     ],
   };
+  const chartOptions = {
+    responsive: true,
+    cutout: "50%",
+    plugins: {
+      legend: {
+        position: "bottom",
+        labels: {
+          color: "#333",
+          font: {
+            size: 14,
+          },
+        },
+      },
+      tooltip: {
+        backgroundColor: "rgba(0,0,0,0.8)",
+        titleColor: "#fff",
+        bodyColor: "#fff",
+      },
+      datalabels: {
+        color: "#fff",
+        display: false,
+      },
+    },
+  };
 
-  // ----------------------------------------------------------------
-  // 13. RENDER
-  // ----------------------------------------------------------------
+  // --------------------------------------------
+  // 12) Render
+  // --------------------------------------------
   return (
-    <div className="w-full min-h-screen flex bg-gray-100">
+    <div className="w-full min-h-screen flex bg-gray-50">
       {/* MAIN SECTION */}
       <div className="flex-1 p-4">
         {/* HEADER */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-pink-600">
+          <h2 className="text-2xl font-bold text-gray-900">
             Timetable Calendar
           </h2>
-          <div className="space-x-2">
+          <div className="space-x-2 flex items-center">
             <Radio.Group
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
@@ -469,7 +429,7 @@ export default function TimeTableDash() {
             </Radio.Group>
             <Button
               type="primary"
-              style={{ backgroundColor: "#FF69B4", borderColor: "#FF69B4" }}
+              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
               onClick={() => openDrawer(null)}
             >
               + Add Timetable
@@ -477,354 +437,351 @@ export default function TimeTableDash() {
           </div>
         </div>
 
-        {/* BODY */}
-        {viewMode === "day" && (
-          <div>
-            <DayPicker
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-            />
-            {renderDayView()}
-          </div>
-        )}
-        {viewMode === "week" && (
-          <div>
-            <WeekPicker
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-            />
-            {renderWeekView()}
-          </div>
-        )}
-        {viewMode === "month" && (
-          <Calendar
-            value={dayjs(selectedDate)}
-            onSelect={(dayjsObj) => setSelectedDate(dayjsObj.toDate())}
-            dateCellRender={dateCellRender}
-            className="bg-white shadow-sm border rounded-lg"
-          />
+        {/* BODY with Skeleton for loading */}
+        {loadingFetch ? (
+          <Skeleton active paragraph={{ rows: 12 }} />
+        ) : (
+          <AnimatePresence mode="wait">
+            {viewMode === "day" && (
+              <>
+                <DayPicker
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
+                {renderDayView()}
+              </>
+            )}
+            {viewMode === "week" && (
+              <>
+                <WeekPicker
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                />
+                {renderWeekView()}
+              </>
+            )}
+            {viewMode === "month" && (
+              <motion.div
+                key="monthView"
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Calendar
+                  value={dayjs(selectedDate)}
+                  onSelect={(dayjsObj) => setSelectedDate(dayjsObj.toDate())}
+                  dateCellRender={dateCellRender}
+                  className="bg-white shadow-sm border rounded-lg px-2"
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
       </div>
 
       {/* RIGHT SIDEBAR (STATS) */}
       <div className="w-72 border-l p-4 bg-white flex flex-col justify-between">
-        <div>
-          <h3 className="text-lg font-semibold text-pink-700 mb-3">
-            Stats & Tasks
-          </h3>
-          {/* Quick Stats */}
-          <div className="space-y-2 mb-6">
-            <div className="bg-gray-100 rounded p-2 flex items-center justify-between">
-              <span className="text-gray-700">Lectures</span>
-              <Badge
-                count={timetables.filter((t) => t.type === "weekly").length}
-              />
+        {loadingFetch ? (
+          <Skeleton active title paragraph={{ rows: 4 }} />
+        ) : (
+          <>
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Stats & Tasks</h3>
+              <div className="space-y-2 mb-6">
+                <Card
+                  className="p-2"
+                  style={{ borderLeft: "6px solid #FF99CC" }}
+                >
+                  <span className="text-gray-700">Weekly Timetables</span>
+                  <Badge
+                    count={timetables.filter((t) => t.type === "weekly").length}
+                    style={{ backgroundColor: "#FF99CC", marginLeft: 8 }}
+                  />
+                </Card>
+                <Card
+                  className="p-2"
+                  style={{ borderLeft: "6px solid #29ABE2" }}
+                >
+                  <span className="text-gray-700">Exams</span>
+                  <Badge
+                    count={timetables.filter((t) => t.type === "exam").length}
+                    style={{ backgroundColor: "#29ABE2", marginLeft: 8 }}
+                  />
+                </Card>
+                <Card
+                  className="p-2"
+                  style={{ borderLeft: "6px solid #77DD77" }}
+                >
+                  <span className="text-gray-700">Events</span>
+                  <Badge
+                    count={timetables.filter((t) => t.type === "event").length}
+                    style={{ backgroundColor: "#77DD77", marginLeft: 8 }}
+                  />
+                </Card>
+                <Card
+                  className="p-2"
+                  style={{ borderLeft: "6px solid #FFD700" }}
+                >
+                  <span className="text-gray-700">Others</span>
+                  <Badge
+                    count={timetables.filter((t) => t.type === "others").length}
+                    style={{ backgroundColor: "#FFD700", marginLeft: 8 }}
+                  />
+                </Card>
+              </div>
+              <div className="border rounded p-4 mb-4">
+                <h4 className="font-semibold mb-2 text-center">
+                  Timetable Types
+                </h4>
+                <Doughnut data={chartData} options={chartOptions} />
+              </div>
             </div>
-            <div className="bg-gray-100 rounded p-2 flex items-center justify-between">
-              <span className="text-gray-700">Exams</span>
-              <Badge
-                count={timetables.filter((t) => t.type === "exam").length}
-              />
+            <div className="text-center text-gray-400 text-xs mt-4">
+              <p>&copy; 2025 Your LMS | Aman Dubey</p>
             </div>
-            <div className="bg-gray-100 rounded p-2 flex items-center justify-between">
-              <span className="text-gray-700">Events</span>
-              <Badge
-                count={timetables.filter((t) => t.type === "event").length}
-              />
-            </div>
-          </div>
-
-          {/* Doughnut Chart */}
-          <div className="bg-gray-100 rounded p-4 mb-4">
-            <h4 className="text-pink-600 font-semibold mb-2 text-center">
-              Timetable Types
-            </h4>
-            <Doughnut data={chartData} />
-          </div>
-
-          {/* Placeholder for daily goals */}
-          <div className="bg-gray-100 rounded p-4">
-            <h4 className="text-pink-600 font-semibold">Daily Goal</h4>
-            <p className="text-sm text-gray-500">30% Done</p>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center text-gray-400 text-xs mt-4">
-          <p>&copy; 2025 Your LMS</p>
-        </div>
+          </>
+        )}
       </div>
 
-      {/* CREATE/EDIT DRAWER */}
+      {/* CREATE/EDIT DRAWER FORM */}
       <Drawer
-        title={editingTimetable ? "Edit Timetable" : "Create Timetable"}
+        title={
+          <div className="flex items-center justify-between w-full">
+            <span className="text-xl font-semibold">
+              {editingTimetable ? "Edit Timetable" : "Create Timetable"}
+            </span>
+            <Button
+              type="text"
+              onClick={closeDrawer}
+              icon={<CloseOutlined style={{ fontSize: "16px" }} />}
+            />
+          </div>
+        }
         placement="right"
-        width={"100%"}
+        closable={false}
+        width={650}
         visible={drawerVisible}
         onClose={closeDrawer}
       >
-<Form layout="vertical" form={form} onFinish={onFinish}>
-  {/* Timetable Name */}
-  <Form.Item
-    label="Timetable Name"
-    name="name"
-    rules={[{ required: true, message: "Please enter a name" }]}
-  >
-    <Input placeholder="e.g. Midterm Exam Schedule" />
-  </Form.Item>
-
-  {/* Timetable Type */}
-  <Form.Item label="Type" name="type" rules={[{ required: true }]}>
-    <Select onChange={(val) => setFormType(val)}>
-      <Option value="weekly">Weekly</Option>
-      <Option value="exam">Exam</Option>
-      <Option value="event">Event</Option>
-      <Option value="others">Others</Option>
-    </Select>
-  </Form.Item>
-
-  {/* Validity Start & End Date */}
-  <Form.Item
-    label="Validity Period"
-    name="validity"
-    rules={[{ required: true, message: "Please select the date range" }]}
-  >
-    <RangePicker />
-  </Form.Item>
-
-  {/* Class Selection */}
-  <Form.Item label="Class" name="classId">
-    <Select placeholder="Select Class" allowClear>
-      {classes.map((cls) => (
-        <Option key={cls._id} value={cls._id}>
-          {cls.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-
-  {/* Section Selection */}
-  <Form.Item label="Section" name="sectionId">
-    <Select placeholder="Select Section" allowClear>
-      {sections.map((sec) => (
-        <Option key={sec._id} value={sec._id}>
-          {sec.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-
-  {/* Group Selection */}
-  <Form.Item label="Group" name="groupId">
-    <Select placeholder="Select Group" allowClear>
-      {groups.map((grp) => (
-        <Option key={grp._id} value={grp._id}>
-          {grp.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-
-  {/* Academic Year Selection */}
-  <Form.Item
-    label="Academic Year"
-    name="academicYear"
-    rules={[{ required: true, message: "Select an academic year" }]}
-  >
-    <Select>
-      {academicYears.map((year) => (
-        <Option key={year._id} value={year._id}>
-          {year.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-
-  {/* Semester Selection (Optional) */}
-  <Form.Item label="Semester" name="semesterId">
-    <Select placeholder="Select Semester" allowClear>
-      {semesters.map((sem) => (
-        <Option key={sem._id} value={sem._id}>
-          {sem.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-
-  {/* School Selection */}
-  <Form.Item
-    label="School"
-    name="schoolId"
-    rules={[{ required: true, message: "Select school" }]}
-  >
-    <Select>
-      {schools.map((school) => (
-        <Option key={school._id} value={school._id}>
-          {school.name}
-        </Option>
-      ))}
-    </Select>
-  </Form.Item>
-
-  {/* Timetable Slots (For Weekly, Exam, Events) */}
-  <Form.List name="days">
-    {(fields, { add, remove }) => (
-      <>
-        {fields.map(({ key, name, ...restField }) => (
-          <div key={key} className="border p-2 mb-2 rounded bg-gray-100">
-            {/* Day or Date Input Based on Type */}
-            {formType === "weekly" ? (
-              <Form.Item
-                {...restField}
-                name={[name, "day"]}
-                label="Day"
-                rules={[{ required: true, message: "Select a day" }]}
-              >
-                <Select placeholder="Select Day">
-                  <Option value="Monday">Monday</Option>
-                  <Option value="Tuesday">Tuesday</Option>
-                  <Option value="Wednesday">Wednesday</Option>
-                  <Option value="Thursday">Thursday</Option>
-                  <Option value="Friday">Friday</Option>
-                  <Option value="Saturday">Saturday</Option>
-                  <Option value="Sunday">Sunday</Option>
-                </Select>
-              </Form.Item>
-            ) : (
-              <Form.Item
-                {...restField}
-                name={[name, "date"]}
-                label="Date"
-                rules={[{ required: true, message: "Select a date" }]}
-              >
-                <DatePicker />
-              </Form.Item>
-            )}
-
-            {/* Time Slot (Start & End) */}
-            <Form.Item
-              {...restField}
-              name={[name, "slots"]}
-              label="Time Slots"
-            >
-              <Form.List name={[name, "slots"]}>
-                {(slotFields, { add: addSlot, remove: removeSlot }) => (
-                  <>
-                    {slotFields.map(({ key: slotKey, name: slotName, ...restSlot }) => (
-                      <div key={slotKey} className="flex items-center gap-2">
-                        <Form.Item
-                          {...restSlot}
-                          name={[slotName, "startTime"]}
-                          rules={[{ required: true, message: "Start time required" }]}
-                        >
-                          <Input placeholder="Start Time (HH:MM)" />
-                        </Form.Item>
-                        <Form.Item
-                          {...restSlot}
-                          name={[slotName, "endTime"]}
-                          rules={[{ required: true, message: "End time required" }]}
-                        >
-                          <Input placeholder="End Time (HH:MM)" />
-                        </Form.Item>
-
-                        {/* Subject or Event Name Based on Type */}
-                        {formType === "weekly" || formType === "exam" ? (
-                          <Form.Item
-                            {...restSlot}
-                            name={[slotName, "subjectId"]}
-                            rules={[{ required: true, message: "Subject required" }]}
-                          >
-                            <Select placeholder="Select Subject">
-                              {subjects.map((sub) => (
-                                <Option key={sub._id} value={sub._id}>
-                                  {sub.name}
-                                </Option>
-                              ))}
-                            </Select>
-                          </Form.Item>
-                        ) : (
-                          <Form.Item
-                            {...restSlot}
-                            name={[slotName, "eventName"]}
-                            rules={[{ required: true, message: "Event Name required" }]}
-                          >
-                            <Input placeholder="Event Name" />
-                          </Form.Item>
-                        )}
-
-                        <Button danger onClick={() => removeSlot(slotKey)}>Remove</Button>
-                      </div>
-                    ))}
-                    <Button type="dashed" onClick={() => addSlot()}>
-                      + Add Slot
-                    </Button>
-                  </>
-                )}
-              </Form.List>
-            </Form.Item>
-
-            <Button danger onClick={() => remove(name)}>Remove Day</Button>
-          </div>
-        ))}
-        <Button type="dashed" onClick={() => add()}>
-          + Add Day
-        </Button>
-      </>
-    )}
-  </Form.List>
-
-  <Button type="primary" htmlType="submit">Save Timetable</Button>
-</Form>
-
+        {drawerVisible && (
+          <motion.div
+            key="timetableForm"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <TimeTableForm
+              editingTimetable={editingTimetable}
+              onSubmit={handleFormSubmit}
+              onClose={closeDrawer}
+            />
+          </motion.div>
+        )}
       </Drawer>
 
       {/* TIMETABLE DETAILS DRAWER */}
       <Drawer
-        title="Timetable Details"
+        title={
+          <div className="flex items-center justify-between w-full">
+            <span className="text-xl font-bold">Timetable Details</span>
+            <Button
+              type="text"
+              onClick={closeDetailsDrawer}
+              icon={<CloseOutlined style={{ fontSize: "16px" }} />}
+            />
+          </div>
+        }
         placement="right"
-        width={320}
+        width={650}
+        closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
       >
-        {detailsTimetable && (
-          <>
-            <div className="mb-4">
-              <h4 className="font-semibold">Name:</h4>
-              <p>{detailsTimetable.name}</p>
-            </div>
-            <div className="mb-4">
-              <h4 className="font-semibold">Type:</h4>
-              <p>{detailsTimetable.type}</p>
-            </div>
-            <div className="mb-4">
-              <h4 className="font-semibold">Validity:</h4>
-              <p>
-                {detailsTimetable.validity.startDate} -{" "}
-                {detailsTimetable.validity.endDate}
-              </p>
-            </div>
-            <div className="flex space-x-2 mt-4">
-              <Button
-                type="default"
-                icon={<AiOutlineEdit />}
-                style={{ borderColor: "#FF69B4", color: "#FF69B4" }}
-                onClick={() => {
-                  closeDetailsDrawer();
-                  openDrawer(detailsTimetable);
-                }}
-              >
-                Edit
-              </Button>
-              <Button
-                danger
-                icon={<AiOutlineDelete />}
-                onClick={() => onDeleteClick(detailsTimetable)}
-              >
-                Delete
-              </Button>
-            </div>
-          </>
-        )}
+        <AnimatePresence>
+          {detailsTimetable && (
+            <motion.div
+              key="detailsDrawer"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              className="space-y-4"
+            >
+              {/* Top: Timetable Name, Type Icon, & Badge */}
+              <div className="flex flex-col space-y-1">
+                <h4 className="font-bold text-lg text-gray-900">
+                  {detailsTimetable.name || "Untitled Timetable"}
+                </h4>
+                <div className="flex items-center space-x-2">
+                  {getIconForType(detailsTimetable.type)}
+                  <Badge
+                    text={detailsTimetable.type?.toUpperCase() || "UNKNOWN"}
+                    style={{
+                      backgroundColor: getColorByType(detailsTimetable.type),
+                      color: "#fff",
+                      fontWeight: "bold",
+                      fontSize: "0.85rem",
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Display Class, Section, Group in tags */}
+              <div>
+                <h5 className="text-gray-600 text-sm">This Timetable For:</h5>
+                <div className="mt-1 space-x-1">
+                  {detailsTimetable.classId && (
+                    <Tag color="blue">
+                      {detailsTimetable.classId.className || "No Class Name"}
+                    </Tag>
+                  )}
+                  {detailsTimetable.sectionId && (
+                    <Tag color="purple">
+                      {detailsTimetable.sectionId.sectionName ||
+                        "No Section Name"}
+                    </Tag>
+                  )}
+                  {detailsTimetable.groupId && (
+                    <Tag color="cyan">
+                      {detailsTimetable.groupId.groupName || "No Group Name"}
+                    </Tag>
+                  )}
+                </div>
+              </div>
+
+              {/* Status Tag */}
+              <div>
+                <h5 className="text-gray-600 text-sm">Status:</h5>
+                <Tag
+                  color={detailsTimetable.status === "active" ? "green" : "red"}
+                  className="mt-1"
+                >
+                  {detailsTimetable.status || "inactive"}
+                </Tag>
+              </div>
+
+              {/* Semester */}
+              <div>
+                <h5 className="text-gray-600 text-sm">Semester:</h5>
+                <p className="text-sm text-gray-800">
+                  {detailsTimetable.semesterId?.title || "No Semester"}
+                </p>
+              </div>
+
+              {/* "Available From" & "Due Date" style */}
+              <div className="flex items-center space-x-2">
+                <Card className="flex-1 border p-2 rounded">
+                  <p className="text-sm text-gray-500">Available From :</p>
+                  <p className="text-sm text-gray-800 font-semibold">
+                    {detailsTimetable.validity?.startDate
+                      ? format(
+                          new Date(detailsTimetable.validity.startDate),
+                          "M/d/yyyy"
+                        )
+                      : "N/A"}
+                  </p>
+                </Card>
+                <Card className="flex-1 border p-2 rounded">
+                  <p className="text-sm text-gray-500">Due Date :</p>
+                  <p className="text-sm text-gray-800 font-semibold">
+                    {detailsTimetable.validity?.endDate
+                      ? format(
+                          new Date(detailsTimetable.validity.endDate),
+                          "M/d/yyyy"
+                        )
+                      : "No End Date"}
+                  </p>
+                </Card>
+              </div>
+
+              {/* Days & Slots */}
+              {detailsTimetable.days && detailsTimetable.days.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-gray-800 mt-4">Schedule:</h5>
+                  {detailsTimetable.days.map((dayItem) => (
+                    <div key={dayItem._id} className="mb-3 border p-2 rounded">
+                      {dayItem.date ? (
+                        <p className="text-sm text-gray-700 font-semibold">
+                          {format(new Date(dayItem.date), "dd MMM yyyy")}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-700 font-semibold">
+                          {dayItem.day || "Day Not Specified"}
+                        </p>
+                      )}
+                      {dayItem.slots && dayItem.slots.length > 0 ? (
+                        dayItem.slots.map((slot) => (
+                          <Card
+                            key={slot._id}
+                            size="small"
+                            className="mb-2"
+                            bodyStyle={{ padding: "8px" }}
+                          >
+                            <div className="flex justify-between items-center">
+                              <div>
+                                <p className="text-xs text-gray-600">
+                                  {dayjs(slot.startTime).format("HH:mm")} -{" "}
+                                  {dayjs(slot.endTime).format("HH:mm")}
+                                </p>
+                                {slot.subjectId ? (
+                                  <Tooltip
+                                    title={slot.subjectId.name || "No Subject"}
+                                  >
+                                    <p className="text-xs font-semibold text-gray-800">
+                                      {slot.subjectId.name || "No Subject"}
+                                    </p>
+                                  </Tooltip>
+                                ) : (
+                                  <p className="text-xs font-semibold text-gray-800">
+                                    {slot.eventName || "No Event Name"}
+                                  </p>
+                                )}
+                              </div>
+                              {slot.description && (
+                                <Tooltip title={slot.description}>
+                                  <span className="text-[10px] text-gray-500">
+                                    Info
+                                  </span>
+                                </Tooltip>
+                              )}
+                            </div>
+                          </Card>
+                        ))
+                      ) : (
+                        <p className="text-xs text-gray-500">
+                          No slots available.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex space-x-2 mt-4">
+                <Button
+                  type="default"
+                  icon={<AiOutlineEdit />}
+                  style={{ borderColor: "#FF69B4", color: "#FF69B4" }}
+                  onClick={() => {
+                    closeDetailsDrawer();
+                    openDrawer(detailsTimetable);
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  danger
+                  icon={<AiOutlineDelete />}
+                  onClick={() => onDeleteClick(detailsTimetable)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Drawer>
 
       {/* DELETE CONFIRMATION MODAL */}
@@ -843,19 +800,22 @@ export default function TimeTableDash() {
 }
 
 // --------------------------------------------------------------------
-// HELPER COMPONENTS
+// HELPER COMPONENTS: DayPicker & WeekPicker
 // --------------------------------------------------------------------
 function DayPicker({ selectedDate, setSelectedDate }) {
-  // Provide a mini date picker for user to select a day
   return (
     <div className="mb-2 flex items-center space-x-2">
       <span className="text-gray-600">Select Day:</span>
-      <DatePicker
-        value={dayjs(selectedDate)}
-        onChange={(val) => {
-          if (val) setSelectedDate(val.toDate());
+      <input
+        type="date"
+        className="border rounded px-2 py-1"
+        value={format(selectedDate, "yyyy-MM-dd")}
+        onChange={(e) => {
+          const newDate = e.target.value
+            ? new Date(e.target.value)
+            : new Date();
+          setSelectedDate(newDate);
         }}
-        placeholder="Pick a day"
       />
       <Button onClick={() => setSelectedDate(new Date())}>Today</Button>
     </div>
@@ -863,33 +823,21 @@ function DayPicker({ selectedDate, setSelectedDate }) {
 }
 
 function WeekPicker({ selectedDate, setSelectedDate }) {
-  // Provide a mini date picker to select any date within the desired week
   return (
     <div className="mb-2 flex items-center space-x-2">
       <span className="text-gray-600">Select Week:</span>
-      <DatePicker
-        value={dayjs(selectedDate)}
-        onChange={(val) => {
-          if (val) setSelectedDate(val.toDate());
+      <input
+        type="date"
+        className="border rounded px-2 py-1"
+        value={format(selectedDate, "yyyy-MM-dd")}
+        onChange={(e) => {
+          const newDate = e.target.value
+            ? new Date(e.target.value)
+            : new Date();
+          setSelectedDate(newDate);
         }}
-        placeholder={`Week of ${format(selectedDate, "dd MMM yyyy")}`}
       />
       <Button onClick={() => setSelectedDate(new Date())}>This Week</Button>
     </div>
   );
-}
-
-function getColorByType(type) {
-  switch (type) {
-    case "weekly":
-      return "#FF99CC"; // pinkish
-    case "exam":
-      return "#29ABE2"; // blue
-    case "event":
-      return "#77DD77"; // green
-    case "others":
-      return "#FFD700"; // gold
-    default:
-      return "#D3D3D3"; // default gray
-  }
 }

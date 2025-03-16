@@ -8,7 +8,7 @@ import { PERMISSIONS } from "../../../../config/permission";
 import { FaBook } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Select, Skeleton, Input, Tooltip } from "antd";
-import { FiCalendar, FiAlertCircle, FiRefreshCcw } from "react-icons/fi";
+import { FiRefreshCcw } from "react-icons/fi";
 
 const { Option } = Select;
 const { Search } = Input;
