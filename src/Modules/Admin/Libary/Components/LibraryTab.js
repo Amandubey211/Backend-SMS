@@ -1,8 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Skeleton, Pagination, Select, Tooltip, Modal, Button } from "antd";
+import {
+  Skeleton,
+  Pagination,
+  Select,
+  Tooltip,
+  Modal,
+  Button,
+  Badge,
+} from "antd";
 import { FaBookOpen } from "react-icons/fa";
-import { FiEdit2, FiTrash2, FiEye } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiEye, FiRefreshCcw } from "react-icons/fi";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../config/permission";
 import BookCard from "../Components/BookCard";
@@ -85,6 +93,12 @@ const LibraryTab = () => {
     dispatch(setFilters({ key: "class", value }));
   };
 
+  // Reset filters: clear class filter and selected category
+  const resetFilters = () => {
+    dispatch(setFilters({ key: "class", value: "" }));
+    setSelectedCategory(null);
+  };
+
   // Category selection (filtering books)
   const handleCategoryChange = (catId) => {
     setSelectedCategory(catId);
@@ -118,7 +132,20 @@ const LibraryTab = () => {
   };
   const pageSize = totalPages > 0 ? Math.ceil(totalBooks / totalPages) : 0;
 
-  // Filter books
+  // Helper to get count of books per category based on the class filter
+  const getBookCount = useCallback(
+    (catId) => {
+      if (!books) return 0;
+      return books.filter((book) => {
+        if (filters?.class && book.classId !== filters.class) return false;
+        if (!catId) return true;
+        return book.categories?.some((cat) => cat._id === catId);
+      }).length;
+    },
+    [books, filters]
+  );
+
+  // Filtered books for listing
   const filteredBooks = books?.filter((book) => {
     const selClass = filters?.class || "";
     if (selClass && book.classId !== selClass) return false;
@@ -127,65 +154,55 @@ const LibraryTab = () => {
   });
 
   // Category badge classes
-  // More padding => "px-5 py-2.5"
-  // Slightly bigger max-w => "max-w-[140px]"
   const getBubbleClasses = (catId) => {
     const base =
-      "relative px-5 py-2.5 rounded-full max-w-[140px] truncate text-sm";
+      "relative px-4 py-2 rounded-full max-w-[120px] truncate text-sm";
     return catId === selectedCategory
       ? `${base} bg-gradient-to-r from-pink-500 to-purple-500 text-white`
       : `${base} border border-gray-300 hover:border-pink-400 hover:bg-gray-100`;
   };
 
+  // Pastel purple background & darker purple text for the badge count
+  const badgeStyle = {
+    backgroundColor: "#E1BEE7", // pastel purple
+    color: "#8E24AA", // darker purple text
+    fontSize: "0.75rem",
+    fontWeight: "bold",
+  };
+
   return (
     <div className="w-full">
-      {/* TOP ROW */}
-      <div className="flex items-center w-full gap-2">
-        {/* LEFT: Class Select + All Books */}
-        <div className="flex-shrink-0 flex items-center gap-2 pt-2">
-          <Select
-            value={filters.class || ""}
-            onChange={handleClassSelect}
-            placeholder={t("All Classes")}
-            style={{ width: 160 }}
-            allowClear
-          >
-            <Option value="">{t("All Classes")}</Option>
-            {classes?.map((c) => (
-              <Option key={c?._id} value={c?._id}>
-                {c?.className}
-              </Option>
-            ))}
-          </Select>
-          <button
-            className={getBubbleClasses(null)}
-            onClick={() => handleCategoryChange(null)}
-          >
-            {t("All Books")}
-          </button>
-        </div>
-
-        {/* MIDDLE: Category badges in a scroll container */}
+      {/* TOP ROW: Categories on left; Filter controls on right */}
+      <div className="flex items-center justify-between w-full gap-2">
+        {/* Left: Category badges in a scroll container */}
         <div className="flex-1 relative">
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap pt-2 pr-6">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap pr-6 pt-3">
+            <Badge count={getBookCount(null)} showZero style={badgeStyle}>
+              <button
+                className={getBubbleClasses(null)}
+                onClick={() => handleCategoryChange(null)}
+              >
+                {t("All Books")}
+              </button>
+            </Badge>
             {categories?.map((cat) => (
               <div key={cat._id} className="relative group inline-block">
-                {/* The category badge */}
-                <button
-                  className={getBubbleClasses(cat._id)}
-                  onClick={() => handleCategoryChange(cat._id)}
+                <Badge
+                  count={getBookCount(cat._id)}
+                  showZero
+                  style={badgeStyle}
                 >
-                  <Tooltip title={cat.name}>
-                    <span>{cat.name}</span>
-                  </Tooltip>
-                </button>
-
-                {/* Icon container: placed absolutely outside the top-right corner */}
-                {role !== "teacher" && (
-                  <div
-                    className="absolute top-0 right-0 flex items-center space-x-2 p-2 bg-white rounded-full shadow text-pink-600 opacity-0 group-hover:opacity-100 transition
-                      transform translate-x-1/2 -translate-y-1/2 overflow-visible z-40 border"
+                  <button
+                    className={getBubbleClasses(cat._id)}
+                    onClick={() => handleCategoryChange(cat._id)}
                   >
+                    <Tooltip title={cat.name}>
+                      <span>{cat.name}</span>
+                    </Tooltip>
+                  </button>
+                </Badge>
+                {role !== "teacher" && (
+                  <div className="absolute top-0 right-0 flex items-center space-x-2 p-2 bg-white rounded-full shadow text-pink-600 opacity-0 group-hover:opacity-100 transition transform translate-x-1/2 -translate-y-1/2 overflow-visible z-40 border">
                     <Tooltip title={t("View Category")}>
                       <FiEye
                         className="hover:text-green-500 cursor-pointer"
@@ -237,16 +254,32 @@ const LibraryTab = () => {
           <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent" />
         </div>
 
-        {/* RIGHT: Add Book */}
-        <div className="flex-shrink-0 pt-2">
-          <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK}>
-            <button
-              onClick={openBookSidebar}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 text-white p-3 rounded-full hover:from-pink-600 hover:to-purple-600 text-sm"
+        {/* Right: Class select filter and Reset button */}
+        <div className="flex-shrink-0 flex items-center gap-2">
+          <Select
+            value={filters.class || ""}
+            onChange={handleClassSelect}
+            placeholder={t("All Classes")}
+            style={{ width: 160 }}
+            className="rounded-full"
+            size="large"
+            allowClear
+          >
+            <Option value="">{t("All Classes")}</Option>
+            {classes?.map((c) => (
+              <Option key={c?._id} value={c?._id}>
+                {c?.className}
+              </Option>
+            ))}
+          </Select>
+          <Tooltip title={t("Reset Filters")}>
+            <Button
+              onClick={resetFilters}
+              className="focus:outline-none rounded-full h-12 w-12"
             >
-              + {t("Add Book")}
-            </button>
-          </ProtectedAction>
+              <FiRefreshCcw className="hover:animate-spin" size={20} />
+            </Button>
+          </Tooltip>
         </div>
       </div>
 

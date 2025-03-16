@@ -83,6 +83,14 @@ const BookForm = ({ book, onClose }) => {
     }
   };
 
+  // New: Handle removing the selected image
+  const handleRemoveImage = () => {
+    setBookData((prev) => ({ ...prev, bookImage: null }));
+    setImagePreview(null);
+    // Force re-mounting the ImageUpload component to clear file selection
+    setImageKey(Date.now());
+  };
+
   const validateForm = () => {
     const newErrors = {};
     if (!bookData.bookName) newErrors.bookName = t("Book name is required.");
@@ -136,6 +144,7 @@ const BookForm = ({ book, onClose }) => {
           key={imageKey}
           imagePreview={imagePreview}
           handleImageChange={handleImageChange}
+          handleRemoveImage={handleRemoveImage}
         />
         <div className="px-5 mb-4">
           <FormInput
@@ -245,6 +254,7 @@ const BookForm = ({ book, onClose }) => {
         <button
           type="submit"
           className="w-full p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md text-base"
+          disabled={loading}
         >
           {book ? t("Edit Book") : loading ? t("Adding...") : t("Add Book")}
         </button>

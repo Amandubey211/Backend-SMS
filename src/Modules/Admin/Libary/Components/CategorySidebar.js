@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Input } from "antd";
 import { useDispatch } from "react-redux";
 import {
@@ -7,7 +7,7 @@ import {
   deleteCategoryThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { useTranslation } from "react-i18next";
-import { FiTrash2 } from "react-icons/fi";
+import { FiTrash2, FiLoader, FiTag, FiAlignLeft } from "react-icons/fi";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 
 const CategorySidebar = ({
@@ -42,6 +42,24 @@ const CategorySidebar = ({
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
+
+  // Keyboard handler to close the sidebar when Escape is pressed
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    },
+    [onClose]
+  );
+
+  // Attach keyboard event listener when sidebar is open
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+      return () => document.removeEventListener("keydown", handleKeyDown);
+    }
+  }, [isOpen, handleKeyDown]);
 
   // Submit logic
   const handleSubmit = async (e) => {
@@ -89,17 +107,19 @@ const CategorySidebar = ({
     <>
       {/* Sidebar Overlay and Container */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t("Category Sidebar Modal")}
+        tabIndex={-1}
         className={`fixed inset-0 z-50 transition-opacity ${
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
-        aria-labelledby="sidebar-title"
-        aria-modal="true"
-        role="dialog"
       >
         {/* Blurred overlay */}
         <div
           className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"
           onClick={onClose}
+          aria-hidden="true"
         />
         <div
           className={`absolute right-0 top-0 h-full w-[400px] bg-white shadow-xl transform transition-transform flex flex-col ${
@@ -124,7 +144,7 @@ const CategorySidebar = ({
               <button
                 onClick={onClose}
                 className="text-gray-600 hover:text-gray-800"
-                aria-label={t("Close")}
+                aria-label={t("Close Sidebar")}
               >
                 X
               </button>
@@ -132,25 +152,40 @@ const CategorySidebar = ({
           </div>
 
           {/* Form */}
-          <form className="p-4 flex flex-col h-full" onSubmit={handleSubmit}>
+          <form
+            role="form"
+            className="p-4 flex flex-col h-full"
+            onSubmit={handleSubmit}
+          >
             <div className="p-4 flex-1 overflow-auto space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="categoryName"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  <FiTag className="inline mr-1" />
                   {t("Name")}
                 </label>
                 <Input
+                  id="categoryName"
                   name="name"
                   placeholder={t("Enter category name")}
                   value={formData.name}
                   onChange={handleChange}
                   size="large"
+                  aria-required="true"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label
+                  htmlFor="categoryDescription"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  <FiAlignLeft className="inline mr-1" />
                   {t("Description")}
                 </label>
                 <Input.TextArea
+                  id="categoryDescription"
                   name="description"
                   placeholder={t("Enter description (optional)")}
                   value={formData.description}
@@ -165,8 +200,15 @@ const CategorySidebar = ({
             <div className="sticky bottom-0 w-full bg-white p-4 border-t">
               <button
                 type="submit"
-                className="w-full p-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-base hover:from-pink-600 hover:to-purple-600 transition"
+                disabled={loading}
+                aria-busy={loading}
+                className={`w-full p-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-base hover:from-pink-600 hover:to-purple-600 transition ${
+                  loading ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
+                {loading && (
+                  <FiLoader className="animate-spin inline-block mr-2" />
+                )}
                 {categoryToEdit ? t("Update Category") : t("Add Category")}
               </button>
             </div>
