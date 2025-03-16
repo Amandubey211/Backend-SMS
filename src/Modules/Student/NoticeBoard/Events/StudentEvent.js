@@ -1,12 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Calendar } from "antd";
-import "../Events/customCalendar.css";
-import Layout from "../../../../Components/Common/Layout";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
 import { format, parse, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+
+import Layout from "../../../../Components/Common/Layout";
+import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ViewEvent from "./ViewEvent";
+import EventCard from "./EventCard";
+import Sidebar from "./Sidebar";
+import OfflineModal from "../../../../Components/Common/Offline";
+import Spinner from "../../../../Components/Common/Spinner";
+import NoEventFound from "../../../../Assets/StudentAssets/no-event-found.avif";
+
 import { stdEvent } from "../../../../Store/Slices/Student/Noticeboard/events.action";
 import {
   setFilteredEvents,
@@ -14,15 +22,9 @@ import {
   setSidebarContent,
   setSidebarOpen,
 } from "../../../../Store/Slices/Student/Noticeboard/eventsSlice";
-import ViewEvent from "./ViewEvent";
-import EventCard from "./EventCard";
-import Sidebar from "./Sidebar";
-import { useTranslation } from "react-i18next";
-import { gt } from "../../../../Utils/translator/translation";
-import OfflineModal from "../../../../Components/Common/Offline";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
-import Spinner from "../../../../Components/Common/Spinner";
-import NoEventFound from "../../../../Assets/StudentAssets/no-event-found.avif";
+import { gt } from "../../../../Utils/translator/translation";
+import "../Events/customCalendar.css";
 
 const StudentEvent = () => {
   const {
@@ -36,16 +38,21 @@ const StudentEvent = () => {
     error,
   } = useSelector((store) => store.student.studentEvent);
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  // Set the initial selected month and year using currentDate
   const [selectedMonthYear, setSelectedMonthYear] = useState({
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
 
+  // Single state variable for pagination
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 4;
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+  // Define colors for rendering events on the calendar date cells
   const bgColors = [
     "bg-pink-500",
     "bg-purple-500",
@@ -53,40 +60,47 @@ const StudentEvent = () => {
     "bg-indigo-500",
   ];
 
+  // Set the navigation heading
   useNavHeading("Event");
 
+  // Function to dismiss error alerts
   const handleDismiss = () => {
     dispatch(setShowError(false));
   };
 
+  // Fetch events when component mounts
   useEffect(() => {
     dispatch(stdEvent());
   }, [dispatch]);
 
+  // Filter and sort events whenever the selected month/year or event data changes
   useEffect(() => {
     filterAndSortEvents(eventData, selectedMonthYear);
+    setCurrentPage(0); // Reset pagination when filtering events
   }, [selectedMonthYear, eventData]);
 
   const filterAndSortEvents = (eventData, selectedMonthYear) => {
     const filtered = eventData?.filter((event) => {
       const eventDate = new Date(event.startDate);
       return (
-        eventDate.getMonth() === selectedMonthYear?.month &&
-        eventDate?.getFullYear() === selectedMonthYear.year
+        eventDate.getMonth() === selectedMonthYear.month &&
+        eventDate.getFullYear() === selectedMonthYear.year
       );
     });
 
     const sorted = filtered?.sort(
       (a, b) => new Date(a.startDate) - new Date(b.startDate)
     );
+
     dispatch(setFilteredEvents(sorted));
-    setCurrentIndex(0); // Reset currentIndex when month changes
   };
 
+  // Render events on calendar date cells
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
     const dayEvents = filteredEvents?.filter(
-      (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
+      (event) =>
+        format(new Date(event?.startDate), "yyyy-MM-dd") === formattedDate
     );
 
     return (
@@ -94,7 +108,7 @@ const StudentEvent = () => {
         {dayEvents?.map((event, index) => {
           let eventTime = event?.time
             ? parse(event?.time, "hh:mm a", new Date())
-            : event?.startDate;
+            : new Date(event?.startDate);
 
           if (!isValid(eventTime)) {
             eventTime = parse(event?.time, "HH:mm", new Date());
@@ -108,7 +122,7 @@ const StudentEvent = () => {
             <li
               key={event?.id}
               className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors?.length]
+                bgColors[index % bgColors.length]
               } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
@@ -120,12 +134,14 @@ const StudentEvent = () => {
     );
   };
 
+  // Handle clicking on an event card or calendar item
   const handleStickerClick = (event) => {
     dispatch(setSelectedEvent(event));
     dispatch(setSidebarContent("viewEvent"));
     dispatch(setSidebarOpen(true));
   };
 
+  // Render the sidebar content based on the selected action
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewEvent":
@@ -135,22 +151,27 @@ const StudentEvent = () => {
     }
   };
 
+  // Close the sidebar view
   const handleSidebarView = () => {
     dispatch(setSidebarOpen(false));
   };
 
-  const paginatedEvents = filteredEvents.slice(currentIndex, currentIndex + 4); // Use filteredEvents
+  // Get paginated events based on currentPage
+  const paginatedEvents = filteredEvents?.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
+  // Handle pagination navigation
   const handlePrev = () => {
-    if (currentIndex - 4 >= 0) {
-      setCurrentIndex((prev) => prev - 4);
+    if (currentPage > 0) {
+      setCurrentPage((prev) => prev - 1);
     }
   };
 
   const handleNext = () => {
-    if (currentIndex + 4 < filteredEvents.length) {
-      // Use filteredEvents length
-      setCurrentIndex((prev) => prev + 4);
+    if (currentPage + 1 < totalPages) {
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
@@ -159,69 +180,57 @@ const StudentEvent = () => {
       <Layout title="Events">
         <StudentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50 w-full">
-            <div className="my-4 w-full h-auto flex items-baseline relative">
-              {currentIndex > 0 && (
-                <button
-                  className="p-1 border rounded-full hover:bg-gray-700 hover:text-white absolute left-[-10px] top-1/2 transform -translate-y-1/2 text-gray-500 bg-gray-100 shadow-md transition-all z-10"
-                  onClick={handlePrev}
-                >
-                  <IoIosArrowBack size={20} />
-                </button>
-              )}
-              {loading && !error ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500 ">
-                  <Spinner />
-                </div>
-              ) : paginatedEvents?.length > 0 ? (
-                <div className="grid grid-cols-4 gap-4">
-                  {paginatedEvents.map((event, index) => (
-                    <EventCard
-                      key={event.id}
-                      event={event}
-                      color={bgColors[index % bgColors.length]}
-                      onClick={handleStickerClick}
-                      className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
-                  <img
-                    src={NoEventFound}
-                    className="h-[200px] w-[300px]"
-                    alt="event"
-                  ></img>
-                  {/* <IoCalendarOutline className="text-6xl" /> */}
-                  <span>{t("No Events in this Month", gt.stdEvents)}</span>
-                </div>
-              )}
+            {/* Events display */}
+            <div className="relative flex items-center justify-center">
+              <button
+                className={`absolute left-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                  currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+                onClick={handlePrev}
+                disabled={currentPage === 0}
+              >
+                <IoIosArrowBack size={24} className="text-purple-500" />
+              </button>
 
-              {currentIndex + 4 < filteredEvents.length && (
-                <button
-                  className="p-1 border rounded-full hover:bg-gray-700 hover:text-white absolute right-[-10px] top-1/2 transform -translate-y-1/2 p text-gray-500 bg-gray-100 shadow-md transition-all z-10"
-                  onClick={handleNext}
-                >
-                  <IoIosArrowForward size={20} />
-                </button>
-              )}
+              <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide">
+                {paginatedEvents.map((event, index) => (
+                  <EventCard
+                    key={event.id}
+                    event={event}
+                    color={bgColors[index % bgColors.length]}
+                    onClick={() => handleStickerClick(event)}
+                    className="min-w-72 transform transition duration-300 ease-in-out hover:scale-110 hover:shadow-2xl rounded-lg"
+                  />
+                ))}
+              </div>
+
+              <button
+                className={`absolute right-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                  currentPage + 1 >= totalPages
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
+                onClick={handleNext}
+                disabled={currentPage + 1 >= totalPages}
+              >
+                <IoIosArrowForward size={24} className="text-purple-500" />
+              </button>
             </div>
 
             <hr className="border-t-1 mt-12" />
+
+            {/* Calendar display */}
             <div className="w-full px-2">
               <Calendar
                 dateCellRender={handleDateCellRender}
-                headerRender={({ value, type, onChange, onTypeChange }) => {
+                headerRender={({ value, onChange }) => {
                   const StartAcademicYear = 2015;
                   const lastAcademicYear = 2050;
-
-                  const start = 0;
-                  const end = 12;
                   const monthOptions = [];
-
                   const localeData = value.localeData();
                   const months = localeData.monthsShort();
 
-                  for (let index = start; index < end; index++) {
+                  for (let index = 0; index < 12; index++) {
                     monthOptions.push(
                       <option key={index} value={index}>
                         {t(months[index], gt.month)}
@@ -230,7 +239,6 @@ const StudentEvent = () => {
                   }
 
                   const year = value.year();
-                  const month = value.month();
                   const options = [];
                   for (let i = StartAcademicYear; i <= lastAcademicYear; i++) {
                     options.push(
@@ -242,8 +250,8 @@ const StudentEvent = () => {
                   return (
                     <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
                       <select
-                        className="border rounded  bg-pink-100  px-3 py-2 text-pink-800 font-medium  "
-                        value={month}
+                        className="border rounded bg-pink-100 px-3 py-2 text-pink-800 font-medium"
+                        value={value.month()}
                         onChange={(event) => {
                           const newMonth = parseInt(event.target.value, 10);
                           const now = value.clone().month(newMonth);
@@ -276,6 +284,8 @@ const StudentEvent = () => {
                 }}
               />
             </div>
+
+            {/* Sidebar for event details */}
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={handleSidebarView}
@@ -285,6 +295,7 @@ const StudentEvent = () => {
               {renderSidebarContent()}
             </Sidebar>
           </div>
+
           {!loading && showError && (
             <OfflineModal error={error} onDismiss={handleDismiss} />
           )}

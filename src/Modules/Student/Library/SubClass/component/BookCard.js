@@ -54,24 +54,24 @@ const BookCard = ({
             {name}
           </span>
         </h2>
-        <p className="capitalize text-sm font-medium text-pink-700 flex items-center gap-1 mt-1">
+        <p className="capitalize text-sm font-medium text-pink-700 flex items-center gap-2 mt-1">
           <BiUser className="text-gray-500" size={15} /> {author}
         </p>
 
         <div className="flex items-center gap-2 text-sm text-gray-600">
           <BiCategoryAlt className="text-gray-500" />
           <span>
-            {t("Category", gt.stdLibrary)}:{" "}
+            {t("Category", gt.stdLibrary)} :{" "}
             <span className="font-semibold text-gray-800 capitalize">
               {category}
             </span>
           </span>
         </div>
 
-        <div className="flex items-center gap-3 text-sm text-gray-600">
+        <div className="flex items-center gap-2 text-sm text-gray-600">
           <BiBook className="text-gray-500" />
           <span>
-            {t("Available", gt.stdLibrary)}:{" "}
+            {t("Available", gt.stdLibrary)}  :{" "}
             <span
               className={`font-semibold ${
                 availableCopies > 0 ? "text-green-600" : "text-red-600"

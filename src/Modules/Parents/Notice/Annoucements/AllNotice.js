@@ -120,17 +120,16 @@ const AllNotice = () => {
                 </select>
               </div>
               <div>
-              <label className="block text-sm text-gray-600">
+                <label className="block text-sm text-gray-600">
                   {t("Hard Reset")}
                 </label>
                 <button
-                onClick={handleResetAll}
-                className="px-3 py-1 border rounded text-sm text-gray-600"
-              >
-                {t("Reset All")}
-              </button>
+                  onClick={handleResetAll}
+                  className="px-3 py-1 border rounded text-sm text-gray-600"
+                >
+                  {t("Reset All")}
+                </button>
               </div>
-             
             </div>
           </div>
 
@@ -146,7 +145,7 @@ const AllNotice = () => {
                 </p>
               </div>
             ) : notices?.length > 0 ? (
-              notices.map((notice, index) => (
+              notices?.map((notice, index) => (
                 <div key={notice?.id || index} className="border-t">
                   <div
                     className="cursor-pointer p-2 flex flex-col bg-white"
@@ -175,13 +174,24 @@ const AllNotice = () => {
                           </span>
                         </h2>
                         <div className="flex items-center text-xs">
+                          <span className="inline-block mr-2 px-2 py-1 bg-indigo-100 text-indigo-600 rounded-full">
+                            From :
+                          </span>
+                          <IoCalendarOutline className="text-gray-400" />
+                          <span className="ml-2 text-sm text-gray-500 mr-4">
+                            {formatDate(notice?.startDate)}
+                          </span>
+                          <span className="inline-block mr-2 px-2 py-1 bg-purple-100 text-purple-600 rounded-full">
+                            To :
+                          </span>
                           <IoCalendarOutline className="text-gray-400" />
                           <span className="ml-2 text-sm text-gray-500">
-                            {formatDate(notice?.startDate)}
+                            {formatDate(notice?.endDate)}
                           </span>
                           <div
                             className={`ml-3 px-3 py-1 text-xs rounded-md border ${
-                              notice?.priority?.toLowerCase() === "high priority"
+                              notice?.priority?.toLowerCase() ===
+                              "high priority"
                                 ? "border-pink-500 text-pink-600 bg-pink-100/30 shadow-sm"
                                 : "border-gray-400 text-gray-600 bg-gray-100/30 shadow-sm"
                             }`}
@@ -203,7 +213,10 @@ const AllNotice = () => {
 
                     {/* Description */}
                     {activeIndex === index && (
-                      <div className="p-4 text-sm text-gray-700">
+                      <div
+                        className="p-4 text-sm text-gray-700"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <pre className="whitespace-pre-wrap font-sans">
                           {notice?.description || t("No description available")}
                         </pre>
@@ -216,7 +229,11 @@ const AllNotice = () => {
               <div className="flex flex-col items-center justify-center h-full">
                 <img
                   src={CalendarIcon}
-                  style={{ width: "40px", height: "40px", marginBottom: "10px" }}
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                    marginBottom: "10px",
+                  }}
                   alt="calendar"
                 />
                 <p className="text-gray-600 text-lg">
