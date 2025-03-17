@@ -7,17 +7,22 @@ import { getAY } from "../../../../Utils/academivYear";
 export const studentNotice = createAsyncThunk(
   "announcement/studentNotice",
   async (
-    { page, limit, search, priority },
+    {
+      page = 1,
+      limit = 5,
+      search = "",
+      priority = "",
+      sortOrder = "desc",
+      sortBy = "startDate",
+    },
     { rejectWithValue, dispatch }
   ) => {
     try {
-
       const say = getAY();
       dispatch(setShowError(false));
       const data = await getData(
-        `/admin/all/notices?say=${say}&page=${page}&limit=${limit}&sortBy=startDate&sortOrder=desc&search=${search}&priority=${priority}`
+        `/admin/all/notices?say=${say}&page=${page}&limit=${limit}&search=${search}&priority=${priority}&sortBy=${sortBy}&sortOrder=${sortOrder}`
       );
-      console.log("notices action data", data);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

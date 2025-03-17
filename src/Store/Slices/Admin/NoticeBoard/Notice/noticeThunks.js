@@ -11,7 +11,6 @@ import { getAY } from "../../../../../Utils/academivYear";
 import { getUserRole } from "../../../../../Utils/getRoles";
 import toast from "react-hot-toast";
 
-// Fetch all notices
 // Fetch all notices with pagination support
 export const fetchNoticesThunk = createAsyncThunk(
   "notice/fetchAll",
@@ -20,7 +19,6 @@ export const fetchNoticesThunk = createAsyncThunk(
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      // Append the page number for pagination
       const response = await getData(
         `/${getRole}/all/notices?say=${say}&page=${page}`
       );
@@ -86,8 +84,23 @@ export const deleteNoticeThunk = createAsyncThunk(
       await deleteData(`/${getRole}/delete/notice/${noticeId}?say=${say}`);
       toast.success("Notice Delete successfully");
       dispatch(fetchNoticesThunk());
-
       return noticeId;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// New Thunk: Fetch all notice users
+export const fetchNoticeUsersThunk = createAsyncThunk(
+  "notice/fetchNoticeUsers",
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const getRole = getUserRole(getState);
+      // Call the new backend route
+      const response = await getData(`/${getRole}/all/notices/users`);
+      // Assuming the response has shape { error: false, data: [...] }
+      return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

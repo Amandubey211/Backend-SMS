@@ -1,34 +1,53 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchBooksThunk,
-  fetchBookIssuesThunk,
+  fetchBooksDetailsThunk,
   addBookThunk,
   deleteBookThunk,
-  issueBookThunk,
   updateBookThunk,
-  fetchBooksDetailsThunk,
+  fetchBookIssuesThunk,
+  issueBookThunk,
+  // NEW CATEGORY THUNKS
+  fetchCategoriesThunk,
+  addCategoryThunk,
+  updateCategoryThunk,
+  deleteCategoryThunk,
 } from "./LibraryThunks";
 
 const initialState = {
+  // BOOKS
   books: [],
-  addbookloading: false,
   bookIssues: [],
   loading: false,
+  addbookloading: false,
   addBookSuccess: false,
   error: null,
+
+  // FILTERS
   filters: {
     class: "",
     category: "",
     classLevel: "",
     section: "",
   },
-  activeTab: "Library", // Managed tab switching
+
+  // TABS
+  activeTab: "Library",
   isSidebarOpen: false,
   editIssueData: null,
-  // New pagination state
+
+  // PAGINATION
   totalBooks: 0,
   totalPages: 0,
   currentPage: 1,
+
+  // CATEGORIES
+  categories: [],
+  categoriesLoading: false,
+  categoryError: null,
+  addCategorySuccess: false,
+  updateCategorySuccess: false,
+  deleteCategorySuccess: false,
 };
 
 const librarySlice = createSlice({
@@ -50,9 +69,14 @@ const librarySlice = createSlice({
     },
     resetLibraryState(state) {
       state.addBookSuccess = false;
+      state.addCategorySuccess = false;
+      state.updateCategorySuccess = false;
+      state.deleteCategorySuccess = false;
+      // you can reset other states if needed
     },
   },
   extraReducers: (builder) => {
+    // ----------------- BOOKS ------------------
     builder
       .addCase(fetchBooksThunk.pending, (state) => {
         state.loading = true;
@@ -65,12 +89,13 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // Detailed Books (with pagination)
       .addCase(fetchBooksDetailsThunk.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchBooksDetailsThunk.fulfilled, (state, action) => {
         state.loading = false;
-        // Update state with pagination response
         state.books = action.payload.books;
         state.totalBooks = action.payload.totalBooks;
         state.totalPages = action.payload.totalPages;
@@ -80,7 +105,8 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // ...other reducers remain unchanged
+
+      // ADD BOOK
       .addCase(addBookThunk.pending, (state) => {
         state.addbookloading = true;
         state.addBookSuccess = false;
@@ -93,33 +119,33 @@ const librarySlice = createSlice({
         state.addbookloading = false;
         state.error = action.payload;
       })
+
+      // DELETE BOOK
       .addCase(deleteBookThunk.pending, (state) => {
         state.loading = true;
       })
       .addCase(deleteBookThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.books = state.books.filter((book) => book._id !== action.payload);
+        // state.books = state.books.filter((book) => book._id !== action.payload);
       })
       .addCase(deleteBookThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
+      // UPDATE BOOK
       .addCase(updateBookThunk.pending, (state) => {
-        state.loading = true;
+        state.addbookloading = true;
       })
       .addCase(updateBookThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.books.findIndex(
-          (book) => book._id === action.payload._id
-        );
-        if (index !== -1) {
-          state.books[index] = action.payload;
-        }
+        state.addbookloading = false;
       })
       .addCase(updateBookThunk.rejected, (state, action) => {
-        state.loading = false;
+        state.addbookloading = false;
         state.error = action.payload;
       })
+
+      // ----------------- BOOK ISSUES ------------------
       .addCase(fetchBookIssuesThunk.pending, (state) => {
         state.loading = true;
       })
@@ -131,15 +157,86 @@ const librarySlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      // ISSUE BOOK
       .addCase(issueBookThunk.pending, (state) => {
         state.loading = true;
       })
-      .addCase(issueBookThunk.fulfilled, (state, action) => {
+      .addCase(issueBookThunk.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(issueBookThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // ----------------- CATEGORIES ------------------
+      .addCase(fetchCategoriesThunk.pending, (state) => {
+        state.categoriesLoading = true;
+        state.categoryError = null;
+      })
+      .addCase(fetchCategoriesThunk.fulfilled, (state, action) => {
+        state.categoriesLoading = false;
+        state.categories = action.payload;
+      })
+      .addCase(fetchCategoriesThunk.rejected, (state, action) => {
+        state.categoriesLoading = false;
+        state.categoryError = action.payload;
+      })
+
+      // ADD CATEGORY
+      .addCase(addCategoryThunk.pending, (state) => {
+        state.categoriesLoading = true;
+        state.addCategorySuccess = false;
+      })
+      .addCase(addCategoryThunk.fulfilled, (state, action) => {
+        state.categoriesLoading = false;
+        state.addCategorySuccess = true;
+        // Add the new category to the store
+        state.categories.push(action.payload);
+      })
+      .addCase(addCategoryThunk.rejected, (state, action) => {
+        state.categoriesLoading = false;
+        state.categoryError = action.payload;
+      })
+
+      // UPDATE CATEGORY
+      .addCase(updateCategoryThunk.pending, (state) => {
+        state.categoriesLoading = true;
+        state.updateCategorySuccess = false;
+      })
+      .addCase(updateCategoryThunk.fulfilled, (state, action) => {
+        state.categoriesLoading = false;
+        state.updateCategorySuccess = true;
+        const updatedCat = action.payload;
+        const idx = state.categories.findIndex(
+          (cat) => cat._id === updatedCat._id
+        );
+        if (idx !== -1) {
+          state.categories[idx] = updatedCat;
+        }
+      })
+      .addCase(updateCategoryThunk.rejected, (state, action) => {
+        state.categoriesLoading = false;
+        state.categoryError = action.payload;
+      })
+
+      // DELETE CATEGORY
+      .addCase(deleteCategoryThunk.pending, (state) => {
+        state.categoriesLoading = true;
+        state.deleteCategorySuccess = false;
+      })
+      .addCase(deleteCategoryThunk.fulfilled, (state, action) => {
+        state.categoriesLoading = false;
+        state.deleteCategorySuccess = true;
+        const deletedId = action.payload;
+        state.categories = state.categories.filter(
+          (cat) => cat._id !== deletedId
+        );
+      })
+      .addCase(deleteCategoryThunk.rejected, (state, action) => {
+        state.categoriesLoading = false;
+        state.categoryError = action.payload;
       });
   },
 });

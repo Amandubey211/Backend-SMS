@@ -23,7 +23,7 @@ const ModuleCard = ({ title, moduleNumber, imageUrl }) => {
   }, []);
 
   return (
-    <div className="relative mb-4 border-2 bg-white rounded-lg">
+    <div className="relative">
       <img
         src={imageUrl}
         alt={title}
@@ -40,7 +40,7 @@ const ModuleCard = ({ title, moduleNumber, imageUrl }) => {
       {menuOpen && (
         <div
           ref={menuRef}
-          className="absolute top-12 right-4 bg-white border rounded-lg shadow-lg w-48 z-10"
+          className="absolute top-12 right-4 bg-white border rounded-lg  w-48 z-10"
         >
           <ul className="py-2">
             <li className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer">

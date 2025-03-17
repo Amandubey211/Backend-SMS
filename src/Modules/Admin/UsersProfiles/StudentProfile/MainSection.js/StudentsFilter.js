@@ -1,11 +1,15 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Select, Input } from "antd";
 import {
   fetchGroupsByClass,
   fetchSectionsByClass,
 } from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
+
+const { Option } = Select;
+const { Search } = Input;
 
 export default function StudentsFilter({ filters, onFilterChange }) {
   const { t } = useTranslation("admAccounts");
@@ -15,84 +19,118 @@ export default function StudentsFilter({ filters, onFilterChange }) {
     (store) => store?.admin?.group_section
   );
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    // console.log(`Selected: ${name} = ${value}`);
-
-    if (name === "classId" && value === "") {
+  // When a class is selected
+  const handleClassChange = (value) => {
+    if (value === "") {
       dispatch(fetchAllStudents({ classId: "", sectionId: "", groupId: "" }));
       onFilterChange("classId", "");
       onFilterChange("sectionId", "");
       onFilterChange("groupId", "");
       return;
     }
+    dispatch(fetchSectionsByClass(value));
+    dispatch(fetchGroupsByClass(value));
+    onFilterChange("classId", value);
+  };
 
-    if (name === "classId") {
-      dispatch(fetchSectionsByClass(value));
-      dispatch(fetchGroupsByClass(value));
-    }
+  const handleSectionChange = (value) => {
+    onFilterChange("sectionId", value);
+  };
 
-    onFilterChange(name, value);
+  const handleGroupChange = (value) => {
+    onFilterChange("groupId", value);
+  };
+
+  const handleSearch = (value) => {
+    // When search text is entered, update the filter key "search"
+    onFilterChange("search", value);
   };
 
   return (
     <div>
-      <div className="flex items-end gap-4 py-4 bg-white w-full">
-        <div className="flex flex-col flex-grow">
+      <div className="flex items-end gap-4 py-4 bg-white w-full justify-start">
+        {/* Search Box */}
+        <div className="flex flex-col">
+          <label className="text-sm font-medium text-gray-700">
+            {t("Search")}
+          </label>
+          <Search
+            placeholder={t("Search by Name, QID, Admission number")}
+            onSearch={handleSearch}
+            allowClear
+            style={{ width: 320 }}
+            size="large"
+            className="mt-1"
+          />
+        </div>
+
+        {/* Class Select */}
+        <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">
             {t("Class")}
           </label>
-          <select
-            name="classId"
+          <Select
             value={filters?.classId || ""}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            onChange={handleClassChange}
+            placeholder={t("All")}
+            style={{ width: 200 }}
+            allowClear
+            size="large"
+            className="mt-1"
           >
-            <option value="">{t("All")}</option>
+            <Option value="">{t("All")}</Option>
             {classes?.map((c) => (
-              <option key={c?._id} value={c?._id}>
+              <Option key={c?._id} value={c?._id}>
                 {c?.className}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
         </div>
 
-        <div className="flex flex-col flex-grow">
+        {/* Section Select */}
+        <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">
             {t("Section")}
           </label>
-          <select
-            name="sectionId"
+          <Select
             value={filters?.sectionId || ""}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            onChange={handleSectionChange}
+            placeholder={t("All")}
+            style={{ width: 200 }}
+            allowClear
+            size="large"
+            className="mt-1"
           >
-            <option value="">{t("All")}</option>
+            <Option value="">{t("All")}</Option>
             {sectionsList?.map((s) => (
-              <option key={s?._id} value={s?._id}>
+              <Option key={s?._id} value={s?._id}>
                 {s?.sectionName}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
         </div>
 
-        <div className="flex flex-col flex-grow">
+        {/* Group Select */}
+        <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">
             {t("Group")}
           </label>
-          <select
-            name="groupId"
+          <Select
             value={filters?.groupId || ""}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            onChange={handleGroupChange}
+            placeholder={t("All")}
+            style={{ width: 200 }}
+            allowClear
+            size="large"
+            className="mt-1"
           >
-            <option value="">{t("All")}</option>
+            <Option value="">{t("All")}</Option>
             {groupsList?.map((g) => (
-              <option key={g?._id} value={g?._id}>
+              <Option key={g?._id} value={g?._id}>
                 {g?.groupName}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
     </div>

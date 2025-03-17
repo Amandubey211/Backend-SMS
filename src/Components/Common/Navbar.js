@@ -38,7 +38,6 @@ const Navbar = () => {
     }
   }, []);
 
-
   // Fetch notifications from IndexedDB
   const getNotificationsFromIndexedDB = () => {
     return new Promise((resolve, reject) => {
@@ -85,7 +84,7 @@ const Navbar = () => {
     const routes = {
       parent: "/users/parent/profile",
       admin: "/users/admin",
-      student: "/users/student/profile",
+      student: "/student_dash/profile",
       teacher: "/users/my/profile",
       finance: "/users/my/profile",
       librarian: "/users/my/profile",

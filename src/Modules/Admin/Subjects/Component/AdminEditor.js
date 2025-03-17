@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 import useCloudinaryMediaUpload from "../../../../Hooks/CommonHooks/useCloudinaryMediaUpload";
 import useCloudinaryDeleteByPublicId from "../../../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
 
-// Helpers to wrap uploads in HTML
+// Helper to wrap uploaded images in HTML
 function createImageWrapper(imageUrl, publicId) {
   const now = Date.now();
   return `
@@ -30,6 +30,7 @@ function createImageWrapper(imageUrl, publicId) {
   `;
 }
 
+// Helper to wrap uploaded files (PDFs) in HTML
 function createFileWrapper(fileUrl, publicId) {
   const now = Date.now();
   return `
@@ -59,12 +60,13 @@ const EditorComponent = ({
   onEditorChange,
   inputPlaceHolder,
   isCreateQuestion,
-  nameError, // For Quiz Name validation
-  contentError, // For Instructions validation
+  nameError,
+  contentError,
   inputRef,
 }) => {
   const editor = useRef(null);
   const containerRef = useRef(null);
+  const lastDeleteTimeRef = useRef(0); // Tracks timestamp of last delete action
 
   const [scrollPosition, setScrollPosition] = useState(0);
   const processedDeletions = useRef(new Set());
@@ -73,7 +75,7 @@ const EditorComponent = ({
   const { uploadImage, uploadFile } = useCloudinaryMediaUpload();
   const { deleteMediaByPublicId } = useCloudinaryDeleteByPublicId();
 
-  // ===================== PROGRESS BAR =====================
+  // Progress bar functions
   const showProgressBar = useCallback((parentElement) => {
     const container = document.createElement("div");
     container.style.position = "relative";
@@ -104,24 +106,20 @@ const EditorComponent = ({
       progressBarContainer.parentNode.removeChild(progressBarContainer);
     }
   }, []);
-  // ===================== END PROGRESS BAR =====================
 
-  // ===================== UPLOAD HANDLERS =====================
+  // Image upload handler
   const handleImageUpload = useCallback(
     async (file) => {
       if (!file) return;
       const editorInstance = editor.current;
-
       let progressBarObj;
       setScrollPosition(window.scrollY);
       uploadInProgress.current = true;
-
       if (editorInstance?.toolbar?.container) {
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
       }
-
       try {
         const response = await uploadImage(file, (e) => {
           const pct = Math.round((e.loaded * 100) / e.total);
@@ -150,28 +148,26 @@ const EditorComponent = ({
     },
     [
       uploadImage,
+      updateProgressBar,
       removeProgressBar,
       showProgressBar,
-      updateProgressBar,
       scrollPosition,
     ]
   );
 
+  // File upload handler
   const handleFileUpload = useCallback(
     async (file) => {
       if (!file) return;
       const editorInstance = editor.current;
-
       let progressBarObj;
       setScrollPosition(window.scrollY);
       uploadInProgress.current = true;
-
       if (editorInstance?.toolbar?.container) {
         progressBarObj = showProgressBar(
           editorInstance.toolbar.container.parentNode
         );
       }
-
       try {
         const response = await uploadFile(file, (e) => {
           const pct = Math.round((e.loaded * 100) / e.total);
@@ -200,13 +196,14 @@ const EditorComponent = ({
     },
     [
       uploadFile,
+      updateProgressBar,
       removeProgressBar,
       showProgressBar,
-      updateProgressBar,
       scrollPosition,
     ]
   );
 
+  // Trigger image upload
   const triggerImageUpload = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
@@ -218,6 +215,7 @@ const EditorComponent = ({
     input.click();
   }, [handleImageUpload]);
 
+  // Trigger file upload
   const triggerFileUpload = useCallback(() => {
     const input = document.createElement("input");
     input.type = "file";
@@ -228,52 +226,50 @@ const EditorComponent = ({
     };
     input.click();
   }, [handleFileUpload]);
-  // ===================== END UPLOAD HANDLERS =====================
 
-  // ===================== DELETION HANDLER =====================
+  // Deletion handler with debounce to prevent rapid, unintentional calls
   const handleDeleteClick = useCallback(
     async (e) => {
-      if (e.target.classList.contains("delete-btn")) {
-        e.stopPropagation();
-        const wrapper =
-          e.target.closest(".uploaded-image-wrapper") ||
-          e.target.closest(".uploaded-file-wrapper");
-        if (wrapper) {
-          const publicId = wrapper.getAttribute("data-public-id");
-          if (!publicId || processedDeletions.current.has(publicId)) return;
+      // Ensure the click is on a button with the delete-btn class
+      if (
+        e.target.nodeName !== "BUTTON" ||
+        !e.target.classList.contains("delete-btn")
+      )
+        return;
+      const now = Date.now();
+      if (now - lastDeleteTimeRef.current < 500) return;
+      lastDeleteTimeRef.current = now;
 
-          const editorInstance = editor.current;
-          let progressBarObj;
-          if (editorInstance?.toolbar?.container) {
-            progressBarObj = showProgressBar(
-              editorInstance.toolbar.container.parentNode
-            );
-          }
+      e.stopPropagation();
+      const wrapper =
+        e.target.closest(".uploaded-image-wrapper") ||
+        e.target.closest(".uploaded-file-wrapper");
+      if (wrapper) {
+        const publicId = wrapper.getAttribute("data-public-id");
+        if (!publicId || processedDeletions.current.has(publicId)) return;
 
-          try {
-            const data = await deleteMediaByPublicId(publicId);
-            if (data.result === "ok") {
-              if (progressBarObj)
-                updateProgressBar(progressBarObj.progressBar, 100);
-              processedDeletions.current.add(publicId);
-              setTimeout(() => {
-                if (progressBarObj) {
-                  removeProgressBar(progressBarObj.progressBarContainer);
-                }
-                wrapper.remove();
-              }, 500);
-              toast.success("Asset deleted successfully");
-            } else {
-              if (progressBarObj)
-                updateProgressBar(progressBarObj.progressBar, 100);
-              setTimeout(() => {
-                if (progressBarObj) {
-                  removeProgressBar(progressBarObj.progressBarContainer);
-                }
-              }, 500);
-              toast.error("Failed to delete asset");
-            }
-          } catch (error) {
+        const editorInstance = editor.current;
+        let progressBarObj;
+        if (editorInstance?.toolbar?.container) {
+          progressBarObj = showProgressBar(
+            editorInstance.toolbar.container.parentNode
+          );
+        }
+
+        try {
+          const data = await deleteMediaByPublicId(publicId);
+          if (data.result === "ok") {
+            if (progressBarObj)
+              updateProgressBar(progressBarObj.progressBar, 100);
+            processedDeletions.current.add(publicId);
+            setTimeout(() => {
+              if (progressBarObj) {
+                removeProgressBar(progressBarObj.progressBarContainer);
+              }
+              wrapper.remove();
+            }, 500);
+            toast.success("Asset deleted successfully");
+          } else {
             if (progressBarObj)
               updateProgressBar(progressBarObj.progressBar, 100);
             setTimeout(() => {
@@ -281,68 +277,38 @@ const EditorComponent = ({
                 removeProgressBar(progressBarObj.progressBarContainer);
               }
             }, 500);
-            toast.error("Error deleting asset. Please try again.");
+            toast.error("Failed to delete asset");
           }
+        } catch (error) {
+          if (progressBarObj)
+            updateProgressBar(progressBarObj.progressBar, 100);
+          setTimeout(() => {
+            if (progressBarObj) {
+              removeProgressBar(progressBarObj.progressBarContainer);
+            }
+          }, 500);
+          toast.error("Error deleting asset. Please try again.");
         }
       }
     },
     [
       deleteMediaByPublicId,
-      removeProgressBar,
       showProgressBar,
       updateProgressBar,
+      removeProgressBar,
     ]
   );
-  // ===================== END DELETION HANDLER =====================
 
-  // Observe manual node removals to auto-delete from Cloudinary
+  // Attach the deletion event listener to the editor container
   useEffect(() => {
     if (containerRef.current) {
-      const observer = new MutationObserver((mutationsList) => {
-        if (uploadInProgress.current) return;
-        mutationsList.forEach((mutation) => {
-          mutation.removedNodes.forEach((node) => {
-            if (
-              node.nodeType === 1 &&
-              (node.classList.contains("uploaded-image-wrapper") ||
-                node.classList.contains("uploaded-file-wrapper"))
-            ) {
-              const publicId = node.getAttribute("data-public-id");
-              const uploadedAt = parseInt(
-                node.getAttribute("data-uploaded-at"),
-                10
-              );
-              if (publicId && !processedDeletions.current.has(publicId)) {
-                const age = Date.now() - uploadedAt;
-                // Only delete if the node was present for >3s
-                if (age > 3000) {
-                  deleteMediaByPublicId(publicId)
-                    .then((data) => {
-                      if (data.result === "ok") {
-                        processedDeletions.current.add(publicId);
-                        toast.success("Asset deleted (manual removal)");
-                      } else {
-                        toast.error("Failed to delete asset (manual removal)");
-                      }
-                    })
-                    .catch(() => {
-                      toast.error("Error deleting asset (manual removal)");
-                    });
-                }
-              }
-            }
-          });
-        });
-      });
-      observer.observe(containerRef.current, {
-        childList: true,
-        subtree: true,
-      });
-      return () => observer.disconnect();
+      containerRef.current.addEventListener("click", handleDeleteClick);
+      return () =>
+        containerRef.current.removeEventListener("click", handleDeleteClick);
     }
-  }, [deleteMediaByPublicId]);
+  }, [handleDeleteClick]);
 
-  // Jodit config
+  // Jodit Editor configuration
   const config = useMemo(
     () => ({
       readonly: false,
@@ -409,20 +375,10 @@ const EditorComponent = ({
     [isCreateQuestion, triggerImageUpload, triggerFileUpload, handleDeleteClick]
   );
 
-  // Cleanup
-  useEffect(() => {
-    return () => {
-      if (containerRef.current) {
-        containerRef.current.removeEventListener("click", handleDeleteClick);
-      }
-    };
-  }, [handleDeleteClick]);
-
   return (
     <div className="relative w-full bg-white mb-3 p-2">
       <Toaster />
-
-      {/* If hideInput == false, show Quiz Name field */}
+      {/* Optional input field if hideInput is false */}
       {!hideInput && (
         <div className="flex flex-col md:flex-row items-center gap-4 mb-2">
           <div className="flex flex-col w-full md:w-7/10">
@@ -435,13 +391,11 @@ const EditorComponent = ({
               value={assignmentName}
               onChange={(e) => onNameChange(e.target.value)}
               ref={inputRef}
-              className={`w-full p-2 border rounded-sm shadow-sm focus:outline-none focus:ring-1
-                ${
-                  nameError
-                    ? "border-red-500 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-blue-500"
-                }
-              `}
+              className={`w-full p-2 border rounded-sm shadow-sm focus:outline-none focus:ring-1 ${
+                nameError
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-blue-500"
+              }`}
               spellCheck="true"
             />
             {nameError && (
@@ -457,8 +411,6 @@ const EditorComponent = ({
           </div>
         </div>
       )}
-
-      {/* Editor container with red outline if contentError */}
       <div
         className={`${
           contentError

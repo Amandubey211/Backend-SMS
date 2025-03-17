@@ -13,7 +13,7 @@ const StudentGradePieChart = () => {
   const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF"];
 
   // Check if all data values are 0
-  const allZero = dataValues.every(value => value === 0);
+  const allZero = dataValues?.every(value => value === 0);
 
   const data = {
     labels: labels,

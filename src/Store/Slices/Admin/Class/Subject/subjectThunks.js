@@ -43,6 +43,7 @@ export const createSubject = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const endpoint = `/${getRole}/subject?say=${say}`;
+      // subjectData now includes isOptional and studentIds (if applicable)
       const response = await postData(endpoint, subjectData);
 
       if (response && response.status) {

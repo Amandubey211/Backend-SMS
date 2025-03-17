@@ -33,11 +33,11 @@ export const fetchChildren = createAsyncThunk(
 // Thunk to fetch attendance
 export const fetchAttendance = createAsyncThunk(
   "children/fetchAttendance",
-  async ({ studentId, month, year }, { rejectWithValue, dispatch }) => {
+  async ({ id, month, year }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const data = await getData(
-        `/parent/api/attendance?studentId=${studentId}&month=${month}&year=${year}`
+        `/parent/api/attendance?studentId=${id}&month=${month}&year=${year}`
       );
       return data;
     } catch (error) {

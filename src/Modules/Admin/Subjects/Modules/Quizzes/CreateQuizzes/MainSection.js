@@ -1,4 +1,3 @@
-// MainSection.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,7 +16,6 @@ import {
   updateQuestionThunk,
   deleteQuestionThunk,
 } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
-import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import toast from "react-hot-toast";
@@ -27,6 +25,7 @@ import toast from "react-hot-toast";
  */
 function validateQuizForm(quizData, isPublishing) {
   const errors = {};
+
   if (!quizData.name || !quizData.name.trim()) {
     errors.name = "Quiz name is required.";
   }
@@ -71,8 +70,6 @@ function validateQuizForm(quizData, isPublishing) {
     if (!quizData.dueDate) {
       errors.dueDate = "Due Date is required when publishing.";
     }
-    // Optionally add validation for results fields if needed:
-    // For example, if not publishing immediately, ensure a valid date.
   }
   return errors;
 }
@@ -87,7 +84,7 @@ function scrollToFirstError(errors) {
   }
 }
 
-// Use singular key names for multi-select arrays; also add new results fields
+// Default quiz form fields
 const initialFormState = {
   points: "",
   quizType: "Practice",
@@ -120,16 +117,23 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Grab quiz detail from Redux
   const { quizzDetail: quiz } = useSelector((state) => state.admin.quizzes);
-  const quizIdFromRedux = useSelector(
-    (state) => state.admin.quizzes.quizzDetail?._id || ""
-  );
+  const quizIdFromRedux = quiz?._id || "";
 
+  // Tab State
   const [activeTab, setActiveTab] = useState("instructions");
+
+  // Basic quiz info
+  const [quizId, setQuizId] = useState("");
   const [assignmentName, setAssignmentName] = useState("");
   const [instruction, setInstruction] = useState("");
+
+  // Full quiz form data
   const [formState, setFormState] = useState(initialFormState);
-  const [quizId, setQuizId] = useState("");
+  const [formErrors, setFormErrors] = useState({});
+
+  // Question-related local states
   const [questions, setQuestions] = useState([]);
   const [question, setQuestion] = useState("");
   const [answers, setAnswers] = useState([]);
@@ -137,10 +141,14 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
   const [questionPoint, setQuestionPoint] = useState(1);
   const [questionType, setQuestionType] = useState("multiple choice");
+
+  // Sidebar for Add/Edit question
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [editingQuestionId, setEditingQuestionId] = useState(null);
-  const [formErrors, setFormErrors] = useState({});
 
+  // ---------------------------------------------
+  //   Load an existing quiz if we have quizId
+  // ---------------------------------------------
   useEffect(() => {
     const quizIdFromState = location.state?.quizId;
     if (quizIdFromState) {
@@ -160,11 +168,15 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     }
   }, [location.state, dispatch, quizIdFromRedux, setIsEditing]);
 
+  // ---------------------------------------------
+  //   Whenever quiz is loaded, populate states
+  // ---------------------------------------------
   useEffect(() => {
     if (isEditing && quiz) {
       setAssignmentName(quiz.name || "");
       setInstruction(quiz.content || "");
       setQuizId(quiz._id || "");
+
       setFormState((prev) => ({
         ...prev,
         points: quiz.points || prev.points,
@@ -194,13 +206,16 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         resultsPublished: quiz.resultsPublished || false,
         resultsPublishDate: quiz.resultsPublishDate || "",
       }));
+
       setQuestions(quiz.questions || []);
-      // Optionally load answers from quiz if applicable
       setRightAnswerComment(quiz.correctAnswerComment || "");
       setWrongAnswerComment(quiz.inCorrectAnswerComment || "");
     }
   }, [isEditing, quiz]);
 
+  // ---------------------------------------------
+  //   If quizIdFromRedux changes, reflect it
+  // ---------------------------------------------
   useEffect(() => {
     if (quizIdFromRedux) {
       setQuizId(quizIdFromRedux);
@@ -208,10 +223,15 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     }
   }, [quizIdFromRedux, setIsEditing]);
 
+  // ---------------------------------------------
+  //   Handle form changes
+  // ---------------------------------------------
   const handleFormChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;
     const finalValue = type === "checkbox" ? checked : value;
+
     if (name === "allowedAttempts" && !checked) {
+      // If user unchecks "allowedAttempts", reset `allowNumberOfAttempts`.
       setFormState((prev) => ({
         ...prev,
         allowedAttempts: false,
@@ -223,24 +243,30 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         [name]: finalValue,
       }));
     }
+
+    // Clear any existing error for this field
     setFormErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
 
   const handleInstructionChange = useCallback((newContent) => {
     setInstruction(newContent);
+    // Clear content error
     setFormErrors((prev) => ({ ...prev, content: undefined }));
   }, []);
 
   const handleNameChange = useCallback((newName) => {
     setAssignmentName(newName);
+    // Clear name error
     setFormErrors((prev) => ({ ...prev, name: undefined }));
   }, []);
 
-  // QUESTION handlers (unchanged)...
-  const handleQuestionChange = useCallback(
-    (content) => setQuestion(content),
-    []
-  );
+  // ---------------------------------------------
+  //   Question handlers
+  // ---------------------------------------------
+  const handleQuestionChange = useCallback((newContent) => {
+    setQuestion(newContent);
+  }, []);
+
   const handleAnswerChange = useCallback(
     (index, e) => {
       const { name, value } = e.target;
@@ -250,17 +276,31 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     },
     [answers]
   );
+
+  // "Add new Question" - also sets initial answers for multiple choice
   const handleAddNewQuestion = () => {
+    // Clear old data
+    setEditingQuestionId(null);
     setQuestion("");
-    setAnswers([]);
     setRightAnswerComment("");
     setWrongAnswerComment("");
     setQuestionPoint(1);
-    setQuestionType("multiple choice");
+    setQuestionType("multiple choice"); // Default to multiple choice
+
+    // Set 4 blank answers so the child renders them immediately
+    setAnswers([
+      { text: "", isCorrect: false },
+      { text: "", isCorrect: false },
+      { text: "", isCorrect: false },
+      { text: "", isCorrect: false },
+    ]);
+
     setSidebarOpen(true);
-    setEditingQuestionId(null);
   };
 
+  // ---------------------------------------------
+  //   Add a new question to the quiz
+  // ---------------------------------------------
   const addNewQuestion = useCallback(async () => {
     const correctOption = answers.find((a) => a.isCorrect);
     const newQ = {
@@ -272,6 +312,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
+
     try {
       const result = await dispatch(
         addQuestionThunk({ quizId, question: newQ })
@@ -295,6 +336,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     wrongAnswerComment,
   ]);
 
+  // ---------------------------------------------
+  //   Update existing question
+  // ---------------------------------------------
   const updateQuestion = useCallback(async () => {
     const correctOption = answers.find((a) => a.isCorrect);
     const updatedQ = {
@@ -306,6 +350,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
     };
+
     try {
       const result = await dispatch(
         updateQuestionThunk({
@@ -334,6 +379,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     editingQuestionId,
   ]);
 
+  // ---------------------------------------------
+  //   Delete a question
+  // ---------------------------------------------
   const deleteQuestionHandler = useCallback(
     async (questionId) => {
       await dispatch(deleteQuestionThunk({ quizId, questionId }));
@@ -341,23 +389,29 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     [dispatch, quizId]
   );
 
+  // ---------------------------------------------
+  //   Edit an existing question
+  // ---------------------------------------------
   const editQuestionHandler = useCallback(
     (questionId) => {
       const questionToEdit = questions.find((q) => q._id === questionId);
       if (questionToEdit) {
+        setEditingQuestionId(questionToEdit._id);
         setQuestion(questionToEdit.questionText);
         setAnswers(questionToEdit.options);
         setRightAnswerComment(questionToEdit.correctAnswerComment);
         setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
         setQuestionPoint(questionToEdit.questionPoint);
-        setQuestionType(questionToEdit.type);
-        setEditingQuestionId(questionToEdit._id);
+        setQuestionType(questionToEdit.type || "multiple choice");
         setSidebarOpen(true);
       }
     },
     [questions]
   );
 
+  // ---------------------------------------------
+  //   Handle Save/Publish Quiz
+  // ---------------------------------------------
   const handleSaveQuiz = useCallback(
     (publish) => {
       const quizData = {
@@ -369,12 +423,12 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         classId: cid,
         subjectId: sid,
         publish,
-        // New results fields included
+        // carry over new fields
         resultsPublished: formState.resultsPublished,
         resultsPublishDate: formState.resultsPublishDate,
       };
 
-      // Use singular keys in payload for multi-select assignments
+      // If assigning to Section or Group, set the array
       if (formState.assignTo === "Section") {
         quizData.sectionId = formState.sectionId;
       } else if (formState.assignTo === "Group") {
@@ -389,6 +443,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       quizData.allowedAttempts = allowedAttempts;
       quizData.allowNumberOfAttempts = allowNumberOfAttempts;
 
+      // Validate
       const errors = validateQuizForm(quizData, publish === true);
       if (Object.keys(errors).length > 0) {
         setFormErrors(errors);
@@ -397,6 +452,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         return;
       }
 
+      // If we have quizId -> update, otherwise -> create
       if (quizId) {
         dispatch(updateQuizThunk({ quizId, quizData, navigate }));
       } else {
@@ -418,6 +474,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     ]
   );
 
+  // ---------------------------------------------
+  //   Render
+  // ---------------------------------------------
   return (
     <div className="flex flex-col w-full">
       <CreateQuizHeader
@@ -427,6 +486,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       />
 
       <div className="w-full flex">
+        {/*  Main content area  */}
         <div
           className={`${
             activeTab === "instructions" ? "w-[70%]" : "w-full"
@@ -474,6 +534,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
           </Tabs>
         </div>
 
+        {/*  Sidebar with CreateQuizForm if instructions tab is active  */}
         {activeTab === "instructions" && (
           <div className="w-[30%] h-full">
             <ProtectedSection requiredPermission={PERMISSIONS.UPDATE_QUIZ}>
@@ -487,6 +548,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         )}
       </div>
 
+      {/*  Slide-over Sidebar for Add/Edit Question  */}
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}

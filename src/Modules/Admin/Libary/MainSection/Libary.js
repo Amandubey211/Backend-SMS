@@ -8,27 +8,26 @@ import TabButton from "../Components/TabButton";
 import {
   fetchBookIssuesThunk,
   fetchBooksDetailsThunk,
+  fetchCategoriesThunk, // <-- new import
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { resetLibraryState } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
-
 import LibraryTab from "../Components/LibraryTab";
 import AddIssue from "../Components/AddIssue";
-import AddBook from "../Components/AddBook";
+import AddBook from "../Components/BookForm";
 import BookIssueTab from "../Components/BookIssueTab";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { fetchAllStudents } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
+import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 
 const LibraryAndBookIssue = () => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
-  const { books, bookIssues, loading, addBookSuccess, addIssueSuccess } =
-    useSelector((state) => state.admin.library);
-  const classList = useSelector((state) => state.admin.class.classes);
-  const StudentList = useSelector((store) => store.admin.students.studentsList);
+  const { loading, addBookSuccess } = useSelector(
+    (state) => state.admin.library
+  );
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
@@ -36,43 +35,28 @@ const LibraryAndBookIssue = () => {
   // Fetch initial data on mount
   useEffect(() => {
     dispatch(fetchAllClasses());
-    // dispatch(fetchAllStudents()); // Uncomment if needed
   }, [dispatch]);
 
   // Re-fetch data when switching tabs
   useEffect(() => {
     if (activeTab === "Library") {
       dispatch(fetchBooksDetailsThunk());
+      dispatch(fetchCategoriesThunk()); // <-- fetch categories here
     } else if (activeTab === "BookIssue") {
       dispatch(fetchBookIssuesThunk());
     }
   }, [activeTab, dispatch]);
 
-  // Existing effect that prevents duplicate fetching if data exists; you may remove if always re-fetching
-  // useEffect(() => {
-  //   if (!books?.length) dispatch(fetchBooksDetailsThunk());
-  //   if (!bookIssues?.length) dispatch(fetchBookIssuesThunk());
-  //   if (!classList?.length) dispatch(fetchAllClasses());
-  //  // if (!StudentList?.length) dispatch(fetchAllStudents());
-  // }, [
-  //   dispatch,
-  //   books?.length,
-  //   bookIssues?.length,
-  //   classList?.length,
-  //   StudentList?.length,
-  // ]);
-
   useEffect(() => {
-    if (addBookSuccess || addIssueSuccess) {
+    if (addBookSuccess) {
       setSidebarOpen(false);
       setEditIssueData(null);
-
       // Reset success state after closing sidebar
       setTimeout(() => {
         dispatch(resetLibraryState());
-      }, 500); // Ensures smooth transition
+      }, 500);
     }
-  }, [addBookSuccess, addIssueSuccess, dispatch]);
+  }, [addBookSuccess, dispatch]);
 
   const handleSidebarOpen = () => setSidebarOpen(true);
   const handleSidebarClose = () => {
@@ -83,26 +67,41 @@ const LibraryAndBookIssue = () => {
   useNavHeading(t("Admin"), currentPath);
 
   return (
-    <Layout title={`${"Library & Book Issues"} | ${"Admin Panel"}`}>
+    <Layout title={`Library & Book Issues | Admin Panel`}>
       <DashLayout>
         {loading ? (
           <Spinner />
         ) : (
-          <div className="min-h-screen p-4 flex flex-col">
-            {/* Tab Buttons */}
-            <div className="flex gap-7 mb-4">
-              <TabButton
-                isActive={activeTab === "Library"}
-                onClick={() => setActiveTab("Library")}
-              >
-                {t("Library")}
-              </TabButton>
-              <TabButton
-                isActive={activeTab === "BookIssue"}
-                onClick={() => setActiveTab("BookIssue")}
-              >
-                {t("Book Issue")}
-              </TabButton>
+          <div className="min-h-screen p-2 flex flex-col">
+            {/* Tab Buttons with Add Book button on right (if Library tab is active) */}
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex gap-4">
+                <TabButton
+                  isActive={activeTab === "Library"}
+                  onClick={() => setActiveTab("Library")}
+                >
+                  {t("Library")}
+                </TabButton>
+                <TabButton
+                  isActive={activeTab === "BookIssue"}
+                  onClick={() => setActiveTab("BookIssue")}
+                >
+                  {t("Book Issue")}
+                </TabButton>
+              </div>
+              {activeTab === "Library" && (
+                <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK}>
+                  <button
+                    onClick={handleSidebarOpen}
+                    className="flex items-center border border-gray-300 ps-5 py-0 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  >
+                    <span className="mr-2 text-sm">{t("Add Book")}</span>
+                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+                      <span className="text-3xl -mt-2">+</span>
+                    </div>
+                  </button>
+                </ProtectedAction>
+              )}
             </div>
 
             {/* Tab Content */}
@@ -112,7 +111,7 @@ const LibraryAndBookIssue = () => {
                   requiredPermission={PERMISSIONS.GET_ALL_BOOKS}
                   title={"Library"}
                 >
-                  <LibraryTab handleSidebarOpen={handleSidebarOpen} />
+                  <LibraryTab />
                 </ProtectedSection>
               ) : (
                 <ProtectedSection
