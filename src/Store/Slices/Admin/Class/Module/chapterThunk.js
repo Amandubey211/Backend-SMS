@@ -18,7 +18,7 @@ import { getUserRole } from "../../../../../Utils/getRoles";
 export const addChapter = createAsyncThunk(
   "chapter/addChapter",
   async (
-    { name, thumbnail, moduleId, sid, groupIds = [], sectionIds = [] },
+    { name, thumbnail, moduleId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
@@ -28,25 +28,11 @@ export const addChapter = createAsyncThunk(
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
-
       const formData = new FormData();
       formData.append("name", name);
       formData.append("moduleId", moduleId);
       formData.append("subjectId", subjectId);
       formData.append("semesterId", semesterId);
-
-      // Append each groupId and sectionId individually
-      if (groupIds && groupIds.length > 0) {
-        groupIds.forEach((id) => {
-          formData.append("groupIds", id);
-        });
-      }
-      if (sectionIds && sectionIds.length > 0) {
-        sectionIds.forEach((id) => {
-          formData.append("sectionIds", id);
-        });
-      }
-
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }
@@ -55,7 +41,9 @@ export const addChapter = createAsyncThunk(
         "post",
         `/${getRole}/add_chapter?say=${say}`,
         formData,
-        { "Content-Type": "multipart/form-data" }
+        {
+          "Content-Type": "multipart/form-data",
+        }
       );
 
       if (response && response.success) {
@@ -88,15 +76,7 @@ export const addChapter = createAsyncThunk(
 export const editChapter = createAsyncThunk(
   "chapter/editChapter",
   async (
-    {
-      name,
-      thumbnail,
-      moduleId,
-      chapterId,
-      sid,
-      groupIds = [],
-      sectionIds = [],
-    },
+    { name, thumbnail, moduleId, chapterId, sid },
     { rejectWithValue, getState, dispatch }
   ) => {
     try {
@@ -109,23 +89,12 @@ export const editChapter = createAsyncThunk(
       const formData = new FormData();
       formData.append("name", name);
       formData.append("semesterId", semesterId);
-      // Append each groupId and sectionId individually
-      if (groupIds && groupIds.length > 0) {
-        groupIds.forEach((id) => {
-          formData.append("groupIds", id);
-        });
-      }
-      if (sectionIds && sectionIds.length > 0) {
-        sectionIds.forEach((id) => {
-          formData.append("sectionIds", id);
-        });
-      }
-
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }
 
       const endpoint = `/${getRole}/subjects/${subjectId}/modules/${moduleId}/chapters/${chapterId}?say=${say}`;
+
       const response = await customRequest("put", endpoint, formData, {
         "Content-Type": "multipart/form-data",
       });
