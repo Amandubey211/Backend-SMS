@@ -283,7 +283,9 @@ export default function TimeTableDash() {
               onClick={() => onEventClick(evt)}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-800">{evt?.name}</span>
+                <span className="font-medium text-gray-800">
+                  {evt?.name}
+                </span>
                 <AiOutlineEdit className="text-gray-400" />
               </div>
             </Card>
@@ -511,9 +513,7 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Weekly Timetables</span>
                   <Badge
-                    count={
-                      timetables.filter((t) => t?.type === "weekly").length
-                    }
+                    count={timetables.filter((t) => t?.type === "weekly").length}
                     style={{ backgroundColor: "#FF99CC", marginLeft: 8 }}
                   />
                 </Card>
@@ -543,9 +543,7 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Others</span>
                   <Badge
-                    count={
-                      timetables.filter((t) => t?.type === "others").length
-                    }
+                    count={timetables.filter((t) => t?.type === "others").length}
                     style={{ backgroundColor: "#FFD700", marginLeft: 8 }}
                   />
                 </Card>
@@ -557,9 +555,9 @@ export default function TimeTableDash() {
                 <Doughnut data={chartData} options={chartOptions} />
               </div>
             </div>
-            <div className="text-center text-gray-400 text-xs mt-4">
+            {/* <div className="text-center text-gray-400 text-xs mt-4">
               <p>&copy; 2025 Your LMS | Aman Dubey</p>
-            </div>
+            </div> */}
           </>
         )}
       </div>
@@ -608,7 +606,7 @@ export default function TimeTableDash() {
         title="Timetable Details"
         placement="right"
         width={650}
-        // closable={false}
+        closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
         // Keep at a lower zIndex than the modal as well
@@ -698,76 +696,61 @@ export default function TimeTableDash() {
                     </p>
                   </div>
 
-                  {/* Schedule */}
+                  {/* Schedule - Rendered as a table */}
                   {detailsTimetable?.days &&
                     detailsTimetable?.days?.length > 0 && (
                       <div>
                         <h5 className="font-medium text-gray-800 mt-4">
                           Schedule:
                         </h5>
-                        {detailsTimetable?.days?.map((dayItem) => (
-                          <div
-                            key={dayItem?._id}
-                            className="mb-3 border p-2 rounded"
-                          >
-                            {dayItem?.date ? (
-                              <p className="text-sm text-gray-700 font-semibold">
-                                {format(new Date(dayItem?.date), "dd MMM yyyy")}
-                              </p>
-                            ) : (
-                              <p className="text-sm text-gray-700 font-semibold">
-                                {dayItem?.day || "Day Not Specified"}
-                              </p>
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead>
+                            <tr>
+                              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                                Day
+                              </th>
+                              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                                Time
+                              </th>
+                              <th className="px-4 py-2 text-left text-sm font-medium text-gray-700">
+                                Subject
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {detailsTimetable?.days?.map((dayItem) =>
+                              dayItem?.slots && dayItem?.slots?.length > 0 ? (
+                                dayItem?.slots?.map((slot) => (
+                                  <tr key={slot?._id}>
+                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                                      {dayItem?.date
+                                        ? format(new Date(dayItem?.date), "dd MMM yyyy")
+                                        : dayItem?.day || "Day Not Specified"}
+                                    </td>
+                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                                      {dayjs(slot?.startTime).format("HH:mm")} -{" "}
+                                      {dayjs(slot?.endTime).format("HH:mm")}
+                                    </td>
+                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                                      {slot?.subjectId
+                                        ? slot?.subjectId?.name || "No Subject"
+                                        : slot?.eventName || "No Event Name"}
+                                    </td>
+                                  </tr>
+                                ))
+                              ) : (
+                                <tr key={dayItem?._id}>
+                                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700" colSpan={3}>
+                                    {dayItem?.date
+                                      ? format(new Date(dayItem?.date), "dd MMM yyyy")
+                                      : dayItem?.day || "Day Not Specified"}{" "}
+                                    - No slots available.
+                                  </td>
+                                </tr>
+                              )
                             )}
-                            {dayItem?.slots && dayItem?.slots?.length > 0 ? (
-                              dayItem?.slots?.map((slot) => (
-                                <Card
-                                  key={slot?._id}
-                                  size="small"
-                                  className="mb-2"
-                                  bodyStyle={{ padding: "8px" }}
-                                >
-                                  <div className="flex justify-between items-center">
-                                    <div>
-                                      <p className="text-xs text-gray-600">
-                                        {dayjs(slot?.startTime).format("HH:mm")}{" "}
-                                        - {dayjs(slot?.endTime).format("HH:mm")}
-                                      </p>
-                                      {slot?.subjectId ? (
-                                        <Tooltip
-                                          title={
-                                            slot?.subjectId?.name ||
-                                            "No Subject"
-                                          }
-                                        >
-                                          <p className="text-xs font-semibold text-gray-800">
-                                            {slot?.subjectId?.name ||
-                                              "No Subject"}
-                                          </p>
-                                        </Tooltip>
-                                      ) : (
-                                        <p className="text-xs font-semibold text-gray-800">
-                                          {slot?.eventName || "No Event Name"}
-                                        </p>
-                                      )}
-                                    </div>
-                                    {slot?.description && (
-                                      <Tooltip title={slot?.description}>
-                                        <span className="text-[10px] text-gray-500">
-                                          Info
-                                        </span>
-                                      </Tooltip>
-                                    )}
-                                  </div>
-                                </Card>
-                              ))
-                            ) : (
-                              <p className="text-xs text-gray-500">
-                                No slots available.
-                              </p>
-                            )}
-                          </div>
-                        ))}
+                          </tbody>
+                        </table>
                       </div>
                     )}
 
