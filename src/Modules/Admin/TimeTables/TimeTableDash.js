@@ -608,7 +608,7 @@ export default function TimeTableDash() {
         title="Timetable Details"
         placement="right"
         width={650}
-        closable={false}
+        // closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
         // Keep at a lower zIndex than the modal as well
