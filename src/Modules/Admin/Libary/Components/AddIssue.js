@@ -10,6 +10,7 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { FaSchool } from "react-icons/fa";
 import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
+import { fetchNoticeUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
 
 const { Option } = Select;
 
@@ -74,6 +75,10 @@ const AddIssue = ({ onClose, editIssueData }) => {
 
   // Local submitting state for the button
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchNoticeUsersThunk());
+  }, [dispatch]);
 
   // Pre-populate form if editing
   useEffect(() => {
@@ -152,10 +157,10 @@ const AddIssue = ({ onClose, editIssueData }) => {
     }
   };
 
-  // Filter out any user whose role is 'admin', then apply role-based filter
+  // Filter out any user whose role is 'admin', then apply role-based filter using fuzzy search
   const filteredUsers =
     noticeUsers
-      ?.filter((user) => user.role?.toLowerCase() !== "admin") // hide admin users
+      ?.filter((user) => user.role?.toLowerCase() !== "admin")
       .filter((user) =>
         selectedRole === "all"
           ? true
@@ -195,66 +200,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
   return (
     <form className="flex flex-col h-full space-y-6" onSubmit={handleSubmit}>
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
-        {/* Class & Section side by side */}
-        <div className="flex gap-4">
-          <div className="flex-1">
-            <label
-              htmlFor="class"
-              className="block text-sm font-medium text-gray-700 flex items-center gap-1"
-            >
-              <FaSchool /> {t("Class")}
-            </label>
-            <Select
-              id="class"
-              name="class"
-              value={issueData.class}
-              onChange={(value) => handleSelectChange("class", value)}
-              placeholder={t("Select Class")}
-              style={{ width: "100%" }}
-              size="large"
-              showSearch
-              filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
-              }
-              required
-            >
-              {classList?.map((cls) => (
-                <Option key={cls._id} value={cls._id}>
-                  {cls.className}
-                </Option>
-              ))}
-            </Select>
-          </div>
-          <div className="flex-1">
-            <label
-              htmlFor="section"
-              className="block text-sm font-medium text-gray-700"
-            >
-              {t("Section")}
-            </label>
-            <Select
-              id="section"
-              name="section"
-              value={issueData.section}
-              onChange={(value) => handleSelectChange("section", value)}
-              placeholder={t("Select Section")}
-              style={{ width: "100%" }}
-              size="large"
-              disabled={loading}
-              showSearch
-              filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
-              }
-            >
-              {sectionList?.map((section) => (
-                <Option key={section._id} value={section._id}>
-                  {section.sectionName}
-                </Option>
-              ))}
-            </Select>
-          </div>
-        </div>
-
         {/* Role Filter for Users */}
         <div>
           <label
@@ -278,7 +223,67 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </Select>
         </div>
-
+        {/* Conditionally render Class & Section side by side if role is 'student' */}
+        {selectedRole === "student" && (
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <label
+                htmlFor="class"
+                className="block text-sm font-medium text-gray-700 flex items-center gap-1"
+              >
+                <FaSchool /> {t("Class")}
+              </label>
+              <Select
+                id="class"
+                name="class"
+                value={issueData.class}
+                onChange={(value) => handleSelectChange("class", value)}
+                placeholder={t("Select Class")}
+                style={{ width: "100%" }}
+                size="large"
+                showSearch
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().includes(input.toLowerCase())
+                }
+                required
+              >
+                {classList?.map((cls) => (
+                  <Option key={cls._id} value={cls._id}>
+                    {cls.className}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+            <div className="flex-1">
+              <label
+                htmlFor="section"
+                className="block text-sm font-medium text-gray-700"
+              >
+                {t("Section")}
+              </label>
+              <Select
+                id="section"
+                name="section"
+                value={issueData.section}
+                onChange={(value) => handleSelectChange("section", value)}
+                placeholder={t("Select Section")}
+                style={{ width: "100%" }}
+                size="large"
+                disabled={loading}
+                showSearch
+                filterOption={(input, option) =>
+                  option.children.toLowerCase().includes(input.toLowerCase())
+                }
+              >
+                {sectionList?.map((section) => (
+                  <Option key={section._id} value={section._id}>
+                    {section.sectionName}
+                  </Option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        )}
         {/* User Field */}
         <div>
           <label
@@ -299,9 +304,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             optionFilterProp="data-search"
             filterOption={(input, option) =>
               option.props["data-search"] &&
-              option.props["data-search"]
-                .toLowerCase()
-                .includes(input.toLowerCase())
+              fuzzySearch(input, option.props["data-search"])
             }
             required
           >
@@ -344,7 +347,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
             })}
           </Select>
         </div>
-
         {/* Book Field */}
         <div>
           <label
@@ -374,8 +376,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </Select>
         </div>
-
-        {/* Author Name using AntD Input */}
+        {/* Author Name using AntD Input (read-only) */}
         <div>
           <label
             htmlFor="authorName"
@@ -390,9 +391,10 @@ const AddIssue = ({ onClose, editIssueData }) => {
             onChange={handleInputChange}
             size="large"
             placeholder={t("Enter author name")}
+            disabled
+            readOnly
           />
         </div>
-
         {/* Issue Date & Return Date side by side using DatePicker */}
         <div className="flex gap-4">
           <div className="flex-1">
@@ -438,7 +440,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
             />
           </div>
         </div>
-
         {/* Status as Radio Buttons */}
         <div>
           <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
@@ -458,7 +459,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
           </Radio.Group>
         </div>
       </div>
-
       {/* Submit Button with loading state */}
       <div className="sticky bottom-0 w-full bg-white pb-3 px-5">
         <Button

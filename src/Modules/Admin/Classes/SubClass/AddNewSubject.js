@@ -18,7 +18,6 @@ import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSli
 
 const { Option } = Select;
 
-// Preset color array as hex values
 const presetColors = [
   "#FCD34D", // yellow-300
   "#93C5FD", // blue-300
@@ -42,7 +41,8 @@ const presetColors = [
 const AddNewSubject = ({ onClose, subject }) => {
   const { t } = useTranslation("admClass");
   const [activeTab, setActiveTab] = useState("icon");
-  const [selectedColor, setSelectedColor] = useState("");
+  // Default selected color is now "#FCD34D"
+  const [selectedColor, setSelectedColor] = useState("#FCD34D");
   const [subjectTitle, setSubjectTitle] = useState("");
   const [isOptional, setIsOptional] = useState(false);
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
@@ -57,12 +57,10 @@ const AddNewSubject = ({ onClose, subject }) => {
     (state) => state.admin.students
   );
 
-  // Fetch icons on mount
   useEffect(() => {
     dispatch(fetchAllIcons({ type: "Subject" }));
   }, [dispatch]);
 
-  // Fetch students list when class id changes
   useEffect(() => {
     if (cid) {
       dispatch(fetchStudentsByClassAndSection(cid));
@@ -75,7 +73,6 @@ const AddNewSubject = ({ onClose, subject }) => {
       setSelectedColor(subject?.subjectColor || "");
       setIsOptional(subject?.isOptional || false);
 
-      // Pre-select the subject icon
       if (subject?.subjectIcon) {
         let matchingIcon = null;
         if (typeof subject.subjectIcon === "object") {
@@ -96,15 +93,18 @@ const AddNewSubject = ({ onClose, subject }) => {
         dispatch(selectIcon(null));
       }
 
-      // Pre-select subject title
       setSubjectTitle(subject?.name || "");
 
-      // If optional, pre-select students
+      // If optional, pre-select students (mapping objects to their _id)
       if (subject?.isOptional && subject?.studentIds) {
-        setSelectedStudentIds(subject.studentIds);
+        const preloadedStudentIds = subject.studentIds.map((student) =>
+          student._id ? student._id : student
+        );
+        setSelectedStudentIds(preloadedStudentIds);
       }
     } else {
-      setSelectedColor("");
+      // When no subject is provided, ensure default selected color is "#FCD34D"
+      setSelectedColor("#FCD34D");
       setSubjectTitle("");
       setIsOptional(false);
       setSelectedStudentIds([]);
@@ -112,7 +112,6 @@ const AddNewSubject = ({ onClose, subject }) => {
     }
   }, [subject, dispatch, icons]);
 
-  // Validation checks
   const validateInputs = useCallback(() => {
     if (!subjectTitle.trim()) {
       toast.error(t("Subject name is required."));
@@ -127,7 +126,6 @@ const AddNewSubject = ({ onClose, subject }) => {
     return true;
   }, [subjectTitle, isOptional, selectedStudentIds, t]);
 
-  // Check if any field has changed
   const hasChanges = () => {
     if (!subject) return true;
     const iconChanged =
@@ -146,7 +144,6 @@ const AddNewSubject = ({ onClose, subject }) => {
     );
   };
 
-  // Save handler
   const handleSave = async (publish = false) => {
     if (!validateInputs()) return;
     const subjectData = {
@@ -164,14 +161,30 @@ const AddNewSubject = ({ onClose, subject }) => {
         toast(t("No changes detected."));
         return;
       }
-      dispatch(updateSubject({ subjectId: subject._id, subjectData }));
+      dispatch(updateSubject({ subjectId: subject._id, subjectData }))
+        .unwrap()
+        .then((res) => {
+          clearForm();
+          onClose();
+        });
     } else {
-      dispatch(createSubject(subjectData));
+      dispatch(createSubject(subjectData))
+        .unwrap()
+        .then((res) => {
+          clearForm();
+          onClose();
+        });
     }
-    onClose();
   };
 
-  // Icon Modal
+  const clearForm = () => {
+    setSelectedColor("#FCD34D");
+    setSubjectTitle("");
+    setIsOptional(false);
+    setSelectedStudentIds([]);
+    dispatch(selectIcon(null));
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = (icon = null) => {
     dispatch(selectIcon(icon));
@@ -179,7 +192,6 @@ const AddNewSubject = ({ onClose, subject }) => {
   };
   const closeModal = () => setIsModalOpen(false);
 
-  // Icon Grid
   const iconGrid = useMemo(
     () => (
       <div className="flex flex-col gap-2 flex-grow w-full">
@@ -198,10 +210,8 @@ const AddNewSubject = ({ onClose, subject }) => {
     [icons, selectedIcon, openModal]
   );
 
-  // Preset Colors + Ant Design ColorPicker
   const renderColorOptions = () => (
     <div className="grid grid-cols-6 gap-2">
-      {/* Preset Colors */}
       {presetColors.map((color, index) => (
         <button
           key={index}
@@ -213,8 +223,6 @@ const AddNewSubject = ({ onClose, subject }) => {
           aria-label={t("Select color")}
         />
       ))}
-
-      {/* Ant Design ColorPicker for custom color */}
       <div
         className={`w-12 h-12 rounded-full border-2 flex items-center justify-center cursor-pointer ${
           !presetColors.includes(selectedColor) && selectedColor
@@ -226,7 +234,6 @@ const AddNewSubject = ({ onClose, subject }) => {
           value={selectedColor || "#ffffff"}
           onChange={(color) => setSelectedColor(color.toHexString())}
           placement="bottomRight"
-          // This ensures the popover is rendered within the sidebar
           getPopupContainer={(triggerNode) => triggerNode.parentNode}
         >
           <FaPalette size={18} />
@@ -237,7 +244,6 @@ const AddNewSubject = ({ onClose, subject }) => {
 
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
-      {/* Subject Title */}
       <div className="mb-4">
         <label
           htmlFor="subject-title"
@@ -255,7 +261,6 @@ const AddNewSubject = ({ onClose, subject }) => {
         />
       </div>
 
-      {/* Optional Subject Checkbox */}
       <div className="mb-4">
         <Checkbox
           checked={isOptional}
@@ -265,7 +270,6 @@ const AddNewSubject = ({ onClose, subject }) => {
         </Checkbox>
       </div>
 
-      {/* Select Students */}
       {isOptional && (
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
@@ -321,16 +325,13 @@ const AddNewSubject = ({ onClose, subject }) => {
         </div>
       )}
 
-      {/* Tabs for Icon and Frame Color */}
       <div className="flex mb-4">
-        {/* Subject Icon Tab */}
         <div
           className="flex-1 py-2 text-center cursor-pointer"
           onClick={() => setActiveTab("icon")}
           style={{
             borderBottom:
               activeTab === "icon" ? "2px solid" : "2px solid transparent",
-            // Gradient border
             borderImage:
               activeTab === "icon"
                 ? "linear-gradient(to right, #ec4899, #8b5cf6) 1"
@@ -347,15 +348,12 @@ const AddNewSubject = ({ onClose, subject }) => {
             {t("Subject Icon")}
           </span>
         </div>
-
-        {/* Frame Color Tab */}
         <div
           className="flex-1 py-2 text-center cursor-pointer"
           onClick={() => setActiveTab("color")}
           style={{
             borderBottom:
               activeTab === "color" ? "2px solid" : "2px solid transparent",
-            // Gradient border
             borderImage:
               activeTab === "color"
                 ? "linear-gradient(to right, #ec4899, #8b5cf6) 1"
@@ -374,7 +372,6 @@ const AddNewSubject = ({ onClose, subject }) => {
         </div>
       </div>
 
-      {/* Icon Tab */}
       <div
         className={`flex flex-row p-2 w-full ${
           activeTab === "icon" ? "block" : "hidden"
@@ -383,14 +380,12 @@ const AddNewSubject = ({ onClose, subject }) => {
         {iconGrid}
       </div>
 
-      {/* Frame Color Tab with Preset Colors + ColorPicker */}
       <div
         className={`flex flex-col items-center gap-2 ${
           activeTab === "color" ? "block" : "hidden"
         }`}
       >
         {renderColorOptions()}
-        {/* Display the selected color in a larger square with code in center */}
         <div
           className="flex items-center justify-center w-32 h-14 mt-2 border rounded-md"
           style={{ backgroundColor: selectedColor || "#fff" }}
@@ -401,7 +396,6 @@ const AddNewSubject = ({ onClose, subject }) => {
         </div>
       </div>
 
-      {/* Save Buttons */}
       <div className="mt-auto pt-4 flex justify-between space-x-2 sticky bottom-0 bg-white py-4">
         <button
           onClick={() => handleSave(true)}
@@ -427,7 +421,6 @@ const AddNewSubject = ({ onClose, subject }) => {
         </button>
       </div>
 
-      {/* Icon Modal */}
       {isModalOpen && (
         <CreateEditIconModal onClose={closeModal} type="Subject" />
       )}

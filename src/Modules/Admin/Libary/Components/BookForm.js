@@ -91,12 +91,14 @@ const BookForm = ({ book, onClose }) => {
     setImageKey(Date.now());
   };
 
+  // Updated: Class selection is now optional
   const validateForm = () => {
     const newErrors = {};
     if (!bookData.bookName) newErrors.bookName = t("Book name is required.");
     if (!bookData.authorName)
       newErrors.authorName = t("Author name is required.");
-    if (!bookData.class) newErrors.class = t("Class selection is required.");
+    // Removed class validation to make it optional:
+    // if (!bookData.class) newErrors.class = t("Class selection is required.");
     if (bookData.categories.length === 0)
       newErrors.categories = t("At least one category is required.");
     if (Number(bookData.copies) < 1)
@@ -175,7 +177,7 @@ const BookForm = ({ book, onClose }) => {
                 htmlFor="classSelect"
                 className="block text-sm font-medium text-gray-700 mb-1"
               >
-                {t("Class")}
+                {t("Class")} ({t("Optional")})
               </label>
               <Select
                 id="classSelect"
