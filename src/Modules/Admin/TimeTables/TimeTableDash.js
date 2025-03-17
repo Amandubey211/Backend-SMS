@@ -115,7 +115,7 @@ export default function TimeTableDash() {
 
   // Redux store: Timetables
   const { timetables = [], loadingFetch } = useSelector(
-    (store) => store.admin.timetable
+    (store) => store?.admin?.timetable || {}
   );
 
   // On mount, fetch data
@@ -157,7 +157,7 @@ export default function TimeTableDash() {
   // --------------------------------------------
   const handleFormSubmit = (values, isEdit) => {
     if (isEdit && editingTimetable?._id) {
-      dispatch(updateTT({ id: editingTimetable._id, data: values })).then(
+      dispatch(updateTT({ id: editingTimetable?._id, data: values })).then(
         () => {
           closeDrawer();
         }
@@ -190,7 +190,7 @@ export default function TimeTableDash() {
   };
   const confirmDelete = () => {
     if (editingTimetable) {
-      dispatch(deleteTT(editingTimetable._id));
+      dispatch(deleteTT(editingTimetable?._id));
     }
     setEditingTimetable(null);
     setDeleteModalVisible(false);
@@ -204,13 +204,13 @@ export default function TimeTableDash() {
   const dateCellRender = (currentDayjs) => {
     const dateString = currentDayjs.format("YYYY-MM-DD");
     const matched = timetables.flatMap((tt) => {
-      if (tt.type === "weekly") {
+      if (tt?.type === "weekly") {
         const dayName = currentDayjs.format("dddd");
-        return tt.days.find((d) => d.day === dayName) ? [tt] : [];
+        return tt?.days?.find((d) => d?.day === dayName) ? [tt] : [];
       } else {
-        return tt.days.find((d) => {
-          if (!d.date) return false;
-          const dStr = dayjs(d.date).format("YYYY-MM-DD");
+        return tt?.days?.find((d) => {
+          if (!d?.date) return false;
+          const dStr = dayjs(d?.date).format("YYYY-MM-DD");
           return dStr === dateString;
         })
           ? [tt]
@@ -222,17 +222,17 @@ export default function TimeTableDash() {
       <div className="space-y-1">
         {matched.map((evt) => (
           <Tooltip
-            key={evt._id}
-            title={evt.name}
-            color={getColorByType(evt.type)}
+            key={evt?._id}
+            title={evt?.name}
+            color={getColorByType(evt?.type)}
             placement="bottom"
           >
             <div
               className="px-2 py-1 rounded text-white text-xs cursor-pointer"
-              style={{ backgroundColor: getColorByType(evt.type) }}
+              style={{ backgroundColor: getColorByType(evt?.type) }}
               onClick={() => onEventClick(evt)}
             >
-              {evt.name}
+              {evt?.name}
             </div>
           </Tooltip>
         ))}
@@ -248,14 +248,14 @@ export default function TimeTableDash() {
     const dateString = format(selectedDate, "yyyy-MM-dd");
 
     const weekly = timetables
-      .filter((t) => t.type === "weekly")
-      .filter((t) => t.days.some((d) => d.day === dayName));
+      .filter((t) => t?.type === "weekly")
+      .filter((t) => t?.days?.some((d) => d?.day === dayName));
     const nonWeekly = timetables
-      .filter((t) => t.type !== "weekly")
+      .filter((t) => t?.type !== "weekly")
       .filter((t) =>
-        t.days.some((d) => {
-          if (!d.date) return false;
-          return format(new Date(d.date), "yyyy-MM-dd") === dateString;
+        t?.days?.some((d) => {
+          if (!d?.date) return false;
+          return format(new Date(d?.date), "yyyy-MM-dd") === dateString;
         })
       );
     const allEvents = [...weekly, ...nonWeekly];
@@ -277,13 +277,13 @@ export default function TimeTableDash() {
         ) : (
           allEvents.map((evt) => (
             <Card
-              key={evt._id}
+              key={evt?._id}
               className="mb-3 border-l-4 cursor-pointer"
-              style={{ borderLeftColor: getColorByType(evt.type) }}
+              style={{ borderLeftColor: getColorByType(evt?.type) }}
               onClick={() => onEventClick(evt)}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-800">{evt.name}</span>
+                <span className="font-medium text-gray-800">{evt?.name}</span>
                 <AiOutlineEdit className="text-gray-400" />
               </div>
             </Card>
@@ -312,14 +312,14 @@ export default function TimeTableDash() {
       const dateStr = format(dateObj, "yyyy-MM-dd");
 
       const w = timetables
-        .filter((t) => t.type === "weekly")
-        .filter((t) => t.days.some((d) => d.day === dayName));
+        .filter((t) => t?.type === "weekly")
+        .filter((t) => t?.days?.some((d) => d?.day === dayName));
       const others = timetables
-        .filter((t) => t.type !== "weekly")
+        .filter((t) => t?.type !== "weekly")
         .filter((t) =>
-          t.days.some((d) => {
-            if (!d.date) return false;
-            return format(new Date(d.date), "yyyy-MM-dd") === dateStr;
+          t?.days?.some((d) => {
+            if (!d?.date) return false;
+            return format(new Date(d?.date), "yyyy-MM-dd") === dateStr;
           })
         );
       return [...w, ...others];
@@ -354,14 +354,14 @@ export default function TimeTableDash() {
                 ) : (
                   events.map((evt) => (
                     <Card
-                      key={evt._id}
+                      key={evt?._id}
                       className="mb-2 border-l-4 cursor-pointer"
-                      style={{ borderLeftColor: getColorByType(evt.type) }}
+                      style={{ borderLeftColor: getColorByType(evt?.type) }}
                       onClick={() => onEventClick(evt)}
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-800">
-                          {evt.name}
+                          {evt?.name}
                         </span>
                         <AiOutlineEdit className="text-gray-400" />
                       </div>
@@ -384,10 +384,10 @@ export default function TimeTableDash() {
     datasets: [
       {
         data: [
-          timetables.filter((t) => t.type === "weekly").length,
-          timetables.filter((t) => t.type === "exam").length,
-          timetables.filter((t) => t.type === "event").length,
-          timetables.filter((t) => t.type === "others").length,
+          timetables.filter((t) => t?.type === "weekly").length,
+          timetables.filter((t) => t?.type === "exam").length,
+          timetables.filter((t) => t?.type === "event").length,
+          timetables.filter((t) => t?.type === "others").length,
         ],
         backgroundColor: ["#FF99CC", "#29ABE2", "#77DD77", "#FFD700"],
         borderColor: "#fff",
@@ -486,7 +486,7 @@ export default function TimeTableDash() {
               >
                 <Calendar
                   value={dayjs(selectedDate)}
-                  onSelect={(dayjsObj) => setSelectedDate(dayjsObj.toDate())}
+                  onSelect={(dayjsObj) => setSelectedDate(dayjsObj?.toDate())}
                   dateCellRender={dateCellRender}
                   className="bg-white shadow-sm border rounded-lg px-2"
                 />
@@ -511,7 +511,9 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Weekly Timetables</span>
                   <Badge
-                    count={timetables.filter((t) => t.type === "weekly").length}
+                    count={
+                      timetables.filter((t) => t?.type === "weekly").length
+                    }
                     style={{ backgroundColor: "#FF99CC", marginLeft: 8 }}
                   />
                 </Card>
@@ -521,7 +523,7 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Exams</span>
                   <Badge
-                    count={timetables.filter((t) => t.type === "exam").length}
+                    count={timetables.filter((t) => t?.type === "exam").length}
                     style={{ backgroundColor: "#29ABE2", marginLeft: 8 }}
                   />
                 </Card>
@@ -531,7 +533,7 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Events</span>
                   <Badge
-                    count={timetables.filter((t) => t.type === "event").length}
+                    count={timetables.filter((t) => t?.type === "event").length}
                     style={{ backgroundColor: "#77DD77", marginLeft: 8 }}
                   />
                 </Card>
@@ -541,7 +543,9 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Others</span>
                   <Badge
-                    count={timetables.filter((t) => t.type === "others").length}
+                    count={
+                      timetables.filter((t) => t?.type === "others").length
+                    }
                     style={{ backgroundColor: "#FFD700", marginLeft: 8 }}
                   />
                 </Card>
@@ -625,19 +629,19 @@ export default function TimeTableDash() {
                   {/* Title and Big Icon container in body */}
                   <div className="flex items-center justify-between">
                     <h4 className="font-bold text-2xl text-gray-900">
-                      {detailsTimetable.name || "Untitled Timetable"}
+                      {detailsTimetable?.name || "Untitled Timetable"}
                     </h4>
                     <div className="flex flex-col items-center">
                       <div
                         className="w-16 h-16 flex items-center justify-center rounded mb-1"
                         style={{
                           backgroundColor: getLightBgByType(
-                            detailsTimetable.type
+                            detailsTimetable?.type
                           ),
                         }}
                       >
                         <div className="text-4xl text-gray-800">
-                          {getIconForType(detailsTimetable.type)}
+                          {getIconForType(detailsTimetable?.type)}
                         </div>
                       </div>
                       <span className="text-sm text-gray-700">
@@ -652,21 +656,21 @@ export default function TimeTableDash() {
                       This Timetable For:
                     </h5>
                     <div className="mt-1 space-x-1">
-                      {detailsTimetable.classId && (
+                      {detailsTimetable?.classId && (
                         <Tag color="blue">
-                          {detailsTimetable.classId.className ||
+                          {detailsTimetable?.classId?.className ||
                             "No Class Name"}
                         </Tag>
                       )}
-                      {detailsTimetable.sectionId && (
+                      {detailsTimetable?.sectionId && (
                         <Tag color="purple">
-                          {detailsTimetable.sectionId.sectionName ||
+                          {detailsTimetable?.sectionId?.sectionName ||
                             "No Section Name"}
                         </Tag>
                       )}
-                      {detailsTimetable.groupId && (
+                      {detailsTimetable?.groupId && (
                         <Tag color="cyan">
-                          {detailsTimetable.groupId.groupName ||
+                          {detailsTimetable?.groupId?.groupName ||
                             "No Group Name"}
                         </Tag>
                       )}
@@ -678,11 +682,11 @@ export default function TimeTableDash() {
                     <h5 className="text-gray-600 text-sm">Status:</h5>
                     <Tag
                       color={
-                        detailsTimetable.status === "active" ? "green" : "red"
+                        detailsTimetable?.status === "active" ? "green" : "red"
                       }
                       className="mt-1"
                     >
-                      {detailsTimetable.status || "inactive"}
+                      {detailsTimetable?.status || "inactive"}
                     </Tag>
                   </div>
 
@@ -690,35 +694,35 @@ export default function TimeTableDash() {
                   <div>
                     <h5 className="text-gray-600 text-sm">Semester:</h5>
                     <p className="text-sm text-gray-800">
-                      {detailsTimetable.semesterId?.title || "No Semester"}
+                      {detailsTimetable?.semesterId?.title || "No Semester"}
                     </p>
                   </div>
 
                   {/* Schedule */}
-                  {detailsTimetable.days &&
-                    detailsTimetable.days.length > 0 && (
+                  {detailsTimetable?.days &&
+                    detailsTimetable?.days?.length > 0 && (
                       <div>
                         <h5 className="font-medium text-gray-800 mt-4">
                           Schedule:
                         </h5>
-                        {detailsTimetable.days.map((dayItem) => (
+                        {detailsTimetable?.days?.map((dayItem) => (
                           <div
-                            key={dayItem._id}
+                            key={dayItem?._id}
                             className="mb-3 border p-2 rounded"
                           >
-                            {dayItem.date ? (
+                            {dayItem?.date ? (
                               <p className="text-sm text-gray-700 font-semibold">
-                                {format(new Date(dayItem.date), "dd MMM yyyy")}
+                                {format(new Date(dayItem?.date), "dd MMM yyyy")}
                               </p>
                             ) : (
                               <p className="text-sm text-gray-700 font-semibold">
-                                {dayItem.day || "Day Not Specified"}
+                                {dayItem?.day || "Day Not Specified"}
                               </p>
                             )}
-                            {dayItem.slots && dayItem.slots.length > 0 ? (
-                              dayItem.slots.map((slot) => (
+                            {dayItem?.slots && dayItem?.slots?.length > 0 ? (
+                              dayItem?.slots?.map((slot) => (
                                 <Card
-                                  key={slot._id}
+                                  key={slot?._id}
                                   size="small"
                                   className="mb-2"
                                   bodyStyle={{ padding: "8px" }}
@@ -726,28 +730,29 @@ export default function TimeTableDash() {
                                   <div className="flex justify-between items-center">
                                     <div>
                                       <p className="text-xs text-gray-600">
-                                        {dayjs(slot.startTime).format("HH:mm")}{" "}
-                                        - {dayjs(slot.endTime).format("HH:mm")}
+                                        {dayjs(slot?.startTime).format("HH:mm")}{" "}
+                                        - {dayjs(slot?.endTime).format("HH:mm")}
                                       </p>
-                                      {slot.subjectId ? (
+                                      {slot?.subjectId ? (
                                         <Tooltip
                                           title={
-                                            slot.subjectId.name || "No Subject"
+                                            slot?.subjectId?.name ||
+                                            "No Subject"
                                           }
                                         >
                                           <p className="text-xs font-semibold text-gray-800">
-                                            {slot.subjectId.name ||
+                                            {slot?.subjectId?.name ||
                                               "No Subject"}
                                           </p>
                                         </Tooltip>
                                       ) : (
                                         <p className="text-xs font-semibold text-gray-800">
-                                          {slot.eventName || "No Event Name"}
+                                          {slot?.eventName || "No Event Name"}
                                         </p>
                                       )}
                                     </div>
-                                    {slot.description && (
-                                      <Tooltip title={slot.description}>
+                                    {slot?.description && (
+                                      <Tooltip title={slot?.description}>
                                         <span className="text-[10px] text-gray-500">
                                           Info
                                         </span>
@@ -774,9 +779,9 @@ export default function TimeTableDash() {
                     >
                       <p className="text-sm text-gray-500">Available From :</p>
                       <p className="text-sm text-gray-800 font-semibold">
-                        {detailsTimetable.validity?.startDate
+                        {detailsTimetable?.validity?.startDate
                           ? format(
-                              new Date(detailsTimetable.validity.startDate),
+                              new Date(detailsTimetable?.validity?.startDate),
                               "M/d/yyyy"
                             )
                           : "N/A"}
@@ -788,9 +793,9 @@ export default function TimeTableDash() {
                     >
                       <p className="text-sm text-gray-500">Due Date :</p>
                       <p className="text-sm text-gray-800 font-semibold">
-                        {detailsTimetable.validity?.endDate
+                        {detailsTimetable?.validity?.endDate
                           ? format(
-                              new Date(detailsTimetable.validity.endDate),
+                              new Date(detailsTimetable?.validity?.endDate),
                               "M/d/yyyy"
                             )
                           : "No End Date"}

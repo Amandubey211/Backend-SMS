@@ -113,6 +113,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           </label>
           <Search
             size="middle"
+            // style={{ width: "150px" }}
             placeholder={t("Search by student name")}
             onSearch={handleSearch}
             allowClear
@@ -128,9 +129,13 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             <Select
               size="middle"
               placeholder={t("Select Class")}
-              value={localFilters.classLevel}
+              value={
+                localFilters.classLevel === ""
+                  ? undefined
+                  : localFilters.classLevel
+              }
               onChange={(value) => handleFilterChange("classLevel", value)}
-              style={{ width: 150 }}
+              style={{ width: 120 }}
               allowClear
               showSearch
               optionFilterProp="children"
@@ -149,9 +154,11 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             <Select
               size="middle"
               placeholder={t("Select Section")}
-              value={localFilters.section}
+              value={
+                localFilters.section === "" ? undefined : localFilters.section
+              }
               onChange={(value) => handleFilterChange("section", value)}
-              style={{ width: 150 }}
+              style={{ width: 120 }}
               allowClear
               disabled={!localFilters.classLevel}
               showSearch
@@ -171,7 +178,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             <Select
               size="middle"
               placeholder={t("Select Book")}
-              value={localFilters.book}
+              value={localFilters.book === "" ? undefined : localFilters.book}
               onChange={(value) => handleFilterChange("book", value)}
               style={{ width: 150 }}
               allowClear
@@ -192,7 +199,9 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             <Select
               size="middle"
               placeholder={t("Select Status")}
-              value={localFilters.status}
+              value={
+                localFilters.status === "" ? undefined : localFilters.status
+              }
               onChange={(value) => handleFilterChange("status", value)}
               style={{ width: 100 }}
               allowClear
@@ -210,7 +219,9 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             <Select
               size="middle"
               placeholder={t("Select Role")}
-              value={localFilters.roleType}
+              value={
+                localFilters.roleType === "" ? undefined : localFilters.roleType
+              }
               onChange={(value) => handleFilterChange("roleType", value)}
               style={{ width: 100 }}
               allowClear
@@ -260,11 +271,11 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
           <table className="min-w-full">
             <thead>
               <tr className="text-left text-gray-700 bg-gray-200">
-                <th className="px-6 py-3 font-semibold">{t("Student")}</th>
+                <th className="px-6 py-3 font-semibold">{t("User Name")}</th>
                 <th className="px-6 py-3 font-semibold">{t("User Type")}</th>
-                <th className="px-6 py-3 font-semibold">
+                {/* <th className="px-6 py-3 font-semibold">
                   {t("Class & Section")}
-                </th>
+                </th> */}
                 <th className="px-6 py-3 font-semibold">{t("Book")}</th>
                 <th className="px-6 py-3 font-semibold">{t("Author")}</th>
                 <th className="px-6 py-3 font-semibold">{t("Issue Date")}</th>

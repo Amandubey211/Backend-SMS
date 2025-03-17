@@ -39,18 +39,21 @@ const BookIssueRow = ({ item, setEditIssueData, role, handleSidebarOpen }) => {
     ? moment(item.returnDate).format("DD-MM-YYYY")
     : "N/A";
 
-  // Construct full name from user details
+  // Construct full name: if parent, use guardianName; otherwise use firstName + lastName
   const fullName =
-    item?.issuedTo?.userId?.firstName && item?.issuedTo?.userId?.lastName
+    userType.toLowerCase() === "parent"
+      ? item?.issuedTo?.userId?.guardianName || "No username"
+      : item?.issuedTo?.userId?.firstName && item?.issuedTo?.userId?.lastName
       ? `${item.issuedTo.userId.firstName} ${item.issuedTo.userId.lastName}`
-      : "No Student";
+      : "No username";
 
   return (
     <tr className="text-left text-gray-700 hover:bg-gray-100 hover:shadow-md transition duration-200 ease-in-out">
       {/* Student Column */}
       <td className="px-5 py-3 border-b border-gray-200">
         <div className="flex flex-col">
-          <div className="flex items-center">
+          {/* Name & Profile Row */}
+          <div className="flex items-center mb-1">
             {userProfile ? (
               <img
                 src={userProfile}
@@ -62,10 +65,14 @@ const BookIssueRow = ({ item, setEditIssueData, role, handleSidebarOpen }) => {
             )}
             <span>{fullName}</span>
           </div>
+
+          {/* Admission Number on its own line with a slight top margin */}
           {item?.issuedTo?.userId?.role?.toLowerCase() === "student" && (
-            <span className="text-xs text-gray-500">
-              {item?.issuedTo?.userId?.admissionNumber || "Admission No: N/A"}
-            </span>
+            <div>
+              <Tag color="green">
+                {item?.issuedTo?.userId?.admissionNumber || "Admission No: N/A"}
+              </Tag>
+            </div>
           )}
         </div>
       </td>
@@ -76,10 +83,10 @@ const BookIssueRow = ({ item, setEditIssueData, role, handleSidebarOpen }) => {
       </td>
 
       {/* Class & Section Column */}
-      <td className="px-5 py-2 border-b border-gray-200">
+      {/* <td className="px-5 py-2 border-b border-gray-200">
         <div className="text-base font-semibold">{className}</div>
         <div className="text-sm text-green-500">{sectionName}</div>
-      </td>
+      </td> */}
 
       {/* Book Column */}
       <td className="px-5 py-2 border-b border-gray-200">
