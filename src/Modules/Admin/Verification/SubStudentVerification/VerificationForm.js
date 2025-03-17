@@ -38,10 +38,9 @@ const VerificationForm = ({ email, studentId }) => {
     };
 
     // Dispatch verify student thunk (which handles the verification, class assignment, and credentials sending)
-    await dispatch(verifyStudent(verificationDetails));
+    await dispatch(verifyStudent({verificationDetails,navigate}));
 
-    // Navigate back after the process
-    // navigate(-1);
+   
   };
 
   return (

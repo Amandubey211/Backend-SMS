@@ -53,7 +53,7 @@ export const fetchRejectedStudents = createAsyncThunk(
 // Verify Student and Send Credentials
 export const verifyStudent = createAsyncThunk(
   "verification/verifyStudent",
-  async (verificationDetails, { rejectWithValue, dispatch, getState }) => {
+  async ({verificationDetails,navigate}, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
@@ -123,7 +123,8 @@ export const verifyStudent = createAsyncThunk(
 
       // Display one aggregated toast notification
       toast.success(successMessages.join(" "));
-
+      // Navigate back after the process
+      navigate("/verify_students");
       return verifyResponse.student;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
