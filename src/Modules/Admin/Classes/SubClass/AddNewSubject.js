@@ -1,37 +1,42 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
+import { Select, Checkbox, Avatar, Tag, ColorPicker } from "antd";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
+import { FaPalette } from "react-icons/fa";
 import {
   createSubject,
   updateSubject,
 } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
+import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
 import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
 import IconGrid from "../MainSection/IconGrid";
-import CreateEditIconModal from "../MainSection/CreateEditIconModal";
+import CreateEditIconModal from "../MainSection/IconGrid";
 import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 
-const dummyColors = [
-  "bg-yellow-300",
-  "bg-blue-300",
-  "bg-green-300",
-  "bg-red-300",
-  "bg-purple-300",
-  "bg-pink-300",
-  "bg-indigo-300",
-  "bg-orange-300",
-  "bg-teal-300",
-  "bg-cyan-300",
-  "bg-lime-300",
-  "bg-amber-300",
-  "bg-emerald-300",
-  "bg-fuchsia-300",
-  "bg-rose-300",
-  "bg-violet-300",
-  "bg-sky-300",
-  "bg-gray-300",
+const { Option } = Select;
+
+// Preset color array as hex values
+const presetColors = [
+  "#FCD34D", // yellow-300
+  "#93C5FD", // blue-300
+  "#6EE7B7", // green-300
+  "#FCA5A5", // red-300
+  "#D8B4FE", // purple-300
+  "#F9A8D4", // pink-300
+  "#A5B4FC", // indigo-300
+  "#FDBA74", // orange-300
+  "#6EE7C9", // teal-300
+  "#67E8F9", // cyan-300
+  "#D9F99D", // lime-300
+  "#FBBF24", // amber-300
+  "#34D399", // emerald-300
+  "#F472B6", // fuchsia-300
+  "#C4B5FD", // violet-300
+  "#7DD3FC", // sky-300
+  "#D1D5DB", // gray-300
 ];
 
 const AddNewSubject = ({ onClose, subject }) => {
@@ -39,6 +44,8 @@ const AddNewSubject = ({ onClose, subject }) => {
   const [activeTab, setActiveTab] = useState("icon");
   const [selectedColor, setSelectedColor] = useState("");
   const [subjectTitle, setSubjectTitle] = useState("");
+  const [isOptional, setIsOptional] = useState(false);
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
 
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -46,20 +53,32 @@ const AddNewSubject = ({ onClose, subject }) => {
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
+  const { studentsList, loading: studentsLoading } = useSelector(
+    (state) => state.admin.students
+  );
 
-  // Fetch icons for subjects on mount
+  // Fetch icons on mount
   useEffect(() => {
     dispatch(fetchAllIcons({ type: "Subject" }));
   }, [dispatch]);
 
-  // When editing a subject, pre-select its icon using subjectIcon field
+  // Fetch students list when class id changes
+  useEffect(() => {
+    if (cid) {
+      dispatch(fetchStudentsByClassAndSection(cid));
+    }
+  }, [dispatch, cid]);
+
+  // Pre-populate values when editing
   useEffect(() => {
     if (subject) {
-      setSelectedColor(subject?.color || "");
+      setSelectedColor(subject?.subjectColor || "");
+      setIsOptional(subject?.isOptional || false);
+
+      // Pre-select the subject icon
       if (subject?.subjectIcon) {
         let matchingIcon = null;
         if (typeof subject.subjectIcon === "object") {
-          // If subjectIcon is an object, use its _id or id
           const subjectIconId =
             subject.subjectIcon._id || subject.subjectIcon.id;
           if (icons && icons.length > 0) {
@@ -67,45 +86,67 @@ const AddNewSubject = ({ onClose, subject }) => {
               (icon) => (icon._id || icon.id) === subjectIconId
             );
           }
-        } else {
-          // subjectIcon is a string URL—attempt to match by imageLink
-          if (icons && icons.length > 0) {
-            matchingIcon = icons.find(
-              (icon) => icon.imageLink === subject.subjectIcon
-            );
-          }
+        } else if (icons && icons.length > 0) {
+          matchingIcon = icons.find(
+            (icon) => icon.imageLink === subject.subjectIcon
+          );
         }
-        // Dispatch the matching icon object if found; otherwise, fall back to the raw value
-        dispatch(selectIcon(matchingIcon ? matchingIcon : subject.subjectIcon));
+        dispatch(selectIcon(matchingIcon || subject.subjectIcon));
       } else {
         dispatch(selectIcon(null));
       }
+
+      // Pre-select subject title
       setSubjectTitle(subject?.name || "");
+
+      // If optional, pre-select students
+      if (subject?.isOptional && subject?.studentIds) {
+        setSelectedStudentIds(subject.studentIds);
+      }
     } else {
       setSelectedColor("");
       setSubjectTitle("");
+      setIsOptional(false);
+      setSelectedStudentIds([]);
       dispatch(selectIcon(null));
     }
   }, [subject, dispatch, icons]);
 
+  // Validation checks
   const validateInputs = useCallback(() => {
     if (!subjectTitle.trim()) {
       toast.error(t("Subject name is required."));
       return false;
     }
+    if (isOptional && selectedStudentIds.length === 0) {
+      toast.error(
+        t("Please select at least one student for an optional subject.")
+      );
+      return false;
+    }
     return true;
-  }, [subjectTitle, t]);
+  }, [subjectTitle, isOptional, selectedStudentIds, t]);
 
+  // Check if any field has changed
   const hasChanges = () => {
     if (!subject) return true;
+    const iconChanged =
+      (selectedIcon?.imageLink || null) !==
+      (subject.subjectIcon?.imageLink || subject.subjectIcon || null);
+    const studentChanged = isOptional
+      ? JSON.stringify(selectedStudentIds) !==
+        JSON.stringify(subject.studentIds)
+      : false;
     return (
       subjectTitle !== subject.name ||
-      selectedColor !== subject.color ||
-      (selectedIcon?.imageLink || null) !==
-        (subject.subjectIcon?.imageLink || subject.subjectIcon || null)
+      selectedColor !== subject.subjectColor ||
+      iconChanged ||
+      isOptional !== subject.isOptional ||
+      studentChanged
     );
   };
 
+  // Save handler
   const handleSave = async (publish = false) => {
     if (!validateInputs()) return;
     const subjectData = {
@@ -114,6 +155,8 @@ const AddNewSubject = ({ onClose, subject }) => {
       isPublished: publish,
       subjectIcon: selectedIcon?.imageLink,
       subjectColor: selectedColor,
+      isOptional,
+      ...(isOptional && { studentIds: selectedStudentIds }),
     };
 
     if (subject) {
@@ -128,16 +171,15 @@ const AddNewSubject = ({ onClose, subject }) => {
     onClose();
   };
 
+  // Icon Modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = (icon = null) => {
     dispatch(selectIcon(icon));
     setIsModalOpen(true);
   };
+  const closeModal = () => setIsModalOpen(false);
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
+  // Icon Grid
   const iconGrid = useMemo(
     () => (
       <div className="flex flex-col gap-2 flex-grow w-full">
@@ -156,24 +198,46 @@ const AddNewSubject = ({ onClose, subject }) => {
     [icons, selectedIcon, openModal]
   );
 
-  const colorGrid = useMemo(
-    () =>
-      dummyColors.map((color, index) => (
+  // Preset Colors + Ant Design ColorPicker
+  const renderColorOptions = () => (
+    <div className="grid grid-cols-6 gap-2">
+      {/* Preset Colors */}
+      {presetColors.map((color, index) => (
         <button
           key={index}
           onClick={() => setSelectedColor(color)}
-          className={`w-12 h-12 rounded-full border-2 ${color} focus:outline-none transition duration-300 ease-in-out ${
+          className={`w-12 h-12 rounded-full border-2 focus:outline-none transition duration-300 ease-in-out ${
             selectedColor === color ? "border-black" : "border-transparent"
           }`}
-          aria-pressed={selectedColor === color}
-          aria-label={t("Select color", { color })}
+          style={{ backgroundColor: color }}
+          aria-label={t("Select color")}
         />
-      )),
-    [selectedColor, t]
+      ))}
+
+      {/* Ant Design ColorPicker for custom color */}
+      <div
+        className={`w-12 h-12 rounded-full border-2 flex items-center justify-center cursor-pointer ${
+          !presetColors.includes(selectedColor) && selectedColor
+            ? "border-black"
+            : "border-transparent"
+        }`}
+      >
+        <ColorPicker
+          value={selectedColor || "#ffffff"}
+          onChange={(color) => setSelectedColor(color.toHexString())}
+          placement="bottomRight"
+          // This ensures the popover is rendered within the sidebar
+          getPopupContainer={(triggerNode) => triggerNode.parentNode}
+        >
+          <FaPalette size={18} />
+        </ColorPicker>
+      </div>
+    </div>
   );
 
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
+      {/* Subject Title */}
       <div className="mb-4">
         <label
           htmlFor="subject-title"
@@ -186,36 +250,131 @@ const AddNewSubject = ({ onClose, subject }) => {
           id="subject-title"
           value={subjectTitle}
           onChange={(e) => setSubjectTitle(e.target.value)}
-          className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          className="mt-1 block w-full p-3 h-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           placeholder={t("Type here")}
         />
       </div>
 
-      <div className="flex mb-4">
-        <button
-          className={`flex-1 py-2 ${
-            activeTab === "icon"
-              ? "border-b-2 border-indigo-500 text-indigo-500"
-              : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("icon")}
-          aria-controls="icon-tab"
+      {/* Optional Subject Checkbox */}
+      <div className="mb-4">
+        <Checkbox
+          checked={isOptional}
+          onChange={(e) => setIsOptional(e.target.checked)}
         >
-          {t("Subject Icon")}
-        </button>
-        <button
-          className={`flex-1 py-2 ${
-            activeTab === "color"
-              ? "border-b-2 border-indigo-500 text-indigo-500"
-              : "text-gray-500"
-          }`}
-          onClick={() => setActiveTab("color")}
-          aria-controls="color-tab"
-        >
-          {t("Frame Color")}
-        </button>
+          {t("Optional Subject")}
+        </Checkbox>
       </div>
 
+      {/* Select Students */}
+      {isOptional && (
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            {t("Select Students")}
+          </label>
+          <Select
+            mode="multiple"
+            showSearch
+            placeholder={t("Search: Name or Admission")}
+            value={selectedStudentIds}
+            onChange={(value) => setSelectedStudentIds(value)}
+            loading={studentsLoading}
+            style={{ width: "100%" }}
+            size="large"
+            filterOption={(input, option) =>
+              option.fullName.toLowerCase().includes(input.toLowerCase()) ||
+              option.admission.toLowerCase().includes(input.toLowerCase())
+            }
+          >
+            {studentsList &&
+              studentsList.map((student) => (
+                <Option
+                  key={student._id}
+                  value={student._id}
+                  label={`${student.firstName} ${student.lastName}`}
+                  fullName={`${student.firstName} ${student.lastName}`}
+                  admission={`${student.admissionNumber}`}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      <Avatar src={student.profile} size="small" />
+                      <span>
+                        {student.firstName} {student.lastName}
+                      </span>
+                    </div>
+                    <Tag>{student.admissionNumber}</Tag>
+                  </div>
+                </Option>
+              ))}
+          </Select>
+        </div>
+      )}
+
+      {/* Tabs for Icon and Frame Color */}
+      <div className="flex mb-4">
+        {/* Subject Icon Tab */}
+        <div
+          className="flex-1 py-2 text-center cursor-pointer"
+          onClick={() => setActiveTab("icon")}
+          style={{
+            borderBottom:
+              activeTab === "icon" ? "2px solid" : "2px solid transparent",
+            // Gradient border
+            borderImage:
+              activeTab === "icon"
+                ? "linear-gradient(to right, #ec4899, #8b5cf6) 1"
+                : "none",
+          }}
+        >
+          <span
+            className={`${
+              activeTab === "icon"
+                ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 font-semibold"
+                : "text-gray-500"
+            }`}
+          >
+            {t("Subject Icon")}
+          </span>
+        </div>
+
+        {/* Frame Color Tab */}
+        <div
+          className="flex-1 py-2 text-center cursor-pointer"
+          onClick={() => setActiveTab("color")}
+          style={{
+            borderBottom:
+              activeTab === "color" ? "2px solid" : "2px solid transparent",
+            // Gradient border
+            borderImage:
+              activeTab === "color"
+                ? "linear-gradient(to right, #ec4899, #8b5cf6) 1"
+                : "none",
+          }}
+        >
+          <span
+            className={`${
+              activeTab === "color"
+                ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 font-semibold"
+                : "text-gray-500"
+            }`}
+          >
+            {t("Frame Color")}
+          </span>
+        </div>
+      </div>
+
+      {/* Icon Tab */}
       <div
         className={`flex flex-row p-2 w-full ${
           activeTab === "icon" ? "block" : "hidden"
@@ -223,14 +382,26 @@ const AddNewSubject = ({ onClose, subject }) => {
       >
         {iconGrid}
       </div>
+
+      {/* Frame Color Tab with Preset Colors + ColorPicker */}
       <div
-        className={`grid grid-cols-6 gap-2 ${
+        className={`flex flex-col items-center gap-2 ${
           activeTab === "color" ? "block" : "hidden"
         }`}
       >
-        {colorGrid}
+        {renderColorOptions()}
+        {/* Display the selected color in a larger square with code in center */}
+        <div
+          className="flex items-center justify-center w-32 h-14 mt-2 border rounded-md"
+          style={{ backgroundColor: selectedColor || "#fff" }}
+        >
+          <span className="text-sm font-semibold">
+            {selectedColor || "#ffffff"}
+          </span>
+        </div>
       </div>
 
+      {/* Save Buttons */}
       <div className="mt-auto pt-4 flex justify-between space-x-2 sticky bottom-0 bg-white py-4">
         <button
           onClick={() => handleSave(true)}
@@ -255,6 +426,8 @@ const AddNewSubject = ({ onClose, subject }) => {
           )}
         </button>
       </div>
+
+      {/* Icon Modal */}
       {isModalOpen && (
         <CreateEditIconModal onClose={closeModal} type="Subject" />
       )}
