@@ -19,7 +19,7 @@ import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction"
 
 function SubjectCard({
   data,
-  backgroundColor,
+  backgroundColor, // fallback or tailwind class if no hex code found
   Class,
   role,
   subjectId,
@@ -40,16 +40,17 @@ function SubjectCard({
   // For sliding: when teacherCount > windowSize, we slide only the first (windowSize - 1) avatars.
   const slidingCount =
     teacherCount > windowSize ? windowSize - 1 : teacherCount;
+
   // currentStartIndex slides among teacher avatars.
   const [currentStartIndex, setCurrentStartIndex] = useState(0);
+
   // isPulsing indicates that the new avatar in the sliding window should pulse.
   const [isPulsing, setIsPulsing] = useState(false);
 
   // Set up slider only if teacherCount > windowSize.
   useEffect(() => {
+    // if (teacherCount > windowSize) {
     if (true) {
-      // if (teacherCount > windowSize) {
-
       const interval = setInterval(() => {
         setIsPulsing(true);
         setTimeout(() => {
@@ -82,7 +83,10 @@ function SubjectCard({
 
   return (
     <div
-      className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group cursor-pointer h-64`}
+      className={`relative rounded-xl p-4 shadow-lg transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group cursor-pointer h-64`}
+      style={{
+        backgroundColor: data.subjectColor || backgroundColor || "#ccc",
+      }}
       onClick={handleCardClick}
     >
       {/* Admin Action Buttons */}
@@ -123,18 +127,30 @@ function SubjectCard({
         title={data.name}
       />
 
-      {/* Published/Unpublished Label */}
+      {/* Published/Unpublished + Optional Badges */}
       <div className="flex justify-between items-center mb-4">
-        <button
-          className={`border border-white rounded-full px-4 py-1 ${
-            data.isPublished
-              ? "text-green-600 bg-green-100"
-              : "bg-pink-50 text-gray-600"
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {data.isPublished ? t("Published") : t("Unpublished")}
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            className={`border border-white rounded-full px-4 py-1 ${
+              data.isPublished
+                ? "text-green-600 bg-green-100"
+                : "bg-pink-50 text-gray-600"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {data.isPublished ? t("Published") : t("Unpublished")}
+          </button>
+
+          {/* Optional Badge */}
+          {data.isOptional && (
+            <button
+              className="border border-white rounded-full px-4 py-1 bg-blue-100 text-blue-600"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {t("Optional")}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Subject Main Info */}
@@ -146,7 +162,7 @@ function SubjectCard({
           <span className="flex items-center mr-2 gap-1">
             <MdMenuBook />
             <span>
-              {chapterCount} {t("Chapters", { defaultValue: "Chapters" })}
+              {chapterCount} {t("Chapters")}
             </span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
@@ -172,21 +188,21 @@ function SubjectCard({
                 {/* Render sliding teacher avatars */}
                 {Array.from({ length: slidingCount }).map((_, i) => {
                   const teacherIndex = (currentStartIndex + i) % teacherCount;
-                  // Apply pulse on the rightmost avatar in the sliding window
                   const pulseClass =
                     i === slidingCount - 1 && isPulsing ? "animate-pulse" : "";
+                  const teacher = teachers[teacherIndex];
                   return (
                     <Tooltip
                       key={teacherIndex}
-                      title={`${teachers[teacherIndex].firstName} ${teachers[teacherIndex].lastName}`}
+                      title={`${teacher.firstName} ${teacher.lastName}`}
                       placement="top"
                     >
                       <div
                         className={`w-12 h-12 rounded-full border-2 border-white overflow-hidden ${pulseClass}`}
                       >
-                        {teachers[teacherIndex].profile ? (
+                        {teacher.profile ? (
                           <img
-                            src={teachers[teacherIndex].profile}
+                            src={teacher.profile}
                             alt={t("Teacher profile picture")}
                             className="w-full h-full object-cover"
                           />
@@ -199,6 +215,7 @@ function SubjectCard({
                     </Tooltip>
                   );
                 })}
+
                 {/* Fixed badge always at the end */}
                 <Tooltip title={t("Click to see more")} placement="top">
                   <div className="relative w-12 h-12 p-[2px] bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full">
@@ -252,11 +269,11 @@ function SubjectCard({
         title={t("Teacher List")}
         open={isTeacherModalOpen}
         onCancel={(e) => {
-          if (e && e.stopPropagation) {
+          if (e?.stopPropagation) {
             e.stopPropagation();
             e.preventDefault();
           }
-          if (e && e.nativeEvent && e.nativeEvent.stopImmediatePropagation) {
+          if (e?.nativeEvent?.stopImmediatePropagation) {
             e.nativeEvent.stopImmediatePropagation();
           }
           setIsTeacherModalOpen(false);
