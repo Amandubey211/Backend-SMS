@@ -283,10 +283,23 @@ export default function TimeTableDash() {
               onClick={() => onEventClick(evt)}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-800">
-                  {evt?.name}
+                <span className="font-medium text-gray-800">{evt?.name}</span>
+                <span className="text-xs text-gray-500">
+                  {evt?.days.map((day) =>
+                    day?.slots.map((slot) => (
+                      <Badge
+                        key={slot?._id}
+                        count={`${dayjs(slot.startTime).format(
+                          "HH:mm"
+                        )} - ${dayjs(slot.endTime).format("HH:mm")}`}
+                        style={{
+                          backgroundColor: getColorByType(evt?.type),
+                          fontSize: "12px",
+                        }}
+                      />
+                    ))
+                  )}
                 </span>
-                <AiOutlineEdit className="text-gray-400" />
               </div>
             </Card>
           ))
@@ -365,7 +378,22 @@ export default function TimeTableDash() {
                         <span className="text-sm text-gray-800">
                           {evt?.name}
                         </span>
-                        <AiOutlineEdit className="text-gray-400" />
+                        <span className="text-xs text-gray-500">
+                          {evt?.days.map((day) =>
+                            day?.slots.map((slot) => (
+                              <Badge
+                                key={slot?._id}
+                                count={`${dayjs(slot.startTime).format(
+                                  "HH:mm"
+                                )} - ${dayjs(slot.endTime).format("HH:mm")}`}
+                                style={{
+                                  backgroundColor: getColorByType(evt?.type),
+                                  fontSize: "12px",
+                                }}
+                              />
+                            ))
+                          )}
+                        </span>
                       </div>
                     </Card>
                   ))
@@ -497,7 +525,6 @@ export default function TimeTableDash() {
           </AnimatePresence>
         )}
       </div>
-
       {/* RIGHT SIDEBAR (STATS) */}
       <div className="w-72 border-l p-4 bg-white flex flex-col justify-between">
         {loadingFetch ? (
@@ -513,7 +540,9 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Weekly Timetables</span>
                   <Badge
-                    count={timetables.filter((t) => t?.type === "weekly").length}
+                    count={
+                      timetables.filter((t) => t?.type === "weekly").length
+                    }
                     style={{ backgroundColor: "#FF99CC", marginLeft: 8 }}
                   />
                 </Card>
@@ -543,7 +572,9 @@ export default function TimeTableDash() {
                 >
                   <span className="text-gray-700">Others</span>
                   <Badge
-                    count={timetables.filter((t) => t?.type === "others").length}
+                    count={
+                      timetables.filter((t) => t?.type === "others").length
+                    }
                     style={{ backgroundColor: "#FFD700", marginLeft: 8 }}
                   />
                 </Card>
@@ -555,13 +586,9 @@ export default function TimeTableDash() {
                 <Doughnut data={chartData} options={chartOptions} />
               </div>
             </div>
-            {/* <div className="text-center text-gray-400 text-xs mt-4">
-              <p>&copy; 2025 Your LMS | Aman Dubey</p>
-            </div> */}
           </>
         )}
       </div>
-
       {/* CREATE/EDIT DRAWER FORM */}
       <Drawer
         title={
@@ -600,7 +627,6 @@ export default function TimeTableDash() {
           </motion.div>
         )}
       </Drawer>
-
       {/* TIMETABLE DETAILS DRAWER */}
       <Drawer
         title="Timetable Details"
@@ -609,10 +635,9 @@ export default function TimeTableDash() {
         closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
-        // Keep at a lower zIndex than the modal as well
         zIndex={1000}
       >
-        <div className="h-full flex flex-col">
+        <div className="h-full flex flex-col capitalize">
           <div className="flex-1 overflow-y-auto p-4">
             <AnimatePresence>
               {detailsTimetable && (
@@ -648,29 +673,46 @@ export default function TimeTableDash() {
                     </div>
                   </div>
 
-                  {/* Display Class, Section, Group */}
+                  {/* Class Section - Group Organization */}
                   <div>
-                    <h5 className="text-gray-600 text-sm">
-                      This Timetable For:
-                    </h5>
+                    {/* Class */}
+                    <h5 className="text-gray-600 text-sm">Class:</h5>
                     <div className="mt-1 space-x-1">
-                      {detailsTimetable?.classId && (
+                      {detailsTimetable?.classId ? (
                         <Tag color="blue">
                           {detailsTimetable?.classId?.className ||
                             "No Class Name"}
                         </Tag>
+                      ) : (
+                        <Tag color="blue">No Class</Tag>
                       )}
-                      {detailsTimetable?.sectionId && (
-                        <Tag color="purple">
-                          {detailsTimetable?.sectionId?.sectionName ||
-                            "No Section Name"}
-                        </Tag>
+                    </div>
+
+                    {/* Sections */}
+                    <h5 className="text-gray-600 text-sm mt-4">Sections:</h5>
+                    <div className="mt-1 space-x-1">
+                      {detailsTimetable?.sectionId?.length > 0 ? (
+                        detailsTimetable?.sectionId.map((section) => (
+                          <Tag key={section?._id} color="purple">
+                            {section?.sectionName || "No Section Name"}
+                          </Tag>
+                        ))
+                      ) : (
+                        <Tag color="purple">No Sections</Tag>
                       )}
-                      {detailsTimetable?.groupId && (
-                        <Tag color="cyan">
-                          {detailsTimetable?.groupId?.groupName ||
-                            "No Group Name"}
-                        </Tag>
+                    </div>
+
+                    {/* Groups */}
+                    <h5 className="text-gray-600 text-sm mt-4">Groups:</h5>
+                    <div className="mt-1 space-x-1">
+                      {detailsTimetable?.groupId?.length > 0 ? (
+                        detailsTimetable?.groupId.map((group) => (
+                          <Tag key={group?._id} color="cyan">
+                            {group?.groupName || "No Group Name"}
+                          </Tag>
+                        ))
+                      ) : (
+                        <Tag color="cyan">No Groups</Tag>
                       )}
                     </div>
                   </div>
@@ -724,7 +766,10 @@ export default function TimeTableDash() {
                                   <tr key={slot?._id}>
                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
                                       {dayItem?.date
-                                        ? format(new Date(dayItem?.date), "dd MMM yyyy")
+                                        ? format(
+                                            new Date(dayItem?.date),
+                                            "dd MMM yyyy"
+                                          )
                                         : dayItem?.day || "Day Not Specified"}
                                     </td>
                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
@@ -740,10 +785,17 @@ export default function TimeTableDash() {
                                 ))
                               ) : (
                                 <tr key={dayItem?._id}>
-                                  <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700" colSpan={3}>
+                                  <td
+                                    className="px-4 py-2 whitespace-nowrap text-sm text-gray-700"
+                                    colSpan={3}
+                                  >
                                     {dayItem?.date
-                                      ? format(new Date(dayItem?.date), "dd MMM yyyy")
-                                      : dayItem?.day || "Day Not Specified"}{" "}
+                                      ? format(
+                                          new Date(dayItem?.date),
+                                          "dd MMM yyyy"
+                                        )
+                                      : dayItem?.day ||
+                                        "Day Not Specified"}{" "}
                                     - No slots available.
                                   </td>
                                 </tr>

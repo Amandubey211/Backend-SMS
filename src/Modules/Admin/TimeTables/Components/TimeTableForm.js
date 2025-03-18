@@ -1,8 +1,16 @@
-// TimeTableForm.jsx
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, DatePicker, Row, Col, Button } from "antd";
 import {
-  ReadOutlined,
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Row,
+  Col,
+  Button,
+  Switch,
+  Tooltip,
+} from "antd";
+import {
   BookOutlined,
   CalendarOutlined,
   TeamOutlined,
@@ -83,10 +91,11 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         type: editingTimetable.type,
         validity: convertedValidity,
         classId: editingTimetable.classId?._id || undefined,
-        sectionId: editingTimetable.sectionId?._id || undefined,
-        groupId: editingTimetable.groupId?._id || undefined,
+        sectionId: editingTimetable.sectionId || [],
+        groupId: editingTimetable.groupId || [],
         semesterId: editingTimetable.semesterId?._id || undefined,
         days: convertedDays,
+        status: editingTimetable.status || "inactive", // Set the status value
       });
       setTimetableType(editingTimetable.type);
     } else {
@@ -99,7 +108,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
 
   // CLASS change handler
   const handleClassChange = (classId) => {
-    form.setFieldsValue({ sectionId: undefined, groupId: undefined });
+    form.setFieldsValue({ sectionId: [], groupId: [] });
     if (classId) {
       dispatch(fetchSectionsNamesByClass(classId));
       dispatch(fetchGroupsByClass(classId));
@@ -108,11 +117,11 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
   };
 
   // SECTION change handler
-  const handleSectionChange = (sectionId) => {
+  const handleSectionChange = (sectionIds) => {
     const classId = form.getFieldValue("classId");
-    form.setFieldsValue({ groupId: undefined });
-    if (classId && sectionId) {
-      dispatch(fetchGroupsByClassAndSection({ classId, sectionId }));
+    form.setFieldsValue({ groupId: [] });
+    if (classId && sectionIds.length > 0) {
+      dispatch(fetchGroupsByClassAndSection({ classId, sectionIds }));
     }
   };
 
@@ -126,10 +135,11 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         endDate: endMoment ? endMoment.toISOString() : null,
       },
       classId: values.classId,
-      sectionId: values.sectionId || null,
-      groupId: values.groupId || null,
+      sectionId: values.sectionId || [],
+      groupId: values.groupId || [],
       semesterId: values.semesterId || null,
       days: values.days || [],
+      status: values.status ? "active" : "inactive", // Pass the status value
     };
     setLoading(true);
     Promise.resolve(onSubmit(timetableData, isEdit)).finally(() =>
@@ -144,24 +154,43 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
       onFinish={handleFinish}
       requiredMark={false}
     >
-      {/* Timetable Name */}
-      <Form.Item
-        label={
-          <span>
-            <ReadOutlined /> Timetable Name
-          </span>
-        }
-        name="name"
-        rules={[
-          {
-            required: true,
-            message: "Timetable name is required",
-          },
-        ]}
-      >
-        <Input placeholder="e.g. Midterm Exam Schedule" size="large" />
-      </Form.Item>
+      {/* Timetable Name and Status toggle switch in one row */}
+      <Row gutter={16} align="middle">
+        <Col span={21}>
+          <Form.Item
+            label={
+              <span>
+                <BookOutlined /> Timetable Name
+              </span>
+            }
+            name="name"
+            rules={[{ required: true, message: "Timetable name is required" }]}
+          >
+            <Input placeholder="e.g. Midterm Exam Schedule" size="large" />
+          </Form.Item>
+        </Col>
 
+        {/* Status toggle next to Timetable Name */}
+        <Col span={3}>
+          <Form.Item
+            label={
+              <Tooltip title="Toggle between Active and Inactive status">
+                Status
+              </Tooltip>
+            }
+            name="status"
+            valuePropName="checked"
+            initialValue={false} // default value (inactive)
+          >
+            <Switch
+              checkedChildren="Active"
+              unCheckedChildren="Inactive"
+              size="default"
+              onChange={(checked) => form.setFieldsValue({ status: checked })}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
       <Row gutter={16}>
         {/* Type */}
         <Col span={12}>
@@ -212,7 +241,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           </Form.Item>
         </Col>
       </Row>
-
       {/* Class - Section */}
       <Row gutter={16}>
         <Col span={12}>
@@ -254,8 +282,9 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             name="sectionId"
           >
             <Select
+              mode="multiple"
               size="large"
-              placeholder="Select Section"
+              placeholder="Select Sections"
               allowClear
               onChange={handleSectionChange}
             >
@@ -268,7 +297,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           </Form.Item>
         </Col>
       </Row>
-
       {/* Group - Semester */}
       <Row gutter={16}>
         <Col span={12}>
@@ -280,7 +308,12 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             }
             name="groupId"
           >
-            <Select size="large" placeholder="Select Group" allowClear>
+            <Select
+              mode="multiple"
+              size="large"
+              placeholder="Select Groups"
+              allowClear
+            >
               {groupsList?.map((grp) => (
                 <Option key={grp._id} value={grp._id}>
                   {grp.groupName || grp.name}
@@ -308,19 +341,15 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           </Form.Item>
         </Col>
       </Row>
-
       {/* Days + Slots sub-component wrapped with validation */}
       <Form.Item
         name="days"
         rules={[
           {
             validator: (_, value) => {
-              // Ensure that there is at least one day with one slot
               if (
                 Array.isArray(value) &&
-                value.some(
-                  (day) => Array.isArray(day.slots) && day.slots.length > 0
-                )
+                value.some((day) => day.slots && day.slots.length > 0)
               ) {
                 return Promise.resolve();
               }
@@ -335,7 +364,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           allSubjects={allSubjects}
         />
       </Form.Item>
-
       {/* Form Footer with Cancel and Submit Buttons */}
       <div className="flex justify-between mt-6">
         <Button onClick={onClose} size="large" className="px-3 py-2">

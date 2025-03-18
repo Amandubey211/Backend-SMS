@@ -48,7 +48,10 @@ export const createTimetable = createAsyncThunk(
 
       // POST /create-timetable?say=...
       const res = await postData(`/${role}/create-timetable?say=${say}`, data);
-      return res.data; // newly created timetable object
+      if (res.success) {
+        dispatch(fetchTimetableList());
+        return res.data; // newly created timetable object
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
