@@ -76,6 +76,64 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
     }
   }, [editingTeacher]);
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+
+  //   // Reset errors
+  //   setTeacherError("");
+  //   setSubjectError("");
+  //   setSectionError("");
+
+  //   // Validate required fields
+  //   let isValid = true;
+  //   if (!teacherId) {
+  //     setTeacherError(t("Teacher is required"));
+  //     teacherRef.current?.focus();
+  //     isValid = false;
+  //   }
+  //   if (!subjectIds || subjectIds.length === 0) {
+  //     setSubjectError(t("Subject is required"));
+  //     if (isValid) {
+  //       subjectRef.current?.focus();
+  //     }
+  //     isValid = false;
+  //   }
+  //   if (!sectionIds || sectionIds.length === 0) {
+  //     setSectionError(t("Section is required"));
+  //     if (isValid) {
+  //       sectionRef.current?.focus();
+  //     }
+  //     isValid = false;
+  //   }
+  //   if (!isValid) {
+  //     return; // Do not make the API call
+  //   }
+
+  //   try {
+  //     if (editingTeacher) {
+  //       // For editing, backend expects subjects and sectionIds as arrays of objects.
+  //       const editData = {
+  //         id: editingTeacher._id,
+  //         subjects: subjectIds.map((id) => ({ _id: id })),
+  //         classIds: [{ _id: cid }],
+  //         sectionIds: sectionIds.map((id) => ({ _id: id })),
+  //       };
+  //       await dispatch(editTeacher(editData)).unwrap();
+  //     } else {
+  //       const assignData = {
+  //         classId: cid,
+  //         teacherId,
+  //         subjectIds,
+  //         sectionIds,
+  //       };
+  //       await dispatch(assignTeacher(assignData)).unwrap();
+  //     }
+  //     // Only close sidebar on success
+  //     closeSidebar();
+  //   } catch (error) {
+  //     // Optionally set a general error message here
+  //   }
+  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -114,9 +172,9 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
         // For editing, backend expects subjects and sectionIds as arrays of objects.
         const editData = {
           id: editingTeacher._id,
-          subjects: subjectIds.map((id) => ({ _id: id })),
-          classIds: [{ _id: cid }],
-          sectionIds: sectionIds.map((id) => ({ _id: id })),
+          subjectIds: subjectIds.map((id) => (id )),
+          classIds: [ cid],
+          sectionIds: sectionIds.map((id) => ( id )),
         };
         await dispatch(editTeacher(editData)).unwrap();
       } else {
@@ -134,7 +192,6 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
       // Optionally set a general error message here
     }
   };
-
   // Common select box styles (you may adjust these as needed)
   const selectBoxStyle = { width: "100%" };
 
