@@ -138,7 +138,7 @@ const getDisplayScore = (rawScore) => {
       <div className="bg-white p-4">
         {/* Header */}
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-xl font-semibold">
             {t("Top Ranking Students")}
           </h2>
 
