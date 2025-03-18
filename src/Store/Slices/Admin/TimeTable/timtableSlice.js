@@ -56,7 +56,7 @@ const timetableSlice = createSlice({
           state.timetables.push(action.payload.data);
         } else {
           // Otherwise, if it returns the timetable object directly
-          state.timetables.push(action.payload);
+          // state.timetables.push(action.payload);
         }
       })
       .addCase(createTimetable.rejected, (state, action) => {
