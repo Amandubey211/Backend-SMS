@@ -52,14 +52,14 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
 
   useEffect(() => {
     if (editingTimetable) {
-      const { validity, days } = editingTimetable;
-
+      const { validity, days, classId, sectionId, groupId, semesterId } = editingTimetable;
+  
       // Convert validity dates using moment
       const convertedValidity =
         validity?.startDate && validity?.endDate
           ? [moment(validity.startDate), moment(validity.endDate)]
           : [];
-
+  
       // Convert any date fields in the days array and their slots
       const convertedDays = (days || []).map((dayItem) => {
         const newDay = { ...dayItem };
@@ -84,25 +84,35 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         }
         return newDay;
       });
-
+  
       // Preload select fields by extracting _id from nested objects if available
       form.setFieldsValue({
         name: editingTimetable.name,
         type: editingTimetable.type,
         validity: convertedValidity,
-        classId: editingTimetable.classId?._id || undefined,
-        sectionId: editingTimetable.sectionId || [],
-        groupId: editingTimetable.groupId || [],
-        semesterId: editingTimetable.semesterId?._id || undefined,
+        classId: classId?._id || undefined, // Preload classId as _id
+        sectionId: sectionId?.map((section) => section?._id) || [], // Preload sectionIds
+        groupId: groupId?.map((group) => group?._id) || [], // Preload groupIds
+        semesterId: semesterId?._id || undefined, // Preload semesterId as _id
         days: convertedDays,
         status: editingTimetable.status || "inactive", // Set the status value
       });
+  
+      // Fetch sections, groups, and semester if classId exists
+      if (classId?._id) {
+        // Fetch sections, groups, and subjects based on the classId
+        dispatch(fetchSectionsNamesByClass(classId._id));
+        dispatch(fetchGroupsByClass(classId._id));
+        dispatch(fetchSubjects(classId._id));
+      }
+  
       setTimetableType(editingTimetable.type);
     } else {
       form.resetFields();
       setTimetableType(null);
     }
-  }, [editingTimetable, form]);
+  }, [editingTimetable, form, dispatch]);
+  
 
   const isEdit = !!editingTimetable;
 
@@ -201,12 +211,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
               </span>
             }
             name="type"
-            rules={[
-              {
-                required: true,
-                message: "Timetable type is required",
-              },
-            ]}
+            rules={[{ required: true, message: "Timetable type is required" }]}
           >
             <Select
               size="large"
@@ -230,12 +235,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
               </span>
             }
             name="validity"
-            rules={[
-              {
-                required: true,
-                message: "Please select a date range",
-              },
-            ]}
+            rules={[{ required: true, message: "Please select a date range" }]}
           >
             <RangePicker size="large" />
           </Form.Item>
@@ -251,12 +251,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
               </span>
             }
             name="classId"
-            rules={[
-              {
-                required: true,
-                message: "Class is required",
-              },
-            ]}
+            rules={[{ required: true, message: "Class is required" }]}
           >
             <Select
               size="large"

@@ -353,6 +353,8 @@ export default function TimeTableDash() {
           Week View ({format(daysInWeek[0], "dd MMM")} -{" "}
           {format(daysInWeek[6], "dd MMM")})
         </h3>
+
+        {/* Grid Layout for Week Days */}
         <div className="grid grid-cols-7 gap-4">
           {daysInWeek.map((day) => {
             const events = getEventsForDate(day);
@@ -368,34 +370,34 @@ export default function TimeTableDash() {
                   <p className="text-xs text-gray-400">No Timetable</p>
                 ) : (
                   events.map((evt) => (
-                    <Card
+                    <div
                       key={evt?._id}
-                      className="mb-2 border-l-4 cursor-pointer"
-                      style={{ borderLeftColor: getColorByType(evt?.type) }}
+                      className="mb-2 p-2 rounded-md cursor-pointer"
+                      style={{
+                        backgroundColor: getColorByType(evt?.type),
+                        borderLeft: `4px solid ${getColorByType(evt?.type)}`,
+                      }}
                       onClick={() => onEventClick(evt)}
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-800">
-                          {evt?.name}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {evt?.days.map((day) =>
-                            day?.slots.map((slot) => (
-                              <Badge
-                                key={slot?._id}
-                                count={`${dayjs(slot.startTime).format(
-                                  "HH:mm"
-                                )} - ${dayjs(slot.endTime).format("HH:mm")}`}
-                                style={{
-                                  backgroundColor: getColorByType(evt?.type),
-                                  fontSize: "12px",
-                                }}
-                              />
-                            ))
-                          )}
-                        </span>
+                      <div className="flex flex-col">
+                        {evt?.days.map((dayItem) =>
+                          dayItem?.slots.map((slot) => (
+                            <div
+                              key={slot?._id}
+                              className="flex justify-between"
+                            >
+                              <span className="text-sm text-gray-800">
+                                {dayjs(slot.startTime).format("HH:mm")} -{" "}
+                                {dayjs(slot.endTime).format("HH:mm")}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {slot.eventName}
+                              </span>
+                            </div>
+                          ))
+                        )}
                       </div>
-                    </Card>
+                    </div>
                   ))
                 )}
               </div>
