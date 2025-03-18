@@ -52,14 +52,22 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
 
   useEffect(() => {
     if (editingTimetable) {
-      const { validity, days, classId, sectionId, groupId, semesterId } = editingTimetable;
-  
+      const {
+        validity,
+        days,
+        classId,
+        sectionId,
+        groupId,
+        semesterId,
+        status,
+      } = editingTimetable;
+
       // Convert validity dates using moment
       const convertedValidity =
         validity?.startDate && validity?.endDate
           ? [moment(validity.startDate), moment(validity.endDate)]
           : [];
-  
+
       // Convert any date fields in the days array and their slots
       const convertedDays = (days || []).map((dayItem) => {
         const newDay = { ...dayItem };
@@ -84,7 +92,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         }
         return newDay;
       });
-  
+
       // Preload select fields by extracting _id from nested objects if available
       form.setFieldsValue({
         name: editingTimetable.name,
@@ -95,9 +103,9 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         groupId: groupId?.map((group) => group?._id) || [], // Preload groupIds
         semesterId: semesterId?._id || undefined, // Preload semesterId as _id
         days: convertedDays,
-        status: editingTimetable.status || "inactive", // Set the status value
+        status: status === "active", // Preload the status correctly (true for active, false for inactive)
       });
-  
+
       // Fetch sections, groups, and semester if classId exists
       if (classId?._id) {
         // Fetch sections, groups, and subjects based on the classId
@@ -105,14 +113,13 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         dispatch(fetchGroupsByClass(classId._id));
         dispatch(fetchSubjects(classId._id));
       }
-  
+
       setTimetableType(editingTimetable.type);
     } else {
       form.resetFields();
       setTimetableType(null);
     }
   }, [editingTimetable, form, dispatch]);
-  
 
   const isEdit = !!editingTimetable;
 
