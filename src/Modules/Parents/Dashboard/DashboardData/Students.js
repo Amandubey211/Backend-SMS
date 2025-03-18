@@ -62,8 +62,7 @@ const StudentParentCard = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-      dispatch(fetchChildren());
-    
+    dispatch(fetchChildren());
   }, [dispatch]);
 
   // Reset index if students change
@@ -188,7 +187,9 @@ const StudentParentCard = () => {
         {!loadingChildren && !errorChildren && students?.length > 0 && (
           <>
             {students.length === 1 ? (
-              <SingleChildCard student={students[0]} index={0} />
+              <div className="flex item-center justify-center">
+                <SingleChildCard student={students[0]} index={0} />
+              </div>
             ) : (
               <div className="relative flex items-center justify-center group">
                 {/* Previous arrow */}
