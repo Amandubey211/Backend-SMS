@@ -38,9 +38,6 @@ const TopRankingStudents = () => {
 
   // Fetch classes if not done; fetch top students once classes load
   useEffect(() => {
-    // If needed, uncomment to fetch classes:
-    // dispatch(fetchAllClasses());
-
     if (classes?.length > 0) {
       const initialClassId = classes[0]?._id ?? "";
       setSelectedClass(initialClassId);
@@ -122,13 +119,16 @@ const TopRankingStudents = () => {
   );
 
   // Utility to safely display score
-  const getDisplayScore = (rawScore) => {
-    // Use Number.isFinite to avoid Infinity or NaN
-    if (Number.isFinite(rawScore)) {
-      return `${rawScore} %`;
-    }
-    return t("N/A"); // fallback if rawScore is Infinity, NaN, or undefined
-  };
+// Utility to safely display score
+const getDisplayScore = (rawScore) => {
+  const score = parseFloat(rawScore);
+  // Check if score is a valid number (not NaN, Infinity, etc.)
+  if (!isNaN(score) && score !== Infinity && score !== -Infinity) {
+    return `${score.toFixed(2)} %`; // format the score to 2 decimal places
+  }
+  return t("N/A"); // fallback if rawScore is invalid
+};
+
 
   return (
     <ProtectedSection
@@ -204,8 +204,8 @@ const TopRankingStudents = () => {
                     <div className="relative mt-10">
                       <img
                         className="w-14 h-14 rounded-full mx-auto"
-                        src={student?.studentProfile ?? profileIcon}
-                        alt={student?.studentName ?? t("N/A")}
+                        src={student?.studentProfile || profileIcon}
+                        alt={student?.studentName || t("N/A")}
                       />
                       {index !== 0 && (
                         <h3 className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full text-md mb-1 font-medium bg-white px-2">
@@ -225,7 +225,7 @@ const TopRankingStudents = () => {
                     {/* Admission Number with Tooltip */}
                     <p className="mb-2 text-sm">
                       {t("Adm")}:{" "}
-                      <Tooltip title={student?.admissionNumber ?? t("N/A")}>
+                      <Tooltip title={student?.admissionNumber || t("N/A")}>
                         <span className="text-gray-600 text-sm">
                           {truncatedNumber || t("N/A")}
                         </span>
@@ -275,8 +275,8 @@ const TopRankingStudents = () => {
                         <span className="mr-3">{index + 4}</span>
                         <img
                           className="w-10 h-10 rounded-full mr-4"
-                          src={student?.studentProfile ?? profileIcon}
-                          alt={student?.studentName ?? t("N/A")}
+                          src={student?.studentProfile || profileIcon}
+                          alt={student?.studentName || t("N/A")}
                         />
                         <span>
                           {student?.studentName?.slice(0, 15) || t("0")}
@@ -311,7 +311,7 @@ const TopRankingStudents = () => {
                       <div className="w-[30%]">
                         <span>
                           {t("Adm")}:{" "}
-                          <Tooltip title={student?.admissionNumber ?? t("N/A")}>
+                          <Tooltip title={student?.admissionNumber || t("N/A")}>
                             <span className="text-gray-600 ml-1">
                               {truncatedNumber || t("N/A")}
                             </span>
