@@ -102,9 +102,12 @@ const NoticeItem = ({ notice, index, formatDate }) => {
             className="p-4 text-sm text-gray-600 bg-white"
             onClick={(e) => e.stopPropagation()}
           >
-            <pre className="whitespace-pre-wrap font-sans">
-              {notice?.description || t("No description available")}
-            </pre>
+            <pre
+              className="whitespace-pre-wrap font-sans"
+              dangerouslySetInnerHTML={{
+                __html: notice?.description || t("No description available"),
+              }}
+            />
           </div>
         )}
       </div>
