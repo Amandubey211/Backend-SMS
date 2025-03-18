@@ -117,14 +117,19 @@ const AddNewSubject = ({ onClose, subject }) => {
       toast.error(t("Subject name is required."));
       return false;
     }
-    if (isOptional && selectedStudentIds.length === 0) {
+    // Remove the check for number of students if optional is selected
+    if (
+      isOptional &&
+      selectedStudentIds.length === 0 &&
+      studentsList.length > 0
+    ) {
       toast.error(
         t("Please select at least one student for an optional subject.")
       );
       return false;
     }
     return true;
-  }, [subjectTitle, isOptional, selectedStudentIds, t]);
+  }, [subjectTitle, isOptional, selectedStudentIds, studentsList, t]);
 
   const hasChanges = () => {
     if (!subject) return true;
