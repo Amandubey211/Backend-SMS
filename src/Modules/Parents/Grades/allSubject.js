@@ -14,6 +14,7 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Parent/Semesters/pa
 import { setSelectedSemester } from "../../../Store/Slices/Parent/Semesters/parentSemesterSlice.js";
 import Layout from "../../../Components/Common/Layout.js";
 import { FaChevronDown, FaRegSadTear } from "react-icons/fa";
+import {BsFillJournalBookmarkFill} from "react-icons/bs";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 
 const AllSubject = () => {
@@ -35,7 +36,7 @@ const AllSubject = () => {
   // Redux store data (parent side for semesters)
   const { semesters, selectedSemester, loadingSemesters, errorSemesters } =
     useSelector((store) => store?.Parent?.semesters);
-    console.log("semesters iiii: ", selectedSemester);
+    // console.log("semesters iiii: ", selectedSemester);
 
   const semesterId = selectedSemester?._id;
 
@@ -127,7 +128,7 @@ const AllSubject = () => {
     return (
       <Layout title="Parents | Child Courses & Progress">
         <div className="w-full h-[80vh] flex flex-col items-center justify-center text-gray-500">
-          <FaRegSadTear className="text-6xl mb-4" />
+          <BsFillJournalBookmarkFill className="text-6xl mb-4" />
           <p className="text-2xl font-bold">No subjects found.</p>
           <p>Please check back later.</p>
         </div>

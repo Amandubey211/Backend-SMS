@@ -179,9 +179,9 @@ const ParentEvent = () => {
               </p>
             </div>
           ) : paginatedEvents?.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-4">
+            <div className="flex flex-col items-center justify-center py-10">
               <IoCalendarOutline className="text-6xl" />
-              <span>No Events in this Month</span>
+              <span className="py-5">No Events in this Month</span>
             </div>
           ) : (
             <>
