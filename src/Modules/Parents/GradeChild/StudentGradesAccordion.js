@@ -7,6 +7,7 @@ import offlineExamIcon from "../../../Assets/ParentAssets/images/offline_exam.pn
 import onlineExamIcon from "../../../Assets/ParentAssets/images/online_exam.png";
 import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png"; // Fallback image for student
 import { fetchParentStudentGrades } from "../../../Store/Slices/Parent/Grades/parentGrade.action";
+import { GrScorecard } from "react-icons/gr";
 import { fetchSemestersByClass } from "../../../Store/Slices/Parent/Semesters/parentSemester.action";
 import { t } from "i18next";
 import { DownOutlined } from "@ant-design/icons";
@@ -312,7 +313,7 @@ const StudentGradesAccordion = () => {
   // Fallback if no grades exist
   const noGradesFallback = (
     <div className="flex flex-col items-center justify-center min-h-screen flex-grow">
-      
+      <GrScorecard className="w-12 h-12 mb-2"/>
       <p className="text-gray-600 text-lg font-semibold text-center">
         No Grades Present for{" "}
         {selectedChild?.name?.split(" ")[0] || "this student"} yet.
