@@ -19,33 +19,34 @@ import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSli
 const { Option } = Select;
 
 const presetColors = [
-  "#FCD34D", // yellow-300
-  "#93C5FD", // blue-300
-  "#6EE7B7", // green-300
-  "#FCA5A5", // red-300
-  "#D8B4FE", // purple-300
-  "#F9A8D4", // pink-300
-  "#A5B4FC", // indigo-300
-  "#FDBA74", // orange-300
-  "#6EE7C9", // teal-300
-  "#67E8F9", // cyan-300
-  "#D9F99D", // lime-300
-  "#FBBF24", // amber-300
-  "#34D399", // emerald-300
-  "#F472B6", // fuchsia-300
-  "#C4B5FD", // violet-300
-  "#7DD3FC", // sky-300
-  "#D1D5DB", // gray-300
+  "#FCD34D",
+  "#93C5FD",
+  "#6EE7B7",
+  "#FCA5A5",
+  "#D8B4FE",
+  "#F9A8D4",
+  "#A5B4FC",
+  "#FDBA74",
+  "#6EE7C9",
+  "#67E8F9",
+  "#D9F99D",
+  "#FBBF24",
+  "#34D399",
+  "#F472B6",
+  "#C4B5FD",
+  "#7DD3FC",
+  "#D1D5DB",
 ];
 
 const AddNewSubject = ({ onClose, subject }) => {
   const { t } = useTranslation("admClass");
   const [activeTab, setActiveTab] = useState("icon");
-  // Default selected color is now "#FCD34D"
   const [selectedColor, setSelectedColor] = useState("#FCD34D");
   const [subjectTitle, setSubjectTitle] = useState("");
   const [isOptional, setIsOptional] = useState(false);
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+  // Local state to track the loading state based on button clicked ("publish" or "save")
+  const [activeLoading, setActiveLoading] = useState(null);
 
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -67,12 +68,10 @@ const AddNewSubject = ({ onClose, subject }) => {
     }
   }, [dispatch, cid]);
 
-  // Pre-populate values when editing
   useEffect(() => {
     if (subject) {
-      setSelectedColor(subject?.subjectColor || "");
+      setSelectedColor(subject?.subjectColor || "#FCD34D");
       setIsOptional(subject?.isOptional || false);
-
       if (subject?.subjectIcon) {
         let matchingIcon = null;
         if (typeof subject.subjectIcon === "object") {
@@ -92,10 +91,7 @@ const AddNewSubject = ({ onClose, subject }) => {
       } else {
         dispatch(selectIcon(null));
       }
-
       setSubjectTitle(subject?.name || "");
-
-      // If optional, pre-select students (mapping objects to their _id)
       if (subject?.isOptional && subject?.studentIds) {
         const preloadedStudentIds = subject.studentIds.map((student) =>
           student._id ? student._id : student
@@ -103,7 +99,6 @@ const AddNewSubject = ({ onClose, subject }) => {
         setSelectedStudentIds(preloadedStudentIds);
       }
     } else {
-      // When no subject is provided, ensure default selected color is "#FCD34D"
       setSelectedColor("#FCD34D");
       setSubjectTitle("");
       setIsOptional(false);
@@ -112,45 +107,20 @@ const AddNewSubject = ({ onClose, subject }) => {
     }
   }, [subject, dispatch, icons]);
 
+  // Validation: only ensure the subject has a title
   const validateInputs = useCallback(() => {
     if (!subjectTitle.trim()) {
       toast.error(t("Subject name is required."));
       return false;
     }
-    // Remove the check for number of students if optional is selected
-    if (
-      isOptional &&
-      selectedStudentIds.length === 0 &&
-      studentsList.length > 0
-    ) {
-      toast.error(
-        t("Please select at least one student for an optional subject.")
-      );
-      return false;
-    }
     return true;
-  }, [subjectTitle, isOptional, selectedStudentIds, studentsList, t]);
+  }, [subjectTitle, t]);
 
-  const hasChanges = () => {
-    if (!subject) return true;
-    const iconChanged =
-      (selectedIcon?.imageLink || null) !==
-      (subject.subjectIcon?.imageLink || subject.subjectIcon || null);
-    const studentChanged = isOptional
-      ? JSON.stringify(selectedStudentIds) !==
-        JSON.stringify(subject.studentIds)
-      : false;
-    return (
-      subjectTitle !== subject.name ||
-      selectedColor !== subject.subjectColor ||
-      iconChanged ||
-      isOptional !== subject.isOptional ||
-      studentChanged
-    );
-  };
-
-  const handleSave = async (publish = false) => {
+  const handleSave = (publish = false) => {
     if (!validateInputs()) return;
+    // Set local loading state based on which button was clicked
+    setActiveLoading(publish ? "publish" : "save");
+
     const subjectData = {
       name: subjectTitle,
       classId: cid,
@@ -161,25 +131,22 @@ const AddNewSubject = ({ onClose, subject }) => {
       ...(isOptional && { studentIds: selectedStudentIds }),
     };
 
-    if (subject) {
-      if (!hasChanges()) {
-        toast(t("No changes detected."));
-        return;
-      }
-      dispatch(updateSubject({ subjectId: subject._id, subjectData }))
-        .unwrap()
-        .then((res) => {
-          clearForm();
-          onClose();
-        });
-    } else {
-      dispatch(createSubject(subjectData))
-        .unwrap()
-        .then((res) => {
-          clearForm();
-          onClose();
-        });
-    }
+    const action = subject
+      ? updateSubject({ subjectId: subject._id, subjectData })
+      : createSubject(subjectData);
+
+    dispatch(action)
+      .unwrap()
+      .then(() => {
+        clearForm();
+        onClose();
+      })
+      .catch((error) => {
+        // Handle error if necessary
+      })
+      .finally(() => {
+        setActiveLoading(null);
+      });
   };
 
   const clearForm = () => {
@@ -203,9 +170,7 @@ const AddNewSubject = ({ onClose, subject }) => {
         <IconGrid
           icons={icons}
           activeIconId={
-            selectedIcon
-              ? selectedIcon._id || selectedIcon.id || selectedIcon
-              : null
+            selectedIcon ? selectedIcon._id || selectedIcon.id : null
           }
           onEdit={openModal}
           type="Subject"
@@ -247,8 +212,11 @@ const AddNewSubject = ({ onClose, subject }) => {
     </div>
   );
 
+  const isEditing = Boolean(subject);
+
   return (
     <div className="flex flex-col h-full p-4 overflow-y-auto">
+      {/* Subject Title */}
       <div className="mb-4">
         <label
           htmlFor="subject-title"
@@ -266,6 +234,7 @@ const AddNewSubject = ({ onClose, subject }) => {
         />
       </div>
 
+      {/* Optional Subject Checkbox */}
       <div className="mb-4">
         <Checkbox
           checked={isOptional}
@@ -275,6 +244,7 @@ const AddNewSubject = ({ onClose, subject }) => {
         </Checkbox>
       </div>
 
+      {/* Student Selection */}
       {isOptional && (
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
@@ -330,6 +300,7 @@ const AddNewSubject = ({ onClose, subject }) => {
         </div>
       )}
 
+      {/* Tab Navigation */}
       <div className="flex mb-4">
         <div
           className="flex-1 py-2 text-center cursor-pointer"
@@ -344,11 +315,11 @@ const AddNewSubject = ({ onClose, subject }) => {
           }}
         >
           <span
-            className={`${
+            className={
               activeTab === "icon"
                 ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 font-semibold"
                 : "text-gray-500"
-            }`}
+            }
           >
             {t("Subject Icon")}
           </span>
@@ -366,17 +337,18 @@ const AddNewSubject = ({ onClose, subject }) => {
           }}
         >
           <span
-            className={`${
+            className={
               activeTab === "color"
                 ? "text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-500 font-semibold"
                 : "text-gray-500"
-            }`}
+            }
           >
             {t("Frame Color")}
           </span>
         </div>
       </div>
 
+      {/* Tab Content */}
       <div
         className={`flex flex-row p-2 w-full ${
           activeTab === "icon" ? "block" : "hidden"
@@ -401,27 +373,32 @@ const AddNewSubject = ({ onClose, subject }) => {
         </div>
       </div>
 
+      {/* Action Buttons */}
       <div className="mt-auto pt-4 flex justify-between space-x-2 sticky bottom-0 bg-white py-4">
         <button
           onClick={() => handleSave(true)}
+          disabled={loading || activeLoading !== null}
           className="w-full py-2 rounded-md bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-          disabled={loading}
         >
-          {loading ? (
+          {activeLoading === "publish" ? (
             <ImSpinner3 className="animate-spin mx-auto" />
+          ) : isEditing ? (
+            t("Update & Publish")
           ) : (
-            t("Save & Publish")
+            t("Create & Publish")
           )}
         </button>
         <button
           onClick={() => handleSave(false)}
+          disabled={loading || activeLoading !== null}
           className="w-full py-2 rounded-md bg-gradient-to-r from-purple-500 to-red-500 text-white"
-          disabled={loading}
         >
-          {loading ? (
+          {activeLoading === "save" ? (
             <ImSpinner3 className="animate-spin mx-auto" />
+          ) : isEditing ? (
+            t("Update")
           ) : (
-            t("Save")
+            t("Create")
           )}
         </button>
       </div>

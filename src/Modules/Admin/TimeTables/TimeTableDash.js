@@ -633,7 +633,7 @@ export default function TimeTableDash() {
       <Drawer
         title="Timetable Details"
         placement="right"
-        width={650}
+        width={"90%"}
         closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}

@@ -22,7 +22,7 @@ const BookForm = ({ book, onClose }) => {
   const [bookData, setBookData] = useState({
     bookName: "",
     authorName: "",
-    class: "",
+    class: null,
     categories: [],
     copies: "",
     bookImage: null,
@@ -116,7 +116,7 @@ const BookForm = ({ book, onClose }) => {
     const formData = new FormData();
     formData.append("name", bookData.bookName);
     formData.append("author", bookData.authorName);
-    formData.append("classId", bookData.class);
+    formData.append("classId", bookData.class || null);
     bookData.categories.forEach((catId) =>
       formData.append("categories", catId)
     );
