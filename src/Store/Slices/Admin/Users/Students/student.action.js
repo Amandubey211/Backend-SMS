@@ -198,7 +198,7 @@ export const fetchStudentFinance = createAsyncThunk(
 // Fetch Student Subject Progress
 export const fetchStudentSubjectProgress = createAsyncThunk(
   "student/studentSubjectProgress",
-  async ({id}, { rejectWithValue, getState, dispatch }) => {
+  async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const say = getAY();
@@ -234,7 +234,10 @@ export const fetchAttendanceData = createAsyncThunk(
 // Fetch Course Progress
 export const fetchCourseProgress = createAsyncThunk(
   "student/courseProgress",
-  async ({ studentId, subjectId,semesterId }, { rejectWithValue, getState, dispatch }) => {
+  async (
+    { studentId, subjectId, semesterId },
+    { rejectWithValue, getState, dispatch }
+  ) => {
     try {
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);

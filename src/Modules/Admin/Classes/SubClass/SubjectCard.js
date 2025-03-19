@@ -58,8 +58,10 @@ function SubjectCard({
     }
   }, [teacherCount]);
 
-  const handleCardClick = () => {
-    if (ignoreNextClick) return;
+  // Update the handleCardClick method to prevent propagation
+  const handleCardClick = (e) => {
+    if (ignoreNextClick || isDeleteModalOpen) return; // Ignore click if modal is open
+    e.stopPropagation(); // Stop propagation to prevent triggering navigate()
     dispatch(setSelectedSubjectName(data.name));
     dispatch(setSelectedSubjectId(subjectId));
     onClick?.(data);
@@ -249,13 +251,8 @@ function SubjectCard({
         title={t("Teacher List")}
         open={isTeacherModalOpen}
         onCancel={(e) => {
-          if (e?.stopPropagation) {
-            e.stopPropagation();
-            e.preventDefault();
-          }
-          if (e?.nativeEvent?.stopImmediatePropagation) {
-            e.nativeEvent.stopImmediatePropagation();
-          }
+          e.stopPropagation();
+          e.preventDefault();
           setIsTeacherModalOpen(false);
           setIgnoreNextClick(true);
           setTimeout(() => setIgnoreNextClick(false), 500);

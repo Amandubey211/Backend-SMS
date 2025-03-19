@@ -78,30 +78,6 @@ export const addBookThunk = createAsyncThunk(
   }
 );
 
-// Delete Book Thunk
-export const deleteBookThunk = createAsyncThunk(
-  "library/deleteBook",
-  async (bookId, { rejectWithValue, dispatch, getState }) => {
-    try {
-      const getRole = getUserRole(getState);
-      dispatch(setShowError(false));
-      const say = getAY();
-      const response = await deleteData(
-        `/${getRole}/delete/book/${bookId}?say=${say}`
-      );
-      if (response.success) {
-        toast.success("Book deleted successfully!");
-        dispatch(fetchBooksDetailsThunk());
-        return bookId;
-      } else {
-        toast.error("Something went wrong");
-      }
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
-    }
-  }
-);
-
 // Update Book Thunk
 export const updateBookThunk = createAsyncThunk(
   "library/updateBook",
@@ -121,6 +97,30 @@ export const updateBookThunk = createAsyncThunk(
       toast.success("Book updated successfully!");
       dispatch(fetchBooksDetailsThunk());
       return response?.book;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Delete Book Thunk
+export const deleteBookThunk = createAsyncThunk(
+  "library/deleteBook",
+  async (bookId, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const say = getAY();
+      const response = await deleteData(
+        `/${getRole}/delete/book/${bookId}?say=${say}`
+      );
+      if (response.success) {
+        toast.success("Book deleted successfully!");
+        dispatch(fetchBooksDetailsThunk());
+        return bookId;
+      } else {
+        toast.error("Something went wrong");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
