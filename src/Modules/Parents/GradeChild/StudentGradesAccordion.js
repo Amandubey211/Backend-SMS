@@ -311,17 +311,17 @@ const StudentGradesAccordion = () => {
   }
 
   // Fallback if no grades exist
-  const noGradesFallback = (
-    <div className="flex flex-col items-center justify-center min-h-screen flex-grow">
-      <GrScorecard className="w-12 h-12 mb-2"/>
-      <p className="text-gray-600 text-lg font-semibold text-center">
-        No Grades Present for{" "}
-        {selectedChild?.name?.split(" ")[0] || "this student"} yet.
-        <br />
-        Kindly check later!
-      </p>
-    </div>
-  );
+  // const noGradesFallback = (
+  //   <div className="flex flex-col items-center justify-center min-h-screen flex-grow">
+  //     <GrScorecard className="w-12 h-12 mb-2"/>
+  //     <p className="text-gray-600 text-lg font-semibold text-center">
+  //       No Grades Present for{" "}
+  //       {selectedChild?.name?.split(" ")[0] || "this student"} yet.
+  //       <br />
+  //       Kindly check later!
+  //     </p>
+  //   </div>
+  // );
 
   // If data is still loading
   if (loading) {
@@ -400,9 +400,9 @@ const StudentGradesAccordion = () => {
 
   // Check if there's any data for the selected mode and semester
   const hasData = Child && semesters.length > 0 && grades.length > 0;
-  if (!hasData) {
-    return <div className="w-full p-4 relative flex">{noGradesFallback}</div>;
-  }
+  // if (!hasData) {
+  //   return <div className="w-full p-4 relative flex">{noGradesFallback}</div>;
+  // }
 
   // Display message when no data is available for the selected mode
   let noModeDataMessage = null;
