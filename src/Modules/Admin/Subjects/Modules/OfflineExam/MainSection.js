@@ -18,11 +18,13 @@ import CreateExam from "./Components/CreateExam";
 import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action";
 import ExportExcel from "./Components/ExportExcel";
 import FilterExam from "./Components/FilterExam";
+import Pagination from "../../../../../Components/Common/pagination";
+
 
 const MainSection = () => {
   const { sid, cid } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const { offlineExamData, loading } = useSelector(
+  const { offlineExamData, loading, totalExams, totalPages, currentPage, perPage } = useSelector(
     (store) => store.admin.offlineExam
   );
   const dispatch = useDispatch();
@@ -126,13 +128,17 @@ const MainSection = () => {
     debouncedSearch(searchQuery);
 
     dispatch(
-      fetchAllOfflineExam({ classId: cid, subjectId: sid, query: searchQuery })
+      fetchAllOfflineExam({
+        classId: cid, subjectId: sid, query: searchQuery, page: currentPage,
+        limit: perPage, startDate: startDate,
+        endDate: endDate,
+      })
     );
     dispatch(fetchAllStudents());
     return () => {
       debouncedSearch.cancel();
     };
-  }, [searchQuery, debouncedSearch, cid, sid, dispatch]);
+  }, [searchQuery, debouncedSearch, cid, sid, currentPage, perPage, startDate, endDate, dispatch]);
 
   const filteredData = useMemo(() => {
     let data = offlineExamData;
@@ -140,9 +146,6 @@ const MainSection = () => {
       data = data.filter((exam) =>
         exam.examName.toLowerCase().includes(debouncedQuery.toLowerCase())
       );
-    }
-    if (semester) {
-      data = data.filter((exam) => exam.semesterId?.title === semester);
     }
     const startISO = startDate ? new Date(startDate).toISOString() : null;
     const endISO = endDate ? new Date(endDate).toISOString() : null;
@@ -157,6 +160,10 @@ const MainSection = () => {
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
+  };
+
+  const handlePageChange = (page) => {
+    dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid, query: debouncedQuery, page, limit: perPage }));
   };
 
   const handleApplyFilters = () => {
@@ -238,6 +245,22 @@ const MainSection = () => {
                 bgColor="bg-gray-100"
               />
             )}
+
+            {/* Pagination Controls */}
+            {totalExams > 0 && (
+              <Pagination
+                page={currentPage}
+                totalPages={totalPages}
+                totalRecords={totalExams}
+                limit={perPage}
+                setPage={handlePageChange}
+                setLimit={(limit) => dispatch(fetchAllOfflineExam({
+                  classId: cid, subjectId: sid, query: debouncedQuery, page: 1, limit,
+                  startDate: startDate, endDate: endDate,
+                }))}
+                t={(key) => key} // Assuming the translation function
+              />
+            )}
           </div>
           {/* Right Section */}
           <div className="w-[33%] px-2">
@@ -257,8 +280,8 @@ const MainSection = () => {
             {/* Filter */}
             <FilterExam
               handleApplyFilters={handleApplyFilters}
-              semester={semester}
-              setSemester={setSemester}
+              //semester={semester}
+              //setSemester={setSemester}
               startDate={startDate}
               handleStartDateChange={handleStartDateChange}
               endDate={endDate}
