@@ -69,10 +69,10 @@ const StudentMainSection = () => {
   };
 
   return (
-    <div className="flex flex-row w-full">
+    <div className="flex flex-row w-full h-auto pb-4 ">
       {/* Left Section */}
-      <div className="w-[65%]">
-        <div className="flex flex-wrap justify-start gap-4 py-3 w-full px-4">
+      <div className="w-[65%] px-4">
+        <div className="flex flex-wrap justify-around  py-3 w-full">
           {(cardData?.length
             ? cardData
             : [
@@ -119,13 +119,13 @@ const StudentMainSection = () => {
         </div>
 
         {/* Subjects and Task */}
-        <div className="flex flex-1 h-[480px] w-[100%] relative">
+        <div className="flex  h-[500px] gap-4">
           {/* Subject Section */}
-          <div className="w-[60%] flex items-start justify-start pb-4 pl-1 h-full">
+          <div className="w-[60%] flex items-start justify-start pb-4  h-full">
             <div className="w-full h-full">
               {/* Card container with full height and flex layout */}
-              <div className="px-4 pt-4 mx-3 rounded-md bg-white border hover:shadow-sm h-full flex flex-col">
-                <div className="flex justify-between items-center mb-2">
+              <div className="px-4 pt-4  rounded-md bg-white border hover:shadow-sm h-full flex flex-col">
+                <div className="flex justify-between items-center mb-1">
                   <h2 className="text-lg font-semibold text-black">
                     My Subject
                   </h2>
@@ -133,7 +133,7 @@ const StudentMainSection = () => {
                     className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] bg-clip-text text-transparent font-normal cursor-pointer"
                     onClick={() => navigate("/student_class")}
                   >
-                    See All
+                    View All
                   </span>
                 </div>
                 {loading ? (
@@ -153,7 +153,7 @@ const StudentMainSection = () => {
                     <p className="text-sm text-gray-500">
                       A total of {subjects?.length} Courses are in Progress
                     </p>
-                    <div className="flex-grow">
+                    <div className="h-[80%]">
                       <AllSubjects subjects={studentSubjectProgress} />
                     </div>
                   </div>
@@ -170,12 +170,12 @@ const StudentMainSection = () => {
           </div>
 
           {/* Task Section */}
-          <div className="flex flex-col h-[300px] gap-1 w-[40%] mr-5">
-            <div className="w-full h-full p-4 bg-white border rounded-md hover:shadow-sm mb-2">
+          <div className="flex flex-col  gap-1 w-[40%] ">
+            <div className="w-full h-full h-[250px] p-4 bg-white border rounded-md hover:shadow-sm mb-2">
               <h1 className="text-lg font-semibold text-black">Task</h1>
               <TaskCompletionChart />
             </div>
-            <div className="flex w-full h-[300px] justify-between p-2 bg-white rounded-md border hover:shadow-sm mb-4">
+            <div className="flex w-full h-[250px] justify-between p-2 bg-white rounded-md border hover:shadow-sm mb-4">
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
                 amount={unpaidFees || 0}
@@ -185,7 +185,7 @@ const StudentMainSection = () => {
             </div>
           </div>
         </div>
-        <div className="ml-4 mr-5 mb-4 h-[405px]">
+        <div className="  h-[400px]">
           <div className="flex items-start justify-start w-[100%] border rounded-md bg-white hover:shadow-sm h-full">
             <AttendanceDashboard
               attendanceSummary={dashboardAttendance}
@@ -202,7 +202,7 @@ const StudentMainSection = () => {
           <StudentEvents />
         </div>
         {/* Notice Board */}
-        <div className="flex w-full bg-white mb-5 h-full items-start justify-start px-4 pb-2 mt-3 rounded-md border hover:shadow-sm">
+        <div className="flex w-full bg-white  h-full items-start justify-start px-4 pb-2 mt-3 rounded-md border hover:shadow-sm">
           <div className="w-full h-full">
             <DashboardNoticeBoard descriptionLength={58} />
           </div>

@@ -1,11 +1,11 @@
 import React, { useEffect, memo } from "react";
 import Fallback from "../../../../../Components/Common/Fallback";
-import { useNavigate } from "react-router-dom"; // Updated import
-import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
-import { fetchNotices } from "../../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import Redux action
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchNotices } from "../../../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
 import icon1 from "../../../../../Assets/DashboardAssets/Images/image1.png";
-import icon2 from "../../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
-import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
+import icon2 from "../../../../../Assets/DashboardAssets/Images/image2.png";
+import { FaCalendarAlt } from "react-icons/fa";
 import NoticeCard from "../../DashboardData/NoticeCard";
 
 const icons = [icon1, icon2];
@@ -19,20 +19,19 @@ const generateRandomColor = () => {
     "#FBB778",
     "#F9B279",
   ];
-  return colors[Math.floor(Math.random() * colors?.length)];
+  return colors[Math.floor(Math.random() * colors.length)];
 };
 
 const DashboardNoticeBoard = (descriptionLength) => {
-  const dispatch = useDispatch(); // Use useDispatch to dispatch actions
-  const navigate = useNavigate(); // Use useNavigate for navigation
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // Get notices data from Redux state
   const { loading, error, notices } = useSelector(
     (state) => state.admin.adminDashboard
   );
 
   useEffect(() => {
-    dispatch(fetchNotices()); // Dispatch the action to fetch notices when component mounts
+    dispatch(fetchNotices());
   }, [dispatch]);
 
   if (loading) {
@@ -46,39 +45,43 @@ const DashboardNoticeBoard = (descriptionLength) => {
   const topNotices = notices;
 
   return (
-    <div className={`my-4 ${topNotices?.length === 0 ? "h-auto" : "h-[75vh]"}`}>
+    <div className="py-4 h-full">
       <div className="flex justify-between pb-2 items-center pr-5 mb-2">
         <h2 className="text-lg font-semibold mb-2 text-black">
           Upcoming Notices
         </h2>
         <span
-          className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]  bg-clip-text text-transparent font-normal cursor-pointer"
+          className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] bg-clip-text text-transparent font-normal cursor-pointer"
           onClick={() => navigate("/student/noticeboard/announcements")}
         >
           See All
         </span>
       </div>
-      <div className=" overflow-hidden">
+      <div className="overflow-hidden h-[90%]">
         {topNotices?.length === 0 ? (
-          <div className="flex flex-col items-center justify-center my-20 h-auto">
+          <div className="flex flex-col items-center justify-center h-full">
             <FaCalendarAlt className="text-gray-400 text-3xl mb-4" />
-            <p className="text-gray-500 text-md">No noticeboard data found</p>
+            <p className="text-gray-500 text-md">
+              No Upcoming Notice Available
+            </p>
           </div>
         ) : (
-          <div className="flex flex-col h-[70vh] overflow-y-auto overflow-hidden scrollbar-hide">
-            {topNotices?.map((notice, index) => (
-              <NoticeCard
-                key={index}
-                image={icons[index % icons?.length]} // Use cyclic icons
-                title={notice?.title}
-                date={new Date(notice.startDate).toLocaleDateString()} // Formatting date
-                priority={notice?.priority}
-                authorName={notice?.authorName}
-                content={notice?.description} // Changed 'content' to 'description' based on API response
-                backgroundColor={generateRandomColor()}
-                descriptionLength={descriptionLength}
-              />
-            ))}
+          <div className="flex flex-col h-[70vh] overflow-y-auto scrollbar-hide hover:scrollbar-auto">
+            {topNotices
+              ?.slice(0, 5)
+              .map((notice, index) => (
+                <NoticeCard
+                  key={index}
+                  image={icons[index % icons.length]}
+                  title={notice?.title}
+                  date={new Date(notice.startDate).toLocaleDateString()}
+                  priority={notice?.priority}
+                  authorName={notice?.authorName}
+                  content={notice?.description}
+                  backgroundColor={generateRandomColor()}
+                  descriptionLength={descriptionLength}
+                />
+              ))}
           </div>
         )}
       </div>

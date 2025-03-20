@@ -25,6 +25,9 @@ import {
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import { gt } from "../../../../Utils/translator/translation";
 import "../Events/customCalendar.css";
+import { EventCardSkeleton } from "../../../Parents/Skeletons";
+import { RiSignalWifiErrorFill } from "react-icons/ri";
+import { IoCalendarOutline } from "react-icons/io5";
 
 const StudentEvent = () => {
   const {
@@ -181,44 +184,69 @@ const StudentEvent = () => {
         <StudentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50 w-full">
             {/* Events display */}
-            <div className="relative flex items-center justify-center">
-              <button
-                className={`absolute left-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
-                  currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                onClick={handlePrev}
-                disabled={currentPage === 0}
-              >
-                <IoIosArrowBack size={24} className="text-purple-500" />
-              </button>
-
-              <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide">
-                {paginatedEvents.map((event, index) => (
-                  <EventCard
-                    key={event.id}
-                    event={event}
-                    color={bgColors[index % bgColors.length]}
-                    onClick={() => handleStickerClick(event)}
-                    className="min-w-72 transform transition duration-300 ease-in-out hover:scale-110 hover:shadow-2xl rounded-lg"
-                  />
-                ))}
+            {loading ? (
+              // 2. NEW: Use our skeleton for each event card
+              <div>
+                <div className="flex flex-row justify-between">
+                  <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
+                    {t("Events")}
+                  </h1>
+                </div>
+                {/* Skeleton block simulating event cards */}
+                <EventCardSkeleton count={paginatedEvents.length} />
               </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-4">
+                <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
+                <p className="text-gray-600 font-semibold">
+                  {error}: {t("Unable to fetch events")}
+                </p>
+              </div>
+            ) : paginatedEvents?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <IoCalendarOutline className="text-6xl" />
+                <span className="py-5">No Events in this Month</span>
+              </div>
+            ) : (
+              <div className="relative flex items-center justify-center">
+                <button
+                  className={`absolute left-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                    currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={handlePrev}
+                  disabled={currentPage === 0}
+                >
+                  <IoIosArrowBack size={24} className="text-purple-500" />
+                </button>
 
-              <button
-                className={`absolute right-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
-                  currentPage + 1 >= totalPages
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-                onClick={handleNext}
-                disabled={currentPage + 1 >= totalPages}
-              >
-                <IoIosArrowForward size={24} className="text-purple-500" />
-              </button>
-            </div>
+                <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide justify-start w-full">
+                  {paginatedEvents?.map((event, index) => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      color={bgColors[index % bgColors.length]}
+                      onClick={() => handleStickerClick(event)}
+                      className="min-w-72 transform transition duration-300 ease-in-out hover:scale-110 hover:shadow-2xl rounded-lg"
+                    />
+                  ))}
+                </div>
 
-            <hr className="border-t-1 mt-12" />
-
+                <button
+                  className={`absolute right-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                    currentPage + 1 >= totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={handleNext}
+                  disabled={currentPage + 1 >= totalPages}
+                >
+                  <IoIosArrowForward size={24} className="text-purple-500" />
+                </button>
+              </div>
+            )
+             // <hr className="border-t-1 mt-12" />
+            }
+           
             {/* Calendar display */}
             <div className="w-full px-2">
               <Calendar
@@ -284,7 +312,6 @@ const StudentEvent = () => {
                 }}
               />
             </div>
-
             {/* Sidebar for event details */}
             <Sidebar
               isOpen={isSidebarOpen}

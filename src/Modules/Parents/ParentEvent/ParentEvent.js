@@ -200,7 +200,7 @@ const ParentEvent = () => {
                   <IoIosArrowBack size={24} className="text-purple-500" />
                 </button>
 
-                <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide">
+                <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide justify-start w-full">
                   {paginatedEvents.map((event, index) => (
                     <EventCard
                       key={event.id}

@@ -1471,7 +1471,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/student_dash/profile",
+      path: "users/student/profile",
       element: (
         <ProtectRoute Component={StudentProfile} allowedRoles={["student"]} />
       ),
