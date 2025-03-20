@@ -10,6 +10,9 @@ const initialState = {
     category: "",
     status: "All",
   },
+  currentIssuedBookPage: 1,
+  totalIssueBookPages: 0,
+  totalIssuedBook: 0,
 };
 const stdIssueBooksslice = createSlice({
   name: "studentIssueBooks",
@@ -28,8 +31,10 @@ const stdIssueBooksslice = createSlice({
       })
       .addCase(studentIssueBooks.fulfilled, (state, action) => {
         state.loading = false;
-        state.issueBooks = action.payload?.booksIssue;
-        console.log("action libra", action);
+        state.issueBooks = action.payload?.issuedBooks;
+        state.totalIssuedBook= action?.totalIssuedBooks || 0;
+        state.totalIssueBookPages = action?.totalPages || 1;
+        state.currentIssuedBookPage = action?.currentPage || 1; 
       })
       .addCase(studentIssueBooks.rejected, (state, action) => {
         state.loading = false;

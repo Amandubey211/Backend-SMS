@@ -3,7 +3,7 @@ import { MdKeyboardDoubleArrowLeft, MdKeyboardDoubleArrowRight } from "react-ico
 
 const Pagination = ({ page, totalPages, totalRecords, limit, setPage, setLimit, t }) => {
   const isDisabled = totalRecords === 0;
-
+console.log("page",page,totalPages,totalRecords)
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
