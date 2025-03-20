@@ -231,6 +231,8 @@ const MainSection = () => {
                       examId={item._id}
                       students={item.students}
                       semesterId={item.semesterId?._id}
+                      resultsPublishDate={item.resultsPublishDate}
+                      resultsPublished={item.resultsPublished}
                     />
                   </div>
                 ))}

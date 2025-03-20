@@ -58,6 +58,11 @@ const offlineExamSlice = createSlice({
         state.perPage = perPage || 10;
         state.startDate = startDate || state.startDate;
         state.endDate = endDate || state.endDate;
+        state.offlineExamData = state.offlineExamData.map((exam) => ({
+          ...exam,
+          resultsPublished: exam.resultsPublished || false,
+          resultsPublishDate: exam.resultsPublishDate || null,
+        }));
       })
       .addCase(fetchAllOfflineExam.rejected, (state) => {
         state.loading = false;
@@ -71,6 +76,10 @@ const offlineExamSlice = createSlice({
       })
       .addCase(createOfflineExam.fulfilled, (state, action) => {
         state.loading = false;
+        const newExam = action.payload;
+        newExam.resultsPublished = newExam.resultsPublished || false;
+        newExam.resultsPublishDate = newExam.resultsPublishDate || null;
+        state.offlineExamData.push(newExam);
       })
       .addCase(createOfflineExam.rejected, (state) => {
         state.loading = false;
@@ -84,6 +93,11 @@ const offlineExamSlice = createSlice({
       })
       .addCase(UploadOfflineExamSheet.fulfilled, (state, action) => {
         state.loading = false;
+        const updatedExam = action.payload;
+        const index = state.offlineExamData.findIndex((exam) => exam._id === updatedExam._id);
+        if (index !== -1) {
+          state.offlineExamData[index] = updatedExam;
+        }
       })
       .addCase(UploadOfflineExamSheet.rejected, (state) => {
         state.loading = false;
