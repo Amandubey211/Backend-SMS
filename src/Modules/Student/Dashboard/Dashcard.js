@@ -14,7 +14,7 @@ const DashCard = ({
   const navigate = useNavigate();
   return (
     <div
-      className={`py-6 px-4 w-[23%] rounded-md ${bgColor} hover:shadow-lg transition-shadow duration-200 ${
+      className={`py-6  w-[23%] rounded-md ${bgColor} hover:shadow-lg transition-shadow duration-200 ${
         label === "Upcoming Exam" ? "" : "cursor-pointer"
       }`}
       onClick={() => {

@@ -204,7 +204,7 @@ const SideMenubar = () => {
             className={`${
               isOpen ? "w-10 h-10" : "w-8 h-8"
             } rounded-full cursor-pointer`}
-            onClick={() => navigate("/student_dash/profile")}
+            onClick={() => navigate("/users/student/profile")}
           />
           {isOpen && (
             <div className="ml-4">
