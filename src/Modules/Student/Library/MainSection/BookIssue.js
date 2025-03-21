@@ -12,14 +12,19 @@ import { gt } from "../../../../Utils/translator/translation";
 import { useTranslation } from "react-i18next";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../Components/Common/Offline";
+import BookPreviewPortal from "../../../../Components/Common/BookPreviewPortal";
 
 const BookIssue = () => {
-  const { loading, error, issueBooks=[], filters } = useSelector(
-    (store) => store?.student?.studentIssueBooks
-  );
+  const {
+    loading,
+    error,
+    issueBooks = [],
+    filters,
+  } = useSelector((store) => store?.student?.studentIssueBooks);
   const { activeTab } = useSelector(
     (store) => store?.student?.studentLibraryBooks
   );
+  
   const { showError } = useSelector((store) => store?.common?.alertMsg);
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -147,6 +152,8 @@ const BookIssue = () => {
       {!loading && showError && (
         <OfflineModal error={error} onDismiss={handleDismiss} />
       )}
+
+    
     </div>
   );
 };

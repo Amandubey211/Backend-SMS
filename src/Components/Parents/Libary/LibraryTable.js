@@ -347,15 +347,17 @@ const LibraryTable = () => {
           <tbody className="bg-white">{renderTableRows()}</tbody>
         </table>
       </div>
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        totalRecords={totalBookIsuued}
-        limit={pageSize}
-        setPage={setPage}
-        setLimit={setPageSize}
-        t={t}
-      />
+      {totalBookIsuued > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalRecords={totalBookIsuued}
+          limit={pageSize}
+          setPage={setPage}
+          setLimit={setPageSize}
+          t={t}
+        />
+      )}
 
       {/* Render the preview image via portal */}
       <BookPreviewPortal visible={previewVisible} position={previewPosition}>

@@ -44,7 +44,12 @@ const Library = () => {
     totalIssuedBook,
     currentIssuedBookPage,
   } = useSelector((store) => store?.student?.studentIssueBooks);
- console.log("currentIssuedBook", currentIssuedBookPage,totalIssuedBook,totalIssueBookPages)
+  console.log(
+    "currentIssuedBook",
+    currentIssuedBookPage,
+    totalIssuedBook,
+    totalIssueBookPages
+  );
   const { showError } = useSelector((store) => store?.common?.alertMsg);
   const { t } = useTranslation();
   const [allCategories, setAllCategories] = useState([]);
@@ -63,12 +68,22 @@ const Library = () => {
         })
       );
     } else if (activeTab === "BookIssue") {
-      dispatch(studentIssueBooks({
-        page: currentIssuedBookPage,
-        limit: limit,
-      }));
+      dispatch(
+        studentIssueBooks({
+          page: currentIssuedBookPage,
+          limit: limit,
+        })
+      );
     }
-  }, [dispatch, activeTab, currentPage, currentIssuedBookPage, searchQuery, category, limit]);
+  }, [
+    dispatch,
+    activeTab,
+    currentPage,
+    currentIssuedBookPage,
+    searchQuery,
+    category,
+    limit,
+  ]);
 
   const handleSwitchTab = (tab) => dispatch(setActiveTab(tab));
 
@@ -82,7 +97,9 @@ const Library = () => {
   const handlePageChange = (newPage) => {
     if (
       newPage > 0 &&
-      (activeTab === "Library" ? newPage <= totalPages : newPage <= totalIssueBookPages)
+      (activeTab === "Library"
+        ? newPage <= totalPages
+        : newPage <= totalIssueBookPages)
     ) {
       dispatch(setCurrentPage(newPage));
     }
@@ -90,7 +107,11 @@ const Library = () => {
 
   const libraryContent = () => {
     if (libraryLoading) return <Spinner />;
-    if (!libraryLoading && libararyBooks?.length === 0 && activeTab === "Library") {
+    if (
+      !libraryLoading &&
+      libararyBooks?.length === 0 &&
+      activeTab === "Library"
+    ) {
       return <NoDataFound />;
     }
     return (
@@ -121,10 +142,16 @@ const Library = () => {
         <div>
           <div className="flex items-center justify-between p-5">
             <div className="flex items-center gap-5">
-              <TabButton isActive={activeTab === "Library"} onClick={() => handleSwitchTab("Library")}>
+              <TabButton
+                isActive={activeTab === "Library"}
+                onClick={() => handleSwitchTab("Library")}
+              >
                 Library
               </TabButton>
-              <TabButton isActive={activeTab === "BookIssue"} onClick={() => handleSwitchTab("BookIssue")}>
+              <TabButton
+                isActive={activeTab === "BookIssue"}
+                onClick={() => handleSwitchTab("BookIssue")}
+              >
                 Book Issue
               </TabButton>
             </div>
@@ -147,17 +174,30 @@ const Library = () => {
 
           {activeTab === "Library" ? libraryContent() : <BookIssue />}
 
-          <Pagination
-            page={activeTab === "Library" ? currentPage :  currentIssuedBookPage}
-            totalPages={activeTab === "Library" ? totalPages : totalIssueBookPages}
-            totalRecords={activeTab === "Library" ? totalBooks : totalIssuedBook}
-            limit={limit}
-            setPage={handlePageChange}
-            setLimit={setLimit}
-            t={t}
-          />
+          {(activeTab === "Library" ? totalBooks > 0 : totalIssuedBook > 0) && (
+            <Pagination
+              page={
+                activeTab === "Library" ? currentPage : currentIssuedBookPage
+              }
+              totalPages={
+                activeTab === "Library" ? totalPages : totalIssueBookPages
+              }
+              totalRecords={
+                activeTab === "Library" ? totalBooks : totalIssuedBook
+              }
+              limit={limit}
+              setPage={handlePageChange}
+              setLimit={setLimit}
+              t={t}
+            />
+          )}
 
-          {!libraryLoading && showError && <OfflineModal error={libraryError || issueError} onDismiss={handleDismiss} />}
+          {!libraryLoading && showError && (
+            <OfflineModal
+              error={libraryError || issueError}
+              onDismiss={handleDismiss}
+            />
+          )}
         </div>
       </StudentDashLayout>
     </Layout>
