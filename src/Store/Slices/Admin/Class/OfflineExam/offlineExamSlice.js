@@ -9,6 +9,7 @@ import {
   UploadOfflineExamSheet,
 } from "./oflineExam.action";
 
+
 const initialState = {
   error: false,
   loading: false,
@@ -31,6 +32,9 @@ const offlineExamSlice = createSlice({
       //console.log("action selected exam", action.payload);
 
       state.selectedExamStudents = action.payload;
+    },
+    setCurrentPage:(state, action)=>{
+      state.currentPage = action.payload;
     },
     setPagination: (state, action) => {
       const { totalExams, totalPages, currentPage, perPage, startDate, endDate } = action.payload;
@@ -157,5 +161,5 @@ const offlineExamSlice = createSlice({
       });
   },
 });
-export const { setSelectedExamStudents } = offlineExamSlice.actions;
+export const { setSelectedExamStudents,setCurrentPage} = offlineExamSlice.actions;
 export default offlineExamSlice.reducer;

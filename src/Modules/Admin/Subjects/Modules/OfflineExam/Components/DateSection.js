@@ -67,7 +67,7 @@ function DateSection({
     XLSX.writeFile(workbook, `${examDetails.examName}_Exam_Report.xlsx`);
   };
   return (
-    <div className="flex flex-col text-black text-xs">
+    <div className="flex flex-col text-black text-xs ">
       {/* row-1 */}
       <div className="flex items-center justify-between h-auto">
         <div className="flex flex-col w-full gap-1">
@@ -125,7 +125,7 @@ function DateSection({
             </div>
           )}
         </div>
-        <div className="flex justify-end gap-y-2 cursor-pointer items-end h-full">
+        <div className="flex justify-end gap-y-2 cursor-pointer items-end h-full  gap-1">
           <div className="flex flex-col">
             <Tooltip title="Export">
               <button

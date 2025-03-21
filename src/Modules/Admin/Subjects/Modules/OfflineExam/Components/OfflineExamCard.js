@@ -11,6 +11,7 @@ import DateSection from "./DateSection";
 import { setSelectedExamStudents } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/offlineExamSlice";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
+import { Tooltip } from "antd";
 
 const OfflineExamCard = ({
   examType,
@@ -23,7 +24,7 @@ const OfflineExamCard = ({
   students,
   semesterId,
   resultsPublished,
-  resultsPublishDate
+  resultsPublishDate,
 }) => {
   const dispatch = useDispatch();
   const { offlineExamData, loading } = useSelector(
@@ -49,51 +50,48 @@ const OfflineExamCard = ({
         status: student.status || "present",
         studentId: student.studentId
           ? {
-            _id: student.studentId._id || null,
-            firstName: student.studentId.firstName || "",
-            lastName: student.studentId.lastName || "",
-            fullName: student.studentId.fullName || "",
-            id: student.studentId.id || null,
-          }
+              _id: student.studentId._id || null,
+              firstName: student.studentId.firstName || "",
+              lastName: student.studentId.lastName || "",
+              fullName: student.studentId.fullName || "",
+              id: student.studentId.id || null,
+            }
           : null, // Fallback if studentId is undefined
       })) || [],
   });
 
   const [isEditing, setIsEditing] = useState(false);
 
-  //  Update state when Redux state changes
   useEffect(() => {
     const updatedExam = offlineExamData?.find((exam) => exam?._id === examId);
 
     if (updatedExam) {
       setExamDetails({
-        examName: updatedExam?.examName,
-        startDate: updatedExam?.startDate,
-        endDate: updatedExam?.endDate,
-        maxMarks: updatedExam?.students?.length
-          ? updatedExam.students[0].maxMarks
-          : 0,
-        publishDate: updatedExam?.resultsPublishDate || "",
-        isPublished: updatedExam?.resultsPublished || false,
+        examName: updatedExam.examName,
+        startDate: updatedExam.startDate,
+        endDate: updatedExam.endDate,
+        maxMarks: updatedExam.students?.[0]?.maxMarks || 0,
+        publishDate: updatedExam.resultsPublishDate || "",
+        isPublished: updatedExam.resultsPublished || false,
         students:
-          updatedExam?.students?.map((student) => ({
-            _id: student._id || null, // Ensure it's not null
-            score: student.score || 0, // Default score to 0 if undefined
-            maxMarks: student.maxMarks || 0, // Default maxMarks to 0 if undefined
-            status: student.status || "present", // Default status to 'present' if undefined
+          updatedExam.students?.map((student) => ({
+            _id: student._id || null,
+            score: student.score || 0,
+            maxMarks: student.maxMarks || 0,
+            status: student.status || "present",
             studentId: student.studentId
               ? {
-                _id: student.studentId._id || null,
-                firstName: student.studentId.firstName || "",
-                lastName: student.studentId.lastName || "",
-                fullName: student.studentId.fullName || "",
-                id: student.studentId.id || null,
-              }
+                  _id: student.studentId._id || null,
+                  firstName: student.studentId.firstName || "",
+                  lastName: student.studentId.lastName || "",
+                  fullName: student.studentId.fullName || "",
+                  id: student.studentId.id || null,
+                }
               : null,
           })) || [],
       });
     }
-  }, []);
+  }, [offlineExamData, examId]); // <- Dependency fix here
 
   const handleDeleteClick = async () => {
     try {
@@ -117,7 +115,7 @@ const OfflineExamCard = ({
         [name]: checked,
       });
     } else {
-      console.log('value', value);
+      console.log("value", value);
 
       setExamDetails({
         ...examDetails,
@@ -146,12 +144,12 @@ const OfflineExamCard = ({
           status: student.status || "present",
           studentId: student.studentId
             ? {
-              _id: student.studentId._id || null,
-              firstName: student.studentId.firstName || "",
-              lastName: student.studentId.lastName || "",
-              fullName: student.studentId.fullName || "",
-              id: student.studentId.id || null,
-            }
+                _id: student.studentId._id || null,
+                firstName: student.studentId.firstName || "",
+                lastName: student.studentId.lastName || "",
+                fullName: student.studentId.fullName || "",
+                id: student.studentId.id || null,
+              }
             : null,
         })),
       };
@@ -210,26 +208,34 @@ const OfflineExamCard = ({
               {/* Published Icon (Move to the right of examType) */}
               {isEditing ? (
                 <div className="flex items-center gap-2">
-                  <label htmlFor="isPublished" className="text-sm">Published</label>
+                  <label
+                    htmlFor="isPublished"
+                    className="text-sm font-medium text-gray-600"
+                  >
+                    Published
+                  </label>
                   <input
                     type="checkbox"
                     id="isPublished"
                     checked={examDetails.isPublished}
                     onChange={handleInputChange}
                     name="isPublished"
-                    className="h-5 w-5"
+                    className="h-4 w-4 accent-green-500 cursor-pointer"
                   />
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  {examDetails.isPublished ? (
-                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
-                  ) : (
-                    <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
-                  )}
-                </div>
+                {examDetails.isPublished ? (
+                  <Tooltip title="Published">
+                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7 cursor-pointer" />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="UnPublished">
+                    <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7 cursor-pointer" />
+                  </Tooltip>
+                )}
+              </div>
               )}
-
             </div>
             <div className="bg-gray-100 text-gray-600 text-sm font-semibold rounded-full px-2 py-1 capitalize">
               {examType}

@@ -10,31 +10,66 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllOfflineExam } from "../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import { formatDate } from "../../../../../Utils/helperFunctions";
-
-import { PERMISSIONS } from "../../../../../config/permission";
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import * as XLSX from "xlsx";
 import CreateExam from "./Components/CreateExam";
 import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action";
 import ExportExcel from "./Components/ExportExcel";
 import FilterExam from "./Components/FilterExam";
 import Pagination from "../../../../../Components/Common/pagination";
+import { PERMISSIONS } from "../../../../../config/permission";
+import { useTranslation } from "react-i18next";
 
 
 const MainSection = () => {
   const { sid, cid } = useParams();
-  const [searchQuery, setSearchQuery] = useState("");
-  const { offlineExamData, loading, totalExams, totalPages, currentPage, perPage } = useSelector(
-    (store) => store.admin.offlineExam
-  );
   const dispatch = useDispatch();
-  const [semester, setSemester] = useState("");
+  const { t } = useTranslation();
+
+  const {
+    offlineExamData,
+    loading,
+    totalExams,
+    totalPages,
+    currentPage,
+  } = useSelector((store) => store.admin.offlineExam);
+  const { allStudents } = useSelector((store) => store.admin.all_students);
+  const [page,setPage]=useState(currentPage);
+  const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
-  const [isExportModelOpen, setIsExportModelOpen] = useState(false);
+  const [limit, setLimit] = useState(10);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
-  const { allStudents } = useSelector((store) => store.admin.all_students);
+  const [isExportModelOpen, setIsExportModelOpen] = useState(false);
   const [selectedExportExamTypes, setSelectedExportExamTypes] = useState([]);
+
+  const debouncedSearch = useMemo(
+    () => debounce((query) => setDebouncedQuery(query), 300),
+    []
+  );
+
+  useEffect(() => {
+    debouncedSearch(searchQuery);
+    return () => debouncedSearch.cancel();
+  }, [searchQuery, debouncedSearch]);
+
+  useEffect(() => {
+    dispatch(fetchAllOfflineExam({
+      classId: cid,
+      subjectId: sid,
+      query: debouncedQuery,
+      page: page,
+      limit,
+      startDate,
+      endDate,
+    }));
+    dispatch(fetchAllStudents());
+  }, [cid, sid, debouncedQuery, page, limit, startDate, endDate, dispatch]);
+
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
+
 
   const handleExportExcel = (e) => {
     e.preventDefault();
@@ -43,20 +78,17 @@ const MainSection = () => {
       return;
     }
 
-    const formattedStartDate = formatDate(startDate);
-    const formattedEndDate = formatDate(endDate);
-
-    // Convert start & end dates to proper comparison format
     const start = new Date(startDate).setHours(0, 0, 0, 0);
     const end = new Date(endDate).setHours(23, 59, 59, 999);
 
-    const filteredExams = offlineExamData?.filter((exam) => {
+    const filteredExams = offlineExamData.filter((exam) => {
       const examDate = new Date(exam.startDate);
-      const isWithinDateRange = examDate >= start && examDate <= end;
-      const isMatchingExamType =
-        selectedExportExamTypes.length === 0 ||
-        selectedExportExamTypes.includes(exam.examType);
-      return isWithinDateRange && isMatchingExamType;
+      return (
+        examDate >= start &&
+        examDate <= end &&
+        (selectedExportExamTypes.length === 0 ||
+          selectedExportExamTypes.includes(exam.examType))
+      );
     });
 
     if (filteredExams.length === 0) {
@@ -64,207 +96,95 @@ const MainSection = () => {
       return;
     }
 
-    const examNames = new Set(filteredExams.map((exam) => exam.examName));
-
+    const examNames = [...new Set(filteredExams.map((exam) => exam.examName))];
     const studentData = {};
 
     filteredExams.forEach((exam) => {
-      examNames.add(exam.examName);
       exam.students.forEach((student) => {
         const studentId = student.studentId._id;
-        const matchedStudent = allStudents.find((i) => i._id === studentId);
+        const matchedStudent = allStudents.find((s) => s._id === studentId);
         if (!studentData[studentId]) {
           studentData[studentId] = {
             Name: `${student.studentId.firstName} ${student.studentId.lastName}`,
-            AdmissionNumber: matchedStudent
-              ? matchedStudent.admissionNumber
-              : "N/A",
+            AdmissionNumber: matchedStudent ? matchedStudent.admissionNumber : "N/A",
           };
         }
         studentData[studentId][exam.examName] =
           student.status === "absent" || student.status === "excused"
-            ? `${student.status}/${student?.maxMarks}`
-            : `${student.score}/${student?.maxMarks}`;
+            ? `${student.status}/${student.maxMarks}`
+            : `${student.score}/${student.maxMarks}`;
       });
     });
+
     const studentList = Object.values(studentData).map((student) => {
-      examNames.forEach((exam) => {
-        if (!student[exam]) {
-          student[exam] = "NA";
-        }
+      examNames.forEach((name) => {
+        if (!student[name]) student[name] = "NA";
       });
       return student;
     });
 
-    generateExcel(
-      studentList,
-      `Offline_Exams_${formattedStartDate}_to_${formattedEndDate}.xlsx`
-    );
-  };
-  const generateExcel = (data, filename) => {
-    const worksheet = XLSX.utils.json_to_sheet(data);
+    const worksheet = XLSX.utils.json_to_sheet(studentList);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Offline Exams");
-
-    XLSX.writeFile(workbook, filename);
+    XLSX.writeFile(workbook, `Offline_Exams_${formatDate(startDate)}_to_${formatDate(endDate)}.xlsx`);
   };
-
-  const debouncedSearch = useMemo(
-    () =>
-      debounce((searchQuery) => {
-        setDebouncedQuery(searchQuery);
-      }, 300),
-    []
-  );
-
-  useEffect(() => {
-    debouncedSearch(searchQuery);
-    return () => {
-      debouncedSearch.cancel();
-    };
-  }, [searchQuery, debouncedSearch]);
-
-  useEffect(() => {
-    debouncedSearch(searchQuery);
-
-    dispatch(
-      fetchAllOfflineExam({
-        classId: cid, subjectId: sid, query: searchQuery, page: currentPage,
-        limit: perPage, startDate: startDate,
-        endDate: endDate,
-      })
-    );
-    dispatch(fetchAllStudents());
-    return () => {
-      debouncedSearch.cancel();
-    };
-  }, [searchQuery, debouncedSearch, cid, sid, currentPage, perPage, startDate, endDate, dispatch]);
-
-  const filteredData = useMemo(() => {
-    let data = offlineExamData;
-    if (debouncedQuery.trim()) {
-      data = data.filter((exam) =>
-        exam.examName.toLowerCase().includes(debouncedQuery.toLowerCase())
-      );
-    }
-    const startISO = startDate ? new Date(startDate).toISOString() : null;
-    const endISO = endDate ? new Date(endDate).toISOString() : null;
-    if (startISO) {
-      data = data.filter((exam) => exam.startDate >= startISO);
-    }
-    if (endISO) {
-      data = data.filter((exam) => exam.endDate <= endISO);
-    }
-    return data;
-  }, [offlineExamData, debouncedQuery, semester, startDate, endDate]);
-
-  const handleSearch = (event) => {
-    setSearchQuery(event.target.value);
-  };
-
-  const handlePageChange = (page) => {
-    dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid, query: debouncedQuery, page, limit: perPage }));
-  };
-
-  const handleApplyFilters = () => {
-    setSearchQuery("");
-    setSemester("");
-    setStartDate(null);
-    setEndDate(null);
-  };
-
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-    if (endDate && date > endDate) {
-      setEndDate(null);
-    }
-  };
-
-  const handleEndDateChange = (date) => {
-    if (!startDate) {
-      alert("Please select a start date first.");
-      return;
-    }
-    setEndDate(date);
-  };
-
-  const handleCancel = () => {
-    setIsExportModelOpen(false);
-    setSelectedExportExamTypes([]);
-  };
-
 
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
-      <ProtectedSection
-        title="All Offline Exams"
-        requiredPermission={PERMISSIONS.GET_OFFLINE_EXAM}
-      >
+      <ProtectedSection title="All Offline Exams" requiredPermission={PERMISSIONS.GET_OFFLINE_EXAM}>
         <div className="flex pt-4">
-          {/* Left Section */}
           <div className="w-[62%] border-l">
             <Header
               loading={loading}
               data={offlineExamData}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
-              handleSearch={handleSearch}
-              searchedData={filteredData}
             />
-            <ul className="border-t mt-4 ml-4 mr-6"></ul>
-            {/* Offline Exam Card */}
+            <hr className="my-4" />
+
             {loading ? (
               <Spinner />
-            ) : filteredData?.length ? (
-              <div className="h-[calc(100vh-150px)] overflow-y-auto">
-                {filteredData?.map((item, index) => (
-                  <div>
-                    <OfflineExamCard
-                      key={index}
-                      examType={item.examType}
-                      examName={item.examName}
-                      semester={item.semesterId?.title ?? "NA"}
-                      startDate={formatDate(item.startDate)}
-                      endDate={formatDate(item.endDate)}
-                      maxMarks={item.students?.[0]?.maxMarks}
-                      examId={item._id}
-                      students={item.students}
-                      semesterId={item.semesterId?._id}
-                      resultsPublishDate={item.resultsPublishDate}
-                      resultsPublished={item.resultsPublished}
-                    />
-                  </div>
+            ) : offlineExamData.length ? (
+              <div className="overflow-y-auto h-[calc(100vh-150px)]">
+                {offlineExamData.map((exam) => (
+                  <OfflineExamCard
+                    key={exam._id}
+                    examType={exam.examType}
+                    examName={exam.examName}
+                    semester={exam.semesterId?.title ?? "NA"}
+                    startDate={formatDate(exam.startDate)}
+                    endDate={formatDate(exam.endDate)}
+                    maxMarks={exam.students?.[0]?.maxMarks}
+                    examId={exam._id}
+                    students={exam.students}
+                    semesterId={exam.semesterId?._id}
+                    resultsPublishDate={exam.resultsPublishDate}
+                    resultsPublished={exam.resultsPublished}
+                  />
                 ))}
               </div>
             ) : (
               <NoDataFound
                 title="Offline Exam"
-                desc="No Offline Exam Found !"
+                desc="No Offline Exam Found!"
                 icon={FaClipboardList}
-                iconColor="text-blue-500"
-                textColor="text-gray-700"
-                bgColor="bg-gray-100"
               />
             )}
 
-            {/* Pagination Controls */}
             {totalExams > 0 && (
               <Pagination
-                page={currentPage}
+                page={page}
                 totalPages={totalPages}
                 totalRecords={totalExams}
-                limit={perPage}
+                limit={limit}
                 setPage={handlePageChange}
-                setLimit={(limit) => dispatch(fetchAllOfflineExam({
-                  classId: cid, subjectId: sid, query: debouncedQuery, page: 1, limit,
-                  startDate: startDate, endDate: endDate,
-                }))}
-                t={(key) => key} // Assuming the translation function
+                setLimit={setLimit}
+                t={t}
               />
             )}
           </div>
-          {/* Right Section */}
+
           <div className="w-[33%] px-2">
             <ExportExcel
               isExportModelOpen={isExportModelOpen}
@@ -273,26 +193,20 @@ const MainSection = () => {
               selectedExportExamTypes={selectedExportExamTypes}
               setSelectedExportExamTypes={setSelectedExportExamTypes}
               startDate={startDate}
-              setEndDate={setEndDate}
-              endDate={endDate}
               setStartDate={setStartDate}
-              handleCancel={handleCancel}
+              endDate={endDate}
+              setEndDate={setEndDate}
             />
 
-            {/* Filter */}
             <FilterExam
-              handleApplyFilters={handleApplyFilters}
-              //semester={semester}
-              //setSemester={setSemester}
               startDate={startDate}
-              handleStartDateChange={handleStartDateChange}
+              handleStartDateChange={setStartDate}
               endDate={endDate}
-              handleEndDateChange={handleEndDateChange}
+              handleEndDateChange={setEndDate}
             />
           </div>
         </div>
       </ProtectedSection>
-      {/* Floating Add Exam Button */}
       <CreateExam />
     </div>
   );
