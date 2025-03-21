@@ -41,6 +41,8 @@ const StudentGradesAccordion = () => {
     submittedGroupAssignmentScore,
     totalGroupQuizScore,
     submittedGroupQuizScore,
+    totalOfflineExamsScore,
+    totalScoreOfOfflineExams,
   } = gradesResponse;
 
   // Semester state
@@ -640,10 +642,10 @@ const StudentGradesAccordion = () => {
           </span>
         </div>
         <div className="flex items-center justify-between mb-2 text-gray-600">
-          {/* <span>Group Quiz</span>
+          <span>OfflineExams Score</span>
           <span>
-            {submittedGroupQuizScore ?? 0} / {totalGroupQuizScore ?? 0}
-          </span> */}
+            {totalScoreOfOfflineExams ?? 0} / {totalOfflineExamsScore ?? 0}
+          </span>
         </div>
         <div className="flex items-center justify-between mb-2 text-gray-600">
           <span>Attendance</span>
