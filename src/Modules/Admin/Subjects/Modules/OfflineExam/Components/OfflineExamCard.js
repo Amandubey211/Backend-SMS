@@ -9,6 +9,8 @@ import { formatDate } from "../../../../../../Utils/helperFunctions";
 import toast from "react-hot-toast";
 import DateSection from "./DateSection";
 import { setSelectedExamStudents } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/offlineExamSlice";
+import { BsPatchCheckFill } from "react-icons/bs";
+import { MdOutlineBlock } from "react-icons/md";
 
 const OfflineExamCard = ({
   examType,
@@ -20,6 +22,8 @@ const OfflineExamCard = ({
   examId,
   students,
   semesterId,
+  resultsPublished,
+  resultsPublishDate
 }) => {
   const dispatch = useDispatch();
   const { offlineExamData, loading } = useSelector(
@@ -35,6 +39,8 @@ const OfflineExamCard = ({
     startDate,
     endDate,
     maxMarks: maxMarks || 0,
+    publishDate: resultsPublishDate || "",
+    isPublished: resultsPublished || false,
     students:
       students?.map((student) => ({
         _id: student._id,
@@ -43,12 +49,12 @@ const OfflineExamCard = ({
         status: student.status || "present",
         studentId: student.studentId
           ? {
-              _id: student.studentId._id || null,
-              firstName: student.studentId.firstName || "",
-              lastName: student.studentId.lastName || "",
-              fullName: student.studentId.fullName || "",
-              id: student.studentId.id || null,
-            }
+            _id: student.studentId._id || null,
+            firstName: student.studentId.firstName || "",
+            lastName: student.studentId.lastName || "",
+            fullName: student.studentId.fullName || "",
+            id: student.studentId.id || null,
+          }
           : null, // Fallback if studentId is undefined
       })) || [],
   });
@@ -67,6 +73,8 @@ const OfflineExamCard = ({
         maxMarks: updatedExam?.students?.length
           ? updatedExam.students[0].maxMarks
           : 0,
+        publishDate: updatedExam?.resultsPublishDate || "",
+        isPublished: updatedExam?.resultsPublished || false,
         students:
           updatedExam?.students?.map((student) => ({
             _id: student._id || null, // Ensure it's not null
@@ -75,12 +83,12 @@ const OfflineExamCard = ({
             status: student.status || "present", // Default status to 'present' if undefined
             studentId: student.studentId
               ? {
-                  _id: student.studentId._id || null,
-                  firstName: student.studentId.firstName || "",
-                  lastName: student.studentId.lastName || "",
-                  fullName: student.studentId.fullName || "",
-                  id: student.studentId.id || null,
-                }
+                _id: student.studentId._id || null,
+                firstName: student.studentId.firstName || "",
+                lastName: student.studentId.lastName || "",
+                fullName: student.studentId.fullName || "",
+                id: student.studentId.id || null,
+              }
               : null,
           })) || [],
       });
@@ -102,10 +110,20 @@ const OfflineExamCard = ({
   };
 
   const handleInputChange = (e) => {
-    setExamDetails({
-      ...examDetails,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value, type, checked } = e.target;
+    if (type === "checkbox") {
+      setExamDetails({
+        ...examDetails,
+        [name]: checked,
+      });
+    } else {
+      console.log('value', value);
+
+      setExamDetails({
+        ...examDetails,
+        [name]: value,
+      });
+    }
   };
 
   const handleEditClick = () => {
@@ -119,6 +137,8 @@ const OfflineExamCard = ({
         startDate: examDetails.startDate,
         endDate: examDetails.endDate,
         maxMarks: examDetails.maxMarks,
+        resultsPublishDate: examDetails.publishDate,
+        resultsPublished: examDetails.isPublished,
         students: examDetails?.students?.map((student) => ({
           _id: student._id || null,
           score: student.score || 0,
@@ -126,12 +146,12 @@ const OfflineExamCard = ({
           status: student.status || "present",
           studentId: student.studentId
             ? {
-                _id: student.studentId._id || null,
-                firstName: student.studentId.firstName || "",
-                lastName: student.studentId.lastName || "",
-                fullName: student.studentId.fullName || "",
-                id: student.studentId.id || null,
-              }
+              _id: student.studentId._id || null,
+              firstName: student.studentId.firstName || "",
+              lastName: student.studentId.lastName || "",
+              fullName: student.studentId.fullName || "",
+              id: student.studentId.id || null,
+            }
             : null,
         })),
       };
@@ -186,6 +206,30 @@ const OfflineExamCard = ({
                   {examDetails.examName}
                 </h1>
               )}
+
+              {/* Published Icon (Move to the right of examType) */}
+              {isEditing ? (
+                <div className="flex items-center gap-2">
+                  <label htmlFor="isPublished" className="text-sm">Published</label>
+                  <input
+                    type="checkbox"
+                    id="isPublished"
+                    checked={examDetails.isPublished}
+                    onChange={handleInputChange}
+                    name="isPublished"
+                    className="h-5 w-5"
+                  />
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  {examDetails.isPublished ? (
+                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
+                  ) : (
+                    <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
+                  )}
+                </div>
+              )}
+
             </div>
             <div className="bg-gray-100 text-gray-600 text-sm font-semibold rounded-full px-2 py-1 capitalize">
               {examType}

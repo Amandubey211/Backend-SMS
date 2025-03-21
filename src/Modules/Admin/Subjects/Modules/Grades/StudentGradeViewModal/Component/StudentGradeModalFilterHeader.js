@@ -20,9 +20,14 @@ const StudentGradeModalFilterHeader = ({
   const [chapters, setChapters] = useState([]);
   const dispatch = useDispatch();
 
+  const { semesters: semesterList } = useSelector(
+    (state) => state.admin.semesters
+  );
+
   const { modules: moduleList, moduleLoading } = useSelector(
     (state) => state.admin.module
   );
+
   const { studentSubjectProgress } = useSelector(
     (store) => store.admin.all_students
   );
@@ -40,7 +45,6 @@ const StudentGradeModalFilterHeader = ({
   // Generic handler for user changing selects/inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     // If user picked a new module, update the chapters in that module
     if (name === "module") {
       const selectedModule = moduleList?.find((m) => m?._id === value);
@@ -57,8 +61,13 @@ const StudentGradeModalFilterHeader = ({
         }
       });
     }
+    if (name === "semester") {
+      // Store only the id in filters.semester
+      onFilterChange(name, value);  // Call the passed function to handle state update
+    } else {
+      onFilterChange(name, value);
+    }
 
-    onFilterChange(name, value);
   };
 
   return (
@@ -222,7 +231,31 @@ const StudentGradeModalFilterHeader = ({
         </div>
       )}
 
-      {/* Reset Icon with Tooltip */}
+      {/* Semester Filter */}
+      <div className="flex flex-col w-48 relative">
+        <label className="text-sm font-medium text-gray-700">Semester</label>
+        <div className="relative mt-1">
+          <select
+            name="semester"
+            value={filters.semester}
+            onChange={(e) => handleChange(e)}
+            className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
+                 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
+                 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="">Select Semester</option>
+            {/* Add dynamic semester options from your semester list */}
+            {semesterList?.map((semester) => (
+              <option key={semester._id} value={semester._id}>
+                {semester.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Reset Icon - spin on hover */}
+
       {onResetFilters && (
         <Tooltip title="Reset Filters">
           <FiRefreshCw
