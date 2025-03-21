@@ -28,7 +28,7 @@ const QIDLogin = () => {
       .unwrap()
       .then((res) => {
         // Redirect on successful verification
-        navigate("/student_dash");
+        navigate("/dashboard/select/academic");
       })
       .catch((error) => {
         toast.error(error || "Verification failed");
