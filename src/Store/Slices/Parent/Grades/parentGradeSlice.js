@@ -16,6 +16,8 @@ const initialState = {
     submittedGroupAssignmentScore: 0,
     totalGroupQuizScore: 0,
     submittedGroupQuizScore: 0,
+    totalOfflineExamsScore: 0,
+    totalScoreOfOfflineExams:0
   },
   loading: false,
   error: null,
@@ -51,13 +53,18 @@ const parentGradeSlice = createSlice({
               action.payload.totalScoreOfSubmitAssignments || 0,
             totalScoreOfAllAssignments:
               action.payload.totalScoreOfAllAssignments || 0,
-            totalQuizCompletedScore: action.payload.totalQuizCompletedScore || 0,
+            totalQuizCompletedScore:
+              action.payload.totalQuizCompletedScore || 0,
             totalScoreOfAllQuizzes: action.payload.totalScoreOfAllQuizzes || 0,
-            totalGroupAssignmentScore: action.payload.totalGroupAssignmentScore || 0,
+            totalGroupAssignmentScore:
+              action.payload.totalGroupAssignmentScore || 0,
             submittedGroupAssignmentScore:
               action.payload.submittedGroupAssignmentScore || 0,
             totalGroupQuizScore: action.payload.totalGroupQuizScore || 0,
-            submittedGroupQuizScore: action.payload.submittedGroupQuizScore || 0,
+            submittedGroupQuizScore:
+              action.payload.submittedGroupQuizScore || 0,
+            totalOfflineExamsScore: action.payload.totalOfflineExams || 0,
+            totalScoreOfOfflineExams:action.payload.totalScoreOfOfflineExams || 0
           };
         } else {
           state.grades = { ...initialState.grades };

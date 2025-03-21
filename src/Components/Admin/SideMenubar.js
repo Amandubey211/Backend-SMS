@@ -16,10 +16,11 @@ import profileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice.js";
 import { useTranslation } from "react-i18next";
 import { filterSidebarData } from "../../Utils/sidebarUtils.js";
-import { Tooltip } from "antd";
+import { Tag, Tooltip } from "antd";
 import "antd/dist/reset.css";
 
 import { motion, AnimatePresence } from "framer-motion";
+import { getRoleColor, getTruncatedName } from "../../Utils/helperFunctions.js";
 
 /* Example: simple custom hook for window size */
 function useWindowSize() {
@@ -409,24 +410,17 @@ const SideMenubar = () => {
 
         {isOpen && (
           <div className="flex-1 ml-3">
-            <h2 className="font-semibold text-sm">
-              {userDetails?.fullName
-                ? userDetails.fullName
-                    .split(" ")
-                    .map((n) => n[0]?.toUpperCase())
-                    .join("")
-                : "User"}
+            <h2 className="text-sm font-semibold">
+              {getTruncatedName(userDetails?.fullName)}
             </h2>
-            <p className="text-gray-500 capitalize text-xs">{role}</p>
+            {/* <p className="text-gray-500 capitalize text-xs">{role}</p> */}
+            <Tag color={getRoleColor(role)}>
+              <span> {role?.toUpperCase() || "USER"}</span>
+            </Tag>
           </div>
         )}
 
-        <Tooltip
-          placement="right"
-          title={!isOpen ? t("Logout") : ""}
-          trigger={["hover"]}
-          overlayClassName="!bg-gray-700 !text-white"
-        >
+        <Tooltip title="Logout">
           <button
             title={t("Logout")}
             onClick={handleLogout}

@@ -147,10 +147,10 @@ export const fetchStudentGrades = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const say = getAY();
-      const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
+      //const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
 
       const response = await getData(
-        `/${getRole}/grades/student/${studentId}/class/${studentClassId}?say=${say}&semesterId=${semesterId}`,
+        `/${getRole}/grades/student/${studentId}/class/${studentClassId}?say=${say}`,
         params
       );
 
@@ -198,7 +198,7 @@ export const fetchStudentFinance = createAsyncThunk(
 // Fetch Student Subject Progress
 export const fetchStudentSubjectProgress = createAsyncThunk(
   "student/studentSubjectProgress",
-  async ({id}, { rejectWithValue, getState, dispatch }) => {
+  async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const say = getAY();
@@ -234,7 +234,10 @@ export const fetchAttendanceData = createAsyncThunk(
 // Fetch Course Progress
 export const fetchCourseProgress = createAsyncThunk(
   "student/courseProgress",
-  async ({ studentId, subjectId,semesterId }, { rejectWithValue, getState, dispatch }) => {
+  async (
+    { studentId, subjectId, semesterId },
+    { rejectWithValue, getState, dispatch }
+  ) => {
     try {
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);

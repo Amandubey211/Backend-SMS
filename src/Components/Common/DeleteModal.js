@@ -54,6 +54,7 @@ const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
       footer={null} // We'll provide a custom footer
       maskStyle={{ backdropFilter: "blur(5px)" }} // Blurred background
       destroyOnClose // Unmount modal content on close
+      onClick={(e) => e.stopPropagation()} // Stop any click event from propagating when inside modal
     >
       <Paragraph>
         Type the name{" "}

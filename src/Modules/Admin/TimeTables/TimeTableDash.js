@@ -607,7 +607,8 @@ export default function TimeTableDash() {
         }
         placement="right"
         closable={false}
-        width={650}
+        // width={650}
+        width={"90%"}
         visible={drawerVisible}
         onClose={closeDrawer}
         // We keep Drawer at a lower zIndex than the Modal
@@ -633,8 +634,8 @@ export default function TimeTableDash() {
       <Drawer
         title="Timetable Details"
         placement="right"
-        width={650}
-        closable={false}
+        width={"90%"}
+        // closable={false}
         visible={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
         zIndex={1000}

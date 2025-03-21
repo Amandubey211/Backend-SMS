@@ -62,6 +62,8 @@ const MainSection = () => {
       totalGroupQuizScore: grades?.submittedGroupQuizScore,
       totalQuizCompletedScore: grades?.totalQuizCompletedScore,
       total: grades?.total,
+      totalScoreOfOfflineExams:grades?.totalScoreOfOfflineExams,
+      totalOfflineExamsScore:grades?.totalOfflineExams
     };
 
     content = (

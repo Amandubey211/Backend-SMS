@@ -13,7 +13,7 @@ const AttendanceDashboard = ({ attendanceSummary, error }) => {
   }, [attendanceSummary, error]);
 
   return (
-    <div className="attendance-dashboard w-[95%] h-full  mx-4 rounded-md">
+    <div className="attendance-dashboard w-full h-full  mx-4 rounded-md">
       <h1 className="text-lg font-semibold  text-black mt-3">Attendance</h1>
 
       {loading ? (
@@ -25,17 +25,20 @@ const AttendanceDashboard = ({ attendanceSummary, error }) => {
           <FaUserGraduate size={80} />
           <span className="mt-4 text-lg font-semibold">{error}</span>{" "}
         </div>
-      ) : !attendanceSummary ||
-        (!attendanceSummary.present?.some((day) => day > 0) &&
-          !attendanceSummary.absent?.some((day) => day > 0) &&
-          !attendanceSummary.leave?.some((day) => day > 0)) ? (
-        <div className="flex flex-col h-full items-center justify-center text-gray-500 mt-4">
-          <FaUserGraduate size={80} />
-          <span className="mt-4 text-lg font-semibold">
-            No attendance data available
-          </span>
-        </div>
-      ) : (
+      ) 
+      // : !attendanceSummary ||
+      //   (!attendanceSummary.present?.some((day) => day > 0) &&
+      //     !attendanceSummary.absent?.some((day) => day > 0) &&
+      //     !attendanceSummary.leave?.some((day) => day > 0)) ? (
+      //   <div className="flex flex-col h-full items-center justify-center text-gray-500 mt-4">
+      //     <FaUserGraduate size={80} />
+      //     <span className="mt-4 text-lg font-semibold">
+      //       No attendance data available
+      //     </span>
+      //   </div>
+      // )
+       : 
+      (
         <div className="justify-center text-center w-full h-[330px] my-4 ">
           <AttendanceChart
             data={[

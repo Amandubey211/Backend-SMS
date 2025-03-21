@@ -96,10 +96,10 @@ const librarySlice = createSlice({
       })
       .addCase(fetchBooksDetailsThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.books = action.payload.books;
-        state.totalBooks = action.payload.totalBooks;
-        state.totalPages = action.payload.totalPages;
-        state.currentPage = action.payload.currentPage;
+        state.books = action.payload?.books || [];
+        state.totalBooks = action.payload?.totalBooks;
+        state.totalPages = action.payload?.totalPages;
+        state.currentPage = action.payload?.currentPage;
       })
       .addCase(fetchBooksDetailsThunk.rejected, (state, action) => {
         state.loading = false;

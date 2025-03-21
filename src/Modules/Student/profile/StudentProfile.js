@@ -17,10 +17,12 @@ import { IdcardOutlined } from "@ant-design/icons";
 import { motion } from "framer-motion";
 import ImageUpload from "../../Admin/Addmission/Components/ImageUpload";
 import { setUserDetails } from "../../../Store/Slices/Common/User/reducers/userSlice";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentProfile = () => {
   const { userDetails, status } = useSelector((store) => store.common.user);
   const dispatch = useDispatch();
+  useNavHeading("Student","Profile")
 
   // ---------------------------
   // Password Update Logic
