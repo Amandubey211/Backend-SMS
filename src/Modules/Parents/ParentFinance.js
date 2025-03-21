@@ -344,7 +344,7 @@ const ParentFinanceTable = () => {
                       <div className="w-40 h-10 bg-gray-200 animate-pulse rounded" />
                     ) : (
                       <select
-                        className="border border-gray-300 rounded px-3 py-2 focus:outline-none"
+                        className="border border-gray-300 rounded px-3 py-1 focus:outline-none"
                         style={{ width: "160px" }}
                         value={selectedChildId}
                         onChange={(e) => handleChildSelect(e.target.value)}
@@ -362,7 +362,7 @@ const ParentFinanceTable = () => {
                   <div className="flex flex-col">
                     <span className="text-sm mb-1">Status</span>
                     <select
-                      className="border border-gray-300 rounded px-3 py-2 focus:outline-none"
+                      className="border border-gray-300 rounded px-3 py-1 focus:outline-none"
                       style={{ width: "100px" }}
                       value={filters.status}
                       onChange={(e) => setFilters({ status: e.target.value })}

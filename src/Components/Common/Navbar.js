@@ -84,7 +84,7 @@ const Navbar = () => {
     const routes = {
       parent: "/users/parent/profile",
       admin: "/users/admin",
-      student: "/student_dash/profile",
+      student: "/student/profile",
       teacher: "/users/my/profile",
       finance: "/users/my/profile",
       librarian: "/users/my/profile",

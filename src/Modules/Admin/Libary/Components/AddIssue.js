@@ -216,7 +216,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             style={{ width: "100%" }}
             size="large"
           >
-            {roleOptions.map((roleOption) => (
+            {roleOptions?.map((roleOption) => (
               <Option key={roleOption.value} value={roleOption.value}>
                 {t(roleOption.label)}
               </Option>
@@ -308,7 +308,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             }
             required
           >
-            {filteredUsers.map((usr) => {
+            {filteredUsers?.map((usr) => {
               const searchString = `${usr.name} ${usr.role} ${
                 usr.admissionNumber || ""
               }`;
