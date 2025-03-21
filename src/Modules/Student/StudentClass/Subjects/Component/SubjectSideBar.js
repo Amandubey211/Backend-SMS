@@ -10,28 +10,29 @@ import { fetchSemestersByClass } from "../../../../../Store/Slices/Student/MyCla
 const SubjectSideBar = () => {
   const location = useLocation();
   const { cid, sid } = useParams();
-  // const { classId } = useSelector((store) => store?.student?.studentClass?.classData);
-  // const { subjectId } = useSelector((store) => store?.student?.studentSubject?.subject);
+
+  // Redux states
+  const dispatch = useDispatch();
+  const { t } = useTranslation("admModule");
+
   const {
     semesters,
     loading: semesterLoading,
     error: semesterError,
   } = useSelector((state) => state.student.semesters);
+
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
-  const dispatch = useDispatch();
 
-  // Local state to control the semester selection modal visibility
+  // Local state for controlling the semester selection modal
   const [semesterModalVisible, setSemesterModalVisible] = useState(false);
-  const { t } = useTranslation("admModule");
-  // const formattedSid = sid?.toLowerCase().replace(/ /g, "_");
 
+  // Menu items for the subject side bar
   const menuItems = [
     { name: "Module", path: "module" },
     { name: "Assignments", path: "assignments" },
     { name: "Quizzes", path: "quizzes" },
-    // { name: "Offline Exam", path: "offline_exam" },
     { name: "Discussions", path: "discussions" },
     { name: "Page", path: "page" },
     { name: "Grades", path: "grades" },
@@ -40,11 +41,21 @@ const SubjectSideBar = () => {
     { name: "Rubric", path: "rubric" },
   ];
 
+  // Construct the base path for each menu item
   const getBasePath = (item) => `/student_class/${cid}/${sid}/${item?.path}`;
 
+  // Fetch semesters when the component mounts
   useEffect(() => {
     dispatch(fetchSemestersByClass(cid));
-  }, []);
+  }, [cid, dispatch]);
+
+  // Automatically select the first semester if none is selected
+  useEffect(() => {
+    if (semesters?.length > 0 && !selectedSemester?.id) {
+      handleSemesterSelect(semesters[0]);
+    }
+  }, [semesters, selectedSemester]);
+
   // Handler for selecting a semester from the modal
   const handleSemesterSelect = (semester) => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
@@ -59,21 +70,21 @@ const SubjectSideBar = () => {
           type="default"
           onClick={() => setSemesterModalVisible(true)}
           className="
-    w-full
-    border border-pink-400
-    bg-white
-    text-black
-    rounded-lg
-    font-semibold
-    text-sm           /* smaller text */
-    whitespace-normal /* allow wrapping */
-    break-words       /* break long words */
-    text-center       /* optionally center-align text */
-    transition-colors
-    duration-200
-    hover:bg-pink-400
-    hover:text-pink-900
-  "
+            w-full
+            border border-pink-400
+            bg-white
+            text-black
+            rounded-lg
+            font-semibold
+            text-sm
+            whitespace-normal
+            break-words
+            text-center
+            transition-colors
+            duration-200
+            hover:bg-pink-400
+            hover:text-pink-900
+          "
           aria-label="Select Semester"
         >
           {selectedSemester && selectedSemester.name ? (
@@ -97,12 +108,12 @@ const SubjectSideBar = () => {
       </div>
 
       <Divider className="border-purple-300" />
+
+      {/* Subject Menu Links */}
       <div className="flex flex-col space-y-2">
-        {menuItems?.map((item, index) => {
+        {menuItems.map((item, index) => {
           const basePath = getBasePath(item);
-          const isActive = location.pathname.includes(
-            `/student_class/${cid}/${sid}/${item.path}`
-          );
+          const isActive = location.pathname.includes(basePath);
 
           return (
             <NavLink
@@ -119,6 +130,7 @@ const SubjectSideBar = () => {
           );
         })}
       </div>
+
       {/* Semester Selection Modal with Framer Motion Animations */}
       <Modal
         visible={semesterModalVisible}

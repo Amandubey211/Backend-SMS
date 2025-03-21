@@ -1,3 +1,4 @@
+// MainSection.jsx
 import React, { useEffect, useState } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import { FaSchool } from "react-icons/fa";
@@ -11,39 +12,37 @@ import { stdClass } from "../../../../Store/Slices/Student/MyClass/Class/class.a
 import SubjectCard from "./SubjectCard";
 import { Modal } from "antd";
 import SectionGroupModal from "./Components/Section/SectionModal";
-import { NavLink } from "react-router-dom";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../Components/Common/Offline";
 import { stdSubjectProgressPercentage } from "../../../../Store/Slices/Student/MyClass/Class/Subjects/subject.action";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
 
-const colors = [
-  "bg-yellow-300",
-  "bg-blue-300",
-  "bg-green-300",
-  "bg-red-300",
-  "bg-purple-300",
-  "bg-pink-300",
-];
-
-const getColor = (index) => colors[index % colors?.length];
-
 const MainSection = () => {
+  const dispatch = useDispatch();
+
+  // Global state
   const { classData, loading, error } = useSelector(
     (store) => store?.student?.studentClass
   );
-
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-  // console.log("cls=>>>>>>>>>>>>",classData)
-  const dispatch = useDispatch();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalData, setModalData] = useState(null);
   const { subjectProgress } = useSelector(
     (store) => store?.student?.studentSubject
   );
-  const {userDetails}=useSelector((store)=>store?.common?.user);
-  const {userId}=userDetails;
-  const iconData =  [
+  const { userDetails } = useSelector((store) => store?.common?.user);
+  const { userId } = userDetails;
+
+  // Local state for modal
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalData, setModalData] = useState(null);
+
+  useEffect(() => {
+    dispatch(stdClass()).then(() => {
+      dispatch(stdSubjectProgressPercentage({ studentId: userId }));
+    });
+  }, [dispatch]);
+
+  // Navigation icon data
+  const iconData = [
     {
       icon: <SlEyeglass className="text-purple-600" />,
       text: `My Instructors (${classData?.teachersCount || 0})`,
@@ -63,12 +62,12 @@ const MainSection = () => {
         }
       })(),
       onClick: () => {
-        !loading && !error && handleSectionClick(classData); // Handle section click to show modal
+        if (!loading && !error) handleSectionClick(classData);
       },
     },
     {
       icon: <FcGraduationCap />,
-      text: `My Classmates (${classData?.classmatesCount || 0}) `,
+      text: `My Classmates (${classData?.classmatesCount || 0})`,
       url: `/student_class/${classData?.classId}/classmates`,
     },
     {
@@ -79,43 +78,29 @@ const MainSection = () => {
   ];
 
   const handleSectionClick = (section) => {
-    setModalData(classData); // Set section data for the modal
+    setModalData(classData);
     setIsModalVisible(true);
   };
 
   const handleModalClose = () => {
-    setIsModalVisible(false); // Hide the modal
+    setIsModalVisible(false);
   };
-
-  // const handleSubjectClick = ({ subjectId, subjectName }) => {
-  //   // console.log("Subject Clicked!")
-  //   dispatch(setSelectedSubject(subjectId));
-  //   dispatch(setSelectedSubjectName(subjectName));
-  // };
 
   const handleDismiss = () => {
     dispatch(setShowError(false));
   };
 
-  useEffect(() => {
-    dispatch(stdClass()).then(()=>{
-      dispatch(stdSubjectProgressPercentage({studentId:userId}));
-    })
-   
-  }, [dispatch]);
-
   return (
     <>
-   
+      {/* Icon Cards */}
       <div className="flex flex-wrap justify-center gap-3 p-4">
-  
         {iconData?.map((item, index) => (
           <NavIconCard
             key={index}
-            icon={item?.icon}
-            text={item?.text}
-            url={item?.url}
-            onClick={item?.onClick} // Trigger onClick for modal if available
+            icon={item.icon}
+            text={item.text}
+            url={item.url}
+            onClick={item?.onClick}
             loading={loading}
             error={error}
             classData={classData}
@@ -123,55 +108,53 @@ const MainSection = () => {
         ))}
       </div>
 
+      {/* Subject Section */}
       <div className="px-5">
-        <h1 className="text-2xl ml-5 mt-5 font-semibold">
+        <h1 className="text-lg ml-5 font-semibold">
           My Subjects ({classData?.subjects?.length || 0})
         </h1>
 
         {loading ? (
-          <div className="w-full  flex flex-col items-center justify-center py-20">
+          <div className="w-full flex flex-col items-center justify-center py-20">
             <Spinner />
           </div>
-        ) 
-        :   !loading && (classData=={} || !classData ||
-          classData?.subjects?.length == 0) ? (
+        ) : !loading &&
+          (!classData ||
+            !classData?.subjects ||
+            classData.subjects.length === 0) ? (
           <div className="flex flex-col items-center justify-center py-20">
             <NoDataFound title="Subject" />
           </div>
-        ) 
-        : (
-          <div>
-            {classData?.subjects?.length > 0 && (
-              <div className="grid grid-cols-3 gap-4 mt-5 h-full">
-                {classData?.subjects?.map((subject, index) => (
-                  <SubjectCard
-                    key={index}
-                    data={subject}
-                    classId={classData?.classId}
-                    // onSubjectClick={handleSubjectClick}
-                    backgroundColor={subject?.subjectColor?subject?.subjectColor:getColor(index)}
-                    currentProgress={subjectProgress?.find(
-                      (el) => el?.subjectId === subject?.subjectId
-                    )}
-                  />
-                ))}
-              </div>
-            )}
+        ) : (
+          <div className="grid grid-cols-3 gap-4 mt-5">
+            {classData?.subjects?.map((subject, index) => (
+              <SubjectCard
+                key={index}
+                data={subject}
+                classId={classData?.classId}
+                backgroundColor={subject?.subjectColor || "#FCD34D"}
+                currentProgress={subjectProgress?.find(
+                  (el) => el?.subjectId === subject?.subjectId
+                )}
+              />
+            ))}
           </div>
         )}
       </div>
+
+      {/* Error/Offline Modal */}
       {!loading && showError && (
         <OfflineModal error={error} onDismiss={handleDismiss} />
       )}
 
-      {/* Modal for Section and group*/}
+      {/* Section/Group Sidebar */}
       {modalData && (
         <SidebarSlide
           isOpen={isModalVisible}
           onClose={handleModalClose}
           title={
             <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-              Sections & groups
+              Sections & Groups
             </span>
           }
           width="30%"
@@ -183,4 +166,5 @@ const MainSection = () => {
     </>
   );
 };
+
 export default MainSection;
