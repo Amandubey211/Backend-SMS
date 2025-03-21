@@ -73,7 +73,7 @@ const SubjectCard = ({
         hover:shadow-2xl hover:scale-105 transition-transform duration-300 
         cursor-pointer min-h-[220px] flex flex-col justify-between
       `}
-      style={{ backgroundColor: backgroundColor }}
+      style={{ backgroundColor }}
       onClick={handleCardClick}
     >
       {/* OPTIONAL BADGE AT TOP-LEFT (ABSOLUTE) */}
@@ -92,16 +92,22 @@ const SubjectCard = ({
             {subjectName}
           </h2>
 
-          {/* Modules & Chapters */}
-          <div className="flex items-center text-white space-x-4 text-sm">
-            <span className="flex items-center gap-1">
+          {/* Modules & Chapters with a divider */}
+          <div className="flex items-center text-white text-sm space-x-2">
+            {/* Modules */}
+            <div className="flex items-center gap-1">
               <BsBook />
               <span>{moduleCount} Modules</span>
-            </span>
-            <span className="flex items-center gap-1">
+            </div>
+
+            {/* Divider */}
+            <span className="text-white">|</span>
+
+            {/* Chapters */}
+            <div className="flex items-center gap-1">
               <MdMenuBook />
               <span>{chapterCount} Chapters</span>
-            </span>
+            </div>
           </div>
         </div>
 
@@ -110,7 +116,7 @@ const SubjectCard = ({
           <CircularProgressbar
             value={percentage}
             text={`${percentage}%`}
-            strokeWidth={12} // Make the progress bar thicker
+            strokeWidth={15} // Make the progress bar thicker
             styles={buildStyles({
               rotation: 0,
               strokeLinecap: "round",
@@ -174,7 +180,6 @@ const SubjectCard = ({
                   </Tooltip>
                 </>
               ) : (
-                // If teacherCount <= 4, show them all
                 teachers.map((teacher, index) => (
                   <Tooltip
                     key={`teacher-${index}`}
