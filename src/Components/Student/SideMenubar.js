@@ -17,6 +17,7 @@ import LogoutConfirmationModal from "../Common/LogoutConfirmationModal";
 
 /* NEW IMPORTS */
 import { Tag, Tooltip } from "antd";
+import { getRoleColor, getTruncatedName } from "../../Utils/helperFunctions";
 // If you have a file with roles, import them (example)
 // import { ROLES } from "../../permission";
 
@@ -29,27 +30,6 @@ const isActivePath = (path, locationPath) => locationPath.startsWith(path);
   If you have a "permission.js" with roles, 
   you can match them in a switch or object map:
 */
-
-function getRoleColor(role) {
-  switch (role) {
-    case "admin":
-      return "red";
-    case "teacher":
-      return "blue";
-    case "finance":
-      return "orange";
-    case "librarian":
-      return "geekblue";
-    case "staff":
-      return "purple";
-    case "student":
-      return "green";
-    case "parent":
-      return "gold";
-    default:
-      return "default"; // fallback
-  }
-}
 
 const SideMenubar = () => {
   const dispatch = useDispatch();
@@ -88,27 +68,6 @@ const SideMenubar = () => {
       setIsLoggingOut(false);
     }
   };
-  function getTruncatedName(fullName) {
-    if (!fullName) return "User";
-
-    const [firstName, ...rest] = fullName.trim().split(" ");
-    const lastName = rest.length > 0 ? rest[rest.length - 1] : "";
-
-    // Truncate the first name if it's very long (adjust threshold as you prefer)
-    const MAX_LENGTH = 10;
-    const safeFirstName =
-      firstName.length > MAX_LENGTH
-        ? firstName.slice(0, MAX_LENGTH) + "..."
-        : firstName;
-
-    // Construct final display => e.g. "Jonathan" + "R." => "Jonathan R."
-    let display = safeFirstName;
-    if (lastName) {
-      display += " " + lastName.charAt(0).toUpperCase() + ".";
-    }
-
-    return display;
-  }
 
   return (
     <nav

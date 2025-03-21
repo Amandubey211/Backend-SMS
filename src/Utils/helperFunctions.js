@@ -28,7 +28,6 @@ export const formatDate = (isoDate, type = "long") => {
   }
 };
 
-
 export const calculateFinalAmount = ({
   lineItems = [],
   tax = 0,
@@ -48,23 +47,25 @@ export const calculateFinalAmount = ({
   totalPaidAmount = parseFloat(totalPaidAmount) || 0;
 
   // Calculate subtotal from line items
-  const subtotal = lineItems.reduce((acc, item) => acc + (parseFloat(item.amount || item.total || 0)), 0);
+  const subtotal = lineItems.reduce(
+    (acc, item) => acc + parseFloat(item.amount || item.total || 0),
+    0
+  );
 
   // Calculate tax amount
   const taxAmount = (subtotal * tax) / 100;
 
   // Calculate penalty amount based on type
-  const penaltyAmount = penaltyType === "percentage"
-    ? (subtotal * penalty) / 100
-    : penalty;
+  const penaltyAmount =
+    penaltyType === "percentage" ? (subtotal * penalty) / 100 : penalty;
 
   // Calculate discount amount based on type
-  const discountAmount = discountType === "percentage"
-    ? (subtotal * discount) / 100
-    : discount;
+  const discountAmount =
+    discountType === "percentage" ? (subtotal * discount) / 100 : discount;
 
   // Final amount calculation
-  let calculatedFinalAmount = subtotal + taxAmount + penaltyAmount - discountAmount;
+  let calculatedFinalAmount =
+    subtotal + taxAmount + penaltyAmount - discountAmount;
 
   // If final_amount is passed (Quotation template), use it directly
   if (final_amount) {
@@ -75,7 +76,49 @@ export const calculateFinalAmount = ({
   return calculatedFinalAmount.toFixed(2);
 };
 
-
 export const truncateText = (text, maxLength) => {
   return text?.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+};
+
+export const getTruncatedName = (fullName) => {
+  if (!fullName) return "User";
+
+  const [firstName, ...rest] = fullName.trim().split(" ");
+  const lastName = rest.length > 0 ? rest[rest.length - 1] : "";
+
+  // Truncate the first name if it's very long (adjust threshold as you prefer)
+  const MAX_LENGTH = 10;
+  const safeFirstName =
+    firstName.length > MAX_LENGTH
+      ? firstName.slice(0, MAX_LENGTH) + "..."
+      : firstName;
+
+  // Construct final display => e.g. "Jonathan" + "R." => "Jonathan R."
+  let display = safeFirstName;
+  if (lastName) {
+    display += " " + lastName.charAt(0).toUpperCase() + ".";
+  }
+
+  return display;
+};
+
+export const getRoleColor = (role) => {
+  switch (role) {
+    case "admin":
+      return "red";
+    case "teacher":
+      return "blue";
+    case "finance":
+      return "orange";
+    case "librarian":
+      return "geekblue";
+    case "staff":
+      return "purple";
+    case "student":
+      return "green";
+    case "parent":
+      return "gold";
+    default:
+      return "default"; // fallback
+  }
 };
