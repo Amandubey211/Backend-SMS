@@ -6,7 +6,7 @@ const initialState = {
   error: false,
   libararyBooks: [],
   totalBooks: 0,
-  totalPages: 0,
+  totalPages: 1,
   currentPage: 1,
   activeTab: "Library",
   searchQuery: "",

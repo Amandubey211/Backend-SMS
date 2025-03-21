@@ -196,15 +196,17 @@ const StudentAnnounce = () => {
         </div>
 
         {/* Pagination Controls */}
-        <Pagination
-          page={currentPage}
-          totalPages={totalPages}
-          totalRecords={totalNotices}
-          limit={limit}
-          setPage={handlePageChange}
-          setLimit={setLimit}
-          t={t}
-        />
+        {totalNotices > 0 && (
+          <Pagination
+            page={currentPage}
+            totalPages={totalPages}
+            totalRecords={totalNotices}
+            limit={limit}
+            setPage={handlePageChange}
+            setLimit={setLimit}
+            t={t}
+          />
+        )}
 
         {!loading && showError && (
           <OfflineModal error={error} onDismiss={handleDismiss} />

@@ -249,15 +249,17 @@ const AllNotice = () => {
           </div>
 
           {/* Pagination Controls */}
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            totalRecords={totalNotices}
-            limit={limit}
-            setPage={setPage}
-            setLimit={setLimit}
-            t={t}
-          />
+          {totalNotices > 0 && (
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalRecords={totalNotices}
+              limit={limit}
+              setPage={setPage}
+              setLimit={setLimit}
+              t={t}
+            />
+          )}
         </div>
       </ParentDashLayout>
     </Layout>
