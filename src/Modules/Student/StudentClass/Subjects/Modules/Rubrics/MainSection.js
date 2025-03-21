@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   stdRubric,
-  getStudentRubricByIdThunk
+  getStudentRubricByIdThunk,
 } from "../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Rubric/rubric.action";
 import {
   setRubricField,
@@ -19,18 +19,27 @@ import { useTranslation } from "react-i18next";
 import { FaClipboardList } from "react-icons/fa";
 import RubricModal from "./Components/RubricModal";
 
-
 const MainSection = () => {
   const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const { sid } = useParams();
 
   // Fix: Corrected state selection
-  const studentRubricState = useSelector((state) => state.student.studentRubric) || {};
+  const studentRubricState =
+    useSelector((state) => state.student.studentRubric) || {};
 
   console.log("Student Rubric State:", studentRubricState); // Debugging line
 
-  const { RubricData = [], loading, isModalOpen, readonlyMode, criteria, rubricName, totalPoints, rubricLoading } = studentRubricState;
+  const {
+    RubricData = [],
+    loading,
+    isModalOpen,
+    readonlyMode,
+    criteria,
+    rubricName,
+    totalPoints,
+    rubricLoading,
+  } = studentRubricState;
 
   useEffect(() => {
     if (sid) {
@@ -42,11 +51,11 @@ const MainSection = () => {
     dispatch(resetRubricState());
     dispatch(setRubricField({ field: "readonlyMode", value: true }));
     dispatch(setRubricField({ field: "isModalOpen", value: true }));
-    console.log('rubric--', rubric);
+    console.log("rubric--", rubric);
 
     const rubricId = rubric.assignmentId?._id || rubric.quizId?._id;
     if (rubricId) {
-      dispatch(getStudentRubricByIdThunk({id:rubricId}));
+      dispatch(getStudentRubricByIdThunk({ id: rubricId }));
     } else {
       console.error("No valid ID found for rubric");
     }
@@ -59,7 +68,11 @@ const MainSection = () => {
         {RubricData?.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
             {RubricData?.map((rubric) => (
-              <RubricCard key={rubric?._id} rubric={rubric} onView={() => handleViewRubric(rubric)} />
+              <RubricCard
+                key={rubric?._id}
+                rubric={rubric}
+                onView={() => handleViewRubric(rubric)}
+              />
             ))}
           </div>
         ) : (
@@ -74,10 +87,12 @@ const MainSection = () => {
         )}
         {isModalOpen && (
           <RubricModal
-          isOpen={isModalOpen}
-          rubric={studentRubricState.selectedRubric}
-          onClose={() => dispatch(setRubricField({ field: "isModalOpen", value: false }))}
-          loading={rubricLoading}
+            isOpen={isModalOpen}
+            rubric={studentRubricState.selectedRubric}
+            onClose={() =>
+              dispatch(setRubricField({ field: "isModalOpen", value: false }))
+            }
+            loading={rubricLoading}
           />
         )}
       </div>

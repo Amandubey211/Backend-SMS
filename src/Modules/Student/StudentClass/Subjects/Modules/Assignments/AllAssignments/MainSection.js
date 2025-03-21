@@ -46,7 +46,6 @@ const AssignmentMainSection = () => {
           data={filteredAssignments}
           icon={<RiListCheck3 />}
           loading={loading}
-          //error={error}
           getItemName={getItemName}
           getItemDetails={getItemDetails}
           navLinkPath={navLinkPath}

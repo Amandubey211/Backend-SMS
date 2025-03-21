@@ -39,7 +39,7 @@ const RubricCard = ({ rubric, onView }) => {
     <div className="ps-1 rounded-md">
       <div className="border rounded-md shadow-sm relative flex bg-white justify-between p-4">
         <div className="flex flex-col items-start justify-start">
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between items-center capitalize" >
             <Tooltip title={rubric.name}>
               <h2 className="text-base font-semibold">
                 {truncateText(rubric.name, 20)}
