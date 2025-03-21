@@ -129,6 +129,13 @@ const MainSection = () => {
     XLSX.writeFile(workbook, `Offline_Exams_${formatDate(startDate)}_to_${formatDate(endDate)}.xlsx`);
   };
 
+
+  const handleCancel = () => {
+    setIsExportModelOpen(false);
+    setSelectedExportExamTypes([]);
+    setStartDate(null);
+    setEndDate(null);
+  };
   return (
     <div className="flex h-full w-full">
       <SubjectSideBar />
@@ -196,6 +203,7 @@ const MainSection = () => {
               setStartDate={setStartDate}
               endDate={endDate}
               setEndDate={setEndDate}
+              handleCancel={handleCancel}
             />
 
             <FilterExam
