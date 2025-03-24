@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   Calendar,
   Radio,
@@ -10,12 +10,17 @@ import {
   Card,
   Tooltip,
   Tag,
+  Divider,
 } from "antd";
-import { format } from "date-fns";
+import { format, isWithinInterval } from "date-fns";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { Doughnut } from "react-chartjs-2";
-import { AiOutlineDelete, AiOutlineEdit } from "react-icons/ai";
+import {
+  AiOutlineDelete,
+  AiOutlineEdit,
+  AiOutlineFilter,
+} from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import {
   CloseOutlined,
@@ -25,7 +30,7 @@ import {
 } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Chart.js core + plugin for a 3D-like effect
+// Chart.js core + plugin
 import {
   Chart as ChartJS,
   ArcElement,
@@ -33,7 +38,6 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-
 // Timetable Thunks
 import {
   fetchTimetableList,
@@ -47,6 +51,8 @@ import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/class
 
 // Child components
 import TimeTableForm from "./Components/TimeTableForm";
+dayjs.extend(isSameOrBefore);
+ChartJS.register(ArcElement, ChartTooltip, Legend, ChartDataLabels);
 
 dayjs.extend(isSameOrBefore);
 
@@ -128,7 +134,7 @@ export default function TimeTableDash() {
   // Local state
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
-
+  const [filterType, setFilterType] = useState(null);
   // Drawer states for create/edit
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
@@ -151,7 +157,23 @@ export default function TimeTableDash() {
     setEditingTimetable(null);
     setDrawerVisible(false);
   };
+  // Filter timetables based on selected type
+  const filteredTimetables = useMemo(() => {
+    if (!filterType) return timetables;
+    return timetables.filter((tt) => tt.type === filterType);
+  }, [timetables, filterType]);
 
+  // Check if event is within validity period for weekly types
+  const isWithinValidity = (timetable, currentDate) => {
+    if (!timetable.validity) return true;
+    const { startDate, endDate } = timetable.validity;
+    if (!startDate || !endDate) return true;
+
+    return isWithinInterval(currentDate, {
+      start: new Date(startDate),
+      end: new Date(endDate),
+    });
+  };
   // --------------------------------------------
   // 5) CREATE or UPDATE Timetable
   // --------------------------------------------
@@ -201,38 +223,46 @@ export default function TimeTableDash() {
   // --------------------------------------------
   // 8) Month View: dateCellRender
   // --------------------------------------------
+
   const dateCellRender = (currentDayjs) => {
+    const currentDate = currentDayjs.toDate();
     const dateString = currentDayjs.format("YYYY-MM-DD");
-    const matched = timetables.flatMap((tt) => {
-      if (tt?.type === "weekly") {
+
+    const matched = filteredTimetables.flatMap((tt) => {
+      if (tt.type === "weekly") {
+        // Only show weekly timetables within their validity period
+        if (!isWithinValidity(tt, currentDate)) return [];
+
         const dayName = currentDayjs.format("dddd");
-        return tt?.days?.find((d) => d?.day === dayName) ? [tt] : [];
+        return tt.days?.find((d) => d.day === dayName) ? [tt] : [];
       } else {
-        return tt?.days?.find((d) => {
-          if (!d?.date) return false;
-          const dStr = dayjs(d?.date).format("YYYY-MM-DD");
+        return tt.days?.find((d) => {
+          if (!d.date) return false;
+          const dStr = dayjs(d.date).format("YYYY-MM-DD");
           return dStr === dateString;
         })
           ? [tt]
           : [];
       }
     });
+
     if (matched.length === 0) return null;
+
     return (
       <div className="space-y-1">
         {matched.map((evt) => (
           <Tooltip
-            key={evt?._id}
-            title={evt?.name}
-            color={getColorByType(evt?.type)}
+            key={evt._id}
+            title={`${evt.name} (${evt.type})`}
+            color={getColorByType(evt.type)}
             placement="bottom"
           >
             <div
-              className="px-2 py-1 rounded text-white text-xs cursor-pointer"
-              style={{ backgroundColor: getColorByType(evt?.type) }}
+              className="px-2 py-1 rounded text-white text-xs cursor-pointer truncate"
+              style={{ backgroundColor: getColorByType(evt.type) }}
               onClick={() => onEventClick(evt)}
             >
-              {evt?.name}
+              {evt.name}
             </div>
           </Tooltip>
         ))}
@@ -241,24 +271,33 @@ export default function TimeTableDash() {
   };
 
   // --------------------------------------------
-  // 9) Day View
+  // 9) Day View: Add Timeline
   // --------------------------------------------
   const renderDayView = () => {
     const dayName = format(selectedDate, "EEEE");
     const dateString = format(selectedDate, "yyyy-MM-dd");
 
-    const weekly = timetables
-      .filter((t) => t?.type === "weekly")
-      .filter((t) => t?.days?.some((d) => d?.day === dayName));
-    const nonWeekly = timetables
-      .filter((t) => t?.type !== "weekly")
-      .filter((t) =>
-        t?.days?.some((d) => {
+    const events = timetables.filter((t) =>
+      t?.days?.some(
+        (d) => d?.date && format(new Date(d?.date), "yyyy-MM-dd") === dateString
+      )
+    );
+
+    const slots = Array.from({ length: 24 }, (_, i) => ({
+      hour: i,
+      events: events.filter((e) =>
+        e?.days.some((d) => {
           if (!d?.date) return false;
-          return format(new Date(d?.date), "yyyy-MM-dd") === dateString;
+          const dateMatch =
+            format(new Date(d?.date), "yyyy-MM-dd") === dateString;
+          const slotMatch = d?.slots?.some((slot) => {
+            const slotHour = new Date(slot.startTime).getHours();
+            return slotHour === i;
+          });
+          return dateMatch && slotMatch;
         })
-      );
-    const allEvents = [...weekly, ...nonWeekly];
+      ),
+    }));
 
     return (
       <motion.div
@@ -272,47 +311,41 @@ export default function TimeTableDash() {
         <h3 className="text-xl font-bold mb-4">
           Day View — {format(selectedDate, "dd MMM yyyy")}
         </h3>
-        {allEvents.length === 0 ? (
-          <p className="text-gray-500">No events for this day.</p>
-        ) : (
-          allEvents.map((evt) => (
-            <Card
-              key={evt?._id}
-              className="mb-3 border-l-4 cursor-pointer"
-              style={{ borderLeftColor: getColorByType(evt?.type) }}
-              onClick={() => onEventClick(evt)}
+        <div className="grid grid-cols-24 gap-2">
+          {slots.map((slot) => (
+            <div
+              key={slot.hour}
+              className="flex flex-col items-center p-2 border-t"
             >
-              <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-800">{evt?.name}</span>
-                <span className="text-xs text-gray-500">
-                  {evt?.days.map((day) =>
-                    day?.slots.map((slot) => (
-                      <Badge
-                        key={slot?._id}
-                        count={`${dayjs(slot.startTime).format(
-                          "HH:mm"
-                        )} - ${dayjs(slot.endTime).format("HH:mm")}`}
-                        style={{
-                          backgroundColor: getColorByType(evt?.type),
-                          fontSize: "12px",
-                        }}
-                      />
-                    ))
-                  )}
-                </span>
-              </div>
-            </Card>
-          ))
-        )}
+              <div className="text-xs text-gray-500">{`${slot.hour}:00`}</div>
+              {slot.events.length > 0 ? (
+                slot.events.map((evt) => (
+                  <div
+                    key={evt?._id}
+                    className="bg-blue-200 p-1 rounded mt-2 text-center"
+                    style={{
+                      backgroundColor: getColorByType(evt?.type),
+                    }}
+                    onClick={() => onEventClick(evt)}
+                  >
+                    {evt?.name}
+                  </div>
+                ))
+              ) : (
+                <div className="text-xs text-gray-400">No events</div>
+              )}
+            </div>
+          ))}
+        </div>
       </motion.div>
     );
   };
 
   // --------------------------------------------
-  // 10) Week View
+  // 10) Week View: Add Timeline
   // --------------------------------------------
   const renderWeekView = () => {
-    const dayOfWeek = +format(selectedDate, "i"); // Monday=1, Sunday=7
+    const dayOfWeek = +format(selectedDate, "i");
     const monday = new Date(selectedDate);
     monday.setDate(monday.getDate() - (dayOfWeek - 1));
 
@@ -322,23 +355,8 @@ export default function TimeTableDash() {
       return d;
     });
 
-    const getEventsForDate = (dateObj) => {
-      const dayName = format(dateObj, "EEEE");
-      const dateStr = format(dateObj, "yyyy-MM-dd");
-
-      const w = timetables
-        .filter((t) => t?.type === "weekly")
-        .filter((t) => t?.days?.some((d) => d?.day === dayName));
-      const others = timetables
-        .filter((t) => t?.type !== "weekly")
-        .filter((t) =>
-          t?.days?.some((d) => {
-            if (!d?.date) return false;
-            return format(new Date(d?.date), "yyyy-MM-dd") === dateStr;
-          })
-        );
-      return [...w, ...others];
-    };
+    // Generate time slots from 8 AM to 8 PM
+    const timeSlots = Array.from({ length: 13 }, (_, i) => i + 8);
 
     return (
       <motion.div
@@ -346,7 +364,6 @@ export default function TimeTableDash() {
         initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
-        transition={{ duration: 0.3 }}
         className="p-4"
       >
         <h3 className="text-xl font-bold mb-4">
@@ -354,60 +371,137 @@ export default function TimeTableDash() {
           {format(daysInWeek[6], "dd MMM")})
         </h3>
 
-        {/* Grid Layout for Week Days */}
-        <div className="grid grid-cols-7 gap-4">
-          {daysInWeek.map((day) => {
-            const events = getEventsForDate(day);
-            return (
+        <div className="flex">
+          {/* Timeline Column */}
+          <div className="w-16 mr-2">
+            <div className="h-10 border-b"></div>
+            {timeSlots.map((hour) => (
+              <div
+                key={hour}
+                className="h-16 border-b flex items-start justify-end pr-2 text-xs text-gray-500"
+              >
+                {`${hour}:00`}
+              </div>
+            ))}
+          </div>
+
+          {/* Days Grid */}
+          <div className="flex-1 grid grid-cols-7 gap-1">
+            {/* Day headers */}
+            {daysInWeek.map((day) => (
               <div
                 key={day.toString()}
-                className="bg-white rounded shadow-sm p-2 min-h-[150px]"
+                className="text-center font-medium p-2 border-b"
               >
-                <h4 className="font-semibold border-b pb-1 mb-2 text-gray-600">
-                  {format(day, "EEE dd")}
-                </h4>
-                {events.length === 0 ? (
-                  <p className="text-xs text-gray-400">No Timetable</p>
-                ) : (
-                  events.map((evt) => (
-                    <div
-                      key={evt?._id}
-                      className="mb-2 p-2 rounded-md cursor-pointer"
-                      style={{
-                        backgroundColor: getColorByType(evt?.type),
-                        borderLeft: `4px solid ${getColorByType(evt?.type)}`,
-                      }}
-                      onClick={() => onEventClick(evt)}
-                    >
-                      <div className="flex flex-col">
-                        {evt?.days.map((dayItem) =>
-                          dayItem?.slots.map((slot) => (
-                            <div
-                              key={slot?._id}
-                              className="flex justify-between"
-                            >
-                              <span className="text-sm text-gray-800">
-                                {dayjs(slot.startTime).format("HH:mm")} -{" "}
-                                {dayjs(slot.endTime).format("HH:mm")}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {slot.eventName}
-                              </span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </div>
-                  ))
-                )}
+                {format(day, "EEE dd")}
               </div>
-            );
-          })}
+            ))}
+
+            {/* Time slots */}
+            {timeSlots.map((hour) => (
+              <>
+                {daysInWeek.map((day) => {
+                  const dayString = format(day, "yyyy-MM-dd");
+                  const events = filteredTimetables.filter((tt) => {
+                    // For weekly timetables, check validity and day match
+                    if (tt.type === "weekly") {
+                      if (!isWithinValidity(tt, day)) return false;
+                      return tt.days?.some(
+                        (d) =>
+                          d.day === format(day, "EEEE") &&
+                          d.slots?.some(
+                            (slot) =>
+                              new Date(slot.startTime).getHours() === hour
+                          )
+                      );
+                    }
+                    // For dated events
+                    return tt.days?.some(
+                      (d) =>
+                        d.date &&
+                        format(new Date(d.date), "yyyy-MM-dd") === dayString &&
+                        d.slots?.some(
+                          (slot) => new Date(slot.startTime).getHours() === hour
+                        )
+                    );
+                  });
+
+                  return (
+                    <div
+                      key={`${dayString}-${hour}`}
+                      className="h-16 border-b relative"
+                    >
+                      {events.map((evt) => (
+                        <div
+                          key={evt._id}
+                          className="absolute top-0 left-0 right-0 bottom-0 m-1 rounded cursor-pointer flex items-center justify-center text-xs text-white text-center p-1"
+                          style={{
+                            backgroundColor: getColorByType(evt.type),
+                            zIndex: 1,
+                          }}
+                          onClick={() => onEventClick(evt)}
+                        >
+                          {evt.name}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </>
+            ))}
+          </div>
         </div>
       </motion.div>
     );
   };
+  // Updated Stats Section with clickable cards
+  const renderStatsSection = () => {
+    const stats = [
+      { type: "weekly", label: "Weekly Timetables", color: "#FF99CC" },
+      { type: "exam", label: "Exams", color: "#29ABE2" },
+      { type: "event", label: "Events", color: "#77DD77" },
+      { type: "others", label: "Others", color: "#FFD700" },
+    ];
 
+    return (
+      <div className="space-y-2 mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <h4 className="font-medium">Filter by Type:</h4>
+          {filterType && (
+            <Button
+              size="small"
+              icon={<AiOutlineFilter />}
+              onClick={() => setFilterType(null)}
+            >
+              Clear Filter
+            </Button>
+          )}
+        </div>
+
+        {stats.map((stat) => (
+          <Card
+            key={stat.type}
+            className={`p-2 cursor-pointer transition-all ${
+              filterType === stat.type ? "ring-2 ring-offset-2" : ""
+            }`}
+            style={{
+              borderLeft: `6px solid ${stat.color}`,
+              transform: filterType === stat.type ? "scale(1.02)" : "scale(1)",
+            }}
+            onClick={() => setFilterType(stat.type)}
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-gray-700">{stat.label}</span>
+              <Badge
+                count={timetables.filter((t) => t.type === stat.type).length}
+                style={{ backgroundColor: stat.color }}
+              />
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  };
   // --------------------------------------------
   // 11) Doughnut Chart
   // --------------------------------------------
@@ -534,53 +628,9 @@ export default function TimeTableDash() {
         ) : (
           <>
             <div>
-              <h3 className="text-lg font-semibold mb-3">Stats & Tasks</h3>
-              <div className="space-y-2 mb-6">
-                <Card
-                  className="p-2"
-                  style={{ borderLeft: "6px solid #FF99CC" }}
-                >
-                  <span className="text-gray-700">Weekly Timetables</span>
-                  <Badge
-                    count={
-                      timetables.filter((t) => t?.type === "weekly").length
-                    }
-                    style={{ backgroundColor: "#FF99CC", marginLeft: 8 }}
-                  />
-                </Card>
-                <Card
-                  className="p-2"
-                  style={{ borderLeft: "6px solid #29ABE2" }}
-                >
-                  <span className="text-gray-700">Exams</span>
-                  <Badge
-                    count={timetables.filter((t) => t?.type === "exam").length}
-                    style={{ backgroundColor: "#29ABE2", marginLeft: 8 }}
-                  />
-                </Card>
-                <Card
-                  className="p-2"
-                  style={{ borderLeft: "6px solid #77DD77" }}
-                >
-                  <span className="text-gray-700">Events</span>
-                  <Badge
-                    count={timetables.filter((t) => t?.type === "event").length}
-                    style={{ backgroundColor: "#77DD77", marginLeft: 8 }}
-                  />
-                </Card>
-                <Card
-                  className="p-2"
-                  style={{ borderLeft: "6px solid #FFD700" }}
-                >
-                  <span className="text-gray-700">Others</span>
-                  <Badge
-                    count={
-                      timetables.filter((t) => t?.type === "others").length
-                    }
-                    style={{ backgroundColor: "#FFD700", marginLeft: 8 }}
-                  />
-                </Card>
-              </div>
+              <h3 className="text-lg font-semibold mb-3">Stats & Filters</h3>
+              {renderStatsSection()}
+              <Divider />
               <div className="border rounded p-4 mb-4">
                 <h4 className="font-semibold mb-2 text-center">
                   Timetable Types
@@ -607,11 +657,9 @@ export default function TimeTableDash() {
         }
         placement="right"
         closable={false}
-        // width={650}
         width={"90%"}
-        visible={drawerVisible}
+        open={drawerVisible}
         onClose={closeDrawer}
-        // We keep Drawer at a lower zIndex than the Modal
         zIndex={1000}
       >
         {drawerVisible && (
@@ -635,8 +683,7 @@ export default function TimeTableDash() {
         title="Timetable Details"
         placement="right"
         width={"90%"}
-        // closable={false}
-        visible={detailsDrawerVisible}
+        open={detailsDrawerVisible}
         onClose={closeDetailsDrawer}
         zIndex={1000}
       >
@@ -873,12 +920,11 @@ export default function TimeTableDash() {
       {/* DELETE CONFIRMATION MODAL */}
       <Modal
         title="Confirm Deletion"
-        visible={deleteModalVisible}
+        open={deleteModalVisible}
         onOk={confirmDelete}
         onCancel={() => setDeleteModalVisible(false)}
         okButtonProps={{ danger: true }}
         okText="Delete"
-        // Set higher zIndex so the modal is above both drawers
         zIndex={2000}
       >
         <p>Are you sure you want to delete this timetable?</p>

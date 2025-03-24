@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { setLocalCookies } from "../../../../Utils/academivYear";
 import { Tooltip, Spin, Skeleton } from "antd";
 import DefaultBranchLogo from "../../../../Assets/HomeAssets/TeacherBtnLogo.png";
+import toast from "react-hot-toast";
 
 // Reusable Skeleton component to mimic branch card UI
 const BranchCardSkeleton = () => {
@@ -224,22 +225,26 @@ const SelectBranch = () => {
               <div className="flex justify-center w-full mt-6">
                 <motion.button
                   type="button"
-                  className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md transition-all duration-300 hover:brightness-110 hover:shadow-md ${
+                  className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 px-5 rounded-md transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-200 ${
                     loading || !selectedBranch
                       ? "opacity-50 cursor-not-allowed"
-                      : ""
+                      : "hover:brightness-110 hover:shadow-lg"
                   }`}
                   disabled={loading || !selectedBranch}
                   onClick={HandleBranch}
+                  aria-label="Proceed to next step"
                 >
                   {loading ? (
-                    <div className="flex justify-center">
-                      <Spin size="small" />
+                    <div className="flex justify-center items-center">
+                      <Spin size="large" className="text-white" />
+                      <span className="ml-2 text-white text-lg">
+                        Processing...
+                      </span>
                     </div>
                   ) : (
-                    <span className="flex items-center justify-center gap-2">
+                    <span className="flex items-center justify-center gap-3 text-lg font-medium">
                       Next
-                      <AiOutlineArrowRight className="text-white" />
+                      <AiOutlineArrowRight className="text-white text-2xl" />
                     </span>
                   )}
                 </motion.button>

@@ -284,7 +284,7 @@ const SideMenubar = () => {
                                         subItem.path,
                                         location.pathname
                                       )
-                                        ? "text-purple-500 bg-purple-100 border-r-4 border-purple-500"
+                                        ? "text-purple-500 bg-purple-100 border-l-4 border-purple-500"
                                         : "text-gray-700 hover:bg-gray-100"
                                     }
                                     ${isOpen ? "pl-2" : "justify-center"}`
