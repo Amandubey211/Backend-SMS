@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Skeleton,
-  Pagination,
   Select,
   Tooltip,
   Modal,
@@ -19,15 +18,16 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import BookForm from "./BookForm";
 import CategorySidebar from "./CategorySidebar";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
+import { setCurrentPage, setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
 import { fetchBooksDetailsThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { useTranslation } from "react-i18next";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { deleteCategoryThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
+import Pagination from '../../../../Components/Common/pagination';
 
 const { Option } = Select;
 
-const LibraryTab = () => {
+const LibraryTab = ({ page, setPage, limit, setLimit }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
 
@@ -126,11 +126,16 @@ const LibraryTab = () => {
     setIsViewModalOpen(false);
   };
 
-  // Pagination
-  const handlePageChange = (page) => {
-    dispatch(fetchBooksDetailsThunk(page));
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
   };
-  const pageSize = totalPages > 0 ? Math.ceil(totalBooks / totalPages) : 0;
+
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(newLimit);
+    dispatch(setCurrentPage(1));
+    dispatch(fetchBooksDetailsThunk({ page: 1, limit: newLimit }));
+  };
 
   // Helper to get count of books per category based on the class filter
   const getBookCount = useCallback(
@@ -310,10 +315,13 @@ const LibraryTab = () => {
       {!loading && totalPages > 1 && (
         <div className="flex justify-end mt-4">
           <Pagination
-            current={currentPage}
-            total={totalBooks}
-            pageSize={pageSize}
-            onChange={handlePageChange}
+            page={page}
+            totalPages={totalPages}
+            totalRecords={totalBooks}
+            limit={limit}
+            setPage={setPage}
+            setLimit={setLimit}
+            t={t}
           />
         </div>
       )}

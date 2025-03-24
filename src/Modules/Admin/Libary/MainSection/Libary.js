@@ -31,21 +31,30 @@ const LibraryAndBookIssue = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   // Fetch initial data on mount
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    if (tab === "BookIssue") {
+      setPage(1); // reset pagination to first page
+    }
+  };
+
   // Re-fetch data when switching tabs
   useEffect(() => {
     if (activeTab === "Library") {
-      dispatch(fetchBooksDetailsThunk());
+      dispatch(fetchBooksDetailsThunk({ page, limit }));
       dispatch(fetchCategoriesThunk()); // <-- fetch categories here
     } else if (activeTab === "BookIssue") {
-      dispatch(fetchBookIssuesThunk());
+      dispatch(fetchBookIssuesThunk({ page, limit }));
     }
-  }, [activeTab, dispatch]);
+  }, [activeTab, dispatch, page, limit]);
 
   useEffect(() => {
     if (addBookSuccess) {
@@ -76,16 +85,10 @@ const LibraryAndBookIssue = () => {
             {/* Tab Buttons with Add Book button on right (if Library tab is active) */}
             <div className="flex justify-between items-center mb-2">
               <div className="flex gap-4">
-                <TabButton
-                  isActive={activeTab === "Library"}
-                  onClick={() => setActiveTab("Library")}
-                >
+                <TabButton isActive={activeTab === "Library"} onClick={() => handleTabSwitch("Library")}>
                   {t("Library")}
                 </TabButton>
-                <TabButton
-                  isActive={activeTab === "BookIssue"}
-                  onClick={() => setActiveTab("BookIssue")}
-                >
+                <TabButton isActive={activeTab === "BookIssue"} onClick={() => handleTabSwitch("BookIssue")}>
                   {t("Book Issue")}
                 </TabButton>
               </div>
@@ -111,7 +114,12 @@ const LibraryAndBookIssue = () => {
                   requiredPermission={PERMISSIONS.GET_ALL_BOOKS}
                   title={"Library"}
                 >
-                  <LibraryTab />
+                  <LibraryTab
+                    page={page}
+                    setPage={setPage}
+                    limit={limit}
+                    setLimit={setLimit}
+                  />
                 </ProtectedSection>
               ) : (
                 <ProtectedSection
@@ -121,6 +129,10 @@ const LibraryAndBookIssue = () => {
                   <BookIssueTab
                     handleSidebarOpen={handleSidebarOpen}
                     setEditIssueData={setEditIssueData}
+                    page={page}
+                    setPage={setPage}
+                    limit={limit}
+                    setLimit={setLimit}
                   />
                 </ProtectedSection>
               )}
@@ -134,8 +146,8 @@ const LibraryAndBookIssue = () => {
                 activeTab === "Library"
                   ? t("Add New Book")
                   : editIssueData
-                  ? t("Edit Book Issue")
-                  : t("Add Book Issue")
+                    ? t("Edit Book Issue")
+                    : t("Add Book Issue")
               }
             >
               {activeTab === "Library" ? (
