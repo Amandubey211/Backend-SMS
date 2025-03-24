@@ -74,6 +74,9 @@ const librarySlice = createSlice({
       state.deleteCategorySuccess = false;
       // you can reset other states if needed
     },
+    setCurrentPage(state, action) {
+      state.currentPage = action.payload;
+    },    
   },
   extraReducers: (builder) => {
     // ----------------- BOOKS ------------------
@@ -151,7 +154,10 @@ const librarySlice = createSlice({
       })
       .addCase(fetchBookIssuesThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.bookIssues = action.payload;
+        state.bookIssues = action.payload.issues;
+        state.totalBooks = action.payload.pagination.totalItems;
+        state.totalPages = action.payload.pagination.totalPages;
+        state.currentPage = action.payload.pagination.currentPage;
       })
       .addCase(fetchBookIssuesThunk.rejected, (state, action) => {
         state.loading = false;
@@ -247,6 +253,7 @@ export const {
   toggleSidebar,
   setEditIssueData,
   resetLibraryState,
+  setCurrentPage,
 } = librarySlice.actions;
 
 export default librarySlice.reducer;
