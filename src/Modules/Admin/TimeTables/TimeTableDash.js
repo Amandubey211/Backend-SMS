@@ -16,7 +16,7 @@ import {
   Row,
   Col,
 } from "antd";
-import { format, isWithinInterval, addDays, subDays } from "date-fns";
+import { format, isWithinInterval, addDays, subDays, parseISO } from "date-fns";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { Doughnut } from "react-chartjs-2";
@@ -37,7 +37,8 @@ import {
   ArrowRightOutlined,
 } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
-
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 // Chart.js core + plugin
 import {
   Chart as ChartJS,
@@ -259,13 +260,182 @@ export default function TimeTableDash() {
   // 8) Export Functions
   // --------------------------------------------
   const handleExportPDF = () => {
-    // TODO: Implement PDF export
-    console.log("Exporting to PDF");
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text("Timetable Report", 105, 15, { align: "center" });
+
+    // Add date range
+    doc.setFontSize(12);
+    doc.text(`Date: ${format(new Date(), "MMMM dd, yyyy")}`, 14, 25);
+
+    // Prepare data for the table
+    const tableData = timetables.flatMap((timetable) =>
+      timetable.days.flatMap(
+        (day) =>
+          day.slots?.map((slot) => ({
+            type: timetable.type,
+            name: timetable.name,
+            day:
+              day.day ||
+              (day.date ? format(new Date(day.date), "EEEE") : "Weekly"),
+            date: day.date
+              ? format(new Date(day.date), "dd MMM yyyy")
+              : "Weekly",
+            time: `${
+              dayjs(slot.startTime).isValid()
+                ? dayjs(slot.startTime).format("HH:mm")
+                : "N/A"
+            } - ${
+              dayjs(slot.endTime).isValid()
+                ? dayjs(slot.endTime).format("HH:mm")
+                : "N/A"
+            }`,
+            subject: slot.subjectId?.name || slot.eventName || "N/A",
+            teacher: slot.teacherId?.name || "N/A",
+          })) || []
+      )
+    );
+
+    // Add table
+    doc.autoTable({
+      head: [["Type", "Name", "Day", "Date", "Time", "Subject", "Teacher"]],
+      body: tableData.map((item) => [
+        item.type,
+        item.name,
+        item.day,
+        item.date,
+        item.time,
+        item.subject,
+        item.teacher,
+      ]),
+      startY: 30,
+      styles: {
+        cellPadding: 2,
+        fontSize: 8,
+        valign: "middle",
+      },
+      headStyles: {
+        fillColor: [41, 171, 226],
+        textColor: 255,
+        fontStyle: "bold",
+      },
+      alternateRowStyles: {
+        fillColor: [240, 240, 240],
+      },
+      columnStyles: {
+        0: { cellWidth: 20 },
+        1: { cellWidth: 30 },
+        2: { cellWidth: 20 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 30 },
+        6: { cellWidth: 30 },
+      },
+    });
+
+    doc.save("timetable-report.pdf");
   };
 
   const handlePrint = () => {
-    // TODO: Implement print functionality
-    console.log("Printing timetable");
+    const printWindow = window.open("", "_blank");
+
+    // Prepare the table rows
+    const tableRows = timetables
+      .flatMap((timetable) =>
+        timetable.days.flatMap(
+          (day) =>
+            day.slots?.map((slot) => {
+              const startTime = dayjs(slot.startTime).isValid()
+                ? dayjs(slot.startTime).format("HH:mm")
+                : "N/A";
+              const endTime = dayjs(slot.endTime).isValid()
+                ? dayjs(slot.endTime).format("HH:mm")
+                : "N/A";
+
+              return `
+              <tr>
+                <td>${timetable.type}</td>
+                <td>${timetable.name}</td>
+                <td>${
+                  day.day ||
+                  (day.date ? format(new Date(day.date), "EEEE") : "Weekly")
+                }</td>
+                <td>${
+                  day.date
+                    ? format(new Date(day.date), "dd MMM yyyy")
+                    : "Weekly"
+                }</td>
+                <td>${startTime} - ${endTime}</td>
+                <td>${slot.subjectId?.name || slot.eventName || "N/A"}</td>
+                <td>${slot.teacherId?.name || "N/A"}</td>
+              </tr>
+            `;
+            }) || []
+        )
+      )
+      .join("");
+
+    const printContent = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Timetable Report</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; text-align: center; margin-bottom: 20px; }
+            .report-date { text-align: right; margin-bottom: 20px; font-size: 14px; color: #666; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #29ABE2; color: white; font-weight: bold; }
+            tr:nth-child(even) { background-color: #f2f2f2; }
+            @media print {
+              body { margin: 0; padding: 20px; }
+              .no-print { display: none; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Timetable Report</h1>
+          <div class="report-date">Generated on: ${format(
+            new Date(),
+            "MMMM dd, yyyy"
+          )}</div>
+          <table>
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Day</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Subject</th>
+                <th>Teacher</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${tableRows}
+            </tbody>
+          </table>
+          <div class="no-print" style="margin-top: 20px; text-align: center;">
+            <button onclick="window.print()" style="padding: 8px 16px; background-color: #29ABE2; color: white; border: none; border-radius: 4px; cursor: pointer;">Print</button>
+            <button onclick="window.close()" style="padding: 8px 16px; margin-left: 10px; background-color: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+          </div>
+          <script>
+            // Auto-print when window loads
+            window.onload = function() {
+              setTimeout(function() {
+                window.print();
+              }, 200);
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    printWindow.document.write(printContent);
+    printWindow.document.close();
   };
 
   // --------------------------------------------
@@ -440,8 +610,13 @@ export default function TimeTableDash() {
                         {displayText}
                       </div>
                       <div className="text-white text-xxs mt-auto">
-                        {dayjs(slotData?.startTime).format("HH:mm")} -{" "}
-                        {dayjs(slotData?.endTime).format("HH:mm")}
+                        {dayjs(slotData?.startTime).isValid()
+                          ? dayjs(slotData?.startTime).format("HH:mm")
+                          : "N/A"}{" "}
+                        -{" "}
+                        {dayjs(slotData?.endTime).isValid()
+                          ? dayjs(slotData?.endTime).format("HH:mm")
+                          : "N/A"}
                       </div>
                     </div>
                   );
@@ -599,11 +774,15 @@ export default function TimeTableDash() {
                             </div>
                             <div className="text-white text-xxs mt-auto">
                               {slotData &&
-                                `${dayjs(slotData.startTime).format(
-                                  "HH:mm"
-                                )} - ${dayjs(slotData.endTime).format(
-                                  "HH:mm"
-                                )}`}
+                                `${
+                                  dayjs(slotData.startTime).isValid()
+                                    ? dayjs(slotData.startTime).format("HH:mm")
+                                    : "N/A"
+                                } - ${
+                                  dayjs(slotData.endTime).isValid()
+                                    ? dayjs(slotData.endTime).format("HH:mm")
+                                    : "N/A"
+                                }`}
                             </div>
                           </div>
                         );
@@ -651,9 +830,9 @@ export default function TimeTableDash() {
     ];
 
     return (
-      <div className="space-y-2 mb-6">
-        <div className="flex items-center justify-between mb-2">
-          <h4 className="font-medium">Filter by Type:</h4>
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="font-normal text-sm">Filter by Type:</h4>
           {filterType && (
             <Button
               size="small"
@@ -666,53 +845,52 @@ export default function TimeTableDash() {
           )}
         </div>
 
-        <Row gutter={[8, 8]}>
+        <div className="space-y-2">
           {stats.map((stat) => {
             const count = timetables.filter((t) => t.type === stat.type).length;
             return (
-              <Col span={12} key={stat.type}>
-                <Card
-                  className={`cursor-pointer transition-all h-full ${
-                    filterType === stat.type ? "ring-2 ring-offset-2" : ""
-                  }`}
-                  style={{
-                    borderLeft: `4px solid ${stat.color}`,
-                    transform:
-                      filterType === stat.type ? "scale(1.02)" : "scale(1)",
-                    height: "80px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
-                  onClick={() => setFilterType(stat.type)}
-                  bodyStyle={{ padding: "8px" }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div
-                        className="w-8 h-8 flex items-center justify-center rounded mr-2"
-                        style={{ backgroundColor: getLightBgByType(stat.type) }}
-                      >
-                        {stat.icon}
-                      </div>
-                      <span className="text-sm">{stat.label}</span>
+              <Card
+                key={stat.type}
+                className={`cursor-pointer transition-all ${
+                  filterType === stat.type ? "ring-2 ring-offset-4" : ""
+                }`}
+                style={{
+                  borderLeft: `4px solid ${stat.color}`,
+                  transform:
+                    filterType === stat.type ? "scale(1.02)" : "scale(1)",
+                  height: "60px", // Reduced height
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                }}
+                onClick={() => setFilterType(stat.type)}
+                bodyStyle={{ padding: "8px" }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div
+                      className="w-8 h-8 flex items-center justify-center rounded mr-2" // Smaller icon container
+                      style={{ backgroundColor: getLightBgByType(stat.type) }}
+                    >
+                      {React.cloneElement(stat.icon, { className: "text-sm" })}{" "}
                     </div>
-                    <Badge
-                      count={count}
-                      style={{
-                        backgroundColor: stat.color,
-                        fontSize: "10px",
-                        height: "18px",
-                        minWidth: "18px",
-                        lineHeight: "18px",
-                      }}
-                    />
+                    <span className="text-xs">{stat.label}</span>
                   </div>
-                </Card>
-              </Col>
+                  <Badge
+                    count={count}
+                    style={{
+                      backgroundColor: stat.color,
+                      fontSize: "17px", // Smaller font
+                      height: "25px", // Smaller badge
+                      minWidth: "25px",
+                      lineHeight: "24px",
+                    }}
+                  />
+                </div>
+              </Card>
             );
           })}
-        </Row>
+        </div>
       </div>
     );
   };
@@ -805,21 +983,13 @@ export default function TimeTableDash() {
   const renderNavigationControls = () => {
     return (
       <div className="flex items-center justify-between mb-4">
-        <Button
-          icon={<ArrowLeftOutlined />}
-          onClick={navigateToPrevious}
-          size="small"
-        />
+        <Button icon={<ArrowLeftOutlined />} onClick={navigateToPrevious} />
 
-        <Button type="text" onClick={navigateToToday} size="small">
+        <Button type="text" onClick={navigateToToday}>
           Today
         </Button>
 
-        <Button
-          icon={<ArrowRightOutlined />}
-          onClick={navigateToNext}
-          size="small"
-        />
+        <Button icon={<ArrowRightOutlined />} onClick={navigateToNext} />
       </div>
     );
   };
@@ -1168,8 +1338,13 @@ export default function TimeTableDash() {
                                         : dayItem?.day || "Day Not Specified"}
                                     </td>
                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
-                                      {dayjs(slot?.startTime).format("HH:mm")} -{" "}
-                                      {dayjs(slot?.endTime).format("HH:mm")}
+                                      {dayjs(slot?.startTime).isValid()
+                                        ? dayjs(slot?.startTime).format("HH:mm")
+                                        : "N/A"}{" "}
+                                      -{" "}
+                                      {dayjs(slot?.endTime).isValid()
+                                        ? dayjs(slot?.endTime).format("HH:mm")
+                                        : "N/A"}
                                     </td>
                                     <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
                                       {slot?.subjectId
@@ -1296,9 +1471,7 @@ function DayPicker({ selectedDate, setSelectedDate }) {
           setSelectedDate(newDate);
         }}
       />
-      <Button onClick={() => setSelectedDate(new Date())} size="small">
-        Today
-      </Button>
+      <Button onClick={() => setSelectedDate(new Date())}>Today</Button>
     </div>
   );
 }
@@ -1318,9 +1491,7 @@ function WeekPicker({ selectedDate, setSelectedDate }) {
           setSelectedDate(newDate);
         }}
       />
-      <Button onClick={() => setSelectedDate(new Date())} size="small">
-        This Week
-      </Button>
+      <Button onClick={() => setSelectedDate(new Date())}>This Week</Button>
     </div>
   );
 }
