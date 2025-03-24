@@ -11,8 +11,12 @@ import {
   Tooltip,
   Tag,
   Divider,
+  Popover,
+  Space,
+  Row,
+  Col,
 } from "antd";
-import { format, isWithinInterval } from "date-fns";
+import { format, isWithinInterval, addDays, subDays } from "date-fns";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import { Doughnut } from "react-chartjs-2";
@@ -20,6 +24,8 @@ import {
   AiOutlineDelete,
   AiOutlineEdit,
   AiOutlineFilter,
+  AiOutlinePrinter,
+  AiOutlineFilePdf,
 } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -27,6 +33,8 @@ import {
   CalendarOutlined,
   BookOutlined,
   TeamOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
 } from "@ant-design/icons";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -38,6 +46,7 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+
 // Timetable Thunks
 import {
   fetchTimetableList,
@@ -51,18 +60,12 @@ import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/class
 
 // Child components
 import TimeTableForm from "./Components/TimeTableForm";
+
 dayjs.extend(isSameOrBefore);
 ChartJS.register(ArcElement, ChartTooltip, Legend, ChartDataLabels);
 
-dayjs.extend(isSameOrBefore);
-
 // --------------------------------------------
-// 1) Chart.js Register
-// --------------------------------------------
-ChartJS.register(ArcElement, ChartTooltip, Legend, ChartDataLabels);
-
-// --------------------------------------------
-// 2) Helper: getColorByType
+// 1) Helper: getColorByType
 // --------------------------------------------
 function getColorByType(type) {
   switch (type) {
@@ -80,18 +83,18 @@ function getColorByType(type) {
 }
 
 // --------------------------------------------
-// 3) Helper: getIconForType
+// 2) Helper: getIconForType
 // --------------------------------------------
 function getIconForType(type) {
   switch (type) {
     case "weekly":
-      return <CalendarOutlined className="text-lg text-gray-800" />;
+      return <CalendarOutlined className="text-lg" />;
     case "exam":
-      return <BookOutlined className="text-lg text-gray-800" />;
+      return <BookOutlined className="text-lg" />;
     case "event":
-      return <CalendarOutlined className="text-lg text-gray-800" />;
+      return <CalendarOutlined className="text-lg" />;
     case "others":
-      return <TeamOutlined className="text-lg text-gray-800" />;
+      return <TeamOutlined className="text-lg" />;
     default:
       return null;
   }
@@ -135,6 +138,8 @@ export default function TimeTableDash() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
   const [filterType, setFilterType] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
   // Drawer states for create/edit
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
@@ -147,16 +152,43 @@ export default function TimeTableDash() {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   // --------------------------------------------
+  // 3) Navigation helpers
+  // --------------------------------------------
+  const navigateToToday = () => setSelectedDate(new Date());
+
+  const navigateToPrevious = () => {
+    if (viewMode === "day") {
+      setSelectedDate(subDays(selectedDate, 1));
+    } else if (viewMode === "week") {
+      setSelectedDate(subDays(selectedDate, 7));
+    } else {
+      setSelectedDate(subDays(selectedDate, 30));
+    }
+  };
+
+  const navigateToNext = () => {
+    if (viewMode === "day") {
+      setSelectedDate(addDays(selectedDate, 1));
+    } else if (viewMode === "week") {
+      setSelectedDate(addDays(selectedDate, 7));
+    } else {
+      setSelectedDate(addDays(selectedDate, 30));
+    }
+  };
+
+  // --------------------------------------------
   // 4) Open/Close Drawer for Create/Edit
   // --------------------------------------------
   const openDrawer = (timetable = null) => {
     setEditingTimetable(timetable);
     setDrawerVisible(true);
   };
+
   const closeDrawer = () => {
     setEditingTimetable(null);
     setDrawerVisible(false);
   };
+
   // Filter timetables based on selected type
   const filteredTimetables = useMemo(() => {
     if (!filterType) return timetables;
@@ -174,6 +206,7 @@ export default function TimeTableDash() {
       end: new Date(endDate),
     });
   };
+
   // --------------------------------------------
   // 5) CREATE or UPDATE Timetable
   // --------------------------------------------
@@ -198,6 +231,7 @@ export default function TimeTableDash() {
     setDetailsTimetable(timetable);
     setDetailsDrawerVisible(true);
   };
+
   const closeDetailsDrawer = () => {
     setDetailsDrawerVisible(false);
     setDetailsTimetable(null);
@@ -210,6 +244,7 @@ export default function TimeTableDash() {
     setEditingTimetable(timetable);
     setDeleteModalVisible(true);
   };
+
   const confirmDelete = () => {
     if (editingTimetable) {
       dispatch(deleteTT(editingTimetable?._id));
@@ -221,9 +256,21 @@ export default function TimeTableDash() {
   };
 
   // --------------------------------------------
-  // 8) Month View: dateCellRender
+  // 8) Export Functions
   // --------------------------------------------
+  const handleExportPDF = () => {
+    // TODO: Implement PDF export
+    console.log("Exporting to PDF");
+  };
 
+  const handlePrint = () => {
+    // TODO: Implement print functionality
+    console.log("Printing timetable");
+  };
+
+  // --------------------------------------------
+  // 9) Month View: dateCellRender
+  // --------------------------------------------
   const dateCellRender = (currentDayjs) => {
     const currentDate = currentDayjs.toDate();
     const dateString = currentDayjs.format("YYYY-MM-DD");
@@ -248,30 +295,67 @@ export default function TimeTableDash() {
 
     if (matched.length === 0) return null;
 
+    // Calculate event density for color intensity
+    const density = Math.min(matched.length / 3, 1);
+    const bgColor = `rgba(66, 153, 225, ${0.2 + density * 0.3})`;
+
     return (
       <div className="space-y-1">
-        {matched.map((evt) => (
-          <Tooltip
-            key={evt._id}
-            title={`${evt.name} (${evt.type})`}
-            color={getColorByType(evt.type)}
-            placement="bottom"
-          >
-            <div
-              className="px-2 py-1 rounded text-white text-xs cursor-pointer truncate"
-              style={{ backgroundColor: getColorByType(evt.type) }}
-              onClick={() => onEventClick(evt)}
+        <div
+          className="absolute top-1 right-1 w-2 h-2 rounded-full"
+          style={{ backgroundColor: bgColor }}
+        />
+        {matched.slice(0, 3).map((evt) => {
+          const firstSlot = evt.days?.find(
+            (d) =>
+              d.day === currentDayjs.format("dddd") ||
+              (d.date && dayjs(d.date).format("YYYY-MM-DD") === dateString)
+                ?.slots?.[0]
+          );
+          const displayText =
+            firstSlot?.subjectId?.name || firstSlot?.eventName || evt.name;
+
+          return (
+            <Tooltip
+              key={evt._id}
+              title={`${displayText} (${evt.type})`}
+              color={getColorByType(evt.type)}
+              placement="bottom"
             >
-              {evt.name}
-            </div>
-          </Tooltip>
-        ))}
+              <div
+                className="px-2 py-1 rounded text-white text-xs cursor-pointer truncate"
+                style={{
+                  backgroundColor: getColorByType(evt.type),
+                  fontSize: "10px",
+                  lineHeight: "1.2",
+                  padding: "2px 4px",
+                  marginBottom: "2px",
+                }}
+                onClick={() => onEventClick(evt)}
+              >
+                {displayText}
+              </div>
+            </Tooltip>
+          );
+        })}
+        {matched.length > 3 && (
+          <Badge
+            count={`+${matched.length - 3}`}
+            style={{
+              backgroundColor: "#666",
+              fontSize: "10px",
+              padding: "0 4px",
+              lineHeight: "16px",
+              height: "16px",
+            }}
+          />
+        )}
       </div>
     );
   };
 
   // --------------------------------------------
-  // 9) Day View: Add Timeline
+  // 10) Day View: Add Timeline
   // --------------------------------------------
   const renderDayView = () => {
     const dayName = format(selectedDate, "EEEE");
@@ -306,43 +390,72 @@ export default function TimeTableDash() {
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
         transition={{ duration: 0.3 }}
-        className="p-4"
+        className="p-4 overflow-x-auto"
       >
         <h3 className="text-xl font-bold mb-4">
-          Day View — {format(selectedDate, "dd MMM yyyy")}
+          {format(selectedDate, "EEEE, dd MMM yyyy")}
         </h3>
-        <div className="grid grid-cols-24 gap-2">
-          {slots.map((slot) => (
-            <div
-              key={slot.hour}
-              className="flex flex-col items-center p-2 border-t"
-            >
-              <div className="text-xs text-gray-500">{`${slot.hour}:00`}</div>
-              {slot.events.length > 0 ? (
-                slot.events.map((evt) => (
-                  <div
-                    key={evt?._id}
-                    className="bg-blue-200 p-1 rounded mt-2 text-center"
-                    style={{
-                      backgroundColor: getColorByType(evt?.type),
-                    }}
-                    onClick={() => onEventClick(evt)}
-                  >
-                    {evt?.name}
-                  </div>
-                ))
-              ) : (
-                <div className="text-xs text-gray-400">No events</div>
-              )}
-            </div>
-          ))}
+        <div className="flex">
+          {/* Timeline Column */}
+          <div className="w-16 flex-shrink-0">
+            {slots.map((slot) => (
+              <div
+                key={slot.hour}
+                className="h-16 border-b flex items-center justify-end pr-2 text-sm text-gray-500"
+              >
+                {`${slot.hour}:00`}
+              </div>
+            ))}
+          </div>
+
+          {/* Events Column */}
+          <div className="flex-1 min-w-0">
+            {slots.map((slot) => (
+              <div key={slot.hour} className="h-16 border-b relative">
+                {slot.events.map((evt) => {
+                  const dayData = evt.days.find(
+                    (d) =>
+                      d.date &&
+                      format(new Date(d.date), "yyyy-MM-dd") === dateString
+                  );
+                  const slotData = dayData?.slots?.find(
+                    (s) => new Date(s.startTime).getHours() === slot.hour
+                  );
+
+                  const displayText =
+                    slotData?.subjectId?.name ||
+                    slotData?.eventName ||
+                    evt.name;
+
+                  return (
+                    <div
+                      key={evt?._id}
+                      className="absolute top-1 left-1 right-1 bottom-1 p-1 rounded cursor-pointer flex flex-col"
+                      style={{
+                        backgroundColor: getColorByType(evt?.type),
+                      }}
+                      onClick={() => onEventClick(evt)}
+                    >
+                      <div className="text-white text-xs font-medium truncate">
+                        {displayText}
+                      </div>
+                      <div className="text-white text-xxs mt-auto">
+                        {dayjs(slotData?.startTime).format("HH:mm")} -{" "}
+                        {dayjs(slotData?.endTime).format("HH:mm")}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </motion.div>
     );
   };
 
   // --------------------------------------------
-  // 10) Week View: Add Timeline
+  // 11) Week View: Add Timeline
   // --------------------------------------------
   const renderWeekView = () => {
     const dayOfWeek = +format(selectedDate, "i");
@@ -364,21 +477,21 @@ export default function TimeTableDash() {
         initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
         exit={{ opacity: 0, x: -30 }}
-        className="p-4"
+        className="p-4 overflow-x-auto"
       >
         <h3 className="text-xl font-bold mb-4">
-          Week View ({format(daysInWeek[0], "dd MMM")} -{" "}
-          {format(daysInWeek[6], "dd MMM")})
+          Week of {format(daysInWeek[0], "dd MMM")} -{" "}
+          {format(daysInWeek[6], "dd MMM")}
         </h3>
 
-        <div className="flex">
+        <div className="flex min-w-max">
           {/* Timeline Column */}
-          <div className="w-16 mr-2">
+          <div className="w-16 mr-2 flex-shrink-0">
             <div className="h-10 border-b"></div>
             {timeSlots.map((hour) => (
               <div
                 key={hour}
-                className="h-16 border-b flex items-start justify-end pr-2 text-xs text-gray-500"
+                className="h-16 border-b flex items-start justify-end pr-2 text-sm text-gray-500"
               >
                 {`${hour}:00`}
               </div>
@@ -386,16 +499,39 @@ export default function TimeTableDash() {
           </div>
 
           {/* Days Grid */}
-          <div className="flex-1 grid grid-cols-7 gap-1">
+          <div className="flex-1 grid grid-cols-7 gap-1 min-w-max">
             {/* Day headers */}
-            {daysInWeek.map((day) => (
-              <div
-                key={day.toString()}
-                className="text-center font-medium p-2 border-b"
-              >
-                {format(day, "EEE dd")}
-              </div>
-            ))}
+            {daysInWeek.map((day) => {
+              const dayEvents = filteredTimetables.filter((tt) => {
+                const dayString = format(day, "yyyy-MM-dd");
+                if (tt.type === "weekly") {
+                  if (!isWithinValidity(tt, day)) return false;
+                  return tt.days?.some((d) => d.day === format(day, "EEEE"));
+                }
+                return tt.days?.some(
+                  (d) =>
+                    d.date &&
+                    format(new Date(d.date), "yyyy-MM-dd") === dayString
+                );
+              });
+
+              // Calculate event density for the day
+              const density = Math.min(dayEvents.length / 5, 1);
+              const bgColor = `rgba(66, 153, 225, ${0.2 + density * 0.3})`;
+
+              return (
+                <div
+                  key={day.toString()}
+                  className="text-center font-medium p-2 border-b relative"
+                >
+                  <div
+                    className="absolute top-1 right-1 w-2 h-2 rounded-full"
+                    style={{ backgroundColor: bgColor }}
+                  />
+                  {format(day, "EEE dd")}
+                </div>
+              );
+            })}
 
             {/* Time slots */}
             {timeSlots.map((hour) => (
@@ -431,19 +567,47 @@ export default function TimeTableDash() {
                       key={`${dayString}-${hour}`}
                       className="h-16 border-b relative"
                     >
-                      {events.map((evt) => (
-                        <div
-                          key={evt._id}
-                          className="absolute top-0 left-0 right-0 bottom-0 m-1 rounded cursor-pointer flex items-center justify-center text-xs text-white text-center p-1"
-                          style={{
-                            backgroundColor: getColorByType(evt.type),
-                            zIndex: 1,
-                          }}
-                          onClick={() => onEventClick(evt)}
-                        >
-                          {evt.name}
-                        </div>
-                      ))}
+                      {events.map((evt) => {
+                        const dayData = evt.days.find(
+                          (d) =>
+                            d.day === format(day, "EEEE") ||
+                            (d.date &&
+                              format(new Date(d.date), "yyyy-MM-dd") ===
+                                dayString)
+                        );
+                        const slotData = dayData?.slots?.find(
+                          (s) => new Date(s.startTime).getHours() === hour
+                        );
+
+                        const displayText =
+                          slotData?.subjectId?.name ||
+                          slotData?.eventName ||
+                          evt.name;
+
+                        return (
+                          <div
+                            key={evt._id}
+                            className="absolute top-1 left-1 right-1 bottom-1 rounded cursor-pointer flex flex-col p-1"
+                            style={{
+                              backgroundColor: getColorByType(evt.type),
+                              zIndex: 1,
+                            }}
+                            onClick={() => onEventClick(evt)}
+                          >
+                            <div className="text-white text-xs font-medium truncate">
+                              {displayText}
+                            </div>
+                            <div className="text-white text-xxs mt-auto">
+                              {slotData &&
+                                `${dayjs(slotData.startTime).format(
+                                  "HH:mm"
+                                )} - ${dayjs(slotData.endTime).format(
+                                  "HH:mm"
+                                )}`}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   );
                 })}
@@ -454,13 +618,36 @@ export default function TimeTableDash() {
       </motion.div>
     );
   };
-  // Updated Stats Section with clickable cards
+
+  // --------------------------------------------
+  // 12) Stats Section with compact cards
+  // --------------------------------------------
   const renderStatsSection = () => {
     const stats = [
-      { type: "weekly", label: "Weekly Timetables", color: "#FF99CC" },
-      { type: "exam", label: "Exams", color: "#29ABE2" },
-      { type: "event", label: "Events", color: "#77DD77" },
-      { type: "others", label: "Others", color: "#FFD700" },
+      {
+        type: "weekly",
+        label: "Weekly",
+        icon: <CalendarOutlined />,
+        color: "#FF99CC",
+      },
+      {
+        type: "exam",
+        label: "Exams",
+        icon: <BookOutlined />,
+        color: "#29ABE2",
+      },
+      {
+        type: "event",
+        label: "Events",
+        icon: <CalendarOutlined />,
+        color: "#77DD77",
+      },
+      {
+        type: "others",
+        label: "Others",
+        icon: <TeamOutlined />,
+        color: "#FFD700",
+      },
     ];
 
     return (
@@ -472,38 +659,66 @@ export default function TimeTableDash() {
               size="small"
               icon={<AiOutlineFilter />}
               onClick={() => setFilterType(null)}
+              style={{ padding: "0 8px" }}
             >
-              Clear Filter
+              Clear
             </Button>
           )}
         </div>
 
-        {stats.map((stat) => (
-          <Card
-            key={stat.type}
-            className={`p-2 cursor-pointer transition-all ${
-              filterType === stat.type ? "ring-2 ring-offset-2" : ""
-            }`}
-            style={{
-              borderLeft: `6px solid ${stat.color}`,
-              transform: filterType === stat.type ? "scale(1.02)" : "scale(1)",
-            }}
-            onClick={() => setFilterType(stat.type)}
-          >
-            <div className="flex justify-between items-center">
-              <span className="text-gray-700">{stat.label}</span>
-              <Badge
-                count={timetables.filter((t) => t.type === stat.type).length}
-                style={{ backgroundColor: stat.color }}
-              />
-            </div>
-          </Card>
-        ))}
+        <Row gutter={[8, 8]}>
+          {stats.map((stat) => {
+            const count = timetables.filter((t) => t.type === stat.type).length;
+            return (
+              <Col span={12} key={stat.type}>
+                <Card
+                  className={`cursor-pointer transition-all h-full ${
+                    filterType === stat.type ? "ring-2 ring-offset-2" : ""
+                  }`}
+                  style={{
+                    borderLeft: `4px solid ${stat.color}`,
+                    transform:
+                      filterType === stat.type ? "scale(1.02)" : "scale(1)",
+                    height: "80px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                  onClick={() => setFilterType(stat.type)}
+                  bodyStyle={{ padding: "8px" }}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div
+                        className="w-8 h-8 flex items-center justify-center rounded mr-2"
+                        style={{ backgroundColor: getLightBgByType(stat.type) }}
+                      >
+                        {stat.icon}
+                      </div>
+                      <span className="text-sm">{stat.label}</span>
+                    </div>
+                    <Badge
+                      count={count}
+                      style={{
+                        backgroundColor: stat.color,
+                        fontSize: "10px",
+                        height: "18px",
+                        minWidth: "18px",
+                        lineHeight: "18px",
+                      }}
+                    />
+                  </div>
+                </Card>
+              </Col>
+            );
+          })}
+        </Row>
       </div>
     );
   };
+
   // --------------------------------------------
-  // 11) Doughnut Chart
+  // 13) Doughnut Chart
   // --------------------------------------------
   const chartData = {
     labels: ["Weekly", "Exam", "Event", "Others"],
@@ -522,6 +737,7 @@ export default function TimeTableDash() {
       },
     ],
   };
+
   const chartOptions = {
     responsive: true,
     cutout: "50%",
@@ -531,8 +747,11 @@ export default function TimeTableDash() {
         labels: {
           color: "#333",
           font: {
-            size: 14,
+            size: 12,
           },
+          padding: 20,
+          usePointStyle: true,
+          pointStyle: "circle",
         },
       },
       tooltip: {
@@ -548,18 +767,109 @@ export default function TimeTableDash() {
   };
 
   // --------------------------------------------
-  // 12) Render
+  // 14) Legend Component
+  // --------------------------------------------
+  const renderLegend = () => {
+    const types = [
+      { type: "weekly", label: "Weekly Timetables", color: "#FF99CC" },
+      { type: "exam", label: "Exams", color: "#29ABE2" },
+      { type: "event", label: "Events", color: "#77DD77" },
+      { type: "others", label: "Others", color: "#FFD700" },
+    ];
+
+    return (
+      <div className="mb-4">
+        <h4 className="font-medium mb-2">Legend</h4>
+        <div className="grid grid-cols-2 gap-2">
+          {types.map((item) => (
+            <div
+              key={item.type}
+              className="flex items-center cursor-pointer"
+              onClick={() => setFilterType(item.type)}
+            >
+              <div
+                className="w-3 h-3 rounded-full mr-2"
+                style={{ backgroundColor: item.color }}
+              />
+              <span className="text-xs">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  // --------------------------------------------
+  // 15) Navigation Controls
+  // --------------------------------------------
+  const renderNavigationControls = () => {
+    return (
+      <div className="flex items-center justify-between mb-4">
+        <Button
+          icon={<ArrowLeftOutlined />}
+          onClick={navigateToPrevious}
+          size="small"
+        />
+
+        <Button type="text" onClick={navigateToToday} size="small">
+          Today
+        </Button>
+
+        <Button
+          icon={<ArrowRightOutlined />}
+          onClick={navigateToNext}
+          size="small"
+        />
+      </div>
+    );
+  };
+
+  // --------------------------------------------
+  // 16) Empty State
+  // --------------------------------------------
+  const renderEmptyState = () => {
+    if (timetables.length > 0) return null;
+
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-400 mb-4">No timetables found</div>
+        <Button
+          type="primary"
+          onClick={() => openDrawer(null)}
+          className="bg-blue-500"
+        >
+          Create Your First Timetable
+        </Button>
+      </div>
+    );
+  };
+
+  // --------------------------------------------
+  // 17) Render
   // --------------------------------------------
   return (
-    <div className="w-full min-h-screen flex ">
+    <div className="w-full min-h-screen flex">
       {/* MAIN SECTION */}
-      <div className="flex-1 p-4">
+      <div
+        className={`flex-1 p-4 transition-all ${
+          sidebarCollapsed ? "mr-0" : "mr-72"
+        }`}
+      >
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
           <h2 className="text-2xl font-bold text-gray-900">
             Timetable Calendar
           </h2>
-          <div className="space-x-2 flex items-center">
+
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              type="default"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+              className="md:hidden"
+            >
+              {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
+            </Button>
+
             <Radio.Group
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
@@ -569,78 +879,112 @@ export default function TimeTableDash() {
               <Radio.Button value="week">Week</Radio.Button>
               <Radio.Button value="month">Month</Radio.Button>
             </Radio.Group>
-            <Button
-              type="primary"
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
-              onClick={() => openDrawer(null)}
-            >
-              + Add Timetable
-            </Button>
+
+            <Space>
+              <Popover
+                content={
+                  <div className="flex flex-col">
+                    <Button
+                      icon={<AiOutlineFilePdf />}
+                      onClick={handleExportPDF}
+                      className="mb-2"
+                    >
+                      Export as PDF
+                    </Button>
+                    <Button icon={<AiOutlinePrinter />} onClick={handlePrint}>
+                      Print
+                    </Button>
+                  </div>
+                }
+                trigger="click"
+                placement="bottomRight"
+              >
+                <Button>Export</Button>
+              </Popover>
+              <Button
+                type="primary"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
+                onClick={() => openDrawer(null)}
+              >
+                + Add Timetable
+              </Button>
+            </Space>
           </div>
         </div>
+
+        {/* Navigation Controls */}
+        {renderNavigationControls()}
 
         {/* BODY with Skeleton for loading */}
         {loadingFetch ? (
           <Skeleton active paragraph={{ rows: 12 }} />
         ) : (
-          <AnimatePresence mode="wait">
-            {viewMode === "day" && (
-              <>
-                <DayPicker
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                />
-                {renderDayView()}
-              </>
-            )}
-            {viewMode === "week" && (
-              <>
-                <WeekPicker
-                  selectedDate={selectedDate}
-                  setSelectedDate={setSelectedDate}
-                />
-                {renderWeekView()}
-              </>
-            )}
-            {viewMode === "month" && (
-              <motion.div
-                key="monthView"
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.3 }}
-              >
-                <Calendar
-                  value={dayjs(selectedDate)}
-                  onSelect={(dayjsObj) => setSelectedDate(dayjsObj?.toDate())}
-                  dateCellRender={dateCellRender}
-                  className="bg-white shadow-sm border rounded-lg px-2"
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        )}
-      </div>
-      {/* RIGHT SIDEBAR (STATS) */}
-      <div className="w-72 border-l p-4 bg-white flex flex-col justify-between">
-        {loadingFetch ? (
-          <Skeleton active title paragraph={{ rows: 4 }} />
-        ) : (
           <>
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Stats & Filters</h3>
-              {renderStatsSection()}
-              <Divider />
-              <div className="border rounded p-4 mb-4">
-                <h4 className="font-semibold mb-2 text-center">
-                  Timetable Types
-                </h4>
-                <Doughnut data={chartData} options={chartOptions} />
-              </div>
-            </div>
+            {renderEmptyState()}
+            <AnimatePresence mode="wait">
+              {viewMode === "day" && (
+                <>
+                  <DayPicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                  />
+                  {renderDayView()}
+                </>
+              )}
+              {viewMode === "week" && (
+                <>
+                  <WeekPicker
+                    selectedDate={selectedDate}
+                    setSelectedDate={setSelectedDate}
+                  />
+                  {renderWeekView()}
+                </>
+              )}
+              {viewMode === "month" && (
+                <motion.div
+                  key="monthView"
+                  initial={{ opacity: 0, x: 30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -30 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Calendar
+                    value={dayjs(selectedDate)}
+                    onSelect={(dayjsObj) => setSelectedDate(dayjsObj?.toDate())}
+                    dateCellRender={dateCellRender}
+                    className="bg-white shadow-sm border rounded-lg px-2"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </>
         )}
       </div>
+
+      {/* RIGHT SIDEBAR (STATS) */}
+      {!sidebarCollapsed && (
+        <div className="w-72 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
+          {loadingFetch ? (
+            <Skeleton active title paragraph={{ rows: 4 }} />
+          ) : (
+            <>
+              <div>
+                <h3 className="text-lg font-semibold mb-3">Stats & Filters</h3>
+                {renderLegend()}
+                {renderStatsSection()}
+                <Divider />
+                <div className="border rounded p-4 mb-4">
+                  <h4 className="font-semibold mb-2 text-center">
+                    Timetable Types
+                  </h4>
+                  <Doughnut data={chartData} options={chartOptions} />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
       {/* CREATE/EDIT DRAWER FORM */}
       <Drawer
         title={
@@ -678,6 +1022,7 @@ export default function TimeTableDash() {
           </motion.div>
         )}
       </Drawer>
+
       {/* TIMETABLE DETAILS DRAWER */}
       <Drawer
         title="Timetable Details"
@@ -942,7 +1287,7 @@ function DayPicker({ selectedDate, setSelectedDate }) {
       <span className="text-gray-600">Select Day:</span>
       <input
         type="date"
-        className="border rounded px-2 py-1"
+        className="border rounded px-2 py-1 text-sm"
         value={format(selectedDate, "yyyy-MM-dd")}
         onChange={(e) => {
           const newDate = e.target.value
@@ -951,7 +1296,9 @@ function DayPicker({ selectedDate, setSelectedDate }) {
           setSelectedDate(newDate);
         }}
       />
-      <Button onClick={() => setSelectedDate(new Date())}>Today</Button>
+      <Button onClick={() => setSelectedDate(new Date())} size="small">
+        Today
+      </Button>
     </div>
   );
 }
@@ -962,7 +1309,7 @@ function WeekPicker({ selectedDate, setSelectedDate }) {
       <span className="text-gray-600">Select Week:</span>
       <input
         type="date"
-        className="border rounded px-2 py-1"
+        className="border rounded px-2 py-1 text-sm"
         value={format(selectedDate, "yyyy-MM-dd")}
         onChange={(e) => {
           const newDate = e.target.value
@@ -971,7 +1318,9 @@ function WeekPicker({ selectedDate, setSelectedDate }) {
           setSelectedDate(newDate);
         }}
       />
-      <Button onClick={() => setSelectedDate(new Date())}>This Week</Button>
+      <Button onClick={() => setSelectedDate(new Date())} size="small">
+        This Week
+      </Button>
     </div>
   );
 }
