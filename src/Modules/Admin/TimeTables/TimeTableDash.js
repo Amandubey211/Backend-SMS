@@ -15,6 +15,7 @@ import {
   Space,
   Row,
   Col,
+  Select,
 } from "antd";
 import { format, isWithinInterval, addDays, subDays, parseISO } from "date-fns";
 import dayjs from "dayjs";
@@ -58,7 +59,12 @@ import {
 // Additional Thunks
 import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semester/semesterThunks";
 import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
-
+import {
+  fetchGroupsByClass,
+  fetchGroupsByClassAndSection,
+  fetchSectionsNamesByClass,
+} from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { fetchSubjects } from "../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 // Child components
 import TimeTableForm from "./Components/TimeTableForm";
 
@@ -127,13 +133,17 @@ export default function TimeTableDash() {
   const { timetables = [], loadingFetch } = useSelector(
     (store) => store?.admin?.timetable || {}
   );
-
-  // On mount, fetch data
-  useEffect(() => {
-    dispatch(fetchTimetableList());
-    dispatch(fetchAllClasses());
-    dispatch(fetchSemestersByClass());
-  }, [dispatch]);
+  const classList = useSelector((state) => state.admin.class.classes);
+  const sectionList = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const groupsList = useSelector(
+    (state) => state.admin.group_section.groupsList
+  );
+  const allSubjects = useSelector((state) => state.admin.subject.subjects);
+  const { semesters: reduxSemesters } = useSelector(
+    (state) => state.admin.semesters
+  );
 
   // Local state
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -144,7 +154,13 @@ export default function TimeTableDash() {
   // Drawer states for create/edit
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
-
+  const [filters, setFilters] = useState({
+    class: null,
+    section: null,
+    group: null,
+    subject: null,
+    semester: null,
+  });
   // For viewing details
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
   const [detailsTimetable, setDetailsTimetable] = useState(null);
@@ -189,12 +205,6 @@ export default function TimeTableDash() {
     setEditingTimetable(null);
     setDrawerVisible(false);
   };
-
-  // Filter timetables based on selected type
-  const filteredTimetables = useMemo(() => {
-    if (!filterType) return timetables;
-    return timetables.filter((tt) => tt.type === filterType);
-  }, [timetables, filterType]);
 
   // Check if event is within validity period for weekly types
   const isWithinValidity = (timetable, currentDate) => {
@@ -437,7 +447,99 @@ export default function TimeTableDash() {
     printWindow.document.write(printContent);
     printWindow.document.close();
   };
+  // Fetch data on mount and when filters change
+  useEffect(() => {
+    dispatch(fetchTimetableList());
+    dispatch(fetchAllClasses());
+  }, [dispatch]);
+  // Fetch sections,subjects,semesters when class is selected
+  useEffect(() => {
+    if (filters.class) {
+      console.log(filters, "filtersfilters");
+      dispatch(fetchSectionsNamesByClass(filters.class));
+      dispatch(fetchSemestersByClass(filters.class));
+      dispatch(fetchSubjects(filters.class));
+    } else {
+      dispatch(fetchSectionsNamesByClass(null));
+      dispatch(fetchSemestersByClass(null));
+      dispatch(fetchSubjects(null));
+    }
+  }, [dispatch, filters.class]);
 
+  // Fetch groups when class or section changes
+  useEffect(() => {
+    if (filters.class && filters.section) {
+      dispatch(fetchGroupsByClassAndSection(filters.class, filters.section));
+    } else if (filters.class) {
+      dispatch(fetchGroupsByClass(filters.class));
+    } else {
+      dispatch(fetchGroupsByClass(null));
+    }
+  }, [dispatch, filters.class, filters.section]);
+  // Filter timetables based on selected filters
+  const filteredTimetables = useMemo(() => {
+    let result = timetables;
+
+    // Filter by type if selected
+    if (filterType) {
+      result = result.filter((tt) => tt.type === filterType);
+    }
+
+    // Apply other filters
+    if (filters.class) {
+      result = result.filter((tt) => tt.classId?._id === filters.class);
+    }
+    if (filters.section) {
+      result = result.filter((tt) =>
+        tt.sectionId?.some((section) => section._id === filters.section)
+      );
+    }
+    if (filters.group) {
+      result = result.filter((tt) =>
+        tt.groupId?.some((group) => group._id === filters.group)
+      );
+    }
+    if (filters.subject) {
+      result = result.filter((tt) =>
+        tt.days?.some((day) =>
+          day.slots?.some((slot) => slot.subjectId?._id === filters.subject)
+        )
+      );
+    }
+    if (filters.semester) {
+      result = result.filter((tt) => tt.semesterId?._id === filters.semester);
+    }
+
+    return result;
+  }, [timetables, filterType, filters]);
+  // Handle filter changes
+  const handleFilterChange = (filterName, value) => {
+    setFilters((prev) => {
+      const newFilters = { ...prev, [filterName]: value };
+
+      // Reset dependent filters when parent filter changes
+      if (filterName === "class") {
+        newFilters.section = null;
+        newFilters.group = null;
+      } else if (filterName === "section") {
+        newFilters.group = null;
+      }
+
+      return newFilters;
+    });
+  };
+
+  // Clear all filters
+  const clearAllFilters = () => {
+    setFilters({
+      class: null,
+      section: null,
+      group: null,
+      subject: null,
+      semester: null,
+    });
+    setFilterType(null);
+  };
   // --------------------------------------------
   // 9) Month View: dateCellRender
   // --------------------------------------------
@@ -1026,59 +1128,140 @@ export default function TimeTableDash() {
         }`}
       >
         {/* HEADER */}
-        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Timetable Calendar
-          </h2>
-
-          <div className="flex items-center gap-2 flex-wrap">
-            <Button
-              type="default"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="md:hidden"
-            >
-              {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
-            </Button>
-
-            <Radio.Group
-              value={viewMode}
-              onChange={(e) => setViewMode(e.target.value)}
-              className="mr-3"
-            >
-              <Radio.Button value="day">Day</Radio.Button>
-              <Radio.Button value="week">Week</Radio.Button>
-              <Radio.Button value="month">Month</Radio.Button>
-            </Radio.Group>
-
-            <Space>
-              <Popover
-                content={
-                  <div className="flex flex-col">
-                    <Button
-                      icon={<AiOutlineFilePdf />}
-                      onClick={handleExportPDF}
-                      className="mb-2"
-                    >
-                      Export as PDF
-                    </Button>
-                    <Button icon={<AiOutlinePrinter />} onClick={handlePrint}>
-                      Print
-                    </Button>
-                  </div>
-                }
-                trigger="click"
-                placement="bottomRight"
-              >
-                <Button>Export</Button>
-              </Popover>
+        <div className="flex flex-col gap-4 mb-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <Button
-                type="primary"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
-                onClick={() => openDrawer(null)}
+                type="default"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="md:hidden"
+                icon={<AiOutlineFilter />}
               >
-                + Add Timetable
+                {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
               </Button>
-            </Space>
+
+              <Radio.Group
+                value={viewMode}
+                onChange={(e) => setViewMode(e.target.value)}
+                className="mr-3"
+                buttonStyle="solid"
+              >
+                <Radio.Button value="day">Day</Radio.Button>
+                <Radio.Button value="week">Week</Radio.Button>
+                <Radio.Button value="month">Month</Radio.Button>
+              </Radio.Group>
+
+              <Space>
+                <Popover
+                  content={
+                    <div className="flex flex-col">
+                      <Button
+                        icon={<AiOutlineFilePdf />}
+                        onClick={handleExportPDF}
+                        className="mb-2"
+                      >
+                        Export as PDF
+                      </Button>
+                      <Button icon={<AiOutlinePrinter />} onClick={handlePrint}>
+                        Print
+                      </Button>
+                    </div>
+                  }
+                  trigger="click"
+                  placement="bottomRight"
+                >
+                  <Button>Export</Button>
+                </Popover>
+                <Button
+                  type="primary"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
+                  onClick={() => openDrawer(null)}
+                >
+                  + Add Timetable
+                </Button>
+              </Space>
+            </div>
+          </div>
+
+          {/* FILTER ROW */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <Select
+              placeholder="Select Class"
+              style={{ width: 180 }}
+              value={filters.class}
+              onChange={(value) => handleFilterChange("class", value)}
+              options={classList.map((c) => ({
+                value: c._id,
+                label: c.className,
+              }))}
+              allowClear
+            />
+
+            <Select
+              placeholder="Select Section"
+              style={{ width: 180 }}
+              value={filters.section}
+              onChange={(value) => handleFilterChange("section", value)}
+              options={sectionList.map((s) => ({
+                value: s._id,
+                label: s.sectionName,
+              }))}
+              disabled={!filters.class}
+              allowClear
+            />
+
+            <Select
+              placeholder="Select Group"
+              style={{ width: 180 }}
+              value={filters.group}
+              onChange={(value) => handleFilterChange("group", value)}
+              options={groupsList.map((g) => ({
+                value: g._id,
+                label: g.groupName,
+              }))}
+              disabled={!filters.class}
+              allowClear
+            />
+
+            <Select
+              placeholder="Select Subject"
+              style={{ width: 180 }}
+              value={filters.subjectName}
+              onChange={(value) => handleFilterChange("subjectName", value)}
+              options={allSubjects.map((s) => ({
+                value: s._id,
+                label: s.subjectName,
+              }))}
+              allowClear
+            />
+
+            <Select
+              placeholder="Select Semester"
+              style={{ width: 180 }}
+              value={filters.semester}
+              onChange={(value) => handleFilterChange("semester", value)}
+              options={reduxSemesters.map((s) => ({
+                value: s._id,
+                label: s.title,
+              }))}
+              allowClear
+            />
+
+            <Button
+              type="text"
+              danger
+              onClick={clearAllFilters}
+              disabled={
+                !filters.class &&
+                !filters.section &&
+                !filters.group &&
+                !filters.subject &&
+                !filters.semester &&
+                !filterType
+              }
+            >
+              Clear Filters
+            </Button>
           </div>
         </div>
 
@@ -1140,7 +1323,7 @@ export default function TimeTableDash() {
             <>
               <div>
                 <h3 className="text-lg font-semibold mb-3">Stats & Filters</h3>
-                {renderLegend()}
+                {/* {renderLegend()} */}
                 {renderStatsSection()}
                 <Divider />
                 <div className="border rounded p-4 mb-4">
