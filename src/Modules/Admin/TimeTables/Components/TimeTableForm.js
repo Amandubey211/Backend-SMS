@@ -20,13 +20,14 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import DaySlotFields from "./DaySlotFields";
 import dayjs from "dayjs";
-import moment from "moment"; // <-- Import moment for RangePicker compatibility
+import moment from "moment";
 import {
   fetchGroupsByClass,
   fetchGroupsByClassAndSection,
   fetchSectionsNamesByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchSubjects } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
+import { fetchSemestersByClass } from "../../../../Store/Slices/Admin/Class/Semester/semesterThunks";
 
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -35,7 +36,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [timetableType, setTimetableType] = useState(null);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
 
   // Data from Redux
   const classList = useSelector((state) => state.admin.class.classes);
@@ -62,13 +63,11 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         status,
       } = editingTimetable;
 
-      // Convert validity dates using moment
       const convertedValidity =
         validity?.startDate && validity?.endDate
           ? [moment(validity.startDate), moment(validity.endDate)]
           : [];
 
-      // Convert any date fields in the days array and their slots
       const convertedDays = (days || []).map((dayItem) => {
         const newDay = { ...dayItem };
         if (newDay.date) {
@@ -83,7 +82,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             if (newSlot.endTime) {
               newSlot.endTime = moment(newSlot.endTime);
             }
-            // Preload subject by extracting _id from the subjectId object if available
             if (newSlot.subjectId && typeof newSlot.subjectId === "object") {
               newSlot.subjectId = newSlot.subjectId._id;
             }
@@ -93,25 +91,23 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         return newDay;
       });
 
-      // Preload select fields by extracting _id from nested objects if available
       form.setFieldsValue({
         name: editingTimetable.name,
         type: editingTimetable.type,
         validity: convertedValidity,
-        classId: classId?._id || undefined, // Preload classId as _id
-        sectionId: sectionId?.map((section) => section?._id) || [], // Preload sectionIds
-        groupId: groupId?.map((group) => group?._id) || [], // Preload groupIds
-        semesterId: semesterId?._id || undefined, // Preload semesterId as _id
+        classId: classId?._id || undefined,
+        sectionId: sectionId?.map((section) => section?._id) || [],
+        groupId: groupId?.map((group) => group?._id) || [],
+        semesterId: semesterId?._id || undefined,
         days: convertedDays,
-        status: status === "active", // Preload the status correctly (true for active, false for inactive)
+        status: status === "active",
       });
 
-      // Fetch sections, groups, and semester if classId exists
       if (classId?._id) {
-        // Fetch sections, groups, and subjects based on the classId
         dispatch(fetchSectionsNamesByClass(classId._id));
         dispatch(fetchGroupsByClass(classId._id));
         dispatch(fetchSubjects(classId._id));
+        dispatch(fetchSemestersByClass(classId._id)); // Fetch semesters when editing
       }
 
       setTimetableType(editingTimetable.type);
@@ -123,17 +119,19 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
 
   const isEdit = !!editingTimetable;
 
-  // CLASS change handler
   const handleClassChange = (classId) => {
-    form.setFieldsValue({ sectionId: [], groupId: [] });
+    form.setFieldsValue({ sectionId: [], groupId: [], semesterId: undefined });
     if (classId) {
       dispatch(fetchSectionsNamesByClass(classId));
       dispatch(fetchGroupsByClass(classId));
       dispatch(fetchSubjects(classId));
+      dispatch(fetchSemestersByClass(classId)); // Fetch semesters when class changes
+    } else {
+      // Clear semester options if no class is selected
+      form.setFieldsValue({ semesterId: undefined });
     }
   };
 
-  // SECTION change handler
   const handleSectionChange = (sectionIds) => {
     const classId = form.getFieldValue("classId");
     form.setFieldsValue({ groupId: [] });
@@ -156,7 +154,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
       groupId: values.groupId || [],
       semesterId: values.semesterId || null,
       days: values.days || [],
-      status: values.status ? "active" : "inactive", // Pass the status value
+      status: values.status ? "active" : "inactive",
     };
     setLoading(true);
     Promise.resolve(onSubmit(timetableData, isEdit)).finally(() =>
@@ -171,7 +169,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
       onFinish={handleFinish}
       requiredMark={false}
     >
-      {/* Timetable Name and Status toggle switch in one row */}
       <Row gutter={16} align="middle">
         <Col span={21}>
           <Form.Item
@@ -186,8 +183,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             <Input placeholder="e.g. Midterm Exam Schedule" size="large" />
           </Form.Item>
         </Col>
-
-        {/* Status toggle next to Timetable Name */}
         <Col span={3}>
           <Form.Item
             label={
@@ -197,7 +192,7 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             }
             name="status"
             valuePropName="checked"
-            initialValue={false} // default value (inactive)
+            initialValue={false}
           >
             <Switch
               checkedChildren="Active"
@@ -209,7 +204,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
         </Col>
       </Row>
       <Row gutter={16}>
-        {/* Type */}
         <Col span={12}>
           <Form.Item
             label={
@@ -232,8 +226,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             </Select>
           </Form.Item>
         </Col>
-
-        {/* Validity Period */}
         <Col span={12}>
           <Form.Item
             label={
@@ -248,7 +240,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           </Form.Item>
         </Col>
       </Row>
-      {/* Class - Section */}
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
@@ -299,7 +290,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           </Form.Item>
         </Col>
       </Row>
-      {/* Group - Semester */}
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
@@ -333,7 +323,12 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
             }
             name="semesterId"
           >
-            <Select size="large" placeholder="Select Semester" allowClear>
+            <Select
+              size="large"
+              placeholder="Select Semester"
+              allowClear
+              disabled={!form.getFieldValue("classId")}
+            >
               {reduxSemesters?.map((sem) => (
                 <Option key={sem._id} value={sem._id}>
                   {sem.title}
@@ -343,7 +338,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           </Form.Item>
         </Col>
       </Row>
-      {/* Days + Slots sub-component wrapped with validation */}
       <Form.Item
         name="days"
         rules={[
@@ -366,7 +360,6 @@ export default function TimeTableForm({ editingTimetable, onSubmit, onClose }) {
           allSubjects={allSubjects}
         />
       </Form.Item>
-      {/* Form Footer with Cancel and Submit Buttons */}
       <div className="flex justify-between mt-6">
         <Button onClick={onClose} size="large" className="px-3 py-2">
           Cancel
