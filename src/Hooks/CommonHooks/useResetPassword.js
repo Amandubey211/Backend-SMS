@@ -10,10 +10,20 @@ export const useForgotPassword = () => {
     setLoading(true);
     try {
       const response = await forgotPassword(email, role);
-      toast.success('Check your email to reset your password!');
-      return response.data;
+      console.log('response', response)
+      if (response.data.success) {
+        toast.success('Check your email to reset your password!');
+        return response.data;
+      } else {
+        // Handle the case where success is false
+        const errorMessage = response.data.msg || "Failed to reset password. Please try again.";
+        toast.error(errorMessage);
+        throw new Error(errorMessage); // Throw error to handle it in the catch block
+      }
     } catch (error) {
-      
+      console.log('error', error);
+      const errorMessage = error?.msg || "Something went wrong. Please try again.";
+      toast.error(errorMessage); // Display error toast
       throw error;
     } finally {
       setLoading(false);

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Logo from "../../../../../Components/Common/Logo";
 import { LuLoader } from "react-icons/lu";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -9,10 +9,42 @@ import { useForgotPassword } from "../../../../../Hooks/CommonHooks/useResetPass
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState("");
+  const [timer, setTimer] = useState(0); // timer in seconds
+  const [hasSubmitted, setHasSubmitted] = useState(false);
   const { loading, sendForgotPassword } = useForgotPassword();
   const navigate = useNavigate();
   const location = useLocation();
   const { role } = location.state;
+
+  // On mount, check localStorage for an existing timer end time.
+  useEffect(() => {
+    const timerEnd = localStorage.getItem("forgetPasswordTimerEnd");
+    if (timerEnd) {
+      const remaining = Math.ceil((parseInt(timerEnd) - Date.now()) / 1000);
+      if (remaining > 0) {
+        setTimer(remaining);
+        setHasSubmitted(true);
+      } else {
+        localStorage.removeItem("forgetPasswordTimerEnd");
+      }
+    }
+  }, []);
+
+  // Countdown effect: decrement timer every second until it reaches 0.
+  useEffect(() => {
+    if (timer <= 0) return;
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          localStorage.removeItem("forgetPasswordTimerEnd");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [timer]);
 
   const handleChange = (e) => {
     setEmail(e.target.value);
@@ -22,19 +54,38 @@ const ForgetPassword = () => {
     e.preventDefault();
     try {
       await sendForgotPassword({ email, role });
-      // navigate('/reset_password');
+      setHasSubmitted(true);
+      // Start a 60-second countdown after successful submission.
+      setTimer(60);
+      localStorage.setItem("forgetPasswordTimerEnd", Date.now() + 60000);
+      // Optionally, if you want to navigate immediately after submission, uncomment:
+      // navigate("/");
     } catch (error) {
+      // Optionally, handle errors here.
       // toast.error(error.msg || "Failed to reset password.");
     }
   };
 
+  // Determine button label
+  let buttonLabel = "Submit";
+  if (loading) {
+    buttonLabel = (
+      <div className="flex justify-center">
+        <LuLoader className="animate-spin text-2xl" />
+      </div>
+    );
+  } else if (timer > 0) {
+    buttonLabel = `Resend after ${timer} seconds`;
+  } else if (hasSubmitted) {
+    buttonLabel = "Resubmit";
+  }
+
   return (
     <Layout title="Forget Password">
-      <div className="relative w-full h-full">
+      <div className="relative w-full h-screen flex justify-center items-center">
         <div className="absolute top-0 right-0 p-6">
           <Logo />
         </div>
-
         <form
           onSubmit={handleSubmit}
           className="flex justify-center w-full h-full"
@@ -62,18 +113,14 @@ const ForgetPassword = () => {
                 required
               />
             </div>
-
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
+              disabled={loading || timer > 0}
+              className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
+                timer > 0 ? "opacity-50 cursor-not-allowed" : "hover:from-pink-600 hover:to-purple-600"
+              }`}
             >
-              {loading ? (
-                <div className="flex justify-center">
-                  <LuLoader className="animate-spin text-2xl" />
-                </div>
-              ) : (
-                "Submit"
-              )}
+              {buttonLabel}
             </button>
           </div>
         </form>
