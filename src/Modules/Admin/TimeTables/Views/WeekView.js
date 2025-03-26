@@ -229,14 +229,17 @@ export default function WeekView({
                               ? `${Math.min(50, 100 / events.length)}%`
                               : "100%";
 
+                          // Ensure the height of each event is distributed properly
+                          const eventHeight = (duration * 64) / events.length;
+
                           return (
                             <div
                               key={evt._id}
                               className="flex-shrink-0 flex flex-col overflow-hidden shadow-sm mx-px"
                               style={{
                                 width: eventWidth,
-                                height: "100%",
-                                minWidth: "150px",
+                                height: `${eventHeight}px`, // Adjust height based on duration and event count
+                                minWidth: "70px",
                               }}
                               onClick={() => onEventClick(evt)}
                             >
