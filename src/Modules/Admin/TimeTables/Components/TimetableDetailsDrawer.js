@@ -273,7 +273,11 @@ const TimetableDetailsDrawer = ({
             >
               Edit
             </Button>
-            <Button danger icon={<AiOutlineDelete />} onClick={onDelete}>
+            <Button
+              danger
+              icon={<AiOutlineDelete />}
+              onClick={() => onDelete(timetable._id)} // Pass just the ID
+            >
               Delete
             </Button>
           </div>

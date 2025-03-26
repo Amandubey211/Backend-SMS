@@ -42,14 +42,20 @@ export default function MonthView({
           className="absolute top-1 right-1 w-2 h-2 rounded-full"
           style={{ backgroundColor: bgColor }}
         />
-        {matched.slice(0, 3).map((evt) => {
+        {matched.map((evt) => {
           const firstSlot = evt.days?.find(
             (d) =>
               d.day === currentDayjs.format("dddd") ||
               (d.date && dayjs(d.date).format("YYYY-MM-DD") === dateString)
           )?.slots?.[0];
-          const displayText =
+
+          let displayText =
             firstSlot?.subjectId?.name || firstSlot?.eventName || evt.name;
+
+          // Add class name if available
+          if (evt.classId?.className) {
+            displayText += ` (${evt.classId.className})`;
+          }
 
           return (
             <Tooltip
@@ -74,18 +80,6 @@ export default function MonthView({
             </Tooltip>
           );
         })}
-        {matched.length > 3 && (
-          <Badge
-            count={`+${matched.length - 3}`}
-            style={{
-              backgroundColor: "#666",
-              fontSize: "10px",
-              padding: "0 4px",
-              lineHeight: "16px",
-              height: "16px",
-            }}
-          />
-        )}
       </div>
     );
   };

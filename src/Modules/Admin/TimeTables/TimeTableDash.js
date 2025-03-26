@@ -249,19 +249,28 @@ export default function TimeTableDash() {
     setDetailsTimetable(null);
   };
 
-  const onDeleteClick = (timetable) => {
-    setEditingTimetable(timetable);
+  const onDeleteClick = (timetableId) => {
     setDeleteModalVisible(true);
+    // Store just the ID in state
+    setEditingTimetable({ _id: timetableId });
   };
 
+  // Update the confirmDelete function:
   const confirmDelete = () => {
-    if (editingTimetable) {
-      dispatch(deleteTT(editingTimetable?._id));
+    console.log(editingTimetable, "editingTimetableeditingTimetable");
+    if (editingTimetable?._id) {
+      dispatch(deleteTT(editingTimetable._id))
+        .unwrap()
+        .then(() => {
+          setDeleteModalVisible(false);
+          closeDetailsDrawer();
+          setEditingTimetable(null);
+          closeDrawer();
+        })
+        .catch((error) => {
+          console.error("Failed to delete timetable:", error);
+        });
     }
-    setEditingTimetable(null);
-    setDeleteModalVisible(false);
-    closeDetailsDrawer();
-    closeDrawer();
   };
 
   const handleFormSubmit = (values, isEdit) => {
@@ -356,7 +365,24 @@ export default function TimeTableDash() {
         {loadingFetch ? (
           <div className="space-y-4">
             {/* Skeleton Loaders */}
-            {/* ... (keep your existing skeleton loaders) ... */}
+            <div className="flex items-center justify-between mb-4">
+              <Skeleton.Button active size="large" shape="round" />
+              <div className="flex gap-2">
+                <Skeleton.Button active size="large" shape="round" />
+                <Skeleton.Button active size="large" shape="round" />
+                <Skeleton.Button active size="large" shape="round" />
+              </div>
+            </div>
+
+            {viewMode === "month" && (
+              <div className="grid grid-cols-7 gap-1">
+                {[...Array(35)].map((_, i) => (
+                  <div key={i} className="border rounded p-2 h-24">
+                    <Skeleton active paragraph={{ rows: 2 }} />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
           <AnimatePresence mode="wait">
@@ -392,8 +418,44 @@ export default function TimeTableDash() {
         <div className="w-72 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
           {loadingFetch ? (
             <div className="space-y-4">
-              {/* Skeleton Loaders */}
-              {/* ... (keep your existing skeleton loaders) ... */}
+              <Skeleton.Input active size="default" style={{ width: 150 }} />
+              <div className="flex flex-col gap-2">
+                <Skeleton.Button active block size="large" />
+                <Skeleton.Button active block size="large" />
+              </div>
+              <div className="space-y-2">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="border-l-4 p-2 h-[60px] flex items-center justify-between"
+                  >
+                    <div className="flex items-center">
+                      <Skeleton.Avatar
+                        active
+                        size={32}
+                        shape="square"
+                        className="mr-2"
+                      />
+                      <Skeleton.Input
+                        active
+                        size="small"
+                        style={{ width: 80 }}
+                      />
+                    </div>
+                    <Skeleton.Input active size="small" style={{ width: 30 }} />
+                  </div>
+                ))}
+              </div>
+              <div className="border rounded p-4">
+                <Skeleton.Input
+                  active
+                  size="default"
+                  style={{ width: 150, margin: "0 auto" }}
+                />
+                <div className="flex justify-center mt-4">
+                  <Skeleton.Avatar active size={200} shape="circle" />
+                </div>
+              </div>
             </div>
           ) : (
             <div>
@@ -481,7 +543,7 @@ export default function TimeTableDash() {
           closeDetailsDrawer();
           openDrawer(detailsTimetable);
         }}
-        onDelete={onDeleteClick}
+        onDelete={(id) => onDeleteClick(id)} // Pass just the ID
       />
 
       <Modal
