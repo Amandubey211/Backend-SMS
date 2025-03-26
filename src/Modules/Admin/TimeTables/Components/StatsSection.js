@@ -146,7 +146,7 @@ export default function StatsSection({
         </div>
 
         {isAnyFilterApplied && (
-          <Button className="w-full ms-2"  onClick={onClearFilters}>
+          <Button className="w-full ms-2" onClick={onClearFilters}>
             Clear All
           </Button>
         )}

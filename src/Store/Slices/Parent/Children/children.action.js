@@ -1,24 +1,18 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { baseUrl } from "../../../../config/Common";
 import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
-import { ErrorMsg, handleError } from "../../Common/Alerts/errorhandling.action";
+import {
+  ErrorMsg,
+  handleError,
+} from "../../Common/Alerts/errorhandling.action";
 import axios from "axios";
 import { getAY } from "../../../../Utils/academivYear";
 import { getData } from "../../../../services/apiEndpoints";
-
 
 // Thunk to fetch children
 export const fetchChildren = createAsyncThunk(
   "dashboard/fetchChildren",
   async (_, { rejectWithValue, dispatch }) => {
-    // const userData = JSON.parse(localStorage.getItem("userData"));
-
-    // if (!userData || !userData.email) {
-    //   dispatch(setShowError(true));
-    //   dispatch(setErrorMsg("No guardian email found"));
-    //   return rejectWithValue("No guardian email found");
-    // }
-
     try {
       const say = getAY();
       dispatch(setShowError(false));
@@ -45,7 +39,6 @@ export const fetchAttendance = createAsyncThunk(
     }
   }
 );
-
 
 // Thunk to fetch teachers
 export const fetchTeachers = createAsyncThunk(
@@ -100,7 +93,9 @@ export const fetchModules = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(`/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}?say=${say}`);
+      const data = await getData(
+        `/admin/parent/classes/${presentClassId}/modules/${subjectId}/studentId/${studentId}?say=${say}`
+      );
       // console.log("mmm------->>>",data)
       return data?.data?.modules;
     } catch (error) {

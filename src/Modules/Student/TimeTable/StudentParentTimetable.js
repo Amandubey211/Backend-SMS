@@ -4,6 +4,7 @@ import Layout from "../../../Components/Common/Layout";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStudentTimetable } from "../../../Store/Slices/Student/TimeTable/studentTimeTable.action";
+import { fetchParentTimetable } from "../../../Store/Slices/Parent/TimeTable/parentTimeTable.action";
 import {
   Radio,
   Button,
@@ -14,6 +15,7 @@ import {
   Tag,
   Drawer,
   Table,
+  Avatar,
 } from "antd";
 import {
   AiOutlineFilePdf,
@@ -28,27 +30,45 @@ import {
   CalendarOutlined,
   BookOutlined,
   TeamOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-// Components
 import NavigationControls from "../../Admin/TimeTables/Components/NavigationControls";
 import DayView from "../../Admin/TimeTables/Views/DayView";
 import WeekView from "../../Admin/TimeTables/Views/WeekView";
 import MonthView from "../../Admin/TimeTables/Views/MonthView";
-// Utils
 import { format } from "date-fns";
 import ExportFunctions from "../../../Utils/timetableUtils";
+import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
+import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
 const StudentTimetablePage = () => {
   const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
   const role = useSelector((store) => store.common.auth.role);
+  const { userDetails } = useSelector((store) => store.common.user);
 
-  const { timetables = [], loading: loadingFetch } = useSelector(
-    (state) => state.student.studentTimetable
+  // For parent role - children data
+  const { children = [], loading: loadingChildren } = useSelector(
+    (state) => state.Parent.children
   );
+  const [selectedChildId, setSelectedChildId] = useState(null);
 
-  const studentInfo = useSelector((state) => state.student.info) || {};
+  // Select timetable data based on role
+  const studentTimetableData = useSelector(
+    (state) => state.student?.studentTimetable
+  );
+  const parentTimetableData = useSelector(
+    (state) => state.Parent?.parentTimetable.timetables
+  );
+  console.log(parentTimetableData.timetables, "parentTimetableData");
+  const { timetables = [], loading: loadingFetch } =
+    role === "student"
+      ? studentTimetableData
+      : role === "parent"
+      ? parentTimetableData
+      : { timetables: [], loading: false };
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
   const [filterType, setFilterType] = useState(null);
@@ -60,33 +80,72 @@ const StudentTimetablePage = () => {
   useNavHeading(role, t("TimeTable"));
 
   useEffect(() => {
-    dispatch(fetchStudentTimetable());
-  }, [dispatch]);
+    if (role === "student") {
+      dispatch(fetchStudentTimetable());
+    } else if (role === "parent") {
+      dispatch(fetchChildren(userDetails.userId));
+    }
+  }, [dispatch, role, userDetails.userId]);
 
-  // Get student's class and sections for filtering
-  const studentClassId = studentInfo.classId?._id;
-  const studentSectionIds = studentInfo.sections?.map((s) => s._id) || [];
+  // When children data is loaded for parent, select first child by default
+  useEffect(() => {
+    if (role === "parent" && children.length > 0 && !selectedChildId) {
+      setSelectedChildId(children[0].id);
+    }
+  }, [children, role, selectedChildId]);
+
+  // Fetch timetable for selected child when it changes
+  useEffect(() => {
+    if (role === "parent" && selectedChildId) {
+      dispatch(fetchParentTimetable(selectedChildId));
+    }
+  }, [dispatch, role, selectedChildId]);
+
+  // Get student's/parent's class and sections for filtering
+  const getFilterInfo = () => {
+    if (role === "student") {
+      return {
+        classId: userDetails.classId,
+        sections: [], // Student may not have section info in userDetails
+      };
+    } else if (role === "parent" && selectedChildId) {
+      const selectedChild = children.find(
+        (child) => child.id === selectedChildId
+      );
+      return {
+        classId: selectedChild?.presentClassId,
+        sections: selectedChild?.section ? [selectedChild.section] : [],
+      };
+    }
+    return { classId: null, sections: [] };
+  };
+  console.log(selectedChildId, "selectedChildId");
+
+  const { classId, sections } = getFilterInfo();
 
   const filteredTimetables = useMemo(() => {
-    let result = timetables;
+    let result = timetables || [];
 
     // Filter by type if selected
-    if (filterType) result = result.filter((tt) => tt.type === filterType);
+    if (filterType) result = result?.filter((tt) => tt.type === filterType);
 
-    // Filter by student's class
-    if (studentClassId) {
-      result = result.filter((tt) => tt.classId?._id === studentClassId);
+    // Filter by class
+    console.log(classId,"sdfsdfsdfsdfsdfsdfsdfsdf")
+    if (classId) {
+      result = result.filter((tt) => tt.classId?._id === classId);
     }
 
-    // Filter by student's sections if available
-    if (studentSectionIds.length > 0) {
+    // Filter by sections if available
+    if (sections.length > 0) {
       result = result.filter((tt) =>
-        tt.sectionId?.some((section) => studentSectionIds.includes(section._id))
+        tt.sectionId?.some((section) => sections.includes(section._id))
       );
     }
 
     return result;
-  }, [timetables, filterType, studentClassId, studentSectionIds]);
+  }, [timetables, filterType, classId, sections]);
+
+  console.log(filteredTimetables, "sdfsdf");
 
   const exportFunctions = new ExportFunctions({
     viewMode,
@@ -170,9 +229,13 @@ const StudentTimetablePage = () => {
     },
   ];
 
+  // Get the appropriate dashboard layout based on role
+  const DashboardLayout =
+    role === "student" ? StudentDashLayout : ParentDashLayout;
+
   return (
     <Layout title="TimeTable | Student Diwan">
-      <StudentDashLayout>
+      <DashboardLayout>
         <div className="w-full min-h-screen flex">
           {/* Main Content */}
           <div
@@ -180,6 +243,43 @@ const StudentTimetablePage = () => {
               sidebarCollapsed ? "mr-0" : "mr-72"
             }`}
           >
+            {/* Children selector for parent role */}
+            {role === "parent" && children.length > 0 && (
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-600 mb-2">
+                  {t("Select Child")}
+                </h4>
+                <div className="flex flex-wrap gap-3">
+                  {children.map((child) => (
+                    <Card
+                      key={child.id}
+                      onClick={() => setSelectedChildId(child.id)}
+                      className={`cursor-pointer transition-all ${
+                        selectedChildId === child.id
+                          ? "border-blue-500 border-2"
+                          : "border-gray-200"
+                      }`}
+                      bodyStyle={{ padding: "12px" }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          src={child.profile}
+                          icon={<UserOutlined />}
+                          size="large"
+                        />
+                        <div>
+                          <div className="font-medium">{child.name}</div>
+                          <div className="text-xs text-gray-600">
+                            {child.class} • {child.section}
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Header and Controls */}
             <div className="flex flex-col gap-4 mb-4">
               <div className="flex items-center justify-between flex-wrap gap-2">
@@ -220,7 +320,7 @@ const StudentTimetablePage = () => {
             />
 
             {/* Loading State */}
-            {loadingFetch ? (
+            {loadingFetch || (role === "parent" && loadingChildren) ? (
               <div className="space-y-4">
                 <Skeleton active paragraph={{ rows: 10 }} />
               </div>
@@ -256,7 +356,7 @@ const StudentTimetablePage = () => {
           {/* Stats Sidebar */}
           {!sidebarCollapsed && (
             <div className="w-72 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
-              {loadingFetch ? (
+              {loadingFetch || (role === "parent" && loadingChildren) ? (
                 <div className="space-y-4">
                   <Skeleton.Input
                     active
@@ -398,40 +498,62 @@ const StudentTimetablePage = () => {
                     )}
                   </div>
 
-                  {/* Student Info */}
+                  {/* User Info */}
                   <div className="border rounded p-4">
                     <h4 className="font-semibold mb-2">
-                      {t("Your Schedule Info")}
+                      {role === "student"
+                        ? t("Your Schedule Info")
+                        : selectedChildId
+                        ? t("Child's Schedule Info")
+                        : t("Schedule Info")}
                     </h4>
                     <div className="space-y-2">
-                      <div>
-                        <span className="text-gray-600 text-sm">
-                          {t("Class:")}
-                        </span>
-                        <Tag color="blue" className="ml-2">
-                          {studentInfo.classId?.className || t("No Class")}
-                        </Tag>
-                      </div>
-                      <div>
-                        <span className="text-gray-600 text-sm">
-                          {t("Sections:")}
-                        </span>
-                        {studentInfo.sections?.length > 0 ? (
-                          studentInfo.sections.map((section) => (
-                            <Tag
-                              key={section._id}
-                              color="purple"
-                              className="ml-2"
-                            >
-                              {section.sectionName}
+                      {role === "student" ? (
+                        <>
+                          <div>
+                            <span className="text-gray-600 text-sm">
+                              {t("Class:")}
+                            </span>
+                            <Tag color="blue" className="ml-2">
+                              {userDetails.className || t("No Class")}
                             </Tag>
-                          ))
-                        ) : (
-                          <Tag color="purple" className="ml-2">
-                            {t("No Sections")}
-                          </Tag>
-                        )}
-                      </div>
+                          </div>
+                        </>
+                      ) : selectedChildId ? (
+                        <>
+                          <div>
+                            <span className="text-gray-600 text-sm">
+                              {t("Child:")}
+                            </span>
+                            <Tag color="blue" className="ml-2">
+                              {children.find((c) => c.id === selectedChildId)
+                                ?.name || t("No Child Selected")}
+                            </Tag>
+                          </div>
+                          <div>
+                            <span className="text-gray-600 text-sm">
+                              {t("Class:")}
+                            </span>
+                            <Tag color="blue" className="ml-2">
+                              {children.find((c) => c.id === selectedChildId)
+                                ?.class || t("No Class")}
+                            </Tag>
+                          </div>
+                          <div>
+                            <span className="text-gray-600 text-sm">
+                              {t("Section:")}
+                            </span>
+                            <Tag color="purple" className="ml-2">
+                              {children.find((c) => c.id === selectedChildId)
+                                ?.section || t("No Section")}
+                            </Tag>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-gray-500 text-sm">
+                          {t("No child selected")}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -654,7 +776,7 @@ const StudentTimetablePage = () => {
             </div>
           </Drawer>
         )}
-      </StudentDashLayout>
+      </DashboardLayout>
     </Layout>
   );
 };
