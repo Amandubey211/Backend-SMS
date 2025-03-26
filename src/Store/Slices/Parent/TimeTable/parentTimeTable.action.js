@@ -11,11 +11,9 @@ export const fetchParentTimetable = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(
-        `/parent/api/timetable?say=${say}`
-      );
+      const response = await getData(`/parent/api/timetable?say=${say}`);
       // console.log('API Response:', response);  // Log the response to verify structure
-      return response; // Ensure response is in the expected format
+      return response || []; // Ensure response is in the expected format
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

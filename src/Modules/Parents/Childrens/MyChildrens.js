@@ -23,6 +23,7 @@ const MyChildren = () => {
   const userId = useSelector((state) => state.common.user.userDetails.userId);
 
   // Fetch children on mount
+  console.log(children,"children")
   useEffect(() => {
     if (userId) {
       dispatch(fetchChildren(userId));

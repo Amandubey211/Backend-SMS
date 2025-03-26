@@ -22,15 +22,28 @@ export default function WeekView({
     return d;
   });
 
-  // Time slots from 8AM to 8PM
-  const timeSlots = Array.from({ length: 13 }, (_, i) => i + 8);
+  // Full 24-hour timeline
+  const timeSlots = Array.from({ length: 24 }, (_, i) => i);
+  const hourHeight = 64; // Fixed height for each hour slot
 
-  // Function to calculate cell height based on duration
-  const calculateCellHeight = (startTime, endTime) => {
-    if (!startTime || !endTime) return 1;
-    const duration =
-      (new Date(endTime) - new Date(startTime)) / (1000 * 60 * 60);
-    return Math.max(1, Math.round(duration));
+  // Function to calculate exact event position and height
+  const calculateEventPosition = (startTime, endTime) => {
+    if (!startTime || !endTime) return { height: hourHeight, top: 0 };
+
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+
+    // Calculate minutes from start of day
+    const startMinutes = start.getHours() * 60 + start.getMinutes();
+    const endMinutes = end.getHours() * 60 + end.getMinutes();
+
+    const top = (startMinutes / 60) * hourHeight;
+    const height = ((endMinutes - startMinutes) / 60) * hourHeight;
+
+    return {
+      height: Math.max(hourHeight / 4, height), // Minimum height of 15 minutes
+      top,
+    };
   };
 
   return (
@@ -61,17 +74,23 @@ export default function WeekView({
       </div>
 
       <div className="flex min-w-max bg-white rounded-lg shadow">
-        {/* Time column */}
-        <div className="w-16 mt-6 flex-shrink-0">
-          <div className="h-10 border-b border-gray-200 flex justify-center text-2xl">
+        {/* Time column - Full 24-hour timeline */}
+        <div
+          className="w-16 flex-shrink-0 mt-6"
+          style={{ height: `${24 * hourHeight + 40}px` }}
+        >
+          <div className="h-10  border-gray-200 flex justify-center text-2xl">
             <TfiTime />
           </div>
           {timeSlots.map((hour) => (
             <div
               key={hour}
-              className="h-16 border-b border-gray-200 flex items-start justify-end pr-2 text-xs text-gray-500"
+              className="flex border items-start justify-end pr-2 text-xs text-gray-500"
+              style={{ height: `${hourHeight}px` }}
             >
-              {hour < 12
+              {hour === 0
+                ? "12 AM"
+                : hour < 12
                 ? `${hour} AM`
                 : hour === 12
                 ? "12 PM"
@@ -85,16 +104,6 @@ export default function WeekView({
           {/* Day headers */}
           {daysInWeek.map((day) => {
             const dayString = format(day, "yyyy-MM-dd");
-            const dayEvents = filteredTimetables.filter((tt) => {
-              if (tt.type === "weekly") {
-                if (!isWithinValidity(tt, day)) return false;
-                return tt.days?.some((d) => d.day === format(day, "EEEE"));
-              }
-              return tt.days?.some(
-                (d) =>
-                  d.date && format(new Date(d.date), "yyyy-MM-dd") === dayString
-              );
-            });
             const isToday =
               format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
 
@@ -119,172 +128,182 @@ export default function WeekView({
             );
           })}
 
-          {/* Time slots */}
-          {timeSlots.map((hour) => (
-            <React.Fragment key={hour}>
-              {daysInWeek.map((day) => {
-                const dayString = format(day, "yyyy-MM-dd");
-                const events = filteredTimetables.filter((tt) => {
-                  if (tt.type === "weekly") {
-                    if (!isWithinValidity(tt, day)) return false;
-                    return tt.days?.some(
-                      (d) =>
-                        d.day === format(day, "EEEE") &&
-                        d.slots?.some(
-                          (slot) => new Date(slot.startTime).getHours() === hour
-                        )
-                    );
-                  }
-                  return tt.days?.some(
-                    (d) =>
-                      d.date &&
-                      format(new Date(d.date), "yyyy-MM-dd") === dayString &&
-                      d.slots?.some(
-                        (slot) => new Date(slot.startTime).getHours() === hour
-                      )
-                  );
-                });
+          {/* Time slots container */}
+          <div
+            className="col-span-7 relative"
+            style={{ height: `${24 * hourHeight}px` }}
+          >
+            {/* Background grid lines */}
+            {timeSlots.map((hour) => (
+              <div
+                key={`grid-${hour}`}
+                className="border-b border-gray-200 absolute w-full"
+                style={{
+                  top: `${hour * hourHeight}px`,
+                  height: `${hourHeight}px`,
+                }}
+              ></div>
+            ))}
 
-                // Calculate max duration for this cell
-                const maxDuration = events.reduce((max, evt) => {
-                  const dayData = evt?.days?.find(
-                    (d) =>
-                      d.day === format(day, "EEEE") ||
-                      (d.date &&
-                        format(new Date(d.date), "yyyy-MM-dd") === dayString)
-                  );
-                  const slotData = dayData?.slots?.find(
-                    (s) => new Date(s.startTime).getHours() === hour
-                  );
-                  if (!slotData) return max;
-                  return Math.max(
-                    max,
-                    calculateCellHeight(slotData.startTime, slotData.endTime)
-                  );
-                }, 1);
+            {/* Events */}
+            {daysInWeek.map((day, dayIndex) => {
+              const dayString = format(day, "yyyy-MM-dd");
+              const events = filteredTimetables.flatMap((tt) => {
+                const dayData = tt.days?.find(
+                  (d) =>
+                    d.day === format(day, "EEEE") ||
+                    (d.date &&
+                      format(new Date(d.date), "yyyy-MM-dd") === dayString)
+                );
+
+                if (!dayData) return [];
 
                 return (
-                  <div
-                    key={`${dayString}-${hour}`}
-                    className="h-16 border relative"
-                    style={{
-                      height: `${maxDuration * 64}px`,
-                    }}
-                  >
-                    {/* Badge for multiple events */}
-                    {events.length > 1 && (
-                      <Badge
-                        count={events.length}
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #ff4e8a, #ff80bf)",
-                          position: "absolute",
-                          top: -14,
-                          right: -14,
-                          zIndex: 2,
-                          fontSize: "10px",
-                          height: "16px",
-                          minWidth: "16px",
-                          lineHeight: "16px",
-                          padding: "0 4px",
-                          borderRadius: "4px",
-                        }}
-                      />
-                    )}
-
-                    {/* Events container */}
-                    <Element
-                      name={`${dayString}-${hour}`}
-                      className="absolute inset-0 overflow-x-auto scrollbar-thin"
-                    >
-                      <div className="flex h-full">
-                        {events.map((evt, index) => {
-                          const dayData = evt?.days?.find(
-                            (d) =>
-                              d.day === format(day, "EEEE") ||
-                              (d.date &&
-                                format(new Date(d.date), "yyyy-MM-dd") ===
-                                  dayString)
-                          );
-                          const slotData = dayData?.slots?.find(
-                            (s) => new Date(s.startTime).getHours() === hour
-                          );
-
-                          if (!slotData) return null;
-
-                          const duration = calculateCellHeight(
-                            slotData.startTime,
-                            slotData.endTime
-                          );
-                          const displayText =
-                            slotData?.subjectId?.name ||
-                            slotData?.eventName ||
-                            evt.name;
-                          const color = getColorByType(evt.type);
-                          const darkerColor = darkenColor(color, 20);
-
-                          // Calculate width based on number of events
-                          const eventWidth =
-                            events.length > 1
-                              ? `${Math.min(50, 100 / events.length)}%`
-                              : "100%";
-
-                          // Ensure the height of each event is distributed properly
-                          const eventHeight = (duration * 64) / events.length;
-
-                          return (
-                            <div
-                              key={evt._id}
-                              className="flex-shrink-0 flex flex-col overflow-hidden shadow-sm mx-px"
-                              style={{
-                                width: eventWidth,
-                                height: `${eventHeight}px`, // Adjust height based on duration and event count
-                                minWidth: "70px",
-                              }}
-                              onClick={() => onEventClick(evt)}
-                            >
-                              {/* Header */}
-                              <div
-                                className="px-2 py-1 text-white text-xs font-medium truncate border-b"
-                                style={{ backgroundColor: darkerColor }}
-                              >
-                                {evt.name}
-                              </div>
-
-                              {/* Divider */}
-                              <div
-                                className="h-px w-full"
-                                style={{ backgroundColor: darkerColor }}
-                              />
-
-                              {/* Body */}
-                              <div
-                                className="flex-1 px-2 py-1 text-xs"
-                                style={{ backgroundColor: color }}
-                              >
-                                <div className="text-white font-medium truncate">
-                                  {displayText}
-                                </div>
-                                <div className="text-white text-xxs opacity-80 mt-1">
-                                  {dayjs(slotData.startTime).format("h:mm A")} -{" "}
-                                  {dayjs(slotData.endTime).format("h:mm A")}
-                                </div>
-                                {slotData.teacherId?.name && (
-                                  <div className="text-white text-xxs opacity-80 mt-1">
-                                    {slotData.teacherId.name}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </Element>
-                  </div>
+                  dayData.slots?.map((slot) => ({
+                    ...tt,
+                    slot,
+                    dayIndex,
+                  })) || []
                 );
-              })}
-            </React.Fragment>
-          ))}
+              });
+
+              // Group events by their time slot
+              const eventGroups = {};
+              events.forEach((evt) => {
+                const hour = new Date(evt.slot.startTime).getHours();
+                const key = `${dayIndex}-${hour}`;
+                if (!eventGroups[key]) {
+                  eventGroups[key] = [];
+                }
+                eventGroups[key].push(evt);
+              });
+
+              return (
+                <React.Fragment key={dayString}>
+                  {Object.entries(eventGroups).map(([key, groupEvents]) => {
+                    const firstEvent = groupEvents[0];
+                    const { height, top } = calculateEventPosition(
+                      firstEvent.slot.startTime,
+                      firstEvent.slot.endTime
+                    );
+
+                    return (
+                      <div
+                        key={key}
+                        className="absolute"
+                        style={{
+                          left: `${(dayIndex / 7) * 100}%`,
+                          width: "calc(100% / 7 - 8px)",
+                          height: `${height}px`,
+                          top: `${top}px`,
+                        }}
+                      >
+                        {/* Badge for multiple events */}
+                        {groupEvents.length > 1 && (
+                          <Badge
+                            count={groupEvents.length}
+                            style={{
+                              backgroundColor: "#1890ff",
+                              position: "absolute",
+                              top: 0,
+                              right: -14,
+                              zIndex: 2,
+                              fontSize: "10px",
+                              height: "16px",
+                              minWidth: "16px",
+                              lineHeight: "16px",
+                              padding: "0 4px",
+                              borderRadius: "4px",
+                            }}
+                          />
+                        )}
+
+                        {/* Horizontal scroll container for events */}
+                        <Element
+                          name={`${dayString}-${key}`}
+                          className="h-full overflow-x-auto scrollbar-thin"
+                        >
+                          <div
+                            className="flex h-full"
+                            style={{
+                              minWidth: `${groupEvents.length * 150}px`,
+                            }}
+                          >
+                            {groupEvents.map((evt) => {
+                              const displayText =
+                                evt.slot?.subjectId?.name ||
+                                evt.slot?.eventName ||
+                                evt.name;
+                              const color = getColorByType(evt.type);
+                              const darkerColor = darkenColor(color, 20);
+
+                              return (
+                                <motion.div
+                                  key={evt._id}
+                                  className="flex-shrink-0 flex flex-col overflow-hidden shadow-sm mx-px relative cursor-pointer"
+                                  style={{
+                                    width:
+                                      groupEvents.length === 1
+                                        ? "150px"
+                                        : "70px",
+                                    height: "100%",
+                                  }}
+                                  onClick={() => onEventClick(evt)}
+                                  whileHover={{
+                                    // scale: 1.05,
+                                    zIndex: 10,
+                                    cursor: "pointer",
+                                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                                    transition: { duration: 0.2 },
+                                  }}
+                                >
+                                  {/* Header */}
+                                  <div
+                                    className="px-2 py-1 text-white text-xs font-medium truncate border-b"
+                                    style={{ backgroundColor: darkerColor }}
+                                  >
+                                    {evt.name}
+                                  </div>
+
+                                  {/* Divider */}
+                                  <div
+                                    className="h-px w-full"
+                                    style={{ backgroundColor: darkerColor }}
+                                  />
+
+                                  {/* Body */}
+                                  <div
+                                    className="flex-1 px-2 py-1 text-xs"
+                                    style={{ backgroundColor: color }}
+                                  >
+                                    <div className="text-white font-medium truncate">
+                                      {displayText}
+                                    </div>
+                                    <div className="text-white text-xxs opacity-80 mt-1">
+                                      {dayjs(evt.slot.startTime).format(
+                                        "h:mm A"
+                                      )}{" "}
+                                      -{" "}
+                                      {dayjs(evt.slot.endTime).format("h:mm A")}
+                                    </div>
+                                    {evt.slot.teacherId?.name && (
+                                      <div className="text-white text-xxs opacity-80 mt-1">
+                                        {evt.slot.teacherId.name}
+                                      </div>
+                                    )}
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        </Element>
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
       </div>
     </motion.div>

@@ -1349,7 +1349,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={StudentParentTimeTablePage}
-          allowedRoles={["student"]}
+          allowedRoles={["student", "parent"]}
         />
       ),
       errorElement: <Error />,
