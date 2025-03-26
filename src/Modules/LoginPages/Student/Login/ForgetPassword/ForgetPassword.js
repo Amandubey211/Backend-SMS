@@ -14,21 +14,26 @@ const ForgetPassword = () => {
   const { loading, sendForgotPassword } = useForgotPassword();
   const navigate = useNavigate();
   const location = useLocation();
-  const { role } = location.state;
+  const { role } = location.state; // 'student' or 'parent'
 
-  // On mount, check localStorage for an existing timer end time.
+  const normalizedRole = role === "" ? "staff" : role;
+
+  // On mount, check localStorage for an existing timer end time based on role.
   useEffect(() => {
-    const timerEnd = localStorage.getItem("forgetPasswordTimerEnd");
+    const timerEndKey = `forgetPasswordTimerEnd_${normalizedRole}`;
+    console.log('timerEndKey', timerEndKey)
+    const timerEnd = localStorage.getItem(timerEndKey);
+
     if (timerEnd) {
       const remaining = Math.ceil((parseInt(timerEnd) - Date.now()) / 1000);
       if (remaining > 0) {
         setTimer(remaining);
         setHasSubmitted(true);
       } else {
-        localStorage.removeItem("forgetPasswordTimerEnd");
+        localStorage.removeItem(timerEndKey);
       }
     }
-  }, []);
+  }, [normalizedRole]); // Re-run this effect when the role changes.
 
   // Countdown effect: decrement timer every second until it reaches 0.
   useEffect(() => {
@@ -37,14 +42,15 @@ const ForgetPassword = () => {
       setTimer((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          localStorage.removeItem("forgetPasswordTimerEnd");
+          const timerEndKey = `forgetPasswordTimerEnd_${normalizedRole}`;
+          localStorage.removeItem(timerEndKey);
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
     return () => clearInterval(interval);
-  }, [timer]);
+  }, [timer, normalizedRole]);
 
   const handleChange = (e) => {
     setEmail(e.target.value);
@@ -57,7 +63,8 @@ const ForgetPassword = () => {
       setHasSubmitted(true);
       // Start a 60-second countdown after successful submission.
       setTimer(60);
-      localStorage.setItem("forgetPasswordTimerEnd", Date.now() + 60000);
+      const timerEndKey = `forgetPasswordTimerEnd_${normalizedRole}`;
+      localStorage.setItem(timerEndKey, Date.now() + 60000);
       // Optionally, if you want to navigate immediately after submission, uncomment:
       // navigate("/");
     } catch (error) {
@@ -116,9 +123,8 @@ const ForgetPassword = () => {
             <button
               type="submit"
               disabled={loading || timer > 0}
-              className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
-                timer > 0 ? "opacity-50 cursor-not-allowed" : "hover:from-pink-600 hover:to-purple-600"
-              }`}
+              className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${timer > 0 ? "opacity-50 cursor-not-allowed" : "hover:from-pink-600 hover:to-purple-600"
+                }`}
             >
               {buttonLabel}
             </button>
