@@ -130,17 +130,17 @@ const StudentTimetablePage = () => {
     if (filterType) result = result?.filter((tt) => tt.type === filterType);
 
     // Filter by class
-    console.log(classId,"sdfsdfsdfsdfsdfsdfsdfsdf")
+    console.log(classId, "sdfsdfsdfsdfsdfsdfsdfsdf");
     if (classId) {
       result = result.filter((tt) => tt.classId?._id === classId);
     }
-
+    console.log(result, "result");
     // Filter by sections if available
-    if (sections.length > 0) {
-      result = result.filter((tt) =>
-        tt.sectionId?.some((section) => sections.includes(section._id))
-      );
-    }
+    // if (sections.length > 0) {
+    //   result = result.filter((tt) =>
+    //     tt.sectionId?.some((section) => sections.includes(section._id))
+    //   );
+    // }
 
     return result;
   }, [timetables, filterType, classId, sections]);
