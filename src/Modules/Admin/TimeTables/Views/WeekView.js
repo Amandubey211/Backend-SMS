@@ -76,10 +76,10 @@ export default function WeekView({
       <div className="flex min-w-max bg-white rounded-lg shadow">
         {/* Time column - Full 24-hour timeline */}
         <div
-          className="w-16 flex-shrink-0 mt-6"
+          className="w-16 flex-shrink-0"
           style={{ height: `${24 * hourHeight + 40}px` }}
         >
-          <div className="h-10  border-gray-200 flex justify-center text-2xl">
+          <div className="h-16  border-gray-200 flex justify-center items-center text-2xl">
             <TfiTime />
           </div>
           {timeSlots.map((hour) => (
@@ -110,7 +110,7 @@ export default function WeekView({
             return (
               <div
                 key={day.toString()}
-                className={`text-center p-2 border border-gray-200 ${
+                className={`text-center p-2 border-t border-l border-b border-gray-200 ${
                   isToday ? "bg-blue-50 font-semibold" : ""
                 }`}
               >

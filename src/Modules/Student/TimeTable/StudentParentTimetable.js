@@ -41,6 +41,7 @@ import ExportFunctions from "../../../Utils/timetableUtils";
 import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
+import toast from "react-hot-toast";
 
 const StudentTimetablePage = () => {
   const { t } = useTranslation("admTimeTable");
@@ -61,7 +62,6 @@ const StudentTimetablePage = () => {
   const parentTimetableData = useSelector(
     (state) => state.Parent?.parentTimetable.timetables
   );
-  console.log(parentTimetableData.timetables, "parentTimetableData");
   const { timetables = [], loading: loadingFetch } =
     role === "student"
       ? studentTimetableData
@@ -101,27 +101,27 @@ const StudentTimetablePage = () => {
     }
   }, [dispatch, role, selectedChildId]);
 
-  // Get student's/parent's class and sections for filtering
+  // Get student's/parent's class and section for filtering
   const getFilterInfo = () => {
     if (role === "student") {
       return {
         classId: userDetails.classId,
-        sections: [], // Student may not have section info in userDetails
+        sectionId: userDetails.sectionId, // Single section ID for student
       };
     } else if (role === "parent" && selectedChildId) {
       const selectedChild = children.find(
         (child) => child.id === selectedChildId
       );
+      console.log(selectedChild, "selectedChildselectedChild");
       return {
         classId: selectedChild?.presentClassId,
-        sections: selectedChild?.section ? [selectedChild.section] : [],
+        sectionId: selectedChild?.sectionId, // Single section ID for child
       };
     }
-    return { classId: null, sections: [] };
+    return { classId: null, sectionId: null };
   };
-  console.log(selectedChildId, "selectedChildId");
 
-  const { classId, sections } = getFilterInfo();
+  const { classId, sectionId } = getFilterInfo();
 
   const filteredTimetables = useMemo(() => {
     let result = timetables || [];
@@ -130,22 +130,28 @@ const StudentTimetablePage = () => {
     if (filterType) result = result?.filter((tt) => tt.type === filterType);
 
     // Filter by class
-    console.log(classId, "sdfsdfsdfsdfsdfsdfsdfsdf");
     if (classId) {
       result = result.filter((tt) => tt.classId?._id === classId);
     }
-    console.log(result, "result");
-    // Filter by sections if available
-    // if (sections.length > 0) {
-    //   result = result.filter((tt) =>
-    //     tt.sectionId?.some((section) => sections.includes(section._id))
-    //   );
-    // }
+
+    // Filter by section if available
+    if (sectionId) {
+      toast.success("we have section");
+      result = result.filter((tt) => {
+        // If timetable has no sections, include it (applies to all sections)
+        if (!tt.sectionId || tt.sectionId.length === 0) return true;
+
+        // Check if the timetable includes the student's/child's section
+        return tt.sectionId.some((section) =>
+          typeof section === "object"
+            ? section._id === sectionId
+            : section === sectionId
+        );
+      });
+    }
 
     return result;
-  }, [timetables, filterType, classId, sections]);
-
-  console.log(filteredTimetables, "sdfsdf");
+  }, [timetables, filterType, classId, sectionId]);
 
   const exportFunctions = new ExportFunctions({
     viewMode,
@@ -518,6 +524,14 @@ const StudentTimetablePage = () => {
                               {userDetails.className || t("No Class")}
                             </Tag>
                           </div>
+                          <div>
+                            <span className="text-gray-600 text-sm">
+                              {t("Section:")}
+                            </span>
+                            <Tag color="purple" className="ml-2">
+                              {userDetails.section || t("No Section")}
+                            </Tag>
+                          </div>
                         </>
                       ) : selectedChildId ? (
                         <>
@@ -646,11 +660,13 @@ const StudentTimetablePage = () => {
                           {detailsTimetable?.sectionId?.length > 0 ? (
                             detailsTimetable?.sectionId.map((section) => (
                               <Tag key={section?._id} color="purple">
-                                {section?.sectionName || "No Section Name"}
+                                {typeof section === "object"
+                                  ? section?.sectionName
+                                  : section || "No Section Name"}
                               </Tag>
                             ))
                           ) : (
-                            <Tag color="purple">No Sections</Tag>
+                            <Tag color="purple">All Sections</Tag>
                           )}
                         </div>
                       </div>
