@@ -19,44 +19,51 @@ import { clearGroupsList } from "../../../Store/Slices/Admin/Class/Section_Group
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../config/permission";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
-import { motion } from "framer-motion";
 import { fetchStudentsByClassAndSection } from "../../../Store/Slices/Admin/Class/Students/studentThunks";
-import SectionStudentList from "./Components/SectionStudentList"; // <-- New import
+import SectionStudentList from "./Components/SectionStudentList";
 import { Tabs } from "antd";
+import Fuse from "fuse.js";
 
 const MainSection = () => {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Section states
+  // State for which section is active
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
 
-  // Tabs: "groups" or "section"
-  const [activeTab, setActiveTab] = useState("groups");
+  // State for active tab: "section" or "groups"
+  const [activeTab, setActiveTab] = useState("section");
 
   // Grade modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [studentData, setStudentData] = useState(null);
 
-  // Redux store
-  const { unassignedStudentsList } = useSelector(
+  // Global fuzzy search
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Redux store data
+  const { groupsList, groupsLoading, unassignedStudentsList } = useSelector(
     (state) => state.admin.group_section
   );
+  const {
+    studentsList,
+    loading: studentsLoading,
+    error: studentsError,
+  } = useSelector((state) => state.admin.students);
 
-  // Initial data load
+  // ------------------- Data Fetching -------------------
   useEffect(() => {
     if (cid) {
-      dispatch(clearGroupsList()); // Clear previous groups
-      dispatch(fetchSectionsByClass(cid)); // Fetch sections
-      dispatch(fetchGroupsByClass(cid)); // Fetch all groups
-      dispatch(fetchUnassignedStudents(cid)); // Fetch unassigned
-      dispatch(fetchStudentsByClassAndSection(cid)); // Get entire class's students
+      dispatch(clearGroupsList());
+      dispatch(fetchSectionsByClass(cid));
+      dispatch(fetchGroupsByClass(cid));
+      dispatch(fetchUnassignedStudents(cid));
+      dispatch(fetchStudentsByClassAndSection(cid));
     }
   }, [cid, dispatch]);
 
-  // Whenever activeSection changes, fetch groups by that section.
-  // If "Everyone," fetch all groups in that class.
+  // If user selects a specific section, fetch only that section's groups
   useEffect(() => {
     if (activeSection !== "Everyone" && activeSectionId) {
       dispatch(
@@ -70,11 +77,12 @@ const MainSection = () => {
     }
   }, [activeSection, activeSectionId, cid, dispatch]);
 
-  // Handle section selection from the NavigationBar
+  // NavigationBar callback for picking a section
   const handleSectionChange = useCallback(
-    (section, sectionId) => {
-      setActiveSection(section);
+    (sectionName, sectionId) => {
+      setActiveSection(sectionName);
       setActiveSectionId(sectionId);
+
       if (sectionId) {
         dispatch(
           fetchGroupsByClassAndSection({
@@ -83,19 +91,18 @@ const MainSection = () => {
           })
         );
       } else {
-        // "Everyone"
         dispatch(fetchGroupsByClass(cid));
       }
     },
     [cid, dispatch]
   );
 
-  // On "See Grade" click for any student
+  // "See Grade" for a student
   const onSeeGradeClick = (student) => {
     setStudentData(student);
     setIsModalOpen(true);
 
-    // Fetch the student's data
+    // fetch student grades & progress
     dispatch(
       fetchStudentGrades({
         params: {},
@@ -106,35 +113,74 @@ const MainSection = () => {
     dispatch(fetchStudentSubjectProgress(student?._id));
   };
 
-  // Close grade modal
+  // Grade modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setStudentData(null);
   };
 
-  // Ant Design Tabs content
+  // ------------------ Fuzzy Search Setup ------------------
+  // 1) Fuzzy search for Groups
+  const fuseGroups = new Fuse(groupsList || [], {
+    keys: ["groupName"],
+    threshold: 0.3,
+  });
+  const filteredGroups = searchQuery
+    ? fuseGroups.search(searchQuery).map((res) => res.item)
+    : groupsList || [];
+
+  // 2) Fuzzy search for Students (filter by activeSection first)
+  let relevantStudents = studentsList || [];
+  if (activeSection !== "Everyone" && activeSectionId) {
+    relevantStudents = relevantStudents.filter(
+      (s) => s.presentSectionId === activeSectionId
+    );
+  }
+  const fuseStudents = new Fuse(relevantStudents, {
+    keys: ["firstName", "lastName", "email", "contactNumber", "rollNumber"],
+    threshold: 0.3,
+  });
+  const filteredStudents = searchQuery
+    ? fuseStudents.search(searchQuery).map((res) => res.item)
+    : relevantStudents;
+
+  // Tab labels: show counts
+  const groupCount = filteredGroups?.length || 0;
+  const studentCount = filteredStudents?.length || 0;
+
+  // Tabs data
   const tabItems = [
     {
-      key: "groups",
-      label: "Groups",
-      children: <GroupList onSeeGradeClick={onSeeGradeClick} />,
-    },
-    {
       key: "section",
-      label: "Section Students",
+      label: `Section (${studentCount})`,
       children: (
         <SectionStudentList
           onSeeGradeClick={onSeeGradeClick}
           activeSectionId={activeSectionId}
           activeSection={activeSection}
+          students={filteredStudents}
+          loading={studentsLoading}
+          error={studentsError}
+        />
+      ),
+    },
+    {
+      key: "groups",
+      label: `Groups (${groupCount})`,
+      children: (
+        <GroupList
+          onSeeGradeClick={onSeeGradeClick}
+          groups={filteredGroups}
+          groupsLoading={groupsLoading}
         />
       ),
     },
   ];
 
+  // ------------------ Render Layout ------------------
   return (
     <div className="flex flex-col h-screen">
-      {/* Navigation to pick sections */}
+      {/* Top Navigation + Section Buttons */}
       <ProtectedAction requiredPermission={PERMISSIONS.SECTION_BY_CLASS}>
         <NavigationBar
           onSectionChange={handleSectionChange}
@@ -143,32 +189,47 @@ const MainSection = () => {
       </ProtectedAction>
 
       <div className="flex flex-grow">
-        {/* Hide Unassigned Student panel if no unassigned students */}
+        {/* Left: Unassigned Students */}
         {unassignedStudentsList?.length > 0 && (
           <div className="w-80 h-full flex-shrink-0">
             <ProtectedSection
               requiredPermission={PERMISSIONS.UNASSIGNED_STUDENTS}
-              title={"Unassigned Student"}
+              title="Unassigned Student"
             >
               <UnAssignedStudentList />
             </ProtectedSection>
           </div>
         )}
 
-        {/* Main Content: Tabs (Groups / Section Students) */}
-        <div className="flex-grow h-full border-l p-4">
+        {/* Right: Tabs + Search bar */}
+        <div className="flex-grow h-full border-l p-4 flex flex-col">
+          {/* Protected area for the main content */}
           <ProtectedSection
             requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION}
-            title="Sections / Groups"
+            title="Sections & Groups"
           >
+            {/* Tabs with search on the right */}
             <Tabs
               activeKey={activeTab}
               onChange={(key) => setActiveTab(key)}
-              animated
+              // This extra content puts the search bar on the right edge
+              tabBarExtraContent={
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-md w-64"
+                />
+              }
             >
-              {tabItems.map((item) => (
-                <Tabs.TabPane key={item.key} tab={item.label}>
-                  {item.children}
+              {tabItems.map((tab) => (
+                <Tabs.TabPane key={tab.key} tab={tab.label}>
+                  {/* 
+                    Each tab's content is automatically rendered below the tab bar,
+                    taking up the full space. 
+                  */}
+                  {tab.children}
                 </Tabs.TabPane>
               ))}
             </Tabs>
