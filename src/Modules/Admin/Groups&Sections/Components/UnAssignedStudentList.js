@@ -12,28 +12,27 @@ const UnAssignedStudentList = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Redux data
   const { unassignedStudentsList, sectionsList } = useSelector(
     (store) => store.admin.group_section
   );
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
+  // Filter by name
   const filteredStudents = unassignedStudentsList?.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Sidebar open/close
   const handleSidebarOpen = (student) => {
     setSelectedStudent(student);
     setSidebarOpen(true);
   };
-
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     setSelectedStudent(null);
   };
 
+  // Show section name or "No Section Assigned"
   const getSectionName = (sectionId) => {
     const section = sectionsList.find((sec) => sec._id === sectionId);
     return section
@@ -52,7 +51,7 @@ const UnAssignedStudentList = () => {
           type="text"
           placeholder={t("Search Student")}
           value={searchQuery}
-          onChange={handleSearch}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="mt-2 w-full px-3 py-2 border rounded-full"
         />
       </div>
@@ -97,6 +96,7 @@ const UnAssignedStudentList = () => {
         </ul>
       )}
 
+      {/* Assign Student Sidebar */}
       {selectedStudent && (
         <Sidebar
           isOpen={isSidebarOpen}

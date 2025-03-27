@@ -19,54 +19,86 @@ import { clearGroupsList } from "../../../Store/Slices/Admin/Class/Section_Group
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../config/permission";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
-import toast from "react-hot-toast";
+import { motion } from "framer-motion";
+import { fetchStudentsByClassAndSection } from "../../../Store/Slices/Admin/Class/Students/studentThunks";
+import SectionStudentList from "./Components/SectionStudentList"; // <-- New import
+import { Tabs } from "antd";
 
 const MainSection = () => {
-  const [activeSection, setActiveSection] = useState("Everyone");
-  const [activeSectionId, setActiveSectionId] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [studentData, setStudentData] = useState();
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Reset groups on class change
+  // Section states
+  const [activeSection, setActiveSection] = useState("Everyone");
+  const [activeSectionId, setActiveSectionId] = useState(null);
+
+  // Tabs: "groups" or "section"
+  const [activeTab, setActiveTab] = useState("groups");
+
+  // Grade modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [studentData, setStudentData] = useState(null);
+
+  // Redux store
+  const { unassignedStudentsList } = useSelector(
+    (state) => state.admin.group_section
+  );
+
+  // Initial data load
   useEffect(() => {
     if (cid) {
-      dispatch(clearGroupsList()); // Clear previous groups to avoid stale data
-      dispatch(fetchSectionsByClass(cid)); // Fetch sections for the class
-      dispatch(fetchGroupsByClass(cid)); // Fetch groups for the new class
-      dispatch(fetchUnassignedStudents(cid)); // Fetch unassigned students
+      dispatch(clearGroupsList()); // Clear previous groups
+      dispatch(fetchSectionsByClass(cid)); // Fetch sections
+      dispatch(fetchGroupsByClass(cid)); // Fetch all groups
+      dispatch(fetchUnassignedStudents(cid)); // Fetch unassigned
+      dispatch(fetchStudentsByClassAndSection(cid)); // Get entire class's students
     }
   }, [cid, dispatch]);
 
-  // Handle section change
+  // Whenever activeSection changes, fetch groups by that section.
+  // If "Everyone," fetch all groups in that class.
   useEffect(() => {
-    if (activeSection != "Everyone" && activeSectionId) {
+    if (activeSection !== "Everyone" && activeSectionId) {
       dispatch(
         fetchGroupsByClassAndSection({
           classId: cid,
           sectionId: activeSectionId,
         })
       );
-    } else if (activeSection == "Everyone") {
+    } else if (activeSection === "Everyone") {
       dispatch(fetchGroupsByClass(cid));
     }
-  }, [activeSectionId, activeSection, cid, dispatch]);
+  }, [activeSection, activeSectionId, cid, dispatch]);
 
-  // Handle section change from navigation bar
-  const handleSectionChange = useCallback((section, sectionId) => {
-    setActiveSection(section);
-    setActiveSectionId(sectionId);
-    dispatch(fetchGroupsByClassAndSection({ classId: cid, sectionId }));
-  }, []);
+  // Handle section selection from the NavigationBar
+  const handleSectionChange = useCallback(
+    (section, sectionId) => {
+      setActiveSection(section);
+      setActiveSectionId(sectionId);
+      if (sectionId) {
+        dispatch(
+          fetchGroupsByClassAndSection({
+            classId: cid,
+            sectionId,
+          })
+        );
+      } else {
+        // "Everyone"
+        dispatch(fetchGroupsByClass(cid));
+      }
+    },
+    [cid, dispatch]
+  );
 
+  // On "See Grade" click for any student
   const onSeeGradeClick = (student) => {
     setStudentData(student);
     setIsModalOpen(true);
-    const params = {};
+
+    // Fetch the student's data
     dispatch(
       fetchStudentGrades({
-        params,
+        params: {},
         studentId: student?._id,
         studentClassId: cid,
       })
@@ -74,42 +106,82 @@ const MainSection = () => {
     dispatch(fetchStudentSubjectProgress(student?._id));
   };
 
+  // Close grade modal
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setStudentData(null);
   };
+
+  // Ant Design Tabs content
+  const tabItems = [
+    {
+      key: "groups",
+      label: "Groups",
+      children: <GroupList onSeeGradeClick={onSeeGradeClick} />,
+    },
+    {
+      key: "section",
+      label: "Section Students",
+      children: (
+        <SectionStudentList
+          onSeeGradeClick={onSeeGradeClick}
+          activeSectionId={activeSectionId}
+          activeSection={activeSection}
+        />
+      ),
+    },
+  ];
 
   return (
     <div className="flex flex-col h-screen">
+      {/* Navigation to pick sections */}
       <ProtectedAction requiredPermission={PERMISSIONS.SECTION_BY_CLASS}>
         <NavigationBar
           onSectionChange={handleSectionChange}
           selectedSection={activeSection}
         />
       </ProtectedAction>
+
       <div className="flex flex-grow">
-        <div className="w-80 h-full flex-shrink-0">
-          <ProtectedSection
-            requiredPermission={PERMISSIONS.UNASSIGNED_STUDENTS}
-            title={"Unassigned Student"}
-          >
-            <UnAssignedStudentList />
-          </ProtectedSection>
-        </div>
-        <div className="flex-grow h-full border-l">
+        {/* Hide Unassigned Student panel if no unassigned students */}
+        {unassignedStudentsList?.length > 0 && (
+          <div className="w-80 h-full flex-shrink-0">
+            <ProtectedSection
+              requiredPermission={PERMISSIONS.UNASSIGNED_STUDENTS}
+              title={"Unassigned Student"}
+            >
+              <UnAssignedStudentList />
+            </ProtectedSection>
+          </div>
+        )}
+
+        {/* Main Content: Tabs (Groups / Section Students) */}
+        <div className="flex-grow h-full border-l p-4">
           <ProtectedSection
             requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION}
-            title={"Groups"}
+            title="Sections / Groups"
           >
-            <GroupList onSeeGradeClick={onSeeGradeClick} />
+            <Tabs
+              activeKey={activeTab}
+              onChange={(key) => setActiveTab(key)}
+              animated
+            >
+              {tabItems.map((item) => (
+                <Tabs.TabPane key={item.key} tab={item.label}>
+                  {item.children}
+                </Tabs.TabPane>
+              ))}
+            </Tabs>
           </ProtectedSection>
         </div>
-
-        <StudentGradeModal
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          student={studentData}
-        />
       </div>
+
+      {/* Grade Modal */}
+      <StudentGradeModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        student={studentData}
+      />
     </div>
   );
 };
