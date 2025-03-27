@@ -11,7 +11,7 @@ import {
   fetchSectionsByClass,
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useParams } from "react-router-dom";
-import { fetchStudentsByClassAndSectionNames } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
 import { Tooltip, Modal } from "antd";
 import { motion } from "framer-motion";
@@ -31,14 +31,13 @@ const AddGroup = ({ group, isUpdate, groupId, onClose }) => {
 
   // Fetch student names for the dropdown
   useEffect(() => {
-    dispatch(fetchStudentsByClassAndSectionNames(cid));
+    // dispatch(fetchStudentsByClassAndSection(cid));
   }, [dispatch, cid]);
 
   // From Redux store
-  const { unassignedStudents, loading } = useSelector((store) => ({
-    unassignedStudents: store.admin.group_section.unassignedStudentsList,
-    loading: store.admin.group_section.loading,
-  }));
+  const { unassignedStudents, groupsLoading: loading } = useSelector(
+    (store) => store.admin.group_section.unassignedStudentsList
+  );
   const { studentsList } = useSelector((store) => store.admin.students);
 
   // Preload data when editing

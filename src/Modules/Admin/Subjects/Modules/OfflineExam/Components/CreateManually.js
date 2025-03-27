@@ -3,7 +3,7 @@ import { Button, Select, DatePicker, message, Switch, Tooltip } from "antd";
 import { TeamOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { createOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
-import { fetchStudentsByClassAndSectionNames } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { fetchStudentsByClassAndSection } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { fetchSectionsByClass } from "../../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import toast from "react-hot-toast";
@@ -49,7 +49,7 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
 
   useEffect(() => {
     dispatch(fetchSectionsByClass(cid));
-    dispatch(fetchStudentsByClassAndSectionNames(cid));
+    dispatch(fetchStudentsByClassAndSection(cid));
     dispatch(fetchAllStudents());
   }, [cid, dispatch]);
 
