@@ -44,12 +44,7 @@ const Library = () => {
     totalIssuedBook,
     currentIssuedBookPage,
   } = useSelector((store) => store?.student?.studentIssueBooks);
-  console.log(
-    "currentIssuedBook",
-    currentIssuedBookPage,
-    totalIssuedBook,
-    totalIssueBookPages
-  );
+
   const { showError } = useSelector((store) => store?.common?.alertMsg);
   const { t } = useTranslation();
   const [allCategories, setAllCategories] = useState([]);
@@ -174,16 +169,16 @@ const Library = () => {
 
           {activeTab === "Library" ? libraryContent() : <BookIssue />}
 
-          {(activeTab === "Library" ? totalBooks > 0 : totalIssuedBook > 0) && (
+          {(activeTab === "Library" && totalBooks > 0 ) && (
             <Pagination
               page={
-                activeTab === "Library" ? currentPage : currentIssuedBookPage
+                activeTab === "Library" && currentPage 
               }
               totalPages={
-                activeTab === "Library" ? totalPages : totalIssueBookPages
+                activeTab === "Library" && totalPages 
               }
               totalRecords={
-                activeTab === "Library" ? totalBooks : totalIssuedBook
+                activeTab === "Library" && totalBooks 
               }
               limit={limit}
               setPage={handlePageChange}
