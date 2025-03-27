@@ -63,7 +63,7 @@ const CalendarHeader = ({ attendanceData, onPanelChange, value, yearList }) => {
           value={currentMonth}
           onChange={handleMonthChange}
         >
-          {moment.monthsShort().map((monthName, index) => (
+          {moment.monthsShort()?.map((monthName, index) => (
             <Option key={monthName} value={index}>
               {t(monthName.toLowerCase(), gt.month)}
             </Option>
@@ -76,7 +76,7 @@ const CalendarHeader = ({ attendanceData, onPanelChange, value, yearList }) => {
           value={currentYear}
           onChange={handleYearChange}
         >
-          {yearList.map((yr) => (
+          {yearList?.map((yr) => (
             <Option key={yr} value={yr}>
               {yr}
             </Option>

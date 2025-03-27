@@ -41,8 +41,7 @@ import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTab
 import UpdateTimeTable from "../Modules/Admin/TimeTable/Components/UpdateTimeTable.js";
 
 // Student
-import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
-import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
+import StudentParentTimeTablePage from "../Modules/Student/TimeTable/StudentParentTimetable.js";
 
 // Teacher
 import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
@@ -1349,23 +1348,23 @@ function App() {
       path: "/student_timetable",
       element: (
         <ProtectRoute
-          Component={StudentTimeTablePage}
-          allowedRoles={["student"]}
+          Component={StudentParentTimeTablePage}
+          allowedRoles={["student", "parent"]}
         />
       ),
       errorElement: <Error />,
-      children: [
-        {
-          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
-          element: (
-            <ProtectRoute
-              Component={StudentTableView}
-              allowedRoles={["student"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-      ],
+      // children: [
+      //   {
+      //     path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+      //     element: (
+      //       <ProtectRoute
+      //         Component={StudentTableView}
+      //         allowedRoles={["student"]}
+      //       />
+      //     ),
+      //     errorElement: <Error />,
+      //   },
+      // ],
     },
 
     //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
@@ -1557,8 +1556,8 @@ function App() {
       path: "/parent_timetable",
       element: (
         <ProtectRoute
-          Component={ParentTimeTablePage}
-          allowedRoles={["parent"]}
+          Component={StudentParentTimeTablePage}
+          allowedRoles={["parent", "student"]}
         />
       ),
       errorElement: <Error />,

@@ -9,7 +9,7 @@ import { FaBook } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Select, Skeleton, Input, Tooltip } from "antd";
 import { FiRefreshCcw } from "react-icons/fi";
-
+import  Pagination from '../../../../Components/Common/pagination'
 const { Option } = Select;
 const { Search } = Input;
 
@@ -32,7 +32,10 @@ const initialFilters = {
   roleType: "",
 };
 
-const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
+const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
+  setPage,
+  limit,
+  setLimit, }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const {
@@ -41,6 +44,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
     loading: libraryLoading,
   } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
+  const { totalPages, totalBooks } = useSelector((state) => state.admin.library);
   const sectionList = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
@@ -87,13 +91,12 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
     if (
       localFilters.roleType &&
       issue.issuedTo?.userType?.toLowerCase() !==
-        localFilters.roleType.toLowerCase()
+      localFilters.roleType.toLowerCase()
     )
       return false;
     if (localFilters.searchQuery) {
-      const fullName = `${issue.issuedTo?.userId?.firstName || ""} ${
-        issue.issuedTo?.userId?.lastName || ""
-      }`.trim();
+      const fullName = `${issue.issuedTo?.userId?.firstName || ""} ${issue.issuedTo?.userId?.lastName || ""
+        }`.trim();
       if (
         !fullName.toLowerCase().includes(localFilters.searchQuery.toLowerCase())
       )
@@ -318,6 +321,17 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData }) => {
             </tbody>
           </table>
         </div>
+      )}
+      {filteredBookIssues.length > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalRecords={totalBooks}
+          limit={limit}
+          setPage={setPage}
+          setLimit={setLimit}
+          t={t}
+        />
       )}
     </>
   );

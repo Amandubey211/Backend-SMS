@@ -35,8 +35,14 @@ const sidebarData = [
   },
   {
     title: "Finance",
-    icon: <img src={financeIcon} alt="Finance Icon" style={{ width: '24px', height: '24px' }} />,
-    path:'/parentfinance'
+    icon: (
+      <img
+        src={financeIcon}
+        alt="Finance Icon"
+        style={{ width: "24px", height: "24px" }}
+      />
+    ),
+    path: "/parentfinance",
   },
   {
     title: "Library",
@@ -49,11 +55,11 @@ const sidebarData = [
     ),
     path: "/parentlibrary",
   },
-  // {
-  //   title: "Time Table",
-  //   icon: <ImTable2 style={{ width: "20px", height: "20px", color: "gray" }} />,
-  //   path: "/parent_timetable",
-  // },
+  {
+    title: "Time Table",
+    icon: <ImTable2 style={{ width: "20px", height: "20px", color: "gray" }} />,
+    path: "/parent_timetable",
+  },
   {
     title: "Notice Board",
     icon: (

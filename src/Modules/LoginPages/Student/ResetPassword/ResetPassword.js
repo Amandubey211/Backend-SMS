@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, NavLink } from "react-router-dom";
+import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import Logo from "../../../../Components/Common/Logo";
 import { FaEye } from "react-icons/fa";
 import { PiEyeClosedFill } from "react-icons/pi";
@@ -16,9 +16,11 @@ const ResetPassword = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const { loading,  } = useForgotPassword();
-  const {  resetPassword } = useResetPassword();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [countdown, setCountdown] = useState(3); // Countdown for redirection
+  const { loading, resetPassword } = useResetPassword();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const urlParts = location.pathname.split('/');
@@ -40,7 +42,26 @@ const ResetPassword = () => {
       alert("Passwords do not match!");
       return;
     }
-    resetPassword(resetDetails);
+
+    resetPassword(resetDetails)
+      .then(() => {
+        // Successfully reset the password
+        setIsModalOpen(true);
+        let timer = 3;
+        const interval = setInterval(() => {
+          if (timer === 0) {
+            clearInterval(interval);
+            navigate("/studentlogin"); // Redirect to login page after countdown
+          } else {
+            setCountdown(timer);
+            timer -= 1;
+          }
+        }, 1000);
+      })
+      .catch((error) => {
+        // Handle error
+        console.error(error);
+      });
   };
 
   return (
@@ -115,6 +136,76 @@ const ResetPassword = () => {
             </button>
           </div>
         </form>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-gray-100 bg-opacity-80 flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative">
+              {/* Close Button */}
+              <button
+                onClick={() => navigate("/studentlogin")}
+                className="absolute top-3 right-3 text-gray-700 hover:text-gray-900"
+                aria-label="Close Modal"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+
+              {/* Modal Content */}
+              <div className="text-center">
+                {/* Success Icon */}
+                <svg
+                  className="mx-auto h-16 w-16 text-green-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+
+                {/* Title */}
+                <h3 className="mt-4 text-xl font-semibold text-gray-900">
+                  Password Changed Successfully!
+                </h3>
+
+                {/* Countdown Text */}
+                <div className="mt-3">
+                  <p className="text-sm text-gray-700">
+                    You will be redirected in {countdown}...
+                  </p>
+                </div>
+
+                {/* Close Button */}
+                <div className="mt-6">
+                  <button
+                    onClick={() => navigate("/studentlogin")}
+                    className="px-6 py-3 bg-green-500 text-white rounded-md shadow hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

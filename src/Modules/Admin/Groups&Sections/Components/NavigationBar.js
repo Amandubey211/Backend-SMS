@@ -17,6 +17,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
   const [editingSection, setEditingSection] = useState(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [sectionToDelete, setSectionToDelete] = useState(null);
+
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -25,18 +26,20 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     (store) => store.admin.group_section.sectionsList
   );
 
-  // Compare active section by _id if available, otherwise by sectionName.
+  // Decide which button is "active"
   const getButtonClass = (sectionItem) => {
     const isActive =
       selectedSection === "Everyone"
         ? sectionItem === "Everyone"
         : selectedSection === sectionItem._id ||
           selectedSection === sectionItem.sectionName;
+
     return isActive
       ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
       : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
   };
 
+  // Sidebar toggles
   const openAddGroupSidebar = useCallback(() => setSidebarType("addGroup"), []);
   const openAddSectionSidebar = useCallback(() => {
     setSidebarType("addSection");
@@ -47,17 +50,20 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     setEditingSection(null);
   }, []);
 
+  // Delete confirm
   const handleDeleteConfirm = async () => {
     await dispatch(deleteSection(sectionToDelete._id));
     setDeleteModalOpen(false);
-    dispatch(fetchSectionsByClass(cid)); // Refetch sections after deletion
+    dispatch(fetchSectionsByClass(cid));
   };
 
+  // Edit
   const handleEditSection = useCallback((section) => {
     setEditingSection(section);
     setSidebarType("editSection");
   }, []);
 
+  // Delete
   const handleDeleteClick = (section) => {
     setSectionToDelete(section);
     setDeleteModalOpen(true);
@@ -67,6 +73,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     <>
       <div className="flex justify-between items-center border-b p-4">
         <div className="flex space-x-2 px-5">
+          {/* "Everyone" */}
           <button
             className={
               selectedSection === "Everyone"
@@ -77,6 +84,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           >
             Everyone
           </button>
+
+          {/* Each Section */}
           {sections?.map((item) => (
             <button
               key={item._id}
@@ -105,6 +114,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
               )}
             </button>
           ))}
+
+          {/* Add Section (Admins only) */}
           {role === "admin" && (
             <button
               onClick={openAddSectionSidebar}
@@ -114,6 +125,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
             </button>
           )}
         </div>
+
+        {/* Add Group (Admins only) */}
         {role === "admin" && (
           <button
             onClick={openAddGroupSidebar}
@@ -127,6 +140,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         )}
       </div>
 
+      {/* Sidebars */}
       <Sidebar
         isOpen={sidebarType === "addSection"}
         onClose={closeSidebar}
@@ -153,6 +167,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
         )}
       </Sidebar>
 
+      {/* Delete Modal */}
       <DeleteModal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

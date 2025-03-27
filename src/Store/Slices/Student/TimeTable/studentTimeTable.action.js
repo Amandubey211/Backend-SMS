@@ -8,16 +8,13 @@ import { setShowError } from "../../Common/Alerts/alertsSlice";
 export const fetchStudentTimetable = createAsyncThunk(
   "studentTimetable/fetchStudentTimetable",
   async (_, { rejectWithValue, dispatch }) => {
-
     try {
-      const say = getAY()
+      const say = getAY();
       dispatch(setShowError(false));
-      const response = await getData(
-        `/student/timetable?say=${say}`
-      );
+      const response = await getData(`/student/timetable?say=${say}`);
 
       // console.log('API Response:', response);  // Log the response to verify structure
-      return response; // Ensure response is in the expected format
+      return response.timetables || []; // Ensure response is in the expected format
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

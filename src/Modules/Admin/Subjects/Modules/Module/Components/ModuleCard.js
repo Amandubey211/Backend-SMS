@@ -1,18 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
-import { FaEllipsisV, FaPen, FaArrowRight, FaTrashAlt } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { Popover, Button } from "antd";
+import {
+  EditOutlined,
+  ArrowRightOutlined,
+  DeleteOutlined,
+  StopOutlined,
+} from "@ant-design/icons";
 import { BsPatchCheckFill } from "react-icons/bs";
-import { MdOutlineBlock } from "react-icons/md";
+import { BiDotsVertical } from "react-icons/bi";
 import { deleteModule } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
-import { useParams } from "react-router-dom";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../../config/permission";
 
 const ModuleCard = ({ module, onSelect, onEdit, onMove }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const menuRef = useRef();
   const dispatch = useDispatch();
   const { sid } = useParams();
 
@@ -22,39 +26,63 @@ const ModuleCard = ({ module, onSelect, onEdit, onMove }) => {
   // Check if this module is the selected one
   const isSelected = selectedModule && selectedModule.moduleId === module._id;
 
-  const toggleMenu = (e) => {
-    e.stopPropagation();
-    setMenuOpen(!menuOpen);
-  };
-
-  const handleClickOutside = (event) => {
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      setMenuOpen(false);
-    }
-  };
-
   const handleDelete = async () => {
     try {
       await dispatch(deleteModule({ sid, moduleId: module._id }));
-      setIsDeleteModalOpen(false); // Close modal after deletion is successful
+      setIsDeleteModalOpen(false);
     } catch (error) {
-      // Handle error (optional)
       console.error("Failed to delete module:", error);
     }
   };
 
-  const handleMove = (e) => {
-    e.stopPropagation();
-    onMove();
-    setMenuOpen(false);
-  };
+  const menuContent = (
+    <div className="w-40">
+      <ProtectedAction requiredPermission={PERMISSIONS.EDIT_MODULE}>
+        <Button
+          type="text"
+          block
+          icon={<EditOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="text-left flex items-center"
+        >
+          Edit
+        </Button>
+      </ProtectedAction>
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+      <ProtectedAction requiredPermission={PERMISSIONS.REORDER_MODULES}>
+        <Button
+          type="text"
+          block
+          icon={<ArrowRightOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onMove();
+          }}
+          className="text-left flex items-center"
+        >
+          Move to
+        </Button>
+      </ProtectedAction>
+
+      <ProtectedAction requiredPermission={PERMISSIONS.DELETE_MODULE}>
+        <Button
+          type="text"
+          block
+          icon={<DeleteOutlined />}
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsDeleteModalOpen(true);
+          }}
+          className="text-left flex items-center text-red-500"
+        >
+          Remove
+        </Button>
+      </ProtectedAction>
+    </div>
+  );
 
   return (
     <div
@@ -72,71 +100,39 @@ const ModuleCard = ({ module, onSelect, onEdit, onMove }) => {
       <div className="p-4">
         <h2 className="font-semibold text-lg">{module.moduleName}</h2>
         <div className="flex justify-between items-center mt-2">
-          <p className="bg-gradient-to-r from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">
+          <p className="bg-gradient-to-r text-sm from-pink-100 to-purple-200 font-semibold rounded-full py-1 px-4">
             Module {module.moduleNumber}
           </p>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center justify-center space-x-2">
             {!module?.isPublished ? (
               <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-8 w-8" />
             ) : (
-              <MdOutlineBlock className="text-gray-600 p-1 border rounded-full h-7 w-7" />
+              <StopOutlined className="text-gray-600 p-1 border rounded-full h-8 w-8" />
             )}
-            <button
-              className="bg-gray-100 p-2 rounded-full hover:bg-gray-200"
-              onClick={toggleMenu}
+
+            <Popover
+              content={menuContent}
+              trigger="click"
+              placement="bottomRight"
+              overlayClassName="module-card-popover"
             >
-              <FaEllipsisV />
-            </button>
+              <Button
+                type="text"
+                size="large"
+                icon={<BiDotsVertical size={25} />}
+                className="flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+              />
+            </Popover>
           </div>
         </div>
       </div>
-      {menuOpen && (
-        <div
-          ref={menuRef}
-          className="absolute top-0 right-12 bg-white border rounded-lg shadow-lg w-48 z-10"
-        >
-          <ul className="">
-            <ProtectedAction requiredPermission={PERMISSIONS.EDIT_MODULE}>
-              <li
-                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit();
-                  setMenuOpen(false);
-                }}
-              >
-                <FaPen className="mr-2" /> Edit
-              </li>
-            </ProtectedAction>
-            <ProtectedAction requiredPermission={PERMISSIONS.REORDER_MODULES}>
-              <li
-                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={handleMove}
-              >
-                <FaArrowRight className="mr-2" /> Move to...
-              </li>
-            </ProtectedAction>
 
-            <ProtectedAction requiredPermission={PERMISSIONS.DELETE_MODULE}>
-              <li
-                className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsDeleteModalOpen(true);
-                  setMenuOpen(false);
-                }}
-              >
-                <FaTrashAlt className="mr-2" /> Remove
-              </li>
-            </ProtectedAction>
-          </ul>
-        </div>
-      )}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
-        onConfirm={handleDelete} // Handle delete here
+        onConfirm={handleDelete}
         title={module.moduleName}
       />
     </div>

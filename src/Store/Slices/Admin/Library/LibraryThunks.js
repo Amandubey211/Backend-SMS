@@ -37,13 +37,13 @@ export const fetchBooksThunk = createAsyncThunk(
 // Fetch Books with pagination details
 export const fetchBooksDetailsThunk = createAsyncThunk(
   "library/fetchBooksDetails",
-  async (page = 1, { rejectWithValue, dispatch, getState }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const response = await getData(
-        `/${getRole}/all/book?say=${say}&page=${page}`
+        `/${getRole}/all/book?say=${say}&page=${page}&limit=${limit}`
       );
       return response;
     } catch (error) {
@@ -131,13 +131,16 @@ export const deleteBookThunk = createAsyncThunk(
 
 export const fetchBookIssuesThunk = createAsyncThunk(
   "library/fetchBookIssues",
-  async (_, { rejectWithValue, dispatch, getState }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/${getRole}/all/bookIssue?say=${say}`);
-      return response?.books;
+      const response = await getData(`/${getRole}/all/bookIssue?say=${say}&page=${page}&limit=${limit}`);
+      return {
+        issues: response?.books || [],
+        pagination: response?.pagination || { totalItems: 0, totalPages: 1, currentPage: 1 },
+      };
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

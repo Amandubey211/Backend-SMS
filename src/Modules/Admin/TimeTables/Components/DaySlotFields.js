@@ -54,25 +54,25 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                           ({ key: slotKey, name: slotName, ...restSlot }) => (
                             <div
                               key={slotKey}
-                              className="flex items-center gap-2 mb-2"
+                              className="flex items-center gap-4 mb-2"
                             >
                               {/* Start Time */}
                               <Form.Item
                                 {...restSlot}
                                 name={[slotName, "startTime"]}
+                                label="Start Time"
                                 rules={[
                                   {
                                     required: true,
                                     message: "Start time required",
                                   },
                                 ]}
+                                style={{ marginBottom: 0, width: "15%" }}
                               >
                                 <TimePicker
                                   placeholder="Start"
                                   format="HH:mm"
                                   size="large"
-                                  // convert the stored string to dayjs if needed:
-                                  // value={dayjs(...)}
                                 />
                               </Form.Item>
 
@@ -80,12 +80,14 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                               <Form.Item
                                 {...restSlot}
                                 name={[slotName, "endTime"]}
+                                label="End Time"
                                 rules={[
                                   {
                                     required: true,
                                     message: "End time required",
                                   },
                                 ]}
+                                style={{ marginBottom: 0, width: "15%" }}
                               >
                                 <TimePicker
                                   placeholder="End"
@@ -100,12 +102,14 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                                 <Form.Item
                                   {...restSlot}
                                   name={[slotName, "subjectId"]}
+                                  label="Subject"
                                   rules={[
                                     {
                                       required: true,
                                       message: "Subject required",
                                     },
                                   ]}
+                                  style={{ marginBottom: 0, width: "25%" }}
                                 >
                                   <Select
                                     placeholder="Select Subject"
@@ -125,17 +129,19 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                                 <Form.Item
                                   {...restSlot}
                                   name={[slotName, "eventName"]}
+                                  label="Event Name"
                                   rules={[
                                     {
                                       required: true,
                                       message: "Event name required",
                                     },
                                   ]}
+                                  style={{ marginBottom: 0, width: "25%" }}
                                 >
                                   <input
                                     type="text"
                                     placeholder="Event Name"
-                                    className="border rounded p-1 w-36"
+                                    className="border rounded p-1 w-full"
                                   />
                                 </Form.Item>
                               )}
@@ -144,6 +150,7 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                               <Button
                                 danger
                                 onClick={() => removeSlot(slotKey)}
+                                style={{ alignSelf: "flex-end" }}
                               >
                                 Remove
                               </Button>

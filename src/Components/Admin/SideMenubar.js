@@ -18,7 +18,6 @@ import { useTranslation } from "react-i18next";
 import { filterSidebarData } from "../../Utils/sidebarUtils.js";
 import { Tag, Tooltip } from "antd";
 import "antd/dist/reset.css";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { getRoleColor, getTruncatedName } from "../../Utils/helperFunctions.js";
 
@@ -31,27 +30,14 @@ function useWindowSize() {
       setWidth(window.innerWidth);
     }
     window.addEventListener("resize", handleResize);
-
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return {
     width,
-    isMobile: width < 768, // e.g. Tailwind "md" breakpoint ~768px
+    isMobile: width < 768,
   };
 }
-
-/* Minimal sidebar width animation */
-const sidebarVariants = {
-  open: {
-    width: "15%",
-    transition: { duration: 0.3 },
-  },
-  closed: {
-    width: "7%",
-    transition: { duration: 0.3 },
-  },
-};
 
 /* Submenu expand/collapse animation */
 const submenuVariants = {
@@ -87,22 +73,14 @@ const SideMenubar = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   // Window size hook -> auto collapse on mobile
-  const { width, isMobile } = useWindowSize();
+  const { isMobile } = useWindowSize();
 
-  /*
-   * If we detect isMobile and the sidebar is currently open,
-   * we auto-collapse it. You can also invert the logic if you prefer.
-   */
   useEffect(() => {
     if (isMobile && isOpen) {
-      dispatch(toggleSidebar()); // auto-close if on mobile
+      dispatch(toggleSidebar());
     }
   }, [isMobile, isOpen, dispatch]);
 
-  /*
-   * useCallback to avoid re-creating the same toggle function
-   * on every render
-   */
   const toggleDropdown = useCallback((title) => {
     setOpenItems((prevOpenItems) =>
       prevOpenItems.includes(title)
@@ -111,11 +89,6 @@ const SideMenubar = () => {
     );
   }, []);
 
-  /*
-   * Logout flow
-   * (wrapped with useCallback for potential performance
-   * if used in deep child components, etc.)
-   */
   const handleLogout = useCallback(() => {
     setIsLogoutModalOpen(true);
   }, []);
@@ -131,9 +104,6 @@ const SideMenubar = () => {
     }
   }, [dispatch, navigate]);
 
-  /*
-   * Navigate to user profile
-   */
   const HandleNavigate = useCallback(() => {
     if (role === "admin") {
       navigate("/users/admin");
@@ -148,17 +118,9 @@ const SideMenubar = () => {
       ].includes(role)
     ) {
       navigate("/users/my/profile");
-    } else {
-      console.warn(
-        "Role not recognized. Navigation not defined for this role."
-      );
     }
   }, [role, navigate]);
 
-  /*
-   * Filter sidebar data by role/permissions
-   * useMemo to reduce repeated filtering on every render
-   */
   const filteredSidebarData = useMemo(() => {
     if (!sidebarData || !Array.isArray(sidebarData)) {
       return [];
@@ -166,9 +128,6 @@ const SideMenubar = () => {
     return filterSidebarData(sidebarData, role, permissions);
   }, [role, permissions]);
 
-  /*
-   * On mount, auto-expand any parent that has an active child
-   */
   useEffect(() => {
     const initialOpenItems = [];
     filteredSidebarData.forEach((item) => {
@@ -182,10 +141,8 @@ const SideMenubar = () => {
       }
     });
     setOpenItems(initialOpenItems);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [filteredSidebarData, location.pathname]);
 
-  // Minimal "error handling" if data is missing or user details are not fetched
   if (!sidebarData || !Array.isArray(sidebarData)) {
     return (
       <div className="flex items-center justify-center bg-red-50 text-red-500 w-64 p-4">
@@ -196,7 +153,6 @@ const SideMenubar = () => {
 
   return (
     <nav
-      // This keeps the old UI transition style (no framer-motion).
       className={`fixed top-0 left-0 bottom-0 transition-all duration-500 p-1 px-2 z-30 border-r flex flex-col bg-white ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
@@ -214,11 +170,6 @@ const SideMenubar = () => {
           />
         </NavLink>
 
-        {/* 
-          Arrow Toggle: 
-          - tooltip for accessibility
-          - high z-index if needed
-        */}
         <Tooltip
           title={isOpen ? t("Collapse Sidebar") : t("Expand Sidebar")}
           placement="bottom"
@@ -249,7 +200,6 @@ const SideMenubar = () => {
           {filteredSidebarData.map((item, index) => (
             <React.Fragment key={item.title}>
               {item.items ? (
-                // Parent item with a submenu
                 <div>
                   <Tooltip
                     placement="right"
@@ -327,15 +277,17 @@ const SideMenubar = () => {
                                 <NavLink
                                   to={subItem.path}
                                   className={({ isActive }) =>
-                                    `flex items-center p-2 rounded-lg text-sm ${
+                                    `flex items-center p-2 rounded-lg text-sm
+                                    ${
                                       isActive ||
                                       isActivePath(
                                         subItem.path,
                                         location.pathname
                                       )
-                                        ? "text-purple-500 bg-purple-100"
+                                        ? "text-purple-500 bg-purple-100 border-l-4 border-purple-500"
                                         : "text-gray-700 hover:bg-gray-100"
-                                    } ${isOpen ? "pl-2" : "justify-center"}`
+                                    }
+                                    ${isOpen ? "pl-2" : "justify-center"}`
                                   }
                                   aria-label={t(subItem.title)}
                                 >
@@ -360,7 +312,6 @@ const SideMenubar = () => {
                   </AnimatePresence>
                 </div>
               ) : (
-                // Parent item without a submenu
                 <Tooltip
                   placement="right"
                   title={!isOpen ? t(item.title) : ""}
@@ -370,11 +321,13 @@ const SideMenubar = () => {
                   <NavLink
                     to={item.path}
                     className={({ isActive }) =>
-                      `flex items-center p-2 rounded-lg text-sm ${
+                      `flex items-center p-2 rounded-lg text-sm
+                      ${
                         isActive || isActivePath(item.path, location.pathname)
-                          ? "text-purple-500 bg-purple-100"
+                          ? "text-purple-500 bg-purple-100 border-r-4 border-purple-500"
                           : "text-gray-700 hover:bg-gray-100"
-                      } ${isOpen ? "" : "justify-center"}`
+                      }
+                      ${isOpen ? "" : "justify-center"}`
                     }
                     aria-label={t(item.title)}
                   >
@@ -413,7 +366,6 @@ const SideMenubar = () => {
             <h2 className="text-sm font-semibold">
               {getTruncatedName(userDetails?.fullName)}
             </h2>
-            {/* <p className="text-gray-500 capitalize text-xs">{role}</p> */}
             <Tag color={getRoleColor(role)}>
               <span> {role?.toUpperCase() || "USER"}</span>
             </Tag>
