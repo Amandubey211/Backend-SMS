@@ -24,7 +24,9 @@ import StudentGradeSummary from "./Component/StudentGradeSummary";
 const StudentGradeModal = ({ isOpen, onClose, student }) => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
-
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   // Keep the selected student's ID in local state so we don't lose it on re-renders
   const [localStudentId, setLocalStudentId] = useState(null);
 
@@ -52,6 +54,22 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
       setLocalStudentId(student.studentId);
     }
   }, [student]);
+
+  useEffect(() => {
+    if (selectedSemester?.id && !filters.semester && localStudentId) {
+      const newFilters = { ...filters, semester: selectedSemester.id };
+      setFilters(newFilters);
+
+      // Trigger fetch with updated semester
+      const params = {
+        semesterId: selectedSemester.id,
+        subjectId: sid,
+        mode: newFilters.gradeMode,
+      };
+
+      debouncedGetStudentGrades(params);
+    }
+  }, [selectedSemester, filters.semester, sid, localStudentId]);
 
   /**
    * Fetch the student's grades from the backend,
@@ -158,16 +176,24 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
    * fetch fresh data in "online" mode.
    */
   const handleResetFilters = useCallback(() => {
-    setFilters(defaultFilters);
+    const newFilters = {
+      ...defaultFilters,
+      semester: selectedSemester?.id || "", // 💡 set default semester
+    };
+    setFilters(newFilters);
     const params = {};
     if (sid) params.subjectId = sid;
     // default is "online"
     params.mode = "online";
 
-    if (localStudentId) {
-      debouncedGetStudentGrades(params);
+    if (selectedSemester?.id) {
+      params.semesterId = selectedSemester.id;
     }
-  }, [sid, localStudentId, debouncedGetStudentGrades]);
+
+    if (localStudentId) {
+      getStudentGrades(params);
+    }
+  }, [sid, localStudentId, selectedSemester]);
 
   /**
    * Lock scroll on the background when the modal is open.

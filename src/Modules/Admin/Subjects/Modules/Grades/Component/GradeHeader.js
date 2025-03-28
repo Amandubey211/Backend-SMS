@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 
 const GradeHeader = ({ onSearch, onFilterChange }) => {
   const [search, setSearch] = useState("");
+  const [semesterId, setSemesterId] = useState("");
   const { t } = useTranslation("admClass");
 
   // Retrieve lists for filtering from Redux
@@ -22,7 +23,10 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
 
   // On mount or when selectedSemester changes, update parent's semester filter
   useEffect(() => {
-    onFilterChange("semesterId", selectedSemester || "");
+    if (selectedSemester) {
+      setSemesterId(selectedSemester.id);
+      onFilterChange("semesterId", selectedSemester.id);
+    }
   }, [selectedSemester, onFilterChange]);
 
   const handleSearchChange = (e) => {
@@ -32,6 +36,12 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
 
   const handleFilterChange = (name, value) => {
     onFilterChange(name, value);
+  };
+
+  const handleSemesterChange = (e) => {
+    const value = e.target.value;
+    setSemesterId(value);
+    onFilterChange("semesterId", value);
   };
 
   return (
@@ -116,8 +126,8 @@ const GradeHeader = ({ onSearch, onFilterChange }) => {
           <select
             name="semesterId"
             className="px-4 py-2 border w-[10rem] rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
-            defaultValue={selectedSemester || ""}
-            onChange={(e) => handleFilterChange("semesterId", e.target.value)}
+            value={semesterId}
+            onChange={handleSemesterChange}
             aria-label={t("Select Semester")}
           >
             <option value="">{t("Select")}</option>
