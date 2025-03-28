@@ -213,13 +213,15 @@ const SelectBranch = () => {
                 </h3>
                 <p className="text-lg text-gray-700">{selectedBranch?.city}</p>
                 <div className="flex items-center justify-center mt-6">
-                  <img
-                    src={selectedBranch.logo || DefaultBranchLogo}
-                    alt={`Logo of ${
-                      selectedBranch?.nameOfSchool || "Default branch"
-                    }`}
-                    className="w-60 h-60 object-contain rounded-full border-4 border-pink-500"
-                  />
+                  <div className="w-72 h-72 rounded-full overflow-hidden border-4 border-pink-500">
+                    <img
+                      src={selectedBranch.logo || DefaultBranchLogo}
+                      alt={`Logo of ${
+                        selectedBranch?.nameOfSchool || "Default branch"
+                      }`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
               </div>
               <div className="flex justify-center w-full mt-6">
