@@ -1,9 +1,9 @@
 import React from "react";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaGraduationCap, FaLock } from "react-icons/fa";
 import StudentMenuOptions from "./StudentMenuOptions";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
-import { Tag, Tooltip } from "antd";
-import { FaGraduationCap } from "react-icons/fa";
+import { Tooltip } from "antd";
+
 const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
     activeSection === "Everyone"
@@ -30,11 +30,23 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
                 onSeeGradeClick={onSeeGradeClick}
               />
 
-              <StudentMenuOptions
-                studentName={`${student?.firstName} ${student?.lastName}`}
-                studentId={student?._id}
-                student={student}
-              />
+              {/* 
+                If the student is graduated, show a lock icon (read-only), 
+                otherwise show the StudentMenuOptions. 
+              */}
+              {student.isGraduate ? (
+                <div className="flex items-center text-gray-400 cursor-default p-2 ">
+                  <Tooltip title="Graduated student. No further actions.">
+                    <FaLock className="w-4 h-5" />
+                  </Tooltip>
+                </div>
+              ) : (
+                <StudentMenuOptions
+                  studentName={`${student?.firstName} ${student?.lastName}`}
+                  studentId={student?._id}
+                  student={student}
+                />
+              )}
             </li>
           ))}
         </ul>
@@ -97,11 +109,11 @@ const StudentDetails = React.memo(({ student }) => (
     </div>
     <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
       <div className="text-sm text-gray-500 truncate">
-        {student?.sectionName || "N/A"}
+        {student?.sectionName || "No Section"}
       </div>
       {student?.groups?.length > 0 && (
         <div className="text-sm text-gray-500 truncate">
-          {student?.groups[0]?.groupName || "N/A"}
+          {student?.groups[0]?.groupName || "No Group"}
         </div>
       )}
     </div>
@@ -111,7 +123,6 @@ const StudentDetails = React.memo(({ student }) => (
     </div>
     <div className="flex pl-20 flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
       <div className="truncate">
-        {" "}
         {student.guardianRelationToStudent || "Guardian"}
       </div>
       <div className="truncate">{student.guardianContactNumber}</div>

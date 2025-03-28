@@ -18,7 +18,7 @@ import { HiOutlinePencilAlt, HiOutlineTrash } from "react-icons/hi";
 
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
-import { Empty, Tooltip } from "antd";
+import { Empty, Tag, Tooltip } from "antd";
 import { FaGraduationCap } from "react-icons/fa";
 
 /* 
@@ -111,14 +111,14 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
         return (
           <motion.div
             key={group._id}
-            layout
-            initial={{ opacity: 0.6, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            // layout
+            // initial={{ opacity: 0.6, y: 10 }}
+            // animate={{ opacity: 1, y: 0 }}
+            // transition={{ duration: 0.3 }}
             className="mb-2 border-b"
           >
             {/* Group Header */}
-            <div className="flex items-center justify-between py-3 bg-gray-50 px-2">
+            <div className="flex items-center justify-between py-3 bg-pink-50 px-2 rounded-md">
               <h3
                 className="text-lg font-semibold text-gradient cursor-pointer"
                 onClick={() =>
@@ -260,6 +260,13 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
                         </div>
                       </div>
 
+                      <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
+                        <Tag className="text-sm text-gray-500 truncate">
+                          {student?.presentSectionId?.sectionName ||
+                            "No Section"}
+                        </Tag>
+                      </div>
+
                       {/* Email / Contact */}
                       <div className="flex flex-col w-1/4 truncate text-sm">
                         <span className="truncate">
@@ -273,7 +280,7 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
                       {/* Guardian Info */}
                       <div className="flex flex-col w-1/4 truncate text-sm">
                         <span className="truncate">
-                          {student?.guardianRelationToStudent || "N/A"}
+                          {student?.guardianRelationToStudent || "Guardian No"}
                         </span>
                         <span className="truncate">
                           {student?.guardianContactNumber || "N/A"}

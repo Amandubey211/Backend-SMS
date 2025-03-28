@@ -82,17 +82,15 @@ const StudentMenuOptions = ({ studentName, studentId, student, groupId }) => {
   const menuContent = (
     <div className="min-w-[180px]">
       <ul className="space-y-1">
+        {/* 
+          If the student is already graduated, show a simple placeholder text.
+          Otherwise, show the other menu options.
+        */}
         {student?.isGraduate ? (
-          // Show ONLY Demote if student is already graduated
-          <ProtectedAction requiredPermission={PERMISSIONS.DEMOTE_STUDENT}>
-            <MenuItem
-              icon={<TfiStatsDown className="text-[#E33131]" />}
-              text="Demote Class"
-              onClick={() => handleMenuItemClick("Demote Class")}
-            />
-          </ProtectedAction>
+          <div className="p-2 text-sm text-gray-500">
+            This student is graduated
+          </div>
         ) : (
-          // Otherwise, show all the other options
           <>
             <ProtectedAction requiredPermission={PERMISSIONS.PROMOTE_STUDENT}>
               <MenuItem
@@ -140,7 +138,7 @@ const StudentMenuOptions = ({ studentName, studentId, student, groupId }) => {
         onOpenChange={setIsPopoverOpen}
       >
         <button
-          className="p-2"
+          className="p-2 "
           aria-haspopup="true"
           aria-expanded={isPopoverOpen}
         >
