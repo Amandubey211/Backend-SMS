@@ -134,7 +134,7 @@ export const deleteClass = createAsyncThunk(
 
       if (response && response?.success) {
         toast.success("Class deleted successfully!");
-        dispatch(fetchAllClasses()); // Refresh the classes list
+        dispatch(fetchAllClassesDetails()); // Refresh the classes list
         return classId;
       }
     } catch (error) {

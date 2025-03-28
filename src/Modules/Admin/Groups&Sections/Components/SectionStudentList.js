@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Button, Modal, Popover, Empty } from "antd";
-import { MoreOutlined, EditOutlined } from "@ant-design/icons";
+import { Button, Modal, Popover, Empty, Tag, Tooltip } from "antd";
+import {
+  MoreOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 import { HiOutlineX } from "react-icons/hi";
-
+import { FaGraduationCap } from "react-icons/fa";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import AssignStudent from "./AssignStudent"; // <-- For "Update Section"
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
@@ -50,7 +54,7 @@ const SectionStudentList = ({
   if (!students || students.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-72 text-center">
-        <Empty description="No students found." />
+        <Empty description="No students found in This Section." />
       </div>
     );
   }
@@ -105,7 +109,7 @@ const SectionStudentList = ({
         </div>
 
         <div className="space-y-2">
-          {students.map((student) => (
+          {students.map((student, index) => (
             <motion.div
               key={student._id}
               layout
@@ -115,18 +119,30 @@ const SectionStudentList = ({
               className="flex items-center justify-between p-4 border-b border-gray-200 rounded bg-white relative"
             >
               {/* Student basic info */}
+
               <div className="flex items-center flex-shrink-0 w-1/4">
-                <img
-                  src={student?.profile || profileIcon}
-                  alt={student?.firstName || "First"}
-                  className="w-10 h-10 rounded-full mr-3"
-                />
+                <div className="relative mr-3">
+                  <img
+                    src={student?.profile || profileIcon}
+                    alt={student?.firstName || "First"}
+                    className={`w-10 h-10 rounded-full object-cover ${
+                      student.isGraduate ? "border-2 border-green-500" : ""
+                    }`}
+                  />
+                  {student.isGraduate && (
+                    <Tooltip title="Graduated">
+                      <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
+                        <FaGraduationCap className="text-white w-3 h-3" />
+                      </div>
+                    </Tooltip>
+                  )}
+                </div>
                 <div className="flex flex-col">
                   <div className="text-sm font-medium truncate">
                     {student?.firstName} {student?.lastName || ""}
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {student?.admissionNumber || "Admission #"}
+                  <div className="flex items-center text-xs text-gray-500 truncate">
+                    <span>{student?.admissionNumber || index}</span>
                   </div>
                 </div>
               </div>
@@ -164,15 +180,16 @@ const SectionStudentList = ({
                   trigger="click"
                   content={
                     <div className="flex flex-col">
-                      <Button
-                        type="text"
-                        icon={<EditOutlined />}
-                        onClick={() => handleOpenAssignSidebar(student)}
-                      >
-                        Update Section
-                      </Button>
+                      {!student.isGraduate && (
+                        <Button
+                          type="text"
+                          icon={<EditOutlined />}
+                          onClick={() => handleOpenAssignSidebar(student)}
+                        >
+                          Update Section
+                        </Button>
+                      )}
 
-                      {/*
                       <Button
                         type="text"
                         icon={<InfoCircleOutlined />}
@@ -180,7 +197,6 @@ const SectionStudentList = ({
                       >
                         Full Details
                       </Button>
-                      */}
                     </div>
                   }
                 >
@@ -224,17 +240,25 @@ const SectionStudentList = ({
               <img
                 src={detailsStudent?.profile || profileIcon}
                 alt={detailsStudent?.firstName}
-                className="w-16 h-16 rounded-full mr-4"
+                className="w-16 h-16 rounded-full mr-4  object-cover"
               />
               <div>
                 <h2 className="text-lg font-semibold">
                   {detailsStudent.firstName} {detailsStudent.lastName}
                 </h2>
-                <p className="text-sm text-gray-600">
-                  Admission: {detailsStudent.admissionNumber || "N/A"}
-                </p>
+                <div className="flex items-center text-sm text-gray-600">
+                  <span>
+                    Admission: {detailsStudent.admissionNumber || "N/A"}
+                  </span>
+                  {detailsStudent.isGraduate && (
+                    <Tag color="green" className="text-xs ml-1">
+                      Graduated
+                    </Tag>
+                  )}
+                </div>
               </div>
             </div>
+
             <div className="mt-4">
               <p>
                 <strong>Email:</strong> {detailsStudent.email || "No email"}

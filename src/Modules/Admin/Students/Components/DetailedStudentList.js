@@ -2,7 +2,8 @@ import React from "react";
 import { FaUsers } from "react-icons/fa";
 import StudentMenuOptions from "./StudentMenuOptions";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
-
+import { Tag, Tooltip } from "antd";
+import { FaGraduationCap } from "react-icons/fa";
 const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
   const filteredStudents =
     activeSection === "Everyone"
@@ -28,6 +29,7 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
                 index={index}
                 onSeeGradeClick={onSeeGradeClick}
               />
+
               <StudentMenuOptions
                 studentName={`${student?.firstName} ${student?.lastName}`}
                 studentId={student?._id}
@@ -44,19 +46,29 @@ const DetailedStudentList = ({ activeSection, onSeeGradeClick, students }) => {
 const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
   <>
     <div className="flex items-center w-1/4">
-      <img
-        src={student.profile || profileIcon}
-        alt={student.name}
-        className="w-10 h-10 rounded-full mr-3"
-        loading="lazy"
-      />
+      <div className="relative mr-3">
+        <img
+          src={student.profile || profileIcon}
+          alt={student.name}
+          loading="lazy"
+          className={`w-10 h-10 rounded-full object-cover ${
+            student.isGraduate ? "border-2 border-green-500" : ""
+          }`}
+        />
+        {student.isGraduate && (
+          <Tooltip title="Graduated">
+            <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
+              <FaGraduationCap className="text-white w-3 h-3" />
+            </div>
+          </Tooltip>
+        )}
+      </div>
       <div className="flex flex-col truncate">
         <div className="text-sm font-medium truncate">
           {student?.firstName} {student?.lastName}
         </div>
-
-        <div className="text-xs text-gray-500 truncate">
-          {student?.admissionNumber || index}
+        <div className="flex items-center text-xs text-gray-500 truncate">
+          <span>{student?.admissionNumber || index}</span>
         </div>
       </div>
     </div>
@@ -66,7 +78,6 @@ const StudentInfo = React.memo(({ student, index, onSeeGradeClick }) => (
         className="px-3 py-1 text-green-500 font-semibold text-sm border border-green-500 rounded-lg"
         onClick={() => {
           onSeeGradeClick(student);
-          // console.log(student);
         }}
         aria-label={`See Grade for ${student?.firstName} ${student?.lastName}`}
       >
@@ -99,7 +110,10 @@ const StudentDetails = React.memo(({ student }) => (
       <div className="truncate">{student.contactNumber}</div>
     </div>
     <div className="flex pl-20 flex-col text-sm gap-1 items-start justify-start w-1/4 truncate">
-      <div>Parent</div>
+      <div className="truncate">
+        {" "}
+        {student.guardianRelationToStudent || "Guardian"}
+      </div>
       <div className="truncate">{student.guardianContactNumber}</div>
     </div>
   </>

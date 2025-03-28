@@ -14,8 +14,8 @@ import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 const AssignStudent = ({ name, imageUrl, section, studentId }) => {
   const { t } = useTranslation("admClass");
   const [sectionId, setSectionId] = useState("");
-  const AllSections = useSelector(
-    (store) => store.admin.group_section.sectionsList
+  const { sectionsList: AllSections, sectionsLoading } = useSelector(
+    (store) => store.admin.group_section
   );
 
   const { cid } = useParams();
@@ -32,7 +32,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
     if (sectionToPreload) {
       setSectionId(sectionToPreload._id);
     }
-  }, [cid, dispatch, section, AllSections]);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +58,7 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           <img
             src={imageUrl || profileIcon}
             alt={name}
-            className="w-10 h-10 rounded-full mr-3"
+            className="w-10 h-10 rounded-full mr-3 object-cover"
           />
           <div>
             <div className="text-sm font-medium">{name}</div>
@@ -91,9 +91,9 @@ const AssignStudent = ({ name, imageUrl, section, studentId }) => {
           className={`w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md ${
             !sectionId ? "opacity-50 cursor-not-allowed" : ""
           }`}
-          disabled={!sectionId}
+          disabled={!sectionId || sectionsLoading}
         >
-          {t("Assign Student")}
+          {sectionsLoading ? t("Assigning Student") : t("Assign Student")}
         </button>
       </div>
     </form>

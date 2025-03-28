@@ -15,7 +15,7 @@ const StudentProfileCard = ({ student }) => {
       <img
         src={student?.profile || profileIcon}
         alt={t("student_image")}
-        className="rounded-full w-[100px] h-[100px] bg-gray-300 border"
+        className="rounded-full object-cover w-[100px] h-[100px] bg-gray-300 border"
       />
       <span className="font-bold capitalize ">{student?.firstName}</span>
       <div className="flex gap-4 font-medium text-gray-500 flex-row text-sm ">

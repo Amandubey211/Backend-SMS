@@ -33,7 +33,7 @@ const MainSection = () => {
   const [activeSectionId, setActiveSectionId] = useState(null);
 
   // State for active tab: "section" or "groups"
-  const [activeTab, setActiveTab] = useState("section");
+  const [activeTab, setActiveTab] = useState("student");
 
   // Grade modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,7 +61,7 @@ const MainSection = () => {
       dispatch(fetchUnassignedStudents(cid));
       dispatch(fetchStudentsByClassAndSection(cid));
     }
-  }, [cid, dispatch]);
+  }, []);
 
   // If user selects a specific section, fetch only that section's groups
   useEffect(() => {
@@ -151,8 +151,8 @@ const MainSection = () => {
   // Tabs data
   const tabItems = [
     {
-      key: "section",
-      label: `Section (${studentCount})`,
+      key: "student",
+      label: `Students (${studentCount})`,
       children: (
         <SectionStudentList
           onSeeGradeClick={onSeeGradeClick}
@@ -202,7 +202,7 @@ const MainSection = () => {
         )}
 
         {/* Right: Tabs + Search bar */}
-        <div className="flex-grow h-full border-l p-4 flex flex-col">
+        <div className="flex-grow h-full border-l p-3 flex flex-col">
           {/* Protected area for the main content */}
           <ProtectedSection
             requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION}

@@ -110,6 +110,10 @@ function MainSection() {
         )
       : [];
 
+  const publishedSubjects =
+    classDetails?.subjects?.filter((s) => s.isPublished) || [];
+  const draftSubjects =
+    classDetails?.subjects?.filter((s) => !s.isPublished) || [];
   // Dynamic data for top NavIconCard items
   const staticIconData = [
     {
@@ -205,13 +209,14 @@ function MainSection() {
           {/* Subject Tabs (Published/Draft) + Subject List */}
           <div className="px-5">
             <ButtonGroup
-              role={role}
               onAddNewSubject={handleAddNewSubject}
               onViewSemester={handleViewSemester}
               selectedTab={selectedTab}
               setSelectedTab={setSelectedTab}
+              role={role}
+              publishedCount={publishedSubjects?.length || 0}
+              draftCount={draftSubjects?.length || 0}
             />
-
             <div className="grid grid-cols-3 gap-4 mb-10">
               {filteredSubjects && filteredSubjects.length > 0 ? (
                 <AnimatePresence>

@@ -21,6 +21,7 @@ const UnAssignedStudentList = () => {
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  console.log(selectedStudent, "selectedStudentselectedStudentselectedStudent");
   // Sidebar open/close
   const handleSidebarOpen = (student) => {
     setSelectedStudent(student);
@@ -73,7 +74,7 @@ const UnAssignedStudentList = () => {
                 <img
                   src={student.profile || profileIcon}
                   alt={student.firstName}
-                  className="w-10 h-10 rounded-full mr-3"
+                  className="w-10 h-10 rounded-full mr-3 object-cover"
                 />
                 <div>
                   <div className="text-sm font-medium">{student.firstName}</div>
