@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, memo } from "react";
 import Notice from "./Notice";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,7 +9,7 @@ import { FaCalendarAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
-import { Skeleton, Empty } from "antd";
+import { Skeleton } from "antd";
 
 const icons = [icon1, icon2];
 
@@ -156,7 +156,8 @@ const NoticeBoard = (descriptionLength) => {
               image={icons[index % icons.length]}
               title={notice?.title}
               authorName={notice?.authorName}
-              date={new Date(notice?.startDate).toLocaleDateString()}
+              startdate={new Date(notice?.startDate).toLocaleDateString()}
+              enddate={new Date(notice?.endDate).toLocaleDateString()}
               priority={notice?.priority}
               content={notice?.description}
               backgroundColor={generateRandomColor()}

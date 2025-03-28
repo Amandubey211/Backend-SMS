@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from "react";
+import React, { useEffect, memo } from "react";
 import BookItem from "./BookItem";
 import { FaBook } from "react-icons/fa"; // For "No data found" icon
 import { useSelector, useDispatch } from "react-redux";
@@ -116,15 +116,15 @@ const Library = () => {
             </p>
           </div>
         ) : (
-          latestBooks?.map((book) => (
+          latestBooks.map((book) => (
             <BookItem
               key={book?._id}
               image={book?.image || "https://via.placeholder.com/50"}
               title={book?.name || t("Untitled Book")}
-              category={book?.category || t("Uncategorized")}
+              categories={book?.categories} // Pass the categories array here
               copies={book?.copies || 0}
               author={book?.author || t("Unknown")}
-              className={book?.className || t("Unknown Class")}
+              className={book?.className || t("No  Class")}
               role={role}
             />
           ))
