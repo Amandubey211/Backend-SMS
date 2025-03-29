@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  fetchTimetables,
   createTimetable,
-  updateTimetable,
   deleteTimetable,
+  fetchTimetableList,
+  updateTimetable,
 } from "./timetable.action";
 
 const initialState = {
@@ -23,22 +23,26 @@ const timetableSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // Fetch Timetables
+    // -------------------------------------------
+    // 1) FETCH Timetables
+    // -------------------------------------------
     builder
-      .addCase(fetchTimetables.pending, (state) => {
+      .addCase(fetchTimetableList.pending, (state) => {
         state.loadingFetch = true;
         state.errorFetch = null;
       })
-      .addCase(fetchTimetables.fulfilled, (state, action) => {
+      .addCase(fetchTimetableList.fulfilled, (state, action) => {
         state.loadingFetch = false;
-        state.timetables = action.payload; // Set timetables to the response data
+        state.timetables = action.payload || [];
       })
-      .addCase(fetchTimetables.rejected, (state, action) => {
+      .addCase(fetchTimetableList.rejected, (state, action) => {
         state.loadingFetch = false;
         state.errorFetch = action.payload || "Failed to fetch timetables.";
       });
 
-    // Create Timetable
+    // -------------------------------------------
+    // 2) CREATE Timetable
+    // -------------------------------------------
     builder
       .addCase(createTimetable.pending, (state) => {
         state.loadingCreate = true;
@@ -46,14 +50,23 @@ const timetableSlice = createSlice({
       })
       .addCase(createTimetable.fulfilled, (state, action) => {
         state.loadingCreate = false;
-        state.timetables.push(action.payload); // Add the newly created timetable
+        // Append the newly created timetable to the list
+        if (action.payload?.data) {
+          // If your API returns { success, message, data } destructure accordingly
+          state.timetables.push(action.payload.data);
+        } else {
+          // Otherwise, if it returns the timetable object directly
+          // state.timetables.push(action.payload);
+        }
       })
       .addCase(createTimetable.rejected, (state, action) => {
         state.loadingCreate = false;
         state.errorCreate = action.payload || "Failed to create timetable.";
       });
 
-    // Update Timetable
+    // -------------------------------------------
+    // 3) UPDATE Timetable
+    // -------------------------------------------
     builder
       .addCase(updateTimetable.pending, (state) => {
         state.loadingUpdate = true;
@@ -61,16 +74,22 @@ const timetableSlice = createSlice({
       })
       .addCase(updateTimetable.fulfilled, (state, action) => {
         state.loadingUpdate = false;
-        state.timetables = state.timetables?.map((timetable) =>
-          timetable._id === action.payload._id ? action.payload : timetable
-        );
+
+        // const updated = action.payload?.data || action.payload;
+        // // Find the index of the updated timetable
+        // const idx = state.timetables.findIndex((tt) => tt._id === updated._id);
+        // if (idx !== -1) {
+        //   state.timetables[idx] = updated;
+        // }
       })
       .addCase(updateTimetable.rejected, (state, action) => {
         state.loadingUpdate = false;
         state.errorUpdate = action.payload || "Failed to update timetable.";
       });
 
-    // Delete Timetable
+    // -------------------------------------------
+    // 4) DELETE Timetable
+    // -------------------------------------------
     builder
       .addCase(deleteTimetable.pending, (state) => {
         state.loadingDelete = true;
@@ -78,9 +97,8 @@ const timetableSlice = createSlice({
       })
       .addCase(deleteTimetable.fulfilled, (state, action) => {
         state.loadingDelete = false;
-        state.timetables = state.timetables.filter(
-          (timetable) => timetable._id !== action.payload.id
-        );
+        const { id } = action.payload; // ID of the deleted timetable
+        state.timetables = state.timetables.filter((tt) => tt._id !== id);
       })
       .addCase(deleteTimetable.rejected, (state, action) => {
         state.loadingDelete = false;

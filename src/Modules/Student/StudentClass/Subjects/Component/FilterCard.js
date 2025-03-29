@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FiRefreshCw } from "react-icons/fi";
-import { stdModule } from "../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
+import { MdViewModule, MdOutlineMenuBook } from "react-icons/md";
+import { Select, Button, Tooltip as AntTooltip } from "antd";
 import { useParams } from "react-router-dom";
+import { stdModule } from "../../../../../Store/Slices/Student/MyClass/Class/Subjects/Modules/module.action";
+
+const { Option } = Select;
 
 const FilterCard = ({ filters, setFilters }) => {
   const [selectedModule, setSelectedModule] = useState(filters.moduleId || "");
@@ -10,13 +14,17 @@ const FilterCard = ({ filters, setFilters }) => {
     filters.chapterId || ""
   );
   const [chapters, setChapters] = useState([]);
+
+  // Track local loading state for "Apply"
+  const [applying, setApplying] = useState(false);
+
   const { modulesData } = useSelector((store) => store?.student?.studentModule);
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
-  
+
   useEffect(() => {
-      dispatch(stdModule({ cid, sid }));
-  }, [cid, dispatch, sid]);
+    dispatch(stdModule({ cid, sid }));
+  }, [cid, sid, dispatch]);
 
   useEffect(() => {
     if (selectedModule) {
@@ -27,13 +35,23 @@ const FilterCard = ({ filters, setFilters }) => {
     }
   }, [selectedModule, modulesData]);
 
+  /* ---------------------- Handlers ---------------------- */
   const handleApplyFilters = () => {
+    setApplying(true);
+    // If your thunk returns a promise, handle .then()/.catch() to stop applying
     setFilters({ moduleId: selectedModule, chapterId: selectedChapter });
+
+    // Simulate short async operation
+    setTimeout(() => setApplying(false), 500);
   };
 
-  const handleModuleChange = (e) => {
-    setSelectedModule(e.target.value);
+  const handleModuleChange = (value) => {
+    setSelectedModule(value);
     setSelectedChapter("");
+  };
+
+  const handleChapterChange = (value) => {
+    setSelectedChapter(value);
   };
 
   const handleResetFilters = () => {
@@ -42,64 +60,79 @@ const FilterCard = ({ filters, setFilters }) => {
     setFilters({ moduleId: "", chapterId: "" });
   };
 
-  // console.log("selected sem", semesterId);
+  /* 
+    Disable "Apply" if no moduleId and no chapterId are selected,
+    or if a filter apply is in progress.
+  */
+  const isApplyDisabled = (!selectedModule && !selectedChapter) || applying;
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md w-80 relative">
-      <button
-        onClick={handleResetFilters}
-        className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-        aria-label="Reset filters"
-      >
-        <FiRefreshCw size={24} />
-      </button>
+    <div className="bg-white p-6 rounded-lg shadow-md w-72 relative">
+      {/* RESET ICON WITH TOOLTIP */}
+      <AntTooltip title="Reset Filters">
+        <button
+          onClick={handleResetFilters}
+          className="absolute top-2 right-2 text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+          aria-label="Reset filters"
+        >
+          <FiRefreshCw size={24} />
+        </button>
+      </AntTooltip>
+
       <h2 className="text-lg font-semibold mb-4">Filter</h2>
 
+      {/* MODULE FIELD */}
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="module-select">
-          Module
+        <label className="flex items-center gap-2 text-gray-700 mb-1">
+          {/* <MdViewModule className="text-lg text-gray-600" /> */}
+          <span>Module</span>
         </label>
-        <select
-          id="module-select"
-          className="mt-1 block w-full pl-3 pr-10 border py-2 text-base focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          value={selectedModule}
+        <Select
+          placeholder="Select a module"
+          className="w-full"
+          value={selectedModule || undefined}
           onChange={handleModuleChange}
+          allowClear
         >
-          <option value="">Select</option>
           {modulesData?.map((module) => (
-            <option key={module._id} value={module._id}>
+            <Option key={module._id} value={module._id}>
               {module.moduleName}
-            </option>
+            </Option>
           ))}
-        </select>
+        </Select>
       </div>
 
+      {/* CHAPTER FIELD */}
       <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="chapter-select">
-          Chapter
+        <label className="flex items-center gap-2 text-gray-700 mb-1">
+          {/* <MdOutlineMenuBook className="text-lg text-gray-600" /> */}
+          <span>Chapter</span>
         </label>
-        <select
-          id="chapter-select"
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-          value={selectedChapter}
-          onChange={(e) => setSelectedChapter(e.target.value)}
+        <Select
+          placeholder="Select a chapter"
+          className="w-full"
+          value={selectedChapter || undefined}
+          onChange={handleChapterChange}
+          allowClear
         >
-          <option value="">Select</option>
           {chapters?.map((chapter) => (
-            <option key={chapter._id} value={chapter._id}>
+            <Option key={chapter._id} value={chapter._id}>
               {chapter.name}
-            </option>
+            </Option>
           ))}
-        </select>
+        </Select>
       </div>
 
-      <button
+      {/* APPLY BUTTON WITH LOADING SPINNER & DISABLE LOGIC */}
+      <Button
         onClick={handleApplyFilters}
+        type="primary"
         className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 rounded-full focus:outline-none transform transition-transform duration-300 hover:scale-105"
-        aria-label="Apply filters"
+        loading={applying}
+        disabled={isApplyDisabled}
       >
         Apply
-      </button>
+      </Button>
     </div>
   );
 };

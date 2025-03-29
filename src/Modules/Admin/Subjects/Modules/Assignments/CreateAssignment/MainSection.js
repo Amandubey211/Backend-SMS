@@ -1,4 +1,5 @@
 // MainSection.jsx
+
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -42,7 +43,7 @@ function validateAssignment(data, isPublishing) {
   return errors;
 }
 
-// Updated initial state with arrays for sectionIds and groupIds
+// Updated initial state including the new results fields
 const initialFormState = {
   points: "",
   displayGrade: false,
@@ -50,14 +51,16 @@ const initialFormState = {
   allowedAttempts: false,
   numberOfAttempts: null,
   assignTo: "Everyone",
-  sectionIds: [], // updated from sectionId
+  sectionIds: [],
   dueDate: "",
   availableFrom: "",
   until: "",
   thumbnail: null,
   moduleId: null,
   chapterId: null,
-  groupIds: [], // updated from groupId
+  groupIds: [],
+  resultsPublished: false, // New field
+  resultsPublishDate: "", // New field (date string)
 };
 
 const MainSection = ({ setIsEditing }) => {
@@ -66,7 +69,7 @@ const MainSection = ({ setIsEditing }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // Form state
+  // Form state management
   const [assignmentName, setAssignmentName] = useState("");
   const [editorContent, setEditorContent] = useState("");
   const [formState, setFormState] = useState(initialFormState);
@@ -118,7 +121,7 @@ const MainSection = ({ setIsEditing }) => {
     }
   };
 
-  // Preload assignment if editing
+  // Preload assignment data when editing
   useEffect(() => {
     if (location.state && location.state.assignment) {
       const assignment = location.state.assignment;
@@ -134,14 +137,16 @@ const MainSection = ({ setIsEditing }) => {
         allowedAttempts: assignment.allowedAttempts,
         numberOfAttempts: assignment.allowNumberOfAttempts || "",
         assignTo: assignment.assignTo || "",
-        sectionIds: assignment.sectionIds || [], // updated here
+        sectionIds: assignment.sectionIds || [],
         dueDate: assignment.dueDate || "",
         availableFrom: assignment.availableFrom || "",
         until: assignment.until || "",
         thumbnail: assignment.thumbnail || null,
         moduleId: assignment.moduleId || null,
         chapterId: assignment.chapterId || null,
-        groupIds: assignment.groupIds || [], // updated here
+        groupIds: assignment.groupIds || [],
+        resultsPublished: assignment.resultsPublished || false,
+        resultsPublishDate: assignment.resultsPublishDate || "",
       });
       setExistingRubricId(assignment.rubricId || null);
     } else {
@@ -175,7 +180,7 @@ const MainSection = ({ setIsEditing }) => {
           : null;
       }
 
-      // Build the assignment payload with new multi-select keys
+      // Build payload including the new results fields
       const assignmentData = {
         name: assignmentName,
         content: editorContent,
@@ -194,9 +199,11 @@ const MainSection = ({ setIsEditing }) => {
         moduleId: formState.moduleId || null,
         chapterId: formState.chapterId || null,
         publish,
+        resultsPublished: formState.resultsPublished,
+        resultsPublishDate: formState.resultsPublishDate || null,
       };
 
-      // Set multi-section or multi-group payload based on assignTo value
+      // Include multi-select values for Section or Group assignments
       if (formState.assignTo === "Section") {
         assignmentData.sectionIds = formState.sectionIds;
       } else if (formState.assignTo === "Group") {
@@ -290,7 +297,6 @@ const MainSection = ({ setIsEditing }) => {
                 setFormState((prev) => ({ ...prev, displayGrade: grade }))
               }
               handleChange={handleFormChange}
-              // Passing refs for validation
               moduleRef={moduleSelectRef}
               pointsRef={pointsInputRef}
               submissionTypeRef={submissionTypeRef}
@@ -301,7 +307,6 @@ const MainSection = ({ setIsEditing }) => {
               submissionTypeError={formErrors.submissionType}
               availableFromError={formErrors.availableFrom}
               dueDateError={formErrors.dueDate}
-              // Pass multiSelect flag to use multi-select in section/group component
               multiSelect={true}
             />
           </div>

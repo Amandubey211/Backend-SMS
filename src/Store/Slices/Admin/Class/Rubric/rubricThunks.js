@@ -19,12 +19,13 @@ export const fetchRubricsBySubjectId = createAsyncThunk(
   "rubric/fetchRubricsBySubjectId",
   async (sid, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
+    const semesterId = getState().common.user.classInfo.selectedSemester.id;
     dispatch(setShowError(false));
 
     try {
       const getRole = getUserRole(getState);
       const response = await getData(
-        `/${getRole}/rubric/subject/${sid}?say=${say}`
+        `/${getRole}/rubric/subject/${sid}?say=${say}&semesterId=${semesterId}`
       );
       return response.rubrics;
     } catch (error) {

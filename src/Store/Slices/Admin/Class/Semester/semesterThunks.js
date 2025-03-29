@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 export const fetchSemestersByClass = createAsyncThunk(
   "semesters/fetchSemestersByClass",
   async (classId, { rejectWithValue, dispatch, getState }) => {
-    const cid = getState().common.user.classInfo.selectedClassId || classId;
+    const cid = classId || getState().common.user.classInfo.selectedClassId;
     const say = getAY();
     dispatch(setShowError(false));
     try {

@@ -13,6 +13,7 @@ import {
 } from "../../../../../../Store/Slices/Admin/Class/Page/pageThunk";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import AudienceSelector from "../../../Component/AudienceSelector";
 
 const AddPage = () => {
   const { t } = useTranslation("admAccounts");
@@ -24,9 +25,15 @@ const AddPage = () => {
   const [editorContent, setEditorContent] = useState("");
   const [publishAt, setPublishDate] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [loadingType, setLoadingType] = useState(""); // "save" (publishing is always required)
+  const [loadingType, setLoadingType] = useState(""); // e.g., "save"
   const [publishAtError, setPublishAtError] = useState("");
   const [titleError, setTitleError] = useState("");
+
+  // New state for audience selection (groupIds & sectionIds)
+  const [audience, setAudience] = useState({
+    groupIds: [],
+    sectionIds: [],
+  });
 
   // Refs for validations
   const publishDateRef = useRef(null);
@@ -48,6 +55,11 @@ const AddPage = () => {
           new Date(state.page.publishAt).toISOString().substring(0, 10)
         );
       }
+      // Preload audience if editing an existing page
+      setAudience({
+        groupIds: state.page.groupIds || [],
+        sectionIds: state.page.sectionIds || [],
+      });
       setIsUpdating(true);
     }
   }, [state]);
@@ -59,10 +71,9 @@ const AddPage = () => {
     }
   }, []);
 
-  const handleEditorChange = useCallback(
-    (content) => setEditorContent(content),
-    []
-  );
+  const handleEditorChange = useCallback((content) => {
+    setEditorContent(content);
+  }, []);
 
   const handlePublishDateChange = useCallback((e) => {
     setPublishDate(e.target.value);
@@ -71,15 +82,12 @@ const AddPage = () => {
     }
   }, []);
 
-  // Updated: Publish date is always required
   const handleSave = useCallback(async () => {
-    // Validate title first
     if (!title.trim()) {
       setTitleError("Page title is required.");
       titleInputRef.current?.focus();
       return;
     }
-    // Always validate publish date
     if (!publishAt.trim()) {
       setPublishAtError("Publish date is required.");
       publishDateRef.current?.focus();
@@ -98,11 +106,14 @@ const AddPage = () => {
       return;
     }
 
+    // Build the page payload including audience selections
     const pageData = {
       title,
       content: editorContent,
       publishAt,
-      publish: true, // Always publish (since publishAt is always required)
+      publish: true,
+      groupIds: audience.groupIds,
+      sectionIds: audience.sectionIds,
     };
 
     setLoadingType("save");
@@ -113,7 +124,6 @@ const AddPage = () => {
       } else {
         await dispatch(createPage({ pageData, cid }));
       }
-      // After successful creation/update, navigate back
       navigate(-1);
     } catch (error) {
       console.error("Error saving page:", error);
@@ -129,9 +139,9 @@ const AddPage = () => {
     dispatch,
     cid,
     navigate,
+    audience,
   ]);
 
-  // Compute if publish date is set (used in header tooltip)
   const isPublishDateSet = publishAt.trim() !== "";
 
   return (
@@ -154,7 +164,6 @@ const AddPage = () => {
             loadingType={loadingType}
             isPublishDateSet={isPublishDateSet}
           />
-
           <ProtectedSection
             requiredPermission={
               PERMISSIONS.UPDATE_PAGE || PERMISSIONS.CREATE_PAGE
@@ -162,6 +171,7 @@ const AddPage = () => {
             title={"Add/Edit Page"}
           >
             <div className="flex w-full h-full">
+              {/* Left side: Editor (70%) */}
               <div className="w-[70%]">
                 <EditorComponent
                   assignmentName={title}
@@ -173,6 +183,7 @@ const AddPage = () => {
                   inputRef={titleInputRef}
                 />
               </div>
+              {/* Right side: Options (30%) */}
               <div className="w-[30%] border-l min-h-screen px-4 py-2">
                 <h2 className="text-lg font-semibold mb-4">{t("Option")}</h2>
                 <DateInput
@@ -183,10 +194,11 @@ const AddPage = () => {
                   error={publishAtError}
                   ref={publishDateRef}
                 />
+                {/* Integrate AudienceSelector for group and section selections */}
+                <AudienceSelector value={audience} onChange={setAudience} />
               </div>
             </div>
           </ProtectedSection>
-
           {loading && (
             <p className="text-center my-4 text-indigo-600">{t("Saving...")}</p>
           )}

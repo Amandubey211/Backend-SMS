@@ -27,11 +27,12 @@ export const addChapter = createAsyncThunk(
       dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
-
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const formData = new FormData();
       formData.append("name", name);
       formData.append("moduleId", moduleId);
       formData.append("subjectId", subjectId);
+      formData.append("semesterId", semesterId);
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }
@@ -84,9 +85,10 @@ export const editChapter = createAsyncThunk(
       dispatch(setShowError(false));
       const cid = getState().common.user.classInfo.selectedClassId;
       const subjectId = getState().common.user.subjectInfo.selectedSubjectId;
-
+      const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const formData = new FormData();
       formData.append("name", name);
+      formData.append("semesterId", semesterId);
       if (thumbnail) {
         formData.append("thumbnail", thumbnail);
       }

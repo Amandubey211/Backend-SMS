@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, shallowEqual } from "react-redux";
 import { motion } from "framer-motion";
 import { FaLock } from "react-icons/fa";
 import { ROLES } from "../../config/permission";
@@ -35,12 +35,15 @@ const AccessDenied = ({ title }) => (
 
 // **ProtectedSection Component**
 const ProtectedSection = ({ requiredPermission, children, title, aman }) => {
-  const { permissions, role, loading, error } = useSelector((state) => ({
-    permissions: state.common.auth.permissions,
-    role: state.common.auth.role,
-    loading: state.common.auth.loading,
-    error: state.common.auth.error,
-  }));
+  const { permissions, role, loading, error } = useSelector(
+    (state) => ({
+      permissions: state.common.auth.permissions,
+      role: state.common.auth.role,
+      loading: state.common.auth.loading,
+      error: state.common.auth.error,
+    }),
+    shallowEqual
+  );
 
   if (loading) {
     return (
@@ -49,6 +52,7 @@ const ProtectedSection = ({ requiredPermission, children, title, aman }) => {
       </div>
     );
   }
+
   if (role === ROLES.ADMIN && aman) {
     return (
       <div className="w-full h-full relative">
@@ -58,6 +62,7 @@ const ProtectedSection = ({ requiredPermission, children, title, aman }) => {
       </div>
     );
   }
+
   // Bypass permission checks for admin role
   if (role === ROLES.ADMIN) {
     return <div className="w-full h-full">{children}</div>;
@@ -77,5 +82,4 @@ const ProtectedSection = ({ requiredPermission, children, title, aman }) => {
   );
 };
 
-// **Memoize to prevent unnecessary re-renders**
 export default React.memo(ProtectedSection);

@@ -1,9 +1,9 @@
-// CreateManually.js
 import React, { useEffect, useState } from "react";
-import { Button, Select, message } from "antd";
+import { Button, Select, DatePicker, message, Switch, Tooltip } from "antd";
+import { TeamOutlined, CalendarOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { createOfflineExam } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
-import { fetchStudentsByClassAndSectionNames } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import { fetchStudentsByClassAndSection } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { fetchSectionsByClass } from "../../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchAllStudents } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import toast from "react-hot-toast";
@@ -25,7 +25,6 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
     "Status",
     "Actions",
   ]);
-
   const [tableData, setTableData] = useState([]);
 
   // Exam-level fields
@@ -34,6 +33,10 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
   const [enteredMaxScore, setEnteredMaxScore] = useState("");
   const [selectedStartDate, setSelectedStartDate] = useState(null);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
+
+  // Fields for results publishing
+  const [resultsPublished, setResultsPublished] = useState(false);
+  const [resultsPublishDate, setResultsPublishDate] = useState(null);
 
   // Multiple section selection
   const [selectedSections, setSelectedSections] = useState([]);
@@ -46,7 +49,7 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
 
   useEffect(() => {
     dispatch(fetchSectionsByClass(cid));
-    dispatch(fetchStudentsByClassAndSectionNames(cid));
+    dispatch(fetchStudentsByClassAndSection(cid));
     dispatch(fetchAllStudents());
   }, [cid, dispatch]);
 
@@ -78,6 +81,7 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
       });
       setTableData(updatedTableData);
     } else {
+      // Filter by selected sections
       const filtered = studentsList.filter((student) =>
         values.includes(student.presentSectionId)
       );
@@ -113,6 +117,7 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
   const handleCellChange = (rowIdx, colIdx, value) => {
     setTableData((prevData) => {
       const newData = [...prevData];
+      // If changing the "Name" object
       if (colIdx === 0 && typeof newData[rowIdx][0] === "object") {
         newData[rowIdx][0] = { ...newData[rowIdx][0], name: value };
       } else {
@@ -138,6 +143,10 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
       subjectId: sid,
       startDate: selectedStartDate ? selectedStartDate.toISOString() : null,
       endDate: selectedEndDate ? selectedEndDate.toISOString() : null,
+      resultsPublished,
+      resultsPublishDate: resultsPublishDate
+        ? resultsPublishDate.toISOString()
+        : null,
       students: tableData.map((row) => {
         const fullName = typeof row[0] === "object" ? row[0].name : row[0];
         const [firstName, lastName = ""] = fullName.split(" ");
@@ -177,6 +186,8 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
     setSelectedEndDate(null);
     setSelectedSections([]);
     setTableData([]);
+    setResultsPublished(false);
+    setResultsPublishDate(null);
   };
 
   const handleClear = () => {
@@ -187,31 +198,67 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
   const purpleColor = "#AB47BC";
   const primaryGradient = `linear-gradient(to right, ${pinkColor}, ${purpleColor})`;
 
-  // We'll add a basic red border style if fields are missing
+  // Basic red border style if fields are missing
   const inputClassName = (fieldValue) =>
-    `w-full p-1 border rounded-md m-2 font-medium text-xs capitalize text-center focus:outline-none focus:ring 
+    `w-full p-1 border rounded-md text-xs capitalize text-center focus:outline-none focus:ring 
     ${fieldValue ? "border-gray-200" : "border-red-500"}`;
 
   return (
     <div className="px-4 w-full -mb-9 min-h-[500px]">
-      {/* Section(s) multi-select */}
-      <div className="mb-4 w-full">
-        <label className="font-semibold block mb-1">Select Section(s):</label>
-        <Select
-          mode="multiple"
-          placeholder="Choose one or more sections"
-          style={{ width: "100%", maxWidth: 350 }}
-          value={selectedSections}
-          onChange={handleSectionsChange}
-          allowClear
-          options={[
-            { label: "All Sections", value: "all" },
-            ...sectionsList.map((section) => ({
-              value: section._id,
-              label: section.sectionName,
-            })),
-          ]}
-        />
+      {/* Container for Section(s) and Results Publish Options */}
+      <div className="flex flex-wrap items-center justify-between mb-6 p-4 bg-gray-50 rounded-md shadow-sm gap-4">
+        {/* Section(s) Selection */}
+        <div className="flex flex-col">
+          <div className="flex items-center space-x-2 mb-1">
+            <TeamOutlined className="text-xl text-gray-600" />
+            <label className="font-semibold text-gray-700">
+              Select Student Sections
+            </label>
+          </div>
+          <Select
+            mode="multiple"
+            placeholder="Choose one or more sections"
+            style={{ width: 300 }}
+            value={selectedSections}
+            onChange={handleSectionsChange}
+            allowClear
+            options={[
+              { label: "All Sections", value: "all" },
+              ...sectionsList.map((section) => ({
+                value: section._id,
+                label: section.sectionName,
+              })),
+            ]}
+          />
+        </div>
+
+        {/* Results Publish Options */}
+        <div className="flex flex-col md:flex-row items-start md:items-end space-x-0 md:space-x-4 w-full md:w-auto">
+          {/* Publish Results Switch (Tooltip only) */}
+          <div className="flex items-center space-x-2 mb-2 md:mb-0">
+            <Tooltip title="Publish Results Immediately">
+              <Switch
+                checked={resultsPublished}
+                onChange={(checked) => setResultsPublished(checked)}
+              />
+            </Tooltip>
+          </div>
+          {/* Results Publish Date */}
+          <div className="flex flex-col">
+            <div className="flex items-center space-x-2 mb-1">
+              <CalendarOutlined className="text-xl text-gray-600" />
+              <label className="font-semibold text-gray-700">
+                Results Publish Date
+              </label>
+            </div>
+            <DatePicker
+              value={resultsPublishDate}
+              onChange={(date) => setResultsPublishDate(date)}
+              disabled={resultsPublished}
+              style={{ width: 220 }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Create Table */}

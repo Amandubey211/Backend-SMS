@@ -24,7 +24,9 @@ import StudentGradeSummary from "./Component/StudentGradeSummary";
 const StudentGradeModal = ({ isOpen, onClose, student }) => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
-
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   // Keep the selected student's ID in local state so we don't lose it on re-renders
   const [localStudentId, setLocalStudentId] = useState(null);
 
@@ -37,6 +39,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     status: "",
     subject: "",
     search: "",
+    semester: "",
   };
 
   // Manage filters
@@ -51,6 +54,22 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
       setLocalStudentId(student.studentId);
     }
   }, [student]);
+
+  useEffect(() => {
+    if (selectedSemester?.id && !filters.semester && localStudentId) {
+      const newFilters = { ...filters, semester: selectedSemester.id };
+      setFilters(newFilters);
+
+      // Trigger fetch with updated semester
+      const params = {
+        semesterId: selectedSemester.id,
+        subjectId: sid,
+        mode: newFilters.gradeMode,
+      };
+
+      debouncedGetStudentGrades(params);
+    }
+  }, [selectedSemester, filters.semester, sid, localStudentId]);
 
   /**
    * Fetch the student's grades from the backend,
@@ -102,6 +121,8 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
         newFilters.subject = "";
         newFilters.search = "";
       }
+    } else if (name === "semester") {
+      newFilters.semester = value.id ? value.id : value;
     } else {
       newFilters[name] = value;
     }
@@ -109,7 +130,12 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
 
     // Construct query params for fetch
     const params = {};
-
+    if (newFilters.semester) {
+      params.semesterId = newFilters.semester;
+    }
+    if (name === "semester") {
+      params.semesterId = value; // Pass the selected semester
+    }
     // If the route param sid is available, use it (unless user changes subject)
     if (sid) params.subjectId = sid;
     // For example, if user changes subject in the filter
@@ -150,16 +176,24 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
    * fetch fresh data in "online" mode.
    */
   const handleResetFilters = useCallback(() => {
-    setFilters(defaultFilters);
+    const newFilters = {
+      ...defaultFilters,
+      semester: selectedSemester?.id || "", // 💡 set default semester
+    };
+    setFilters(newFilters);
     const params = {};
     if (sid) params.subjectId = sid;
     // default is "online"
     params.mode = "online";
 
-    if (localStudentId) {
-      debouncedGetStudentGrades(params);
+    if (selectedSemester?.id) {
+      params.semesterId = selectedSemester.id;
     }
-  }, [sid, localStudentId, debouncedGetStudentGrades]);
+
+    if (localStudentId) {
+      getStudentGrades(params);
+    }
+  }, [sid, localStudentId, selectedSemester]);
 
   /**
    * Lock scroll on the background when the modal is open.
@@ -178,7 +212,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
   // Grab the grades data from Redux
   const { grades, loading } =
     useSelector((store) => store.admin.all_students) || {};
-  console.log(grades, "sdfsdf");
+  //console.log(grades, "sdfsdf");
 
   // Mark the initial load done once we have fetched data at least once
   useEffect(() => {
@@ -195,14 +229,12 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
          * so we don't show a half-loaded UI
          */
         <div
-          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
-            isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
         >
           <div
-            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${
-              isOpen ? "translate-y-0" : "translate-y-full"
-            }`}
+            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${isOpen ? "translate-y-0" : "translate-y-full"
+              }`}
           >
             <SkeletonLoadingUI />
           </div>
@@ -212,14 +244,12 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
          * After the first load, show the real UI
          */
         <div
-          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${
-            isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-          }`}
+          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+            }`}
         >
           <div
-            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${
-              isOpen ? "translate-y-0" : "translate-y-full"
-            }`}
+            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${isOpen ? "translate-y-0" : "translate-y-full"
+              }`}
           >
             {/* Header */}
             <div className="flex justify-between items-center p-1 border-b">

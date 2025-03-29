@@ -36,12 +36,13 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // If the click is inside an Ant Design DatePicker dropdown, a modal, or its mask, ignore it.
+      // Ignore clicks on Ant Design components rendered in portals.
       if (
         event.target.closest(".ant-picker-dropdown") ||
+        event.target.closest(".ant-select-dropdown") || // Added condition for the Select dropdown
         event.target.closest(".ant-modal") ||
         event.target.closest(".ant-modal-mask") ||
-        document.querySelector(".ant-confirm, .ant-modal-confirm") // Check if a confirm modal is open
+        document.querySelector(".ant-confirm, .ant-modal-confirm")
       ) {
         return;
       }

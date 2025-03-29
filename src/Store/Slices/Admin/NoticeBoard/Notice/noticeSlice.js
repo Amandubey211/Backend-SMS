@@ -4,18 +4,20 @@ import {
   createNoticeThunk,
   updateNoticeThunk,
   deleteNoticeThunk,
+  fetchNoticeUsersThunk, // import the new thunk
 } from "./noticeThunks";
 
 const initialState = {
   notices: [],
+  noticeUsers: [], // New: stores the fetched notice users
   selectedNotice: null,
   editMode: false,
   loading: false,
   error: null,
   titleToDelete: "",
-  currentPage: 1, // New: current page number
-  totalPages: 1, // New: total pages available
-  totalNotices: 0, // New: total count of notices
+  currentPage: 1, // current page number
+  totalPages: 1, // total pages available
+  totalNotices: 0, // total count of notices
 };
 
 const noticeSlice = createSlice({
@@ -103,6 +105,20 @@ const noticeSlice = createSlice({
         state.loading = false;
       })
       .addCase(deleteNoticeThunk.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loading = false;
+      })
+
+      // New: Fetch Notice Users
+      .addCase(fetchNoticeUsersThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchNoticeUsersThunk.fulfilled, (state, action) => {
+        state.noticeUsers = action.payload || [];
+        state.loading = false;
+      })
+      .addCase(fetchNoticeUsersThunk.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       });

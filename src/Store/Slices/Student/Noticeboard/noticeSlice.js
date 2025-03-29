@@ -8,7 +8,7 @@ const initialState = {
   searchTerm: "",
   activeIndex: null,
   totalNotices: 0,
-  totalPages: 0,
+  totalPages: 1,
   currentPage: 1,
   priority: "",
 };

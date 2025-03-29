@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
-import { FaRegHeart, FaRegComment, FaEdit, FaTrashAlt } from 'react-icons/fa';
-import Reply from './Reply';
-import InputComment from './InputComment';
-import toast from 'react-hot-toast';
+import React, { useState } from "react";
+import { FaRegHeart, FaRegComment, FaEdit, FaTrashAlt } from "react-icons/fa";
+import Reply from "./Reply";
+import InputComment from "./InputComment";
+import toast from "react-hot-toast";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
-const Comment = ({ comment, deleteComment, deleteReply, addNestedReply, activeReplyId, setActiveReplyId }) => {
+const Comment = ({
+  comment,
+  deleteComment,
+  deleteReply,
+  addNestedReply,
+  activeReplyId,
+  setActiveReplyId,
+}) => {
   const [showReplies, setShowReplies] = useState(false);
 
   const handleDeleteComment = () => {
     if (comment.isUserCreated) {
       deleteComment(comment.id);
-      toast.success('Comment Deleted');
+      toast.success("Comment Deleted");
     } else {
-      toast.error('You can only delete comments you created.');
+      toast.error("You can only delete comments you created.");
     }
   };
 
@@ -40,14 +47,20 @@ const Comment = ({ comment, deleteComment, deleteReply, addNestedReply, activeRe
         </div>
         <div className="ml-auto flex space-x-2">
           <MdOutlineEdit className="text-gray-500 text-xl cursor-pointer" />
-          <RxCross2 className="text-red-500 cursor-pointer text-xl" onClick={handleDeleteComment} />
+          <RxCross2
+            className="text-red-500 cursor-pointer text-xl"
+            onClick={handleDeleteComment}
+          />
         </div>
       </div>
       <p className="text-gray-700 mb-2">{comment.text}</p>
       <div className="flex items-center mb-2 pt-3 border-t">
         <FaRegHeart className="text-gray-500 cursor-pointer" />
         <span className="ml-1 text-gray-500">{comment.likes}</span>
-        <FaRegComment className="ml-4 text-gray-500 cursor-pointer" onClick={() => handleReplyClick(comment.id)} />
+        <FaRegComment
+          className="ml-4 text-gray-500 cursor-pointer"
+          onClick={() => handleReplyClick(comment.id)}
+        />
         <span className="ml-1 text-gray-500">Reply</span>
       </div>
       {showReplies && comment.replies?.length > 0 && (

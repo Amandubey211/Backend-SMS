@@ -12,28 +12,27 @@ const UnAssignedStudentList = () => {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { unassignedStudentsList, sectionsList } = useSelector(
-    (store) => store.admin.group_section
-  );
+  // Redux data
+  const { unassignedStudentsList, sectionsList, unassignedLoading } =
+    useSelector((store) => store.admin.group_section);
 
-  const handleSearch = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
+  // Filter by name
   const filteredStudents = unassignedStudentsList?.filter((student) =>
     student.firstName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  console.log(selectedStudent, "selectedStudentselectedStudentselectedStudent");
+  // Sidebar open/close
   const handleSidebarOpen = (student) => {
     setSelectedStudent(student);
     setSidebarOpen(true);
   };
-
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     setSelectedStudent(null);
   };
 
+  // Show section name or "No Section Assigned"
   const getSectionName = (sectionId) => {
     const section = sectionsList.find((sec) => sec._id === sectionId);
     return section
@@ -45,20 +44,21 @@ const UnAssignedStudentList = () => {
     <div className="w-80 p-4 bg-white">
       <div className="mb-4">
         <h2 className="text-md font-semibold">
-          {t("Unassigned Students")}{" "}
+          {t("Unassigned Students ")}{" "}
           <span className="text-gray-500">({filteredStudents?.length})</span>
         </h2>
         <input
           type="text"
           placeholder={t("Search Student")}
           value={searchQuery}
-          onChange={handleSearch}
+          onChange={(e) => setSearchQuery(e.target.value)}
           className="mt-2 w-full px-3 py-2 border rounded-full"
         />
       </div>
 
-      {/* Check if there are no students */}
-      {filteredStudents?.length === 0 ? (
+      {unassignedLoading ? (
+        <UnAssignedStudentSkeleton />
+      ) : filteredStudents?.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 text-center text-gray-500">
           <PiStudentThin className="text-5xl mb-2" />
           <p>{t("No students found.")}</p>
@@ -74,7 +74,7 @@ const UnAssignedStudentList = () => {
                 <img
                   src={student.profile || profileIcon}
                   alt={student.firstName}
-                  className="w-10 h-10 rounded-full mr-3"
+                  className="w-10 h-10 rounded-full mr-3 object-cover"
                 />
                 <div>
                   <div className="text-sm font-medium">{student.firstName}</div>
@@ -98,6 +98,7 @@ const UnAssignedStudentList = () => {
         </ul>
       )}
 
+      {/* Assign Student Sidebar */}
       {selectedStudent && (
         <Sidebar
           isOpen={isSidebarOpen}
@@ -117,3 +118,25 @@ const UnAssignedStudentList = () => {
 };
 
 export default UnAssignedStudentList;
+
+const UnAssignedStudentSkeleton = () => {
+  return (
+    <div className="space-y-4">
+      {Array.from({ length: 3 }).map((_, index) => (
+        <div
+          key={index}
+          className="flex items-center justify-between border-b py-2 animate-pulse"
+        >
+          <div className="flex items-center">
+            <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+            <div>
+              <div className="h-4 w-24 bg-gray-300 rounded mb-1"></div>
+              <div className="h-3 w-16 bg-gray-300 rounded"></div>
+            </div>
+          </div>
+          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+        </div>
+      ))}
+    </div>
+  );
+};

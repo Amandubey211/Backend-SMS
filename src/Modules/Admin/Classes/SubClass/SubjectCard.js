@@ -4,7 +4,7 @@ import { MdOutlineModeEdit, MdMenuBook } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { CiUser } from "react-icons/ci";
 import { BsBook } from "react-icons/bs";
-import { Modal } from "antd";
+import { Modal, Tooltip } from "antd";
 
 import DeleteModal from "../../../../Components/Common/DeleteModal";
 import {
@@ -19,69 +19,69 @@ import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction"
 
 function SubjectCard({
   data,
-  backgroundColor,
+  backgroundColor, // fallback or tailwind class if no hex code found
   Class,
   role,
   subjectId,
   onEdit,
-  onClick, // Parent function to handle navigation checks
+  onClick,
 }) {
   const dispatch = useDispatch();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isTeacherModalOpen, setIsTeacherModalOpen] = useState(false);
   const [ignoreNextClick, setIgnoreNextClick] = useState(false);
-  const [currentTeacherIndex, setCurrentTeacherIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
   const { t } = useTranslation("admClass");
 
   const teachers = data.teacherIds ?? [];
   const teacherCount = teachers.length;
+  const windowSize = 5;
+  const slidingCount =
+    teacherCount > windowSize ? windowSize - 1 : teacherCount;
+  const [currentStartIndex, setCurrentStartIndex] = useState(0);
+  const [isPulsing, setIsPulsing] = useState(false);
 
-  // Prevent card navigation if the teacher modal was just closed.
-  const handleCardClick = () => {
-    if (ignoreNextClick) return;
+  // Use effective color: if data.subjectColor is not provided, fallback to backgroundColor or default "#FCD34D"
+  const effectiveColor = data.subjectColor
+    ? data.subjectColor
+    : backgroundColor || "#FCD34D";
+
+  useEffect(() => {
+    if (true) {
+      const interval = setInterval(() => {
+        setIsPulsing(true);
+        setTimeout(() => {
+          setCurrentStartIndex((prevIndex) => (prevIndex + 1) % teacherCount);
+          setIsPulsing(false);
+        }, 500);
+      }, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [teacherCount]);
+
+  // Update the handleCardClick method to prevent propagation
+  const handleCardClick = (e) => {
+    if (ignoreNextClick || isDeleteModalOpen) return; // Ignore click if modal is open
+    e.stopPropagation(); // Stop propagation to prevent triggering navigate()
     dispatch(setSelectedSubjectName(data.name));
     dispatch(setSelectedSubjectId(subjectId));
     onClick?.(data);
   };
 
-  // Handle subject deletion.
   const handleDelete = () => {
     dispatch(deleteSubject({ subjectId, classId: Class }));
     setIsDeleteModalOpen(false);
   };
 
-  // Auto-slide teacher info every 2 seconds if multiple teachers exist.
-  useEffect(() => {
-    let timer;
-    if (teacherCount > 1) {
-      timer = setInterval(() => {
-        setCurrentTeacherIndex((prevIndex) => (prevIndex + 1) % teacherCount);
-      }, 2000);
-    }
-    return () => timer && clearInterval(timer);
-  }, [teacherCount]);
-
-  // Trigger slide-in animation whenever the teacher index changes.
-  useEffect(() => {
-    if (teacherCount > 0) {
-      setIsAnimating(true);
-      const timeout = setTimeout(() => setIsAnimating(false), 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentTeacherIndex, teacherCount]);
-
-  // Calculate total chapter count across all modules.
   const chapterCount = data.modules
     ? data.modules.reduce((acc, mod) => acc + (mod.chapters?.length || 0), 0)
     : 0;
 
   return (
     <div
-      className={`relative rounded-xl p-4 shadow-lg ${backgroundColor} transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group cursor-pointer h-64`}
+      className={`relative rounded-xl p-4 shadow-lg transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl group cursor-pointer h-64`}
+      style={{ backgroundColor: effectiveColor }}
       onClick={handleCardClick}
     >
-      {/* Admin Action Buttons */}
       {role === "admin" && (
         <div className="absolute top-2 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <ProtectedAction>
@@ -111,7 +111,6 @@ function SubjectCard({
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
       <DeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -119,21 +118,29 @@ function SubjectCard({
         title={data.name}
       />
 
-      {/* Published/Unpublished Label */}
       <div className="flex justify-between items-center mb-4">
-        <button
-          className={`border border-white rounded-full px-4 py-1 ${
-            data.isPublished
-              ? "text-green-600 bg-green-100"
-              : "bg-pink-50 text-gray-600"
-          }`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {data.isPublished ? t("Published") : t("Unpublished")}
-        </button>
+        <div className="flex items-center space-x-2">
+          <button
+            className={`border border-white rounded-full px-4 py-1 ${
+              data.isPublished
+                ? "text-green-600 bg-green-100"
+                : "bg-pink-50 text-gray-600"
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {data.isPublished ? t("Published") : t("Unpublished")}
+          </button>
+          {data.isOptional && (
+            <button
+              className="border border-white rounded-full px-4 py-1 bg-blue-100 text-blue-600"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {t("Optional")}
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Subject Main Info */}
       <div className="block">
         <h2 className="text-xl font-bold capitalize text-white transition-colors duration-300">
           {data.name}
@@ -142,7 +149,7 @@ function SubjectCard({
           <span className="flex items-center mr-2 gap-1">
             <MdMenuBook />
             <span>
-              {chapterCount} {t("Chapters", { defaultValue: "Chapters" })}
+              {chapterCount} {t("Chapters")}
             </span>
           </span>
           <span className="border-r-2 border-white h-5 mr-2"></span>
@@ -153,45 +160,85 @@ function SubjectCard({
         </div>
       </div>
 
-      {/* Teacher Section (bottom-left) */}
       {teacherCount > 0 ? (
         <div
-          className="relative mt-12 h-16 overflow-hidden cursor-pointer"
+          className="flex items-center mt-12 cursor-pointer overflow-hidden"
           onClick={(e) => {
             e.stopPropagation();
             setIsTeacherModalOpen(true);
           }}
         >
-          <div
-            className={`flex items-center transition-transform duration-500 ease-out ${
-              isAnimating ? "slide-in" : ""
-            }`}
-          >
-            {teachers[currentTeacherIndex].profile ? (
-              <img
-                src={teachers[currentTeacherIndex].profile}
-                alt={t("Teacher profile picture")}
-                className="w-12 h-12 rounded-full"
-              />
+          <div className="flex -space-x-3">
+            {teacherCount > windowSize ? (
+              <>
+                {Array.from({ length: slidingCount }).map((_, i) => {
+                  const teacherIndex = (currentStartIndex + i) % teacherCount;
+                  const pulseClass =
+                    i === slidingCount - 1 && isPulsing ? "animate-pulse" : "";
+                  const teacher = teachers[teacherIndex];
+                  return (
+                    <Tooltip
+                      key={teacherIndex}
+                      title={`${teacher.firstName} ${teacher.lastName}`}
+                      placement="top"
+                    >
+                      <div
+                        className={`w-12 h-12 rounded-full border-2 border-white overflow-hidden ${pulseClass}`}
+                      >
+                        {teacher.profile ? (
+                          <img
+                            src={teacher.profile}
+                            alt={t("Teacher profile picture")}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center w-full h-full bg-gray-300">
+                            <CiUser className="text-white w-6 h-6" />
+                          </div>
+                        )}
+                      </div>
+                    </Tooltip>
+                  );
+                })}
+
+                <Tooltip title={t("Click to see more")} placement="top">
+                  <div className="relative w-12 h-12 p-[2px] bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full">
+                    <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-sm font-medium">
+                      <span className="bg-gradient-to-tr from-pink-500 to-purple-500 bg-clip-text text-transparent text-xl">
+                        +{teacherCount - slidingCount}
+                      </span>
+                    </div>
+                  </div>
+                </Tooltip>
+              </>
             ) : (
-              <CiUser className="w-10 h-10 text-white" />
+              teachers.map((teacher, index) => (
+                <Tooltip
+                  key={index}
+                  title={`${teacher.firstName} ${teacher.lastName}`}
+                  placement="top"
+                >
+                  <div className="w-12 h-12 rounded-full border-2 border-white overflow-hidden">
+                    {teacher.profile ? (
+                      <img
+                        src={teacher.profile}
+                        alt={t("Teacher profile picture")}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-full h-full bg-gray-300">
+                        <CiUser className="text-white w-6 h-6" />
+                      </div>
+                    )}
+                  </div>
+                </Tooltip>
+              ))
             )}
-            <div className="ml-3 capitalize z-10">
-              <p className="text-white font-semibold">
-                {`${teachers[currentTeacherIndex].firstName} ${teachers[currentTeacherIndex].lastName}`}
-                {teacherCount > 1 && (
-                  <span className="ml-2 text-sm">({teacherCount})</span>
-                )}
-              </p>
-              <p className="text-white text-sm">
-                {teachers[currentTeacherIndex].role || t("Teacher")}
-              </p>
-            </div>
           </div>
         </div>
       ) : (
         <div className="flex items-center mt-12">
-          <CiUser className="w-10 h-10 bg-transparent text-white" />
+          <CiUser className="w-12 h-12 bg-transparent text-white" />
           <div className="ml-3 capitalize z-10">
             <p className="text-white font-semibold">
               {t("No Instructor Assigned")}
@@ -200,18 +247,19 @@ function SubjectCard({
         </div>
       )}
 
-      {/* Teacher List Modal */}
       <Modal
         title={t("Teacher List")}
         open={isTeacherModalOpen}
-        onCancel={() => {
-          // Prevent the subsequent click from triggering subject navigation
+        onCancel={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
           setIsTeacherModalOpen(false);
           setIgnoreNextClick(true);
-          setTimeout(() => setIgnoreNextClick(false), 300);
+          setTimeout(() => setIgnoreNextClick(false), 500);
         }}
         footer={null}
-        maskClosable={false}
+        maskClosable={true}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="space-y-4" onClick={(e) => e.stopPropagation()}>
           {teachers.map((teacher, index) => (
@@ -238,24 +286,12 @@ function SubjectCard({
         </div>
       </Modal>
 
-      {/* Subject Icon (bottom-right) */}
       <img
         src={data.subjectIcon ? data.subjectIcon : SubjectIcon}
         alt={t("Subject icon")}
         className="absolute bottom-6 right-6 h-20 w-20 transition-transform z-40 duration-300 transform hover:scale-110 object-contain"
         onClick={(e) => e.stopPropagation()}
       />
-
-      {/* Inline styles for slide-in animation */}
-      <style>{`
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        .slide-in {
-          animation: slideIn 0.5s ease-out;
-        }
-      `}</style>
     </div>
   );
 }

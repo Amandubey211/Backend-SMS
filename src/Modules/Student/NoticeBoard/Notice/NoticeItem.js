@@ -21,13 +21,15 @@ const NoticeItem = ({ notice, index, formatDate }) => {
   return (
     <div className="border-t">
       <div
-        className="cursor-pointer p-2 flex flex-col bg-white"
+        className={`cursor-pointer p-2 flex flex-col ${
+          activeIndex === index && "bg-white"
+        }`}
         onClick={() => toggleAccordion(index)}
         aria-expanded={activeIndex === index ? "true" : "false"}
       >
         <div className="flex gap-6 px-3 py-2 items-center">
           <div
-            className=" rounded-md flex items-center justify-center overflow-hidden"
+            className="rounded-md flex items-center justify-center overflow-hidden"
             style={{ height: "100%", width: "100px" }}
           >
             <picture>
@@ -42,42 +44,36 @@ const NoticeItem = ({ notice, index, formatDate }) => {
           {/* Title and Date */}
           <div className="flex-1 flex flex-col gap-2">
             <h2 className="font-[500] text-gray-600 text-md leading-5 capitalize break-words">
-             {notice?.title}
-            
+              {notice?.title}
             </h2>
             <p className="text-sm text-purple-600">
-                (Posted by{" "}
-                <span className="text-sm text-purple-600">
-                  {notice?.authorName || "-"}
-                </span>
-                )
-              </p>
-            <div className="flex items-center text-sm gap-x-3">
-              <div className="flex  gap-1">
-                <IoCalendarOutline
-                  className="text-gray-400 text-lg"
-                  aria-hidden="true"
-                />
-                <span className=" font-[400] text-[#7F7F7F]">
-                  {formatDate(notice.startDate)}
-                </span>
-              </div>
-              <div className="flex gap-1">
-                <IoCalendarOutline
-                  className="text-gray-400 text-lg"
-                  aria-hidden="true"
-                />
-                <span className=" font-[400] text-[#7F7F7F]">
-                  {formatDate(notice.endDate)}
-                </span>
-              </div>
-
-              <div className=" px-3 py-[2px] text-center flex justify-center items-center rounded-full">
+              (Posted by{" "}
+              <span className="text-sm text-purple-600">
+                {notice?.authorName || "-"}
+              </span>
+              )
+            </p>
+            <div className="flex items-center text-xs">
+              <span className="inline-block mr-2 px-2 py-1 bg-indigo-100 text-indigo-600 rounded-full">
+                From :
+              </span>
+              <IoCalendarOutline className="text-gray-400" />
+              <span className="ml-2 text-sm text-gray-500 mr-4">
+                {formatDate(notice?.startDate)}
+              </span>
+              <span className="inline-block mr-2 px-2 py-1 bg-purple-100 text-purple-600 rounded-full">
+                To :
+              </span>
+              <IoCalendarOutline className="text-gray-400" />
+              <span className="ml-2 text-sm text-gray-500">
+                {formatDate(notice?.endDate)}
+              </span>
+              <div className="px-3 py-[2px] text-center flex justify-center items-center rounded-full">
                 <span
                   className={`text-xs capitalize ${
                     notice.priority === "High priority"
                       ? "font-semibold text-pink-500 bg-pink-100 px-2 rounded-full"
-                      : "text-gray-500 bg-gray-100 font-semibold px-2  rounded-full"
+                      : "text-gray-500 bg-gray-100 font-semibold px-2 rounded-full"
                   }`}
                 >
                   {t(notice.priority, gt.stdNoticeboard)}
@@ -85,7 +81,6 @@ const NoticeItem = ({ notice, index, formatDate }) => {
               </div>
             </div>
           </div>
-
           {/* Expand Icon */}
           <div className="flex items-center justify-center">
             {activeIndex === index ? (
@@ -101,11 +96,18 @@ const NoticeItem = ({ notice, index, formatDate }) => {
             )}
           </div>
         </div>
-
         {/* Description */}
         {activeIndex === index && (
-          <div className="p-4 text-sm  text-gray-600 bg-white capitalize">
-            <p>{notice.description}</p>
+          <div
+            className="p-4 text-sm text-gray-600 bg-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <pre
+              className="whitespace-pre-wrap font-sans"
+              dangerouslySetInnerHTML={{
+                __html: notice?.description || t("No description available"),
+              }}
+            />
           </div>
         )}
       </div>

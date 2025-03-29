@@ -122,7 +122,7 @@ const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
           </p>
 
           <div className="flex justify-between items-center mt-1">
-            <div className="flex items-center gap-1">
+            {/* <div className="flex items-center gap-1">
               <input
                 type="checkbox"
                 className="mr-2"
@@ -130,7 +130,7 @@ const RubricModalRow = ({ data, criteriaIndex, readonly }) => {
                 readOnly
               />
               <p className="text-sm text-gray-500">{t("Range")}</p>
-            </div>
+            </div> */}
 
             {/* Buttons: Eye, Delete, Edit */}
             <div className="flex gap-2">

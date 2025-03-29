@@ -1,11 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import Handsontable from "handsontable";
 import "handsontable/dist/handsontable.full.css";
-import { Button } from "antd";
+import { Button, Switch, DatePicker, Tooltip } from "antd";
+import { MdFileUpload } from "react-icons/md";
 import { UploadOfflineExamSheet } from "../../../../../../Store/Slices/Admin/Class/OfflineExam/oflineExam.action";
 import * as XLSX from "xlsx";
-// Optional Icon
-import { MdFileUpload } from "react-icons/md";
 
 const UploadExcel = ({
   isOpen,
@@ -23,44 +22,39 @@ const UploadExcel = ({
   const [data, setData] = useState([]);
   const [isCreateLoading, setIsCreateLoading] = useState(false);
 
-  // We store a ref to the hidden file input so we can programmatically click it
+  // Ref for hidden file input
   const fileInputRef = useRef(null);
 
-  // Read/parse the Excel file
+  // New exam-level fields for results publishing
+  const [resultsPublished, setResultsPublished] = useState(false);
+  const [resultsPublishDate, setResultsPublishDate] = useState(null);
+
+  // Read and parse the Excel file
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (!selectedFile) return;
-
     setFile(selectedFile);
-
     const reader = new FileReader();
     reader.onload = (e) => {
       const fileData = new Uint8Array(e.target.result);
       const workbook = XLSX.read(fileData, { type: "array" });
-
-      // Read the first sheet
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
-
-      // Convert to JSON
       const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
       setData(jsonData);
     };
     reader.readAsArrayBuffer(selectedFile);
   };
 
-  // Initialize Handsontable after data changes
+  // Initialize Handsontable instance on data change
   useEffect(() => {
     const headers =
       data.length > 0
         ? data[0]
         : ["Name", "AdmissionNumber", "Quiz1", "Exam1", "Quiz2", "Exam2"];
-
     const formattedData =
       data.length > 1 ? data.slice(1) : [["", "", "", "", "", ""]];
-
     if (hotInstanceRef.current) {
-      // Update existing Handsontable instance
       hotInstanceRef.current.updateSettings({
         data: formattedData,
         colHeaders: headers,
@@ -68,7 +62,6 @@ const UploadExcel = ({
         columns: headers.map(() => ({ readOnly: true })),
       });
     } else {
-      // Create a new Handsontable instance
       hotInstanceRef.current = new Handsontable(hotRef.current, {
         data: formattedData,
         colHeaders: headers,
@@ -83,7 +76,6 @@ const UploadExcel = ({
         className: "handsontable",
       });
     }
-
     return () => {
       if (hotInstanceRef.current) {
         hotInstanceRef.current.destroy();
@@ -92,7 +84,7 @@ const UploadExcel = ({
     };
   }, [data]);
 
-  // Dispatch action to create exam from Excel
+  // Create exam by dispatching the thunk
   const handleCreateExam = () => {
     if (!file) {
       console.error("No file selected");
@@ -102,6 +94,13 @@ const UploadExcel = ({
     formData.append("sheet", file);
     formData.append("classId", cid);
     formData.append("subjectId", sid);
+
+    // Append new results publishing fields to formData
+    formData.append("resultsPublished", resultsPublished);
+    formData.append(
+      "resultsPublishDate",
+      resultsPublishDate ? resultsPublishDate.toISOString() : null
+    );
 
     setIsCreateLoading(true);
     dispatch(UploadOfflineExamSheet({ formData, cid, sid }))
@@ -120,10 +119,7 @@ const UploadExcel = ({
     setIsOpen(false);
   };
 
-  /**
-   * Triggers the hidden <input type="file"/> click event
-   * when the user clicks the "Select File" or "Replace File" button.
-   */
+  // Trigger the hidden file input
   const triggerFileDialog = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -134,7 +130,6 @@ const UploadExcel = ({
     <div className="w-full p-4 bg-white border shadow-md mt-2">
       {/* File Upload Section */}
       <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        {/* Stylized Button to trigger hidden input */}
         <div>
           <Button
             type="primary"
@@ -148,17 +143,14 @@ const UploadExcel = ({
           >
             {file ? "Replace File" : "Select File"}
           </Button>
-
           <input
             ref={fileInputRef}
             type="file"
             accept=".xls,.xlsx"
             onChange={handleFileChange}
-            style={{ display: "none" }} // Hidden native file input
+            style={{ display: "none" }}
           />
         </div>
-
-        {/* Display Selected File Name */}
         <div>
           {file ? (
             <p className="text-sm text-gray-700">
@@ -170,7 +162,35 @@ const UploadExcel = ({
         </div>
       </div>
 
-      {/* Handsontable preview area */}
+      {/* Exam-Level Results Publishing Options */}
+      <div className="mb-4 flex flex-wrap items-center justify-between p-4 bg-gray-50 rounded-md shadow-sm gap-4">
+        <div className="flex items-center gap-2">
+          <Tooltip title="Toggle to publish results immediately">
+            <span className="font-semibold text-gray-700">
+              Publish Results Immediately
+            </span>
+          </Tooltip>
+          <Switch
+            checked={resultsPublished}
+            onChange={(checked) => setResultsPublished(checked)}
+          />
+        </div>
+        <div className="flex flex-col">
+          <Tooltip title="Set a scheduled publish date for exam results">
+            <label className="font-semibold text-gray-700 mb-1">
+              Results Publish Date
+            </label>
+          </Tooltip>
+          <DatePicker
+            value={resultsPublishDate}
+            onChange={(date) => setResultsPublishDate(date)}
+            disabled={resultsPublished}
+            style={{ width: 220 }}
+          />
+        </div>
+      </div>
+
+      {/* Handsontable Preview */}
       <div
         ref={hotRef}
         className="h-full w-full border rounded-sm shadow-sm bg-gray-50 overflow-x-scroll handsontable"
@@ -183,7 +203,6 @@ const UploadExcel = ({
         <Button
           disabled={!file}
           loading={isCreateLoading}
-          htmlType="submit"
           onClick={handleCreateExam}
           style={{
             background: primaryGradient,

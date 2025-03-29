@@ -6,7 +6,7 @@ const initialState = {
   error: false,
   libararyBooks: [],
   totalBooks: 0,
-  totalPages: 0,
+  totalPages: 1,
   currentPage: 1,
   activeTab: "Library",
   searchQuery: "",
@@ -44,7 +44,8 @@ const stdLibrarySlice = createSlice({
         state.loading = false;
         state.libararyBooks = action.payload?.books || [];
         state.totalPages = action.payload?.totalPages || 1;
-        state.currentPage = action.payload?.currentPage || 1;
+        state.currentPage = action.payload?.currentPage || 1 ;
+        state.totalBooks = action.payload?.totalBooks || 0;
       })
       .addCase(libraryBooksStudent.rejected, (state, action) => {
         state.loading = false;

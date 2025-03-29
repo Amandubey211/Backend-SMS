@@ -1,3 +1,5 @@
+// CreateAssignmentForm.jsx
+
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PointsInput from "./PointsInput";
@@ -13,6 +15,7 @@ import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Modu
 import { motion, AnimatePresence } from "framer-motion";
 import { Modal, Button } from "antd";
 import { FiInfo, FiCheck } from "react-icons/fi";
+import ResultsPublishInput from "./ResultsPublishInput";
 
 const CreateAssignmentForm = ({
   points,
@@ -23,12 +26,14 @@ const CreateAssignmentForm = ({
   allowedAttempts,
   numberOfAttempts,
   assignTo,
-  sectionIds, // expected as array for assignments
+  sectionIds,
   dueDate,
   availableFrom,
   moduleId,
   chapterId,
-  groupIds, // expected as array for assignments
+  groupIds,
+  resultsPublished, // New prop
+  resultsPublishDate, // New prop
   // Refs for validation
   moduleRef,
   pointsRef,
@@ -41,6 +46,7 @@ const CreateAssignmentForm = ({
   submissionTypeError,
   availableFromError,
   dueDateError,
+  errorResultsPublishDate,
   multiSelect,
 }) => {
   const dispatch = useDispatch();
@@ -48,7 +54,7 @@ const CreateAssignmentForm = ({
   const { cid, sid } = useParams();
   const [chapters, setChapters] = useState([]);
 
-  // State for guidelines modal
+  // Guidelines modal state
   const [showGuidelines, setShowGuidelines] = useState(false);
 
   useEffect(() => {
@@ -77,7 +83,6 @@ const CreateAssignmentForm = ({
       {/* Heading + Guidelines Button */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold">Options</h3>
-
         <button
           onClick={() => setShowGuidelines(true)}
           className="inline-flex items-center gap-2 px-3 py-2 bg-purple-100 text-purple-700 rounded-md hover:bg-purple-200 transition-colors"
@@ -87,7 +92,7 @@ const CreateAssignmentForm = ({
         </button>
       </div>
 
-      {/* Existing form fields remain unchanged */}
+      {/* Points Input */}
       <PointsInput
         id="points"
         points={points}
@@ -96,6 +101,7 @@ const CreateAssignmentForm = ({
         error={pointsError}
       />
 
+      {/* Module Selection */}
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="moduleId">
           Module
@@ -131,6 +137,7 @@ const CreateAssignmentForm = ({
         )}
       </div>
 
+      {/* Chapter Selection */}
       <div className="mb-4">
         <label className="block text-gray-700" htmlFor="chapterId">
           Chapter
@@ -152,11 +159,13 @@ const CreateAssignmentForm = ({
         </select>
       </div>
 
+      {/* Grade Option */}
       <GradeOption
         displayGrade={displayGrade}
         setDisplayGrade={setDisplayGrade}
       />
 
+      {/* Submission Type Dropdown */}
       <SubmissionTypeDropdown
         id="submissionType"
         submissionType={submissionType}
@@ -165,6 +174,7 @@ const CreateAssignmentForm = ({
         error={submissionTypeError}
       />
 
+      {/* Allowed Attempts */}
       <AllowedAttemptsSelect
         allowedAttempts={allowedAttempts}
         handleChange={handleChange}
@@ -177,12 +187,14 @@ const CreateAssignmentForm = ({
         />
       )}
 
+      {/* Assign To Radios */}
       <AssignToRadios
         isAssignToLabel
         assignTo={assignTo}
         handleChange={handleChange}
       />
 
+      {/* Section / Group Select */}
       <SectionSelect
         sectionValue={sectionIds}
         groupValue={groupIds}
@@ -194,6 +206,7 @@ const CreateAssignmentForm = ({
         fieldGroup="groupIds"
       />
 
+      {/* Date Inputs */}
       <DateInput
         label="Available From"
         name="availableFrom"
@@ -213,7 +226,15 @@ const CreateAssignmentForm = ({
         error={dueDateError}
       />
 
-      {/* Guidelines Modal - Updated text for Assignment context */}
+      {/* New Results Publish Fields */}
+      <ResultsPublishInput
+        resultsPublished={resultsPublished}
+        resultsPublishDate={resultsPublishDate}
+        handleChange={handleChange}
+        errorResultsPublishDate={errorResultsPublishDate}
+      />
+
+      {/* Guidelines Modal */}
       <Modal
         visible={showGuidelines}
         onCancel={() => setShowGuidelines(false)}
@@ -231,7 +252,6 @@ const CreateAssignmentForm = ({
               transition={{ duration: 0.3 }}
               className="flex flex-col p-6"
             >
-              {/* Header */}
               <div className="flex items-center space-x-4 mb-4">
                 <div className="bg-purple-100 p-3 rounded-full">
                   <FiInfo className="text-purple-600 text-4xl" />
@@ -240,8 +260,6 @@ const CreateAssignmentForm = ({
                   Assignment Creation Guidelines
                 </h2>
               </div>
-
-              {/* Guidelines List */}
               <ul className="list-none text-gray-700 pl-6 space-y-2">
                 <li className="flex items-center space-x-2">
                   <FiCheck className="text-green-500" />
@@ -260,8 +278,7 @@ const CreateAssignmentForm = ({
                   <FiCheck className="text-green-500" />
                   <span>
                     Ensure the <strong>available from</strong> and{" "}
-                    <strong>due date</strong> are valid and within the course
-                    timeframe.
+                    <strong>due date</strong> are valid.
                   </span>
                 </li>
                 <li className="flex items-center space-x-2">
@@ -278,8 +295,6 @@ const CreateAssignmentForm = ({
                   </span>
                 </li>
               </ul>
-
-              {/* Footer */}
               <div className="flex justify-end mt-6">
                 <Button
                   onClick={() => setShowGuidelines(false)}
@@ -292,7 +307,6 @@ const CreateAssignmentForm = ({
           )}
         </AnimatePresence>
       </Modal>
-      {/* End Guidelines Modal */}
     </div>
   );
 };

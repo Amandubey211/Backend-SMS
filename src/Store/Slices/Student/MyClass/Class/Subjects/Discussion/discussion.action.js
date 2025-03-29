@@ -52,7 +52,7 @@ export const updateStudentPinStatus = createAsyncThunk(
 
 export const markAsReadStudentDiscussion = createAsyncThunk(
   "discussion/markAsReadStudentDiscussion",
-  async (discussionId, { rejectWithValue, dispatch }) => {
+  async ({discussionId, cid, sid}, { rejectWithValue, dispatch }) => {
     try {
       const say = getAY();
       dispatch(setShowError(false));
@@ -60,6 +60,9 @@ export const markAsReadStudentDiscussion = createAsyncThunk(
         `/admin/discussion/readstatus/${discussionId}?say=${say}`,
         {}
       );
+       dispatch(fetchStudentDiscussion({ cid, sid }));
+      console.log("mark read", data, discussionId);
+
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

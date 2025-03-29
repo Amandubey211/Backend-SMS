@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import checkboxIcon from '../../../Assets/ParentAssets/svg/checkbox.svg';
 import crossIcon from '../../../Assets/ParentAssets/svg/cross.svg';
 import leaveIcon from '../../../Assets/ParentAssets/svg/leave.png';
@@ -14,8 +14,8 @@ const AttendanceCard = ({ presentCount = 0, absentCount = 0, leaveCount = 0 }) =
   ];
 
   return (
-    <div className="flex justify-center w-full">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 w-full max-w-6xl">
+    <div className="w-full">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {summaryData.map((item, index) => (
           <CardComponent key={index} data={item} />
         ))}
@@ -24,7 +24,6 @@ const AttendanceCard = ({ presentCount = 0, absentCount = 0, leaveCount = 0 }) =
   );
 };
 
-
 const CardComponent = ({ data }) => {
   const cardStyle = data.isGradient
     ? 'bg-gradient-to-b from-[#FAECF0] to-[#F3EBFB]'
@@ -32,21 +31,19 @@ const CardComponent = ({ data }) => {
 
   return (
     <div
-      className={`h-[100px] w-full max-w-[320px] rounded-lg shadow-md p-4 flex items-center justify-between ${cardStyle} 
-      transform transition-all duration-300 ease-in-out hover:shadow-xl hover:scale-105 mx-auto`}
+      className={`w-full rounded-lg shadow-md p-6  flex items-center justify-between ${cardStyle}`}
     >
-      <div className="flex items-center space-x-3">
-        <div className="bg-white rounded-full p-2 shadow-sm">
-          <img src={data.icon} alt={data.title} className="w-6 h-6" />
+      <div className="flex items-center space-x-4">
+        <div className="bg-white rounded-full p-3 shadow-sm">
+          <img src={data.icon} alt={data.title} className="w-8 h-8" />
         </div>
         <div className="flex flex-col">
-          <span className="text-lg font-semibold">{data.value}</span>
-          <span className="text-sm font-medium text-gray-600">{data.title}</span>
+          <span className="text-2xl font-bold">{data.value}</span>
+          <span className="text-sm font-medium text-gray-700">{data.title}</span>
         </div>
       </div>
     </div>
   );
 };
-
 
 export default AttendanceCard;

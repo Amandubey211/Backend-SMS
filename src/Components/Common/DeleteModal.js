@@ -1,187 +1,104 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { createPortal } from "react-dom";
-import { RiCloseLine } from "react-icons/ri";
+import { Modal, Button, Input, Typography } from "antd";
 import { ImSpinner3 } from "react-icons/im";
 
+const { Text, Paragraph } = Typography;
+
+/**
+ * DeleteModal:
+ * - isOpen (bool): whether the modal is visible
+ * - onClose (func): closes the modal
+ * - onConfirm (func): called when deletion is confirmed
+ * - title (string): the name of the item to delete (user must type exactly this)
+ */
 const DeleteModal = ({ isOpen, onClose, onConfirm, title }) => {
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const modalRef = useRef(null);
-  const closeButtonRef = useRef(null);
-  const confirmButtonRef = useRef(null);
 
-  useEffect(() => {
-    if (!isOpen || !modalRef.current) return;
-
-    const focusableSelectors = [
-      "a[href]",
-      "button:not([disabled])",
-      "input:not([disabled])",
-      "textarea:not([disabled])",
-      "select:not([disabled])",
-      "details",
-      "[tabindex]:not([tabindex='-1'])",
-    ];
-
-    const focusableElements = modalRef.current.querySelectorAll(
-      focusableSelectors.join(", ")
-    );
-
-    if (focusableElements?.length === 0) return;
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements[focusableElements?.length - 1];
-
-    const handleKeyDown = (e) => {
-      if (e.key === "Tab") {
-        if (e.shiftKey) {
-          // Shift + Tab
-          if (document.activeElement === firstElement) {
-            e.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          // Tab
-          if (document.activeElement === lastElement) {
-            e.preventDefault();
-            firstElement.focus();
-          }
-        }
-      }
-    };
-
-    closeButtonRef.current.focus();
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [isOpen]);
-
+  // Reset state when the modal closes
   useEffect(() => {
     if (!isOpen) {
       setInputValue("");
       setError(null);
+      setLoading(false);
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
-  const handleOutsideClick = (e) => {
-    if (e.target.id === "modal-container") {
-      e.stopPropagation(); // Prevent modal close from triggering other events
-      onClose();
-    }
-  };
-
-  const handleInsideClick = (e) => {
-    e.stopPropagation(); // Prevent click event from propagating to parent elements
-  };
-
-  const handleChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleConfirm = async () => {
-    setLoading(true);
-    try {
-      await onConfirm();
-      setInputValue("");
-      setLoading(false);
-      onClose();
-    } catch (err) {
-      setError("Error deleting item. Please try again.");
-      setLoading(false);
-    }
-  };
-
-  // Ensure title is a string before using trim
+  // Trim and compare ignoring case
   const trimmedTitle = title ? title.trim() : "";
-
   const isMatching =
     inputValue.trim().toLowerCase() === trimmedTitle.toLowerCase();
 
-  return createPortal(
-    <div
-      id="modal-container"
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-      onClick={handleOutsideClick}
-      aria-labelledby="delete-modal-title"
-      aria-describedby="delete-modal-description"
-      role="dialog"
-      aria-modal="true"
+  // Confirm handler with spinner and error handling
+  const handleConfirm = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      await onConfirm();
+      onClose();
+    } catch (err) {
+      setError("Error deleting item. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Modal
+      visible={isOpen}
+      onCancel={onClose}
+      centered
+      title={<span className="font-bold">{`Delete ${trimmedTitle}`}</span>}
+      footer={null} // We'll provide a custom footer
+      maskStyle={{ backdropFilter: "blur(5px)" }} // Blurred background
+      destroyOnClose // Unmount modal content on close
+      onClick={(e) => e.stopPropagation()} // Stop any click event from propagating when inside modal
     >
-      <div
-        ref={modalRef}
-        className="bg-white rounded-lg overflow-hidden shadow-lg transform transition-transform duration-300 w-11/12 md:w-1/3"
-        onClick={handleInsideClick} // Stop propagation of clicks inside the modal
-      >
-        <div className="flex justify-between items-center p-4 border-b">
-          <h3 id="delete-modal-title" className="text-lg font-semibold">
-            Delete {trimmedTitle}
-          </h3>
-          <button
-            ref={closeButtonRef}
-            onClick={(e) => {
-              e.stopPropagation(); // Ensure the click doesn't propagate
-              onClose();
-            }}
-            aria-label="Close modal"
-          >
-            <RiCloseLine className="text-gray-700 w-6 h-6" />
-          </button>
-        </div>
-        <div className="p-4">
-          <p id="delete-modal-description">
-            Type the name{" "}
-            <span className="text-red-400 select-none">{trimmedTitle}</span> to
-            confirm deletion:
-          </p>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleChange}
-            className="mt-2 p-2 border rounded w-full"
-            placeholder={`Type "${trimmedTitle}"`}
-            aria-label={`Type "${trimmedTitle}" to confirm`}
-          />
-          {error && <p className="mt-2 text-red-500">{error}</p>}
-          <div className="mt-4 flex justify-end space-x-2">
-            <button
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md"
-              onClick={(e) => {
-                e.stopPropagation(); // Ensure the click doesn't propagate
-                onClose();
-              }}
-              aria-label="Cancel"
-            >
-              Cancel
-            </button>
-            <button
-              ref={confirmButtonRef}
-              className={`px-4 py-2 rounded-md flex items-center ${
-                isMatching
-                  ? "bg-red-500 text-white cursor-pointer"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              }`}
-              onClick={isMatching ? handleConfirm : null}
-              disabled={!isMatching}
-              aria-label="Delete"
-            >
-              {loading ? (
-                <ImSpinner3 className="animate-spin mr-2" />
-              ) : (
-                "Delete"
-              )}
-            </button>
-          </div>
-        </div>
+      <Paragraph>
+        Type the name{" "}
+        <Text strong className="text-red-500 select-none">
+          {trimmedTitle}
+        </Text>{" "}
+        to confirm deletion:
+      </Paragraph>
+      <Input
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        placeholder={`Type "${trimmedTitle}"`}
+        className="mb-2"
+        aria-label={`Type "${trimmedTitle}" to confirm deletion`}
+      />
+      {error && (
+        <Paragraph type="danger" className="mb-2 text-red-500">
+          {error}
+        </Paragraph>
+      )}
+
+      {/* Custom Footer Buttons */}
+      <div className="flex justify-end space-x-2 mt-4">
+        <Button onClick={onClose} aria-label="Cancel">
+          Cancel
+        </Button>
+        <Button
+          type="primary"
+          danger
+          disabled={!isMatching || loading}
+          onClick={isMatching ? handleConfirm : undefined}
+          aria-label="Delete"
+        >
+          {loading ? (
+            <span className="flex items-center">
+              <ImSpinner3 className="animate-spin mr-2" />
+              Deleting...
+            </span>
+          ) : (
+            "Delete"
+          )}
+        </Button>
       </div>
-    </div>,
-    document.body
+    </Modal>
   );
 };
 

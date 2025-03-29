@@ -294,7 +294,7 @@ const StudentEvents = () => {
             transform: translate(-50%, -50%);
             width: 20px;
             height: 20px;
-            background-color: rgba(0, 0, 0, 0.2);
+            background-color:rgb(59, 130, 246);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;

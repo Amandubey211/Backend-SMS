@@ -1,4 +1,3 @@
-// AnswerSection.jsx
 import React from "react";
 import {
   AiOutlinePlus,
@@ -16,7 +15,7 @@ const AnswerSection = ({
   setRightAnswerComment,
   wrongAnswerComment,
   setWrongAnswerComment,
-  error, // new error prop
+  error,
 }) => {
   const { t } = useTranslation("admModule");
 
@@ -56,7 +55,7 @@ const AnswerSection = ({
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        {answers?.map((answer, index) => (
+        {answers.map((answer, index) => (
           <div
             key={index}
             className="relative flex items-center space-x-2 border p-1 ps-3 rounded-md"
@@ -100,9 +99,10 @@ const AnswerSection = ({
         aria-label={t("Add answer")}
       >
         <AiOutlinePlus className="mr-2" />
-        {t(answers?.length === 0 ? "Add Answer" : "Add Another Answer")}
+        {t(answers.length === 0 ? "Add Answer" : "Add Another Answer")}
       </button>
 
+      {/*  Right/Wrong Comment Fields  */}
       <div className="grid grid-cols-2 gap-4 mt-6">
         <div className="flex items-center space-x-2">
           <input
@@ -127,6 +127,7 @@ const AnswerSection = ({
           />
         </div>
       </div>
+
       {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </div>
   );

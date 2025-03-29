@@ -21,9 +21,11 @@ const getRandomColor = () => {
   return colors[randomIndex];
 };
 
-const AnnouncementCard = ({ title, date, section, id }) => {
+const AnnouncementCard = ({ title, date, section, id, isRead }) => {
   const { sid, cid } = useParams();
   const bgColor = getRandomColor();
+
+  console.log("is read in card", isRead);
 
   return (
     <div
@@ -34,8 +36,10 @@ const AnnouncementCard = ({ title, date, section, id }) => {
         <NavLink
           to={`/student_class/${cid}/${sid}/announcements/${id}/view`}
           className="flex flex-col items-start justify-start"
+          state={{ id: id }}
         >
           <h2 className="text-base font-semibold">{title}</h2>
+          <h2 className="text-base font-semibold">{!isRead && isRead}</h2>
           {/* <p className="text-base text-green-600">{section}</p> */}
           <div className="flex justify-center items-center gap-1 mt-5 text-gray-500">
             <div className="flex gap-1 items-center">

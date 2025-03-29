@@ -8,6 +8,8 @@ export const stdModule = createAsyncThunk(
   "module/stdModule",
   async ({ cid, sid }, { rejectWithValue, dispatch, getState }) => {
     try {
+      console.log("hii");
+
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       const say = getAY();
       dispatch(setShowError(false));
@@ -15,7 +17,7 @@ export const stdModule = createAsyncThunk(
         `/admin/student/classes/${cid}/modules/${sid}?say=${say}&semesterId=${semesterId}`
       );
       const data = res?.data;
-      // console.log("std module action--->", data);
+      console.log("std module action--->", res);
       return data;
     } catch (error) {
       handleError(error, dispatch, rejectWithValue);

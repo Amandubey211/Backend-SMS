@@ -3,6 +3,8 @@ import {
   fetchUserData,
   fetchClassData,
   fetchSubjectData,
+  updateStudentInfoThunk,
+  updateParentInfoThunk, // Imported parent's update thunk
 } from "../actions/userActions";
 
 const initialState = {
@@ -57,9 +59,8 @@ const userSlice = createSlice({
     setSelectedClassName: (state, action) => {
       state.classInfo.selectedClassName = action.payload;
     },
-    // Replace setSelectedSemesterId and setSelectedSemesterName with one action:
+    // Combined action for semester selection
     setSelectedSemester: (state, action) => {
-      // action.payload should be an object containing { id, name }
       state.classInfo.selectedSemester = action.payload;
     },
     setSelectedSectionId: (state, action) => {
@@ -84,10 +85,10 @@ const userSlice = createSlice({
       state.subjectInfo.selectedAssignmentName = action.payload;
     },
     setUserDetails: (state, action) => {
-      state.userDetails = action.payload; // Store entire user details
+      state.userDetails = action.payload;
     },
     setStudentId: (state, action) => {
-      state.userDetails.studentId = action.payload; // Store studentId inside userDetails
+      state.userDetails.studentId = action.payload;
     },
     resetUserState: (state) => {
       state.userDetails = {};
@@ -113,7 +114,7 @@ const userSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Handle fetching user data
+      // fetchUserData cases
       .addCase(fetchUserData.pending, (state) => {
         state.status.loading = true;
         state.status.error = null;
@@ -126,8 +127,7 @@ const userSlice = createSlice({
         state.status.loading = false;
         state.status.error = action.payload;
       })
-
-      // Handle fetching class data
+      // fetchClassData cases
       .addCase(fetchClassData.pending, (state) => {
         state.status.loading = true;
         state.status.error = null;
@@ -141,8 +141,7 @@ const userSlice = createSlice({
         state.status.loading = false;
         state.status.error = action.payload;
       })
-
-      // Handle fetching subject data
+      // fetchSubjectData cases
       .addCase(fetchSubjectData.pending, (state) => {
         state.status.loading = true;
         state.status.error = null;
@@ -156,6 +155,32 @@ const userSlice = createSlice({
       .addCase(fetchSubjectData.rejected, (state, action) => {
         state.status.loading = false;
         state.status.error = action.payload;
+      })
+      // updateStudentInfoThunk cases
+      .addCase(updateStudentInfoThunk.pending, (state) => {
+        state.status.loading = true;
+        state.status.error = null;
+      })
+      .addCase(updateStudentInfoThunk.fulfilled, (state, action) => {
+        state.status.loading = false;
+        // Optionally update state.userDetails here if needed.
+      })
+      .addCase(updateStudentInfoThunk.rejected, (state, action) => {
+        state.status.loading = false;
+        state.status.error = action.payload;
+      })
+      // updateParentInfoThunk cases
+      .addCase(updateParentInfoThunk.pending, (state) => {
+        state.status.loading = true;
+        state.status.error = null;
+      })
+      .addCase(updateParentInfoThunk.fulfilled, (state, action) => {
+        state.status.loading = false;
+        // Optionally update state.userDetails here if parent's info is updated.
+      })
+      .addCase(updateParentInfoThunk.rejected, (state, action) => {
+        state.status.loading = false;
+        state.status.error = action.payload;
       });
   },
 });
@@ -166,7 +191,7 @@ export const {
   closeSidebar,
   setSelectedClassId,
   setSelectedClassName,
-  setSelectedSemester, // New combined action
+  setSelectedSemester,
   setSelectedSectionId,
   setSelectedSectionName,
   setSelectedModule,

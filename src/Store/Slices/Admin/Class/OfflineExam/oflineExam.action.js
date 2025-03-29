@@ -15,7 +15,7 @@ import toast from "react-hot-toast";
 export const fetchAllOfflineExam = createAsyncThunk(
   "subject/offline_get_exam",
   async (
-    { classId, subjectId, query = "" },
+    { classId, subjectId, query = "", page = 1, limit = 10, startDate = null, endDate = null },
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
@@ -23,9 +23,21 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const say = getAY();
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       dispatch(setShowError(false));
-      const response = await getData(
-        `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}&search=${query}&semesterId=${semesterId}`
-      );
+
+      const isValidStartDate = startDate && !isNaN(new Date(startDate).getTime());
+      const isValidEndDate = endDate && !isNaN(new Date(endDate).getTime());
+      
+      let queryParams = `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}&search=${query}&semesterId=${semesterId}&page=${page}&limit=${limit}`;
+
+      if (isValidStartDate) {
+        queryParams += `&startDate=${new Date(startDate).toISOString()}`;
+      }
+
+      if (isValidEndDate) {
+        queryParams += `&endDate=${new Date(endDate).toISOString()}`;
+      }
+
+      const response = await getData(queryParams);
 
       return response;
     } catch (error) {
@@ -34,6 +46,7 @@ export const fetchAllOfflineExam = createAsyncThunk(
   }
 );
 
+// oflineExam.action.js (excerpt)
 export const createOfflineExam = createAsyncThunk(
   "subject/offline_create_exam",
   async ({ payload, cid, sid }, { rejectWithValue, dispatch, getState }) => {
@@ -47,6 +60,9 @@ export const createOfflineExam = createAsyncThunk(
         schoolId,
         semesterId,
         academicYearId: say,
+        // New fields added to the payload
+        resultsPublished: payload.resultsPublished,
+        resultsPublishDate: payload.resultsPublishDate,
       };
 
       dispatch(setShowError(false));
@@ -69,6 +85,15 @@ export const UploadOfflineExamSheet = createAsyncThunk(
     try {
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       formData.append("semesterId", semesterId);
+
+      // Append new results fields if they are not already present
+      if (!formData.has("resultsPublished")) {
+        formData.append("resultsPublished", false);
+      }
+      if (!formData.has("resultsPublishDate")) {
+        formData.append("resultsPublishDate", null);
+      }
+
       const getRole = getUserRole(getState);
       const say = getAY();
       dispatch(setShowError(false));

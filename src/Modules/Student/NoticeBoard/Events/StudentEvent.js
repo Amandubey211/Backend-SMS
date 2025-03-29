@@ -1,55 +1,61 @@
 import React, { useEffect, useState } from "react";
 import { Calendar } from "antd";
-import "../Events/customCalendar.css";
-import Layout from "../../../../Components/Common/Layout";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
 import { format, parse, isValid } from "date-fns";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { IoCalendarOutline } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+
+import Layout from "../../../../Components/Common/Layout";
+import StudentDashLayout from "../../../../Components/Student/StudentDashLayout";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
+import ViewEvent from "./ViewEvent";
+import EventCard from "./EventCard";
+import Sidebar from "./Sidebar";
+import OfflineModal from "../../../../Components/Common/Offline";
+import Spinner from "../../../../Components/Common/Spinner";
+import NoEventFound from "../../../../Assets/StudentAssets/no-event-found.avif";
+
 import { stdEvent } from "../../../../Store/Slices/Student/Noticeboard/events.action";
 import {
-  setCurrentPage,
   setFilteredEvents,
   setSelectedEvent,
   setSidebarContent,
   setSidebarOpen,
 } from "../../../../Store/Slices/Student/Noticeboard/eventsSlice";
-import ViewEvent from "./ViewEvent";
-import EventCard from "./EventCard";
-import Sidebar from "./Sidebar";
-import { useTranslation } from "react-i18next";
-import { gt } from "../../../../Utils/translator/translation";
-import OfflineModal from "../../../../Components/Common/Offline";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
-import Spinner from "../../../../Components/Common/Spinner";
+import { gt } from "../../../../Utils/translator/translation";
+import "../Events/customCalendar.css";
+import { EventCardSkeleton } from "../../../Parents/Skeletons";
+import { RiSignalWifiErrorFill } from "react-icons/ri";
+import { IoCalendarOutline } from "react-icons/io5";
 
 const StudentEvent = () => {
   const {
     eventData,
     filteredEvents,
-    currentPage,
     selectedEvent,
     sidebarContent,
     isSidebarOpen,
-    itemsPerPage,
     currentDate,
     loading,
     error,
   } = useSelector((store) => store.student.studentEvent);
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
+  // Set the initial selected month and year using currentDate
   const [selectedMonthYear, setSelectedMonthYear] = useState({
     month: currentDate.getMonth(),
     year: currentDate.getFullYear(),
   });
-  // console.log("I am in inside1 :", eventData);
 
-  // console.log("I am in inside :", filteredEvents);
-  // card colour
+  // Single state variable for pagination
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 4;
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+  // Define colors for rendering events on the calendar date cells
   const bgColors = [
     "bg-pink-500",
     "bg-purple-500",
@@ -57,71 +63,69 @@ const StudentEvent = () => {
     "bg-indigo-500",
   ];
 
+  // Set the navigation heading
   useNavHeading("Event");
 
+  // Function to dismiss error alerts
   const handleDismiss = () => {
     dispatch(setShowError(false));
   };
 
+  // Fetch events when component mounts
   useEffect(() => {
     dispatch(stdEvent());
-  }, [dispatch, stdEvent]);
+  }, [dispatch]);
 
+  // Filter and sort events whenever the selected month/year or event data changes
   useEffect(() => {
     filterAndSortEvents(eventData, selectedMonthYear);
+    setCurrentPage(0); // Reset pagination when filtering events
   }, [selectedMonthYear, eventData]);
 
   const filterAndSortEvents = (eventData, selectedMonthYear) => {
     const filtered = eventData?.filter((event) => {
       const eventDate = new Date(event.startDate);
-      // console.log("event date is: ", eventDate);
       return (
-        eventDate.getMonth() === selectedMonthYear?.month &&
-        eventDate?.getFullYear() === selectedMonthYear.year
+        eventDate.getMonth() === selectedMonthYear.month &&
+        eventDate.getFullYear() === selectedMonthYear.year
       );
     });
 
-    const sorted = filtered?.sort((a, b) => a.startDate - b.startDate);
-    // console.log("sorted event :", sorted);
+    const sorted = filtered?.sort(
+      (a, b) => new Date(a.startDate) - new Date(b.startDate)
+    );
+
     dispatch(setFilteredEvents(sorted));
-    dispatch(setCurrentPage(0));
   };
 
-  // calender function
+  // Render events on calendar date cells
   const handleDateCellRender = (value) => {
     const formattedDate = format(value.toDate(), "yyyy-MM-dd");
     const dayEvents = filteredEvents?.filter(
-      (event) => format(event?.startDate, "yyyy-MM-dd") === formattedDate
+      (event) =>
+        format(new Date(event?.startDate), "yyyy-MM-dd") === formattedDate
     );
-
-    const bgColors = [
-      "bg-pink-500",
-      "bg-purple-500",
-      "bg-blue-500",
-      "bg-indigo-500",
-    ];
 
     return (
       <ul className="events space-y-1 max-h-20 overflow-y-auto">
         {dayEvents?.map((event, index) => {
-          // Parse time from event, support both 24-hour and 12-hour formats
           let eventTime = event?.time
-            ? parse(event?.time, "hh:mm a", new Date()) // Try parsing as 12-hour format first
-            : event?.startDate;
+            ? parse(event?.time, "hh:mm a", new Date())
+            : new Date(event?.startDate);
 
           if (!isValid(eventTime)) {
-            eventTime = parse(event?.time, "HH:mm", new Date()); // Fallback for 24-hour format
+            eventTime = parse(event?.time, "HH:mm", new Date());
           }
 
           const timeString = isValid(eventTime)
-            ? format(eventTime, "hh:mm a") // Always display in 12-hour format
+            ? format(eventTime, "hh:mm a")
             : "Invalid Time";
 
           return (
             <li
               key={event?.id}
               className={`inline-block px-2 py-1 rounded text-white ${
-                bgColors[index % bgColors?.length]
+                bgColors[index % bgColors.length]
               } shadow-md cursor-pointer`}
               onClick={() => handleStickerClick(event)}
             >
@@ -133,14 +137,14 @@ const StudentEvent = () => {
     );
   };
 
-  // event card function
+  // Handle clicking on an event card or calendar item
   const handleStickerClick = (event) => {
     dispatch(setSelectedEvent(event));
     dispatch(setSidebarContent("viewEvent"));
     dispatch(setSidebarOpen(true));
   };
 
-  // View event function
+  // Render the sidebar content based on the selected action
   const renderSidebarContent = () => {
     switch (sidebarContent) {
       case "viewEvent":
@@ -150,93 +154,111 @@ const StudentEvent = () => {
     }
   };
 
-  // sidebar function
+  // Close the sidebar view
   const handleSidebarView = () => {
     dispatch(setSidebarOpen(false));
   };
 
-  // pagination
+  // Get paginated events based on currentPage
   const paginatedEvents = filteredEvents?.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
   );
-  // console.log("pagination event is :", paginatedEvents);
-  const handlePagination = () => {
-    dispatch(setCurrentPage((prev) => Math.max(prev - 1, 0)));
+
+  // Handle pagination navigation
+  const handlePrev = () => {
+    if (currentPage > 0) {
+      setCurrentPage((prev) => prev - 1);
+    }
   };
 
-  const handleFilterPage = () => {
-    dispatch(setCurrentPage((prev) => prev + 1));
+  const handleNext = () => {
+    if (currentPage + 1 < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
   };
 
-  // selected Month and Year
-  // console.log("dsdfasasasa",paginatedEvents)
   return (
     <>
-      <Layout title="Event">
+      <Layout title="Events">
         <StudentDashLayout>
           <div className="min-h-screen p-4 bg-gray-50 w-full">
-            <div className="flex flex-row justify-between">
-              <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                {t("Student Events", gt.stdEvents)}
-              </h1>
-            </div>
-
-            <div className="my-4 w-full h-auto flex rounded-sm gap- relative">
-              {currentPage > 0 && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
-                  onClick={handlePagination}
+            {/* Events display */}
+            {loading ? (
+              // 2. NEW: Use our skeleton for each event card
+              <div>
+                <div className="flex flex-row justify-between">
+                  <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
+                    {t("Events")}
+                  </h1>
+                </div>
+                {/* Skeleton block simulating event cards */}
+                <EventCardSkeleton count={paginatedEvents.length} />
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-4">
+                <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
+                <p className="text-gray-600 font-semibold">
+                  {error}: {t("Unable to fetch events")}
+                </p>
+              </div>
+            ) : paginatedEvents?.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-10">
+                <IoCalendarOutline className="text-6xl" />
+                <span className="py-5">No Events in this Month</span>
+              </div>
+            ) : (
+              <div className="relative flex items-center justify-center">
+                <button
+                  className={`absolute left-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                    currentPage === 0 ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                  onClick={handlePrev}
+                  disabled={currentPage === 0}
                 >
-                  <IoIosArrowBack />
-                </div>
-              )}
-              {loading && !error ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
-                  <Spinner />
-                </div>
-              ) : !loading && paginatedEvents?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-gray-500">
-                  <IoCalendarOutline className="text-6xl" />
-                  <span>{t("No Events in this Month", gt.stdEvents)}</span>
-                </div>
-              ) : (
-                paginatedEvents?.map((event, index) => (
-                  <EventCard
-                    key={event?.id}
-                    event={event}
-                    color={bgColors[index % bgColors?.length]}
-                    onClick={handleStickerClick}
-                    className="transform transition-transform duration-200 hover:scale-105 hover:shadow-xl"
-                  />
-                ))
-              )}
-              {(currentPage + 1) * itemsPerPage < filteredEvents?.length && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
-                  onClick={handleFilterPage}
-                >
-                  <IoIosArrowForward />
-                </div>
-              )}
-            </div>
+                  <IoIosArrowBack size={24} className="text-purple-500" />
+                </button>
 
-            <hr className="border-t-1 mt-12" />
+                <div className="flex gap-6 overflow-x-auto px-6 py-1 scrollbar-hide justify-start w-full">
+                  {paginatedEvents?.map((event, index) => (
+                    <EventCard
+                      key={event.id}
+                      event={event}
+                      color={bgColors[index % bgColors.length]}
+                      onClick={() => handleStickerClick(event)}
+                      className="min-w-72 transform transition duration-300 ease-in-out hover:scale-110 hover:shadow-2xl rounded-lg"
+                    />
+                  ))}
+                </div>
+
+                <button
+                  className={`absolute right-0 z-10 p-3 bg-white shadow-lg rounded-full transition-transform duration-200 hover:scale-110 ${
+                    currentPage + 1 >= totalPages
+                      ? "opacity-50 cursor-not-allowed"
+                      : ""
+                  }`}
+                  onClick={handleNext}
+                  disabled={currentPage + 1 >= totalPages}
+                >
+                  <IoIosArrowForward size={24} className="text-purple-500" />
+                </button>
+              </div>
+            )
+             // <hr className="border-t-1 mt-12" />
+            }
+           
+            {/* Calendar display */}
             <div className="w-full px-2">
               <Calendar
                 dateCellRender={handleDateCellRender}
-                headerRender={({ value, type, onChange, onTypeChange }) => {
+                headerRender={({ value, onChange }) => {
                   const StartAcademicYear = 2015;
                   const lastAcademicYear = 2050;
-
-                  const start = 0;
-                  const end = 12;
                   const monthOptions = [];
-
                   const localeData = value.localeData();
                   const months = localeData.monthsShort();
 
-                  for (let index = start; index < end; index++) {
+                  for (let index = 0; index < 12; index++) {
                     monthOptions.push(
                       <option key={index} value={index}>
                         {t(months[index], gt.month)}
@@ -245,7 +267,6 @@ const StudentEvent = () => {
                   }
 
                   const year = value.year();
-                  const month = value.month();
                   const options = [];
                   for (let i = StartAcademicYear; i <= lastAcademicYear; i++) {
                     options.push(
@@ -257,8 +278,8 @@ const StudentEvent = () => {
                   return (
                     <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
                       <select
-                        className="border rounded  bg-pink-100  px-3 py-2 text-pink-800 font-medium  "
-                        value={month}
+                        className="border rounded bg-pink-100 px-3 py-2 text-pink-800 font-medium"
+                        value={value.month()}
                         onChange={(event) => {
                           const newMonth = parseInt(event.target.value, 10);
                           const now = value.clone().month(newMonth);
@@ -291,6 +312,7 @@ const StudentEvent = () => {
                 }}
               />
             </div>
+            {/* Sidebar for event details */}
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={handleSidebarView}
@@ -300,6 +322,7 @@ const StudentEvent = () => {
               {renderSidebarContent()}
             </Sidebar>
           </div>
+
           {!loading && showError && (
             <OfflineModal error={error} onDismiss={handleDismiss} />
           )}

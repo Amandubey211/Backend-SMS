@@ -1,56 +1,73 @@
-import React, { useEffect, useState, useMemo } from 'react';
-import { Table, Select } from 'antd';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchLibraryBooks } from '../../../Store/Slices/Parent/Library/library.action';
-import { FaBookOpen } from 'react-icons/fa';
-import { RiSignalWifiErrorFill } from 'react-icons/ri';
-import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
-import { LibraryRowSkeleton } from '../../../Modules/Parents/Skeletons';
-import bookNew from '../../../Assets/ParentAssets/images/book_new.png'; // Import fallback book image
+import React, { useEffect, useState, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchLibraryBooks } from "../../../Store/Slices/Parent/Library/library.action";
+import { FaBookOpen } from "react-icons/fa";
+import { RiSignalWifiErrorFill } from "react-icons/ri";
+import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
+import { LibraryRowSkeleton } from "../../../Modules/Parents/Skeletons";
+import bookNew from "../../../Assets/ParentAssets/images/book_new.png"; // Fallback book image
+import Pagination from "../../Common/pagination";
+import { CiSearch } from "react-icons/ci";
+import BookPreviewPortal from "../../Common/BookPreviewPortal"; // adjust the path as needed
+import { Popover } from "antd";
 
-const { Option } = Select;
-
-// Fallback image URL for user profile
-const fallbackProfile = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+const fallbackProfile = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 
 const LibraryTable = () => {
-  const { t } = useTranslation('prtLibrary');
+  const { t } = useTranslation("prtLibrary");
   const dispatch = useDispatch();
 
-  // Redux state
   const {
     books = [],
     loading = false,
     error = null,
-  } = useSelector((state) => state?.Parent?.library || {});
+    currentPage = 1,
+    totalPages = 1,
+    totalBookIsuued = 0,
+  } = useSelector((state) => state?.Parent?.library);
 
-  // Local state for filtering & pagination
-  const [childFilter, setChildFilter] = useState('All');
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  // Local state for query parameters
+  const [childFilter, setChildFilter] = useState("All");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(currentPage);
+  const [pageSize, setPageSize] = useState(10);
 
-  // Fetch on mount
+  // State for preview popover
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewPosition, setPreviewPosition] = useState({ top: 0, left: 0 });
+  const [previewData, setPreviewData] = useState({
+    bookName: "",
+    bookImage: "",
+  });
+
   useEffect(() => {
-    dispatch(fetchLibraryBooks());
-  }, [dispatch]);
+    setPage(page);
+  }, [page]);
 
-  /**
-   * 1. Build dropdown options from studentId
-   *    - Each unique student => { _id, fullName, profile }
-   */
+  useEffect(() => {
+    const query = {
+      page,
+      limit: pageSize,
+      search,
+      childId: childFilter === "All" ? "" : childFilter,
+      status: statusFilter === "All" ? "" : statusFilter,
+    };
+    dispatch(fetchLibraryBooks(query));
+  }, [dispatch, page, pageSize, search, childFilter, statusFilter]);
+
   const childrenOptions = useMemo(() => {
     const map = {};
     books.forEach((item) => {
-      const student = item?.studentId;
+      const student = item?.issuedTo?.userId;
       if (student && student._id && !map[student._id]) {
         const fallbackName = [student?.firstName, student?.lastName]
           .filter(Boolean)
-          .join(' ');
+          .join(" ");
         map[student._id] = {
           _id: student._id,
-          fullName: student?.fullName || (fallbackName ? fallbackName : 'N/A'),
+          fullName: student?.fullName || (fallbackName ? fallbackName : "N/A"),
           profile: student?.profile || fallbackProfile,
         };
       }
@@ -58,357 +75,300 @@ const LibraryTable = () => {
     return Object.values(map);
   }, [books]);
 
-  /**
-   * 2. Date Formatting
-   */
-  const formatDate = (dateString) => {
-    return dateString ? dayjs(dateString).format('DD/MM/YY') : 'N/A';
+  const formatDate = (dateString) =>
+    dateString ? dayjs(dateString).format("DD/MM/YY") : "N/A";
+
+  const paginatedData = books;
+
+  // Event handlers for the preview popover
+  const handleMouseEnter = (e, bookName, bookImage) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setPreviewPosition({
+      top: rect.top, // top position of the trigger element
+      left: rect.left + rect.width / 2, // center horizontally
+    });
+    setPreviewData({ bookName, bookImage });
+    setPreviewVisible(true);
   };
 
-  /**
-   * 3. Filter Logic (child + status)
-   */
-  const filteredData = useMemo(() => {
-    let data = [...books];
-    if (childFilter !== 'All') {
-      data = data.filter((item) => item?.studentId?._id === childFilter);
-    }
-    if (statusFilter !== 'All') {
-      data = data.filter(
-        (item) => (item?.status || '').toLowerCase() === statusFilter.toLowerCase()
+  const handleMouseLeave = () => {
+    setPreviewVisible(false);
+  };
+
+  // Reset all filters to defaults
+  const handleReset = () => {
+    setChildFilter("All");
+    setStatusFilter("All");
+    setSearch("");
+    setPage(1);
+  };
+
+  const renderTableRows = () => {
+    if (loading) {
+      return (
+        <tr>
+          <td colSpan={7}>
+            <LibraryRowSkeleton rows={pageSize || 10} />
+          </td>
+        </tr>
       );
     }
-    return data;
-  }, [books, childFilter, statusFilter]);
 
-  /**
-   * 4. Pagination
-   */
-  const handlePageChange = (page) => setCurrentPage(page);
+    if (error) {
+      return (
+        <tr>
+          <td colSpan={7}>
+            <div
+              className="flex flex-col items-center justify-center text-center py-4"
+              style={{ width: "100%", height: "200px" }}
+            >
+              <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
+              <p className="text-gray-600 text-lg mt-2">
+                {t("Error")}: {error} — {t("Unable to fetch Library data")}
+              </p>
+            </div>
+          </td>
+        </tr>
+      );
+    }
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, currentPage, pageSize]);
+    if (paginatedData.length === 0) {
+      return (
+        <tr>
+          <td colSpan={7}>
+            <div
+              className="flex flex-col items-center justify-center text-center py-4"
+              style={{ width: "100%", height: "200px" }}
+            >
+              <FaBookOpen className="text-gray-400 text-8xl mb-6" />
+              <p className="text-gray-600 text-lg mt-2">
+                {t(
+                  "No borrowed books at the moment. Encourage your child to explore the library!"
+                )}
+              </p>
+            </div>
+          </td>
+        </tr>
+      );
+    }
 
-  /**
-   * 5. Table Columns
-   */
-  const columns = [
-    // Child
-    {
-      title: t('Child'),
-      key: 'child',
-      render: (_, record) => {
-        const student = record?.studentId || {};
-        const fallbackName = [student?.firstName, student?.lastName]
-          .filter(Boolean)
-          .join(' ');
-        const displayName =
-          student?.fullName || (fallbackName ? fallbackName : 'N/A');
-        return (
-          <div className="flex items-center">
-            <img
-              src={student?.profile || fallbackProfile}
-              alt={displayName}
-              className="h-10 w-10 rounded-full mr-2 object-cover"
-            />
-            <span>{displayName}</span>
-          </div>
-        );
-      },
-    },
-    // Book
-    {
-      title: t('Issue Book'),
-      key: 'book',
-      render: (_, record) => {
-        const book = record?.bookId;
-        const bookName = book?.name || 'N/A';
-        const bookImage = book?.image || bookNew;
-        return (
-          <div className="flex items-center">
-            <img
-              src={bookImage}
-              alt={bookName}
-              className="h-12 w-12 rounded-full mr-4 object-cover"
-            />
-            <span>{bookName}</span>
-          </div>
-        );
-      },
-    },
-    // Author
-    {
-      title: t('Author Name'),
-      key: 'author',
-      render: (_, record) => {
-        const book = record?.bookId;
-        return <span>{book?.author || record?.author || 'N/A'}</span>;
-      },
-    },
-    // Category
-    {
-      title: t('Category'),
-      key: 'category',
-      render: (_, record) => {
-        const book = record?.bookId;
-        return <span>{book?.category || 'N/A'}</span>;
-      },
-    },
-    // Issue Date
-    {
-      title: t('Issue Date'),
-      dataIndex: 'issueDate',
-      key: 'issueDate',
-      render: (date) => formatDate(date),
-    },
-    // Return Date
-    {
-      title: t('Return Date'),
-      dataIndex: 'returnDate',
-      key: 'returnDate',
-      render: (date) => formatDate(date),
-    },
-    // Status
-    {
-      title: t('Status'),
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const isReturned = (status || '').toLowerCase() === 'returned';
-        return (
-          <span
-            className={`inline-block px-3 py-1 rounded-full text-sm ${
-              isReturned
-                ? 'bg-green-100 text-green-800'
-                : 'bg-yellow-100 text-yellow-800'
-            }`}
+    return paginatedData.map((record) => {
+      const studentInfo = record?.issuedTo?.userId;
+      const fallbackName = [studentInfo?.firstName, studentInfo?.lastName]
+        .filter(Boolean)
+        .join(" ");
+      const displayName =
+        studentInfo?.fullName || (fallbackName ? fallbackName : "N/A");
+
+      const book = record?.bookId;
+      const bookName = book?.name || "N/A";
+      const bookImage = book?.image || bookNew;
+      const authorName = book?.author || record?.author || "N/A";
+
+      // Extract category names from the category objects
+      const categories = book?.categories || [];
+      const categoryNames = categories.map((cat) => cat.name || "N/A");
+
+      // Determine what to display and the preview text
+      const categoryDisplay =
+        categoryNames.length > 0 ? categoryNames[0] : "N/A";
+      const additionalCategoriesCount =
+        categoryNames.length > 1 ? categoryNames.length - 1 : 0;
+      const categoryPreview = categoryNames.join(", ");
+
+      return (
+        <tr key={record._id} className="border-b hover:bg-gray-50 text-center">
+          {/* Child */}
+          <td className="px-4 py-3 text-center">
+            <div className="flex items-center justify-center">
+              <img
+                src={studentInfo?.profile || fallbackProfile}
+                alt={displayName}
+                className="h-10 w-10 rounded-full mr-2 object-cover"
+              />
+              <span>{displayName}</span>
+            </div>
+          </td>
+          {/* Issue Book with truncation and tooltip */}
+          <td
+            className="px-4 py-3 overflow-hidden whitespace-nowrap text-ellipsis"
+            title={bookName}
           >
-            {status || 'N/A'}
-          </span>
-        );
-      },
-    },
-  ];
+            <span
+              className="cursor-pointer text-blue-600"
+              onMouseEnter={(e) => handleMouseEnter(e, bookName, bookImage)}
+              onMouseLeave={handleMouseLeave}
+            >
+              {bookName}
+            </span>
+          </td>
+          {/* Author Name with truncation */}
+          <td
+            className="px-4 py-3 w-32 overflow-hidden whitespace-nowrap text-ellipsis"
+            title={authorName}
+          >
+            {authorName}
+          </td>
+          {/* Category with conditional display */}
+          <td
+            className="px-4 py-3 w-32 overflow-hidden whitespace-nowrap text-ellipsis"
+            title={categoryPreview}
+          >
+            <div className="inline-flex items-center">
+              <span>{categoryDisplay}</span>
+              {additionalCategoriesCount > 0 && (
+                <Popover content={categoryPreview} trigger="hover">
+                  <span className="ml-2 inline-flex items-center justify-center w-6 h-6 rounded-full bg-blue-600 text-white text-xs">
+                    +{additionalCategoriesCount}
+                  </span>
+                </Popover>
+              )}
+            </div>
+          </td>
+          {/* Issue Date */}
+          <td className="px-4 py-3">{formatDate(record.issueDate)}</td>
+          {/* Return Date */}
+          <td className="px-4 py-3">{formatDate(record.returnDate)}</td>
+          {/* Status */}
+          <td className="px-4 py-3">
+            <span
+              className={`inline-flex items-center justify-center w-24 h-7 text-sm font-medium rounded-md border whitespace-nowrap ${
+                record.status?.toLowerCase() === "returned"
+                  ? "border-green-700 bg-green-50 text-green-600"
+                  : "border-yellow-700 bg-yellow-50 text-yellow-600"
+              }`}
+            >
+              {record.status || "N/A"}
+            </span>
+          </td>
+        </tr>
+      );
+    });
+  };
 
-  /**
-   * 6. Loading / No-Data / Error states
-   */
-  const renderLoading = () => <LibraryRowSkeleton rows={3} />;
-
-
-  const renderErrorMessage = () => (
-    <tr>
-      <td colSpan={columns.length}>
-        <div
-          className="flex flex-col items-center justify-center text-center py-4"
-          style={{
-            width: '100%',
-            height: '200px',
-          }}
-        >
-          <RiSignalWifiErrorFill className="text-gray-400 text-8xl mb-6" />
-          <p className="text-gray-600 text-lg mt-2">
-            {t('Error')}: {error} — {t('Unable to fetch Library data')}
-          </p>
-        </div>
-      </td>
-    </tr>
-  );
-
-  /**
-   * 7. Render
-   */
   return (
     <div className="p-6 pt-5">
-      {/* Header: Title + Filters */}
-      <div className="flex items-center justify-end mb-4">
-        <div className="flex items-center space-x-6">
-          {/* Child Filter */}
-          <Select
-            value={childFilter}
-            onChange={setChildFilter}
-            style={{ width: 220 }}
-          >
-            <Option value="All">{t('All Children')}</Option>
-            {childrenOptions.map((child) => (
-              <Option key={child._id} value={child._id}>
-                <div className="flex items-center">
-                  <img
-                    src={child.profile}
-                    alt={child.fullName}
-                    className="h-5 w-5 rounded-full mr-2 object-cover"
-                  />
-                  <span>{child.fullName}</span>
-                </div>
-              </Option>
-            ))}
-          </Select>
-
-          {/* Status Filter */}
-          <div className="flex items-center space-x-4">
-            <span className="font-medium">{t('Status')}</span>
-            {/* All */}
-            <label style={{ position: 'relative', paddingLeft: '24px', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="status"
-                value="All"
-                checked={statusFilter === 'All'}
-                onChange={() => setStatusFilter('All')}
-                style={{ display: 'none' }}
-              />
-              <span style={{ position: 'relative', paddingLeft: '16px' }}>
-                {t('All')}
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    transform: 'translateY(-50%)',
-                    width: '14px',
-                    height: '14px',
-                    border: '2px solid #0D9755',
-                    borderRadius: '50%',
-                    background: '#FFF',
-                  }}
-                />
-                {statusFilter === 'All' && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '3px',
-                      transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: '#0D9755',
-                    }}
-                  />
-                )}
-              </span>
+      {/* Header: Search, Filters & Reset */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 space-y-4 md:space-y-0">
+        {/* Search field on the left */}
+        <div className="relative flex items-center max-w-xs w-full mr-4">
+          <input
+            type="text"
+            placeholder={t("Search here")}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+          />
+          <button className="absolute right-3">
+            <CiSearch className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+        {/* Filters & Reset on the right */}
+        <div className="flex items-center space-x-4">
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-600 mb-1">
+              {t("Select Your Children")}
             </label>
-
-            {/* Pending */}
-            <label style={{ position: 'relative', paddingLeft: '24px', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="status"
-                value="Pending"
-                checked={statusFilter === 'Pending'}
-                onChange={() => setStatusFilter('Pending')}
-                style={{ display: 'none' }}
-              />
-              <span style={{ position: 'relative', paddingLeft: '16px' }}>
-                {t('Pending')}
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    transform: 'translateY(-50%)',
-                    width: '14px',
-                    height: '14px',
-                    border: '2px solid #0D9755',
-                    borderRadius: '50%',
-                    background: '#FFF',
-                  }}
-                />
-                {statusFilter === 'Pending' && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '3px',
-                      transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: '#0D9755',
-                    }}
-                  />
-                )}
-              </span>
+            <select
+              className="border border-gray-300 rounded px-3 py-1 w-56 focus:outline-none focus:border-blue-500"
+              value={childFilter}
+              onChange={(e) => {
+                setChildFilter(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="All">{t("All Children")}</option>
+              {childrenOptions.map((child) => (
+                <option key={child._id} value={child._id}>
+                  {child.fullName}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-600 mb-1">{t("Status")}</label>
+            <select
+              className="border border-gray-300 rounded px-3 py-1 w-36 focus:outline-none focus:border-blue-500"
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value);
+                setPage(1);
+              }}
+            >
+              <option value="All">{t("All")}</option>
+              <option value="Pending">{t("Pending")}</option>
+              <option value="Returned">{t("Returned")}</option>
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label className="text-sm text-gray-600 mb-1">
+              {t("Hard Reset")}
             </label>
-
-            {/* Returned */}
-            <label style={{ position: 'relative', paddingLeft: '24px', cursor: 'pointer' }}>
-              <input
-                type="radio"
-                name="status"
-                value="Returned"
-                checked={statusFilter === 'Returned'}
-                onChange={() => setStatusFilter('Returned')}
-                style={{ display: 'none' }}
-              />
-              <span style={{ position: 'relative', paddingLeft: '16px' }}>
-                {t('Returned')}
-                <span
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: 0,
-                    transform: 'translateY(-50%)',
-                    width: '14px',
-                    height: '14px',
-                    border: '2px solid #0D9755',
-                    borderRadius: '50%',
-                    background: '#FFF',
-                  }}
-                />
-                {statusFilter === 'Returned' && (
-                  <span
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '3px',
-                      transform: 'translateY(-50%)',
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: '#0D9755',
-                    }}
-                  />
-                )}
-              </span>
-            </label>
+            <button
+              onClick={handleReset}
+              className="px-4 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-100"
+            >
+              {t("Reset All")}
+            </button>
           </div>
         </div>
       </div>
-
       {/* Table */}
-      <Table
-        columns={columns}
-        dataSource={paginatedData}
-        rowKey="_id"
-        pagination={{
-          current: currentPage,
-          pageSize,
-          total: filteredData.length,
-          onChange: handlePageChange,
-          showSizeChanger: false,
-        }}
-        locale={{
-          emptyText: loading
-            ? renderLoading()
-            : error
-            ? renderErrorMessage()
-           : <div
-           className="flex flex-col items-center justify-center text-center py-4"
-           style={{
-             width: '100%',
-             height: '200px',
-           }}
-         >
-           <FaBookOpen className="text-gray-400 text-8xl mb-6" />
-           <p className="text-gray-600 text-lg mt-2">
-             {t('No borrowed books at the moment. Encourage your child to explore the library!')}
-           </p>
-         </div>,
-        }}
-      />
+      <div className="overflow-x-auto border border-gray-200 rounded-md">
+        <table className="min-w-full table-fixed text-left">
+          <thead className="bg-gray-100">
+            <tr className="border-b text-center">
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Child")}
+              </th>
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Issue Book")}
+              </th>
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Author Name")}
+              </th>
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Category")}
+              </th>
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Issue Date")}
+              </th>
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Return Date")}
+              </th>
+              <th className="px-4 py-2 text-sm font-semibold text-gray-700">
+                {t("Status")}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="bg-white">{renderTableRows()}</tbody>
+        </table>
+      </div>
+      {totalBookIsuued > 0 && (
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          totalRecords={totalBookIsuued}
+          limit={pageSize}
+          setPage={setPage}
+          setLimit={setPageSize}
+          t={t}
+        />
+      )}
+
+      {/* Render the preview image via portal */}
+      <BookPreviewPortal visible={previewVisible} position={previewPosition}>
+        <div className="bg-white border border-gray-200 shadow-lg rounded p-2">
+          <img
+            src={previewData.bookImage}
+            alt={previewData.bookName}
+            className="w-24 h-24 object-cover"
+          />
+        </div>
+      </BookPreviewPortal>
     </div>
   );
 };

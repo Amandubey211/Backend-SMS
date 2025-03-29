@@ -1,106 +1,104 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-
-import { setShowError } from "../../Common/Alerts/alertsSlice";
-import { handleError } from "../../Common/Alerts/errorhandling.action";
-import { getAY } from "../../../../Utils/academivYear";
 import {
+  deleteData,
   getData,
   postData,
   putData,
-  deleteData,
 } from "../../../../services/apiEndpoints";
+import { getAY } from "../../../../Utils/academivYear";
 import { getUserRole } from "../../../../Utils/getRoles";
+import { handleError } from "../../Common/Alerts/errorhandling.action";
+import { setShowError } from "../../Common/Alerts/alertsSlice";
 
-// Fetch Timetables
-export const fetchTimetables = createAsyncThunk(
-  "timetable/fetchTimetables",
+/**
+ * Fetch the timetable list from the server.
+ * Accepts optional filters object to include in the query if needed (e.g. classId, type, status).
+ */
+export const fetchTimetableList = createAsyncThunk(
+  "timetable/fetchTimetableList",
   async (filters = {}, { rejectWithValue, getState, dispatch }) => {
-    const { role } = getState().common.auth;
-    let updatedFilters = { ...filters };
-
-    // If role is student or teacher, include classId from state
-    if (role === "student" || role === "teacher") {
-      const { userDetails } = getState().common.user;
-      const classId = userDetails?.classId;
-      if (classId) {
-        updatedFilters = { ...updatedFilters, classId };
-      }
-    }
-
-    // Add semesterId from state
-    const semesterId = getState().common.user.classInfo.selectedSemester.id;
-    if (semesterId) {
-      updatedFilters = { ...updatedFilters, semesterId };
-    }
-
     try {
       const say = getAY();
-      const getRole = getUserRole(getState);
+      const role = getUserRole(getState);
+
+      // Example: If you have custom filters, you can attach them as query params.
+      // e.g., ?classId=xxx&type=xxx etc. Currently this is just a demonstration.
+      // Construct a query string from filters if needed. For now, we pass them as an object.
       dispatch(setShowError(false));
-      const response = await getData(
-        `/${getRole}/timetable?say=${say}`,
-        updatedFilters
-      );
-      return response?.data;
+
+      const response = await getData(`/${role}/timetable?say=${say}`, filters);
+      return response?.data; // This should be the array of timetables
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Create Timetable
+/**
+ * Create a new timetable.
+ * `data` is the form object to create the timetable.
+ */
 export const createTimetable = createAsyncThunk(
   "timetable/createTimetable",
   async (data, { rejectWithValue, getState, dispatch }) => {
     try {
-      const semesterId = getState().common.user.classInfo.selectedSemester.id;
-      // Merge semesterId into the request body
-      data = { ...data, semesterId };
       const say = getAY();
-      const getRole = getUserRole(getState);
+      const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await postData(
-        `/${getRole}/create-timetable?say=${say}`,
-        data
-      );
-      return response?.data;
+
+      // POST /create-timetable?say=...
+      const res = await postData(`/${role}/create-timetable?say=${say}`, data);
+      if (res.success) {
+        dispatch(fetchTimetableList());
+        return res.data; // newly created timetable object
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Update Timetable
+/**
+ * Update an existing timetable.
+ * `payload` = { id, data } — where id is the timetable ID and data are the updated fields.
+ */
 export const updateTimetable = createAsyncThunk(
   "timetable/updateTimetable",
   async ({ id, data }, { rejectWithValue, getState, dispatch }) => {
     try {
-      const semesterId = getState().common.user.classInfo.selectedSemester.id;
-      // Merge semesterId into the request body
-      data = { ...data, semesterId };
       const say = getAY();
-      const getRole = getUserRole(getState);
+      const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(
-        `/${getRole}/update-timetable/${id}?say=${say}`,
+
+      // PUT /update-timetable/:id?say=...
+      const res = await putData(
+        `/${role}/update-timetable/${id}?say=${say}`,
         data
       );
-      return response?.data;
+      dispatch(fetchTimetableList());
+      return res.data; // updated timetable object
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Delete Timetable
+/**
+ * Delete an existing timetable by ID.
+ * `id` is the timetable ID.
+ */
 export const deleteTimetable = createAsyncThunk(
   "timetable/deleteTimetable",
   async (id, { rejectWithValue, getState, dispatch }) => {
     try {
       const say = getAY();
-      const getRole = getUserRole(getState);
+      const role = getUserRole(getState);
       dispatch(setShowError(false));
-      await deleteData(`/${getRole}/delete-timetable/${id}?say=${say}`);
+
+      // DELETE /delete-timetable/:id?say=...
+      await deleteData(`/${role}/delete-timetable/${id}?say=${say}`);
+
+      // Return the deleted ID so we can remove it from the state
       return { id };
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

@@ -1,15 +1,15 @@
 import React, { useEffect, memo } from "react";
 import Notice from "./Notice";
-import { useNavigate } from "react-router-dom"; // Updated import
-import { useDispatch, useSelector } from "react-redux"; // Import Redux hooks
-import { fetchNotices } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action"; // Import Redux action
-import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png"; // Update with correct path
-import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png"; // Update with correct path
-import { FaCalendarAlt } from "react-icons/fa"; // For "No data found" icon
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchNotices } from "../../../../Store/Slices/Admin/Dashboard/adminDashboard.action";
+import icon1 from "../../../../Assets/DashboardAssets/Images/image1.png";
+import icon2 from "../../../../Assets/DashboardAssets/Images/image2.png";
+import { FaCalendarAlt } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
-import Spinner from "../../../../Components/Common/Spinner";
+import { Skeleton } from "antd";
 
 const icons = [icon1, icon2];
 
@@ -22,13 +22,12 @@ const generateRandomColor = () => {
     "#FBB778",
     "#F9B279",
   ];
-  return colors[Math.floor(Math.random() * colors?.length)];
+  return colors[Math.floor(Math.random() * colors.length)];
 };
 
 const NoticeBoard = (descriptionLength) => {
-  const dispatch = useDispatch(); // Use useDispatch to dispatch actions
-  const navigate = useNavigate(); // Use useNavigate for navigation
-
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation("dashboard");
 
   // Get notices data from Redux state
@@ -37,20 +36,94 @@ const NoticeBoard = (descriptionLength) => {
     errorNotices: error,
     notices,
   } = useSelector((state) => state.admin.adminDashboard);
+
   useEffect(() => {
     dispatch(fetchNotices());
   }, [dispatch]);
 
+  // If loading, show skeleton (shimmer) UI
   if (loading) {
-    return <Spinner />;
+    return (
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.SHOW_EVENTS}
+        title={"Notices"}
+      >
+        <div className="p-2">
+          {/* Header Skeleton */}
+          <div className="flex justify-between p-4 items-center px-6">
+            <Skeleton.Input active style={{ width: 200, height: 24 }} />
+            <Skeleton.Button active style={{ width: 100, height: 32 }} />
+          </div>
+          {/* Skeleton for Notice cards (render exactly 3) */}
+          <div className="space-y-3">
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <div
+                key={`notice-skeleton-${idx}`}
+                className="w-[97%] p-3 my-3 border shadow-md border-gray-200 rounded-lg flex min-h-[80px]"
+              >
+                {/* Left Icon Skeleton */}
+                <div className="pr-3 flex-shrink-0">
+                  <Skeleton.Avatar active size={56} shape="circle" />
+                </div>
+                {/* Right Content Skeleton */}
+                <div className="flex flex-col flex-grow">
+                  {/* Title & Priority Row */}
+                  <div className="flex items-center justify-between">
+                    <Skeleton.Input
+                      active
+                      style={{ width: "70%", height: 20 }}
+                    />
+                    <Skeleton.Input
+                      active
+                      style={{ width: "25%", height: 16 }}
+                    />
+                  </div>
+                  {/* Posted by Row */}
+                  <div className="mt-2">
+                    <Skeleton.Input
+                      active
+                      style={{ width: "50%", height: 16 }}
+                    />
+                  </div>
+                  {/* Content Snippet Row */}
+                  <div className="mt-2">
+                    <Skeleton.Input
+                      active
+                      style={{ width: "80%", height: 16 }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </ProtectedSection>
+    );
   }
 
-  // Ensure notices is an array and create a copy before sorting
+  // If there's an error, show error state
+  if (error) {
+    return (
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.SHOW_EVENTS}
+        title={"Notices"}
+      >
+        <div className="flex flex-col items-center justify-center my-10">
+          <FaCalendarAlt className="text-gray-400 text-6xl mb-4" />
+          <p className="text-gray-500 text-xl">
+            {t("Error while fetching notices")}
+          </p>
+        </div>
+      </ProtectedSection>
+    );
+  }
+
+  // Process notices data
   const noticesArray = Array.isArray(notices) ? [...notices] : [];
   const noticesSort = noticesArray.sort(
     (a, b) => new Date(b.startDate) - new Date(a.startDate)
   );
-  const topNotices = noticesSort?.slice(0, 3);
+  const topNotices = noticesSort.slice(0, 3);
 
   return (
     <ProtectedSection
@@ -77,15 +150,16 @@ const NoticeBoard = (descriptionLength) => {
             </p>
           </div>
         ) : (
-          topNotices?.map((notice, index) => (
+          topNotices.map((notice, index) => (
             <Notice
               key={index}
-              image={icons[index % icons?.length]} // Use cyclic icons
+              image={icons[index % icons.length]}
               title={notice?.title}
               authorName={notice?.authorName}
-              date={new Date(notice?.startDate).toLocaleDateString()} // Formatting date
+              startdate={new Date(notice?.startDate).toLocaleDateString()}
+              enddate={new Date(notice?.endDate).toLocaleDateString()}
               priority={notice?.priority}
-              content={notice?.description} // Changed 'content' to 'description' based on API response
+              content={notice?.description}
               backgroundColor={generateRandomColor()}
               descriptionLength={descriptionLength}
             />

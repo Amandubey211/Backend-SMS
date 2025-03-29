@@ -16,6 +16,9 @@ import { fetchFilteredQuizzesThunk } from "../../../../../Store/Slices/Admin/Cla
 const MainSection = () => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
 
   // Search/filter states
   const [search, setSearch] = useState("");
@@ -36,13 +39,24 @@ const MainSection = () => {
     (store) => store.admin.subject_grades
   );
 
+  useEffect(() => {
+    if (selectedSemester) {
+      setFilters((prev) => ({
+        ...prev,
+        semesterId: selectedSemester.id,
+      }));
+    }
+  }, [selectedSemester]);
+
   // Fetch data on mount or when filters change
   useEffect(() => {
+    if (!filters.semesterId) return;
     dispatch(fetchSubjectGrades({ classId: cid, subjectId: sid, filters }));
     dispatch(fetchModules({ cid, sid }));
     dispatch(fetchFilteredAssignments({ sid }));
     dispatch(fetchFilteredQuizzesThunk({ sid }));
   }, [dispatch, cid, sid, filters]);
+  console.log("Dispatching with filters:", filters);
 
   // Stabilize search change handler
   const handleSearchChange = useCallback((value) => {

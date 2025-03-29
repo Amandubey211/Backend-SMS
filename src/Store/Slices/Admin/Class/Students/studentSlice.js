@@ -45,8 +45,7 @@ const studentSlice = createSlice({
         fetchStudentsByClassAndSectionNames.fulfilled,
         (state, action) => {
           state.loading = false;
-          console.log(action.payload, "kkk");
-          state.studentsList = action.payload;
+          // state.studentsList = action.payload;
         }
       )
 

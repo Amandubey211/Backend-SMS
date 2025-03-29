@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import {
   FaEllipsisV,
   FaChevronDown,
@@ -9,26 +9,36 @@ import {
   FaFileWord,
   FaFilePowerpoint,
   FaEye,
+  FaSearch,
+  FaClipboardList,
+  FaRegFileAlt,
 } from "react-icons/fa";
-import { ImSpinner3 } from "react-icons/im";
-import { RiDeleteBin5Line } from "react-icons/ri";
 import { GrAttachment } from "react-icons/gr";
 import ChapterItem from "./ChapterItem";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import AddAttachment from "./AddAttachment";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { deleteChapter } from "../../../../../../Store/Slices/Admin/Class/Module/chapterThunk";
 import { fetchModules } from "../../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import toast from "react-hot-toast";
 import { deleteAttachmentThunk } from "../../../../../../Store/Slices/Admin/Class/Module/attachmentThunk";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
-import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import {
+  Dropdown,
+  Menu,
+  Modal,
+  Tag,
+  Input,
+  Skeleton,
+  Empty,
+  Button,
+} from "antd";
+import { motion } from "framer-motion";
 
 const Chapter = ({ onEdit, chapterNumber, chapter }) => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [chapterExpanded, setChapterExpanded] = useState(false);
@@ -36,6 +46,10 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
   const [previewType, setPreviewType] = useState(null);
   const [attachmentToDelete, setAttachmentToDelete] = useState(null);
   const [attachmentLoading, setAttachmentLoading] = useState({});
+  const [activeSection, setActiveSection] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isItemsLoading, setIsItemsLoading] = useState(false);
+  const [errorLoading, setErrorLoading] = useState(null);
 
   const {
     _id: chapterId,
@@ -45,42 +59,44 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     attachments,
     quizzes,
   } = chapter;
-
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
   const { moduleId } = useSelector(
     (state) => state.admin.module.selectedModule
   );
 
-  const menuRef = useRef(null);
+  const handleDelete = () => setDeleteModalOpen(true);
 
-  const toggleMenu = (e) => {
-    e.stopPropagation();
-    setMenuOpen((prevState) => !prevState);
-  };
+  const menu = (
+    <Menu>
+      <Menu.Item key="edit" onClick={onEdit} style={{ minWidth: "150px" }}>
+        <div className="flex items-center">
+          <FaPen className="mr-2" />
+          <span>Edit</span>
+        </div>
+      </Menu.Item>
+      <Menu.Item
+        key="delete"
+        onClick={handleDelete}
+        style={{ minWidth: "150px" }}
+      >
+        <div className="flex items-center">
+          <FaTrashAlt className="mr-2" />
+          <span>Delete</span>
+        </div>
+      </Menu.Item>
+    </Menu>
+  );
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuOpen(false);
-      }
-    };
-
-    if (menuOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [menuOpen]);
-
-  const handleDelete = () => {
-    setDeleteModalOpen(true);
-    setMenuOpen(false);
-  };
+  const menuMotion = (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    >
+      {menu}
+    </motion.div>
+  );
 
   const confirmDelete = async () => {
     try {
@@ -92,22 +108,15 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     }
   };
 
-  const handleAddAttachment = () => {
-    setIsSidebarOpen(true);
-  };
-
-  const handleSidebarClose = () => {
-    setIsSidebarOpen(false);
-  };
+  const handleAddAttachment = () => setIsSidebarOpen(true);
+  const handleSidebarClose = () => setIsSidebarOpen(false);
 
   const handleDeleteAttachment = async () => {
     if (!attachmentToDelete) return;
-
     setAttachmentLoading((prev) => ({
       ...prev,
       [attachmentToDelete.url]: true,
     }));
-
     try {
       await dispatch(
         deleteAttachmentThunk({
@@ -129,9 +138,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     }
   };
 
-  const toggleChapter = () => {
-    setChapterExpanded((prev) => !prev);
-  };
+  const toggleChapter = () => setChapterExpanded((prev) => !prev);
 
   const getFileIcon = (type) => {
     switch (type) {
@@ -148,6 +155,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     }
   };
 
+  // Open preview modal by setting URL and type.
   const openPreviewModal = (url, type) => {
     setPreviewUrl(url);
     setPreviewType(type);
@@ -158,10 +166,127 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     setPreviewType(null);
   };
 
+  const filteredAttachments = attachments
+    ? attachments.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (item.label &&
+            item.label.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : [];
+
+  const filteredAssignments = assignments
+    ? assignments.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+  const filteredQuizzes = quizzes
+    ? quizzes.filter((item) =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
+  const totalCount =
+    filteredAttachments.length +
+    filteredAssignments.length +
+    filteredQuizzes.length;
+
+  // Always show the header if items exist or if a search query is present.
+  const renderHeader = () => (
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center ">
+      <div className="w-full sm:w-1/3 mb-2 sm:mb-0">
+        <Input.Search
+          placeholder="Search..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          allowClear
+        />
+      </div>
+      <div
+        className="flex gap-1 justify-end"
+        role="group"
+        aria-label="Filter options"
+      >
+        <Tag
+          onClick={() => setActiveSection("all")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "all"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          All ({totalCount})
+        </Tag>
+        <Tag
+          onClick={() => setActiveSection("attachments")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "attachments"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          Attachments ({filteredAttachments.length})
+        </Tag>
+        <Tag
+          onClick={() => setActiveSection("assignments")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "assignments"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          Assignments ({filteredAssignments.length})
+        </Tag>
+        <Tag
+          onClick={() => setActiveSection("quizzes")}
+          className={`cursor-pointer rounded-full border px-2 py-1 ${
+            activeSection === "quizzes"
+              ? "bg-pink-100 text-pink-800"
+              : "bg-transparent text-gray-500"
+          }`}
+        >
+          Quiz ({filteredQuizzes.length})
+        </Tag>
+      </div>
+    </div>
+  );
+
+  // Smaller "No items found" placeholder.
+  const renderPlaceholder = () => (
+    <div className="flex flex-col items-center justify-center py-2">
+      <Empty description="No items found" />
+      <div className="mt-2 flex space-x-4">
+        <Button
+          type="primary"
+          onClick={handleAddAttachment}
+          icon={<GrAttachment size={12} />}
+          size="small"
+        >
+          Add Attachment
+        </Button>
+        <Link to={`/class/${cid}/${sid}/create_quiz`}>
+          <Button
+            type="primary"
+            icon={<FaClipboardList size={12} />}
+            size="small"
+          >
+            Create Quiz
+          </Button>
+        </Link>
+        <Link to={`/class/${cid}/${sid}/createassignment`}>
+          <Button type="primary" icon={<FaRegFileAlt size={12} />} size="small">
+            Create Assignment
+          </Button>
+        </Link>
+      </div>
+    </div>
+  );
+
+  const handleRetry = () => setErrorLoading(null);
+
   return (
     <div className="mb-4 p-1 bg-white rounded-lg border-b relative">
       {/* Chapter Header */}
-      <div className="flex items-center justify-between mb-2 relative">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center">
           <img
             src={imageUrl}
@@ -169,13 +294,11 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
             className="w-12 h-12 mr-4 rounded-lg"
           />
           <div className="flex flex-col">
-            <h2 className="font-semibold text-md">{title}</h2>
-            <div className="flex gap-1 items-center">
-              <p className="text-gray-500">Chapter {chapterNumber}</p>
-            </div>
+            <h2 className="font-semibold capitalize text-md">{title}</h2>
+            <p className="text-gray-500">Chapter {chapterNumber}</p>
           </div>
         </div>
-        <div className="flex items-center space-x-2 relative">
+        <div className="flex items-center space-x-2">
           <ProtectedAction
             requiredPermission={PERMISSIONS.UPLOAD_CHAPTER_FILES}
           >
@@ -187,7 +310,6 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
               >
                 <GrAttachment />
               </button>
-
               {attachments?.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {attachments?.length}
@@ -195,56 +317,20 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
               )}
             </div>
           </ProtectedAction>
-
-          <button
-            className="border p-2 rounded-full hover:bg-gray-100 relative"
-            onClick={toggleMenu}
-            aria-expanded={menuOpen}
-            aria-haspopup="menu"
-            aria-label="Options"
+          <Dropdown
+            overlay={menuMotion}
+            trigger={["click"]}
+            placement="bottomRight"
           >
-            <FaEllipsisV />
-          </button>
-          {menuOpen && (
-            <div
-              ref={menuRef}
-              className="absolute top-full mt-2 right-0 bg-white border rounded-lg shadow-lg w-48 z-10"
-              role="menu"
-              aria-label="Options Menu"
+            <button
+              className="border p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring focus:ring-pink-300"
+              aria-label="Options menu"
             >
-              <ul>
-                
-                  <li
-                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEdit();
-                      setMenuOpen(false);
-                    }}
-                    role="menuitem"
-                  >
-                    <FaPen className="mr-2" /> Edit
-                  </li>
-               
-                <ProtectedAction
-                  requiredPermission={PERMISSIONS.DELETE_CHAPTER}
-                >
-                  <li
-                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete();
-                    }}
-                    role="menuitem"
-                  >
-                    <FaTrashAlt className="mr-2" /> Delete
-                  </li>
-                </ProtectedAction>
-              </ul>
-            </div>
-          )}
+              <FaEllipsisV />
+            </button>
+          </Dropdown>
           <button
-            className="border p-2 rounded-full hover:bg-gray-100"
+            className="border p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring focus:ring-pink-300"
             onClick={toggleChapter}
             aria-label="Toggle Chapter"
             aria-expanded={chapterExpanded}
@@ -257,161 +343,158 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
       {/* Chapter Content */}
       {chapterExpanded && (
-        
-          <div
-            id={`chapter-content-${chapterId}`}
-            className="mt-2 transition-all duration-300 ease-in-out"
-          >
-            <div className="flex flex-col space-y-4">
-              {/* Attachments */}
-              {attachments?.length > 0 && (
-                <div>
-                  <h3 className="text-sm font-semibold text-green-600">
-                    Attachments ({attachments?.length})
-                  </h3>
-                  <div className="grid grid-cols-1 gap-2 mb-2">
-                    {attachments?.map((attachment, index) => (
-                      <div
-                        key={index}
-                        className="flex flex-col p-2 border rounded-md transform transition duration-100 hover:shadow-md"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            {getFileIcon(attachment.type) || (
+        <div
+          id={`chapter-content-${chapterId}`}
+          className="mt-2 transition-all duration-300 ease-in-out"
+        >
+          <div className="flex flex-col space-y-4">
+            {(totalCount > 0 || searchQuery !== "") && renderHeader()}
+            {/* Scrollable Container */}
+            <div className="max-h-48 overflow-y-auto">
+              {errorLoading ? (
+                <div role="alert" className="p-4 text-red-600">
+                  Failed to load items.{" "}
+                  <button
+                    onClick={handleRetry}
+                    className="underline focus:outline-none"
+                  >
+                    Retry
+                  </button>
+                </div>
+              ) : isItemsLoading ? (
+                <Skeleton active paragraph={{ rows: 3 }} />
+              ) : totalCount === 0 ? (
+                renderPlaceholder()
+              ) : (
+                <>
+                  {(activeSection === "all" ||
+                    activeSection === "attachments") &&
+                    filteredAttachments.length > 0 && (
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold">Attachments</h3>
+                        {filteredAttachments.map((attachment, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center p-2 border rounded-md"
+                          >
+                            {attachment.type === "application/pdf" ? (
+                              <FaFilePdf
+                                className="text-red-500 mr-2"
+                                size={24}
+                              />
+                            ) : attachment.type === "application/msword" ||
+                              attachment.type ===
+                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
+                              <FaFileWord
+                                className="text-blue-500 mr-2"
+                                size={24}
+                              />
+                            ) : attachment.type ===
+                                "application/vnd.ms-powerpoint" ||
+                              attachment.type ===
+                                "application/vnd.openxmlformats-officedocument.presentationml.presentation" ? (
+                              <FaFilePowerpoint
+                                className="text-orange-500 mr-2"
+                                size={24}
+                              />
+                            ) : attachment.type.startsWith("image/") ? (
                               <img
                                 src={attachment.url}
                                 alt={attachment.name}
-                                className="h-8 w-8 object-cover rounded-md"
+                                className="w-10 h-10 mr-2 object-cover rounded"
+                              />
+                            ) : (
+                              <FaRegFileAlt
+                                className="text-gray-500 mr-2"
+                                size={24}
                               />
                             )}
-                            <div className="flex flex-col ml-4">
-                              <p className="text-gray-700 text-sm truncate max-w-xs overflow-hidden whitespace-nowrap">
+                            <div>
+                              <p className="font-medium capitalize">
+                                {attachment.label}
+                              </p>
+                              <p className="text-xs text-gray-500">
                                 {attachment.name}
                               </p>
-                              <p className="text-md">{attachment.label}</p>
                             </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                        
+                            <div className="ml-auto flex items-center space-x-2">
                               <button
-                                onClick={() =>
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   openPreviewModal(
                                     attachment.url,
                                     attachment.type
-                                  )
-                                }
-                                className="text-green-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                                aria-label="Preview"
+                                  );
+                                }}
+                                className="p-1 text-blue-500 hover:text-blue-700"
+                                aria-label="View Attachment"
                               >
                                 <FaEye size={20} />
                               </button>
-                         
-
-                            <ProtectedAction
-                              requiredPermission={
-                                PERMISSIONS.REMOVE_CHAPTER_FILES
-                              }
-                            >
                               <button
-                                type="button"
-                                className="text-red-500 transition p-1 border rounded-full transform hover:scale-110 cursor-pointer"
-                                onClick={() => {
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setAttachmentToDelete(attachment);
                                   setDeleteModalOpen(true);
                                 }}
-                                disabled={attachmentLoading[attachment.url]}
+                                className="p-1 text-red-500 hover:text-red-700"
+                                aria-label="Delete Attachment"
                               >
-                                {attachmentLoading[attachment.url] ? (
-                                  <ImSpinner3
-                                    size={20}
-                                    className="animate-spin text-gray-700"
-                                  />
-                                ) : (
-                                  <RiDeleteBin5Line size={20} />
-                                )}
+                                <FaTrashAlt size={20} />
                               </button>
-                            </ProtectedAction>
+                            </div>
                           </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Assignments and Quizzes */}
-              <div>
-                {/* {assignments?.length > 0 || quizzes?.length > 0 ? (
-                <>
-                  {assignments?.map((assignment, index) => (
-                    <ChapterItem
-                      key={index}
-                      type="assignment"
-                      title={assignment.name}
-                      id={assignment._id}
-                      isPublished={assignment.isPublished}
-                    />
-                  ))}
-                  {quizzes?.map((quiz, index) => (
-                    <ChapterItem
-                      key={index}
-                      type="quiz"
-                      title={quiz.name}
-                      id={quiz._id}
-                      isPublished={quiz.isPublished}
-                    />
-                  ))}
+                    )}
+                  {(activeSection === "all" ||
+                    activeSection === "assignments") &&
+                    filteredAssignments.length > 0 && (
+                      <div>
+                        {filteredAssignments.map((assignment, index) => (
+                          <ChapterItem
+                            key={`assignment-${index}`}
+                            type="assignment"
+                            title={assignment.name}
+                            id={assignment._id}
+                            isPublished={assignment.isPublished}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  {(activeSection === "all" || activeSection === "quizzes") &&
+                    filteredQuizzes.length > 0 && (
+                      <div>
+                        {filteredQuizzes.map((quiz, index) => (
+                          <ChapterItem
+                            key={`quiz-${index}`}
+                            type="quiz"
+                            title={quiz.name}
+                            id={quiz._id}
+                            isPublished={quiz.isPublished}
+                          />
+                        ))}
+                      </div>
+                    )}
                 </>
-              ) : (
-                <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
-                  No Assignment or Quizz
-                </p>
-              )} */}
-                {assignments?.length > 0 ||
-                  (quizzes?.length > 0 && (
-                    <>
-                      {assignments?.map((assignment, index) => (
-                        <ChapterItem
-                          key={index}
-                          type="assignment"
-                          title={assignment.name}
-                          id={assignment._id}
-                          isPublished={assignment.isPublished}
-                        />
-                      ))}
-                      {quizzes?.map((quiz, index) => (
-                        <ChapterItem
-                          key={index}
-                          type="quiz"
-                          title={quiz.name}
-                          id={quiz._id}
-                          isPublished={quiz.isPublished}
-                        />
-                      ))}
-                    </>
-                  ))}
-              </div>
+              )}
             </div>
           </div>
-      
+        </div>
       )}
 
-      {/* Delete Modal for Chapter */}
       <DeleteModal
-        isOpen={deleteModalOpen && attachmentToDelete === null}
+        isOpen={deleteModalOpen && !attachmentToDelete}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={confirmDelete}
         title={title}
       />
-
-      {/* Delete Modal for Attachment */}
       <DeleteModal
-        isOpen={deleteModalOpen && attachmentToDelete !== null}
+        isOpen={deleteModalOpen && attachmentToDelete}
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleDeleteAttachment}
         title={attachmentToDelete?.label || "Attachment"}
       />
-
       {isSidebarOpen && (
         <Sidebar
           width="60%"
@@ -425,46 +508,39 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
           />
         </Sidebar>
       )}
-
-      {previewUrl && (
-        <div
-          className="fixed inset-0 flex items-center justify-center z-50"
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-300"
-            onClick={closePreviewModal}
-          ></div>
-          <div className="bg-white rounded-lg overflow-hidden shadow-xl transform transition-transform duration-300 max-w-3xl w-full p-6 relative">
-            <button
-              onClick={closePreviewModal}
-              className="absolute top-2 right-2 p-2 px-3 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-colors duration-500 ease-in-out shadow-lg"
-            >
-              ✕
-            </button>
-            <div className="flex justify-center">
-              <div className="overflow-y-auto max-h-[80vh] w-full">
-                {previewType === "application/pdf" ? (
-                  <embed
-                    src={previewUrl}
-                    type="application/pdf"
-                    width="100%"
-                    height="500px"
-                    className="max-h-[80vh] overflow-y-auto rounded-md"
-                  />
-                ) : (
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="max-h-[80vh] w-full object-contain rounded-md"
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal
+        visible={!!previewUrl}
+        footer={null}
+        onCancel={closePreviewModal}
+        centered
+        closable
+        aria-modal="true"
+        modalRender={(modal) => (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
+            {modal}
+          </motion.div>
+        )}
+      >
+        {previewType === "application/pdf" ? (
+          <embed
+            src={previewUrl}
+            type="application/pdf"
+            width="100%"
+            height="500px"
+            className="rounded-md"
+          />
+        ) : (
+          <img
+            src={previewUrl}
+            alt="Preview"
+            className="w-full object-contain rounded-md"
+          />
+        )}
+      </Modal>
     </div>
   );
 };

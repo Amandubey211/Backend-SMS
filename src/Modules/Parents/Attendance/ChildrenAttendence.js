@@ -5,7 +5,7 @@ import ParentDashLayout from "../../../Components/Parents/ParentDashLayout";
 
 function ChildrenAttendance() {
   return (
-    <Layout title="Parent Attendance">
+    <Layout title="Parents | Child Attendance">
       <ParentDashLayout>
         <MyChildAttendance />
       </ParentDashLayout>

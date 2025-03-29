@@ -22,6 +22,12 @@ function DateSection({
   setIsModalOpen,
 }) {
   // const dispatch = useDispatch();
+  const formatDateForInput = (date) => {
+    if (!date) return "";
+    const formattedDate = new Date(date);
+    return formattedDate.toISOString().split("T")[0]; // Returns "YYYY-MM-DD"
+  };
+
   const { t } = useTranslation("admClass");
   const { allStudents } = useSelector((store) => store.admin.all_students);
   const handleExport = () => {
@@ -61,43 +67,65 @@ function DateSection({
     XLSX.writeFile(workbook, `${examDetails.examName}_Exam_Report.xlsx`);
   };
   return (
-    <div className="flex flex-col text-black text-xs">
+    <div className="flex flex-col text-black text-xs ">
       {/* row-1 */}
-      <div className="flex flex-wrap items-center justify-between">
-        <div className="flex items-center ">
-          <div className="flex items-center gap-1">
-            <IoCalendarOutline className="text-sm" />
-            <span>Start Date:</span>
-            {isEditing ? (
-              <input
-                type="date"
-                name="startDate"
-                value={examDetails.startDate}
-                onChange={handleInputChange}
-                className="border px-2 py-1 rounded-md"
-              />
-            ) : (
-              <span>{formatDate(examDetails.startDate)}</span>
-            )}
+      <div className="flex items-center justify-between h-auto">
+        <div className="flex flex-col w-full gap-1">
+          <div className="flex items-center">
+            <div className="flex items-center gap-1">
+              <IoCalendarOutline className="text-sm" />
+              <span>Start Date:</span>
+              {isEditing ? (
+                <input
+                  type="date"
+                  name="startDate"
+                  value={formatDateForInput(examDetails.startDate)}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 rounded-md"
+                />
+              ) : (
+                <span>{formatDate(examDetails.startDate)}</span>
+              )}
+            </div>
+            <div className="flex items-center gap-1 pl-2">
+              <IoCalendarOutline className="text-sm " />
+              <span>End Date:</span>
+              {isEditing ? (
+                <input
+                  type="date"
+                  name="endDate"
+                  value={formatDateForInput(examDetails.endDate)}
+                  onChange={handleInputChange}
+                  className="border px-2 py-1 rounded-md"
+                />
+              ) : (
+                <span>{formatDate(examDetails.endDate)}</span>
+              )}
+            </div>
           </div>
-          <div className="flex items-center gap-1 pl-2">
-            <IoCalendarOutline className="text-sm " />
-            <span>End Date:</span>
-            {isEditing ? (
-              <input
-                type="date"
-                name="endDate"
-                value={examDetails.endDate}
-                onChange={handleInputChange}
-                className="border px-2 py-1 rounded-md"
-              />
-            ) : (
-              <span>{formatDate(examDetails.endDate)}</span>
-            )}
-          </div>
-        </div>
+          {examDetails.publishDate && !isEditing && (
+            <div className="flex items-center gap-1">
+              <IoCalendarOutline className="text-sm" />
+              <span>Published Date:</span>
+              <span>{formatDate(examDetails.publishDate)}</span>
+            </div>
+          )}
 
-        <div className="flex gap-x-2 cursor-pointer">
+          {isEditing && (
+            <div className="flex items-center gap-1 w-full md:w-auto">
+              <IoCalendarOutline className="text-sm" />
+              <span>Published Date:</span>
+              <input
+                type="date"
+                name="publishDate"
+                value={formatDateForInput(examDetails.publishDate)} // Set to empty if no date is set
+                onChange={handleInputChange}
+                className="border px-2 py-1 rounded-md w-full md:w-36"
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex justify-end gap-y-2 cursor-pointer items-end h-full  gap-1">
           <div className="flex flex-col">
             <Tooltip title="Export">
               <button
@@ -149,7 +177,7 @@ function DateSection({
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onConfirm={handleDeleteClick}
-            
+
           />
         </div>
       </div>

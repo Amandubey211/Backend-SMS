@@ -6,14 +6,24 @@ import { useParams } from "react-router-dom";
 import { ImSpinner3 } from "react-icons/im";
 import { FaExclamationTriangle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { createStudentDiscussionComment, createStudentDiscussionReply, deleteStudentDiscussionComment, deleteStudentDiscussionReply, editStudentDiscussionComment, editStudentDiscussionReply, fetchStudentCommentsByDiscussion, toggleLikeStudentDiscussion } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
+import {
+  createStudentDiscussionComment,
+  createStudentDiscussionReply,
+  deleteStudentDiscussionComment,
+  deleteStudentDiscussionReply,
+  editStudentDiscussionComment,
+  editStudentDiscussionReply,
+  fetchStudentCommentsByDiscussion,
+  toggleLikeStudentDiscussion,
+} from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Discussion/discussion.action";
 
 const DiscussionMessage = () => {
-
   const dispatch = useDispatch();
-  const { discussion, comments, loadingComments, errorComments } = useSelector((store) => store?.student?.studentDiscussion)
+  const { discussion, comments, loadingComments, errorComments } = useSelector(
+    (store) => store?.student?.studentDiscussion
+  );
   const { userId } = useSelector((store) => store?.common?.user?.userDetails);
-  const studentId = userId
+  const studentId = userId;
 
   const { _id } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,7 +32,9 @@ const DiscussionMessage = () => {
 
   useEffect(() => {
     if (discussion && discussion?._id) {
-      dispatch(fetchStudentCommentsByDiscussion({ discussionId: discussion._id }));
+      dispatch(
+        fetchStudentCommentsByDiscussion({ discussionId: discussion._id })
+      );
     }
   }, [discussion?._id, dispatch]);
 
@@ -32,7 +44,9 @@ const DiscussionMessage = () => {
 
   const handleRefresh = () => {
     if (discussion?._id) {
-      dispatch(fetchStudentCommentsByDiscussion({ discussionId: discussion._id }));
+      dispatch(
+        fetchStudentCommentsByDiscussion({ discussionId: discussion._id })
+      );
     }
   };
 
@@ -46,7 +60,6 @@ const DiscussionMessage = () => {
       return isAuthorMatch || isReplyMatch;
     });
   };
-
 
   const filteredComments = filterCommentsRecursively(comments, searchQuery);
 
@@ -77,22 +90,44 @@ const DiscussionMessage = () => {
           <div className="h-[70%] overflow-y-scroll no-scrollbar px-6">
             <CommentSection
               comments={filteredComments}
-              deleteComment={(commentId) => dispatch(deleteStudentDiscussionComment(commentId))}
-              deleteReply={(replyId) => dispatch(deleteStudentDiscussionReply(replyId))}
-              addNestedReply={(reply) => dispatch(createStudentDiscussionReply({ discussionId: discussion._id, reply }))}
+              deleteComment={(commentId) =>
+                dispatch(deleteStudentDiscussionComment(commentId))
+              }
+              deleteReply={(replyId) =>
+                dispatch(deleteStudentDiscussionReply(replyId))
+              }
+              addNestedReply={(reply) =>
+                dispatch(
+                  createStudentDiscussionReply({
+                    discussionId: discussion._id,
+                    reply,
+                  })
+                )
+              }
               //deleteReply={deleteReply}
               //addNestedReply={addNestedReply}
               activeReplyId={activeReplyId}
               setActiveReplyId={setActiveReplyId}
               activeReplyParentId={activeReplyParentId}
               setActiveReplyParentId={setActiveReplyParentId}
-              editReply={(replyId, updatedReply) => dispatch(editStudentDiscussionReply({ replyId, updatedReply }))}
+              editReply={(replyId, updatedReply) =>
+                dispatch(editStudentDiscussionReply({ replyId, updatedReply }))
+              }
               //editReply={editReply}
               currentUserId={studentId}
             />
           </div>
           <div className="flex-none h-[15%]">
-            <InputComment addComment={(comment) => dispatch(createStudentDiscussionComment({ discussionId: discussion._id, comment }))} />
+            <InputComment
+              addComment={(comment) =>
+                dispatch(
+                  createStudentDiscussionComment({
+                    discussionId: discussion._id,
+                    comment,
+                  })
+                )
+              }
+            />
           </div>
         </>
       )}

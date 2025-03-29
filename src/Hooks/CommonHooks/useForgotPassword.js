@@ -7,9 +7,9 @@ import { baseUrl } from '../../config/Common';
 
 export const forgotPassword = async (email, role) => {
   try {
-    const res =  await axios.post(`${baseUrl}/api/password/forgot-password`, { email, role });
-    return // console.log(res);
-    
+    const res = await axios.post(`${baseUrl}/api/password/forgot-password`, { email, role });
+    return res;
+
   } catch (error) {
 
     console.error("Error in forgot password:", error);

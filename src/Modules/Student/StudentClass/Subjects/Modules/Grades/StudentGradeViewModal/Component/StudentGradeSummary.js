@@ -18,6 +18,8 @@ const StudentGradeSummary = ({ studentGrade }) => {
     totalQuizCompletedScore,
     total,
     totalAssignmentScore,
+    totalScoreOfOfflineExams,
+    totalOfflineExamsScore
   } = studentGrade;
 
   return (
@@ -44,12 +46,12 @@ const StudentGradeSummary = ({ studentGrade }) => {
                 {totalAssignmentScore ? totalAssignmentScore : 0} / {assignment ? assignment : 0}
               </p>
             </div>
-            <div className="flex justify-between mb-2">
+            {/* <div className="flex justify-between mb-2">
               <p className="text-sm">Group Assignment</p>
               <p className="text-sm">
                 {groupAssignment ? groupAssignment : 0} / {totalGroupAssignmentScore ? totalGroupAssignmentScore : 0}
               </p>
-            </div>
+            </div> */}
             <div className="flex justify-between mb-2">
               <p className="text-sm">Quiz</p>
               <p className="text-sm">
@@ -57,9 +59,9 @@ const StudentGradeSummary = ({ studentGrade }) => {
               </p>
             </div>
             <div className="flex justify-between mb-2">
-              <p className="text-sm">Group Quiz</p>
+              <p className="text-sm">OfflineExam Score</p>
               <p className="text-sm">
-                {groupQuiz ? groupQuiz : 0} / {totalGroupQuizScore ? totalGroupQuizScore : 0}{" "}
+                {totalScoreOfOfflineExams ?? 0} / {totalOfflineExamsScore ?? 0}{" "}
               </p>
             </div>
             <div className="flex justify-between mb-2">

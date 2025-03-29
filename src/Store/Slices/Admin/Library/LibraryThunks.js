@@ -16,36 +16,36 @@ import {
 } from "../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../Utils/getRoles";
 
-// Fetch Books Thunk
+// --------------------------- BOOKS ---------------------------
+
+// Fetch Books Thunk (simple list of book names)
 export const fetchBooksThunk = createAsyncThunk(
   "library/fetchBooks",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {
-      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
-      dispatch(setShowError(false)); // Reset error visibility
+      const say = getAY();
+      dispatch(setShowError(false));
       const getRole = getUserRole(getState);
-      console.log(say, "ddddddddd");
-      const response = await getData(`/${getRole}/all/bookNames?say=${say}`); // Use getData for API calls
-      return response?.books; // Safely access books using optional chaining
+      const response = await getData(`/${getRole}/all/bookNames?say=${say}`);
+      return response?.books;
     } catch (error) {
-      return handleError(error, dispatch, rejectWithValue); // Centralized error handling
+      return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
+// Fetch Books with pagination details
 export const fetchBooksDetailsThunk = createAsyncThunk(
   "library/fetchBooksDetails",
-  async (page = 1, { rejectWithValue, dispatch, getState }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch, getState }) => {
     try {
-      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
-      dispatch(setShowError(false)); // Reset error visibility
+      const say = getAY();
+      dispatch(setShowError(false));
       const getRole = getUserRole(getState);
-      console.log(say, "ddddddddd");
-      // Append page parameter to support pagination
       const response = await getData(
-        `/${getRole}/all/book?say=${say}&page=${page}`
+        `/${getRole}/all/book?say=${say}&page=${page}&limit=${limit}`
       );
-      return response; // Return full pagination response from the backend
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -57,28 +57,47 @@ export const addBookThunk = createAsyncThunk(
   "library/addBook",
   async (formData, { rejectWithValue, dispatch, getState }) => {
     try {
-      const say = getAY(); // Dynamically fetch the 'say' parameter
+      const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      // Use postData to send FormData
       const response = await customRequest(
         "post",
         `/${getRole}/add_book?say=${say}`,
         formData,
-        // Additional headers for the request
-
         {
           "Content-Type": "multipart/form-data",
         }
       );
-
-      // Handle successful response
       toast.success("Book added successfully!");
       dispatch(toggleSidebar());
-      // dispatch(fetchBooksThunk()); // Refresh the list of books
-      return response?.book; // Return the added book data safely
+      dispatch(fetchBooksDetailsThunk());
+      return response?.book;
     } catch (error) {
-      // Centralized error handling
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Update Book Thunk
+export const updateBookThunk = createAsyncThunk(
+  "library/updateBook",
+  async ({ bookId, formData }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await customRequest(
+        "PUT",
+        `/${getRole}/update/book/${bookId}?say=${say}`,
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      );
+      toast.success("Book updated successfully!");
+      dispatch(fetchBooksDetailsThunk());
+      return response?.book;
+    } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -91,51 +110,37 @@ export const deleteBookThunk = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
-      await deleteData(`/${getRole}/delete/book/${bookId}?say=${say}`); // Use deleteData
-      toast.success("Book deleted successfully!");
-      return bookId; // Return the deleted book ID
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
-    }
-  }
-);
-
-// Update Book Thunk
-export const updateBookThunk = createAsyncThunk(
-  "library/updateBook",
-  async ({ bookId, formData }, { rejectWithValue, dispatch, getState }) => {
-    try {
-      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
-      const getRole = getUserRole(getState);
-      dispatch(setShowError(false));
-      const response = await customRequest(
-        "PUT",
-        `/${getRole}/update/book/${bookId}?say=${say}`,
-        formData,
-        {
-          "Content-Type": "multipart/form-data",
-        }
+      const say = getAY();
+      const response = await deleteData(
+        `/${getRole}/delete/book/${bookId}?say=${say}`
       );
-      toast.success("Book updated successfully!");
-      dispatch(fetchBooksThunk());
-      return response?.book; // Safely access book using optional chaining
+      if (response.success) {
+        toast.success("Book deleted successfully!");
+        dispatch(fetchBooksDetailsThunk());
+        return bookId;
+      } else {
+        toast.error("Something went wrong");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-// Fetch Book Issues Thunk
+// --------------------------- BOOK ISSUES ---------------------------
+
 export const fetchBookIssuesThunk = createAsyncThunk(
   "library/fetchBookIssues",
-  async (_, { rejectWithValue, dispatch, getState }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch, getState }) => {
     try {
-      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      const say = getAY();
       const getRole = getUserRole(getState);
-      dispatch(setShowError(false)); // Reset error visibility
-      const response = await getData(`/${getRole}/all/bookIssue?say=${say}`); // Use getData
-      return response?.books; // Safely access books using optional chaining
+      dispatch(setShowError(false));
+      const response = await getData(`/${getRole}/all/bookIssue?say=${say}&page=${page}&limit=${limit}`);
+      return {
+        issues: response?.books || [],
+        pagination: response?.pagination || { totalItems: 0, totalPages: 1, currentPage: 1 },
+      };
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
@@ -147,7 +152,7 @@ export const issueBookThunk = createAsyncThunk(
   "library/issueBook",
   async (issueData, { rejectWithValue, dispatch, getState }) => {
     try {
-      const say = getAY(); // Replace localStorage.getItem("say") with getAY()
+      const say = getAY();
       const getRole = getUserRole(getState);
       const { id, ...bookIssueData } = issueData;
       const url = id
@@ -155,17 +160,99 @@ export const issueBookThunk = createAsyncThunk(
         : `/${getRole}/issue_book?say=${say}`;
       const method = id ? "put" : "post";
 
-      const response = await customRequest(method, url, bookIssueData); // Use customRequest for dynamic methods
-
+      const response = await customRequest(method, url, bookIssueData);
       dispatch(fetchBookIssuesThunk());
-
       toast.success(
         id
           ? "Book issue updated successfully!"
           : "Book issue created successfully!"
       );
+      return response?.book;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
-      return response?.book; // Safely access book using optional chaining
+// --------------------------- CATEGORIES ---------------------------
+
+// Fetch All Categories
+export const fetchCategoriesThunk = createAsyncThunk(
+  "library/fetchCategories",
+  async (_, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
+      // GET request to /:role/book/category
+      const response = await getData(`/${getRole}/book/category?say=${say}`);
+      return response?.data || []; // 'data' property from the backend response
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Add Category
+export const addCategoryThunk = createAsyncThunk(
+  "library/addCategory",
+  async (categoryData, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await postData(
+        `/${getRole}/book/add/category?say=${say}`,
+        categoryData
+      );
+      toast.success("Category created successfully!");
+      return response?.data; // returning the new category object
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Update Category
+export const updateCategoryThunk = createAsyncThunk(
+  "library/updateCategory",
+  async (
+    { categoryId, categoryData },
+    { rejectWithValue, dispatch, getState }
+  ) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/${getRole}/book/update/category/${categoryId}?say=${say}`,
+        categoryData
+      );
+      toast.success("Category updated successfully!");
+      return response?.data; // updated category
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Delete Category
+export const deleteCategoryThunk = createAsyncThunk(
+  "library/deleteCategory",
+  async (categoryId, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await deleteData(
+        `/${getRole}/book/delete/category/${categoryId}?say=${say}`
+      );
+      if (response.success) {
+        toast.success("Category deleted successfully!");
+        return categoryId;
+      } else {
+        toast.error(response.response.data.message || "Cannot Delete Category");
+      }
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

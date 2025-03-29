@@ -1,104 +1,53 @@
 import React, { useState } from "react";
-import { FaRegHeart, FaRegComment, FaTrashAlt } from "react-icons/fa";
-import InputComment from "./InputComment";
-import toast from "react-hot-toast";
+import { FaRegHeart } from "react-icons/fa";
 import { MdOutlineEdit } from "react-icons/md";
 import { RxCross2 } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
-import { createStudentAnnounceReply, deleteStudentAnnounceReply, editStudentAnnounceReply, fetchStudentAnnounceComments, toggleStudentAnnounceLike } from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcement.action";
+import {
+  deleteStudentAnnounceReply,
+  editStudentAnnounceReply,
+  toggleStudentAnnounceLike,
+} from "../../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Announcement/announcement.action";
 import { FcLike } from "react-icons/fc";
 
-const Reply = ({
-  reply,
-  commentId,
-  deleteReply,
-  addNestedReply,
-  activeReplyId,
-  setActiveReplyId,
-  toggleLike,
-  editReply,
-  // currentUserId,
-}) => {
-  //const currentUserId = useSelector((state) => state.Common.studentId);
+const Reply = ({ reply }) => {
+  const dispatch = useDispatch();
   const { userId } = useSelector((store) => store?.common?.user?.userDetails);
-  const currentUserId = userId;
-  const { announcement } = useSelector((store) => store?.student?.studentAnnounce)
-  const dispatch = useDispatch()
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(reply.text);
-
-  // Console logs to debug
+  const [editText, setEditText] = useState(reply.content);
   const [likesCount, setLikesCount] = useState(reply.likes?.length);
   const [isLiked, setIsLiked] = useState(
     reply.likes.some((like) => like.userId === userId)
   );
 
-  const normalizedCurrentUserId = String(currentUserId).trim().toString();
-  const normalizedReplyAuthorId = String(reply.creatorID).trim().toString();
+  const isCurrentUser =
+    String(userId).trim() === String(reply.creatorID).trim();
 
-
-  const handleEditReply = async () => {
+  const handleEditReply = () => {
     if (editText.trim() && editText !== reply.content) {
-      dispatch(editStudentAnnounceReply({ replyId: reply._id, newText: editText }))
-      //await editReply(reply.id, editText);
+      dispatch(
+        editStudentAnnounceReply({ replyId: reply._id, newText: editText })
+      );
       setIsEditing(false);
     } else {
       setIsEditing(false);
     }
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditText(reply.content);
-  };
-
   const handleDelete = () => {
-    dispatch(deleteStudentAnnounceReply({ replyId: reply._id }))
-    dispatch(fetchStudentAnnounceComments({ aid: announcement._id }))
-    //deleteReply(commentId, reply.id);
-  };
-  // console.log("activeReplyId", activeReplyId);
-
-
-  const handleReplyClick = () => {
-    setActiveReplyId(activeReplyId === reply._id ? null : reply._id);
+    dispatch(deleteStudentAnnounceReply({ replyId: reply._id }));
   };
 
-  const handleAddNestedReply = (text) => {
-    if (text.trim()) {
-      dispatch(createStudentAnnounceReply({ aid: announcement._id, replyId: reply._id, text: text }))
-      //addNestedReply(reply.id, text);
-      setActiveReplyId(null);
-    }
+  const handleToggleLike = () => {
+    dispatch(toggleStudentAnnounceLike({ id: reply._id }));
+    setIsLiked((prev) => !prev);
+    setLikesCount((prev) => prev + (isLiked ? -1 : 1));
   };
-
-  const handleToggleLike = async () => {
-    const originalIsLiked = isLiked;
-    const originalLikesCount = likesCount;
-    dispatch(toggleStudentAnnounceLike({ id: reply._id })).then(() => {
-      setIsLiked(!isLiked);
-      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-    }).catch(() => {
-      setIsLiked(originalIsLiked);
-      setLikesCount(originalLikesCount);
-    })
-  };
-
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    const options = { year: "numeric", month: "short", day: "numeric" };
-    const timeOptions = { hour: "2-digit", minute: "2-digit" };
-    return `${date.toLocaleDateString(
-      undefined,
-      options
-    )} at ${date.toLocaleTimeString(undefined, timeOptions)}`;
-  };
-
-  const formattedDate = formatDate(reply?.createdAt);
 
   return (
     <div className="ml-8 mt-2 ps-4 bg-white p-2 rounded-lg border shadow-sm">
+      {/* User Profile Section */}
       <div className="flex items-center mb-2">
         <img
           src={reply?.profile}
@@ -115,9 +64,9 @@ const Reply = ({
           <span className="text-sm text-gray-500">{reply.time}</span>
         </div>
 
-        {/* {String(currentUserId).trim() === String(reply.authorId).trim() && ( */}
-        {normalizedCurrentUserId === normalizedReplyAuthorId && (
-          <div className="ml-auto gap-2 flex space-x-2">
+        {/* Edit & Delete Icons */}
+        {isCurrentUser && (
+          <div className="ml-auto flex space-x-2">
             <MdOutlineEdit
               className="text-gray-500 text-xl cursor-pointer"
               onClick={() => setIsEditing(true)}
@@ -130,6 +79,7 @@ const Reply = ({
         )}
       </div>
 
+      {/* Edit Mode */}
       {isEditing ? (
         <div className="flex flex-col mb-2">
           <textarea
@@ -139,14 +89,14 @@ const Reply = ({
           />
           <div className="flex justify-end gap-2 mt-2">
             <button
-              className="mt-2 self-end bg-blue-500 text-white px-4 py-1 rounded"
+              className="bg-blue-500 text-white px-4 py-1 rounded"
               onClick={handleEditReply}
             >
               Save
             </button>
             <button
-              className="mt-2 self-end bg-red-500 text-white px-4 py-1 rounded"
-              onClick={handleCancelEdit}
+              className="bg-red-500 text-white px-4 py-1 rounded"
+              onClick={() => setIsEditing(false)}
             >
               Cancel
             </button>
@@ -154,12 +104,12 @@ const Reply = ({
         </div>
       ) : (
         <>
+          {/* Reply Content */}
           <p className="text-gray-700 mb-2">{reply?.content}</p>
+
+          {/* Actions: Like */}
           <div className="flex items-center mb-2 pt-2 border-t">
-            {/* <FaRegHeart
-              className="text-gray-500 cursor-pointer"
-              onClick={handleToggleLike}
-            /> */}
+            {/* Like Button */}
             {isLiked ? (
               <FcLike
                 className="text-gray-500 cursor-pointer"
@@ -172,38 +122,6 @@ const Reply = ({
               />
             )}
             <span className="ml-1 text-gray-500">{likesCount}</span>
-            <FaRegComment
-              className="ml-4 text-gray-500 cursor-pointer"
-              onClick={handleReplyClick}
-            />
-            <span className="ml-1 text-gray-500">Reply</span>
-          </div>
-
-          {activeReplyId === reply._id && (
-            <div className="mt-4">
-              <InputComment
-                addComment={handleAddNestedReply}
-                placeholder="Write a reply..."
-              />
-            </div>
-          )}
-
-          <div className="mt-4 ml-4">
-            {reply.replies &&
-              reply.replies?.map((nestedReply) => (
-                <Reply
-                  key={nestedReply._id}
-                  reply={nestedReply}
-                  commentId={commentId}
-                  //deleteReply={deleteReply}
-                  //addNestedReply={addNestedReply}
-                  activeReplyId={activeReplyId}
-                  setActiveReplyId={setActiveReplyId}
-                //toggleLike={toggleLike}
-                //editReply={editReply}
-                //currentUserId={currentUserId}
-                />
-              ))}
           </div>
         </>
       )}

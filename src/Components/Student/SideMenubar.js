@@ -10,12 +10,26 @@ import {
 import { FiLogOut } from "react-icons/fi";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice"; // Importing the toggleSidebar action
-import { studentLogout } from "../../Store/Slices/Common/Auth/actions/studentActions"; // Import studentLogout action
+import { toggleSidebar } from "../../Store/Slices/Common/User/reducers/userSlice";
+import { studentLogout } from "../../Store/Slices/Common/Auth/actions/studentActions";
 import ProfileIcon from "../../Assets/DashboardAssets/profileIcon.png";
 import LogoutConfirmationModal from "../Common/LogoutConfirmationModal";
 
+/* NEW IMPORTS */
+import { Tag, Tooltip } from "antd";
+import { getRoleColor, getTruncatedName } from "../../Utils/helperFunctions";
+// If you have a file with roles, import them (example)
+// import { ROLES } from "../../permission";
+
 const isActivePath = (path, locationPath) => locationPath.startsWith(path);
+
+/* 
+  OPTIONAL HELPER:
+  Assign each role a color. Adjust as you wish.
+
+  If you have a "permission.js" with roles, 
+  you can match them in a switch or object map:
+*/
 
 const SideMenubar = () => {
   const dispatch = useDispatch();
@@ -23,8 +37,8 @@ const SideMenubar = () => {
   const navigate = useNavigate();
 
   const { isOpen, userDetails, role } = useSelector((state) => ({
-    isOpen: state.common.user.sidebar.isOpen, // Redux state for sidebar toggle
-    userDetails: state.common.user.userDetails, // Redux state for user details
+    isOpen: state.common.user.sidebar.isOpen,
+    userDetails: state.common.user.userDetails,
     role: state.common.auth.role,
   }));
 
@@ -47,9 +61,9 @@ const SideMenubar = () => {
   const confirmLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await dispatch(studentLogout()).unwrap(); // Dispatch the logout action
+      await dispatch(studentLogout()).unwrap();
       setIsLogoutModalOpen(false);
-      navigate("/studentlogin"); // Redirect to login after logout
+      navigate("/studentlogin");
     } finally {
       setIsLoggingOut(false);
     }
@@ -57,7 +71,7 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r  border-b flex flex-col bg-white ${
+      className={`fixed top-0 left-0 bottom-0 transition-all duration-300 p-1 px-3 z-30 border-r border-b flex flex-col bg-white ${
         isOpen ? "w-[15%]" : "w-[7%]"
       }`}
       aria-label="Sidebar"
@@ -75,7 +89,7 @@ const SideMenubar = () => {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            dispatch(toggleSidebar()); // Dispatch toggleSidebar action
+            dispatch(toggleSidebar());
           }}
           className="absolute bottom-0 right-0"
           aria-label="Toggle Sidebar"
@@ -193,9 +207,9 @@ const SideMenubar = () => {
       </div>
 
       <div
-        className={`fixed bottom-1  h-[3rem]  flex flex- row items-center justify-center  w-auto ${
+        className={`fixed bottom-1 h-[3rem] flex flex-row items-center justify-center w-auto ${
           isOpen ? "w-[14%]" : "w-[7%]"
-        }  `}
+        }`}
       >
         <div className="flex items-center justify-between">
           <img
@@ -208,24 +222,27 @@ const SideMenubar = () => {
           />
           {isOpen && (
             <div className="ml-4">
-              <h2 className="text-sm font-semibold">
-                {userDetails?.fullName?.charAt(0)?.toUpperCase() + userDetails?.fullName?.split(' ')[1]?.charAt(0)?.toUpperCase() || "User"}
-              </h2>
-              <p className="text-gray-500 capitalize">{role}</p>
+              <Tooltip title={userDetails?.fullName || "User"}>
+                <h2 className="text-sm font-semibold">
+                  {getTruncatedName(userDetails?.fullName)}
+                </h2>
+              </Tooltip>
+              {/* Tag for role (color-coded). Adjust as needed */}
+              <Tag color={getRoleColor(role)}>
+                <span> {role?.toUpperCase() || "USER"}</span>
+              </Tag>
             </div>
           )}
-          <button
-            title="logout"
-            onClick={handleLogout}
-            className="ml-10"
-            aria-label="Logout"
-          >
-            <FiLogOut
-              className={`${isOpen ? "w-7 h-7" : "w-5 h-5"} text-gray-500  ${
-                !isOpen && "ml-0"
-              }`}
-            />
-          </button>
+          {/* Tooltip for the logout button */}
+          <Tooltip title="Logout">
+            <button onClick={handleLogout} className="" aria-label="Logout">
+              <FiLogOut
+                className={`${
+                  isOpen ? "w-5 h-5" : "w-5 h-5 ml-3"
+                } text-gray-500`}
+              />
+            </button>
+          </Tooltip>
         </div>
         <LogoutConfirmationModal
           isOpen={isLogoutModalOpen}

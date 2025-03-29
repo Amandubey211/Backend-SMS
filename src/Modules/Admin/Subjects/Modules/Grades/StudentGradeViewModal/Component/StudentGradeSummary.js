@@ -33,23 +33,29 @@ const StudentGradeSummary = ({ grades, studentData }) => {
             {grades?.totalScoreOfAllAssignments}
           </p>
         </div>
-        <div className="flex justify-between mb-2">
+        {/* <div className="flex justify-between mb-2">
           <p className="text-sm">{t("Group Assignment")}</p>
           <p className="text-sm">
             {grades?.submittedGroupAssignmentScore} /{" "}
             {grades?.totalGroupAssignmentScore}
           </p>
-        </div>
+        </div> */}
         <div className="flex justify-between mb-2">
           <p className="text-sm">{t("Quiz")}</p>
           <p className="text-sm">
             {grades?.totalQuizCompletedScore} / {grades?.totalScoreOfAllQuizzes}
           </p>
         </div>
-        <div className="flex justify-between mb-2">
+        {/* <div className="flex justify-between mb-2">
           <p className="text-sm">{t("Group Quiz")}</p>
           <p className="text-sm">
             {grades?.submittedGroupQuizScore} / {grades?.totalGroupQuizScore}
+          </p>
+        </div> */}
+        <div className="flex justify-between mb-2">
+          <p className="text-sm">{t("Offline Exam")}</p>
+          <p className="text-sm">
+            {grades?.totalScoreOfOfflineExams} / {grades?.totalOfflineExams}
           </p>
         </div>
         <div className="flex justify-between mb-2">
@@ -59,7 +65,7 @@ const StudentGradeSummary = ({ grades, studentData }) => {
           </p>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

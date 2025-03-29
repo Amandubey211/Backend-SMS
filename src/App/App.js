@@ -41,8 +41,7 @@ import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTab
 import UpdateTimeTable from "../Modules/Admin/TimeTable/Components/UpdateTimeTable.js";
 
 // Student
-import StudentTimeTablePage from "../Modules/Student/TimeTable/TimeTablePage.js";
-import StudentTableView from "../Modules/Student/TimeTable/Components/TableView.js";
+import StudentParentTimeTablePage from "../Modules/Student/TimeTable/StudentParentTimetable.js";
 
 // Teacher
 import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
@@ -300,6 +299,9 @@ const StudentPageView = lazy(() =>
   import(
     "../Modules/Student/StudentClass/Subjects/Modules/Pages/PageView/PageView.js"
   )
+);
+const StudentRubric = lazy(() =>
+  import("../Modules/Student/StudentClass/Subjects/Modules/Rubrics/Rubrics.js")
 );
 const Attendance = lazy(() =>
   import("../Modules/Admin/Attendance/Attendance.js")
@@ -1340,23 +1342,23 @@ function App() {
       path: "/student_timetable",
       element: (
         <ProtectRoute
-          Component={StudentTimeTablePage}
-          allowedRoles={["student"]}
+          Component={StudentParentTimeTablePage}
+          allowedRoles={["student", "parent"]}
         />
       ),
       errorElement: <Error />,
-      children: [
-        {
-          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
-          element: (
-            <ProtectRoute
-              Component={StudentTableView}
-              allowedRoles={["student"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-      ],
+      // children: [
+      //   {
+      //     path: "viewtable/:tablename", // Notice it’s a child path, not a full path
+      //     element: (
+      //       <ProtectRoute
+      //         Component={StudentTableView}
+      //         allowedRoles={["student"]}
+      //       />
+      //     ),
+      //     errorElement: <Error />,
+      //   },
+      // ],
     },
 
     //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
@@ -1445,6 +1447,13 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/student_class/:cid/:sid/rubric",
+      element: (
+        <ProtectRoute Component={StudentRubric} allowedRoles={["student"]} />
+      ),
+      errorElement: <Error />,
+    },
 
     //--------------------------------------------------------------------------------------------------
     {
@@ -1455,7 +1464,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/users/student/profile",
+      path: "users/student/profile",
       element: (
         <ProtectRoute Component={StudentProfile} allowedRoles={["student"]} />
       ),
@@ -1533,7 +1542,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/attendance",
+      path: "/attendance/:id",
       element: <ProtectRoute Component={Calendar} allowedRoles={["parent"]} />,
       errorElement: <Error />,
     },
@@ -1541,8 +1550,8 @@ function App() {
       path: "/parent_timetable",
       element: (
         <ProtectRoute
-          Component={ParentTimeTablePage}
-          allowedRoles={["parent"]}
+          Component={StudentParentTimeTablePage}
+          allowedRoles={["parent", "student"]}
         />
       ),
       errorElement: <Error />,
@@ -1591,7 +1600,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/checkprogress/:studentId",
+      path: "/checkprogress/:cid/:studentId",
       element: (
         <ProtectRoute Component={CheckProgress} allowedRoles={["parent"]} />
       ),

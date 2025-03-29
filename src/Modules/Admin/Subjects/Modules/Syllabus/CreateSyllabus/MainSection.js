@@ -11,24 +11,40 @@ import {
 import Spinner from "../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
+import AudienceSelector from "../../../Component/AudienceSelector";
 
 const MainSection = ({ setIsEditing }) => {
   const { state } = useLocation();
   const { cid, sid } = useParams();
-  const navigate = useNavigate(); // Added navigate hook
+  const navigate = useNavigate();
   console.log(state, "state");
+
+  // Preload title and content if editing
   const [assignmentName, setAssignmentName] = useState(
     state?.syllabus?.title || ""
   );
-  // Use optional chaining to safely preload the content
   const [editorContent, setEditorContent] = useState(
     state?.syllabus?.content || ""
   );
+
+  // New state for audience selection (holds groupIds and sectionIds)
+  const [audience, setAudience] = useState({
+    groupIds: [],
+    sectionIds: [],
+  });
+
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.admin.syllabus.loading);
 
   useEffect(() => {
     setIsEditing(Boolean(state?.syllabus?._id));
+    // Preload audience if editing an existing syllabus
+    if (state?.syllabus) {
+      setAudience({
+        groupIds: state.syllabus.groupIds || [],
+        sectionIds: state.syllabus.sectionIds || [],
+      });
+    }
   }, [state, setIsEditing]);
 
   const handleNameChange = useCallback((name) => {
@@ -40,14 +56,17 @@ const MainSection = ({ setIsEditing }) => {
   }, []);
 
   const handleSave = useCallback(async () => {
+    // Construct payload including audience selections
     const data = {
       title: assignmentName,
       content: editorContent,
       subjectId: sid,
+      groupIds: audience.groupIds,
+      sectionIds: audience.sectionIds,
     };
 
     if (state?.syllabus?._id) {
-      // Edit operation (no redirection here)
+      // Edit operation (no redirection)
       await dispatch(
         editSyllabus({ syllabusId: state.syllabus._id, data, cid })
       );
@@ -55,7 +74,16 @@ const MainSection = ({ setIsEditing }) => {
       // Create operation: pass navigate so the thunk can redirect on success
       await dispatch(createSyllabus({ ...data, navigate }));
     }
-  }, [assignmentName, editorContent, sid, state, dispatch, cid, navigate]);
+  }, [
+    assignmentName,
+    editorContent,
+    sid,
+    state,
+    dispatch,
+    cid,
+    navigate,
+    audience,
+  ]);
 
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
@@ -67,9 +95,7 @@ const MainSection = ({ setIsEditing }) => {
       <SideMenubar />
       <div
         className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
-        style={{
-          marginLeft: sidebarWidth,
-        }}
+        style={{ marginLeft: sidebarWidth }}
       >
         <CreateSyllabusHeader
           onSave={handleSave}
@@ -82,14 +108,23 @@ const MainSection = ({ setIsEditing }) => {
           }
           title="Create/Update Syllabus"
         >
-          <EditorComponent
-            inputPlaceHolder="Syllabus Heading"
-            assignmentLabel="Page Title"
-            assignmentName={assignmentName}
-            editorContent={editorContent}
-            onNameChange={handleNameChange}
-            onEditorChange={handleEditorChange}
-          />
+          <div className="flex">
+            {/* Left Side: Editor (70%) */}
+            <div className="w-[70%]">
+              <EditorComponent
+                inputPlaceHolder="Syllabus Heading"
+                assignmentLabel="Page Title"
+                assignmentName={assignmentName}
+                editorContent={editorContent}
+                onNameChange={handleNameChange}
+                onEditorChange={handleEditorChange}
+              />
+            </div>
+            {/* Right Side: AudienceSelector (30%) */}
+            <div className="w-[30%] pl-4">
+              <AudienceSelector value={audience} onChange={setAudience} />
+            </div>
+          </div>
           {loading && <Spinner />}
         </ProtectedSection>
       </div>

@@ -11,7 +11,9 @@ const AddSection = ({ initialSection = null, onCancel }) => {
   const [sectionName, setSectionName] = useState("");
   const dispatch = useDispatch();
   const { cid } = useParams();
-  const loading = useSelector((state) => state.admin.group_section.loading);
+  const { sectionsLoading: loading } = useSelector(
+    (state) => state.admin.group_section
+  );
 
   // Reset form when initialSection changes
   useEffect(() => {

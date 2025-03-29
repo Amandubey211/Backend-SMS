@@ -6,6 +6,11 @@ import { fetchModules } from "../../../../../../../Store/Slices/Admin/Class/Modu
 // Icons
 import { FiChevronDown, FiRefreshCw } from "react-icons/fi";
 
+// Ant Design components
+import { Select, Input, Tooltip } from "antd";
+
+const { Option } = Select;
+
 const StudentGradeModalFilterHeader = ({
   filters,
   onFilterChange,
@@ -15,7 +20,14 @@ const StudentGradeModalFilterHeader = ({
   const [chapters, setChapters] = useState([]);
   const dispatch = useDispatch();
 
-  const { modules: moduleList } = useSelector((state) => state.admin.module);
+  const { semesters: semesterList } = useSelector(
+    (state) => state.admin.semesters
+  );
+
+  const { modules: moduleList, moduleLoading } = useSelector(
+    (state) => state.admin.module
+  );
+
   const { studentSubjectProgress } = useSelector(
     (store) => store.admin.all_students
   );
@@ -33,7 +45,6 @@ const StudentGradeModalFilterHeader = ({
   // Generic handler for user changing selects/inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     // If user picked a new module, update the chapters in that module
     if (name === "module") {
       const selectedModule = moduleList?.find((m) => m?._id === value);
@@ -50,8 +61,13 @@ const StudentGradeModalFilterHeader = ({
         }
       });
     }
+    if (name === "semester") {
+      // Store only the id in filters.semester
+      onFilterChange(name, value);  // Call the passed function to handle state update
+    } else {
+      onFilterChange(name, value);
+    }
 
-    onFilterChange(name, value);
   };
 
   return (
@@ -60,17 +76,17 @@ const StudentGradeModalFilterHeader = ({
       <div className="flex flex-col w-48 relative">
         <label className="text-sm font-medium text-gray-700">Grade Mode</label>
         <div className="relative mt-1">
-          <select
+          <Select
             name="gradeMode"
             value={filters.gradeMode}
-            onChange={handleChange}
-            className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                       rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                       focus:border-indigo-500 sm:text-sm"
+            onChange={(value) =>
+              handleChange({ target: { name: "gradeMode", value } })
+            }
+            className="w-full"
           >
-            <option value="online">Online</option>
-            <option value="offline">Offline</option>
-          </select>
+            <Option value="online">Online</Option>
+            <Option value="offline">Offline</Option>
+          </Select>
         </div>
       </div>
 
@@ -82,21 +98,18 @@ const StudentGradeModalFilterHeader = ({
               Arrange By
             </label>
             <div className="relative mt-1">
-              <select
+              <Select
                 name="arrangeBy"
                 value={filters.arrangeBy}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                           rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                           focus:border-indigo-500 sm:text-sm"
+                onChange={(value) =>
+                  handleChange({ target: { name: "arrangeBy", value } })
+                }
+                className="w-full"
               >
-                <option value="">Select</option>
-                <option value="assignment">Assignment</option>
-                {/* <option value="group assignment">Group Assignment</option> */}
-                <option value="quiz">Quiz</option>
-                {/* <option value="group quiz">Group Quiz</option> */}
-                {/* <option value="offline_exam">Offline Exam</option> */}
-              </select>
+                <Option value="">Select</Option>
+                <Option value="assignment">Assignment</Option>
+                <Option value="quiz">Quiz</Option>
+              </Select>
             </div>
           </div>
 
@@ -107,21 +120,21 @@ const StudentGradeModalFilterHeader = ({
                 Subjects
               </label>
               <div className="relative mt-1">
-                <select
+                <Select
                   name="subject"
                   value={filters.subject}
-                  onChange={handleChange}
-                  className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                             rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                             focus:border-indigo-500 sm:text-sm"
+                  onChange={(value) =>
+                    handleChange({ target: { name: "subject", value } })
+                  }
+                  className="w-full"
                 >
-                  <option value="">All</option>
+                  <Option value="">All</Option>
                   {studentSubjectProgress?.map((s) => (
-                    <option key={s?.subjectId} value={s?.subjectId}>
+                    <Option key={s?.subjectId} value={s?.subjectId}>
                       {s?.subjectName}
-                    </option>
+                    </Option>
                   ))}
-                </select>
+                </Select>
               </div>
             </div>
           )}
@@ -130,21 +143,22 @@ const StudentGradeModalFilterHeader = ({
           <div className="flex flex-col flex-grow relative">
             <label className="text-sm font-medium text-gray-700">Modules</label>
             <div className="relative mt-1">
-              <select
+              <Select
                 name="module"
                 value={filters.module}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                           rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                           focus:border-indigo-500 sm:text-sm"
+                onChange={(value) =>
+                  handleChange({ target: { name: "module", value } })
+                }
+                className="w-full"
+                loading={moduleLoading}
               >
-                <option value="">All</option>
+                <Option value="">All</Option>
                 {moduleList?.map((m) => (
-                  <option key={m._id} value={m._id}>
+                  <Option key={m._id} value={m._id}>
                     {m?.moduleName?.slice(0, 20)}
-                  </option>
+                  </Option>
                 ))}
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -152,28 +166,29 @@ const StudentGradeModalFilterHeader = ({
           <div className="flex flex-col flex-grow relative">
             <label className="text-sm font-medium text-gray-700">Chapter</label>
             <div className="relative mt-1">
-              <select
+              <Select
                 name="chapter"
                 value={filters.chapter}
-                onChange={handleChange}
+                onChange={(value) =>
+                  handleChange({ target: { name: "chapter", value } })
+                }
                 disabled={!filters.module}
-                className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                           rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                           focus:border-indigo-500 sm:text-sm"
+                className="w-full"
+                loading={moduleLoading}
               >
                 {!filters.module ? (
-                  <option value="">Select Module First</option>
+                  <Option value="">Select Module First</Option>
                 ) : (
                   <>
-                    <option value="">All</option>
+                    <Option value="">All</Option>
                     {chapters?.map((c) => (
-                      <option key={c._id} value={c._id}>
+                      <Option key={c._id} value={c._id}>
                         {c?.name?.slice(0, 20)}
-                      </option>
+                      </Option>
                     ))}
                   </>
                 )}
-              </select>
+              </Select>
             </div>
           </div>
 
@@ -181,19 +196,19 @@ const StudentGradeModalFilterHeader = ({
           <div className="flex flex-col flex-grow relative">
             <label className="text-sm font-medium text-gray-700">Status</label>
             <div className="relative mt-1">
-              <select
+              <Select
                 name="status"
                 value={filters.status}
-                onChange={handleChange}
-                className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                           rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                           focus:border-indigo-500 sm:text-sm"
+                onChange={(value) =>
+                  handleChange({ target: { name: "status", value } })
+                }
+                className="w-full"
               >
-                <option value="">Select</option>
-                <option value="Submit">Submit</option>
-                <option value="Excused">Excused</option>
-                <option value="Missing">Missing</option>
-              </select>
+                <Option value="">Select</Option>
+                <Option value="Submit">Submit</Option>
+                <Option value="Excused">Excused</Option>
+                <Option value="Missing">Missing</Option>
+              </Select>
             </div>
           </div>
         </>
@@ -204,29 +219,52 @@ const StudentGradeModalFilterHeader = ({
         <div className="flex flex-col w-48 relative">
           <label className="text-sm font-medium text-gray-700">Search</label>
           <div className="relative mt-1">
-            <input
+            <Input
               name="search"
               type="text"
               value={filters.search}
-              onChange={handleChange}
+              onChange={(e) => handleChange(e)}
               placeholder="Search exams..."
-              className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
-                         rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
-                         focus:border-indigo-500 sm:text-sm"
+              className="w-full"
             />
           </div>
         </div>
       )}
 
+      {/* Semester Filter */}
+      <div className="flex flex-col w-48 relative">
+        <label className="text-sm font-medium text-gray-700">Semester</label>
+        <div className="relative mt-1">
+          <select
+            name="semester"
+            value={filters.semester}
+            onChange={(e) => handleChange(e)}
+            className="block w-full px-3 py-2 pr-8 bg-white border border-gray-300
+                 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500
+                 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="">Select Semester</option>
+            {/* Add dynamic semester options from your semester list */}
+            {semesterList?.map((semester) => (
+              <option key={semester._id} value={semester._id}>
+                {semester.title}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* Reset Icon - spin on hover */}
+
       {onResetFilters && (
-        <FiRefreshCw
-          onClick={onResetFilters}
-          size={25}
-          className="ml-auto mt-5 cursor-pointer text-gray-500 hover:text-blue-500
-                     transition-transform duration-300 hover:rotate-180"
-          title="Reset Filters"
-        />
+        <Tooltip title="Reset Filters">
+          <FiRefreshCw
+            onClick={onResetFilters}
+            size={25}
+            className="ml-auto mt-5 cursor-pointer text-gray-500 hover:text-blue-500
+                       transition-transform duration-300 hover:rotate-180"
+          />
+        </Tooltip>
       )}
     </div>
   );

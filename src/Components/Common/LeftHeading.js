@@ -4,6 +4,7 @@ import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md";
 const LeftHeading = ({ leftHeading, navigate }) => {
   const [mainHeading, subHeading] = leftHeading; // Destructure for clarity
 
+
   return (
     <div className="flex-1 text-md font-semibold ps-4 capitalize">
       {subHeading ? (

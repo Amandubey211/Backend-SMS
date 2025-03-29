@@ -29,14 +29,16 @@ export const updateBranch = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const res = await postData(`/admin/selectBranch`, data);
-      toast.success("Branch updated successfully.");
+
       Cookies.remove("say");
       if (res?.data?.isAcademicYearActive) {
         setLocalCookies("say", res?.data?.academicYear?._id);
+
         setLocalCookies("logo", data?.logo);
         
         navigate("/dashboard");
       } else {
+        Cookies.remove("isAcademicYearActive");
         navigate("/create_academicYear");
       }
       return res?.data;

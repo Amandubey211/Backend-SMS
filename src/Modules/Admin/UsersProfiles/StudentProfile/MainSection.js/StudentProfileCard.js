@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 
 const StudentProfileCard = ({ student }) => {
-  const { t } = useTranslation('admAccounts');
+  const { t } = useTranslation("admAccounts");
   const { role } = useSelector((store) => store.common.auth);
   const navigate = useNavigate();
 
@@ -15,18 +15,22 @@ const StudentProfileCard = ({ student }) => {
       <img
         src={student?.profile || profileIcon}
         alt={t("student_image")}
-        className="rounded-full w-[100px] h-[100px] bg-gray-300 border"
+        className="rounded-full object-cover w-[100px] h-[100px] bg-gray-300 border"
       />
-      <span className="font-bold">{student?.firstName}</span>
+      <span className="font-bold capitalize ">{student?.firstName}</span>
       <div className="flex gap-4 font-medium text-gray-500 flex-row text-sm ">
         <span className="text-black">
           {t("Class")}:{" "}
-          <span className="text-gray-500">{student?.className || t("N/A")}</span>{" "}
+          <span className="text-gray-500">
+            {student?.className || t("N/A")}
+          </span>{" "}
           <span className="text-gray-300">|</span>{" "}
         </span>
         <span className="text-black">
           {t("Section")}:{" "}
-          <span className="text-gray-500">{student?.sectionName || t("N/A")}</span>
+          <span className="text-gray-500">
+            {student?.sectionName || t("N/A")}
+          </span>
         </span>
       </div>
       <span>

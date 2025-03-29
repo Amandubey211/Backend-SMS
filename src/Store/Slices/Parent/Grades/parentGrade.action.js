@@ -15,7 +15,7 @@ export const fetchParentStudentGrades = createAsyncThunk(
       const say = getAY();
 
       // Keep semesterId in the query string:
-      const endpoint = `/${getRole}/grades/student/${studentId}/class/${studentClassId}?say=${say}&semesterId=${semesterId || ""}`;
+      const endpoint = `/${getRole}/grades/student/${studentId}/class/${studentClassId}?say=${say}&semesterId=${semesterId}`;
 
       // NOTE: "params" will no longer contain "semesterId"
       const response = await getData(endpoint, params);

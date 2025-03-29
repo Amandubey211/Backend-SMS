@@ -59,7 +59,7 @@ export const deleteSyllabus = createAsyncThunk(
 export const createSyllabus = createAsyncThunk(
   "syllabus/createSyllabus",
   async (
-    { title, content, subjectId, navigate },
+    { title, content, subjectId, groupIds = [], sectionIds = [], navigate },
     { rejectWithValue, dispatch, getState }
   ) => {
     const say = getAY();
@@ -74,8 +74,15 @@ export const createSyllabus = createAsyncThunk(
         throw new Error("Semester ID is missing");
       }
 
-      // Construct the payload including semesterId
-      const payload = { title, content, subjectId, semesterId };
+      // Construct the payload including semesterId and audience selections
+      const payload = {
+        title,
+        content,
+        subjectId,
+        semesterId,
+        groupIds,
+        sectionIds,
+      };
 
       const response = await postData(
         `/${getRole}/syllabus?say=${say}`,
@@ -106,8 +113,15 @@ export const editSyllabus = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const formData = new FormData();
+      // Loop over each key in data and check if it's an array
       for (const key in data) {
-        formData.append(key, data[key]);
+        if (Array.isArray(data[key])) {
+          data[key].forEach((item) => {
+            formData.append(key, item);
+          });
+        } else {
+          formData.append(key, data[key]);
+        }
       }
 
       const endpoint = `/${getRole}/syllabus/${syllabusId}/class/${cid}?say=${say}`;

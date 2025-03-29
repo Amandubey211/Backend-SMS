@@ -2,7 +2,11 @@ import React, { useState, useRef } from "react";
 import { FaTimes } from "react-icons/fa"; // Importing the Font Awesome remove icon
 import { useTranslation } from "react-i18next";
 
-const ImageUpload = ({ imagePreview, handleImageChange, handleRemoveImage }) => {
+const ImageUpload = ({
+  imagePreview,
+  handleImageChange,
+  handleRemoveImage,
+}) => {
   const { t } = useTranslation("admLibrary");
   const fileInputRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -77,7 +81,12 @@ const ImageUpload = ({ imagePreview, handleImageChange, handleRemoveImage }) => 
             xmlns="http://www.w3.org/2000/svg"
           >
             <g clipPath="url(#clip0_2_203153)">
-              <path d="M37.5 20H37.52" stroke="#7F7F7F" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M37.5 20H37.52"
+                stroke="#7F7F7F"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
               <path
                 d="M31.25 52.5H15C13.0109 52.5 11.1032 51.7098 9.6967 50.3033C8.29018 48.8968 7.5 46.9891 7.5 45V15C7.5 13.0109 8.29018 11.1032 9.6967 9.6967C11.1032 8.29018 13.0109 7.5 15 7.5H45C46.9891 7.5 48.8968 8.29018 50.3033 9.6967C51.7098 11.1032 52.5 13.0109 52.5 15V31.25"
                 stroke="#7F7F7F"
@@ -96,8 +105,18 @@ const ImageUpload = ({ imagePreview, handleImageChange, handleRemoveImage }) => 
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <path d="M40 47.5H55" stroke="#7F7F7F" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M47.5 40V55" stroke="#7F7F7F" strokeLinecap="round" strokeLinejoin="round" />
+              <path
+                d="M40 47.5H55"
+                stroke="#7F7F7F"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M47.5 40V55"
+                stroke="#7F7F7F"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </g>
             <defs>
               <clipPath id="clip0_2_203153">
@@ -105,7 +124,9 @@ const ImageUpload = ({ imagePreview, handleImageChange, handleRemoveImage }) => 
               </clipPath>
             </defs>
           </svg>
-          <p className="mt-2 text-sm text-gray-600">{t("Drop Your Image here")}</p>
+          <p className="mt-2 text-sm text-gray-600">
+            {t("Drop Your Image here")}
+          </p>
           <button
             type="button"
             onClick={() => fileInputRef.current.click()}
