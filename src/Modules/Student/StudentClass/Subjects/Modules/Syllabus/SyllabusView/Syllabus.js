@@ -10,11 +10,13 @@ import useNavHeading from "../../../../../../../Hooks/CommonHooks/useNavHeading 
 import { useSelector } from "react-redux";
 
 const Syllabus = () => {
-  const { subjectName } = useSelector((store) => store?.student?.studentSubject?.subject);
+  const { subjectName } = useSelector(
+    (store) => store?.student?.studentSubject?.subject
+  );
   const { classData } = useSelector((store) => store?.student?.studentClass);
-  const className=classData?.className;
+  const className = classData?.className;
 
-  useNavHeading(className, subjectName,"Syllabus");
+  useNavHeading(className, subjectName, "Syllabus");
 
   return (
     <div>
