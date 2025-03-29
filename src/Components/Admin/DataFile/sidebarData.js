@@ -299,13 +299,13 @@ const sidebarData = [
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },
-      {
-        title: "Financial Report",
-        path: "/finance/financialReport",
-        icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
-      },
+      // {
+      //   title: "Financial Report",
+      //   path: "/finance/financialReport",
+      //   icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
+      //   roles: [ROLES.ADMIN, ROLES.FINANCE],
+      //   //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      // },
     ],
     bedge:'Beta'
   },
