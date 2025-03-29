@@ -16,9 +16,11 @@ const truncateText = (text, length) => {
   return text.length > length ? text.substring(0, length) + "..." : text;
 };
 
-const Notice = ({ title, startDate, priority, content, image, backgroundColor, authorName }) => {
+const Notice = ({ title, startDate, priority, content, image, backgroundColor, authorName ,endDate}) => {
   // Format date using date-fns
   const formattedStartDate = startDate ? format(new Date(startDate), "dd/MM/yyyy") : "N/A";
+  const formattedEndDate = endDate ? format(new Date(endDate), "dd/MM/yyyy") : "N/A";
+
 
   return (
     <div className="w-[97%] p-3 my-3 border shadow-md border-gray-200 rounded-lg flex min-h-[80px] hover:shadow-lg transition-all duration-300 ease-in-out">
@@ -57,18 +59,21 @@ const Notice = ({ title, startDate, priority, content, image, backgroundColor, a
               className="inline-flex items-center text-xs"
               style={{ width: "auto" }}
             >
-              <UserOutlined />
-              <span className="mx-1">Posted by {authorName || "-"}</span>
+              {/* <UserOutlined />
+              <span className="mx-1">Posted by {authorName || "-"}</span> */}
               <IoCalendarOutline className="mx-1" />
               <span>{formattedStartDate}</span>
+              <IoCalendarOutline className="mx-1" />
+              <span>{formattedEndDate}</span>
+
             </Tag>
           </div>
 
           {/* Content Snippet */}
-          <div className="flex items-center gap-1 text-gray-500 mt-2">
+          {/* <div className="flex items-center gap-1 text-gray-500 mt-2">
             <CiBookmarkCheck size={15} />
             <p className="text-xs m-0 leading-4">{truncateText(content, 100)}</p>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

@@ -213,7 +213,7 @@ const EventScheduler = () => {
                   className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
                   onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
                 >
-                  <IoIosArrowBack />
+                  <IoIosArrowBack style={{width:"20px", height:"20px"}}/>
                 </div>
               )}
 
@@ -223,7 +223,7 @@ const EventScheduler = () => {
                   <span>{t("No Events in this Month")}</span>
                 </div>
               ) : (
-                <div className="flex justify-center items-center gap-8 w-full max-w-5xl mx-auto mt-8">
+                <div className="flex justify-start items-center gap-4 w-full max-w-5xl mx-auto mt-8">
                   {filteredEvents?.map((event) => (
                     <EventCard
                       key={event._id}
@@ -239,7 +239,7 @@ const EventScheduler = () => {
                   className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
                   onClick={() => setCurrentPage((prev) => prev + 1)}
                 >
-                  <IoIosArrowForward />
+                  <IoIosArrowForward style={{width:"20px", height:"20px"}}/>
                 </div>
               )}
             </div>
