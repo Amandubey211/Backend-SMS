@@ -27,7 +27,7 @@ const AnnouncementHeader = ({ onSearch }) => {
         <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_ANNOUNCEMENT}>
           <NavLink
             to={`/class/${cid}/${sid}/announcements/create_announcement`}
-            className="flex items-center border border-gray-300 ps-5 py-2 rounded-full transition-all duration-300 ease-in-out hover:shadow-md"
+            className="flex items-center border border-gray-300 ps-5 rounded-full transition-all duration-300 ease-in-out hover:shadow-md"
           >
             <span className="mr-2">{t("Add New Announcement")}</span>
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
@@ -53,7 +53,7 @@ const AnnouncementHeader = ({ onSearch }) => {
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* <div className="flex items-center gap-4">
           <span className="text-gray-500">{t("Status")}: </span>
 
           <label className="inline-flex items-center">
@@ -78,7 +78,7 @@ const AnnouncementHeader = ({ onSearch }) => {
             />
             <span className="ml-2">{t("Unread")}</span>
           </label>
-        </div>
+        </div> */}
       </div>
     </div>
   );
