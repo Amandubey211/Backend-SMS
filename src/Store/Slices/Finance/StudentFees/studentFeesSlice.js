@@ -43,7 +43,7 @@ const studentFeesSlice = createSlice({
       })
       .addCase(fetchOneStudentFee.fulfilled, (state, action) => {
         state.loading = false;
-        state.fee = action.payload.data || null;
+        state.fee = action.payload?.data || null;
       })
       .addCase(fetchOneStudentFee.rejected, (state, action) => {
         state.loading = false;
@@ -57,12 +57,12 @@ const studentFeesSlice = createSlice({
       })
       .addCase(fetchAllStudentFee.fulfilled, (state, action) => {
         state.loading = false;
-        state.allStudntFees = action.payload.data || [];
-        state.totalRecords= action.payload.totalRecords;
-        state.totalPages= action.payload.totalPages;
-        state.currentPage= action.payload.currentPage;
-        state.paidAllAmount= action.payload.paidAllAmount;
-        state.totalAllAmount = action.payload.totalAllAmount;
+        state.allStudntFees = action.payload?.data || [];
+        state.totalRecords= action.payload?.totalRecords;
+        state.totalPages= action.payload?.totalPages;
+        state.currentPage= action.payload?.currentPage;
+        state.paidAllAmount= action.payload?.paidAllAmount;
+        state.totalAllAmount = action.payload?.totalAllAmount;
        
       })
       .addCase(fetchAllStudentFee.rejected, (state, action) => {
