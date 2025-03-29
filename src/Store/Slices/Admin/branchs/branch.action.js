@@ -34,6 +34,7 @@ export const updateBranch = createAsyncThunk(
       if (res?.data?.isAcademicYearActive) {
         setLocalCookies("say", res?.data?.academicYear?._id);
         setLocalCookies("logo", data?.logo);
+        
         navigate("/dashboard");
       } else {
         navigate("/create_academicYear");

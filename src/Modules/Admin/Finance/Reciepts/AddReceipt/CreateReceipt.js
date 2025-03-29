@@ -1,720 +1,346 @@
 // src/Modules/Admin/Finance/Receipts/AddReceipt/CreateReceipt.js
 
 import React, { useEffect, useRef, useState } from "react";
-import { Formik, Form, Field, ErrorMessage, useFormikContext } from "formik";
-import * as Yup from "yup";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useLocation } from "react-router-dom";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import TextInput from "./Components/TextInput";
-import InvoiceTextInput from "./Components/InvoiceTextInput";
-import ReturnItems from "./Components/ReturnItems";
-import SelectInput from "../../PenaltiesandAdjustments/AddPenaltyAdjustment/Components/SelectInput";
-import { fetchInvoiceByNumber } from "../../../../../Store/Slices/Finance/Invoice/invoice.thunk";
-import {
-  clearSelectedInvoiceNumber,
-  setSelectedInvoiceNumber,
-  clearInvoiceFetchSuccess,
-} from "../../../../../Store/Slices/Finance/Invoice/invoiceSlice";
-import { createReceipt } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
-import FileInput from "./Components/FileInput";
-import { calculateFinalAmounts } from "../../../../../Utils/calculateFinalAmounts";
-
-const CalculationHandler = () => {
-  const { values, setFieldValue } = useFormikContext();
-
-  useEffect(() => {
-    if (!Array.isArray(values.items)) {
-      setFieldValue("subAmount", 0, false);
-      setFieldValue("finalAmount", 0, false);
-      return;
+import { Col,  Row, Tabs } from "antd";
+import { IoSearch } from "react-icons/io5";
+import { MdOutlineFileCopy } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import TabPane from "antd/es/tabs/TabPane";
+import toast from "react-hot-toast";
+import { TbFileInvoice } from "react-icons/tb";
+import { createReceipt, fetchReciptInvoiceData } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
+import {  Form, Input, Button, Select, DatePicker } from "antd";
+import Layout from "../../../../../Components/Common/Layout";
+const CreateReceipt = () => {
+ 
+  const dispatch = useDispatch()
+  const [searchInvoiceNumber,setSearchInvoiceNumber] = useState("");
+  const[invoiceData,setInvoiceData] = useState(null);
+  const[pendingInvoiceData,setPendingInvoiceData] = useState([]);
+  const[studentId,setStudentDetails] = useState(null);
+  const[entityId,setentityId] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [totalPaid, setTotalPaid] = useState(0);
+  const [totalRemaining, setTotalRemaining] = useState(0);
+  const [totalTax, setTotalTax] = useState(0);
+  const [totalPenalty, setTotalPenalty] = useState(0);
+  const [totalDiscount, setTotalDiscount] = useState(0);
+  const [finalAmount, setFinalAmount] = useState(0);
+  const [receiptData, setReceiptData] = useState({
+    paymentType: "",
+    paymentStatus: "",
+    paidBy: "",
+    paymentDate: new Date(),
+    paidItems: [],
+    chequeNumber: "",
+    chequeDate: null,
+    onlineTransactionId: "",
+    note: "",
+    receiptData:null
+  });
+  const handlePayNowAmountChange = (e, lineItemId) => {
+    const value = e.target.value;
+    console.log(value);
+  
+    // Check if the lineItemId exists in the paidItems array
+    const itemIndex = receiptData.paidItems.findIndex(item => item.lineItemId === lineItemId);
+    
+    if (itemIndex !== -1) {
+      // If it exists, update the existing item
+      const updatedPaidItems = [...receiptData.paidItems];
+      updatedPaidItems[itemIndex] = { ...updatedPaidItems[itemIndex], amountPaid: value };
+  
+      setReceiptData((prevData) => ({ ...prevData, paidItems: updatedPaidItems }));
+    } else {
+      // If it doesn't exist, add a new item
+      const newItem = { lineItemId, amountPaid: value };
+      setReceiptData((prevData) => ({
+        ...prevData,
+        paidItems: [...prevData.paidItems, newItem]
+      }));
     }
+  };
+  
+  const searchInvoice = ()=>{
+    
+    
+    if(searchInvoiceNumber?.trim()?.split("-")?.length != 3){
+      toast.error("Please Enter Correct Invoice Number");
+      alert('k')
+      return
+    }
+    if(!["S", "E"].includes(searchInvoiceNumber.slice(-1))){
+      alert('a')
+      toast.error("Please Enter Correct Invoice Number");
+      return
+    }
+   
+    dispatch(fetchReciptInvoiceData(searchInvoiceNumber)).then((data)=>{
+ 
+    setInvoiceData(data.payload?.invoice);
+ 
+  })
+}
 
-    const total_amount = values.items.reduce(
-      (acc, item) => acc + Number(item.quantity)*Number(item.totalAmount || 0),
-      0
-    );
 
-    const calculated = calculateFinalAmounts({
-      total_amount,
-      discountType: values.discountType,
-      discount: Number(values.discount),
-      tax: Number(values.tax),
-      penalty: Number(values.penalty),
-      paid_amount: 0, // Assuming no paid amount
-      advance_amount: 0, // Assuming no advance amount
+  useEffect(()=>{
+    if (!invoiceData?.lineItems) return;
+    console.log(invoiceData);
+    
+    let amount = 0;
+    let paid = 0;
+    let remaining = 0;
+    let tax = 0;
+    let penalty = 0;
+    let discount = 0;
+
+    invoiceData?.lineItems.forEach((item) => {
+      amount += item.final_amount || 0;
+      paid += item.paid_amount || 0;
+      remaining += item.remaining_amount || 0;
+      tax +=  ((item.rate * item.quantity)/100)*item.tax || 0;
+      penalty += item.penalty_amount || 0;
+      discount += item.discountType === "percentage"
+        ? (item.final_amount * item.discount) / 100
+        : item.discount;
     });
 
-    // Update Formik's subAmount and finalAmount
-    setFieldValue("subAmount", total_amount, false);
-    setFieldValue("finalAmount", calculated.finalAmount, false);
-  }, [
-    values.items,
-    values.discountType,
-    values.discount,
-    values.tax,
-    values.penalty,
-    setFieldValue,
-  ]);
-
-  return null;
-};
-
-const CreateReceipt = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const formikRef = useRef();
-
-  useNavHeading("Finance", "Create Receipt");
-
-  // Extract readOnly and receiptData from location.state
-  const { readOnly, receiptData } = location.state || {};
-  const isReadOnly = readOnly === true;
-
-  // Manage local read-only and edit modes
-  const [isReadOnlyState, setIsReadOnlyState] = useState(isReadOnly);
-  const [isEditMode, setIsEditMode] = useState(false); // Flag for edit mode
-
-  // Initialize fetchedInvoiceNumber to prevent infinite API requests
-  const [fetchedInvoiceNumber, setFetchedInvoiceNumber] = useState("");
-
-  // State to handle form resetting
-  const [isFormResetting, setIsFormResetting] = useState(false);
-
-  // Local state to track API errors
-  const [invoiceError, setInvoiceError] = useState(false);
-
-  // Define initialValues based on read-only mode
-  const prefilledValues =
-    isReadOnly && receiptData
-      ? {
-          receiverName: receiptData.receiver?.name || "",
-          mailId: receiptData.receiver?.email || "",
-          contactNumber: receiptData.receiver?.phone || "",
-          address: receiptData.receiver?.address || "",
-          discountType: receiptData.discountType || "amount",
-          discount: receiptData.discount || 0,
-          penalty: receiptData.penalty || 0,
-          tax: receiptData.tax || 0,
-          govtRefNumber: receiptData.govtRefNumber || "",
-          remark: receiptData.remark || "",
-          // Ensure invoiceNumber is a string
-          invoiceNumber:
-            typeof receiptData.invoiceNumber === "string"
-              ? receiptData.invoiceNumber
-              : receiptData.invoiceNumber
-              ? String(
-                  receiptData.invoiceNumber.number ||
-                    receiptData.invoiceNumber.invoiceNumber ||
-                    receiptData.invoiceNumber
-                )
-              : "",
-
-          items:
-            receiptData.lineItems?.map((item) => ({
-              category: item.revenueType || "",
-              quantity: Number(item.quantity) || 0,
-              totalAmount: Number(item.total) || 0,
-              subCategory: "",
-              stationeries: [],
-            })) || [
-              {
-                category: "",
-                quantity: 0,
-                totalAmount: 0,
-                subCategory: "",
-                stationeries: [
-                  {
-                    itemName: "",
-                    quantity: 0,
-                    unitCost: 0,
-                  },
-                ],
-              },
-            ],
-          subAmount: Number(receiptData.subAmount) || 0,
-          finalAmount: Number(receiptData.finalAmount) || 0,
-          document: receiptData.document || null,
-        }
-      : null;
-
-  const blankInitialValues = {
-    receiverName: "",
-    mailId: "",
-    contactNumber: "",
-    address: "",
-    discountType: "amount",
-    tax: 0,
-    discount: 0,
-    penalty: 0,
-    govtRefNumber: "",
-    remark: "",
-    invoiceNumber: "",
-    items: [
-      {
-        category: "",
-        quantity: 1,
-        totalAmount: 0,
-        subCategory: "",
-        stationeries: [],
-      },
-    ],
-    subAmount: 0,
-    finalAmount: 0,
-    document: null,
+    setTotalAmount(amount);
+    setTotalPaid(paid);
+    setTotalRemaining(remaining);
+    setTotalTax(tax);
+    setTotalPenalty(penalty);
+    setTotalDiscount(discount);
+    setFinalAmount(amount + tax + penalty - discount);
+  },[invoiceData])
+  const handleChange = (field, value) => {
+    setReceiptData({
+      ...receiptData,
+      [field]: value,
+    });
   };
 
-  const initialValues =
-    isReadOnlyState && prefilledValues ? prefilledValues : blankInitialValues;
-
-  // Track invoice input
-  const [invoiceNumberInput, setInvoiceNumberInput] = useState(
-    initialValues.invoiceNumber || ""
-  );
-
-  // Removed useDebounce as per user request
-
-  const {
-    invoiceDetails,
-    invoiceFetchSuccess,
-    error = null,
-    selectedInvoiceNumber = "",
-  } = useSelector((state) => state.admin.invoices || {});
-
-  const validationSchema = Yup.object().shape({
-    invoiceNumber: Yup.string().required("Invoice number is required"),
-    receiverName: Yup.string().required("Name is required"),
-    mailId: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    contactNumber: Yup.string().required("Contact number is required"),
-    address: Yup.string().required("Address is required"),
-    discountType: Yup.string()
-      .oneOf(
-        ["percentage", "amount"],
-        "Discount Type must be 'percentage' or 'amount'"
-      )
-      .required("Discount Type is required"),
-    discount: Yup.number()
-      .min(0, "Discount cannot be negative")
-      .required("Discount is required"),
-    penalty: Yup.number()
-      .min(0, "Penalty cannot be negative")
-      .required("Penalty is required"),
-    tax: Yup.number()
-      .min(0, "Tax cannot be less than 0")
-      .max(100, "Tax cannot exceed 100")
-      .required("Tax is required"),
-    items: Yup.array()
-      .of(
-        Yup.object().shape({
-          category: Yup.string().required("Category is required"),
-          quantity: Yup.number()
-            .min(1, "Quantity must be at least 1")
-            .required("Quantity is required"),
-          totalAmount: Yup.number()
-            .min(0, "Total Amount cannot be negative")
-            .required("Total Amount is required"),
-        })
-      )
-      .min(1, "At least one line item is required"),
-    subAmount: Yup.number().min(0).notRequired(),
-    finalAmount: Yup.number().min(0).notRequired(),
-    document: Yup.string().nullable(),
-  });
-
-  const handleSubmit = (values, { setSubmitting, resetForm }) => {
-    if (isReadOnlyState) {
-      // Do not submit if in read-only mode
-      setSubmitting(false);
-      return;
-    }
-
-    const formValues = {
-      receiver: {
-        name: values.receiverName,
-        email: values.mailId,
-        phone: values.contactNumber,
-        address: values.address,
-      },
-      discountType: values.discountType,
-      discount: Number(values.discount),
-      penalty: Number(values.penalty),
-      tax: Number(values.tax),
-      govtRefNumber: values.govtRefNumber,
-      remark: values.remark,
-      invoiceNumber: values.invoiceNumber,
-      lineItems: values.items.map((item) => ({
-        revenueType: item.category,
-        quantity: Number(item.quantity),
-        total: Number(item.totalAmount),
-      })),
-      finalAmount: values.finalAmount, // Include finalAmount in the payload
-      document: values.document, // Include document if needed
-    };
-console.log(formValues,'...');
-
-    dispatch(createReceipt(formValues))
-      .unwrap()
-      .then(() => {
-        resetForm();
-        navigate("/finance/receipts/receipt-list");
-      })
-      .catch((err) => {
-        // Optionally handle errors here
-        console.error("Failed to create receipt:", err);
-      })
-      .finally(() => setSubmitting(false));
-  };
-
-  // Fetch invoice details when invoice number changes and is valid (only in create mode)
-  useEffect(() => {
-    if (isReadOnlyState || isEditMode) return; // Do not fetch if in read-only or edit mode
-    if (isFormResetting) return; // Do not fetch if form is resetting
-
-    const invoiceNumberPattern = /^INV\d{4}-\d{6}-\d{4}$/; // Adjust regex based on exact format
-    if (invoiceNumberInput && invoiceNumberPattern.test(invoiceNumberInput)) {
-      if (invoiceNumberInput !== fetchedInvoiceNumber) {
-        dispatch(fetchInvoiceByNumber(invoiceNumberInput));
-        setFetchedInvoiceNumber(invoiceNumberInput); // Update fetchedInvoiceNumber
-      }
-    } else if (invoiceNumberInput === "" && fetchedInvoiceNumber !== "") {
-      // Only reset if previously fetchedInvoiceNumber was not ""
-      if (formikRef.current) {
-        setIsFormResetting(true); // Indicate that form is resetting
-        formikRef.current.setValues(blankInitialValues);
-        setFetchedInvoiceNumber("");
-        setInvoiceError(false); // Reset error state
-        setIsFormResetting(false); // Reset the flag after form reset
-      }
-    }
-  }, [
-    invoiceNumberInput,
-    dispatch,
-    isReadOnlyState,
-    isEditMode, // Added to dependencies
-    fetchedInvoiceNumber,
-    blankInitialValues,
-    isFormResetting, // Added to dependencies
-  ]);
-
-  // Prefill form when invoice details are fetched successfully (only in create mode)
-  useEffect(() => {
-    if (invoiceFetchSuccess && invoiceDetails && !isReadOnlyState && !isEditMode) {
-      const prefilledValues = {
-        receiverName: invoiceDetails?.receiver?.name || "",
-        mailId: invoiceDetails?.receiver?.email || "",
-        contactNumber: invoiceDetails?.receiver?.contact || "",
-        address: invoiceDetails?.receiver?.address || "",
-        discountType: invoiceDetails?.discountType || "amount",
-        discount: invoiceDetails?.discount || 0,
-        penalty: invoiceDetails?.penalty || 0,
-        tax: invoiceDetails?.tax || 0,
-        govtRefNumber: "",
-        remark: "",
-        invoiceNumber: invoiceDetails?.invoiceNumber
-          ? typeof invoiceDetails.invoiceNumber === "string"
-            ? invoiceDetails.invoiceNumber
-            : invoiceDetails.invoiceNumber.number
-            ? String(invoiceDetails.invoiceNumber.number)
-            : String(invoiceDetails.invoiceNumber)
-          : "",
-        items:
-          invoiceDetails?.lineItems?.map((item) => ({
-            category: item?.revenueType || "",
-            quantity: item?.quantity || 0,
-            totalAmount: item?.amount || 0,
-            subCategory: item?.revenueReference?.subCategory || "",
-            stationeries:
-              item?.revenueReference?.stationeryItems?.map((stationery) => ({
-                itemName: stationery?.itemName || "",
-                quantity: stationery?.quantity || 0,
-                unitCost: stationery?.unitCost || 0,
-              })) || [],
-          })) || [
-            {
-              category: "",
-              quantity: 0,
-              totalAmount: 0,
-              subCategory: "",
-              stationeries: [
-                {
-                  itemName: "",
-                  quantity: 0,
-                  unitCost: 0,
-                },
-              ],
-            },
-          ],
-        subAmount: 0, // Initialize subAmount
-        finalAmount: 0, // Initialize finalAmount
-        document: null, // Initialize document
-      };
-
-      // Debugging: Log the prefilled invoice number
-      console.log("Prefilled Invoice Number:", prefilledValues.invoiceNumber);
-      console.log("Invoice Details:", invoiceDetails);
-
-      formikRef.current.setValues(prefilledValues);
-      setFetchedInvoiceNumber(prefilledValues.invoiceNumber);
-      setInvoiceNumberInput(prefilledValues.invoiceNumber); // Synchronize invoiceNumberInput
-      dispatch(clearSelectedInvoiceNumber());
-      dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
-      setInvoiceError(false); // Reset error state on successful fetch
-    }
-  }, [invoiceFetchSuccess, invoiceDetails, dispatch, isReadOnlyState, isEditMode]);
-
-  // Handle API errors (e.g., invoice not found)
-  useEffect(() => {
-    if (error && !isReadOnlyState && !isEditMode) {
-      // If there's an error and not in read-only or edit mode
-      setInvoiceError(true);
-
-      if (formikRef.current) {
-        // Clear all fields except invoiceNumber
-        const currentValues = formikRef.current.values;
-        formikRef.current.setValues({
-          ...currentValues,
-          receiverName: "",
-          mailId: "",
-          contactNumber: "",
-          address: "",
-          discountType: "amount",
-          discount: 0,
-          penalty: 0,
-          tax: 0,
-          govtRefNumber: "",
-          remark: "",
-          items: [
-            {
-              category: "",
-              quantity: 1,
-              totalAmount: "",
-              subCategory: "",
-              stationeries: [],
-            },
-          ],
-          subAmount: 0,
-          finalAmount: 0,
-          document: null,
-        });
-      }
-    } else {
-      // If there's no error, ensure error state is false
-      setInvoiceError(false);
-    }
-  }, [error, isReadOnlyState, isEditMode]);
-
-  // Prefill subAmount and finalAmount in read-only mode
-  useEffect(() => {
-    if (isReadOnlyState && receiptData) {
-      const lineItems = receiptData.lineItems || [];
-      const total_amount = lineItems.reduce(
-        (acc, item) => acc + Number(item.totalAmount || 0),
-        0
-      );
-
-      const calculated = calculateFinalAmounts({
-        total_amount,
-        discountType: receiptData.discountType,
-        discount: Number(receiptData.discount),
-        tax: Number(receiptData.tax),
-        penalty: Number(receiptData.penalty),
-        paid_amount: 0, // Assuming no paid amount
-        advance_amount: 0, // Assuming no advance amount
-      });
-
-      if (formikRef.current) {
-        formikRef.current.setFieldValue("subAmount", calculated.discountValue, false);
-        formikRef.current.setFieldValue("finalAmount", calculated.finalAmount, false);
-      }
-    }
-  }, [isReadOnlyState, receiptData]);
-
-  // Synchronize invoiceNumberInput when initialValues change (especially in read-only mode)
-  useEffect(() => {
-    setInvoiceNumberInput(initialValues.invoiceNumber || "");
-    // Debugging: Log the initial invoice number
-    console.log("Initial Invoice Number:", initialValues.invoiceNumber);
-  }, [initialValues.invoiceNumber]);
-
-  // Handle Edit Mode Transition
-  const handleEditMode = () => {
-    setIsReadOnlyState(false);
-    setIsEditMode(true); // Set edit mode
-    dispatch(clearSelectedInvoiceNumber()); // Clear selectedInvoiceNumber to prevent API calls
-    dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
-    setInvoiceError(false); // Reset error state
-  };
 
   return (
+    <Layout title="Finance | Create Reciept">
     <DashLayout>
-      <div className="p-6 min-h-screen">
-        <Formik
-          innerRef={formikRef}
-          initialValues={initialValues}
-          enableReinitialize={false} // Prevent Formik from resetting the form on state changes
-          validationSchema={isReadOnlyState ? null : validationSchema} // Skip validation in read-only
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting, values, setFieldValue, resetForm }) => (
-            <Form>
-              {/* Calculation Handler */}
-              {!isReadOnlyState && <CalculationHandler />}
+    
+      <div className="p-4 ">
+        <div className="flex flex-row items-start gap-4">
+          <div className="flex flex-row items-center relative">
+            <input type="text" className="w-[20rem] h-[2.5rem] p-2 border border-gray-400 rounded-lg" placeholder="Enter Invoice Number" onChange={(e)=>setSearchInvoiceNumber(e.target.value)}/>
+            <MdOutlineFileCopy title="Paste" className="absolute right-1 cursor-pointer" size={20} />
+          </div>
+          <div>
+            <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 rounded-lg shadow-lg h-[2.5rem]" onClick={()=>searchInvoice()}> <IoSearch /> Search</button>
+          </div>
+        </div>
+        {invoiceData ? <Tabs className="mt-4">
+          <TabPane tab="Invoice Details" key="1">
+          <div className="flex flex-col">
+          <div>
+          <div className="w-full text-center text-white font-bold py-2" style={{ backgroundColor: "#C83B62", fontSize: "18px" }}>
+          INVOICE {invoiceData?.isCancel && "CANCELLED"}
 
-              {/* Read-Only Mode Message */}
-              {isReadOnlyState && (
-                <div className="flex justify-between items-center bg-yellow-100 text-yellow-700 p-2 rounded-md text-sm mb-4">
-                  <span>
-                    Currently in read-only mode. You cannot edit these fields.
-                  </span>
-                  <button
-                    type="button"
-                    onClick={handleEditMode}
-                    className="flex items-center px-2 py-1 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition-transform duration-200"
-                  >
-                    Edit
-                  </button>
-                </div>
-              )}
+        </div>
+      </div> 
 
-              {/* Header with Buttons */}
-              <div className="flex justify-end mb-2 space-x-4">
-                {!isReadOnlyState && (
-                  <>
-                    <button
-                      type="button" // Changed from "reset" to "button"
-                      onClick={() => {
-                        setIsFormResetting(true); // Indicate that form is resetting
-                        resetForm();
-                        setInvoiceNumberInput("");
-                        setFetchedInvoiceNumber("");
-                        dispatch(clearSelectedInvoiceNumber());
-                        dispatch(clearInvoiceFetchSuccess()); // Clear fetch success flag
-                        setInvoiceError(false); // Reset error state
-                        setIsFormResetting(false); // Reset the flag after form reset
-                      }}
-                      className="px-4 py-2 rounded-md text-white transition duration-300"
-                      style={{
-                        background: "linear-gradient(to right, #ec4899, #a855f7)",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(to right, #a855f7, #ec4899)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(to right, #ec4899, #a855f7)")
-                      }
-                      disabled={isSubmitting}
-                    >
-                      Reset
-                    </button>
+          <div className="text-sm text-gray-800 mb-4 flex justify-between">
+        {invoiceData?.studentId &&<div>
+          <p><strong>Bill To</strong></p>
+          <p><strong>Name:</strong> {invoiceData?.studentId?.firstName} {invoiceData?.studentId?.lastName}</p>
+          <p><strong>Email:</strong> {invoiceData?.studentId?.email }</p>
+          <p><strong>Contact:</strong> {invoiceData?.studentId?.contactNumber }</p>
+        </div>}
+        {invoiceData?.entityId&&<div>
+          <p><strong>Bill To:</strong></p>
+          <p><strong>Name:</strong> {invoiceData?.entityId?.name} </p>
+          <p><strong>Email:</strong> {invoiceData?.entityId?.email }</p>
+          <p><strong>Contact:</strong> {invoiceData?.entityId?.Contact }</p>
+        </div>}
+        <div>
+          <p><strong>Invoice No:</strong> {invoiceData?.InvoiceNumber || ""}</p>
+          <p><strong>Issue Date:</strong> {invoiceData?.generateDate?.slice(0,10)}</p>
+          <p><strong>Status:</strong> {totalPaid == 0 ? "Unpiad":totalPaid == finalAmount ?"Paid":"Partial"}</p>
+          <p><strong>Currency:</strong> {invoiceData?.schoolId?.currency}</p>
 
-                    <button
-                      type="submit"
-                      className="px-4 py-2 rounded-md text-white transition duration-300"
-                      style={{
-                        background: "linear-gradient(to right, #ec4899, #a855f7)",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(to right, #a855f7, #ec4899)")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.background =
-                          "linear-gradient(to right, #ec4899, #a855f7)")
-                      }
-                      disabled={isSubmitting}
-                    >
-                      {isSubmitting ? "Submitting..." : "Create Receipt"}
-                    </button>
-                  </>
-                )}
-                {/* Removed the "Back" button */}
-              </div>
+        </div>
+      </div>
 
-              {/* Receiver Details */}
-              <h2 className="text-lg font-semibold mb-4">Receiver Details</h2>
-              {/* Invoice Number */}
-              <div className="relative mb-6">
-                <Field name="invoiceNumber">
-                  {({ field, form }) => (
-                    <InvoiceTextInput
-                      {...field}
-                      label="Invoice Number"
-                      placeholder="Enter invoice number (e.g., INV0003-202412-0001)"
-                      required
-                      type="text"
-                      onChange={(e) => {
-                        form.handleChange(e);
-                        const value = e.target.value;
-                        setInvoiceNumberInput(value);
+      <table className="w-full text-[15px] mb-6 border border-gray-300">
+        <thead>
+          <tr className="bg-pink-200 text-left">
+          <th className="p-2 border">Item</th>
+            <th className="p-2 border">Item Detail</th>
+            <th className="p-2 border">Rate</th>
+            <th className="p-2 border">Qty</th>
+            <th className="p-2 border">Tax (%)</th>
+            <th className="p-2 border">Penalty</th>
+            <th className="p-2 border">Discount</th>
+            <th className="p-2 border">Total</th>
+            <th className="p-2 border">Paid</th>
+            <th className="p-2 border">Balance</th>
+            <th className="p-2 border">Due Date</th>
+            <th className="p-2 border">Pay Now</th>
+          </tr>
+        </thead>
+        <tbody>
+          {invoiceData?.lineItems.map((item, index) => (
+            <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+              <td className="p-2 border">{item.name || "N/A"}</td>
+              <td className="p-2 border">{item.itemDetails} <br/> {item.frequency !== "one-time" && ` ${item.frequency} from ${item?.startDate?.slice(0,10)} to ${item?.endDate?.slice(0,10)}`}</td>
+              <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
+              <td className="p-2 border text-start">{item.quantity || 1}</td>
+              <td className="p-2 border text-start">{item.tax?.toFixed(2)}</td>
+              <td className="p-2 border text-start">{item.penalty_amount?.toFixed(2)||0}</td>
+              <td className="p-2 border text-start">{item.discount?.toFixed(2)||0}{item.discountType == "percentage"&& "%"}</td>
+              <td className="p-2 border text-start">{item.final_amount?.toFixed(2)||0}</td>
+              <td className="p-2 border text-start">{item.paid_amount?.toFixed(2)||0}</td>
+              <td className="p-2 border text-start">{item.remaining_amount?.toFixed(2)||0}</td>
+              <td className="p-2 border text-start">{item?.dueDate?.slice(0,10)||" "}</td>
+              <td className="pl-1 border text-start"> 
+                <input type="Number" className="w-[7rem] border border-gray-300 rounded-md p-2"
+                 onChange={(e)=>handlePayNowAmountChange(e,item._id)}
+                 placeholder="Enter Amount"/>
+              </td>
+            </tr>
+         
+          ))}
+        </tbody>
+      </table>
+      <div className="flex flex-row items-center border border-gray-300 text-xs ">
+        <div className="flex flex-col items-start p-4 w-[60%]">
+           <p>Payment Details</p>
+           <div className="w-full h-[90%]">
 
-                        // Debugging: Log the input value
-                        console.log("Invoice Number Input Changed:", value);
+           </div>
 
-                        // Only dispatch setSelectedInvoiceNumber in Create Mode
-                        if (!isEditMode) {
-                          dispatch(setSelectedInvoiceNumber(value));
-                        }
-                      }}
-                      disabled={isReadOnlyState} // Disable input in read-only mode
-                      errorState={invoiceError} // Pass error state to handle icon
-                      isEditMode={isEditMode} // Pass edit mode to handle icon
-                    />
-                  )}
-                </Field>
-              </div>
+        </div>
+        <div className="flex flex-col items-start p-4 w-[40%] border-l-2 border-gray-300 text-sm">
+        <p><strong>Total Amount</strong> = {totalAmount?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+        <p><strong>Total Discount</strong> = {totalDiscount?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+        <p><strong>Total Penalty</strong> = {totalPenalty?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+        <p><strong>Total Tax</strong> = {totalTax?.toFixed(2)}  {invoiceData?.schoolId?.currency}</p>
+        <p className="border-t mt-2"><strong>Final Amount</strong> = {finalAmount?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+        <p><strong>Total Paid</strong> = {totalPaid?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+        <p><strong>Total Remaining</strong> = {(finalAmount-totalPaid)?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+        </div>
+      </div>
+      
+       </div>
+       <Form
+      layout="vertical"
+      onFinish={() => {dispatch(createReceipt({...receiptData,invoiceNumber:searchInvoiceNumber}))}}
+      initialValues={receiptData}
+    >
+      {/* Row 1 */}
+      <Row gutter={16}>
+        <Col span={6}>
+          <Form.Item label="Payment Type" name="paymentType"  rules={[{ required: true ,message:"Payment Type is required"}]} >
+            <Select
+              value={receiptData.paymentType}
+              onChange={(value) => handleChange("paymentType", value)}
+            >
+              <Select.Option value="cash">Cash</Select.Option>
+              <Select.Option value="card">Card</Select.Option>
+              <Select.Option value="online">Online</Select.Option>
+              <Select.Option value="cheque">Cheque</Select.Option>
+              <Select.Option value="other">Other</Select.Option>
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item label="Payment Date" name="paymentDate"  rules={[{ required: true ,message:"Payment Date is required"}]}>
+            <input type="date"
+            className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2"
+              value={receiptData.paymentDate}
+              onChange={(e) => handleChange("paymentDate", e.target.value)}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={6}>
+          <Form.Item label="Paid By" name="paidBy">
+            <Input
+              value={receiptData.paidBy}
+              placeholder="self,parents..."
+              onChange={(e) => handleChange("paidBy", e.target.value)}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
 
-              {/* Receiver Details Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                <TextInput
-                  name="receiverName"
-                  label="Receiver Name"
-                  placeholder="Enter receiver name"
-                  required
-                  disabled={isReadOnlyState} // Disable in read-only
+      {/* Row 2 */}
+      <Row gutter={16}>
+       
+
+        {/* Conditional Fields */}
+        {receiptData.paymentType !== "cash" & receiptData.paymentType !== "cheque" ? (
+          <>
+            <Col span={6}>
+              <Form.Item label="Online Transaction ID" name="onlineTransactionId"  rules={[{ required: true ,message:"Transaction ID is required"}]}>
+                <Input
+                  value={receiptData.onlineTransactionId}
+                  onChange={(e) => handleChange("onlineTransactionId", e.target.value)}
                 />
-                <TextInput
-                  name="address"
-                  label="Address"
-                  placeholder="Enter address"
-                  required
-                  disabled={isReadOnlyState}
-                />
-                <TextInput
-                  name="contactNumber"
-                  label="Contact Number"
-                  placeholder="Enter contact number"
-                  required
-                  disabled={isReadOnlyState}
-                />
-                <TextInput
-                  name="mailId"
-                  label="Email"
-                  placeholder="Enter email"
-                  required
-                  disabled={isReadOnlyState}
-                />
-              </div>
+              </Form.Item>
+            </Col>
+          </>
+        ):null}
 
-              {/* Items */}
-              <h2 className="text-lg font-semibold mb-4">Adjustment Items</h2>
-              <ReturnItems
-                values={values}
-                setFieldValue={setFieldValue}
-                disabled={isReadOnlyState} // Pass disabled prop
-              />
-
-              {/* Payment Info */}
-              <h2 className="text-lg font-semibold mb-4 mt-6">Payment Info</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {/* Tax Field with Percent Icon */}
-                <div className="relative">
-                  <label htmlFor="tax" className="text-sm text-gray-500 block mb-1">
-                    Tax <span className="text-red-500">*</span>
-                  </label>
-                  <Field
-                    id="tax"
-                    name="tax"
-                    type="number"
-                    placeholder="Enter tax"
-                    className="bg-white border border-gray-300 rounded-md px-4 py-3 pr-10 text-sm text-gray-800 w-full focus:outline-none focus:ring-2 focus:ring-purple-300"
-                    autoComplete="off"
-                    aria-required="true"
-                    min="0"
-                    max="100"
-                    disabled={isReadOnlyState} // Disable in read-only
-                  />
-                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
-                  <ErrorMessage
-                    name="tax"
-                    component="div"
-                    className="text-sm text-red-500 mt-1"
-                  />
-                </div>
-
-                <TextInput
-                  name="discount"
-                  label="Discount"
-                  placeholder="Enter discount"
-                  required
-                  disabled={isReadOnlyState}
+        {/* Conditional Fields for Cheque */}
+        {receiptData.paymentType === "cheque" && (
+          <>
+            <Col span={6}>
+              <Form.Item label="Cheque Number" name="chequeNumber"  rules={[{ required: true ,message:"Cheque Number is required"}]}>
+                <Input
+                  value={receiptData.chequeNumber}
+                  onChange={(e) => handleChange("chequeNumber", e.target.value)}
                 />
-
-                <SelectInput
-                  name="discountType"
-                  label="Discount Type"
-                  options={[
-                    { value: "percentage", label: "Percentage" },
-                    { value: "amount", label: "Fixed Amount" },
-                  ]}
-                  disabled={isReadOnlyState}
+              </Form.Item>
+            </Col>
+            <Col span={6}>
+              <Form.Item label="Cheque Date" name="chequeDate"  rules={[{ required: true ,message:"Cheque Date is required"}]}>
+                <input type="date"
+                className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2"
+                  value={receiptData.chequeDate}
+                  onChange={(e) => handleChange("chequeDate", e.target.value)}
                 />
+              </Form.Item>
+            </Col>
+          </>
+        )}
+      </Row>
 
-                <TextInput
-                  name="penalty"
-                  label="Penalty"
-                  placeholder="Enter penalty"
-                  required
-                  disabled={isReadOnlyState}
-                />
+      {/* Row 3 */}
+      <Row gutter={16}>
+        <Col span={6}>
+          <Form.Item label="Note" name="note">
+            <Input.TextArea
+              value={receiptData.note}
+              onChange={(e) => handleChange("note", e.target.value)}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
 
-                <TextInput
-                  name="govtRefNumber"
-                  label="Government Reference Number"
-                  placeholder="Enter reference number"
-                  disabled={isReadOnlyState}
-                />
+      <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2" htmlType="submit">Submit</Button>
+    </Form>
+          </TabPane>
 
-                <TextInput
-                  name="remark"
-                  label="Remarks"
-                  placeholder="Add remarks"
-                  disabled={isReadOnlyState}
-                />
-
-                {/* Document Upload Field */}
-                {!isReadOnlyState && (
-                  <FileInput
-                    label="Upload Document (Optional)"
-                    name="document"
-                    onChange={(e) => {
-                      const fileUrl = e.target.value;
-                      setFieldValue("document", fileUrl);
-                    }}
-                    value={values.document}
-                  />
-                )}
-
-                {/* Sub Amount (Read-only) */}
-                <TextInput
-                  name="subAmount"
-                  label="Sub Amount"
-                  placeholder="Sub Amount"
-                  type="number"
-                  disabled // Always disabled
-                />
-                {/* Final Amount (Read-only) */}
-                <TextInput
-                  name="finalAmount"
-                  label="Final Amount"
-                  placeholder="Final Amount"
-                  type="number"
-                  disabled // Always disabled
-                />
-              </div>
-
-              {/* Removed the red error text at the bottom */}
-            </Form>
-          )}
-        </Formik>
+          <TabPane tab="OverDue Invoices" key="2">
+        
+          </TabPane>
+        </Tabs>:<div className="w-full h-[80vh] flex flex-col items-center justify-center">
+            <p className="text-gray-500">Enter or Paste Invoice Number and Get Data</p>
+            <p className="text-gray-500"><TbFileInvoice size={50} /></p>
+          </div>}
+       
       </div>
     </DashLayout>
+    </Layout>
   );
 };
 
 export default CreateReceipt;
+

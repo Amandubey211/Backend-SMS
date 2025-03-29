@@ -10,6 +10,7 @@ import i18next from "i18next";
 import { gt } from "../../Utils/translator/translation";
 import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
 import { BiSolidSchool } from "react-icons/bi";
+import { HiMiniCalendarDateRange } from "react-icons/hi2";
 
 const SettingDropdown = ({
   showSetting,
@@ -99,6 +100,17 @@ const SettingDropdown = ({
           >
             <FaGraduationCap className="text-lg" />
             {t("Academic Year", gt.setting)}
+          </NavLink>
+          <NavLink
+            to={"/financialYear"}
+            className={({ isActive }) =>
+              `${listItemClass} ${
+                isActive ? "text-purple-600 bg-purple-100 " : ""
+              }`
+            }
+          >
+           <HiMiniCalendarDateRange className="text-lg" />
+            {t("Financial Year", gt.setting)}
           </NavLink>
           { role == "admin" && 
           <NavLink

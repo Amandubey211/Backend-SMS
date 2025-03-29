@@ -79,11 +79,11 @@ const StudentFeesGraph = () => {
       y: {
         title: {
           display: true,
-          text: "Fees Collected (QR)",
+          text: "Fees Collected ",
         },
         ticks: {
           callback: function (value) {
-            return `${value.toLocaleString()} QR `; // Format as QR with commas
+            return `${value.toLocaleString()} `; 
           },
         },
       },
@@ -146,11 +146,7 @@ const StudentFeesGraph = () => {
           <div className="flex justify-center items-center h-full">
             <Spin size="large" />
           </div>
-        ) : error ? (
-          <div className="mb-4">
-            <Alert message="Error loading data" type="error" showIcon />
-          </div>
-        ) : (
+        )  : (
           <Line ref={chartRef} data={chartData} options={chartOptions} />
         )}
       </div>

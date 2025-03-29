@@ -49,6 +49,7 @@ export const studentLogin = createAsyncThunk(
             classId: data?.classId,
             sectionName: data?.sectionName,
             schoolName: data?.schoolName,
+            currency: data?.currency,
           })
         );
 

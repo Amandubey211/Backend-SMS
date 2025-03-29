@@ -33,6 +33,24 @@ export const fetchOneStudentFee = createAsyncThunk(
     }
   }
 );
+export const fetchAllStudentFee = createAsyncThunk(
+  "studentFees/fetchAllStudentFee",
+
+  async (params, { rejectWithValue, dispatch, getState }) => {
+
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/revenue/get/all/students/fee?say=${say}`,params
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
 
 export const createStudentFee = createAsyncThunk(
@@ -47,11 +65,13 @@ export const createStudentFee = createAsyncThunk(
       const getRole = getUserRole(getState);
       const response = await postData(
         `/${getRole}/revenue/add/student/fee?say=${say}`,
-        { allData: feeData }
+         feeData
       );
       if (response.success) {
         toast.success('Fees added  successfully!');
         navigate('/finance/studentfees/total-revenue')
+      }else{
+        toast.error(response?.message);
       }
       return response;
     } catch (error) {

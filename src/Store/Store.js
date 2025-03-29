@@ -14,14 +14,20 @@ import userReducer, {
 } from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
 import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice";
+import financialYearReducer from "./Slices/Common/FinancialYear/financialYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
 import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
+import financialCategoryReducer from "./Slices/Finance/Category/financeCategory.Slice";
+import inventoryReducer from "./Slices/Finance/inventory/inventory.slice";
+import budgetReducer from "./Slices/Finance/budget/budget.slice";
+import entityReducer from "./Slices/Finance/entitie/entity.slice";
+import entityRevenueReducer from "./Slices/Finance/EntityRevenue/EntityRevenue.slice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
-import classReducer from "./Slices/Admin/Class/reducer/classSlice"; // Importing the combined admin reducer
-import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; // Importing the combined admin reducer
+import classReducer from "./Slices/Admin/Class/reducer/classSlice"; 
+import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; 
 
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
@@ -45,12 +51,7 @@ import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 
 import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
 import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
-import penaltyAdjustmentReducer from "./Slices/Finance/PenalityandAdjustment/adjustment.slice";
-// import earningReducer from "./Slices/Admin/Accounting/Earning/earningSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
-import invoiceReducer from "./Slices/Finance/Invoice/invoiceSlice";
-
-import expensesReducer from "./Slices/Finance/Expenses/expensesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
 import adminDiscussionCommentsReducer from "./Slices/Admin/Class/Discussion/Comments/discussionCommentsSlice";
 import adminAnnouncementCommentsReducer from "./Slices/Admin/Class/Announcement/Comment/announcementCommentsSlice";
@@ -161,6 +162,7 @@ const commonReducer = combineReducers({
   user: persistReducer(userPersistConfig, userReducer),
   alertMsg: alertReducer,
   academicYear: academicYearReducer,
+  financialYear: financialYearReducer,
   branchs: branchReducer,
   sendEmail: sendEmailReducer,
 });
@@ -198,6 +200,12 @@ const AdminReducer = combineReducers({
   all_students: allStudentReducer,
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
+  financialCategory: financialCategoryReducer,
+  inventory: inventoryReducer,
+  inventory: inventoryReducer,
+  entity: entityReducer,
+  entityRevenue: entityRevenueReducer,
+  budget: budgetReducer,
   // student_fees: studentFeesReducer,
 
   subject_grades: subjectGradesReducer,
@@ -210,10 +218,7 @@ const AdminReducer = combineReducers({
 
   // Finance
   earnings: earnignsReducer,
-  expenses: expensesReducer,
   studentFees: studentFeesReducer,
-  invoices: invoiceReducer,
-  penaltyAdjustment: penaltyAdjustmentReducer,
   offlineExam: adminOfflineExamReducer,
 });
 

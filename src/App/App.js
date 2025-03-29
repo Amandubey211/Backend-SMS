@@ -52,60 +52,68 @@ import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/T
 import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
 import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
-import TotalRevenueList from "../Modules/Admin/Finance/Earnings/TotalRevenueList.js";
 import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
 import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentFeesForm.js";
 import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
-import AddNewFees from "../Modules/Admin/Finance/StudentFees/AddNewFees/AddNewFees.js";
-import InvoicesMain from "../Modules/Admin/Finance/Invoices/InvoicesMain.js";
-import RecentInvoiceList from "../Modules/Admin/Finance/Invoices/RecentInvoiceList.js";
-//import ReturnInvoiceList from "../Modules/Admin/Finance/Invoices/ReturnInvoiceList.js";
-import EarningMainSection from "../Modules/Admin/Finance/Earnings/EarningMainSection.js";
 import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
 import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
 import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
 import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
-import AddReturnInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/AddReturnInvoice.js";
-import CreateNewInvoice from "../Modules/Admin/Finance/Invoices/AddInvoice/CreateNewInvoice.js";
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
-import CreatePenaltyAdjustment from "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/CreatePenaltyAdjustment.js";
 // lazy loaded routes
 const AllStudents = lazy(() =>
   import(
     "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/AllStudents.js"
   )
 );
-const AdjustmentDashboard = lazy(() =>
-  import(
-    "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/AdjustmentDashboard.js"
-  )
-);
-const PenalityandAdjustmentList = lazy(() =>
-  import(
-    "../Modules/Admin/Finance/PenaltiesandAdjustments/AddPenaltyAdjustment/Dashboard/PenalityandAdjustmentList.js"
-  )
-);
 
-const TotalExpenseList = lazy(() =>
-  import(
-    "../Modules/Admin/Finance/Expense/TotalExpenseList/TotalExpenseList.js"
-  )
+
+
+
+
+
+const EntityRevenueDash = lazy(() =>
+  import("../Modules/Admin/Finance/entityRevenue/EntityRevenueDash.js")
 );
-const ExpenseMain = lazy(() =>
-  import("../Modules/Admin/Finance/Expense/ExpenseMain.js")
+const AddEntityRevenue = lazy(() =>
+  import("../Modules/Admin/Finance/entityRevenue/AddEntityRevenue.js")
 );
-const AddExpense = lazy(() =>
-  import("../Modules/Admin/Finance/Expense/AddExpense/AddExpense.js")
+const EntityRevenueList = lazy(() =>
+  import("../Modules/Admin/Finance/entityRevenue/EntityRevenueList.js")
 );
-const AddEarnings = lazy(() =>
-  import("../Modules/Admin/Finance/Earnings/AddEarnings/AddEarnings.js")
+const BudgetPlannerDash = lazy(() =>
+  import("../Modules/Admin/Finance/budget/BudgetDash.js")
+);
+const PayRollDash = lazy(() =>
+  import("../Modules/Admin/Finance/Payroll/PayRollDash.js")
+);
+const AddPayRollDash = lazy(() =>
+  import("../Modules/Admin/Finance/Payroll/AddPayRoll.js")
+);
+const OperationalExpensesDash = lazy(() =>
+  import("../Modules/Admin/Finance/operational-expenses/ExpsenseDash.js")
+);
+const AddOperationalExpenses = lazy(() =>
+  import("../Modules/Admin/Finance/operational-expenses/AddExpsense.js")
 );
 const RoleSelector = lazy(() =>
   import("../Components/Common/RBAC/RoleSelector.js")
 );
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
+);
+const FinancialYear = lazy(() =>
+  import("../Modules/Admin/FinancialYear/FinanceYear.js")
+);
+const FinanceCategory = lazy(() =>
+  import("../Modules/Admin/Finance/financeCategory/FinanceCategory.js")
+);
+const Inventory = lazy(() =>
+  import("../Modules/Admin/Finance/Inventory/Inventory.js")
+);
+const Entities = lazy(() =>
+  import("../Modules/Admin/Finance/entities/Enities.js")
 );
 
 const SelectBranch = lazy(() =>
@@ -191,12 +199,7 @@ const EventSchool = lazy(() =>
 const AdminNotice = lazy(() =>
   import("../Modules/Admin/NoticeBoard/Notice/AdminNotice.js")
 );
-const Earning = lazy(() =>
-  import("../Modules/Admin/Accounting/Earnings/Earning.js")
-);
-const Expenses = lazy(() =>
-  import("../Modules/Admin/Accounting/Expenses/Expenses.js")
-);
+
 const AssignmentList = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Assignments/AllAssignments/AssignmentList.js"
@@ -486,6 +489,46 @@ function App() {
         <ProtectRoute
           Component={Academic}
           allowedRoles={["admin", "teacher", "librarian", "finance", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/financialYear",
+      element: (
+        <ProtectRoute
+          Component={FinancialYear}
+          allowedRoles={["admin"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/categories",
+      element: (
+        <ProtectRoute
+          Component={FinanceCategory}
+          allowedRoles={["admin","finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/Inventory",
+      element: (
+        <ProtectRoute
+          Component={Inventory}
+          allowedRoles={["admin","finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/entities",
+      element: (
+        <ProtectRoute
+          Component={Entities}
+          allowedRoles={["admin","finance"]}
         />
       ),
       errorElement: <Error />,
@@ -946,45 +989,76 @@ function App() {
     },
 
     {
-      path: "/finance/earning",
+      path: "/finance/entity/add/revenue",
       element: (
         <ProtectRoute
-          Component={EarningMainSection}
+          Component={AddEntityRevenue}
           allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/finance/earning/total-revenue-list",
+      path: "/finance/budget-planner",
       element: (
         <ProtectRoute
-          Component={TotalRevenueList}
+          Component={BudgetPlannerDash}
           allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/finance/expenses",
+      path: "/finance/payroll",
       element: (
         <ProtectRoute
-          Component={ExpenseMain}
+          Component={PayRollDash}
           allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
     },
     {
-      path: "/finance/expenses/total-expense-list",
+      path: "/finance/add/payroll",
       element: (
         <ProtectRoute
-          Component={TotalExpenseList}
+          Component={AddPayRollDash}
           allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
     },
+    {
+      path: "/finance/operational-expenses",
+      element: (
+        <ProtectRoute
+          Component={OperationalExpensesDash}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/add/operational-expenses",
+      element: (
+        <ProtectRoute
+          Component={AddOperationalExpenses}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/entity/revenue/list",
+      element: (
+        <ProtectRoute
+          Component={EntityRevenueList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+
 
     {
       path: "/finance/studentfees/add/form",
@@ -1007,20 +1081,10 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/earning/add",
+      path: "/finance/entity/revenue",
       element: (
         <ProtectRoute
-          Component={AddEarnings}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-    {
-      path: "/finance/expenses/add",
-      element: (
-        <ProtectRoute
-          Component={AddExpense}
+          Component={EntityRevenueDash}
           allowedRoles={["admin", "finance"]}
         />
       ),
@@ -1040,53 +1104,12 @@ function App() {
       path: "/finance/studentfees/total-revenue/addFees",
       element: (
         <ProtectRoute
-          Component={AddNewFees}
+          Component={SummaryRevenueList}
           allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
     },
-    {
-      path: "/finance/invoices/dashboard",
-      element: (
-        <ProtectRoute
-          Component={InvoicesMain}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-    {
-      path: "/finance/invoices/add-new-invoice",
-      element: (
-        <ProtectRoute
-          Component={CreateNewInvoice}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-    {
-      path: "/finance/invoices/add-return-invoice",
-      element: (
-        <ProtectRoute
-          Component={AddReturnInvoice}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-    {
-      path: "/finance/invoices/dashboard/recent-invoices",
-      element: (
-        <ProtectRoute
-          Component={RecentInvoiceList}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-
     {
       path: "/finance/receipts",
       element: (
@@ -1147,36 +1170,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-    {
-      path: "/finance/penaltyAdjustment/",
-      element: (
-        <ProtectRoute
-          Component={AdjustmentDashboard}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-    {
-      path: "/finance/penaltyAdjustment-list",
-      element: (
-        <ProtectRoute
-          Component={PenalityandAdjustmentList}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
-    {
-      path: "/finance/penaltyAdjustment/add-new-penalty-adjustment",
-      element: (
-        <ProtectRoute
-          Component={CreatePenaltyAdjustment}
-          allowedRoles={["admin", "finance"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
+   
     {
       path: "/users/students",
       element: (
