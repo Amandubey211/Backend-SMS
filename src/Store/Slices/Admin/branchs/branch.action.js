@@ -32,10 +32,10 @@ export const updateBranch = createAsyncThunk(
 
       Cookies.remove("say");
       if (res?.data?.isAcademicYearActive) {
-        toast.success("Branch updated successfully.");
         setLocalCookies("say", res?.data?.academicYear?._id);
 
         setLocalCookies("logo", data?.logo);
+        
         navigate("/dashboard");
       } else {
         Cookies.remove("isAcademicYearActive");

@@ -31,7 +31,6 @@ import {
 import { Alert, Button, Dropdown, Input, Menu, Spin, Table, Tag } from "antd";
 import Layout from "../../../../Components/Common/Layout";
 import toast from "react-hot-toast";
-import ExportModal from "../Earnings/Components/ExportModal";
 import QuotationTemplate from "../../../../Utils/FinanceTemplate/QuotationTemplate";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";

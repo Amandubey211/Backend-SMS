@@ -153,9 +153,9 @@ const SideMenubar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 bottom-0 transition-all duration-500 p-1 px-2 z-30 border-r flex flex-col bg-white ${
-        isOpen ? "w-[15%]" : "w-[7%]"
-      }`}
+      // This keeps the old UI transition style (no framer-motion).
+      className={`fixed top-0 left-0 bottom-0 transition-all duration-500 p-1 px-2 z-30 border-r flex flex-col bg-white ${isOpen ? "w-[15%]" : "w-[7%]"
+        }`}
       aria-label="Sidebar"
     >
       {/* Logo Section */}
@@ -164,9 +164,8 @@ const SideMenubar = () => {
           <img
             src={isOpen ? StudentDiwanLogo : smallLogo}
             alt="Logo"
-            className={`transition-all duration-300 h-12 ${
-              isOpen ? "w-40 pt-1" : ""
-            }`}
+            className={`transition-all duration-300 h-12 ${isOpen ? "w-40 pt-1" : ""
+              }`}
           />
         </NavLink>
 
@@ -210,13 +209,12 @@ const SideMenubar = () => {
                     <div
                       className={`
                         flex items-center w-full p-2 rounded-lg cursor-pointer
-                        ${
-                          isActivePath(item.path, location.pathname) ||
+                        ${isActivePath(item.path, location.pathname) ||
                           item.items.some((subItem) =>
                             isActivePath(subItem.path, location.pathname)
                           )
-                            ? "bg-purple-100 text-purple-500"
-                            : "text-gray-700 hover:bg-gray-100"
+                          ? "bg-purple-100 text-purple-500"
+                          : "text-gray-700 hover:bg-gray-100"
                         }
                         ${isOpen ? "justify-between" : "justify-center"}
                       `}
@@ -232,8 +230,15 @@ const SideMenubar = () => {
                         </span>
                         {isOpen && (
                           <span className="ml-3 text-sm font-medium">
-                            {t(item.title)}
+                            {t(item.title)} <span></span>
                           </span>
+                        )}
+                        {item.bedge && (
+                          <Tooltip title="This feature is in beta. It may have limited functionality and is subject to changes based on user feedback">
+                            <span className="ml-3 text-xs font-medium border-2 border-red-500 bg-red-100 text-black px-2 rounded-md">
+                              Beta
+                            </span>
+                          </Tooltip>
                         )}
                       </div>
                       {isOpen &&
@@ -292,9 +297,8 @@ const SideMenubar = () => {
                                   aria-label={t(subItem.title)}
                                 >
                                   <span
-                                    className={`text-base ${
-                                      !isOpen && "mx-auto"
-                                    }`}
+                                    className={`text-base ${!isOpen && "mx-auto"
+                                      }`}
                                   >
                                     {subItem.icon}
                                   </span>
@@ -321,6 +325,7 @@ const SideMenubar = () => {
                   <NavLink
                     to={item.path}
                     className={({ isActive }) =>
+
                       `flex items-center p-2 rounded-lg text-sm
                       ${
                         isActive || isActivePath(item.path, location.pathname)
@@ -354,15 +359,15 @@ const SideMenubar = () => {
           <img
             src={userDetails?.profile || profileIcon}
             alt="Profile"
-            className={`${
-              isOpen ? "w-10 h-10" : "w-8 h-8"
-            } cursor-pointer rounded-full`}
+            className={`${isOpen ? "w-10 h-10" : "w-8 h-8"
+              } cursor-pointer rounded-full`}
             onClick={HandleNavigate}
           />
         </Tooltip>
 
         {isOpen && (
           <div className="flex-1 ml-3">
+
             <h2 className="text-sm font-semibold">
               {getTruncatedName(userDetails?.fullName)}
             </h2>

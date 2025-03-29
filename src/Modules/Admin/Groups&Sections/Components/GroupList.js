@@ -18,7 +18,8 @@ import { HiOutlinePencilAlt, HiOutlineTrash } from "react-icons/hi";
 
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import StudentMenuOptions from "../../Students/Components/StudentMenuOptions";
-import { Empty } from "antd";
+import { Empty, Tag, Tooltip } from "antd";
+import { FaGraduationCap } from "react-icons/fa";
 
 /* 
   Props:
@@ -110,14 +111,14 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
         return (
           <motion.div
             key={group._id}
-            layout
-            initial={{ opacity: 0.6, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            // layout
+            // initial={{ opacity: 0.6, y: 10 }}
+            // animate={{ opacity: 1, y: 0 }}
+            // transition={{ duration: 0.3 }}
             className="mb-2 border-b"
           >
             {/* Group Header */}
-            <div className="flex items-center justify-between py-3 bg-gray-50 px-2">
+            <div className="flex items-center justify-between py-3 bg-pink-50 px-2 rounded-md">
               <h3
                 className="text-lg font-semibold text-gradient cursor-pointer"
                 onClick={() =>
@@ -218,16 +219,29 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
                     >
                       {/* Student Info */}
                       <div className="flex items-center flex-shrink-0 w-1/4">
-                        <img
-                          src={student?.profile || profileIcon}
-                          alt={student?.firstName || "First"}
-                          className="w-10 h-10 rounded-full mr-3"
-                        />
+                        <div className="relative mr-3">
+                          <img
+                            src={student?.profile || profileIcon}
+                            alt={student?.firstName || "First"}
+                            className={`w-10 h-10 rounded-full object-cover ${
+                              student.isGraduate
+                                ? "border-2 border-green-500"
+                                : ""
+                            }`}
+                          />
+                          {student.isGraduate && (
+                            <Tooltip title="Graduated">
+                              <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
+                                <FaGraduationCap className="text-white w-3 h-3" />
+                              </div>
+                            </Tooltip>
+                          )}
+                        </div>
                         <div className="flex flex-col">
                           <div className="text-sm font-medium truncate">
                             {student?.firstName} {student?.lastName || ""}
                           </div>
-                          {group.leader === student._id && (
+                          {group.leader === student._id ? (
                             <div className="flex items-center gap-1">
                               <span className="text-xs font-medium text-gradient truncate">
                                 Group Leader
@@ -236,8 +250,21 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
                                 <GiImperialCrown />
                               </span>
                             </div>
+                          ) : (
+                            <div className="flex items-center text-xs text-gray-500 truncate">
+                              <span>
+                                {student?.admissionNumber || memberIndex}
+                              </span>
+                            </div>
                           )}
                         </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1 items-start justify-center w-1/5 truncate">
+                        <Tag className="text-sm text-gray-500 truncate">
+                          {student?.presentSectionId?.sectionName ||
+                            "No Section"}
+                        </Tag>
                       </div>
 
                       {/* Email / Contact */}
@@ -253,7 +280,7 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
                       {/* Guardian Info */}
                       <div className="flex flex-col w-1/4 truncate text-sm">
                         <span className="truncate">
-                          {student?.guardianRelationToStudent || "N/A"}
+                          {student?.guardianRelationToStudent || "Guardian No"}
                         </span>
                         <span className="truncate">
                           {student?.guardianContactNumber || "N/A"}
@@ -270,15 +297,17 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
                         </button>
                       </div>
 
+                      {!student.isGraduate && (
+                        <div className="flex-shrink-0 w-1/8 relative">
+                          <StudentMenuOptions
+                            groupId={group._id}
+                            studentName={`${student?.firstName} ${student?.lastName}`}
+                            studentId={student._id}
+                            student={student}
+                          />
+                        </div>
+                      )}
                       {/* Student Menu (remove from group, etc.) */}
-                      <div className="flex-shrink-0 w-1/8 relative">
-                        <StudentMenuOptions
-                          groupId={group._id}
-                          studentName={`${student?.firstName} ${student?.lastName}`}
-                          studentId={student._id}
-                          student={student}
-                        />
-                      </div>
                     </li>
                   ))
                 )}

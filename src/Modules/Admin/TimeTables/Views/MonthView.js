@@ -14,6 +14,7 @@ export default function MonthView({
   const dateCellRender = (currentDayjs) => {
     const currentDate = currentDayjs.toDate();
     const dateString = currentDayjs.format("YYYY-MM-DD");
+    console.log(filteredTimetables, "filteredTimetablesfilteredTimetables");
 
     const matched = filteredTimetables.flatMap((tt) => {
       if (tt.type === "weekly") {

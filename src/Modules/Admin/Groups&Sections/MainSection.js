@@ -20,10 +20,12 @@ import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../config/permission";
 import ProtectedAction from "../../../Routes/ProtectedRoutes/ProtectedAction";
 import { fetchStudentsByClassAndSection } from "../../../Store/Slices/Admin/Class/Students/studentThunks";
-import SectionStudentList from "./Components/SectionStudentList";
-import { Tabs } from "antd";
+// import SectionStudentList from "./Components/SectionStudentList"; // <-- Removed
 import Fuse from "fuse.js";
+import DetailedStudentList from "../Students/Components/DetailedStudentList";
+import { Tabs, Input } from "antd";
 
+const { Search } = Input;
 const MainSection = () => {
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -32,8 +34,8 @@ const MainSection = () => {
   const [activeSection, setActiveSection] = useState("Everyone");
   const [activeSectionId, setActiveSectionId] = useState(null);
 
-  // State for active tab: "section" or "groups"
-  const [activeTab, setActiveTab] = useState("section");
+  // State for active tab: "student" or "groups"
+  const [activeTab, setActiveTab] = useState("student");
 
   // Grade modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -151,16 +153,13 @@ const MainSection = () => {
   // Tabs data
   const tabItems = [
     {
-      key: "section",
-      label: `Section (${studentCount})`,
+      key: "student",
+      label: `Students (${studentCount})`,
       children: (
-        <SectionStudentList
+        <DetailedStudentList
           onSeeGradeClick={onSeeGradeClick}
-          activeSectionId={activeSectionId}
           activeSection={activeSection}
           students={filteredStudents}
-          loading={studentsLoading}
-          error={studentsError}
         />
       ),
     },
@@ -202,7 +201,7 @@ const MainSection = () => {
         )}
 
         {/* Right: Tabs + Search bar */}
-        <div className="flex-grow h-full border-l p-4 flex flex-col">
+        <div className="flex-grow h-full border-l p-3 flex flex-col">
           {/* Protected area for the main content */}
           <ProtectedSection
             requiredPermission={PERMISSIONS.GROUP_BY_CLASS_SECTION}
@@ -212,23 +211,19 @@ const MainSection = () => {
             <Tabs
               activeKey={activeTab}
               onChange={(key) => setActiveTab(key)}
-              // This extra content puts the search bar on the right edge
               tabBarExtraContent={
-                <input
-                  type="text"
+                <Search
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-md w-64"
+                  style={{ width: 250 }}
+                  // optional: if you only want to search on 'Enter'
+                  // onSearch={(value) => setSearchQuery(value)}
                 />
               }
             >
               {tabItems.map((tab) => (
                 <Tabs.TabPane key={tab.key} tab={tab.label}>
-                  {/* 
-                    Each tab's content is automatically rendered below the tab bar,
-                    taking up the full space. 
-                  */}
                   {tab.children}
                 </Tabs.TabPane>
               ))}

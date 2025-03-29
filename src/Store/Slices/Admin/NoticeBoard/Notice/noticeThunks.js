@@ -14,13 +14,13 @@ import toast from "react-hot-toast";
 // Fetch all notices with pagination support
 export const fetchNoticesThunk = createAsyncThunk(
   "notice/fetchAll",
-  async (page = 1, { rejectWithValue, dispatch, getState }) => {
+  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/all/notices?say=${say}&page=${page}`
+        `/${getRole}/all/notices?say=${say}&page=${page}&limit=${limit}`
       );
       console.log(response, "fetched notices");
       return response;

@@ -71,8 +71,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
 
   return (
     <>
-      <div className="flex justify-between items-center border-b p-4">
-        <div className="flex space-x-2 px-5">
+      <div className="flex justify-between items-center border-b p-2">
+        <div className="flex space-x-2 pe-5 ps-3">
           {/* "Everyone" */}
           <button
             className={

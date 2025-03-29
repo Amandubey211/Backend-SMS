@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import StudentCardSection from "./Components/StudentCardSection"; // Reused Cards Section for Students
 import StudentFeesGraph from "./Components/StudentFeesGraph";
 import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
-import AddNewFeeSidebar from "./Components/AddNewFeeSidebar";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -96,14 +95,7 @@ useEffect(() => {
         </ProtectedSection>
       </motion.div>
 
-      {/* Sidebar for Adding New Fee */}
-      <AddNewFeeSidebar
-        isOpen={isSidebarVisible}
-        onClose={handleSidebarClose}
-        onSubmit={handleAddNewFee}
-        loading={loading}
-        error={error}
-      />
+
     </div>
   );
 };

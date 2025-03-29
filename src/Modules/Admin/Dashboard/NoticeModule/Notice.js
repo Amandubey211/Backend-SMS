@@ -2,7 +2,6 @@ import React from "react";
 import { Tooltip, Tag } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { IoCalendarOutline } from "react-icons/io5";
-import { CiBookmarkCheck } from "react-icons/ci";
 
 // Priority style classes
 const priorityClasses = {
@@ -18,7 +17,8 @@ const truncateText = (text, maxLength) => {
 
 const Notice = ({
   title,
-  date,
+  startdate,
+  enddate, // Destructure the new end date prop
   priority,
   content,
   image,
@@ -42,19 +42,16 @@ const Notice = ({
         </div>
       </div>
 
-      {/* Card Content (flex-col + space-between) */}
+      {/* Card Content */}
       <div className="flex flex-col justify-between flex-grow">
-        {/* Upper Section: Title & Priority */}
         <div>
+          {/* Upper Section: Title & Priority */}
           <div className="flex items-start justify-between">
-            {/* Title (truncated with Tooltip) */}
             <Tooltip title={title}>
               <h2 className="text-base font-semibold text-gray-700 capitalize m-0 leading-5">
                 {truncatedTitle}
               </h2>
             </Tooltip>
-
-            {/* Priority Label */}
             <span
               className={`px-2 pt-[2px] text-xs font-medium rounded self-start ${priorityClasses[priority]}`}
             >
@@ -62,32 +59,28 @@ const Notice = ({
             </span>
           </div>
 
-          {/* Single badge below the title containing author & date */}
+          {/* Date Tag (showing start and end dates) */}
           <div className="mt-1">
             <Tag
               color="blue"
               className="inline-flex items-center text-xs"
-              style={{ width: "auto" }} // ensures it doesn't stretch full width
+              style={{ width: "auto" }}
             >
-              {/* user icon + posted by */}
-              <UserOutlined />
-              <span className="mx-1">Posted by {authorName || "-"}</span>
-              {/* date with calendar icon */}
               <IoCalendarOutline className="mx-1" />
-              <span>{date}</span>
+              <span>{startdate}</span>
+              <span className="mx-1">to</span>
+              <IoCalendarOutline className="mx-1" />
+              <span>{enddate}</span>
             </Tag>
           </div>
+        </div>
 
-          {/* Content Snippet */}
-          <div className="flex items-center gap-1 text-gray-500 mt-2">
-            <CiBookmarkCheck size={15} />
-            <p className="text-xs m-0 leading-4">
-              {truncateText(
-                content,
-                descriptionLength?.descriptionLength || 100
-              )}
-            </p>
-          </div>
+        {/* Posted by info at the bottom right */}
+        <div className="flex justify-start mt-2">
+          <span className="text-xs text-gray-600">
+            <UserOutlined className="mr-1" />
+            Posted by {authorName || "-"}
+          </span>
         </div>
       </div>
     </div>
