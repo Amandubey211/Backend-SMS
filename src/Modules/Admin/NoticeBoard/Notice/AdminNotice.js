@@ -22,7 +22,7 @@ import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
-import { Pagination, DatePicker, Select, Tooltip, Button } from "antd";
+import { DatePicker, Select, Tooltip, Button } from "antd";
 import { motion } from "framer-motion";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
@@ -30,6 +30,7 @@ import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { FiPlus } from "react-icons/fi";
 import { CiSearch } from "react-icons/ci";
 import { FaSync } from "react-icons/fa";
+import Pagination from "../../../../Components/Common/pagination";
 
 // Custom shimmer component mimicking the Notice item layout
 const ShimmerNoticeItem = () => {
@@ -83,9 +84,12 @@ const AdminNotice = () => {
   const [dateFilterValue, setDateFilterValue] = useState([]); // AntD RangePicker value
   const [priorityFilter, setPriorityFilter] = useState("all");
 
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
   useEffect(() => {
-    dispatch(fetchNoticesThunk(1));
-  }, [dispatch]);
+    dispatch(fetchNoticesThunk({ page, limit }));
+  }, [dispatch, page, limit]);
 
   // Filter logic: match on Title or Author, plus optional date and priority checks
   const filteredNotices = notices?.filter((notice) => {
@@ -279,15 +283,15 @@ const AdminNotice = () => {
 
           {/* Pagination on Bottom Right */}
           {totalNotices > 0 && (
-            <div className="flex justify-end mt-4">
-              <Pagination
-                current={currentPage}
-                total={totalNotices}
-                pageSize={10}
-                onChange={handlePageChange}
-                showSizeChanger={false}
-              />
-            </div>
+            <Pagination
+              page={page}
+              totalPages={Math.ceil(totalNotices / limit)}
+              totalRecords={totalNotices}
+              limit={limit}
+              setPage={setPage}
+              setLimit={setLimit}
+              t={t}
+            />
           )}
 
           {/* Sidebar for Add/Edit Notice */}
