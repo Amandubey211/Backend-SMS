@@ -175,11 +175,17 @@ const CreateSyllabus = lazy(() =>
     "../Modules/Admin/Subjects/Modules/Syllabus/CreateSyllabus/CreateSyllabus.js"
   )
 );
+
 const AccountingSection = lazy(() =>
   import("../Modules/Admin/Accounting/MainSection/AccountingSection.js")
 );
 const Syllabus = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Syllabus/SyllabusView/Syllabus.js")
+);
+const SyllabusList = lazy(() =>
+  import(
+    "../Modules/Admin/Subjects/Modules/Syllabus/SyllabusList/SyllabusListPage.js"
+  )
 );
 const DiscussionView = lazy(() =>
   import(
@@ -787,6 +793,16 @@ function App() {
     },
     {
       path: "/class/:cid/:sid/syllabus",
+      element: (
+        <ProtectRoute
+          Component={SyllabusList}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/syllabus/view",
       element: (
         <ProtectRoute
           Component={Syllabus}

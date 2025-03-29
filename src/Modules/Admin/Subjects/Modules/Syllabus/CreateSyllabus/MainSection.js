@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import CreateSyllabusHeader from "./Components/CreateSyllabusHeader";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
 import EditorComponent from "../../../Component/AdminEditor";
@@ -8,44 +8,59 @@ import {
   createSyllabus,
   editSyllabus,
 } from "../../../../../../Store/Slices/Admin/Class/Syllabus/syllabusThunk";
-import Spinner from "../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import AudienceSelector from "../../../Component/AudienceSelector";
 
 const MainSection = ({ setIsEditing }) => {
-  const { state } = useLocation();
   const { cid, sid } = useParams();
   const navigate = useNavigate();
-  console.log(state, "state");
+  const dispatch = useDispatch();
 
-  // Preload title and content if editing
+  // Get selected syllabus and available sections/groups from Redux store
+  const { selectedSyllabus, loading } = useSelector(
+    (state) => state.admin.syllabus
+  );
+  const sectionsList = useSelector(
+    (state) => state.admin.group_section.sectionsList
+  );
+  const groupsList = useSelector(
+    (state) => state.admin.group_section.groupsList
+  );
+
+  // Initialize form state
   const [assignmentName, setAssignmentName] = useState(
-    state?.syllabus?.title || ""
+    selectedSyllabus?.title || ""
   );
   const [editorContent, setEditorContent] = useState(
-    state?.syllabus?.content || ""
+    selectedSyllabus?.content || ""
   );
-
-  // New state for audience selection (holds groupIds and sectionIds)
   const [audience, setAudience] = useState({
-    groupIds: [],
-    sectionIds: [],
+    groupIds: selectedSyllabus?.groupIds?.map((g) => g._id) || [],
+    sectionIds: selectedSyllabus?.sectionIds?.map((s) => s._id) || [],
   });
 
-  const dispatch = useDispatch();
-  const loading = useSelector((state) => state.admin.syllabus.loading);
-
+  // Update isEditing based on whether we have a selected syllabus
   useEffect(() => {
-    setIsEditing(Boolean(state?.syllabus?._id));
-    // Preload audience if editing an existing syllabus
-    if (state?.syllabus) {
+    setIsEditing(Boolean(selectedSyllabus?._id));
+  }, [selectedSyllabus, setIsEditing]);
+
+  // Refresh form values when selectedSyllabus changes
+  useEffect(() => {
+    if (selectedSyllabus) {
+      setAssignmentName(selectedSyllabus.title || "");
+      setEditorContent(selectedSyllabus.content || "");
       setAudience({
-        groupIds: state.syllabus.groupIds || [],
-        sectionIds: state.syllabus.sectionIds || [],
+        groupIds: selectedSyllabus.groupIds?.map((g) => g._id) || [],
+        sectionIds: selectedSyllabus.sectionIds?.map((s) => s._id) || [],
       });
+    } else {
+      // Reset form for new syllabus
+      setAssignmentName("");
+      setEditorContent("");
+      setAudience({ groupIds: [], sectionIds: [] });
     }
-  }, [state, setIsEditing]);
+  }, [selectedSyllabus]);
 
   const handleNameChange = useCallback((name) => {
     setAssignmentName(name);
@@ -56,29 +71,39 @@ const MainSection = ({ setIsEditing }) => {
   }, []);
 
   const handleSave = useCallback(async () => {
+    if (!assignmentName.trim()) {
+      alert("Please enter a syllabus title");
+      return;
+    }
+
     // Construct payload including audience selections
     const data = {
-      title: assignmentName,
+      title: assignmentName.trim(),
       content: editorContent,
       subjectId: sid,
       groupIds: audience.groupIds,
       sectionIds: audience.sectionIds,
     };
 
-    if (state?.syllabus?._id) {
-      // Edit operation (no redirection)
+    if (selectedSyllabus?._id) {
+      // Edit operation
       await dispatch(
-        editSyllabus({ syllabusId: state.syllabus._id, data, cid })
+        editSyllabus({
+          syllabusId: selectedSyllabus._id,
+          data,
+          cid,
+          navigate,
+        })
       );
     } else {
-      // Create operation: pass navigate so the thunk can redirect on success
+      // Create operation
       await dispatch(createSyllabus({ ...data, navigate }));
     }
   }, [
     assignmentName,
     editorContent,
     sid,
-    state,
+    selectedSyllabus,
     dispatch,
     cid,
     navigate,
@@ -99,8 +124,8 @@ const MainSection = ({ setIsEditing }) => {
       >
         <CreateSyllabusHeader
           onSave={handleSave}
-          loading={loading}
-          isEditing={Boolean(state?.syllabus?._id)}
+          loading={loading.create || loading.update}
+          isEditing={Boolean(selectedSyllabus?._id)}
         />
         <ProtectedSection
           requiredPermission={
@@ -110,7 +135,7 @@ const MainSection = ({ setIsEditing }) => {
         >
           <div className="flex">
             {/* Left Side: Editor (70%) */}
-            <div className="w-[70%]">
+            <div className="w-[70%] border-r">
               <EditorComponent
                 inputPlaceHolder="Syllabus Heading"
                 assignmentLabel="Page Title"
@@ -121,11 +146,15 @@ const MainSection = ({ setIsEditing }) => {
               />
             </div>
             {/* Right Side: AudienceSelector (30%) */}
-            <div className="w-[30%] pl-4">
-              <AudienceSelector value={audience} onChange={setAudience} />
+            <div className="w-[30%] px-3">
+              <AudienceSelector
+                value={audience}
+                onChange={setAudience}
+                sections={sectionsList}
+                groups={groupsList}
+              />
             </div>
           </div>
-          {loading && <Spinner />}
         </ProtectedSection>
       </div>
     </div>
