@@ -1,7 +1,7 @@
 // src/store/finance/studentFees/studentFeesSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
-  fetchAllStudentFees,
+  fetchAllStudentFee,
   fetchOneStudentFee,
   createStudentFee,
   updateStudentFee,
@@ -13,6 +13,13 @@ import {
 
 const initialState = {
   fees: [],
+  allStudntFees: [],
+  totalRecords:0,
+  totalPages:1,
+  currentPage: 1,
+  paidAllAmount:0,
+  totalAllAmount:0,
+  studentsIdsArray:[],
   fee: null,
   loading: false,
   error: null,
@@ -24,7 +31,9 @@ const studentFeesSlice = createSlice({
   name: "studentFees",
   initialState,
   reducers: {
-    // Add any synchronous reducers if needed
+    setSelectedStudentsIds: (state, action) => {
+      state.studentsIdsArray = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -37,6 +46,26 @@ const studentFeesSlice = createSlice({
         state.fee = action.payload.data || null;
       })
       .addCase(fetchOneStudentFee.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+
+    builder
+      .addCase(fetchAllStudentFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllStudentFee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allStudntFees = action.payload.data || [];
+        state.totalRecords= action.payload.totalRecords;
+        state.totalPages= action.payload.totalPages;
+        state.currentPage= action.payload.currentPage;
+        state.paidAllAmount= action.payload.paidAllAmount;
+        state.totalAllAmount = action.payload.totalAllAmount;
+       
+      })
+      .addCase(fetchAllStudentFee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       });
@@ -129,5 +158,5 @@ const studentFeesSlice = createSlice({
       });
   },
 });
-
+export const { setSelectedStudentsIds } = studentFeesSlice.actions;
 export default studentFeesSlice.reducer;

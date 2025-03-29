@@ -1,234 +1,100 @@
 import React, { forwardRef } from "react";
-import StudentDiwanLogo from "../../Assets/RBAC/StudentDiwan.svg";
-import IconLogo from "../../Assets/RBAC/Icon.svg";
-import Cookies from "js-cookie";
-// Step 1: Import the helper function
-import { calculateFinalAmount } from "../../Utils/helperFunctions";
+
 
 const ReceiptTemplate = forwardRef((props, ref) => {
   const { data } = props;
   if (!data) return null;
-  const logo = Cookies.get('logo')
+
   const {
-    receiptNumber,
+    _id,
+    invoiceNumber,
     schoolId,
-    date,
-    receiver,
-    reciever,
-    tax,
-    discount,
-    discountType,
-    penalty,
-    lineItems = [],
-    remark,
-    govtRefNumber,
-    paymentMethod,
-    paymentStatus,
-    totalPaidAmount,
+    description,
+    penalty = 0,
     isCancel,
+    paymentDate,
+    paidItems=[],
+    paidBy,
+    studentId,
+    paymentStatus,
+    entityId,
+    onlineTransactionId,
+    chequeDate,
+    chequeNumber,
+    paymentType
   } = data;
 
-  const finalReceiver = reciever?.name ? reciever : receiver;
-  const formattedDate = date ? new Date(date).toLocaleDateString() : "N/A";
 
-  // Step 3: Calculate final amount using the helper function
-  const finalAmount = calculateFinalAmount({
-    lineItems,
-    tax,
-    discount,
-    discountType,
-    penalty,
+
+  // Initialize totals
+  let totalAmount = 0;
+
+  paidItems.forEach((item) => {
+    totalAmount += item.amountPaid || 0;
   });
 
-  // For display purposes, we keep subtotal calculation.
-  const subtotal = lineItems.reduce((acc, item) => acc + (item.total || 0), 0);
-  const discountAmount =
-    discountType === "percentage"
-      ? (subtotal * discount) / 100
-      : discount;
 
-  const { address, branchName, city, code, nameOfSchool } = schoolId;
+  const {
+    address = "",
+    branchName = "",
+    city = "",
+    nameOfSchool = "N/A",
+    currency="",
+    logo="",
+  } = schoolId || {};
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
-      {/* Show "Cancelled" label if isCancel is true */}
-     
-      {/* Header */}
       <div className="flex flex-col items-center mb-6">
-        <div className="w-full bg-pink-100 flex-row px-4 py-2 flex justify-between items-center rounded-t-lg">
+        <div className="w-full bg-pink-100 px-4 flex-row py-2 flex justify-between items-center rounded-t-lg">
           <div>
-            <h1 className="font-bold text-lg">{nameOfSchool || 'N/A'}</h1>
-            <p className="text-sm text-gray-500">{`${address}, ${branchName}, ${city}`}</p>
+            <h1 className="font-bold text-lg">{nameOfSchool}</h1>
+            <p className="text-sm text-gray-500">{`${city}, ${branchName}`}</p>
           </div>
-
-          {/* School Logo */}
-         {logo && <div>
-         <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />
-          </div>}
+          {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
         </div>
-        <div
-          className="w-full text-center text-white font-bold py-2"
-          style={{ backgroundColor: "#C83B62", fontSize: "18px" }}
-        >
-        RECEIPT {isCancel && "CANCELLED"}
+        <div className="w-full text-center text-white font-bold py-2" style={{ backgroundColor: "#C83B62", fontSize: "18px" }}>
+          Receipt {isCancel && "CANCELLED"}
         </div>
       </div>
 
-      {/* Invoice Details */}
       <div className="text-sm text-gray-800 mb-4 flex justify-between">
+        {studentId &&<div>
+          <p><strong>Receipt Number:</strong> {_id?.toUpperCase()}</p>
+          <p><strong>Name:</strong> {studentId?.firstName} {studentId?.lastName}</p>
+          <p><strong>Email:</strong> {studentId?.email }</p>
+          <p><strong>Contact:</strong> {studentId?.contact }</p>
+        </div>}
+        {entityId &&<div>
+          <p><strong>Receipt Number:</strong> {_id?.toUpperCase()}</p>
+          <p><strong>Name:</strong> {entityId?.entityName} </p>
+          <p><strong>Email:</strong> {entityId?.email }</p>
+          <p><strong>Contact:</strong> {entityId?.contactNumber }</p>
+        </div>}
         <div>
-          <p>
-            <strong>Bill To:</strong>
-          </p>
-          <p>Name: {finalReceiver?.name || "N/A"}</p>
-          <p>Email: {finalReceiver?.email || "N/A"}</p>
-          <p>Address: {finalReceiver?.address || "N/A"}</p>
-          <p>Phone no: {finalReceiver?.phone || "N/A"}</p>
-        </div>
-        <div>
-          <p>
-            <strong>Return Reciept No:</strong>{" "}
-            {receiptNumber || "RNT0001-202412-0001"}
-          </p>
-          <p>
-            <strong>Ref Invoice No:</strong> {"INV0001-202412-0001"}
-          </p>
-          <p>
-            <strong>Date:</strong> {formattedDate}
-          </p>
-          {govtRefNumber && (
-            <p>
-              <strong>Govt Ref (if any):</strong> {govtRefNumber}
-            </p>
-          )}
+          <p><strong>Invoice No:</strong> {invoiceNumber || ""}</p>
+          <p><strong>Issue Date:</strong> {paymentDate?.slice(0,10)}</p>
+          <p><strong>Status:</strong> {paymentStatus}</p>
+          <p><strong>Currency:</strong> {currency}</p>
+
         </div>
       </div>
-
-      {/* Additional Details */}
-      <div className="mb-4">
-        <p>
-          <strong>Payment Method:</strong> {paymentMethod || "Cash"}
-        </p>
-        <p>
-          <strong>Payment Status:</strong> {paymentStatus || "Paid"}
-        </p>
-      </div>
-
-      {/* Items Table */}
-      <table className="w-full text-sm mb-6 border border-gray-300">
-        <thead>
-          <tr className="bg-pink-200 text-left">
-            <th className="p-2 border border-gray-300">S.No</th>
-            <th className="p-2 border border-gray-300">Item Description</th>
-            <th className="p-2 border border-gray-300">Quantity</th>
-            <th className="p-2 border border-gray-300">Rate (QAR)</th>
-            <th className="p-2 border border-gray-300">Amount (QAR)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lineItems.length > 0 ? (
-            lineItems.map((item, index) => (
-              <tr
-                key={index}
-                className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}
-              >
-                <td className="p-2 border border-gray-300 text-center">
-                  {index + 1}
-                </td>
-                <td className="p-2 border border-gray-300">
-                  {item.revenueType
-                    ? item.revenueType
-                      .replace(/_/g, ' ') // Replace underscores with spaces
-                      .replace(/\b\w/g, (char) => char.toUpperCase()) // Capitalize first letter of each word
-                    : "N/A"}
-                </td>
-
-                <td className="p-2 border border-gray-300 text-center">
-                  {item.quantity || 1}
-                </td>
-                <td className="p-2 border border-gray-300 text-right">
-                  {(item.total / (item.quantity || 1)).toFixed(2)} QAR
-                </td>
-                <td className="p-2 border border-gray-300 text-right">
-                  {item.total.toLocaleString()} QAR
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td className="p-2 border border-gray-300 text-center" colSpan="5">
-                No items found.
-              </td>
-            </tr>
-          )}
-          {/* Subtotal Row */}
-          <tr className="font-bold bg-gray-50">
-            <td className="p-2 border border-gray-300" colSpan="4">
-              Subtotal
-            </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {subtotal.toFixed(2)} QAR
-            </td>
-          </tr>
-          {/* Tax Row */}
-          <tr>
-            <td className="p-2 border border-gray-300" colSpan="4">
-              Tax
-            </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {tax.toFixed(2)} %
-            </td>
-          </tr>
-          {/* Penalty Row */}
-          <tr>
-            <td className="p-2 border border-gray-300" colSpan="4">
-              Penalty
-            </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {(penalty || 0).toFixed(2)} QAR
-            </td>
-          </tr>
-          {/* Discount Row */}
-          <tr>
-            <td className="p-2 border border-gray-300" colSpan="4">
-              Discount
-            </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {discountType === "percentage"
-                ? `${discount}%`
-                : `${discountAmount.toFixed(2)} QAR`}
-            </td>
-          </tr>
-          {/* Final Total Row */}
-          <tr className="font-bold text-pink-600">
-            <td className="p-2 border border-gray-300" colSpan="4">
-              Final Amount
-            </td>
-            <td className="p-2 border border-gray-300 text-right">
-              {finalAmount} QAR
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Remarks and Summary */}
-      <div className="w-full flex flex-col gap-y-4">
-        <div className="text-sm text-gray-700">
-          <p>
-            <strong>Remarks:</strong>
-          </p>
-          <ul className="list-disc px-5 w-full break-words">
-            {[
-              "Thank you for doing business with us. If you have any questions, please contact us.",
-              "Ensure to retain this document for future reference.",
-              "For further details, reach out to our support team.",
-              `${isCancel && "This Receipt is cancelled"}`
-            ].map((defaultRemark, index) => (
-              <li key={index}>{defaultRemark}</li>
-            ))}
-            {remark && <li>{remark}</li>}
-          </ul>
+      <div className="my-4 border-t border-gray-500">
+          <p><strong>Total Paid:</strong> {totalAmount} {currency}</p>
+          <p><strong>Payment Date :</strong> {paymentDate?.slice(0,10)}</p>
+          <p><strong>Payment Type :</strong> {paymentType}</p>
+          <p><strong>Paid By:</strong> {paidBy || "Self"}</p>
+         {onlineTransactionId && <p><strong>Online Transaction ID: </strong> {onlineTransactionId}</p>}
+         {chequeNumber&& <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
+          {chequeDate &&<p><strong>Cheque Date:</strong> {chequeDate}</p>}
         </div>
+
+      <div className="text-sm text-gray-700">
+        <p><strong>Remarks:</strong></p>
+        <ul className="list-disc px-5">
+          {description && <li>{description}</li>}
+          <li>Thank you for your business. Contact us for any queries.</li>
+        </ul>
       </div>
     </div>
   );

@@ -62,6 +62,7 @@ const SelectBranch = () => {
     };
     dispatch(updateBranch({ navigate, data })).then(() => {
       setLocalCookies("SelectedschoolId", selectedBranch?._id);
+      setLocalCookies("currency", selectedBranch?.currency);
     });
   };
 

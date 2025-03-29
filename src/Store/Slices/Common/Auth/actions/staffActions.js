@@ -61,6 +61,7 @@ export const staffLogin = createAsyncThunk(
           active: data.active ?? false,
           dateOfBirth: data?.dateOfBirth || "N/A",
           schoolName: data?.schoolName,
+          currency: data?.currency,
         })
       );
       dispatch(setRole(data.role)); // e.g., 'admin', 'staff', 'teacher'

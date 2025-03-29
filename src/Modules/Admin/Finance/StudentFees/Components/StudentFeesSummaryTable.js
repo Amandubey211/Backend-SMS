@@ -1,141 +1,153 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { Table, Spin, Alert, Input, Button,Tag, Tooltip } from "antd";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { Table, Input, Tag, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import moment from "moment";
-import { fetchAllIncomes } from "../../../../../Store/Slices/Finance/Earnings/earningsThunks";
-import Spinner from "../../../../../Components/Common/Spinner";
-import NoDataFound from "../../../../../Components/Common/NoDataFound";
+import { SearchOutlined } from "@ant-design/icons";
+import { fetchAllStudentFee } from "../../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import { FaFileInvoice } from "react-icons/fa";
+import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import RecentInvoiceTemplate from "../../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
+import { downloadPDF } from "../../../../../Utils/xl";
 
 const StudentFeesSummaryTable = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const { incomes, loading, error, totalRecords } = useSelector(
-    (state) => state.admin.earnings
+  
+  // Get data from Redux
+  const { allStudntFees: incomes, loading, totalRecords, totalPages, currentPage } = useSelector(
+    (state) => state.admin.studentFees
   );
 
   const [searchText, setSearchText] = useState("");
-  const [currentPage, setCurrentPage] = useState(1); // State for current page
+  const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
 
   useEffect(() => {
-    dispatch(
-      fetchAllIncomes({
-        page: currentPage,
-        search: " ",
-        limit: 10,
-        categoryName: "Student-Based Revenue",
-        includeDetails:true
-      })
-    );
-  }, [dispatch, currentPage]);
+    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize }));
+  }, [dispatch, currentPage, computedPageSize]);
 
-  // Handle search filtering
-  const filteredData = useMemo(() => {
-    if (!incomes) return [];
-    return incomes?.slice(0,5)?.filter((item) => {
-      const searchableString = [
-        item?.category?.[0]?.categoryName,
-        item?.subCategory,
-        item?.description,
-        item?.paymentStatus,
-        item?.paymentType,
-        item?.final_amount,
-      ]
-        .join(" ")
-        .toLowerCase();
-      return searchableString.includes(searchText.toLowerCase());
-    });
-  }, [incomes, searchText]);
+  const handleSearch = (e) => {
+    const value = e.target.value;
+    setSearchText(value);
+    dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize }));
+  };
 
-  const capitalizeFirstLetter = (text) =>
-    text ? text.charAt(0).toUpperCase() + text.slice(1) : "N/A";
   const columns = [
+    {
+      title: "Invoice",
+      dataIndex: "InvoiceNumber",
+      key: "InvoiceNumber",
+      render: (InvoiceNumber) => `${InvoiceNumber}` || "N/A",
+    },
     {
       title: "Student",
       dataIndex: "studentDetails",
       key: "studentDetails",
-      render: (studentDetails) => (
-        <Tooltip
-          title={capitalizeFirstLetter(studentDetails?.firstName) + " " + capitalizeFirstLetter(studentDetails?.lastName)}
-        >
-          {capitalizeFirstLetter(studentDetails?.firstName?.slice(0, 10)) + ".." || "N/A"}
-        </Tooltip>
-      ),
-    },
-    {
-      title: "Class",
-      dataIndex: "classDetails",
-      key: "classDetails",
-      render: (classDetails) => capitalizeFirstLetter(classDetails?.className),
-    },
-    {
-      title: "Sub-Category",
-      dataIndex: "subCategory",
-      key: "subCategory",
-      render: (text) => <span>{capitalizeFirstLetter(text)}</span>,
+      render: (studentDetails) =>
+        studentDetails ? `${studentDetails?.firstName} ${studentDetails?.lastName}` : "N/A",
     },
     {
       title: "Total Amount",
-      dataIndex: "total_amount",
       key: "total_amount",
-      sorter: (a, b) => (a.total_amount || 0) - (b.total_amount || 0),
-      render: (value) => (value ? `${value} QAR` : "N/A"),
+      render: (_, record) =>
+        `${record?.lineItems?.reduce((sum, item) => sum + item.amount, 0)} QAR`,
     },
     {
-      title: "Final Amount",
-      dataIndex: "final_amount",
-      key: "final_amount",
-      sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
-      render: (value) => (value ? `${value} QAR` : "N/A"),
+      title: "Total Paid",
+      key: "paid_amount",
+      render: (_, record) =>
+        `${record?.lineItems?.reduce((sum, item) => sum + item.paid_amount, 0)} QAR`,
     },
     {
       title: "Status",
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (status) => {
-        let color = "default";
-        switch (status) {
-          case "paid":
-            color = "green";
-            break;
-          case "partial":
-            color = "yellow";
-            break;
-          case "unpaid":
-            color = "red";
-            break;
-          default:
-            color = "default";
-        }
+        const color = status === "paid" ? "green" : status === "unpaid" ? "red" : "yellow";
+        return <Tag color={color}>{status}</Tag>;
+      },
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_,record) => {
+     
         return (
-          <Tag color={color} className="text-xs capitalize">
-            {status || "N/A"}
-          </Tag>
+        <div className="flex items-center flex-row gap-2">
+        <button title="Invoice" onClick={()=>{
+          setSelectedInvoice(record);
+          setInvoiceVisible(true)
+        }}><FaFileInvoice size={20}/></button>
+        <button title="Edit"><MdOutlineEdit size={20}/></button>
+        <button title="Delete"><MdDeleteOutline size={20}/></button>
+        </div>
         );
       },
-      width: 80,
-      ellipsis: true,
-    },
-    {
-      title: "Payment Type",
-      dataIndex: "paymentType",
-      key: "paymentType",
-      render: (type) => type || "N/A",
-    },
-    {
-      title: "Date",
-      dataIndex: "paidDate",
-      key: "paidDate",
-      sorter: (a, b) => new Date(a.paidDate) - new Date(b.paidDate),
-      render: (date) => (date ? moment(date).format("YYYY-MM-DD") : "N/A"),
     },
   ];
 
+  // Define expandable row for lineItems
+  const expandedRowRender = (record) => {
+    const lineItemsColumns = [
+      {
+        title: "Item Name",
+        dataIndex: "name",
+        key: "name",
+      },
+      {
+        title: "Quantity",
+        dataIndex: "quantity",
+        key: "quantity",
+        render: (quantity) => quantity || 1,
+      },
+      {
+        title: "Rate",
+        dataIndex: "rate",
+        key: "rate",
+        render: (rate) => `${rate?.toFixed(2)} QAR`,
+      },
+      {
+        title: "Discount",
+        dataIndex: "discount",
+        key: "discount",
+        render: (discount, record) =>
+          record.discountType === "percentage" ? `${discount}%` : `${discount} QAR`,
+      },
+      {
+        title: "Tax",
+        dataIndex: "tax",
+        key: "tax",
+        render: (tax) => `${tax?.toFixed(2)} QAR`,
+      },
+      {
+        title: "Final Amount",
+        dataIndex: "final_amount",
+        key: "final_amount",
+        render: (amount) => `${amount?.toFixed(2)} QAR`,
+      },
+    ];
+
+    return (
+      <Table
+        columns={lineItemsColumns}
+        dataSource={record.lineItems}
+        pagination={false}
+        size="small"
+        rowKey="_id"
+        className="mb-6"
+      />
+    );
+  };
+const navigate = useNavigate();
+  const [isInvoiceVisible,setInvoiceVisible] = useState(false);
+  const [selectedInvoice,setSelectedInvoice] = useState(null);
+  const popupRef = useRef(null); 
+    const pdfRef = useRef(null);
+    const handleDownloadPDF = async (pdfRef, selectedInvoice) => {
+        await downloadPDF(pdfRef, selectedInvoice, "Invoice")
+      }
   return (
-    <div className="w-full">
-      {/* Heading and Controls */}
-      <div className="flex items-center justify-between mb-4">
+   <>
+        <div >
+        <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium text-gray-700">
           Summary of Student Fees
         </h3>
@@ -149,25 +161,53 @@ const StudentFeesSummaryTable = () => {
           </Button>
         </div>
       </div>
-
-      {/* Loading Indicator */}
-    {loading && <Spinner/>}
-    
-
-      {/* Table */}
-      {!loading  && (
-        <div className="bg-white p-4 rounded-lg border-2 border-gray-300">
           <Table
-            dataSource={filteredData}
             columns={columns}
-            rowKey="_id" 
+            dataSource={incomes?.slice(0,5)}
+            expandable={{ expandedRowRender }}
             pagination={false}
-            bordered
-            size="small"
+            rowKey="_id"
+            loading={loading}
           />
         </div>
-      )}
-    </div>
+        {isInvoiceVisible && selectedInvoice && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center">
+                        {/* Full-screen blur background */}
+                        <div
+                          className="absolute inset-0 bg-black bg-opacity-60"
+                          style={{ backdropFilter: "blur(8px)" }}
+                          onClick={() => setInvoiceVisible(false)}
+                        />
+                        {/* Centered content */}
+                        <div
+                          ref={popupRef}
+                          className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {/* Close Button */}
+                          <div className="flex justify-end space-x-2 mb-4">
+                            <button
+                              onClick={() => handleDownloadPDF(pdfRef, selectedInvoice)}
+                              className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold rounded-md hover:opacity-90"
+                            >
+                              Download PDF
+                            </button>
+                            <button
+                              onClick={() => setInvoiceVisible(false)}
+                              className="bg-gray-200 hover:bg-gray-300 rounded-full w-8 h-8 flex items-center justify-center text-lg font-semibold"
+                            >
+                              ✕
+                            </button>
+                          </div>
+        
+                          {/* Hidden container for PDF generation */}
+                          <div >
+                            <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+     </>
   );
 };
 

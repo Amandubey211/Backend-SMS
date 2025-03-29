@@ -8,13 +8,11 @@ import {
 } from "@ant-design/icons";
 
 import moment from "moment";
-import Spinner from "../../../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../../config/permission";
 import { fetchAllIncomes } from "../../../../../../Store/Slices/Finance/Earnings/earningsThunks";
 import Sidebar from "../../../../../../Components/Common/Sidebar";
 import { setCurrentPage } from "../../../../../../Store/Slices/Finance/Earnings/earningsSlice";
-import EditStudentFeesForm from "../../../../Finance/StudentFees/EditStudentFeesForm";
 import StudentCard from "../../../../Finance/StudentFees/Components/StudentCard";
 import { FaDollarSign, FaExclamationCircle, FaWallet } from "react-icons/fa";
 import SkeletonLoader from "../../../../../../Utils/SkeletonLoader";
@@ -245,12 +243,7 @@ return(
             onClose={handleModalClose}
             width="70"
           >
-              {selectedRecord && (
-                          <EditStudentFeesForm
-                            data={selectedRecord}
-                            onClose={handleModalClose}
-                          />
-                        )}
+             
           </Sidebar>
         </ProtectedSection>
     </>

@@ -7,7 +7,7 @@ import {
   FaClipboardList,
   FaUniversity,
 } from "react-icons/fa";
-import { TbDashboard } from "react-icons/tb";
+import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { LuUser } from "react-icons/lu";
 import { HiOutlineCalculator } from "react-icons/hi2";
@@ -17,7 +17,7 @@ import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
 import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
-import { MdLocalLibrary, MdManageAccounts } from "react-icons/md";
+import { MdInventory2, MdLocalLibrary, MdManageAccounts, MdOutlineBusinessCenter, MdOutlineCategory, MdOutlineInventory2 } from "react-icons/md";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
@@ -30,6 +30,8 @@ import { TbReport } from "react-icons/tb";
 import { RiHandCoinLine } from "react-icons/ri";
 import { TfiReceipt } from "react-icons/tfi";
 import { FaWpforms } from "react-icons/fa6";
+import { MdCategory } from "react-icons/md";
+import { GiStabbedNote } from "react-icons/gi";
 
 const sidebarData = [
   {
@@ -140,76 +142,7 @@ const sidebarData = [
       },
     ],
   },
-  {
-    title: "Finance",
-    icon: <HiOutlineCalculator style={{ fontSize: "1.1rem" }} />,
-    roles: [ROLES.ADMIN, ROLES.FINANCE],
-    items: [
-      {
-        title: "Earning",
-        icon: <BsCashCoin />,
-        path: "/finance/earning",
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_EARNINGS, // Added permission reference
-      },
-      {
-        title: "Student Fees",
-        path: "/finance/studentfees",
-        icon: <IoReceiptOutline style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_FEES,
-      },
-      {
-        title: "Expense",
-        path: "/finance/expenses",
-        icon: <RiHandCoinLine style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_EXPENSES,
-      },
-      {
-        title: "Invoices",
-        path: "/finance/invoices/dashboard",
-        icon: <TbFileInvoice style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_INVOICES,
-      },
-      {
-        title: "Receipts",
-        path: "/finance/receipts",
-        icon: <TfiReceipt style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_RECEIPTS,
-      },
-      {
-        title: "Quotations",
-        path: "/finance/quotations",
-        icon: <FaWpforms style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_QUOTATIONS,
-      },
-      // {
-      //   title: "Payments",
-      //   path: "/finance/payments",
-      //   icon: <MdPayment style={{ fontSize: '1.1rem' }} />,
-      //   roles: [ROLES.ADMIN, ROLES.FINANCE],
-      //   //requiredPermission: PERMISSIONS.VIEW_PAYMENTS,
-      // },
-      // {
-      //   title: "Reports",
-      //   path: "/finance/reports",
-      //   icon: <TbReport style={{ fontSize: '1.1rem' }} />,
-      //   roles: [ROLES.ADMIN, ROLES.FINANCE],
-      //   //requiredPermission: PERMISSIONS.VIEW_REPORTS,
-      // },
-      {
-        title: "Penalties & Adjustment",
-        path: "/finance/penaltyAdjustment",
-        icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
-        roles: [ROLES.ADMIN, ROLES.FINANCE],
-        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
-      },
-    ],
-  },
+  
   {
     title: "NoticeBoard",
     icon: <TbNotebook style={{ fontSize: "1.1rem" }} />,
@@ -290,6 +223,91 @@ const sidebarData = [
     roles: [ROLES.ADMIN, ROLES.STAFF],
     path: `/graduates`,
     //requiredPermission: PERMISSIONS.VIEW_GRADUATES, // Added permission reference
+  },
+  {
+    title: `Finance`,
+    icon: <HiOutlineCalculator style={{ fontSize: "1.1rem" }} />,
+    roles: [ROLES.ADMIN, ROLES.FINANCE],
+    items: [
+      {
+        title: "Categories",
+        path: "/finance/categories",
+        icon: <MdOutlineCategory style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_INVOICES,
+      },
+      {
+        title: "Inventory",
+        path: "/finance/Inventory",
+        icon: <MdOutlineInventory2 tyle={{ fontSize: "1.1rem" }}  />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+      },
+          
+      {
+        title: "Entities",
+        path: "/finance/entities",
+        icon: <MdOutlineBusinessCenter style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+      },
+      {
+        title: "Entity Revenue",
+        icon: <BsCashCoin />,
+        path: "/finance/entity/revenue",
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+      },
+      {
+        title: "Student Revenue",
+        path: "/finance/studentfees",
+        icon: <IoReceiptOutline style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+      },
+      
+      {
+        title: "Receipts",
+        path: "/finance/receipts",
+        icon: <TfiReceipt style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_RECEIPTS,
+      },
+
+      {
+        title: "Operational Expenses",
+        path: "/finance/operational-expenses",
+        icon: <RiHandCoinLine style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_EXPENSES,
+      },
+      {
+        title: "Payroll",
+        path: "/finance/payroll",
+        icon: <TbCreditCardPay style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_EXPENSES,
+      },
+
+      {
+        title: "Quotations",
+        path: "/finance/quotations",
+        icon: <FaWpforms style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_QUOTATIONS,
+      },
+      {
+        title: "Budget Planner",
+        path: "/finance/budget-planner",
+        icon: <GiStabbedNote style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      },
+      {
+        title: "Financial Report",
+        path: "/finance/financialReport",
+        icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      },
+    ],
+    bedge:'Beta'
   },
 ];
 
