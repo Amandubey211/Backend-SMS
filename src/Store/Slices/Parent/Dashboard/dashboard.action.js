@@ -28,7 +28,7 @@ export const fetchNotices = createAsyncThunk(
     try {
       const say = getAY();
       dispatch(setShowError(false));
-      const data = await getData(`/admin/dashboard/notices`);
+      const data = await getData(`/admin/dashboard/notices?say=${say}`);
 
       // console.log("API Response for Notices:", data?.notices);
       return data?.notices;
@@ -42,14 +42,6 @@ export const fetchNotices = createAsyncThunk(
 export const fetchChildren = createAsyncThunk(
   "dashboard/fetchChildren",
   async (_, { rejectWithValue, dispatch }) => {
-    // const userData = JSON.parse(localStorage.getItem("userData"));
-
-    // if (!userData || !userData.email) {
-    //   const errorMessage = "No guardian email found";
-    //   dispatch(setErrorMsg(errorMessage));
-    //   return rejectWithValue(errorMessage);
-    // }
-
     try {
       const say = getAY();
       dispatch(setShowError(false));
