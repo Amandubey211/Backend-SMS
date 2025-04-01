@@ -21,67 +21,63 @@ import StudentGradeSummary from "./Component/StudentGradeSummary";
  * - `student` is the object of the currently selected student,
  *   expected to have at least `studentId`.
  */
-const StudentGradeModal = ({ isOpen, onClose, student }) => {
-  const { cid, sid } = useParams();
+const StudentGradeModal = ({ isOpen, onClose, student, externalFilters = null }) => {
+  const { cid, sid: sidFromParams } = useParams();
   const dispatch = useDispatch();
-  const { selectedSemester } = useSelector(
-    (state) => state.common.user.classInfo
-  );
-  // Keep the selected student's ID in local state so we don't lose it on re-renders
-  const [localStudentId, setLocalStudentId] = useState(null);
 
-  // Default filter values
+  const { selectedSemester, semesters } = useSelector((state) => ({
+    selectedSemester: state.common.user.classInfo.selectedSemester,
+    semesters: state.admin.semesters || [],
+  }));
+
+  const effectiveSemester = selectedSemester || semesters?.[0] || null;
+  const studentId = student?._id || student?.studentId; 
+  const subjectId = externalFilters?.subjectId ?? sidFromParams ?? "";
+  const semesterId = externalFilters?.semesterId || effectiveSemester?.id || "";
+
   const defaultFilters = {
-    gradeMode: "online", // "online" or "offline"
+    gradeMode: "online",
     arrangeBy: "",
-    module: "",
+    module: externalFilters?.moduleId || "",
     chapter: "",
     status: "",
-    subject: "",
+    subject: subjectId,
     search: "",
-    semester: "",
+    semester: semesterId,
   };
 
-  // Manage filters
   const [filters, setFilters] = useState(defaultFilters);
-
-  // Track the first data load to show a full-screen skeleton
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-
-  // Whenever we get a new `student` prop, store their ID
-  useEffect(() => {
-    if (student?.studentId) {
-      setLocalStudentId(student.studentId);
-    }
-  }, [student]);
+  const [hasFetchedInitialGrades, setHasFetchedInitialGrades] = useState(false);
 
   useEffect(() => {
-    if (selectedSemester?.id && !filters.semester && localStudentId) {
-      const newFilters = { ...filters, semester: selectedSemester.id };
-      setFilters(newFilters);
+    if (!studentId || !semesterId || !isOpen || hasFetchedInitialGrades) return;
 
-      // Trigger fetch with updated semester
-      const params = {
-        semesterId: selectedSemester.id,
-        subjectId: sid,
-        mode: newFilters.gradeMode,
-      };
+    setHasFetchedInitialGrades(true);
 
-      debouncedGetStudentGrades(params);
-    }
-  }, [selectedSemester, filters.semester, sid, localStudentId]);
+    setFilters((prev) => ({
+      ...prev,
+      semester: semesterId,
+      subject: subjectId,
+    }));
 
-  /**
-   * Fetch the student's grades from the backend,
-   * but only if we have a valid localStudentId.
-   */
+    const params = {
+      mode: "online",
+      semesterId,
+      subjectId,
+      ...(externalFilters || {}),
+    };
+
+    getStudentGrades(params);
+  }, [studentId, semesterId, subjectId, isOpen, hasFetchedInitialGrades, externalFilters]);
+
   const getStudentGrades = async (params) => {
-    if (!localStudentId) return; // skip if we don't have an ID
+    if (!studentId) return;
     try {
       await dispatch(
         fetchStudentGrades({
           params,
-          studentId: localStudentId,
+          studentId,
           studentClassId: cid,
         })
       );
@@ -90,29 +86,11 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     }
   };
 
-  /**
-   * Debounce the fetch to avoid calling it too frequently
-   * when users quickly toggle filters.
-   */
-  const debouncedGetStudentGrades = useMemo(
-    () =>
-      debounce((params) => {
-        getStudentGrades(params);
-      }, 300),
-    [localStudentId] // must re-create if student changes
-  );
-
-  /**
-   * Handle changes to filters. If user selects "offline" mode,
-   * reset all online-only filters. Then build the new query params
-   * and trigger the fetch (debounced).
-   */
   const handleFilterChange = (name, value) => {
-    let newFilters = { ...filters };
+    const newFilters = { ...filters };
 
     if (name === "gradeMode") {
       newFilters.gradeMode = value;
-      // Switching to offline: clear out online-specific filters
       if (value === "offline") {
         newFilters.arrangeBy = "";
         newFilters.module = "";
@@ -122,82 +100,69 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
         newFilters.search = "";
       }
     } else if (name === "semester") {
-      newFilters.semester = value.id ? value.id : value;
+      newFilters.semester = value?.id || value;
     } else {
       newFilters[name] = value;
     }
+
     setFilters(newFilters);
 
-    // Construct query params for fetch
-    const params = {};
-    if (newFilters.semester) {
-      params.semesterId = newFilters.semester;
-    }
-    if (name === "semester") {
-      params.semesterId = value; // Pass the selected semester
-    }
-    // If the route param sid is available, use it (unless user changes subject)
-    if (sid) params.subjectId = sid;
-    // For example, if user changes subject in the filter
-    if (name === "subject") {
-      params.subjectId = value;
-    }
-    if (name === "module") {
-      params.moduleId = value;
-    }
-    if (name === "chapter") {
-      params.chapterId = value;
-    }
-    if (name === "arrangeBy") {
-      params.arrangeBy = value;
+    const params = {
+      semesterId: newFilters.semester,
+      mode: newFilters.gradeMode,
+    };
+
+    if (newFilters.subject && newFilters.subject !== "") {
+      params.subjectId = newFilters.subject;
     }
 
-    // If we’re in "online" mode, we can filter by status
+    if (externalFilters?.moduleId || newFilters.module) {
+      params.moduleId = newFilters.module || externalFilters?.moduleId;
+    }
+    if (externalFilters?.assignmentId || newFilters.assignmentId) {
+      params.assignmentId = newFilters.assignmentId || externalFilters?.assignmentId;
+    }
+    if (externalFilters?.quizId || newFilters.quizId) {
+      params.quizId = newFilters.quizId || externalFilters?.quizId;
+    }
+
+    if (name === "subject") params.subjectId = value;
+    if (name === "module") params.moduleId = value;
+    if (name === "chapter") params.chapterId = value;
+    if (name === "arrangeBy") params.arrangeBy = value;
     if (newFilters.gradeMode === "online" && newFilters.status) {
       params.status = newFilters.status;
     }
-
-    // If we’re in "offline" mode, we can add a "search" param
     if (newFilters.gradeMode === "offline" && newFilters.search) {
       params.search = newFilters.search;
     }
 
-    // Always set the current mode
-    params.mode = newFilters.gradeMode;
-
-    // Trigger the debounced API call
-    if (localStudentId) {
-      debouncedGetStudentGrades(params);
+    if (studentId) {
+      getStudentGrades(params);
     }
   };
 
-  /**
-   * Reset all filters to their default values and
-   * fetch fresh data in "online" mode.
-   */
   const handleResetFilters = useCallback(() => {
-    const newFilters = {
+    const resetFilters = {
       ...defaultFilters,
-      semester: selectedSemester?.id || "", // 💡 set default semester
+      semester: semesterId,
+      subject: subjectId,
     };
-    setFilters(newFilters);
-    const params = {};
-    if (sid) params.subjectId = sid;
-    // default is "online"
-    params.mode = "online";
 
-    if (selectedSemester?.id) {
-      params.semesterId = selectedSemester.id;
-    }
+    setFilters(resetFilters);
 
-    if (localStudentId) {
+    const params = {
+      semesterId,
+      subjectId,
+      mode: "online",
+      ...(externalFilters || {}),
+    };
+
+    if (studentId) {
       getStudentGrades(params);
     }
-  }, [sid, localStudentId, selectedSemester]);
+  }, [studentId, semesterId, subjectId, externalFilters]);
 
-  /**
-   * Lock scroll on the background when the modal is open.
-   */
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add("overflow-hidden");
@@ -209,12 +174,8 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
     };
   }, [isOpen]);
 
-  // Grab the grades data from Redux
-  const { grades, loading } =
-    useSelector((store) => store.admin.all_students) || {};
-  //console.log(grades, "sdfsdf");
+  const { grades, loading } = useSelector((store) => store.admin.all_students) || {};
 
-  // Mark the initial load done once we have fetched data at least once
   useEffect(() => {
     if (!loading && isInitialLoad) {
       setIsInitialLoad(false);
@@ -224,34 +185,18 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
   return (
     <>
       {isInitialLoad ? (
-        /**
-         * On the very first load, show a large skeleton screen
-         * so we don't show a half-loaded UI
-         */
-        <div
-          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
-        >
-          <div
-            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${isOpen ? "translate-y-0" : "translate-y-full"
-              }`}
-          >
+        <div className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}>
+          <div className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${isOpen ? "translate-y-0" : "translate-y-full"
+            }`}>
             <SkeletonLoadingUI />
           </div>
         </div>
       ) : (
-        /**
-         * After the first load, show the real UI
-         */
-        <div
-          className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
-        >
-          <div
-            className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${isOpen ? "translate-y-0" : "translate-y-full"
-              }`}
-          >
-            {/* Header */}
+        <div className={`fixed inset-0 flex items-end justify-center bg-black bg-opacity-50 z-40 transition-opacity duration-500 ease-in-out ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}>
+          <div className={`bg-white w-full p-3 h-[97vh] rounded-t-lg shadow-lg transform transition-transform duration-500 ease-in-out ${isOpen ? "translate-y-0" : "translate-y-full"
+            }`}>
             <div className="flex justify-between items-center p-1 border-b">
               <h2 className="text-lg font-semibold">Total Grade</h2>
               <button
@@ -267,7 +212,6 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
               title={"Student Grades"}
             >
               <div className="flex w-full">
-                {/* Filter Column */}
                 <div className="flex-1">
                   <StudentGradeModalFilterHeader
                     filters={filters}
@@ -283,12 +227,7 @@ const StudentGradeModal = ({ isOpen, onClose, student }) => {
                     />
                   </div>
                 </div>
-
-                {/* Summary Column */}
-                <StudentGradeSummary
-                  grades={grades}
-                  studentData={grades?.student}
-                />
+                <StudentGradeSummary grades={grades} studentData={grades?.student} />
               </div>
             </ProtectedSection>
           </div>
