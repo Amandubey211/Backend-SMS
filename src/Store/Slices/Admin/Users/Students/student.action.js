@@ -147,7 +147,6 @@ export const fetchStudentGrades = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const say = getAY();
-      //const semesterId = getState().common.user.classInfo.selectedSemester.id; // Fetch semesterId correctly
 
       const response = await getData(
         `/${getRole}/grades/student/${studentId}/class/${studentClassId}?say=${say}`,

@@ -41,14 +41,14 @@ const MainSection = () => {
   const handleSeeGradeClick = (student) => {
     setStudentData(student);
     setIsModalOpen(true);
-    const params = {};
-    dispatch(
-      fetchStudentGrades({
-        params,
-        studentId: student?._id,
-        studentClassId: cid,
-      })
-    );
+    //const params = {};
+    // dispatch(
+    //   fetchStudentGrades({
+    //     params,
+    //     studentId: student?._id,
+    //     studentClassId: cid,
+    //   })
+    // );
     dispatch(fetchStudentSubjectProgress(student?._id));
   };
 
