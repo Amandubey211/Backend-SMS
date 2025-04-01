@@ -10,7 +10,7 @@ import i18next from "i18next";
 import { gt } from "../../Utils/translator/translation";
 import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
 import { BiSolidSchool } from "react-icons/bi";
-import { HiMiniCalendarDateRange } from "react-icons/hi2";
+// import { HiMiniCalendarDateRange } from "react-icons/hi2";
 
 const SettingDropdown = ({
   showSetting,
@@ -76,7 +76,9 @@ const SettingDropdown = ({
               ? `/users/admin`
               : role == "student"
               ? "/users/student/profile"
-              : role == "parent"? '/users/parent/profile':'/users/my/profile'
+              : role == "parent"
+              ? "/users/parent/profile"
+              : "/users/my/profile"
           }
           className={({ isActive }) =>
             `${listItemClass} ${
@@ -89,44 +91,46 @@ const SettingDropdown = ({
         </NavLink>
 
         {/* Admin Section */}
-       
-          <NavLink
-            to={role == "admin" ?"/dashboard/academic" :"/dashboard/select/academic"}
-            className={({ isActive }) =>
-              `${listItemClass} ${
-                isActive ? "text-purple-600 bg-purple-100 " : ""
-              }`
-            }
-          >
-            <FaGraduationCap className="text-lg" />
-            {t("Academic Year", gt.setting)}
-          </NavLink>
-          <NavLink
-            to={"/financialYear"}
-            className={({ isActive }) =>
-              `${listItemClass} ${
-                isActive ? "text-purple-600 bg-purple-100 " : ""
-              }`
-            }
-          >
-           <HiMiniCalendarDateRange className="text-lg" />
-            {t("Financial Year", gt.setting)}
-          </NavLink>
-          { role == "admin" && 
-          <NavLink
-          to={"/dashboard/all/branch"}
+
+        <NavLink
+          to={
+            role == "admin"
+              ? "/dashboard/academic"
+              : "/dashboard/select/academic"
+          }
           className={({ isActive }) =>
             `${listItemClass} ${
               isActive ? "text-purple-600 bg-purple-100 " : ""
             }`
           }
         >
-          <BiSolidSchool className="text-lg" />
-          {t("Branchs", gt.setting)}
+          <FaGraduationCap className="text-lg" />
+          {t("Academic Year", gt.setting)}
         </NavLink>
+        <NavLink
+          to={"/financialYear"}
+          className={({ isActive }) =>
+            `${listItemClass} ${
+              isActive ? "text-purple-600 bg-purple-100 " : ""
+            }`
           }
-          
-       
+        >
+          {/* <HiMiniCalendarDateRange className="text-lg" /> */}
+          {t("Financial Year", gt.setting)}
+        </NavLink>
+        {role == "admin" && (
+          <NavLink
+            to={"/dashboard/all/branch"}
+            className={({ isActive }) =>
+              `${listItemClass} ${
+                isActive ? "text-purple-600 bg-purple-100 " : ""
+              }`
+            }
+          >
+            <BiSolidSchool className="text-lg" />
+            {t("Branchs", gt.setting)}
+          </NavLink>
+        )}
 
         {/* Custom Language Switcher */}
         <div className="relative">

@@ -130,7 +130,6 @@ export const editSyllabus = createAsyncThunk(
       });
 
       if (response && response.status) {
-        console.log(response, "resesdfsdf");
         navigate(-1);
         toast.success("Syllabus updated successfully!");
         return response.data;
