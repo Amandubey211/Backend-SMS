@@ -208,8 +208,8 @@ const SyllabusListPage = () => {
                         onClick={handleClearFilters}
                         disabled={
                           !filters.searchQuery &&
-                          !filters.sectionIds.length &&
-                          !filters.groupIds.length
+                          !filters.sectionIds?.length &&
+                          !filters.groupIds?.length
                         }
                         icon={<AiOutlineClear />}
                       />
