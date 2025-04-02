@@ -111,7 +111,7 @@ export default function FilterDrawer({
             size="large"
             onChange={handleClassChange}
           >
-            {classList.map((cls) => (
+            {classList?.map((cls) => (
               <Option key={cls._id} value={cls._id}>
                 {cls.className}
               </Option>
@@ -128,7 +128,7 @@ export default function FilterDrawer({
             disabled={!selectedClass}
             loading={!sectionList.length && !!selectedClass}
           >
-            {sectionList.map((section) => (
+            {sectionList?.map((section) => (
               <Option key={section._id} value={section._id}>
                 {section.sectionName}
               </Option>
@@ -161,7 +161,7 @@ export default function FilterDrawer({
             disabled={!selectedClass}
             loading={!allSubjects.length && !!selectedClass}
           >
-            {allSubjects.map((subject) => (
+            {allSubjects?.map((subject) => (
               <Option key={subject.subjectId} value={subject.subjectId}>
                 {subject.subjectName}
               </Option>
@@ -177,7 +177,7 @@ export default function FilterDrawer({
             size="large"
             loading={!reduxSemesters.length && !!selectedClass}
           >
-            {reduxSemesters.map((semester) => (
+            {reduxSemesters?.map((semester) => (
               <Option key={semester._id} value={semester._id}>
                 {semester.title}
               </Option>

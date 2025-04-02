@@ -67,11 +67,6 @@ const AllStudents = lazy(() =>
   )
 );
 
-
-
-
-
-
 const EntityRevenueDash = lazy(() =>
   import("../Modules/Admin/Finance/entityRevenue/EntityRevenueDash.js")
 );
@@ -504,10 +499,7 @@ function App() {
     {
       path: "/financialYear",
       element: (
-        <ProtectRoute
-          Component={FinancialYear}
-          allowedRoles={["admin"]}
-        />
+        <ProtectRoute Component={FinancialYear} allowedRoles={["admin"]} />
       ),
       errorElement: <Error />,
     },
@@ -516,7 +508,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={FinanceCategory}
-          allowedRoles={["admin","finance"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -526,7 +518,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Inventory}
-          allowedRoles={["admin","finance"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -536,7 +528,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Entities}
-          allowedRoles={["admin","finance"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -1077,7 +1069,6 @@ function App() {
       errorElement: <Error />,
     },
 
-
     {
       path: "/finance/studentfees/add/form",
       element: (
@@ -1188,7 +1179,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-   
+
     {
       path: "/users/students",
       element: (
