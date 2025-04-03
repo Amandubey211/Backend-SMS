@@ -148,9 +148,7 @@ const TotalAttendanceGraph = () => {
             </div> */}
             {/* Textual Information in a single row */}
             <div className="flex items-center gap-1 whitespace-nowrap">
-              <span className="text-base font-semibold">
-                {t("Total Attendance")} :
-              </span>
+              <span className="text-xl font-semibold">{t("Attendance")} :</span>
               <span className="text-lg font-semibold">
                 {attendanceData
                   ? attendanceData.totalMaleAttendance +
@@ -161,7 +159,11 @@ const TotalAttendanceGraph = () => {
           </div>
 
           <div className="flex space-x-2">
-            <Select onChange={handleMonthChange} value={month} className="w-28">
+            <Select
+              onChange={handleMonthChange}
+              value={month}
+              className="min-w-24"
+            >
               {[...Array(12).keys()].map((i) => (
                 <Option key={i} value={i + 1}>
                   {t(
@@ -174,7 +176,7 @@ const TotalAttendanceGraph = () => {
             <Select
               onChange={handleYearChange}
               value={yearLabel}
-              className="w-32"
+              className="min-w-24"
             >
               {availableYears.map(({ label, value }) => (
                 <Option key={value} value={value}>
@@ -186,7 +188,7 @@ const TotalAttendanceGraph = () => {
             <Select
               onChange={handleGenderChange}
               value={gender}
-              className="w-28"
+              className="min-w-24"
             >
               <Option value="Both">{t("Both")}</Option>
               <Option value="Male">{t("Male")}</Option>

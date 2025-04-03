@@ -17,7 +17,14 @@ import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
 import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
-import { MdInventory2, MdLocalLibrary, MdManageAccounts, MdOutlineBusinessCenter, MdOutlineCategory, MdOutlineInventory2 } from "react-icons/md";
+import {
+  MdInventory2,
+  MdLocalLibrary,
+  MdManageAccounts,
+  MdOutlineBusinessCenter,
+  MdOutlineCategory,
+  MdOutlineInventory2,
+} from "react-icons/md";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
@@ -142,7 +149,7 @@ const sidebarData = [
       },
     ],
   },
-  
+
   {
     title: "NoticeBoard",
     icon: <TbNotebook style={{ fontSize: "1.1rem" }} />,
@@ -186,7 +193,7 @@ const sidebarData = [
     title: "Time Table",
     icon: <ImTable2 />,
     path: "/timetable",
-    roles: [ROLES.ADMIN, ROLES.STAFF],
+    roles: [ROLES.ADMIN, ROLES.STAFF, ROLES.TEACHER, ROLES.LIBRARIAN],
     //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
   },
   // {
@@ -239,10 +246,10 @@ const sidebarData = [
       {
         title: "Inventory",
         path: "/finance/Inventory",
-        icon: <MdOutlineInventory2 tyle={{ fontSize: "1.1rem" }}  />,
+        icon: <MdOutlineInventory2 tyle={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
       },
-          
+
       {
         title: "Entities",
         path: "/finance/entities",
@@ -261,7 +268,7 @@ const sidebarData = [
         icon: <IoReceiptOutline style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
       },
-      
+
       {
         title: "Receipts",
         path: "/finance/receipts",
@@ -307,7 +314,7 @@ const sidebarData = [
       //   //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       // },
     ],
-    bedge:'Beta'
+    bedge: "Beta",
   },
 ];
 

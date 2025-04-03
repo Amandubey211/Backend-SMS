@@ -3,7 +3,7 @@ import { Calendar } from "antd";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import { Badge, Tooltip } from "antd";
-import { format } from "date-fns";
+import { format, isWithinInterval, parseISO } from "date-fns";
 
 export default function MonthView({
   selectedDate,
@@ -14,11 +14,18 @@ export default function MonthView({
   const dateCellRender = (currentDayjs) => {
     const currentDate = currentDayjs.toDate();
     const dateString = currentDayjs.format("YYYY-MM-DD");
-    console.log(filteredTimetables, "filteredTimetablesfilteredTimetables");
 
     const matched = filteredTimetables.flatMap((tt) => {
+      // Check if timetable is within validity period
+      if (tt.validity?.startDate && tt.validity?.endDate) {
+        const isValid = isWithinInterval(currentDate, {
+          start: parseISO(tt.validity.startDate),
+          end: parseISO(tt.validity.endDate),
+        });
+        if (!isValid) return [];
+      }
+
       if (tt.type === "weekly") {
-        if (!isWithinValidity(tt, currentDate)) return [];
         const dayName = currentDayjs.format("dddd");
         return tt.days?.find((d) => d.day === dayName) ? [tt] : [];
       } else {
@@ -34,15 +41,8 @@ export default function MonthView({
 
     if (matched.length === 0) return null;
 
-    const density = Math.min(matched.length / 3, 1);
-    const bgColor = `rgba(66, 153, 225, ${0.2 + density * 0.3})`;
-
     return (
       <div className="space-y-1">
-        <div
-          className="absolute top-1 right-1 w-2 h-2 rounded-full"
-          style={{ backgroundColor: bgColor }}
-        />
         {matched.map((evt) => {
           const firstSlot = evt.days?.find(
             (d) =>
@@ -101,13 +101,6 @@ export default function MonthView({
       />
     </motion.div>
   );
-}
-
-function isWithinValidity(timetable, currentDate) {
-  if (!timetable.validity) return true;
-  const { startDate, endDate } = timetable.validity;
-  if (!startDate || !endDate) return true;
-  return currentDate >= new Date(startDate) && currentDate <= new Date(endDate);
 }
 
 function getColorByType(type) {

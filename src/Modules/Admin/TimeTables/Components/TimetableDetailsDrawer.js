@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Drawer, Button, Tag, Divider, Table, Tabs } from "antd";
+import {
+  Drawer,
+  Button,
+  Tag,
+  Divider,
+  Table,
+  Tabs,
+  Badge,
+  Tooltip,
+} from "antd";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { format } from "date-fns";
 import dayjs from "dayjs";
@@ -12,9 +21,12 @@ import {
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
+import { TfiTime } from "react-icons/tfi";
+import { Element } from "react-scroll";
 import DayView from "../Views/DayView";
 import WeekView from "../Views/WeekView";
 
+// Main TimetableDetailsDrawer component
 const TimetableDetailsDrawer = ({
   visible,
   onClose,
@@ -154,6 +166,12 @@ const TimetableDetailsDrawer = ({
     return nextDate <= new Date(timetable.validity.endDate);
   };
 
+  // Enhanced DayView props handler
+  const handleDayViewEventClick = (event) => {
+    // You can add custom handling here if needed
+    console.log("DayView event clicked:", event);
+  };
+
   return (
     <Drawer
       title="Timetable Details"
@@ -201,11 +219,6 @@ const TimetableDetailsDrawer = ({
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {/* <Tag color={timetable?.status === "active" ? "green" : "red"}>
-                    {timetable?.status === "active"
-                      ? "Published"
-                      : "Unpublished"}
-                  </Tag> */}
                   <div
                     className="w-28 h-28 flex items-center justify-center flex-col rounded"
                     style={{
@@ -308,7 +321,7 @@ const TimetableDetailsDrawer = ({
                             </Tag>
                           ))
                         ) : (
-                          <Tag color="purple">No Sections</Tag>
+                          <Tag color="purple">All Sections</Tag>
                         )}
                       </div>
                     </div>
@@ -323,7 +336,7 @@ const TimetableDetailsDrawer = ({
                             </Tag>
                           ))
                         ) : (
-                          <Tag color="cyan">No Groups</Tag>
+                          <Tag color="cyan">All Groups</Tag>
                         )}
                       </div>
                     </div>
@@ -349,8 +362,7 @@ const TimetableDetailsDrawer = ({
                 <DayView
                   selectedDate={selectedDate}
                   filteredTimetables={filteredTimetables}
-                  onEventClick={() => {}}
-                  onDateChange={setSelectedDate}
+                  onEventClick={handleDayViewEventClick}
                 />
               )}
 
