@@ -30,7 +30,7 @@ const StudentFeeForm = () => {
       discount: 0,
       discountType: "amount",
       finalAmount: 0,
-      frequency: "one time",
+      frequency: "Permanent Purchase",
       startDate: null,
       endDate: null,
     },
@@ -120,7 +120,7 @@ const StudentFeeForm = () => {
         discount: 0,
         discountType: "amount",
         finalAmount: 0,
-        frequency: "one time",
+        frequency: "Permanent Purchase",
         startDate: null,
         endDate: null,
         dueDate: null,
@@ -245,7 +245,7 @@ const navigate = useNavigate()
             <Col span={6}>
               <Form.Item name={["lineItems", index, "frequency"]} label="Frequency" rules={[{ required: true ,message:"frequency is required"}]}>
                 <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "frequency", value)}>
-                  <Option value="One Time">One Time</Option>
+                  <Option value="Permanent Purchase">Permanent Purchase</Option>
                   <Option value="Monthly">Monthly</Option>
                   <Option value="Half yearly">Half yearly</Option>
                   <Option value="Yearly">Yearly</Option>
@@ -254,7 +254,7 @@ const navigate = useNavigate()
               </Form.Item>
             </Col>
           
-          {item.frequency !== "One Time" && (
+          {item.frequency !== "Permanent Purchase" && (
           <>
               <Col span={6}>
                 <Form.Item name={["lineItems", index, "startDate"]} label="Start Date" rules={[{ required: true ,message:"Start Date is required"}]}>

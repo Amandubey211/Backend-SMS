@@ -9,11 +9,13 @@ import {
   studentFeesGraph,
   fetchStudentFeeCardData,
   createStudentFeeRecordForClass,
+  fetchGraphStudentFee,
 } from "./studentFeesThunks";
 
 const initialState = {
   fees: [],
   allStudntFees: [],
+  graphStudntFees: [],
   totalRecords:0,
   totalPages:1,
   currentPage: 1,
@@ -49,6 +51,19 @@ const studentFeesSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       });
+    builder
+      .addCase(fetchGraphStudentFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchGraphStudentFee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.graphStudntFees = action.payload?.data || null;
+      })
+      .addCase(fetchGraphStudentFee.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error?.message;
+      });
 
     builder
       .addCase(fetchAllStudentFee.pending, (state) => {
@@ -57,12 +72,12 @@ const studentFeesSlice = createSlice({
       })
       .addCase(fetchAllStudentFee.fulfilled, (state, action) => {
         state.loading = false;
-        state.allStudntFees = action.payload.data || [];
-        state.totalRecords= action.payload.totalRecords;
-        state.totalPages= action.payload.totalPages;
-        state.currentPage= action.payload.currentPage;
-        state.paidAllAmount= action.payload.paidAllAmount;
-        state.totalAllAmount = action.payload.totalAllAmount;
+        state.allStudntFees = action.payload?.data || [];
+        state.totalRecords= action.payload?.totalRecords;
+        state.totalPages= action.payload?.totalPages;
+        state.currentPage= action.payload?.currentPage;
+        state.paidAllAmount= action.payload?.paidAllAmount;
+        state.totalAllAmount = action.payload?.totalAllAmount;
        
       })
       .addCase(fetchAllStudentFee.rejected, (state, action) => {

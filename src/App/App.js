@@ -60,6 +60,7 @@ import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js"
 import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
+import InventoryList from "../Modules/Admin/Finance/Inventory/InventoryList.js";
 // lazy loaded routes
 const AllStudents = lazy(() =>
   import(
@@ -90,11 +91,17 @@ const PayRollDash = lazy(() =>
 const AddPayRollDash = lazy(() =>
   import("../Modules/Admin/Finance/Payroll/AddPayRoll.js")
 );
+const PayRollList = lazy(() =>
+  import("../Modules/Admin/Finance/Payroll/PayrollList.js")
+);
 const OperationalExpensesDash = lazy(() =>
   import("../Modules/Admin/Finance/operational-expenses/ExpsenseDash.js")
 );
 const AddOperationalExpenses = lazy(() =>
   import("../Modules/Admin/Finance/operational-expenses/AddExpsense.js")
+);
+const ExpenseList = lazy(() =>
+  import("../Modules/Admin/Finance/operational-expenses/ExpenseList.js")
 );
 const RoleSelector = lazy(() =>
   import("../Components/Common/RBAC/RoleSelector.js")
@@ -520,6 +527,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={Inventory}
+          allowedRoles={["admin","finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/Inventory/list",
+      element: (
+        <ProtectRoute
+          Component={InventoryList}
           allowedRoles={["admin","finance"]}
         />
       ),
@@ -1031,6 +1048,16 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/payroll/list",
+      element: (
+        <ProtectRoute
+          Component={PayRollList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/operational-expenses",
       element: (
         <ProtectRoute
@@ -1045,6 +1072,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={AddOperationalExpenses}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/operational-expenses/list",
+      element: (
+        <ProtectRoute
+          Component={ExpenseList}
           allowedRoles={["admin", "finance"]}
         />
       ),

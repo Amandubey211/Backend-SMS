@@ -51,6 +51,24 @@ export const fetchAllStudentFee = createAsyncThunk(
     }
   }
 );
+export const fetchGraphStudentFee = createAsyncThunk(
+  "studentFees/fetchGraphStudentFee",
+
+  async (params, { rejectWithValue, dispatch, getState }) => {
+
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/revenue/get/graph/students/fee?say=${say}`,params
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
 
 export const createStudentFee = createAsyncThunk(

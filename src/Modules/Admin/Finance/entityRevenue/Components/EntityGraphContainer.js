@@ -1,32 +1,28 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import EntityRevenueGraph from "./EntityRevenueGraph";
 import { useDispatch, useSelector } from "react-redux";
-import EntityRevenueGraph from "../entityRevenue/Components/EntityRevenueGraph";
-import { fetchOperationalExpensesGraph } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
+import { fetchAllEntityRevenueGraph } from "../../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
 
-
-const OperationalExpensesGraph = () => {
+const RevenueContainer = () => {
   const [viewMode, setViewMode] = useState("year");
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const dispatch = useDispatch()
 
-  const { OperationalExpenseGraphData, loading } = useSelector(
-     (store) => store.admin.operationalExpenses
-   );
- 
+  const { entityRevenueGraph, loading,  } = useSelector(
+    (state) => state.admin.entityRevenue
+  );
   useEffect(() => {
-    dispatch(fetchOperationalExpensesGraph({ view: viewMode, year: selectedYear, month: selectedMonth })).then(()=>{
-      console.log(OperationalExpenseGraphData);
-      
-    })
+    dispatch(fetchAllEntityRevenueGraph({ view: viewMode, year: selectedYear, month: selectedMonth }))
   }, [viewMode, selectedMonth, selectedYear]);
 
   const chartData = {
-    labels:  OperationalExpenseGraphData?.map((d) => viewMode === "year" ? `Month ${d?.dayOrMonth}` : `Day ${d?.dayOrMonth}`),
+    labels: entityRevenueGraph?.map((d) => viewMode === "year" ? `Month ${d?.dayOrMonth}` : `Day ${d?.dayOrMonth}`),
     datasets: [
       {
-        label: "Total Expense",
-        data:  OperationalExpenseGraphData?.map((d) => d?.totalExpense),
+        label: "Total Earnings",
+        data: entityRevenueGraph?.map((d) => d?.totalEarnings),
         fill: false,
         borderWidth: 2,
       },
@@ -40,7 +36,7 @@ const OperationalExpensesGraph = () => {
 
   return (
     <EntityRevenueGraph
-      title="Operational Expense"
+      title="Entity Revenue"
       viewMode={viewMode}
       selectedMonth={selectedMonth}
       selectedYear={selectedYear}
@@ -54,4 +50,4 @@ const OperationalExpensesGraph = () => {
   );
 };
 
-export default OperationalExpensesGraph;
+export default RevenueContainer;
