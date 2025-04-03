@@ -113,7 +113,7 @@ export default function FilterDrawer({
       }
     >
       <Form form={form} layout="vertical">
-        {/* <Form.Item label="Status" name="status">
+        <Form.Item label="Status" name="status">
           <Select
             placeholder="Select Status"
             allowClear
@@ -137,7 +137,7 @@ export default function FilterDrawer({
             <Option value="event">Event</Option>
             <Option value="others">Others</Option>
           </Select>
-        </Form.Item> */}
+        </Form.Item>
 
         <Form.Item label="Class" name="class">
           <Select
