@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Radio,
@@ -14,23 +14,31 @@ import {
   Tag,
   Input,
   Tooltip,
+  Select,
+  Row,
+  Col,
+  message,
 } from "antd";
 import {
   AiOutlineFilter,
   AiOutlineFilePdf,
   AiOutlinePrinter,
 } from "react-icons/ai";
-import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import {
   CloseOutlined,
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
   CalendarOutlined,
+  SearchOutlined,
+  FilterOutlined,
 } from "@ant-design/icons";
+import { BsPatchCheckFill } from "react-icons/bs";
+import { MdOutlineBlock } from "react-icons/md";
 import { motion, AnimatePresence } from "framer-motion";
 import dayjs from "dayjs";
-import { format } from "date-fns";
+import { format, isWithinInterval, parseISO } from "date-fns";
+import debounce from "lodash/debounce";
 
 // Child components
 import DayView from "./Views/DayView";
@@ -41,6 +49,7 @@ import TimetableDetailsDrawer from "./Components/TimetableDetailsDrawer";
 import NavigationControls from "./Components/NavigationControls";
 import TimeTableForm from "./Components/TimeTableForm";
 import { Doughnut } from "react-chartjs-2";
+import FilterDrawer from "./Components/FilterDrawer";
 
 // Thunks
 import {
@@ -60,13 +69,17 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semeste
 
 // Utils
 import ExportFunctions from "../../../Utils/timetableUtils";
-import FilterDrawer from "./Components/FilterDrawer";
+import toast from "react-hot-toast";
+import { SearchComponent } from "./Components/SearchComponent";
 
 export default function TimeTableDash() {
   const dispatch = useDispatch();
-  const { timetables = [], loadingFetch } = useSelector(
-    (store) => store?.admin?.timetable || {}
-  );
+  const {
+    timetables = [],
+    loadingFetch,
+    pagination = {},
+  } = useSelector((store) => store?.admin?.timetable || {});
+
   const classList = useSelector((state) => state.admin.class.classes);
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
@@ -85,7 +98,6 @@ export default function TimeTableDash() {
   // Date, view, toggles
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
-  const [filterType, setFilterType] = useState(null);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   // Drawer states
@@ -106,17 +118,143 @@ export default function TimeTableDash() {
     groups: [],
     subject: null,
     semester: null,
+    status: null,
+    type: null,
   });
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
 
-  // Basic search input
+  // Search and pagination
   const [searchTerm, setSearchTerm] = useState("");
+  const [paginationConfig, setPaginationConfig] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+
+  // Export functions instance
+  const exportFunctions = useMemo(
+    () =>
+      new ExportFunctions({
+        viewMode,
+        selectedDate,
+        filteredTimetables: timetables, // Use the full list from backend
+        format,
+        dayjs,
+        isWithinValidity: (timetable, date) => {
+          if (!timetable.validity) return true;
+          const { startDate, endDate } = timetable.validity;
+          return (
+            !startDate ||
+            !endDate ||
+            isWithinInterval(date, {
+              start: parseISO(startDate),
+              end: parseISO(endDate),
+            })
+          );
+        },
+      }),
+    [viewMode, selectedDate, timetables]
+  );
+
+  // Popover content for export
+  const exportContent = (
+    <div className="flex flex-col gap-2 p-2">
+      <Button
+        icon={<AiOutlineFilePdf />}
+        onClick={exportFunctions.handleExportPDF}
+        className="flex items-center"
+      >
+        Export as PDF
+      </Button>
+      <Button
+        icon={<AiOutlinePrinter />}
+        onClick={exportFunctions.handlePrint}
+        className="flex items-center"
+      >
+        Print
+      </Button>
+    </div>
+  );
+
+  // Memoized filtered timetables (client-side for calendar view)
+  const filteredTimetables = useMemo(() => {
+    let result = [...timetables];
+
+    // Filter for calendar view
+    if (activeTab === "calendar") {
+      result = result.filter((t) => t.showCalendar === true);
+    }
+
+    // Apply type filter if set
+    if (filters.type) {
+      result = result.filter((t) => t.type === filters.type);
+    }
+
+    return result;
+  }, [timetables, activeTab, filters.type]);
 
   // Fetch all initial data
   useEffect(() => {
-    dispatch(fetchTimetableList());
     dispatch(fetchAllClasses());
+    fetchTimetables();
   }, [dispatch]);
+
+  // Fetch timetables with current filters
+  const fetchTimetables = useCallback(
+    (params = {}) => {
+      const queryParams = {
+        page: paginationConfig.current,
+        limit: paginationConfig.pageSize,
+        ...filters,
+        ...params,
+      };
+
+      if (searchTerm) {
+        queryParams.search = searchTerm; // Changed from 'name' to 'search' for backend
+      }
+
+      if (activeTab === "calendar") {
+        queryParams.showCalendar = true;
+      }
+
+      dispatch(fetchTimetableList(queryParams));
+    },
+    [dispatch, filters, searchTerm, activeTab, paginationConfig]
+  );
+
+  // Create a debounced search function
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value) => {
+        setPaginationConfig((prev) => ({ ...prev, current: 1 }));
+        fetchTimetables({ name: value, page: 1 });
+      }, 500),
+    [fetchTimetables]
+  );
+  // Handle search term change
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    if (value.trim() === "") {
+      fetchTimetables({ search: "", page: 1 });
+    } else {
+      debouncedSearch(value);
+    }
+  };
+
+  // Clear search and refetch
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setPaginationConfig((prev) => ({ ...prev, current: 1 }));
+    fetchTimetables({ search: "", page: 1 });
+    debouncedSearch.cancel();
+  };
+
+  // Clean up debounce on unmount
+  useEffect(() => {
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [debouncedSearch]);
 
   // Fetch dependent data when class changes
   useEffect(() => {
@@ -132,15 +270,6 @@ export default function TimeTableDash() {
         } catch (error) {
           console.error("Error fetching dependent data:", error);
         }
-      } else {
-        // Clear dependent data
-        setFilters((prev) => ({
-          ...prev,
-          sections: [],
-          groups: [],
-          subject: null,
-          semester: null,
-        }));
       }
     };
 
@@ -161,131 +290,74 @@ export default function TimeTableDash() {
     }
   }, [dispatch, filters.class, filters.sections]);
 
-  // Filter timetables by user-applied filters & search
-  const filteredTimetables = useMemo(() => {
-    let result = timetables;
-
-    // Type filter
-    if (filterType) {
-      result = result.filter((tt) => tt.type === filterType);
-    }
-    // Class filter
-    if (filters.class) {
-      result = result.filter((tt) => tt.classId?._id === filters.class);
-    }
-    // Sections filter
-    if (filters.sections.length > 0) {
-      result = result.filter((tt) =>
-        tt.sectionId?.some((s) => filters.sections.includes(s._id))
-      );
-    }
-    // Groups filter
-    if (filters.groups.length > 0) {
-      result = result.filter((tt) =>
-        tt.groupId?.some((g) => filters.groups.includes(g._id))
-      );
-    }
-    // Subject filter
-    if (filters.subject) {
-      result = result.filter((tt) =>
-        tt.days?.some((day) =>
-          day.slots?.some((slot) => slot.subjectId?._id === filters.subject)
-        )
-      );
-    }
-    // Semester filter
-    if (filters.semester) {
-      result = result.filter((tt) => tt.semesterId?._id === filters.semester);
-    }
-
-    // Search by timetable name, type, or class name
-    if (searchTerm) {
-      const normalizedSearch = searchTerm.toLowerCase();
-      result = result.filter((tt) => {
-        const title = tt.title?.toLowerCase() || tt.name?.toLowerCase() || "";
-        const type = tt.type?.toLowerCase() || "";
-        const className =
-          tt.classId?.className?.toLowerCase() ||
-          tt.classId?.name?.toLowerCase() ||
-          "";
-        return (
-          title.includes(normalizedSearch) ||
-          type.includes(normalizedSearch) ||
-          className.includes(normalizedSearch)
-        );
-      });
-    }
-
-    return result;
-  }, [timetables, filterType, filters, searchTerm]);
-
-  // Utility for export, printing, etc.
-  const exportFunctions = new ExportFunctions({
-    viewMode,
-    selectedDate,
-    filteredTimetables,
-    format,
-    dayjs,
-    isWithinValidity: (timetable, date) => {
-      if (!timetable.validity) return true;
-      const { startDate, endDate } = timetable.validity;
-      return (
-        !startDate ||
-        !endDate ||
-        (new Date(date) >= new Date(startDate) &&
-          new Date(date) <= new Date(endDate))
-      );
+  // Apply filters and refetch data
+  const applyFilters = useCallback(
+    (newFilters) => {
+      setFilters(newFilters);
+      setPaginationConfig((prev) => ({ ...prev, current: 1 }));
+      fetchTimetables({ ...newFilters, page: 1 });
     },
-  });
+    [fetchTimetables]
+  );
 
   // Handlers
-  const handleFilterChange = (filterName, value) => {
-    if (filterName === "class") {
-      setFilters({
-        class: value,
-        sections: [],
-        groups: [],
-        subject: null,
-        semester: null,
-      });
-    } else if (filterName === "sections") {
-      setFilters((prev) => ({
-        ...prev,
-        sections: value,
-        groups: value.length > 0 ? prev.groups : [],
-      }));
-    } else {
-      setFilters((prev) => ({ ...prev, [filterName]: value }));
-    }
-  };
+  const handleFilterChange = useCallback(
+    (newFilters) => {
+      applyFilters({ ...filters, ...newFilters });
+    },
+    [applyFilters, filters]
+  );
 
-  const clearAllFilters = () => {
-    setFilters({
+  const clearAllFilters = useCallback(() => {
+    const newFilters = {
       class: null,
       sections: [],
       groups: [],
       subject: null,
       semester: null,
-    });
-    setFilterType(null);
+      status: null,
+      type: null,
+    };
     setSearchTerm("");
+    applyFilters(newFilters);
+  }, [applyFilters]);
+
+  const removeFilter = useCallback(
+    (filterName) => {
+      const newFilters = {
+        ...filters,
+        [filterName]: Array.isArray(filters[filterName]) ? [] : null,
+      };
+      applyFilters(newFilters);
+    },
+    [applyFilters, filters]
+  );
+
+  // Handle table pagination/sorting changes
+  const handleTableChange = (pagination, filters, sorter) => {
+    setPaginationConfig(pagination);
+    fetchTimetables({
+      page: pagination.current,
+      limit: pagination.pageSize,
+      ...filters,
+      ...(sorter.field && {
+        sortField: sorter.field,
+        sortOrder: sorter.order,
+      }),
+    });
   };
 
-  const removeFilter = (filterName) => {
-    if (filterName === "class") {
-      setFilters({
-        class: null,
-        sections: [],
-        groups: [],
-        subject: null,
-        semester: null,
-      });
-    } else if (filterName === "sections" || filterName === "groups") {
-      setFilters((prev) => ({ ...prev, [filterName]: [] }));
-    } else {
-      setFilters((prev) => ({ ...prev, [filterName]: null }));
-    }
-  };
+  // Handle type filter from StatsSection
+  const handleTypeFilter = useCallback(
+    (type) => {
+      const newFilters = {
+        ...filters,
+        type: filters.type === type ? null : type,
+      };
+      applyFilters(newFilters);
+    },
+    [applyFilters, filters]
+  );
 
   // Drawer/Modal
   const openDrawer = (timetable = null) => {
@@ -322,46 +394,32 @@ export default function TimeTableDash() {
           closeDetailsDrawer();
           setEditingTimetable(null);
           closeDrawer();
+          fetchTimetables();
         })
         .catch((error) => {
+          message.error("Failed to delete timetable");
           console.error("Failed to delete timetable:", error);
         });
     }
   };
 
   const handleFormSubmit = (values, isEdit) => {
-    if (isEdit && editingTimetable?._id) {
-      dispatch(updateTT({ id: editingTimetable?._id, data: values })).then(
-        () => {
-          closeDrawer();
-        }
-      );
-    } else {
-      dispatch(createTT(values)).then(() => {
-        closeDrawer();
-      });
-    }
-  };
+    const action = isEdit
+      ? dispatch(updateTT({ id: editingTimetable?._id, data: values }))
+      : dispatch(createTT(values));
 
-  // Popover for Export
-  const exportContent = (
-    <div className="flex flex-col gap-2 p-2">
-      <Button
-        icon={<AiOutlineFilePdf />}
-        onClick={exportFunctions.handleExportPDF}
-        className="flex items-center"
-      >
-        Export as PDF
-      </Button>
-      <Button
-        icon={<AiOutlinePrinter />}
-        onClick={exportFunctions.handlePrint}
-        className="flex items-center"
-      >
-        Print
-      </Button>
-    </div>
-  );
+    action
+      .then(() => {
+        closeDrawer();
+        fetchTimetables();
+      })
+      .catch((error) => {
+        message.error(
+          isEdit ? "Failed to update timetable" : "Failed to create timetable"
+        );
+        console.error("Form submission error:", error);
+      });
+  };
 
   // Return a Tag for "Type"
   function getTypeTag(type) {
@@ -432,16 +490,13 @@ export default function TimeTableDash() {
 
     return (
       <div className="flex items-center gap-2 w-full">
-        {/* Status Icon with Tooltip */}
         <Tooltip title={isActive ? "Published" : "Unpublished"}>
           {isActive ? (
-            <CheckCircleOutlined className="text-green-500" />
+            <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
           ) : (
-            <CloseCircleOutlined className="text-red-500" />
+            <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
           )}
         </Tooltip>
-
-        {/* Truncated Title */}
         <div className="font-semibold truncate max-w-[150px] overflow-hidden whitespace-nowrap text-ellipsis">
           {text}
         </div>
@@ -452,11 +507,21 @@ export default function TimeTableDash() {
   // Columns for the list tab
   const listColumns = [
     {
-      title: "Stauts / Timetable Name",
+      title: "Status / Timetable Name",
       dataIndex: "name",
       key: "name",
       render: (text, record) =>
         renderNameWithStatus(text || record.title || "Untitled", record),
+    },
+    {
+      title: "On Calendar",
+      dataIndex: "showCalendar",
+      key: "showCalendar",
+      render: (show) => (
+        <Tag color={show ? "green" : "orange"}>
+          {show ? "Visible" : "Hidden"}
+        </Tag>
+      ),
     },
     {
       title: "Class / Semester",
@@ -525,6 +590,35 @@ export default function TimeTableDash() {
     render: () => <Skeleton active paragraph={{ rows: 1 }} title={false} />,
   }));
 
+  // Filter tags for display
+  const filterTags = Object.entries(filters)
+    .filter(([key, value]) => {
+      if (Array.isArray(value)) return value.length > 0;
+      return value !== null && value !== undefined;
+    })
+    .map(([key, value]) => ({
+      key,
+      value,
+      display:
+        key === "class"
+          ? classList.find((c) => c._id === value)?.className
+          : key === "sections"
+          ? sectionList
+              .filter((s) => value.includes(s._id))
+              .map((s) => s.sectionName)
+              .join(", ")
+          : key === "groups"
+          ? groupsList
+              .filter((g) => value.includes(g._id))
+              .map((g) => g.groupName)
+              .join(", ")
+          : key === "subject"
+          ? allSubjects.find((s) => s._id === value)?.subjectName
+          : key === "semester"
+          ? reduxSemesters.find((s) => s._id === value)?.title
+          : value,
+    }));
+
   return (
     <div className="w-full min-h-screen flex">
       {/* Main Content */}
@@ -534,35 +628,18 @@ export default function TimeTableDash() {
         }`}
       >
         {/* Header and Controls */}
-        <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-col gap-4 ">
           <div className="flex items-center justify-between flex-wrap gap-2">
             {/* Tabs with Icons */}
             <div className="flex items-center gap-2 flex-wrap">
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                <Tabs.TabPane
-                  key="list"
-                  tab={
-                    <span>
-                      {/* <EyeOutlined /> */}
-                      List View
-                    </span>
-                  }
-                />
-                <Tabs.TabPane
-                  key="calendar"
-                  tab={
-                    <span>
-                      {/* <CalendarOutlined /> */}
-                      Calendar View
-                    </span>
-                  }
-                />
+                <Tabs.TabPane key="list" tab={<span>List View</span>} />
+                <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} />
               </Tabs>
             </div>
 
             {/* Right side: filters, export, add */}
             <div className="flex items-center gap-2">
-              {/* Show Day/Week/Month only in Calendar tab */}
               {activeTab === "calendar" && (
                 <Radio.Group
                   value={viewMode}
@@ -602,21 +679,22 @@ export default function TimeTableDash() {
           </div>
         </div>
 
+        {/* Filters and Search */}
+        <SearchComponent
+          searchTerm={searchTerm}
+          handleSearchChange={handleSearchChange}
+          handleClearSearch={handleClearSearch}
+          filters={filters}
+          handleFilterChange={handleFilterChange}
+          setShowFilterDrawer={setShowFilterDrawer}
+          filterTags={filterTags}
+          clearAllFilters={clearAllFilters}
+          fetchTimetables={fetchTimetables}
+        />
+
         {/* Conditionally Render List or Calendar View */}
         {activeTab === "list" && (
           <>
-            {/* Simple Search */}
-            <div className="mb-4 flex flex-col sm:flex-row sm:items-center gap-2">
-              <span className="font-semibold">Search Timetables:</span>
-              <Input
-                placeholder="By Name, Type..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{ maxWidth: "300px" }}
-              />
-            </div>
-
-            {/* Table or skeleton */}
             {loadingFetch ? (
               <Table
                 dataSource={[...Array(5)].map((_, i) => ({ _id: i }))}
@@ -626,10 +704,18 @@ export default function TimeTableDash() {
               />
             ) : (
               <Table
-                dataSource={filteredTimetables}
+                dataSource={timetables} // Use the full list from backend
                 columns={listColumns}
                 rowKey="_id"
-                // pagination={{ pageSize: 10 }}
+                pagination={{
+                  ...paginationConfig,
+                  total: pagination.total,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total) => `Total ${total} items`,
+                }}
+                onChange={handleTableChange}
+                loading={loadingFetch}
               />
             )}
           </>
@@ -694,7 +780,7 @@ export default function TimeTableDash() {
         )}
       </div>
 
-      {/* Sidebar Stats & Filters */}
+      {/* Sidebar Stats */}
       {!sidebarCollapsed && (
         <div className="w-72 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
           {loadingFetch ? (
@@ -740,24 +826,11 @@ export default function TimeTableDash() {
             </div>
           ) : (
             <div>
-              <h3 className="text-lg font-semibold mb-3">Stats & Filters</h3>
+              <h3 className="text-lg font-semibold mb-3">Stats Overview</h3>
               <StatsSection
                 filteredTimetables={filteredTimetables}
-                filterType={filterType}
-                setFilterType={setFilterType}
-                onExportPDF={exportFunctions.handleExportPDF}
-                onPrint={exportFunctions.handlePrint}
-                onAddTimetable={() => openDrawer(null)}
-                filters={filters}
-                onRemoveFilter={removeFilter}
-                onOpenFilterDrawer={() => setShowFilterDrawer(true)}
-                onClearFilters={clearAllFilters}
-                classList={classList}
-                sectionList={sectionList}
-                onFilterChange={handleFilterChange}
-                groupsList={groupsList}
-                allSubjects={allSubjects}
-                reduxSemesters={reduxSemesters}
+                onTypeClick={handleTypeFilter}
+                activeType={filters.type}
               />
               <Divider />
               <div className="border rounded p-4 mb-4">
@@ -841,7 +914,7 @@ export default function TimeTableDash() {
         <p>Are you sure you want to delete this timetable?</p>
       </Modal>
 
-      {/* Optional Filter Drawer */}
+      {/* Filter Drawer */}
       <FilterDrawer
         visible={showFilterDrawer}
         filters={filters}
