@@ -13,7 +13,8 @@ import { downloadPDF } from "../../../../Utils/xl";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
-  
+  const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
+
   // Get data from Redux
   const { allStudntFees: incomes, loading, totalRecords, totalPages, currentPage } = useSelector(
     (state) => state.admin.studentFees
@@ -50,13 +51,13 @@ const SummaryRevenueList = () => {
       title: "Total Amount",
       key: "total_amount",
       render: (_, record) =>
-        `${record?.lineItems?.reduce((sum, item) => sum + item.amount, 0)} QAR`,
+        `${record?.lineItems?.reduce((sum, item) => sum + item.amount, 0)} ${schoolCurrency}`,
     },
     {
       title: "Total Paid",
       key: "paid_amount",
       render: (_, record) =>
-        `${record?.lineItems?.reduce((sum, item) => sum + item.paid_amount, 0)} QAR`,
+        `${record?.lineItems?.reduce((sum, item) => sum + item.paid_amount, 0)} ${schoolCurrency}`,
     },
     {
       title: "Status",
@@ -104,26 +105,26 @@ const SummaryRevenueList = () => {
         title: "Rate",
         dataIndex: "rate",
         key: "rate",
-        render: (rate) => `${rate?.toFixed(2)} QAR`,
+        render: (rate) => `${rate?.toFixed(2)} ${schoolCurrency}`,
       },
       {
         title: "Discount",
         dataIndex: "discount",
         key: "discount",
         render: (discount, record) =>
-          record.discountType === "percentage" ? `${discount}%` : `${discount} QAR`,
+          record.discountType === "percentage" ? `${discount}%` : `${discount} ${schoolCurrency}`,
       },
       {
         title: "Tax",
         dataIndex: "tax",
         key: "tax",
-        render: (tax) => `${tax?.toFixed(2)} QAR`,
+        render: (tax) => `${tax?.toFixed(2)} ${schoolCurrency}`,
       },
       {
         title: "Final Amount",
         dataIndex: "final_amount",
         key: "final_amount",
-        render: (amount) => `${amount?.toFixed(2)} QAR`,
+        render: (amount) => `${amount?.toFixed(2)} ${schoolCurrency}`,
       },
     ];
 

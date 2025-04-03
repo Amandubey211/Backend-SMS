@@ -7,21 +7,23 @@ import { useDispatch, useSelector } from "react-redux";
 const PayRollCards = () => {
   const dispatch = useDispatch();
 
-
+ const { totalAllAmount,paidAllAmount  } = useSelector(
+    (store) => store.admin.payroll
+  );
   const PayRollCardsData = [
     {
       title: "Total PayRoll",
-      value: 0,
+      value: totalAllAmount.toFixed(2) || 0,
       icon: <GiMoneyStack />, 
     },
     {
-      title: "Total PayRoll",
-      value: 0,
+      title: "Total Paid PayRoll",
+      value: paidAllAmount.toFixed(2) || 0,
       icon: <GiReceiveMoney />, 
     },
     {
-      title: "Total Remaining PayRoll",
-      value: 0,
+      title: "Total Unpaid PayRoll",
+      value: (totalAllAmount -paidAllAmount ).toFixed(2) || 0,
       icon: <FaWallet />, 
     },
   ];

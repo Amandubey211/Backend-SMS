@@ -1,7 +1,6 @@
 // src/Modules/Admin/Finance/StudentFees/StudentFeesMain.js
 import React, { useState, useEffect } from "react";
-import StudentCardSection from "./Components/StudentCardSection"; // Reused Cards Section for Students
-import StudentFeesGraph from "./Components/StudentFeesGraph";
+import StudentCardSection from "./Components/StudentCardSection"; 
 import StudentFeesSummaryTable from "./Components/StudentFeesSummaryTable";
 import { GiTakeMyMoney } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +12,7 @@ import { FaPlusCircle } from "react-icons/fa";
 import { MdAttachMoney } from "react-icons/md";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import GraphContainer from "./Components/GraphContainer";
 
 const StudentFeesMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -84,7 +84,7 @@ useEffect(() => {
         {/* Graph Section */}
         <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_GRAPH_FOR_STUDENT_FEES} title={'Graph'}>
         <div className="w-full ">
-          <StudentFeesGraph />
+          <GraphContainer />
         </div>
         </ProtectedSection>
         {/* Summary Table */}

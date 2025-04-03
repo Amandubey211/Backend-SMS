@@ -14,6 +14,7 @@ import { setLocalCookies } from "../../../Utils/academivYear";
 import { FaRegEdit } from "react-icons/fa";
 import { edit } from "@cloudinary/url-gen/actions/animated";
 import EditBranch from "./EditBranch";
+import { setUserDetails } from "../../../Store/Slices/Common/User/reducers/userSlice";
 
 const BranchTable = () => {
   const dispatch = useDispatch();
@@ -35,6 +36,12 @@ const BranchTable = () => {
   const changeBranch = (branchId) => {
     const data = { schoolId: branchId };
     dispatch(updateBranch({ navigate, data })).then(() => {
+       setUserDetails({
+        ...userDetails,
+                schoolId: data?.schoolId,
+                schoolName: data?.schoolName,
+                currency: data?.currency,
+              })
       setLocalCookies("SelectedschoolId", branchId);
       window.location.reload();
     });

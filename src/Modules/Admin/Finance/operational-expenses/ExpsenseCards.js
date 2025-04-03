@@ -7,21 +7,23 @@ import { useDispatch, useSelector } from "react-redux";
 const OperationalExpensesCards = () => {
   const dispatch = useDispatch();
 
-
+const {  totalAllAmount,paidAllAmount } = useSelector(
+    (store) => store.admin.operationalExpenses
+  );
   const OperationalExpensesCardsData = [
     {
-      title: "Total OperationalExpenses",
-      value: 0,
+      title: "Total Operational Expenses",
+      value: totalAllAmount?.toFixed(2) || 0,
       icon: <GiMoneyStack />, 
     },
     {
-      title: "Total OperationalExpenses",
-      value: 0,
+      title: "Total Paid Operational Expenses",
+      value: paidAllAmount?.toFixed(2) || 0,
       icon: <GiReceiveMoney />, 
     },
     {
-      title: "Total Remaining OperationalExpenses",
-      value: 0,
+      title: "Total Unpaid Operational Expenses",
+      value: (totalAllAmount-paidAllAmount)?.toFixed(2) || 0,
       icon: <FaWallet />, 
     },
   ];

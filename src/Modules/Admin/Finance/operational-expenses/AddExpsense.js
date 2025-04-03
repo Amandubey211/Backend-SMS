@@ -8,24 +8,21 @@ import { useNavigate } from "react-router-dom";
 import { fetchCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
 import Layout from '../../../../Components/Common/Layout';
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 import { fetchBudget } from "../../../../Store/Slices/Finance/budget/budget.thunk";
 import SidebarEntitySelection from "../entityRevenue/Components/SelectEntities";
+import { createOperationalExpense } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
 
 const { Option } = Select;
 
 const AddOperationalExpenses = () => {
-  useNavHeading("Finance", "OperationalExpenses");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const categories = useSelector((state) => state.admin.financialCategory.categories);
   const [form] = Form.useForm();
   const [lineItems, setLineItems] = useState([
     {
-
       categoryId: "",
       budgetId: "",
-
       rate: 0,
       quantity: 0,
       unit: 0,
@@ -46,7 +43,7 @@ const AddOperationalExpenses = () => {
     status: "pending",
     paymentType: "cash",
     paymentDate: "",
-    onlineTransactionId: "",
+    onlineTransactionId:"",
     chequeNumber: "",
     chequeDate: "",
     note: "",
@@ -88,14 +85,13 @@ const AddOperationalExpenses = () => {
     setLineItems([
       ...lineItems,
       {
-
         categoryId: "",
         budgetId: "",
-
         rate: 0,
         quantity: 0,
         unit: 0,
         amount: 0,
+        paidAmount:0,
         frequency: "",
         startDate: "",
         endDate: "",
@@ -117,7 +113,7 @@ const AddOperationalExpenses = () => {
       newone
     ]);
   };
-  const handleSubmit = (values) => {
+  const handleSubmit = () => {
     if (entitiesIds.length < 1) {
       toast.error("Please select User");
       return;
@@ -129,6 +125,8 @@ const AddOperationalExpenses = () => {
       ...receiptData,
     };
     console.log(data);
+    
+   dispatch(createOperationalExpense({data,navigate}))
 
   };
 
@@ -141,7 +139,7 @@ const AddOperationalExpenses = () => {
 
 
   return (
-    <Layout title="Finance | OperationalExpenses">
+    <Layout title="Finance | Add Expense">
       <AdminDashLayout>
         <div className="p-6">
           <div className="flex items-center justify-between mb-2">
@@ -227,7 +225,7 @@ const AddOperationalExpenses = () => {
                   {lineItems[index].frequency == "Permanent Purchase" ? <>
                     <Col span={6}>
                       <Form.Item name={["lineItems", index, "unit"]} label="Unit">
-                        <Input style={{ width: "100%" }} value={item.unit} onChange={(value) => handleInputChange(index, "unit", value)} placeholder="e.g, Pieces,Meter..." />
+                        <input type="text" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" style={{ width: "100%" }} value={item.unit} onChange={(e) => handleInputChange(index, "unit", e.target.value)} placeholder="e.g, Pieces,Meter..." />
                       </Form.Item>
                     </Col>
                   </> : <>
@@ -243,6 +241,13 @@ const AddOperationalExpenses = () => {
                       </Form.Item>
                     </Col>
                   </>}
+                  {receiptData.status == "partial" &&
+                    <Col span={6}>
+                    <Form.Item name={["lineItems", index, "paidAmount"]} label="Paid Now" required>
+                      <input style={{ width: "100%" }} className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={item.paidAmount} onChange={(e) => handleInputChange(index, "paidAmount", e.target.value)} />
+                    </Form.Item>
+                  </Col>}
+
                   <Col span={6}>
                     <Form.Item name={["lineItems", index, "amount"]} label="Amount">
                       <p>= {item?.amount}</p>
@@ -266,6 +271,7 @@ const AddOperationalExpenses = () => {
                     <Select value={receiptData.paymentType} onChange={(value) => handleChange("status", value)}>
                       <Option value="pending">Pending</Option>
                       <Option value="paid">Paid</Option>
+                      <Option value="partial">Partial</Option>
                       <Option value="hold">Hold</Option>
                     </Select>
                   </Form.Item>

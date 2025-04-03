@@ -1,42 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Table, Input, Tag } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { SearchOutlined } from "@ant-design/icons";
-import Layout from "../../../../Components/Common/Layout";
-import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FaFileInvoice } from "react-icons/fa";
 import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
-import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
+import VoucherTemplate from "../../../../Utils/FinanceTemplate/VoucherTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
-import { fetchAllEntityRevenue } from "../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
+import { fetchOperationalExpenses } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
 
-const SummaryRevenueList = () => {
+const OperationalExpenseSummaryTable = () => {
   const dispatch = useDispatch();
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
-  // Get data from Redux
-  const { allEntityRevenue:incomes, loading, totalRecords, totalPages, currentPage } = useSelector(
-    (state) => state.admin.entityRevenue
+
+  const { allOperationalExpense, loading,  currentPage } = useSelector(
+    (store) => store.admin.operationalExpenses
   );
 
   const [searchText, setSearchText] = useState("");
   const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
 
   useEffect(() => {
-    dispatch(fetchAllEntityRevenue({ page: currentPage || 1, search: searchText, limit: computedPageSize }));
+    dispatch(fetchOperationalExpenses({ page: currentPage || 1, search: searchText, limit: computedPageSize }));
   }, [dispatch, currentPage, computedPageSize]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    dispatch(fetchAllEntityRevenue({ page: 1, search: value, limit: computedPageSize }));
+    dispatch(fetchOperationalExpenses({ page: 1, search: value, limit: computedPageSize }));
   };
 
   const columns = [
     {
-      title: "Invoice",
-      dataIndex: "InvoiceNumber",
-      key: "InvoiceNumber",
+      title: "Voucher",
+      dataIndex: "voucherNumber",
+      key: "voucherNumber",
       render: (InvoiceNumber) => `${InvoiceNumber}` || "N/A",
     },
     {
@@ -53,46 +50,35 @@ const SummaryRevenueList = () => {
         `${record?.lineItems?.reduce((sum, item) => sum + item.amount, 0)} ${schoolCurrency}`,
     },
     {
-      title: "Total Paid",
-      key: "paid_amount",
-      render: (_, record) =>
-        `${record?.lineItems?.reduce((sum, item) => sum + item.paid_amount, 0)} ${schoolCurrency}`,
+      title: "Total paid",
+      dataIndex: "paidAmount",
+      key: "paidAmount",
+      render: (_, record) =>`${record?.lineItems?.reduce((sum, item) => sum + item.paidAmount, 0)} ${schoolCurrency}`,
     },
     {
       title: "Status",
-      dataIndex: "paymentStatus",
-      key: "paymentStatus",
+      dataIndex: "status",
+      key: "status",
       render: (status) => {
-        const color = status === "paid" ? "green" : status === "unpaid" ? "red" : "yellow";
+        const color = status === "paid" ? "green"  : "yellow";
         return <Tag color={color}>{status}</Tag>;
       },
     },
-    {
-      title: "Action",
-      key: "action",
-      render: (_,record) => {
-     
-        return (
-        <div className="flex items-center flex-row gap-2">
-        <button title="Invoice" onClick={()=>{
-          setSelectedInvoice(record);
-          setInvoiceVisible(true)
-        }}><FaFileInvoice size={20}/></button>
-        <button title="Edit"><MdOutlineEdit size={20}/></button>
-        <button title="Delete"><MdDeleteOutline size={20}/></button>
-        </div>
-        );
-      },
-    },
+    
+    
   ];
 
-  // Define expandable row for lineItems
   const expandedRowRender = (record) => {
     const lineItemsColumns = [
       {
         title: "Item Name",
         dataIndex: "name",
         key: "name",
+      },
+      {
+        title: "Sub Category",
+        dataIndex: "subCategory",
+        key: "subCategory",
       },
       {
         title: "Quantity",
@@ -107,23 +93,16 @@ const SummaryRevenueList = () => {
         render: (rate) => `${rate?.toFixed(2)} ${schoolCurrency}`,
       },
       {
-        title: "Discount",
-        dataIndex: "discount",
-        key: "discount",
-        render: (discount, record) =>
-          record.discountType === "percentage" ? `${discount}%` : `${discount} ${schoolCurrency}`,
+        title: "Amount",
+        dataIndex: "amount",
+        key: "amount",
+        render: (rate) => `${rate?.toFixed(2)} ${schoolCurrency}`,
       },
       {
-        title: "Tax",
-        dataIndex: "tax",
-        key: "tax",
-        render: (tax) => `${tax?.toFixed(2)} ${schoolCurrency}`,
-      },
-      {
-        title: "Final Amount",
-        dataIndex: "final_amount",
-        key: "final_amount",
-        render: (amount) => `${amount?.toFixed(2)} ${schoolCurrency}`,
+        title: "Paid Amount",
+        dataIndex: "paidAmount",
+        key: "paidAmount",
+        render: (paidAmount) => `${paidAmount?.toFixed(2)} ${schoolCurrency}`,
       },
     ];
 
@@ -144,48 +123,25 @@ const navigate = useNavigate();
   const popupRef = useRef(null); 
     const pdfRef = useRef(null);
     const handleDownloadPDF = async (pdfRef, selectedInvoice) => {
-        await downloadPDF(pdfRef, selectedInvoice, "Invoice")
+        await downloadPDF(pdfRef, selectedInvoice, "Voucher")
       }
   return (
-    <Layout title="Finance | Entity Revenue List">
-      <AdminDashLayout>
-        <div className="p-4">
-         <div className="flex flex-row items-center justify-between">
-         <Input
-            placeholder="Search by Name , Email..."
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={handleSearch}
-            allowClear
-            style={{ width: 300, marginBottom: 16 }}
-          />
+ 
+  <>
+        <div className="">
+         <div className="flex flex-row items-center justify-between font-bold">
+         Summary of Operational Expenses
           <div>
-            <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/entity/add/revenue")}>Add New Invoice</button>
+            <button className="flex flex-row text-sm items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/operational-expenses/list")}>View More</button>
           </div>
          </div>
           <Table
             columns={columns}
-            dataSource={incomes}
+            dataSource={allOperationalExpense?.slice(0,5)}
             expandable={{ expandedRowRender }}
-            pagination={{
-              current: currentPage, // Use currentPage from API response
-              total: totalRecords,
-              pageSize: computedPageSize,
-              showSizeChanger: true, // Enable size changer
-              pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
-              size: "small",
-              showTotal: () =>
-                `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
-              onChange: (page, pageSize) => {
-                dispatch(fetchAllEntityRevenue({ page, search: searchText, limit:pageSize }));
-              },
-              onShowSizeChange: (current, size) => {
-                setComputedPageSize(size); // Update local state
-                dispatch(fetchAllEntityRevenue({ page: 1, search: searchText, limit: size }));
-              },
-            }}
             rowKey="_id"
             loading={loading}
+            pagination={false}
           />
         </div>
         {isInvoiceVisible && selectedInvoice && (
@@ -220,14 +176,14 @@ const navigate = useNavigate();
         
                           {/* Hidden container for PDF generation */}
                           <div >
-                            <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                            <VoucherTemplate data={selectedInvoice} ref={pdfRef} />
                           </div>
                         </div>
                       </div>
                     )}
-      </AdminDashLayout>
-    </Layout>
+      
+ </>
   );
 };
 
-export default SummaryRevenueList;
+export default OperationalExpenseSummaryTable;

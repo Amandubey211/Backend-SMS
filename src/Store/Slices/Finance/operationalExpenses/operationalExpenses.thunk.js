@@ -2,16 +2,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
-import {
-  getData,
-  postData,
-  putData,
-  deleteData,
-  customRequest,
-} from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
 import toast from "react-hot-toast";
 import { getUserRole } from "../../../../Utils/getRoles";
+import { getData, postData, putData } from "../../../../services/apiEndpoints";
 
 
 export const fetchOperationalExpenses  = createAsyncThunk(
@@ -22,23 +16,7 @@ export const fetchOperationalExpenses  = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/expense/get/staff/salaryWages?say=${say}`,{ categoryId,search, page, limit}
-      );
-      return response;
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
-    }
-  }
-);
-export const fetchOperationalExpensesStaff  = createAsyncThunk(
-  "finance/fetchOperationalExpensesStaff",
-  async ({type}, { rejectWithValue, dispatch, getState }) => {
-    try {
-      const say = getAY();
-      const getRole = getUserRole(getState);
-      dispatch(setShowError(false));
-      const response = await getData(
-        `/${getRole}/expense/get/operationalExpenses/staffs?say=${say}`,{type}
+        `/${getRole}/expense/get/generalExpense?say=${say}`,{categoryId,search, page, limit}
       );
       return response;
     } catch (error) {
@@ -47,52 +25,47 @@ export const fetchOperationalExpensesStaff  = createAsyncThunk(
   }
 );
 
-export const createoperationalExpenses  = createAsyncThunk(
-  "finance/createoperationalExpenses ",
-  async (data, { rejectWithValue, dispatch, getState }) => {
+
+export const createOperationalExpense = createAsyncThunk(
+  "finance/createOperationalExpense",
+   async ({data,navigate}, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
     try {
       const getRole = getUserRole(getState);
-      const response = await postData(
-        `/${getRole}/expense/add/operationalExpenses/?say=${say}`, data 
-      );
-      if(response.success){
-        toast.success(response.message);
-        dispatch(
-          fetchoperationalExpenses({
-            search: "",
-            page: 1,
-            limit: 10,
-          })
-        )
-       }else{
-        toast.error(response.message);
-       }
+      const response = await postData(`/${getRole}/expense/add/generalExpense?say=${say}`,data);
+      if (response.success) {
+        toast.success('Expense created  successfully!');
+        navigate('/finance/operational-expenses')
+      }else{
+        toast.error(response?.message);
+      }
       return response;
     } catch (error) {
+      console.error(error);
       toast.dismiss()
-      toast.error('operationalExpenses not added');
+      toast.error('Expense not created');
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
 
-export const updateoperationalExpenses  = createAsyncThunk(
-  "finance/updateoperationalExpenses ",
+
+export const updateOperationalExpenses  = createAsyncThunk(
+  "finance/updateOperationalExpenses",
   async (data, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
     try {
       const getRole = getUserRole(getState);
       const response = await putData(
-        `/${getRole}/operationalExpenses/update/${data.id}?say=${say}`,
+        `/${getRole}/expense/add/generalExpense/${data.id}?say=${say}`,
         data
       );
      if(response.success){
       toast.success(response.message);
       dispatch(
-        fetchoperationalExpenses ({
+        fetchOperationalExpenses({
           search: "",
           page: 1,
           limit: 10,
@@ -101,8 +74,6 @@ export const updateoperationalExpenses  = createAsyncThunk(
      }else{
       toast.error(response.message);
      }
-      
-      fetchoperationalExpenses ()
       return response;
     } catch (error) {
       toast.dismiss()
@@ -112,4 +83,23 @@ export const updateoperationalExpenses  = createAsyncThunk(
   }
 );
 
+
+export const fetchOperationalExpensesGraph = createAsyncThunk(
+  "finance/ fetchOperationalExpensesGraph",
+
+  async (params, { rejectWithValue, dispatch, getState }) => {
+
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/expense/get/graph/generalExpense?say=${say}`,params
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
