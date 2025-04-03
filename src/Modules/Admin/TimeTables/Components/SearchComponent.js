@@ -1,6 +1,6 @@
 // src/Modules/Admin/TimeTables/Components/SearchComponent.js
 import React from "react";
-import { Input, Select, Space, Button } from "antd";
+import { Input, Select, Space, Button, Tag } from "antd";
 import {
   FilterOutlined,
   CalendarOutlined,
@@ -9,7 +9,6 @@ import {
 import { AiOutlineFilter } from "react-icons/ai";
 
 const { Search } = Input;
-
 const { Option } = Select;
 
 export const SearchComponent = ({
@@ -21,7 +20,6 @@ export const SearchComponent = ({
   setShowFilterDrawer,
   filterTags,
   clearAllFilters,
-  fetchTimetables,
 }) => {
   return (
     <div className="mb-4 bg-white p-4 rounded-lg shadow-sm">
@@ -32,7 +30,6 @@ export const SearchComponent = ({
           onChange={handleSearchChange}
           allowClear
           onClear={handleClearSearch}
-          onSearch={() => fetchTimetables()}
           enterButton
           style={{ width: 250 }}
         />
@@ -50,8 +47,8 @@ export const SearchComponent = ({
           onChange={(value) => handleFilterChange({ status: value })}
           dropdownMatchSelectWidth={false}
         >
-          <Option value="active">Publish</Option>
-          <Option value="inactive">Unpublish</Option>
+          <Option value="active">Published</Option>
+          <Option value="inactive">Unpublished</Option>
         </Select>
 
         <Select
@@ -91,6 +88,25 @@ export const SearchComponent = ({
           </Button>
         )}
       </Space>
+
+      {/* Display active filters */}
+      {filterTags.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {filterTags.map((filter) => (
+            <Tag
+              key={filter.key}
+              closable
+              onClose={() =>
+                handleFilterChange({
+                  [filter.key]: Array.isArray(filters[filter.key]) ? [] : null,
+                })
+              }
+            >
+              {filter.key}: {filter.display}
+            </Tag>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

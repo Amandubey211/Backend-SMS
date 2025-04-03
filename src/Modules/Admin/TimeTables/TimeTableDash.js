@@ -15,8 +15,6 @@ import {
   Input,
   Tooltip,
   Select,
-  Row,
-  Col,
   message,
 } from "antd";
 import {
@@ -30,12 +28,10 @@ import {
   EditOutlined,
   DeleteOutlined,
   CalendarOutlined,
-  SearchOutlined,
-  FilterOutlined,
 } from "@ant-design/icons";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import dayjs from "dayjs";
 import { format, isWithinInterval, parseISO } from "date-fns";
 import debounce from "lodash/debounce";
@@ -50,6 +46,7 @@ import NavigationControls from "./Components/NavigationControls";
 import TimeTableForm from "./Components/TimeTableForm";
 import { Doughnut } from "react-chartjs-2";
 import FilterDrawer from "./Components/FilterDrawer";
+import { SearchComponent } from "./Components/SearchComponent";
 
 // Thunks
 import {
@@ -69,8 +66,6 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semeste
 
 // Utils
 import ExportFunctions from "../../../Utils/timetableUtils";
-import toast from "react-hot-toast";
-import { SearchComponent } from "./Components/SearchComponent";
 
 export default function TimeTableDash() {
   const dispatch = useDispatch();
@@ -111,7 +106,7 @@ export default function TimeTableDash() {
   // Deletion modal
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  // Filter data
+  // Filter data - initialize all filters as null/empty
   const [filters, setFilters] = useState({
     class: null,
     sections: [],
@@ -121,10 +116,10 @@ export default function TimeTableDash() {
     status: null,
     type: null,
   });
+  const [searchTerm, setSearchTerm] = useState("");
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
 
   // Search and pagination
-  const [searchTerm, setSearchTerm] = useState("");
   const [paginationConfig, setPaginationConfig] = useState({
     current: 1,
     pageSize: 10,
@@ -136,7 +131,7 @@ export default function TimeTableDash() {
       new ExportFunctions({
         viewMode,
         selectedDate,
-        filteredTimetables: timetables, // Use the full list from backend
+        filteredTimetables: timetables,
         format,
         dayjs,
         isWithinValidity: (timetable, date) => {
@@ -192,7 +187,7 @@ export default function TimeTableDash() {
     return result;
   }, [timetables, activeTab, filters.type]);
 
-  // Fetch all initial data
+  // Fetch all initial data with no filters
   useEffect(() => {
     dispatch(fetchAllClasses());
     fetchTimetables();
@@ -208,8 +203,11 @@ export default function TimeTableDash() {
         ...params,
       };
 
-      if (searchTerm) {
-        queryParams.search = searchTerm; // Changed from 'name' to 'search' for backend
+      // Only include search if searchTerm is not empty
+      if (searchTerm.trim()) {
+        queryParams.search = searchTerm;
+      } else {
+        delete queryParams.search;
       }
 
       if (activeTab === "calendar") {
@@ -226,26 +224,23 @@ export default function TimeTableDash() {
     () =>
       debounce((value) => {
         setPaginationConfig((prev) => ({ ...prev, current: 1 }));
-        fetchTimetables({ name: value, page: 1 });
+        fetchTimetables({ search: value, page: 1 });
       }, 500),
     [fetchTimetables]
   );
+
   // Handle search term change
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    if (value.trim() === "") {
-      fetchTimetables({ search: "", page: 1 });
-    } else {
-      debouncedSearch(value);
-    }
+    debouncedSearch(value);
   };
 
   // Clear search and refetch
   const handleClearSearch = () => {
     setSearchTerm("");
     setPaginationConfig((prev) => ({ ...prev, current: 1 }));
-    fetchTimetables({ search: "", page: 1 });
+    fetchTimetables({ search: undefined, page: 1 });
     debouncedSearch.cancel();
   };
 
@@ -318,9 +313,10 @@ export default function TimeTableDash() {
       status: null,
       type: null,
     };
+    setFilters(newFilters);
     setSearchTerm("");
-    applyFilters(newFilters);
-  }, [applyFilters]);
+    fetchTimetables({ ...newFilters, search: undefined, page: 1 });
+  }, [fetchTimetables]);
 
   const removeFilter = useCallback(
     (filterName) => {
@@ -339,7 +335,6 @@ export default function TimeTableDash() {
     fetchTimetables({
       page: pagination.current,
       limit: pagination.pageSize,
-      ...filters,
       ...(sorter.field && {
         sortField: sorter.field,
         sortOrder: sorter.order,
@@ -689,7 +684,6 @@ export default function TimeTableDash() {
           setShowFilterDrawer={setShowFilterDrawer}
           filterTags={filterTags}
           clearAllFilters={clearAllFilters}
-          fetchTimetables={fetchTimetables}
         />
 
         {/* Conditionally Render List or Calendar View */}
@@ -704,15 +698,17 @@ export default function TimeTableDash() {
               />
             ) : (
               <Table
-                dataSource={timetables} // Use the full list from backend
+                dataSource={timetables}
                 columns={listColumns}
                 rowKey="_id"
                 pagination={{
-                  ...paginationConfig,
-                  total: pagination.total,
+                  current: paginationConfig.current,
+                  pageSize: paginationConfig.pageSize,
+                  total: pagination?.total || 0,
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total) => `Total ${total} items`,
+                  position: ["bottomRight"],
                 }}
                 onChange={handleTableChange}
                 loading={loadingFetch}
@@ -786,10 +782,6 @@ export default function TimeTableDash() {
           {loadingFetch ? (
             <div className="space-y-4">
               <Skeleton.Input active size="default" style={{ width: 150 }} />
-              <div className="flex flex-col gap-2">
-                <Skeleton.Button active block size="large" />
-                <Skeleton.Button active block size="large" />
-              </div>
               <div className="space-y-2">
                 {[...Array(4)].map((_, i) => (
                   <div
