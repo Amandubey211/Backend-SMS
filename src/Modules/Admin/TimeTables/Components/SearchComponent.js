@@ -27,17 +27,23 @@ export const SearchComponent = ({
           placeholder="Search timetables..."
           value={searchTerm}
           onChange={handleSearchChange}
-          // If you want an immediate fetch on Enter, add an onSearch:
           onSearch={(value) => {
-            // This ensures pressing Enter triggers fetch instantly
             if (!value.trim()) {
               handleClearSearch();
             } else {
-              // Or call a function that sets page=1 and fetches
+              // Trigger search immediately on Enter
               handleSearchChange({ target: { value } });
             }
           }}
-          allowClear
+          allowClear={{
+            clearIcon: (
+              <CloseOutlined
+                onClick={() => {
+                  handleClearSearch(); // Explicitly call clear handler
+                }}
+              />
+            ),
+          }}
           enterButton
           style={{ width: 250 }}
         />

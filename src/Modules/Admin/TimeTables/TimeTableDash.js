@@ -728,7 +728,10 @@ export default function TimeTableDash() {
         <SearchComponent
           searchTerm={searchTerm}
           handleSearchChange={handleSearchChange}
-          handleClearSearch={handleClearSearch}
+          handleClearSearch={() => {
+            setSearchTerm(""); // Clear the search term state
+            fetchTimetables({ search: undefined, page: 1 }); // Fetch without search query
+          }}
           filters={filters}
           handleFilterChange={handleFilterChange}
           setShowFilterDrawer={setShowFilterDrawer}
