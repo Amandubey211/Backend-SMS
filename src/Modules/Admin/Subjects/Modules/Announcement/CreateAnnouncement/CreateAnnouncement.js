@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Layout from "../../../../../../Components/Common/Layout";
 import SideMenubar from "../../../../../../Components/Admin/SideMenubar";
@@ -47,7 +47,7 @@ const CreateAnnouncement = () => {
     (state) => state.common.user.sidebar.isOpen
   );
   const sidebarWidth = isSidebarOpen ? "15%" : "7%";
-
+  const navigate = useNavigate();
   // Preload announcement data if editing
   useEffect(() => {
     if (announcement) {
@@ -144,10 +144,15 @@ const CreateAnnouncement = () => {
 
     if (announcement?._id) {
       dispatch(
-        editAnnouncement({ id: announcement._id, data: payload, files })
+        editAnnouncement({
+          id: announcement._id,
+          data: payload,
+          files,
+          navigate,
+        })
       );
     } else {
-      dispatch(createAnnouncement({ data: payload, files }));
+      dispatch(createAnnouncement({ data: payload, files, navigate }));
     }
   }, [
     assignmentName,
