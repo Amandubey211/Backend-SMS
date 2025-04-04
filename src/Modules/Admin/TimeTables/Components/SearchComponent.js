@@ -1,4 +1,3 @@
-// src/Modules/Admin/TimeTables/Components/SearchComponent.js
 import React from "react";
 import { Input, Select, Space, Button, Tag } from "antd";
 import {
@@ -28,8 +27,17 @@ export const SearchComponent = ({
           placeholder="Search timetables..."
           value={searchTerm}
           onChange={handleSearchChange}
+          // If you want an immediate fetch on Enter, add an onSearch:
+          onSearch={(value) => {
+            // This ensures pressing Enter triggers fetch instantly
+            if (!value.trim()) {
+              handleClearSearch();
+            } else {
+              // Or call a function that sets page=1 and fetches
+              handleSearchChange({ target: { value } });
+            }
+          }}
           allowClear
-          onClear={handleClearSearch}
           enterButton
           style={{ width: 250 }}
         />

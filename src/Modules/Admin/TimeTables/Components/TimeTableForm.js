@@ -230,17 +230,17 @@ const TimetablePreviewModal = ({
                             <ClockCircleOutlined className="mr-2 text-gray-500" />
                             <span className="font-medium">
                               {slot.startTime &&
-                                moment(slot.startTime).format("h:mm A")}{" "}
+                                moment(slot?.startTime).format("h:mm A")}{" "}
                               -{" "}
-                              {slot.endTime &&
-                                moment(slot.endTime).format("h:mm A")}
+                              {slot?.endTime &&
+                                moment(slot?.endTime).format("h:mm A")}
                             </span>
                           </div>
-                          <Tag color="blue" className="ml-2">
+                          {/* <Tag color="blue" className="ml-2">
                             {getSubjectName(slot.subjectId)}
-                          </Tag>
+                          </Tag> */}
                         </div>
-                        <div className="mt-2 flex flex-wrap gap-2">
+                        {/* <div className="mt-2 flex flex-wrap gap-2">
                           {slot.teacher && (
                             <Tag color="purple">
                               <span className="font-medium">Teacher:</span>{" "}
@@ -258,7 +258,7 @@ const TimetablePreviewModal = ({
                               {slot.description}
                             </div>
                           )}
-                        </div>
+                        </div> */}
                       </div>
                     ))}
                   </div>
