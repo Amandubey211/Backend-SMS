@@ -23,7 +23,7 @@ const MainSection = () => {
   const { cid, sid } = useParams();
   const navigate = useNavigate();
 
-  const { syllabi, loading, error } = useSelector(
+  const { syllabi, loading, error, selectedSyllabus } = useSelector(
     (state) => state.admin.syllabus
   );
 
@@ -39,34 +39,23 @@ const MainSection = () => {
 
   const handleDeleteClick = async (syllabusId) => {
     await dispatch(deleteSyllabus(syllabusId));
+    navigate(-1);
     dispatch(fetchSyllabus({ subjectId: sid, classId: cid }));
   };
 
   const renderContent = () => {
-    if (loading) {
-      return <Spinner />;
-    }
-
-    if (error) {
-      // Centering error state within the right section
-      return (
-        <div className="h-full w-full flex items-center justify-center">
-          <NoDataFound title={t("Syllabus")} />
-        </div>
-      );
-    }
-
     if (syllabi && syllabi.length > 0) {
       return (
         <>
           <SyllabusHeader
-            onEditClick={() => handleEditClick(syllabi[0])}
-            onDeleteClick={() => handleDeleteClick(syllabi[0]._id)}
-            syllabus={syllabi[0]}
+            onEditClick={() => handleEditClick(selectedSyllabus)}
+            onDeleteClick={() => handleDeleteClick(selectedSyllabus._id)}
+            syllabus={selectedSyllabus}
           />
           <SyllabusSection
-            title={syllabi[0]?.title}
-            content={syllabi[0]?.content}
+            syllabus={selectedSyllabus}
+            title={selectedSyllabus?.title}
+            content={selectedSyllabus?.content}
           />
         </>
       );
@@ -99,16 +88,6 @@ const MainSection = () => {
         {/* Updated container: flex layout ensures content is centered when needed */}
         <div className="border-l w-full py-1 px-4 relative flex flex-col h-full">
           {renderContent()}
-          {syllabi && syllabi.length === 0 && (
-            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_SYLLABUS}>
-              <NavLink
-                to={`/class/${cid}/${sid}/syllabus/create_syllabus`}
-                className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4"
-              >
-                <RiAddFill size={24} />
-              </NavLink>
-            </ProtectedAction>
-          )}
         </div>
       </ProtectedSection>
     </div>

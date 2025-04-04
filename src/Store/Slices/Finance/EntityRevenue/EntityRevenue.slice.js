@@ -1,11 +1,12 @@
 // src/store/finance/EntityRevenue/EntityRevenueSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { createEntityRevenue, EntityRevenueGraph, fetchAllEntityRevenue, fetchEntityRevenueCardData, updateEntityRevenue } from "./EntityRevenue.thunk";
+import { createEntityRevenue, EntityRevenueGraph, fetchAllEntityRevenue, fetchAllEntityRevenueGraph, fetchEntityRevenueCardData, updateEntityRevenue } from "./EntityRevenue.thunk";
 
 
 const initialState = {
 
   allEntityRevenue: [],
+  entityRevenueGraph: [],
   totalRecords:0,
   totalPages:1,
   currentPage: 1,
@@ -40,6 +41,20 @@ const EntityRevenueSlice = createSlice({
        
       })
       .addCase(fetchAllEntityRevenue.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+      builder
+      .addCase(fetchAllEntityRevenueGraph.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllEntityRevenueGraph.fulfilled, (state, action) => {
+        state.loading = false;
+        state.entityRevenueGraph = action.payload.data || [];
+       
+      })
+      .addCase(fetchAllEntityRevenueGraph.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       });

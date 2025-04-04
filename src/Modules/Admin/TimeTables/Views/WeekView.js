@@ -1,8 +1,8 @@
 import React from "react";
-import { format } from "date-fns";
+import { format, isSameDay, isWithinInterval, parseISO } from "date-fns";
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import { Badge } from "antd";
+import { Badge, Tooltip, Empty } from "antd";
 import { TfiTime } from "react-icons/tfi";
 import { Element } from "react-scroll";
 
@@ -22,9 +22,26 @@ export default function WeekView({
     return d;
   });
 
-  // Full 24-hour timeline
-  const timeSlots = Array.from({ length: 24 }, (_, i) => i);
+  // Full 24-hour timeline with AM/PM format
+  const timeSlots = Array.from({ length: 24 }, (_, i) => ({
+    hour: i,
+    display: `${i % 12 || 12}:00 ${i < 12 ? "AM" : "PM"}`,
+    isAM: i < 12,
+  }));
+
   const hourHeight = 64; // Fixed height for each hour slot
+
+  // Function to check if a day is within timetable's validity period
+  const isDayWithinValidity = (day, timetable) => {
+    if (!timetable.validity) return true;
+    const { startDate, endDate } = timetable.validity;
+    if (!startDate || !endDate) return true;
+
+    return isWithinInterval(day, {
+      start: parseISO(startDate),
+      end: parseISO(endDate),
+    });
+  };
 
   // Function to calculate exact event position and height
   const calculateEventPosition = (startTime, endTime) => {
@@ -46,6 +63,77 @@ export default function WeekView({
     };
   };
 
+  // Get events for a specific day that are within validity period
+  const getEventsForDay = (day, timetable) => {
+    if (!isDayWithinValidity(day, timetable)) return [];
+
+    const dayString = format(day, "yyyy-MM-dd");
+    const dayName = format(day, "EEEE");
+
+    const dayData = timetable.days?.find(
+      (d) =>
+        d.day === dayName ||
+        (d.date && format(new Date(d.date), "yyyy-MM-dd") === dayString)
+    );
+
+    if (!dayData?.slots) return [];
+
+    return dayData.slots.map((slot) => ({
+      ...timetable,
+      slot,
+      dayData,
+    }));
+  };
+
+  // Function to detect overlapping events and assign z-index
+  const organizeEvents = (events) => {
+    if (events.length === 0) return [];
+
+    // Sort events by start time
+    const sortedEvents = [...events].sort((a, b) => {
+      const aStart = new Date(a.slot.startTime).getTime();
+      const bStart = new Date(b.slot.startTime).getTime();
+      return aStart - bStart;
+    });
+
+    const organized = [];
+    const layers = [];
+
+    sortedEvents.forEach((event) => {
+      const eventStart = new Date(event.slot.startTime).getTime();
+      const eventEnd = new Date(event.slot.endTime).getTime();
+
+      // Find the first layer where this event doesn't overlap with existing events
+      let layerIndex = 0;
+      while (layerIndex < layers.length) {
+        const layer = layers[layerIndex];
+        const overlaps = layer.some(
+          (existingEvent) =>
+            eventStart < new Date(existingEvent.slot.endTime).getTime() &&
+            eventEnd > new Date(existingEvent.slot.startTime).getTime()
+        );
+        if (!overlaps) break;
+        layerIndex++;
+      }
+
+      // Create new layer if needed
+      if (layerIndex >= layers.length) {
+        layers.push([]);
+      }
+
+      // Add event to layer
+      layers[layerIndex].push(event);
+
+      // Store with z-index (higher for later layers)
+      organized.push({
+        ...event,
+        zIndex: layerIndex + 1, // Start from 1 to avoid issues with other elements
+      });
+    });
+
+    return organized;
+  };
+
   return (
     <motion.div
       key="weekView"
@@ -54,21 +142,17 @@ export default function WeekView({
       exit={{ opacity: 0, x: -30 }}
       className="p-4 overflow-x-auto"
     >
-      <div className="flex items-center justify-between">
-        <h3 className="text-xl font-bold mb-4">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-xl font-bold">
           Week of {format(daysInWeek[0], "dd MMM")} -{" "}
-          {format(daysInWeek[6], "dd MMM")}
+          {format(daysInWeek[6], "dd MMM yyyy")}
         </h3>
-        <div className="mb-4 flex items-center gap-2">
-          <label htmlFor="week-date" className="mr-2 font-medium">
-            Select Date:
-          </label>
+        <div className="flex items-center gap-2">
           <input
-            id="week-date"
             type="date"
             value={format(selectedDate, "yyyy-MM-dd")}
             onChange={(e) => onDateChange(new Date(e.target.value))}
-            className="border rounded p-1"
+            className="border rounded p-1 text-sm"
           />
         </div>
       </div>
@@ -76,25 +160,22 @@ export default function WeekView({
       <div className="flex min-w-max bg-white rounded-lg shadow">
         {/* Time column - Full 24-hour timeline */}
         <div
-          className="w-16 flex-shrink-0"
+          className="w-20 flex-shrink-0"
           style={{ height: `${24 * hourHeight + 40}px` }}
         >
-          <div className="h-16  border-gray-200 flex justify-center items-center text-2xl">
-            <TfiTime />
+          <div className="h-20 mt-2.5 border-b border-gray-200 flex justify-center items-center">
+            <TfiTime className="text-lg" />
           </div>
-          {timeSlots.map((hour) => (
+          {timeSlots.map((slot) => (
             <div
-              key={hour}
-              className="flex border items-start justify-end pr-2 text-xs text-gray-500"
-              style={{ height: `${hourHeight}px` }}
+              key={slot.hour}
+              className="flex border-b border-gray-200 items-start justify-end pr-2 text-xs"
+              style={{
+                height: `${hourHeight}px`,
+                color: slot.isAM ? "#4a5568" : "#2d3748",
+              }}
             >
-              {hour === 0
-                ? "12 AM"
-                : hour < 12
-                ? `${hour} AM`
-                : hour === 12
-                ? "12 PM"
-                : `${hour - 12} PM`}
+              {slot.display}
             </div>
           ))}
         </div>
@@ -104,26 +185,45 @@ export default function WeekView({
           {/* Day headers */}
           {daysInWeek.map((day) => {
             const dayString = format(day, "yyyy-MM-dd");
-            const isToday =
-              format(day, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
+            const isToday = isSameDay(day, new Date());
+            const isWeekend = [0, 6].includes(day.getDay());
+            const dayEvents = filteredTimetables.flatMap((tt) =>
+              getEventsForDay(day, tt)
+            );
 
             return (
               <div
-                key={day.toString()}
+                key={dayString}
                 className={`text-center p-2 border-t border-l border-b border-gray-200 ${
                   isToday ? "bg-blue-50 font-semibold" : ""
-                }`}
+                } ${isWeekend ? "bg-gray-50" : ""}`}
               >
-                <div className="text-sm text-gray-600">
+                <div
+                  className={`text-sm ${
+                    isWeekend ? "text-gray-500" : "text-gray-600"
+                  }`}
+                >
                   {format(day, "EEE")}
                 </div>
                 <div
                   className={`text-lg ${
-                    isToday ? "text-blue-600" : "text-gray-800"
+                    isToday
+                      ? "text-blue-600"
+                      : isWeekend
+                      ? "text-gray-500"
+                      : "text-gray-800"
                   }`}
                 >
                   {format(day, "dd")}
                 </div>
+                {dayEvents.length > 0 && (
+                  <Badge
+                    count={dayEvents.length}
+                    size="small"
+                    className="mt-1"
+                    style={{ backgroundColor: "#3B82F6" }}
+                  />
+                )}
               </div>
             );
           })}
@@ -134,12 +234,12 @@ export default function WeekView({
             style={{ height: `${24 * hourHeight}px` }}
           >
             {/* Background grid lines */}
-            {timeSlots.map((hour) => (
+            {timeSlots.map((slot) => (
               <div
-                key={`grid-${hour}`}
+                key={`grid-${slot.hour}`}
                 className="border-b border-gray-200 absolute w-full"
                 style={{
-                  top: `${hour * hourHeight}px`,
+                  top: `${slot.hour * hourHeight}px`,
                   height: `${hourHeight}px`,
                 }}
               ></div>
@@ -148,161 +248,90 @@ export default function WeekView({
             {/* Events */}
             {daysInWeek.map((day, dayIndex) => {
               const dayString = format(day, "yyyy-MM-dd");
+              const isWeekend = [0, 6].includes(day.getDay());
+
+              // Get all events for this day across all timetables
               const events = filteredTimetables.flatMap((tt) => {
-                const dayData = tt.days?.find(
-                  (d) =>
-                    d.day === format(day, "EEEE") ||
-                    (d.date &&
-                      format(new Date(d.date), "yyyy-MM-dd") === dayString)
-                );
-
-                if (!dayData) return [];
-
-                return (
-                  dayData.slots?.map((slot) => ({
-                    ...tt,
-                    slot,
-                    dayIndex,
-                  })) || []
-                );
+                if (!isDayWithinValidity(day, tt)) return [];
+                return getEventsForDay(day, tt);
               });
 
-              // Group events by their time slot
-              const eventGroups = {};
-              events.forEach((evt) => {
-                const hour = new Date(evt.slot.startTime).getHours();
-                const key = `${dayIndex}-${hour}`;
-                if (!eventGroups[key]) {
-                  eventGroups[key] = [];
-                }
-                eventGroups[key].push(evt);
-              });
+              // Organize events with proper z-index for overlapping
+              const organizedEvents = organizeEvents(events);
 
               return (
                 <React.Fragment key={dayString}>
-                  {Object.entries(eventGroups).map(([key, groupEvents]) => {
-                    const firstEvent = groupEvents[0];
+                  {organizedEvents.map((event) => {
                     const { height, top } = calculateEventPosition(
-                      firstEvent.slot.startTime,
-                      firstEvent.slot.endTime
+                      event.slot.startTime,
+                      event.slot.endTime
                     );
 
+                    const displayText =
+                      event.slot?.subjectId?.name ||
+                      event.slot?.eventName ||
+                      event.name;
+                    const color = getColorByType(event.type);
+                    const darkerColor = darkenColor(color, 20);
+
                     return (
-                      <div
-                        key={key}
-                        className="absolute"
+                      <motion.div
+                        key={`${dayString}-${event._id}`}
+                        className="absolute flex-shrink-0 flex flex-col overflow-hidden shadow-sm mx-px cursor-pointer"
                         style={{
                           left: `${(dayIndex / 7) * 100}%`,
                           width: "calc(100% / 7 - 8px)",
                           height: `${height}px`,
                           top: `${top}px`,
+                          zIndex: event.zIndex,
+                        }}
+                        onClick={() => onEventClick(event)}
+                        whileHover={{
+                          zIndex: 100, // Higher than all other events when hovered
+                          boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+                          transition: { duration: 0.2 },
                         }}
                       >
-                        {/* Badge for multiple events */}
-                        {groupEvents.length > 1 && (
-                          <Badge
-                            count={groupEvents.length}
-                            style={{
-                              backgroundColor: "#1890ff",
-                              position: "absolute",
-                              top: 0,
-                              right: -14,
-                              zIndex: 2,
-                              fontSize: "10px",
-                              height: "16px",
-                              minWidth: "16px",
-                              lineHeight: "16px",
-                              padding: "0 4px",
-                              borderRadius: "4px",
-                            }}
-                          />
-                        )}
-
-                        {/* Horizontal scroll container for events */}
-                        <Element
-                          name={`${dayString}-${key}`}
-                          className="h-full overflow-x-auto scrollbar-thin"
+                        {/* Header */}
+                        <div
+                          className="px-2 py-1 text-white text-xs font-medium truncate border-b"
+                          style={{ backgroundColor: darkerColor }}
                         >
-                          <div
-                            className="flex h-full"
-                            style={{
-                              minWidth: `${groupEvents.length * 150}px`,
-                            }}
-                          >
-                            {groupEvents.map((evt) => {
-                              const displayText =
-                                evt.slot?.subjectId?.name ||
-                                evt.slot?.eventName ||
-                                evt.name;
-                              const color = getColorByType(evt.type);
-                              const darkerColor = darkenColor(color, 20);
+                          {event.name}
+                        </div>
 
-                              return (
-                                <motion.div
-                                  key={evt._id}
-                                  className="flex-shrink-0 flex flex-col overflow-hidden shadow-sm mx-px relative cursor-pointer"
-                                  style={{
-                                    width:
-                                      groupEvents.length === 1
-                                        ? "150px"
-                                        : "70px",
-                                    height: "100%",
-                                  }}
-                                  onClick={() => onEventClick(evt)}
-                                  whileHover={{
-                                    // scale: 1.05,
-                                    zIndex: 10,
-                                    cursor: "pointer",
-                                    boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
-                                    transition: { duration: 0.2 },
-                                  }}
-                                >
-                                  {/* Header */}
-                                  <div
-                                    className="px-2 py-1 text-white text-xs font-medium truncate border-b"
-                                    style={{ backgroundColor: darkerColor }}
-                                  >
-                                    {evt.name}
-                                  </div>
-
-                                  {/* Divider */}
-                                  <div
-                                    className="h-px w-full"
-                                    style={{ backgroundColor: darkerColor }}
-                                  />
-
-                                  {/* Body */}
-                                  <div
-                                    className="flex-1 px-2 py-1 text-xs"
-                                    style={{ backgroundColor: color }}
-                                  >
-                                    <div className="text-white font-medium truncate">
-                                      {displayText}
-                                    </div>
-                                    <div className="text-white text-xxs opacity-80 mt-1">
-                                      {dayjs(evt.slot.startTime).format(
-                                        "h:mm A"
-                                      )}{" "}
-                                      -{" "}
-                                      {dayjs(evt.slot.endTime).format("h:mm A")}
-                                    </div>
-                                    {evt.slot.teacherId?.name && (
-                                      <div className="text-white text-xxs opacity-80 mt-1">
-                                        {evt.slot.teacherId.name}
-                                      </div>
-                                    )}
-                                  </div>
-                                </motion.div>
-                              );
-                            })}
+                        {/* Body */}
+                        <div
+                          className="flex-1 px-2 py-1 text-xs"
+                          style={{ backgroundColor: color }}
+                        >
+                          <div className="text-white font-medium truncate">
+                            {displayText}
                           </div>
-                        </Element>
-                      </div>
+                          <div className="text-white text-xxs opacity-80 mt-1">
+                            {dayjs(event.slot.startTime).format("h:mm A")} -{" "}
+                            {dayjs(event.slot.endTime).format("h:mm A")}
+                          </div>
+                        </div>
+                      </motion.div>
                     );
                   })}
                 </React.Fragment>
               );
             })}
+
+            {/* Empty state */}
+            {filteredTimetables.length > 0 &&
+              filteredTimetables.every(
+                (tt) => !daysInWeek.some((day) => isDayWithinValidity(day, tt))
+              ) && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No events within validity period for this week"
+                  />
+                </div>
+              )}
           </div>
         </div>
       </div>
@@ -321,13 +350,6 @@ function darkenColor(color, percent) {
     return `#${((1 << 24) | (R << 16) | (G << 8) | B).toString(16).slice(1)}`;
   }
   return color;
-}
-
-function isWithinValidity(timetable, currentDate) {
-  if (!timetable.validity) return true;
-  const { startDate, endDate } = timetable.validity;
-  if (!startDate || !endDate) return true;
-  return currentDate >= new Date(startDate) && currentDate <= new Date(endDate);
 }
 
 function getColorByType(type) {

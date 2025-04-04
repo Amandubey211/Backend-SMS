@@ -9,11 +9,13 @@ import {
   studentFeesGraph,
   fetchStudentFeeCardData,
   createStudentFeeRecordForClass,
+  fetchGraphStudentFee,
 } from "./studentFeesThunks";
 
 const initialState = {
   fees: [],
   allStudntFees: [],
+  graphStudntFees: [],
   totalRecords:0,
   totalPages:1,
   currentPage: 1,
@@ -48,6 +50,19 @@ const studentFeesSlice = createSlice({
       .addCase(fetchOneStudentFee.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
+      });
+    builder
+      .addCase(fetchGraphStudentFee.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchGraphStudentFee.fulfilled, (state, action) => {
+        state.loading = false;
+        state.graphStudntFees = action.payload?.data || null;
+      })
+      .addCase(fetchGraphStudentFee.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error?.message;
       });
 
     builder

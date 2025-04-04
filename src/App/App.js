@@ -60,17 +60,13 @@ import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js"
 import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
+import InventoryList from "../Modules/Admin/Finance/Inventory/InventoryList.js";
 // lazy loaded routes
 const AllStudents = lazy(() =>
   import(
     "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/AllStudents.js"
   )
 );
-
-
-
-
-
 
 const EntityRevenueDash = lazy(() =>
   import("../Modules/Admin/Finance/entityRevenue/EntityRevenueDash.js")
@@ -90,11 +86,17 @@ const PayRollDash = lazy(() =>
 const AddPayRollDash = lazy(() =>
   import("../Modules/Admin/Finance/Payroll/AddPayRoll.js")
 );
+const PayRollList = lazy(() =>
+  import("../Modules/Admin/Finance/Payroll/PayrollList.js")
+);
 const OperationalExpensesDash = lazy(() =>
   import("../Modules/Admin/Finance/operational-expenses/ExpsenseDash.js")
 );
 const AddOperationalExpenses = lazy(() =>
   import("../Modules/Admin/Finance/operational-expenses/AddExpsense.js")
+);
+const ExpenseList = lazy(() =>
+  import("../Modules/Admin/Finance/operational-expenses/ExpenseList.js")
 );
 const RoleSelector = lazy(() =>
   import("../Components/Common/RBAC/RoleSelector.js")
@@ -175,11 +177,17 @@ const CreateSyllabus = lazy(() =>
     "../Modules/Admin/Subjects/Modules/Syllabus/CreateSyllabus/CreateSyllabus.js"
   )
 );
+
 const AccountingSection = lazy(() =>
   import("../Modules/Admin/Accounting/MainSection/AccountingSection.js")
 );
 const Syllabus = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Syllabus/SyllabusView/Syllabus.js")
+);
+const SyllabusList = lazy(() =>
+  import(
+    "../Modules/Admin/Subjects/Modules/Syllabus/SyllabusList/SyllabusListPage.js"
+  )
 );
 const DiscussionView = lazy(() =>
   import(
@@ -498,10 +506,7 @@ function App() {
     {
       path: "/financialYear",
       element: (
-        <ProtectRoute
-          Component={FinancialYear}
-          allowedRoles={["admin"]}
-        />
+        <ProtectRoute Component={FinancialYear} allowedRoles={["admin"]} />
       ),
       errorElement: <Error />,
     },
@@ -510,7 +515,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={FinanceCategory}
-          allowedRoles={["admin","finance"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -520,6 +525,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={Inventory}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/Inventory/list",
+      element: (
+        <ProtectRoute
+          Component={InventoryList}
           allowedRoles={["admin","finance"]}
         />
       ),
@@ -530,7 +545,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={Entities}
-          allowedRoles={["admin","finance"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -789,6 +804,16 @@ function App() {
       path: "/class/:cid/:sid/syllabus",
       element: (
         <ProtectRoute
+          Component={SyllabusList}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/class/:cid/:sid/syllabus/view",
+      element: (
+        <ProtectRoute
           Component={Syllabus}
           allowedRoles={["admin", "teacher", "staff"]}
         />
@@ -1031,6 +1056,16 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/payroll/list",
+      element: (
+        <ProtectRoute
+          Component={PayRollList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/operational-expenses",
       element: (
         <ProtectRoute
@@ -1051,6 +1086,16 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/finance/operational-expenses/list",
+      element: (
+        <ProtectRoute
+          Component={ExpenseList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/finance/entity/revenue/list",
       element: (
         <ProtectRoute
@@ -1060,7 +1105,6 @@ function App() {
       ),
       errorElement: <Error />,
     },
-
 
     {
       path: "/finance/studentfees/add/form",
@@ -1172,7 +1216,7 @@ function App() {
       ),
       errorElement: <Error />,
     },
-   
+
     {
       path: "/users/students",
       element: (

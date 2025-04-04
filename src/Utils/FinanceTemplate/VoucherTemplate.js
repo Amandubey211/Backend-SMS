@@ -1,0 +1,124 @@
+import React, { forwardRef } from "react";
+import Cookies from "js-cookie";
+import { getSC } from "../getCurrency";
+
+const VoucherTemplate = forwardRef((props, ref) => {
+  const { data } = props;
+  if (!data) return null;
+
+  const {
+    voucherNumber,
+    schoolId,
+    lineItems = [],
+    description,
+    isCancel,
+    createdAt,
+    remark,
+    status,
+    entityDetails,
+  } = data;
+
+  let totalAmount = 0;
+  let  totalPaid = 0;
+
+  lineItems.forEach((item) => {
+    totalAmount += item.amount || 0;
+    totalPaid += item.paidAmount || 0;
+  });
+
+
+  const {
+    address = "",
+    branchName = "",
+    city = "",
+    nameOfSchool = "N/A",
+    currency="",
+    logo="",
+  } = schoolId || {};
+
+  return (
+    <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
+      <div className="flex flex-col items-center mb-6">
+        <div className="w-full bg-pink-100 px-4 flex-row py-2 flex justify-between items-center rounded-t-lg">
+          <div>
+            <h1 className="font-bold text-lg">{nameOfSchool}</h1>
+            <p className="text-sm text-gray-500">{`${city}, ${branchName}`}</p>
+          </div>
+          {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
+        </div>
+        <div className="w-full text-center text-white font-bold py-2" style={{ backgroundColor: "#C83B62", fontSize: "18px" }}>
+        Voucher {isCancel && "CANCELLED"}
+        </div>
+      </div>
+
+      <div className="text-sm text-gray-800 mb-4 flex justify-between">
+        <div>
+          <p><strong>Bill To:</strong></p>
+          <p><strong>Name:</strong> {entityDetails?.entityName} </p>
+          <p><strong>Email:</strong> {entityDetails?.email }</p>
+          <p><strong>Contact:</strong> {entityDetails?.contactNumber }</p>
+        </div>
+        <div>
+          <p><strong>Invoice No:</strong> {voucherNumber || ""}</p>
+          <p><strong>Issue Date:</strong> {createdAt?.slice(0,10)}</p>
+          <p><strong>Status:</strong> {status}</p>
+          <p><strong>Currency:</strong> {currency}</p>
+
+        </div>
+      </div>
+
+      <table className="w-full text-[10px] mb-6 border border-gray-300">
+        <thead>
+          <tr className="bg-pink-200 text-left">
+          <th className="p-2 border">Item</th>
+            <th className="p-2 border">Item Detail</th>
+            <th className="p-2 border">Rate</th>
+            <th className="p-2 border">Qty</th>
+            <th className="p-2 border">Amount</th>
+            <th className="p-2 border">Paid Amount</th>
+            <th className="p-2 border">Remaining Amount</th>
+</tr>
+        </thead>
+        <tbody>
+          {lineItems.map((item, index) => (
+            <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+           
+              <td className="p-2 border">{item?.name || "N/A"}</td>
+              <td className="p-2 border">{item?.subCategory} <br/> {item.frequency != "Permanent Purchase" && `
+               ${item.frequency} from ${item?.startDate?.slice(0,10)} to ${item?.endDate?.slice(0,10)}`}</td>
+              <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
+              <td className="p-2 border text-start">{item.quantity || 1}</td>
+              <td className="p-2 border text-start">{item.amount?.toFixed(2)}</td>
+              <td className="p-2 border text-start">{item.paidAmount?.toFixed(2)}</td>
+              <td className="p-2 border text-start">{item.remainingAmount?.toFixed(2)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="flex flex-row items-center border border-gray-300 text-xs ">
+        <div className="flex flex-col items-start p-4 w-[60%]">
+           <p>Payment Details</p>
+           <div className="w-full h-[90%]">
+
+           </div>
+
+        </div>
+        <div className="flex flex-col items-start p-4 w-[40%] border-l-2 border-gray-300">
+        <p><strong>Total Amount</strong> = {totalAmount?.toFixed(2)} {currency}</p>
+        <p><strong>Total Paid</strong> = {totalPaid?.toFixed(2)} {currency}</p>
+        <p><strong>Total Remaining</strong> = {(totalAmount-totalPaid).toFixed(2)} {currency}</p>
+        </div>
+      </div>
+
+      <div className="text-sm text-gray-700">
+        <p><strong>Remarks:</strong></p>
+        <ul className="list-disc px-5">
+          {description && <li>{description}</li>}
+          <li>Thank you for your business. Contact us for any queries.</li>
+        </ul>
+      </div>
+    </div>
+  );
+});
+
+export default VoucherTemplate;

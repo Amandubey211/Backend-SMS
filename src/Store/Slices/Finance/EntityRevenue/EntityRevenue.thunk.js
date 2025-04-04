@@ -14,6 +14,24 @@ import toast from "react-hot-toast";
 import { getUserRole } from "../../../../Utils/getRoles";
 
 
+export const fetchAllEntityRevenueGraph = createAsyncThunk(
+  "EntityRevenues/fetchAllEntityRevenueGraph",
+
+  async (params, { rejectWithValue, dispatch, getState }) => {
+
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/revenue/get/graph/externalRevenue?say=${say}`,params
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 export const fetchAllEntityRevenue = createAsyncThunk(
   "EntityRevenues/fetchAllEntityRevenue",
 

@@ -22,7 +22,7 @@ const Inventory = () => {
   const role = useSelector((store) => store.common.auth.role);
   const { inventories, loading, total, totalPages, page, otherData } = useSelector((store) => store.admin.inventory);
   const { lowStock } = useSelector((store) => store.admin.inventory);
-
+const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const [searchText, setSearchText] = useState("");
   const [lowStocksearchText, setSowStockSearchText] = useState("");
   const [inventoryStatus, setInventoryStatus] = useState("");
@@ -184,7 +184,7 @@ const Inventory = () => {
             {[{ title: "Total Inventory Items", value: `${total || 0} Items`, icon: <FiBox /> },
             { title: "Low-Stock Alerts", value: `${otherData?.totalLowStockItems?.length || 0} Items`, icon: <FaStackOverflow /> },
             { title: "Expiring Soon Item", value: `${otherData?.expiringSoonItems?.length || 0} Items`, icon: <MdCancelPresentation /> },
-            { title: "Total Asset Value", value: `${otherData?.totalAssestPrice || 0} QAR`, icon: <BiMoneyWithdraw /> }
+            { title: "Total Asset Value", value: `${otherData?.totalAssestPrice || 0} ${schoolCurrency}`, icon: <BiMoneyWithdraw /> }
             ].map((item, index) => (
               <>
               <div
@@ -256,7 +256,7 @@ const Inventory = () => {
                 allowClear
                 className="w-60 py-2"
               />
-              <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm">View More</button>
+              <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm" onClick={()=>navigate("/finance/Inventory/list")}>View More</button>
             </div>
 
           </div>
@@ -290,7 +290,7 @@ const Inventory = () => {
                 allowClear
                 className="w-60 py-2"
               />
-              <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm">View More</button>
+              {/* <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm">View More</button> */}
             </div>
 
           </div>

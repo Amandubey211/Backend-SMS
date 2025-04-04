@@ -113,7 +113,8 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
             <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
            
               <td className="p-2 border">{item.name || "N/A"}</td>
-              <td className="p-2 border">{item.itemDetails} <br/> {item.frequency !== "one-time" && ` ${item.frequency} from ${item?.startDate?.slice(0,10)} to ${item?.endDate?.slice(0,10)}`}</td>
+              <td className="p-2 border">{item.itemDetails} <br/> {item.frequency != "Permanent Purchase" && `
+               ${item.frequency} from ${item?.startDate?.slice(0,10)} to ${item?.endDate?.slice(0,10)}`}</td>
               <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
               <td className="p-2 border text-start">{item.quantity || 1}</td>
               <td className="p-2 border text-start">{item.tax?.toFixed(2)}</td>

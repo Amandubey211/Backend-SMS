@@ -29,10 +29,10 @@ const budgetSlice = createSlice({
       })
       .addCase(fetchBudget.fulfilled, (state, action) => {
         state.loading = false;
-        state.allBudget  = action.payload.data || [];
-        state.totalRecords= action.payload.totalRecords;
-        state.totalPages= action.payload.totalPages;
-        state.currentPage= action.payload.currentPage;
+        state.allBudget  = action.payload?.data || [];
+        state.totalRecords= action.payload?.totalRecords;
+        state.totalPages= action.payload?.totalPages;
+        state.currentPage= action.payload?.currentPage;
        
       })
       .addCase(fetchBudget.rejected, (state, action) => {

@@ -97,7 +97,10 @@ export const deleteAnnouncement = createAsyncThunk(
 
 export const createAnnouncement = createAsyncThunk(
   "announcement/createAnnouncement",
-  async ({ data, files }, { rejectWithValue, dispatch, getState }) => {
+  async (
+    { data, files, navigate },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -137,6 +140,7 @@ export const createAnnouncement = createAsyncThunk(
 
       if (response && response.status) {
         toast.success("Announcement created");
+        navigate(-1);
         return response.data;
       }
     } catch (error) {
@@ -147,7 +151,10 @@ export const createAnnouncement = createAsyncThunk(
 
 export const editAnnouncement = createAsyncThunk(
   "announcement/editAnnouncement",
-  async ({ id, data, files }, { rejectWithValue, dispatch, getState }) => {
+  async (
+    { id, data, files, navigate },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     const say = getAY();
     dispatch(setShowError(false));
 
@@ -186,6 +193,7 @@ export const editAnnouncement = createAsyncThunk(
 
       if (response && response.status) {
         toast.success("Announcement updated successfully!");
+        navigate(-1);
         return response.data;
       }
     } catch (error) {

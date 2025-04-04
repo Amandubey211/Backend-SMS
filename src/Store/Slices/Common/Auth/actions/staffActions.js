@@ -64,7 +64,7 @@ export const staffLogin = createAsyncThunk(
           currency: data?.currency,
         })
       );
-      dispatch(setRole(data.role)); // e.g., 'admin', 'staff', 'teacher'
+      dispatch(setRole(data.role)); 
 
       /** -----------------------
        * ACADEMIC YEAR CHECK

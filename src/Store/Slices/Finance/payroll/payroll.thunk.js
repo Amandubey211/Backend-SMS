@@ -22,7 +22,7 @@ export const fetchPayroll  = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/expense/get/staff/salaryWages?say=${say}`,{ categoryId,search, page, limit}
+        `/${getRole}/expense/get/all/payroll?say=${say}`,{ categoryId,search, page, limit}
       );
       return response;
     } catch (error) {
@@ -48,7 +48,7 @@ export const fetchPayrollStaff  = createAsyncThunk(
 );
 
 export const createPayroll  = createAsyncThunk(
-  "finance/createPayroll ",
+  "finance/createPayroll",
   async (data, { rejectWithValue, dispatch, getState }) => {
     const say = getAY();
     dispatch(setShowError(false));
@@ -111,5 +111,22 @@ export const updatePayroll  = createAsyncThunk(
     }
   }
 );
+export const fetchPayrollGraph = createAsyncThunk(
+  "finance/fetchPayrollGraph",
 
+  async (params, { rejectWithValue, dispatch, getState }) => {
+
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/expense/get/graph/payroll?say=${say}`,params
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 

@@ -230,7 +230,11 @@ const AdminNotice = () => {
             <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_NOTICE}>
               <button
                 className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
-                onClick={() => setSidebarOpen(true)}
+                onClick={() => {
+                  dispatch(resetEditMode());
+                  dispatch(setSelectedNotice(null));
+                  setSidebarOpen(true);
+                }}
               >
                 <FiPlus className="mr-2" />
                 {t("Add Notice")}
@@ -254,8 +258,8 @@ const AdminNotice = () => {
                 </>
               ) : error ? (
                 <NoDataFound
-                  title={t("No Notices ")}
-                  desc={t("Something went wrong while fetching notices.")}
+                  title={t(" Notices ")}
+                  desc={t("Create one by Clicking on Add Notice.")}
                 />
               ) : filteredNotices?.length > 0 ? (
                 filteredNotices.map((notice, index) => (
@@ -272,10 +276,8 @@ const AdminNotice = () => {
                 ))
               ) : (
                 <NoDataFound
-                  title={t("Notices Found")}
-                  desc={t(
-                    "There are currently no notices available. Please add a new notice."
-                  )}
+                  title={t("Notices ")}
+                  desc={t(" Please add a new notice.")}
                 />
               )}
             </div>

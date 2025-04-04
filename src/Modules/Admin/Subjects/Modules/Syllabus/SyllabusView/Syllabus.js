@@ -15,7 +15,7 @@ const Syllabus = () => {
   useNavHeading(className, subjectName);
   return (
     <div>
-      <Layout title={`Syllabus | Student Diwan `}>
+      <Layout title={`Syllabus View | Student Diwan `}>
         <DashLayout children={<MainSection />} hideSearchbar={true} />
       </Layout>
     </div>

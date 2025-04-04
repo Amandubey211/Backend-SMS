@@ -1,5 +1,14 @@
-import React from "react";
-import { Drawer, Button, Tag, Card, Divider, Table } from "antd";
+import React, { useState, useEffect } from "react";
+import {
+  Drawer,
+  Button,
+  Tag,
+  Divider,
+  Table,
+  Tabs,
+  Badge,
+  Tooltip,
+} from "antd";
 import { AiOutlineEdit, AiOutlineDelete } from "react-icons/ai";
 import { format } from "date-fns";
 import dayjs from "dayjs";
@@ -8,8 +17,16 @@ import {
   CalendarOutlined,
   BookOutlined,
   TeamOutlined,
+  EyeOutlined,
+  LeftOutlined,
+  RightOutlined,
 } from "@ant-design/icons";
+import { TfiTime } from "react-icons/tfi";
+import { Element } from "react-scroll";
+import DayView from "../Views/DayView";
+import WeekView from "../Views/WeekView";
 
+// Main TimetableDetailsDrawer component
 const TimetableDetailsDrawer = ({
   visible,
   onClose,
@@ -17,6 +34,18 @@ const TimetableDetailsDrawer = ({
   onEdit,
   onDelete,
 }) => {
+  const [viewMode, setViewMode] = useState("details");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  useEffect(() => {
+    if (timetable?.validity?.startDate) {
+      const startDate = new Date(timetable.validity.startDate);
+      if (!isNaN(startDate.getTime())) {
+        setSelectedDate(startDate);
+      }
+    }
+  }, [timetable]);
+
   if (!timetable) return null;
 
   const getColorByType = (type) => {
@@ -52,16 +81,22 @@ const TimetableDetailsDrawer = ({
   const getIconForType = (type) => {
     switch (type) {
       case "weekly":
-        return <CalendarOutlined className="text-lg" />;
+        return <CalendarOutlined className="text-2lg" />;
       case "exam":
-        return <BookOutlined className="text-lg" />;
+        return <BookOutlined className="text-2lg" />;
       case "event":
-        return <CalendarOutlined className="text-lg" />;
+        return <CalendarOutlined className="text-l2g" />;
       case "others":
-        return <TeamOutlined className="text-lg" />;
+        return <TeamOutlined className="text-2lg" />;
       default:
         return null;
     }
+  };
+
+  const handleDateChange = (days) => {
+    const newDate = new Date(selectedDate);
+    newDate.setDate(newDate.getDate() + days);
+    setSelectedDate(newDate);
   };
 
   const columns = [
@@ -107,6 +142,36 @@ const TimetableDetailsDrawer = ({
       })) || []
   );
 
+  const filteredTimetables = [timetable].filter((tt) => {
+    if (!tt.validity) return true;
+    const currentDate = selectedDate;
+    const { startDate, endDate } = tt.validity;
+    if (!startDate || !endDate) return true;
+    return (
+      currentDate >= new Date(startDate) && currentDate <= new Date(endDate)
+    );
+  });
+
+  const isPreviousDayAvailable = () => {
+    if (!timetable?.validity?.startDate) return true;
+    const prevDate = new Date(selectedDate);
+    prevDate.setDate(prevDate.getDate() - 1);
+    return prevDate >= new Date(timetable.validity.startDate);
+  };
+
+  const isNextDayAvailable = () => {
+    if (!timetable?.validity?.endDate) return true;
+    const nextDate = new Date(selectedDate);
+    nextDate.setDate(nextDate.getDate() + 1);
+    return nextDate <= new Date(timetable.validity.endDate);
+  };
+
+  // Enhanced DayView props handler
+  const handleDayViewEventClick = (event) => {
+    // You can add custom handling here if needed
+    console.log("DayView event clicked:", event);
+  };
+
   return (
     <Drawer
       title="Timetable Details"
@@ -128,13 +193,34 @@ const TimetableDetailsDrawer = ({
               className="space-y-4"
             >
               {/* Header Section */}
-              <div className="flex items-center justify-between">
-                <h4 className="font-bold text-2xl text-gray-900">
-                  {timetable?.name || "Untitled Timetable"}
-                </h4>
-                <div className="flex flex-col items-center">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h4 className="font-bold text-2xl text-gray-900 mb-1">
+                    {timetable?.name || "Untitled Timetable"}
+                  </h4>
+                  <div className="text-sm text-gray-600 mb-2">
+                    {timetable?.validity?.startDate && (
+                      <>
+                        <span className="font-medium">From: </span>
+                        {format(
+                          new Date(timetable.validity.startDate),
+                          "dd MMM yyyy"
+                        )}
+                        {" to "}
+                        <span className="font-medium">To: </span>
+                        {timetable.validity.endDate
+                          ? format(
+                              new Date(timetable.validity.endDate),
+                              "dd MMM yyyy"
+                            )
+                          : "No End Date"}
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
                   <div
-                    className="w-16 h-16 flex items-center justify-center rounded mb-1"
+                    className="w-28 h-28 flex items-center justify-center flex-col rounded"
                     style={{
                       backgroundColor: getLightBgByType(timetable?.type),
                     }}
@@ -142,129 +228,159 @@ const TimetableDetailsDrawer = ({
                     <div className="text-4xl text-gray-800">
                       {getIconForType(timetable?.type)}
                     </div>
+                    <div>
+                      <span> {timetable?.type}</span>
+                    </div>
                   </div>
-                  <span className="text-sm text-gray-700">
-                    {timetable?.type?.toUpperCase() || "UNKNOWN"}
-                  </span>
                 </div>
               </div>
 
-              {/* Basic Info Section */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <h5 className="text-gray-600 text-sm">Class:</h5>
-                  <div className="mt-1">
-                    {timetable?.classId ? (
-                      <Tag color="blue">
-                        {timetable?.classId?.className || "No Class Name"}
-                      </Tag>
-                    ) : (
-                      <Tag color="blue">No Class</Tag>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h5 className="text-gray-600 text-sm">Status:</h5>
-                  <Tag
-                    color={timetable?.status === "active" ? "green" : "red"}
-                    className="mt-1"
-                  >
-                    {timetable?.status || "inactive"}
-                  </Tag>
-                </div>
-
-                <div>
-                  <h5 className="text-gray-600 text-sm">Sections:</h5>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {timetable?.sectionId?.length > 0 ? (
-                      timetable?.sectionId.map((section) => (
-                        <Tag key={section?._id} color="purple">
-                          {section?.sectionName || "No Section Name"}
-                        </Tag>
-                      ))
-                    ) : (
-                      <Tag color="purple">No Sections</Tag>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h5 className="text-gray-600 text-sm">Groups:</h5>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {timetable?.groupId?.length > 0 ? (
-                      timetable?.groupId.map((group) => (
-                        <Tag key={group?._id} color="cyan">
-                          {group?.groupName || "No Group Name"}
-                        </Tag>
-                      ))
-                    ) : (
-                      <Tag color="cyan">No Groups</Tag>
-                    )}
-                  </div>
-                </div>
-
-                <div>
-                  <h5 className="text-gray-600 text-sm">Semester:</h5>
-                  <p className="text-sm text-gray-800">
-                    {timetable?.semesterId?.title || "No Semester"}
-                  </p>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Card
-                    className="flex-1 border p-2 rounded"
-                    style={{ backgroundColor: "#f7f7f7" }}
-                  >
-                    <p className="text-sm text-gray-500">Available From:</p>
-                    <p className="text-sm text-gray-800 font-semibold">
-                      {timetable?.validity?.startDate
-                        ? format(
-                            new Date(timetable?.validity?.startDate),
-                            "M/d/yyyy"
-                          )
-                        : "N/A"}
-                    </p>
-                  </Card>
-                  <Card
-                    className="flex-1 border p-2 rounded"
-                    style={{ backgroundColor: "#f7f7f7" }}
-                  >
-                    <p className="text-sm text-gray-500">Due Date:</p>
-                    <p className="text-sm text-gray-800 font-semibold">
-                      {timetable?.validity?.endDate
-                        ? format(
-                            new Date(timetable?.validity?.endDate),
-                            "M/d/yyyy"
-                          )
-                        : "No End Date"}
-                    </p>
-                  </Card>
-                </div>
-              </div>
-
-              <Divider />
-
-              {/* Schedule Table */}
-              <h5 className="font-medium text-gray-800">Schedule:</h5>
-              <Table
-                columns={columns}
-                dataSource={dataSource}
-                pagination={false}
-                size="small"
-                scroll={{ x: true }}
-                className="mt-2"
-                locale={{
-                  emptyText: "No schedule data available",
-                }}
+              {/* View Mode Tabs */}
+              <Tabs
+                activeKey={viewMode}
+                onChange={setViewMode}
+                items={[
+                  {
+                    key: "details",
+                    label: (
+                      <span>
+                        <EyeOutlined /> Details
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "day",
+                    label: (
+                      <span>
+                        <CalendarOutlined /> Day View
+                      </span>
+                    ),
+                  },
+                  {
+                    key: "week",
+                    label: (
+                      <span>
+                        <CalendarOutlined /> Week View
+                      </span>
+                    ),
+                  },
+                ]}
               />
+
+              {/* Day View Navigation */}
+              {viewMode === "day" && (
+                <div className="flex justify-between items-center mb-4">
+                  <Button
+                    icon={<LeftOutlined />}
+                    onClick={() => handleDateChange(-1)}
+                    disabled={!isPreviousDayAvailable()}
+                  />
+                  <div className="font-medium">
+                    {format(selectedDate, "EEEE, dd MMM yyyy")}
+                  </div>
+                  <Button
+                    icon={<RightOutlined />}
+                    onClick={() => handleDateChange(1)}
+                    disabled={!isNextDayAvailable()}
+                  />
+                </div>
+              )}
+
+              {/* Content based on view mode */}
+              {viewMode === "details" && (
+                <>
+                  {/* Basic Info Section */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                      <h5 className="text-gray-600 text-sm">Class:</h5>
+                      <div className="mt-1">
+                        {timetable?.classId ? (
+                          <Tag color="blue">
+                            {timetable?.classId?.className || "No Class Name"}
+                          </Tag>
+                        ) : (
+                          <Tag color="blue">No Class</Tag>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h5 className="text-gray-600 text-sm">Semester:</h5>
+                      <p className="text-sm text-gray-800">
+                        {timetable?.semesterId?.title || "No Semester"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h5 className="text-gray-600 text-sm">Sections:</h5>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {timetable?.sectionId?.length > 0 ? (
+                          timetable?.sectionId.map((section) => (
+                            <Tag key={section?._id} color="purple">
+                              {section?.sectionName || "No Section Name"}
+                            </Tag>
+                          ))
+                        ) : (
+                          <Tag color="purple">All Sections</Tag>
+                        )}
+                      </div>
+                    </div>
+
+                    <div>
+                      <h5 className="text-gray-600 text-sm">Groups:</h5>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {timetable?.groupId?.length > 0 ? (
+                          timetable?.groupId.map((group) => (
+                            <Tag key={group?._id} color="cyan">
+                              {group?.groupName || "No Group Name"}
+                            </Tag>
+                          ))
+                        ) : (
+                          <Tag color="cyan">All Groups</Tag>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Schedule Table */}
+                  <h5 className="font-medium text-gray-800 mb-2">Schedule:</h5>
+                  <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    pagination={false}
+                    size="small"
+                    scroll={{ x: true }}
+                    className="mt-2"
+                    locale={{
+                      emptyText: "No schedule data available",
+                    }}
+                  />
+                </>
+              )}
+
+              {viewMode === "day" && (
+                <DayView
+                  selectedDate={selectedDate}
+                  filteredTimetables={filteredTimetables}
+                  onEventClick={handleDayViewEventClick}
+                />
+              )}
+
+              {viewMode === "week" && (
+                <WeekView
+                  selectedDate={selectedDate}
+                  filteredTimetables={filteredTimetables}
+                  onEventClick={() => {}}
+                  onDateChange={setSelectedDate}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
 
         {/* Sticky Footer for Edit and Delete */}
         <div className="sticky bottom-0 bg-white py-4 border-t">
-          <div className="flex space-x-2 justify-center">
+          <div className="flex justify-end gap-2">
             <Button
               type="default"
               icon={<AiOutlineEdit />}
@@ -276,7 +392,7 @@ const TimetableDetailsDrawer = ({
             <Button
               danger
               icon={<AiOutlineDelete />}
-              onClick={() => onDelete(timetable._id)} // Pass just the ID
+              onClick={() => onDelete(timetable._id)}
             >
               Delete
             </Button>

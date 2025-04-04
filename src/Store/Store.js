@@ -50,6 +50,7 @@ import allParentReducer from "./Slices/Admin/Users/Parents/parentSilce";
 import allstaffReducer from "./Slices/Admin/Users/Staff/staffSlice";
 
 import receiptsReducer from "./Slices/Finance/Receipts/receiptsSlice";
+
 import quotationReducer from "./Slices/Finance/Quotations/quotationSlice";
 import studentFeesReducer from "./Slices/Finance/StudentFees/studentFeesSlice";
 import adminRubricReducer from "./Slices/Admin/Class/Rubric/rubricSlice";
@@ -64,6 +65,8 @@ import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
 
 import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
 import adminOfflineExamReducer from "./Slices/Admin/Class/OfflineExam/offlineExamSlice";
+import operationalExpensesReducer from "./Slices/Finance/operationalExpenses/operationalExpenses.slice";
+import payrollReducer from "./Slices/Finance/payroll/payroll.slice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -207,6 +210,8 @@ const AdminReducer = combineReducers({
   entity: entityReducer,
   entityRevenue: entityRevenueReducer,
   budget: budgetReducer,
+  payroll:payrollReducer,
+  operationalExpenses:operationalExpensesReducer,
   // student_fees: studentFeesReducer,
 
   subject_grades: subjectGradesReducer,

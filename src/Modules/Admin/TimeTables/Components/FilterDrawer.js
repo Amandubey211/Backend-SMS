@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Drawer, Form, Select, Button } from "antd";
+import React, { useState, useEffect, useCallback } from "react";
+import { Drawer, Form, Select, Button, message } from "antd";
 import { useDispatch } from "react-redux";
 import {
   fetchGroupsByClass,
@@ -24,41 +24,54 @@ export default function FilterDrawer({
 }) {
   const [form] = Form.useForm();
   const [selectedClass, setSelectedClass] = useState(null);
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
-  // Reset form when drawer is opened or filters change
+  // Reset form when drawer is opened
   useEffect(() => {
     if (visible) {
       form.resetFields();
       form.setFieldsValue(filters);
       setSelectedClass(filters.class);
     }
-  }, [visible, filters, form]);
+  }, [visible, form, filters]);
 
   // Fetch dependent data when class changes
-  useEffect(() => {
-    if (selectedClass) {
-      // Fetch all dependent data in parallel
-      Promise.all([
-        dispatch(fetchSectionsNamesByClass(selectedClass)),
-        dispatch(fetchGroupsByClass(selectedClass)),
-        dispatch(fetchSubjects(selectedClass)),
-        dispatch(fetchSemestersByClass(selectedClass)),
-      ]);
-    } else {
-      // Clear dependent data when no class is selected
+  const fetchDependentData = useCallback(async () => {
+    if (!selectedClass) {
       form.setFieldsValue({
         sections: [],
         groups: [],
         subject: null,
         semester: null,
       });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await Promise.all([
+        dispatch(fetchSectionsNamesByClass(selectedClass)),
+        dispatch(fetchGroupsByClass(selectedClass)),
+        dispatch(fetchSubjects(selectedClass)),
+        dispatch(fetchSemestersByClass(selectedClass)),
+      ]);
+    } catch (error) {
+      message.error("Failed to load dependent data");
+      console.error("Error fetching dependent data:", error);
+    } finally {
+      setLoading(false);
     }
   }, [selectedClass, dispatch, form]);
 
+  useEffect(() => {
+    if (visible && selectedClass) {
+      fetchDependentData();
+    }
+  }, [selectedClass, visible, fetchDependentData]);
+
   const handleClassChange = (value) => {
     setSelectedClass(value);
-    // Reset dependent fields immediately
     form.setFieldsValue({
       sections: [],
       groups: [],
@@ -69,20 +82,16 @@ export default function FilterDrawer({
 
   const handleSubmit = () => {
     form.validateFields().then((values) => {
-      // Update all filters at once to prevent multiple re-renders
       const newFilters = {
         class: values.class || null,
         sections: values.sections || [],
         groups: values.groups || [],
         subject: values.subject || null,
         semester: values.semester || null,
+        status: values.status || null,
+        type: values.type || null,
       };
-
-      // Call onFilterChange for each filter
-      Object.entries(newFilters).forEach(([key, value]) => {
-        onFilterChange(key, value);
-      });
-
+      onFilterChange(newFilters);
       onClose();
     });
   };
@@ -97,21 +106,48 @@ export default function FilterDrawer({
       footer={
         <div className="flex justify-between">
           <Button onClick={onClearFilters}>Clear All</Button>
-          <Button type="primary" onClick={handleSubmit}>
+          <Button type="primary" onClick={handleSubmit} loading={loading}>
             Apply Filters
           </Button>
         </div>
       }
     >
       <Form form={form} layout="vertical">
+        <Form.Item label="Status" name="status">
+          <Select
+            placeholder="Select Status"
+            allowClear
+            size="large"
+            disabled={loading}
+          >
+            <Option value="active">Active</Option>
+            <Option value="inactive">Inactive</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item label="Type" name="type">
+          <Select
+            placeholder="Select Type"
+            allowClear
+            size="large"
+            disabled={loading}
+          >
+            <Option value="weekly">Weekly</Option>
+            <Option value="exam">Exam</Option>
+            <Option value="event">Event</Option>
+            <Option value="others">Others</Option>
+          </Select>
+        </Form.Item>
+
         <Form.Item label="Class" name="class">
           <Select
             placeholder="Select Class"
             allowClear
             size="large"
             onChange={handleClassChange}
+            disabled={loading}
           >
-            {classList.map((cls) => (
+            {classList?.map((cls) => (
               <Option key={cls._id} value={cls._id}>
                 {cls.className}
               </Option>
@@ -125,10 +161,10 @@ export default function FilterDrawer({
             placeholder="Select Sections"
             allowClear
             size="large"
-            disabled={!selectedClass}
-            loading={!sectionList.length && !!selectedClass}
+            disabled={!selectedClass || loading}
+            loading={loading && !sectionList.length}
           >
-            {sectionList.map((section) => (
+            {sectionList?.map((section) => (
               <Option key={section._id} value={section._id}>
                 {section.sectionName}
               </Option>
@@ -142,8 +178,8 @@ export default function FilterDrawer({
             size="large"
             placeholder="Select Groups"
             allowClear
-            disabled={!selectedClass}
-            loading={!groupsList.length && !!selectedClass}
+            disabled={!selectedClass || loading}
+            loading={loading && !groupsList.length}
           >
             {groupsList.map((group) => (
               <Option key={group._id} value={group._id}>
@@ -158,10 +194,10 @@ export default function FilterDrawer({
             placeholder="Select Subject"
             allowClear
             size="large"
-            disabled={!selectedClass}
-            loading={!allSubjects.length && !!selectedClass}
+            disabled={!selectedClass || loading}
+            loading={loading && !allSubjects.length}
           >
-            {allSubjects.map((subject) => (
+            {allSubjects?.map((subject) => (
               <Option key={subject.subjectId} value={subject.subjectId}>
                 {subject.subjectName}
               </Option>
@@ -173,11 +209,11 @@ export default function FilterDrawer({
           <Select
             placeholder="Select Semester"
             allowClear
-            disabled={!selectedClass}
+            disabled={!selectedClass || loading}
             size="large"
-            loading={!reduxSemesters.length && !!selectedClass}
+            loading={loading && !reduxSemesters.length}
           >
-            {reduxSemesters.map((semester) => (
+            {reduxSemesters?.map((semester) => (
               <Option key={semester._id} value={semester._id}>
                 {semester.title}
               </Option>

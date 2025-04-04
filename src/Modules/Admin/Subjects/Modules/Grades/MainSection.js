@@ -56,7 +56,6 @@ const MainSection = () => {
     dispatch(fetchFilteredAssignments({ sid }));
     dispatch(fetchFilteredQuizzesThunk({ sid }));
   }, [dispatch, cid, sid, filters]);
-  console.log("Dispatching with filters:", filters);
 
   // Stabilize search change handler
   const handleSearchChange = useCallback((value) => {
@@ -138,6 +137,7 @@ const MainSection = () => {
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             student={student}
+            externalFilters={filters}
           />
         )}
       </ProtectedSection>

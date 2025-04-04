@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 import PayRollGraph from './PayRollGraph.js';
+import PayrollSummaryTable from './PayrollSummaryList.js';
 
 export default function PayRollMain() {
   const navigate = useNavigate()
@@ -36,14 +37,14 @@ export default function PayRollMain() {
             </ProtectedSection>
             {/* Graph Section */}
             <ProtectedSection requiredPermission={PERMISSIONS} title={'Graph'}>
-            <div className="w-full h-[50vh] ">
+            <div className="w-full h-full ">
               <PayRollGraph/>
             </div>
             </ProtectedSection>
             {/* Summary Table */}
             <ProtectedSection requiredPermission={PERMISSIONS} title={'Summary'}>
-            <div className="w-full">
-             
+            <div className="w-full mt-4">
+            <PayrollSummaryTable/>
             </div>
             </ProtectedSection>
         </div>

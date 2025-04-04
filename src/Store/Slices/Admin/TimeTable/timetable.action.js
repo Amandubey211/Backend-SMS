@@ -21,13 +21,10 @@ export const fetchTimetableList = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
 
-      // Example: If you have custom filters, you can attach them as query params.
-      // e.g., ?classId=xxx&type=xxx etc. Currently this is just a demonstration.
-      // Construct a query string from filters if needed. For now, we pass them as an object.
       dispatch(setShowError(false));
 
       const response = await getData(`/${role}/timetable?say=${say}`, filters);
-      return response?.data; // This should be the array of timetables
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

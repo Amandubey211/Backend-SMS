@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
+import RevenueContainer from "./Components/EntityGraphContainer.js";
 
 const EntityRevenueMain = () => {
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
@@ -45,7 +46,7 @@ const EntityRevenueMain = () => {
         {/* Graph Section */}
         <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_GRAPH_FOR_Entity_FEES} title={'Graph'}>
         <div className="w-full ">
-          <EntityRevenueGraph />
+          <RevenueContainer />
         </div>
         </ProtectedSection>
         {/* Summary Table */}

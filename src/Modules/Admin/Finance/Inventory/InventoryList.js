@@ -2,19 +2,16 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../../../Components/Common/Layout.js";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout.js";
 import { useDispatch, useSelector } from "react-redux";
-import { Input, Spin, Table, Select, DatePicker } from "antd";
+import { Input, Spin, Table, Select } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import Card from "../Expense/components/Card.js";
-import { FaWarehouse } from "react-icons/fa";
-import { GiWeight, GiReceiveMoney } from "react-icons/gi";
-import { FaPlusCircle } from "react-icons/fa";
 import InventoryForm from "./InventoryForm.js";
 import { fetchInventory } from "../../../../Store/Slices/Finance/inventory/inventory.thunk.js";
 import Sidebar from "../../../../Components/Common/Sidebar.js";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import { MdEdit, MdRemoveRedEye } from "react-icons/md";
+import { GoPlus } from "react-icons/go";
 
-const Inventory = () => {
+const InventoryList = () => {
   const dispatch = useDispatch();
   const role = useSelector((store) => store.common.auth.role);
   const { inventories, loading, total, totalPages, page } = useSelector((store) => store.admin.inventory);
@@ -33,7 +30,7 @@ const Inventory = () => {
   useNavHeading(role, `Inventory`);
 
   useEffect(() => {
-    dispatch(fetchInventory({ status:inventoryStatus, search: searchText, page: currentPage, limit: pageSize }));
+    dispatch(fetchInventory({ status: inventoryStatus, search: searchText, page: currentPage, limit: pageSize }));
   }, [dispatch, inventoryStatus, searchText, currentPage, pageSize]);
 
   const columns = [
@@ -70,13 +67,22 @@ const Inventory = () => {
       width: 100,
     },
     {
+      title: "Low Stock Alert",
+      render: (_, record) => {
+        return (
+          <p className={`text-${record.lowStockAlert ? "green" : "red"}-500 font-bold px-14`}>{record.lowStockAlert ? "Yes" : "No"}</p>
+        )
+      },
+      width: 100,
+    },
+    {
       title: "Action",
       render: (_, record) => (
         <div className="flex flex-row gap-4">
-        <span className="text-xs text-blue-600 cursor-pointer" onClick={() => { setSelectedInventory(record); setIsModalVisible(true); }} title="Edit"><MdEdit size={20}/></span>
-        <span className="text-xs text-blue-600 cursor-pointer" onClick={() => { setSelectedInventory({mode:"view",...record}); setIsModalVisible(true); }} title="View"><MdRemoveRedEye size={20}/></span>
+          <span className="text-xs text-blue-600 cursor-pointer" onClick={() => { setSelectedInventory(record); setIsModalVisible(true); }} title="Edit"><MdEdit size={20} /></span>
+          <span className="text-xs text-blue-600 cursor-pointer" onClick={() => { setSelectedInventory({ mode: "view", ...record }); setIsModalVisible(true); }} title="View"><MdRemoveRedEye size={20} /></span>
         </div>
-        
+
       ),
       width: 80,
     },
@@ -107,6 +113,15 @@ const Inventory = () => {
                 <Select.Option value="Out Of Stock">Out Of Stock</Select.Option>
                 <Select.Option value="Damaged">Damaged</Select.Option>
               </Select>
+            </div>
+            <div className="w-[10rem]">
+              <button
+                onClick={() => { setSelectedInventory(null); setIsModalVisible(true); }}
+                className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm "
+              >
+                <GoPlus /> Add New Item
+
+              </button>
             </div>
           </div>
 
@@ -145,4 +160,4 @@ const Inventory = () => {
   );
 };
 
-export default Inventory;
+export default InventoryList;

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { GiTakeMyMoney } from "react-icons/gi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,9 +7,16 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import { PERMISSIONS } from "../../../../config/permission.js";
 import OperationalExpensesCards from './ExpsenseCards.js';
 import OperationalExpensesGraph from './ExpsenseGraph.js';
+import { fetchOperationalExpenses } from '../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk.js';
+import OperationalExpenseSummaryTable from './SummaryList.js';
 
 export default function OperationalExpensesMain() {
-  const navigate = useNavigate()
+  
+  const navigate = useNavigate();
+  const dispatch = useDispatch()
+  useEffect(()=>{
+  dispatch(fetchOperationalExpenses({}))
+  },[])
   return (
     <div className="p-4">
           {/* Header Section */}
@@ -36,14 +43,14 @@ export default function OperationalExpensesMain() {
             </ProtectedSection>
             {/* Graph Section */}
             <ProtectedSection requiredPermission={PERMISSIONS} title={'Graph'}>
-            <div className="w-full h-[50vh] ">
+            <div className="w-full h-full">
               <OperationalExpensesGraph/>
             </div>
             </ProtectedSection>
             {/* Summary Table */}
             <ProtectedSection requiredPermission={PERMISSIONS} title={'Summary'}>
-            <div className="w-full">
-             
+            <div className="w-full mt-4">
+            <OperationalExpenseSummaryTable/>
             </div>
             </ProtectedSection>
         </div>

@@ -104,7 +104,7 @@ export const createSyllabus = createAsyncThunk(
 export const editSyllabus = createAsyncThunk(
   "syllabus/editSyllabus",
   async (
-    { syllabusId, data, cid },
+    { syllabusId, data, cid, navigate },
     { rejectWithValue, dispatch, getState }
   ) => {
     const say = getAY();
@@ -130,6 +130,7 @@ export const editSyllabus = createAsyncThunk(
       });
 
       if (response && response.status) {
+        navigate(-1);
         toast.success("Syllabus updated successfully!");
         return response.data;
       }
