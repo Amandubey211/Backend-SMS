@@ -24,7 +24,7 @@ export const fetchTimetableList = createAsyncThunk(
       dispatch(setShowError(false));
 
       const response = await getData(`/${role}/timetable?say=${say}`, filters);
-      return response?.data; // This should be the array of timetables
+      return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

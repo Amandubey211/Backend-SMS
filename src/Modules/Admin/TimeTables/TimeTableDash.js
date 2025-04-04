@@ -12,10 +12,8 @@ import {
   Table,
   Space,
   Tag,
-  Input,
-  Tooltip,
-  Select,
   message,
+  Tooltip,
 } from "antd";
 import {
   AiOutlineFilter,
@@ -27,7 +25,6 @@ import {
   EyeOutlined,
   EditOutlined,
   DeleteOutlined,
-  CalendarOutlined,
 } from "@ant-design/icons";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
@@ -69,10 +66,14 @@ import ExportFunctions from "../../../Utils/timetableUtils";
 
 export default function TimeTableDash() {
   const dispatch = useDispatch();
+
+  // --------------------------
+  // Redux State
+  // --------------------------
   const {
     timetables = [],
     loadingFetch,
-    pagination = {},
+    pagination = {}, // We'll store total, page, limit in here
   } = useSelector((store) => store?.admin?.timetable || {});
 
   const classList = useSelector((state) => state.admin.class.classes);
@@ -87,26 +88,22 @@ export default function TimeTableDash() {
     (state) => state.admin.semesters
   );
 
-  // Tabs for List/Calendar
+  // --------------------------
+  // Local States
+  // --------------------------
   const [activeTab, setActiveTab] = useState("list");
-
-  // Date, view, toggles
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Drawer states
+  // Drawer & Modal
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
-
-  // Details drawer states
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
   const [detailsTimetable, setDetailsTimetable] = useState(null);
-
-  // Deletion modal
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
-  // Filter data - initialize all filters as null/empty
+  // Filters
   const [filters, setFilters] = useState({
     class: null,
     sections: [],
@@ -119,13 +116,15 @@ export default function TimeTableDash() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
 
-  // Search and pagination
+  // Client-side pagination config
   const [paginationConfig, setPaginationConfig] = useState({
     current: 1,
     pageSize: 10,
   });
 
-  // Export functions instance
+  // --------------------------
+  // Export Handler Setup
+  // --------------------------
   const exportFunctions = useMemo(
     () =>
       new ExportFunctions({
@@ -150,7 +149,6 @@ export default function TimeTableDash() {
     [viewMode, selectedDate, timetables]
   );
 
-  // Popover content for export
   const exportContent = (
     <div className="flex flex-col gap-2 p-2">
       <Button
@@ -170,16 +168,17 @@ export default function TimeTableDash() {
     </div>
   );
 
-  // Memoized filtered timetables (client-side for calendar view)
+  // --------------------------
+  // Memo: Calendar-View Filtering (Client-Side)
+  // --------------------------
   const filteredTimetables = useMemo(() => {
     let result = [...timetables];
 
-    // Filter for calendar view
+    // If in calendar view, only show those with showCalendar = true
     if (activeTab === "calendar") {
       result = result.filter((t) => t.showCalendar === true);
     }
-
-    // Apply type filter if set
+    // Additionally filter by type if selected via StatsSection
     if (filters.type) {
       result = result.filter((t) => t.type === filters.type);
     }
@@ -187,13 +186,17 @@ export default function TimeTableDash() {
     return result;
   }, [timetables, activeTab, filters.type]);
 
-  // Fetch all initial data with no filters
+  // --------------------------
+  // Fetch Data
+  // --------------------------
+  // 1) Fetch initial data
   useEffect(() => {
     dispatch(fetchAllClasses());
     fetchTimetables();
-  }, [dispatch]);
+    // eslint-disable-next-line
+  }, []);
 
-  // Fetch timetables with current filters
+  // 2) Reusable function to fetch from the server
   const fetchTimetables = useCallback(
     (params = {}) => {
       const queryParams = {
@@ -203,7 +206,7 @@ export default function TimeTableDash() {
         ...params,
       };
 
-      // Only include search if searchTerm is not empty
+      // Only include search if not empty
       if (searchTerm.trim()) {
         queryParams.search = searchTerm;
       } else {
@@ -214,29 +217,57 @@ export default function TimeTableDash() {
         queryParams.showCalendar = true;
       }
 
-      dispatch(fetchTimetableList(queryParams));
+      dispatch(fetchTimetableList(queryParams))
+        .unwrap()
+        .then((res) => {
+          // If the server returns pagination, update our local state
+          if (res.pagination) {
+            setPaginationConfig((prev) => ({
+              ...prev,
+              current: res.pagination.page,
+              pageSize: res.pagination.limit,
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error("Fetch Timetables Error:", error);
+        });
     },
     [dispatch, filters, searchTerm, activeTab, paginationConfig]
   );
 
-  // Create a debounced search function
+  // --------------------------
+  // Search: Debounced on typing, immediate on Enter
+  // --------------------------
   const debouncedSearch = useMemo(
     () =>
       debounce((value) => {
         setPaginationConfig((prev) => ({ ...prev, current: 1 }));
-        fetchTimetables({ search: value, page: 1 });
+        fetchTimetables({ search: value.trim() || undefined, page: 1 });
       }, 500),
     [fetchTimetables]
   );
 
-  // Handle search term change
+  /**
+   * Called on input changes. Debounced fetch for "live" searching.
+   */
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    debouncedSearch(value);
+    // If cleared, reset
+    if (!value.trim()) {
+      setPaginationConfig((prev) => ({ ...prev, current: 1 }));
+      fetchTimetables({ search: undefined, page: 1 });
+      debouncedSearch.cancel();
+    } else {
+      // Debounce on typing
+      debouncedSearch(value);
+    }
   };
 
-  // Clear search and refetch
+  /**
+   * This is optionally used if you have a "Clear" button outside the input
+   */
   const handleClearSearch = () => {
     setSearchTerm("");
     setPaginationConfig((prev) => ({ ...prev, current: 1 }));
@@ -244,14 +275,16 @@ export default function TimeTableDash() {
     debouncedSearch.cancel();
   };
 
-  // Clean up debounce on unmount
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       debouncedSearch.cancel();
     };
   }, [debouncedSearch]);
 
-  // Fetch dependent data when class changes
+  // --------------------------
+  // Dependent Data (Class => Sections, Groups, Semesters, etc.)
+  // --------------------------
   useEffect(() => {
     const fetchDependentData = async () => {
       if (filters.class) {
@@ -271,7 +304,6 @@ export default function TimeTableDash() {
     fetchDependentData();
   }, [dispatch, filters.class]);
 
-  // Fetch groups when sections change
   useEffect(() => {
     if (filters.class && filters.sections.length > 0) {
       dispatch(
@@ -285,7 +317,9 @@ export default function TimeTableDash() {
     }
   }, [dispatch, filters.class, filters.sections]);
 
-  // Apply filters and refetch data
+  // --------------------------
+  // Filters
+  // --------------------------
   const applyFilters = useCallback(
     (newFilters) => {
       setFilters(newFilters);
@@ -295,7 +329,6 @@ export default function TimeTableDash() {
     [fetchTimetables]
   );
 
-  // Handlers
   const handleFilterChange = useCallback(
     (newFilters) => {
       applyFilters({ ...filters, ...newFilters });
@@ -315,6 +348,7 @@ export default function TimeTableDash() {
     };
     setFilters(newFilters);
     setSearchTerm("");
+    setPaginationConfig((prev) => ({ ...prev, current: 1 }));
     fetchTimetables({ ...newFilters, search: undefined, page: 1 });
   }, [fetchTimetables]);
 
@@ -329,12 +363,20 @@ export default function TimeTableDash() {
     [applyFilters, filters]
   );
 
-  // Handle table pagination/sorting changes
-  const handleTableChange = (pagination, filters, sorter) => {
-    setPaginationConfig(pagination);
+  // --------------------------
+  // Table pagination / sorting
+  // --------------------------
+  const handleTableChange = (pagination, filterObj, sorter) => {
+    setPaginationConfig((prev) => ({
+      ...prev,
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+    }));
+
     fetchTimetables({
       page: pagination.current,
       limit: pagination.pageSize,
+      ...filterObj,
       ...(sorter.field && {
         sortField: sorter.field,
         sortOrder: sorter.order,
@@ -342,19 +384,23 @@ export default function TimeTableDash() {
     });
   };
 
-  // Handle type filter from StatsSection
+  // --------------------------
+  // StatsSection: Type Filter
+  // --------------------------
   const handleTypeFilter = useCallback(
     (type) => {
       const newFilters = {
         ...filters,
-        type: filters.type === type ? null : type,
+        type: filters.type === type ? null : type, // toggle
       };
       applyFilters(newFilters);
     },
     [applyFilters, filters]
   );
 
-  // Drawer/Modal
+  // --------------------------
+  // Drawers & Modals
+  // --------------------------
   const openDrawer = (timetable = null) => {
     setEditingTimetable(timetable);
     setDrawerVisible(true);
@@ -416,7 +462,9 @@ export default function TimeTableDash() {
       });
   };
 
-  // Return a Tag for "Type"
+  // --------------------------
+  // UI Helpers
+  // --------------------------
   function getTypeTag(type) {
     switch (type) {
       case "weekly":
@@ -432,7 +480,6 @@ export default function TimeTableDash() {
     }
   }
 
-  // Return a popover that shows sections/groups if hovered
   function renderClassSemester(record) {
     const className =
       record.classId?.className || record.classId?.name || "No Class";
@@ -440,7 +487,6 @@ export default function TimeTableDash() {
       ? ` - ${record.semesterId.title}`
       : "";
 
-    // Build popover content
     const sections = record.sectionId?.length
       ? record.sectionId.map((sec) => (
           <Tag key={sec._id} color="purple" style={{ marginBottom: 4 }}>
@@ -482,7 +528,6 @@ export default function TimeTableDash() {
 
   function renderNameWithStatus(text, record) {
     const isActive = record.status === "active";
-
     return (
       <div className="flex items-center gap-2 w-full">
         <Tooltip title={isActive ? "Published" : "Unpublished"}>
@@ -499,7 +544,7 @@ export default function TimeTableDash() {
     );
   }
 
-  // Columns for the list tab
+  // Table Columns
   const listColumns = [
     {
       title: "Status / Timetable Name",
@@ -579,13 +624,15 @@ export default function TimeTableDash() {
     },
   ];
 
-  // Skeleton columns for matching the layout when loading
+  // When loading, show skeleton with matching columns
   const skeletonColumns = listColumns.map((col) => ({
     ...col,
     render: () => <Skeleton active paragraph={{ rows: 1 }} title={false} />,
   }));
 
-  // Filter tags for display
+  // --------------
+  // Filter Tags
+  // --------------
   const filterTags = Object.entries(filters)
     .filter(([key, value]) => {
       if (Array.isArray(value)) return value.length > 0;
@@ -614,6 +661,9 @@ export default function TimeTableDash() {
           : value,
     }));
 
+  // --------------------------
+  // Render
+  // --------------------------
   return (
     <div className="w-full min-h-screen flex">
       {/* Main Content */}
@@ -622,10 +672,10 @@ export default function TimeTableDash() {
           sidebarCollapsed ? "mr-0" : "mr-72"
         }`}
       >
-        {/* Header and Controls */}
+        {/* Header & Top Controls */}
         <div className="flex flex-col gap-4 ">
           <div className="flex items-center justify-between flex-wrap gap-2">
-            {/* Tabs with Icons */}
+            {/* Tabs */}
             <div className="flex items-center gap-2 flex-wrap">
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
                 <Tabs.TabPane key="list" tab={<span>List View</span>} />
@@ -674,7 +724,7 @@ export default function TimeTableDash() {
           </div>
         </div>
 
-        {/* Filters and Search */}
+        {/* Filters & Search */}
         <SearchComponent
           searchTerm={searchTerm}
           handleSearchChange={handleSearchChange}
@@ -686,7 +736,7 @@ export default function TimeTableDash() {
           clearAllFilters={clearAllFilters}
         />
 
-        {/* Conditionally Render List or Calendar View */}
+        {/* Conditionally Render List / Calendar */}
         {activeTab === "list" && (
           <>
             {loadingFetch ? (
@@ -704,11 +754,10 @@ export default function TimeTableDash() {
                 pagination={{
                   current: paginationConfig.current,
                   pageSize: paginationConfig.pageSize,
-                  total: pagination?.total || 0,
+                  total: pagination.total || 0,
                   showSizeChanger: true,
                   showQuickJumper: true,
                   showTotal: (total) => `Total ${total} items`,
-                  position: ["bottomRight"],
                 }}
                 onChange={handleTableChange}
                 loading={loadingFetch}
@@ -737,7 +786,7 @@ export default function TimeTableDash() {
                 </div>
                 {viewMode === "month" && (
                   <div className="grid grid-cols-7 gap-1">
-                    {[...Array(35)]?.map((_, i) => (
+                    {[...Array(35)].map((_, i) => (
                       <div key={i} className="border rounded p-2 h-24">
                         <Skeleton active paragraph={{ rows: 2 }} />
                       </div>

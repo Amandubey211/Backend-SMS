@@ -3,7 +3,6 @@
 import React from "react";
 import { Form, Select, DatePicker, Button, TimePicker } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -149,7 +148,7 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                               {/* Remove Slot button */}
                               <Button
                                 danger
-                                onClick={() => removeSlot(slotKey)}
+                                onClick={() => removeSlot(slotName)}
                                 style={{ alignSelf: "flex-end" }}
                               >
                                 Remove
@@ -160,7 +159,7 @@ export default function DaySlotFields({ form, timetableType, allSubjects }) {
                         <Button
                           type="dashed"
                           icon={<PlusOutlined />}
-                          onClick={() => addSlot()}
+                          onClick={() => addSlot({})}
                         >
                           Add Slot
                         </Button>
