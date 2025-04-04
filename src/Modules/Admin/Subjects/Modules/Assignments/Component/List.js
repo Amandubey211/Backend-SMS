@@ -1,21 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { CiSearch } from "react-icons/ci";
-import {
-  FaEllipsisV,
-  FaTrashAlt,
-  FaClipboardList,
-  FaQuestionCircle,
-} from "react-icons/fa";
 import { BsPatchCheckFill } from "react-icons/bs";
 import { MdOutlineBlock } from "react-icons/md";
 import { NavLink, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { deleteAssignmentThunk } from "../../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
 import DeleteModal from "../../../../../../Components/Common/DeleteModal";
-import Spinner from "../../../../../../Components/Common/Spinner";
-import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { Button, Popover, Empty, Skeleton } from "antd";
+import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
+import { FaEllipsisV } from "react-icons/fa";
 
 const List = ({
   data,
@@ -27,38 +22,14 @@ const List = ({
   requiredPermission,
 }) => {
   const { cid, sid } = useParams();
-  const dispatch = useDispatch(); // Hook to dispatch actions
+  const dispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeMenu, setActiveMenu] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDeleteId, setCurrentDeleteId] = useState(null);
   const [currentDeleteTitle, setCurrentDeleteTitle] = useState("");
-  const menuRef = useRef(null);
-
-  // Define no data props based on type
-  const noDataProps =
-    type === "Assignment"
-      ? {
-          title: "Assignment",
-          desc: "Assignments help track progress. Start by creating one for your class!",
-          icon: FaClipboardList,
-          iconColor: "text-blue-500",
-          textColor: "text-gray-500",
-        }
-      : {
-          title: "Quiz",
-          desc: " Quizzes help assess student understanding. Start by creating one for your class!",
-          icon: FaQuestionCircle,
-          iconColor: "text-green-500",
-          textColor: "text-gray-500",
-        };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
-  };
-
-  const handleMenuToggle = (id) => {
-    setActiveMenu(activeMenu === id ? null : id);
   };
 
   const handleDelete = (id, name) => {
@@ -68,7 +39,6 @@ const List = ({
   };
 
   const confirmDelete = async () => {
-    // Call delete assignment thunk directly
     if (type === "Quiz") {
       dispatch(deleteQuizThunk(currentDeleteId));
     } else {
@@ -80,20 +50,6 @@ const List = ({
   const filteredData = data?.filter((item) =>
     item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  // Close menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setActiveMenu(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <div className="bg-white p-5 w-full">
@@ -120,12 +76,20 @@ const List = ({
 
       <ul className="border-t p-4">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <Spinner />
-          </div>
+          <>
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="mb-3">
+                <Skeleton active avatar paragraph={{ rows: 1 }} />
+              </div>
+            ))}
+          </>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <NoDataFound {...noDataProps} />
+          <div className="flex flex-col items-center justify-center py-10">
+            <Empty
+              description={
+                type === "Assignment" ? "No Assignments" : "No Quizzes"
+              }
+            />
           </div>
         ) : filteredData?.length > 0 ? (
           filteredData.reverse().map((item) => (
@@ -154,7 +118,7 @@ const List = ({
                         {item.name || "No Title"}
                       </h3>
                     </NavLink>
-                    <p className="text-sm text-gray-500 capitalize">
+                    <p className="text-sm text-gray-500 capitalize truncate">
                       {type === "Assignment" ? (
                         <>
                           Module: {item.moduleName || "N/A"} | Chapter:{" "}
@@ -175,37 +139,40 @@ const List = ({
                   ) : (
                     <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
                   )}
-                  <div className="relative">
-                    <FaEllipsisV
-                      className="text-green-600 p-1 border rounded-full h-7 w-7 cursor-pointer"
-                      onClick={() => handleMenuToggle(item._id)}
-                    />
-                    {activeMenu === item._id && (
-                      <div
-                        ref={menuRef}
-                        className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded-md shadow-lg"
-                      >
-                        <ProtectedAction
-                          requiredPermission={requiredPermission}
+                  <Popover
+                    content={
+                      <ProtectedAction requiredPermission={requiredPermission}>
+                        <Button
+                          danger
+                          block
+                          icon={<DeleteOutlined />}
+                          onClick={() => handleDelete(item._id, item.name)}
                         >
-                          <button
-                            onClick={() => handleDelete(item._id, item.name)}
-                            className="flex items-center space-x-2 px-4 py-2 hover:bg-red-100 w-full text-left"
-                          >
-                            <FaTrashAlt className="text-red-600" />
-                            <span>Delete</span>
-                          </button>
-                        </ProtectedAction>
-                      </div>
-                    )}
-                  </div>
+                          Delete
+                        </Button>
+                      </ProtectedAction>
+                    }
+                    trigger="click"
+                    placement="bottomRight"
+                    overlayStyle={{ padding: "3px", minHeight: "0" }}
+                  >
+                    <Button
+                      shape="circle"
+                      type="primary"
+                      icon={<FaEllipsisV />}
+                    />
+                  </Popover>
                 </div>
               </div>
             </div>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-10 text-gray-500">
-            <NoDataFound {...noDataProps} />
+          <div className="flex flex-col items-center justify-center py-10">
+            <Empty
+              description={
+                type === "Assignment" ? "No Assignments" : "No Quizzes"
+              }
+            />
           </div>
         )}
       </ul>
