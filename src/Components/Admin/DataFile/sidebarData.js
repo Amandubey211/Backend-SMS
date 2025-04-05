@@ -25,6 +25,7 @@ import {
   MdOutlineCategory,
   MdOutlineInventory2,
 } from "react-icons/md";
+import { CiViewTable } from "react-icons/ci";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
@@ -191,7 +192,7 @@ const sidebarData = [
   },
   {
     title: "Time Table",
-    icon: <ImTable2 />,
+    icon: <CiViewTable />,
     path: "/timetable",
     roles: [ROLES.ADMIN, ROLES.STAFF, ROLES.TEACHER, ROLES.LIBRARIAN],
     //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
