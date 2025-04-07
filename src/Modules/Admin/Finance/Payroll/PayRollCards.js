@@ -23,7 +23,7 @@ const PayRollCards = () => {
     },
     {
       title: "Total Unpaid PayRoll",
-      value: (totalAllAmount -paidAllAmount ).toFixed(2) || 0,
+      value: (totalAllAmount - paidAllAmount ).toFixed(2) || 0,
       icon: <FaWallet />, 
     },
   ];

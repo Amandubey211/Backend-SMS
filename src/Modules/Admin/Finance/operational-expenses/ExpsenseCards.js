@@ -52,7 +52,7 @@ const {  totalAllAmount,paidAllAmount } = useSelector(
         {/* Value and Trend */}
         <div className="flex justify-between items-center">
           <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
-            {item?.value}
+            {item?.value ||0}
           </h2>
         </div>
       </div>

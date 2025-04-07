@@ -1,12 +1,11 @@
 // src/store/finance/Budget /Budget Slice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { createBudget, fetchBudget, updateBudget } from "./budget.thunk";
-
-
+import { createBudget, fetchBudget, fetchBudgetsummary, updateBudget } from "./budget.thunk";
 const initialState = {
   allBudget: [],
   allBudgetDetails:[],
   allBudgetRequest : [],
+  selectedFinancialYear:{},
   totalRecords:0,
   totalPages:1,
   currentPage: 1,
@@ -19,9 +18,12 @@ const initialState = {
 const budgetSlice = createSlice({
   name: "budget",
   initialState,
+  reducers:{
+    setSelectedFinancialYear(state, action) {
+      state.selectedFinancialYear = action.payload;
+    },
+  },
   extraReducers: (builder) => {
-    
-
     builder
       .addCase(fetchBudget.pending, (state) => {
         state.loading = true;
@@ -36,6 +38,23 @@ const budgetSlice = createSlice({
        
       })
       .addCase(fetchBudget.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+    builder
+      .addCase(fetchBudgetsummary.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchBudgetsummary.fulfilled, (state, action) => {
+        state.loading = false;
+        state.allBudgetDetails  = action.payload?.data || [];
+        state.totalRecords= action.payload?.totalRecords;
+        state.totalPages= action.payload?.totalPages;
+        state.currentPage= action.payload?.currentPage;
+       
+      })
+      .addCase(fetchBudgetsummary.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
       });
@@ -71,4 +90,6 @@ const budgetSlice = createSlice({
 
   },
 });
+export const { setSelectedFinancialYear } =
+budgetSlice.actions;
 export default budgetSlice.reducer;
