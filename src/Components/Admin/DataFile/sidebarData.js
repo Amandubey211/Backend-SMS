@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
-import { LuUser } from "react-icons/lu";
+import { LuBookText, LuUser } from "react-icons/lu";
 import { HiOutlineCalculator } from "react-icons/hi2";
 import { ImTable2 } from "react-icons/im";
 import { RiUserAddLine } from "react-icons/ri";
@@ -303,6 +303,13 @@ const sidebarData = [
         title: "Budget Planner",
         path: "/finance/budget-planner",
         icon: <GiStabbedNote style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      },
+      {
+        title: "Day Book",
+        path: "/finance/day-book",
+        icon: <LuBookText style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },

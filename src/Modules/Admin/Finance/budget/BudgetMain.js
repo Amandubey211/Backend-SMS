@@ -12,6 +12,7 @@ import BudgetCards from "./BudgetCards.js";
 import BudgetGraph from "./BudgetGraph.js";
 import Sidebar from "../../../../Components/Common/Sidebar.js";
 import BudgetForm from "./CreateBudget.js";
+import BudgetSummaryList from "./BudgetSummaryList.js";
 
 const BudgetMain= () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -55,14 +56,14 @@ const BudgetMain= () => {
         </ProtectedSection>
         {/* Graph Section */}
         <ProtectedSection requiredPermission={PERMISSIONS} title={'Graph'}>
-        <div className="w-full h-[50vh] ">
+        <div className="w-full h-full">
           <BudgetGraph/>
         </div>
         </ProtectedSection>
         {/* Summary Table */}
         <ProtectedSection requiredPermission={PERMISSIONS} title={'Summary'}>
-        <div className="w-full">
-         
+        <div className="w-full mt-4">
+         <BudgetSummaryList/>
         </div>
         </ProtectedSection>
       </motion.div>

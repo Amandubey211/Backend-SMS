@@ -41,12 +41,14 @@ export const useResetPassword = () => {
     setLoading(true);
     try {
       const response = await apiResetPassword({ email, newPassword, confirmPassword, token });
-      if (!response.data.success) {
+
+      console.log('response---', response)
+      if (!response.success) {
         setTimeout(() => {
           navigate('/');
         }, 3000);
-        toast.error(response.data.msg || 'Failed to reset password.');
-        throw new Error(response.data.msg);
+        //toast.error(response.msg || 'Failed to reset password.');
+        throw new Error(response.msg);
       } else {
         toast.success('Password reset successfully!');
         return response.data;

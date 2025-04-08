@@ -80,6 +80,12 @@ const EntityRevenueList = lazy(() =>
 const BudgetPlannerDash = lazy(() =>
   import("../Modules/Admin/Finance/budget/BudgetDash.js")
 );
+const BudgetPlannerList = lazy(() =>
+  import("../Modules/Admin/Finance/budget/BudgetList.js")
+);
+const DayBook= lazy(() =>
+  import("../Modules/Admin/Finance/dayBook/DayBookMain.js")
+);
 const PayRollDash = lazy(() =>
   import("../Modules/Admin/Finance/Payroll/PayRollDash.js")
 );
@@ -1030,6 +1036,26 @@ function App() {
       element: (
         <ProtectRoute
           Component={BudgetPlannerDash}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/budget-planner/list",
+      element: (
+        <ProtectRoute
+          Component={BudgetPlannerList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/day-book",
+      element: (
+        <ProtectRoute
+          Component={DayBook}
           allowedRoles={["admin", "finance"]}
         />
       ),

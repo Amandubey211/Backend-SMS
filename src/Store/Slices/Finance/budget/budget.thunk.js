@@ -13,9 +13,24 @@ import { getAY } from "../../../../Utils/academivYear";
 import toast from "react-hot-toast";
 import { getUserRole } from "../../../../Utils/getRoles";
 
-
+export const fetchBudgetsummary  = createAsyncThunk(
+  "finance/fetchBudgetsummary",
+  async ({subCategory,search, page, limit,financialYearId}, {rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/budget/get/summary?say=${say}`,{ subCategory,search, page, limit,financialYearId}
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 export const fetchBudget  = createAsyncThunk(
-  "finance/fetchBudget ",
+  "finance/fetchBudget",
   async ({categoryId,search, page, limit}, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
@@ -70,7 +85,7 @@ export const updateBudget  = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const response = await putData(
-        `/${getRole}/budget/update/${data.id}?say=${say}`,
+        `/${getRole}/budget/update/${data?._id}?say=${say}`,
         data
       );
      if(response.success){

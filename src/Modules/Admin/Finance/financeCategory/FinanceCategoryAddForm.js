@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Input, Select, Button, Form } from "antd";
+import { Input, Select, Button, Form, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { Option } from "antd/es/mentions";
 import { createCategory, updateCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
@@ -7,6 +7,7 @@ import CreateEditIconModal from "../../Classes/MainSection/CreateEditIconModal";
 import IconGrid from "../../Classes/MainSection/IconGrid";
 import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 import toast from "react-hot-toast";
+import { BsInfoCircle } from "react-icons/bs";
 
 const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
   const dispatch = useDispatch();
@@ -69,14 +70,29 @@ const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
 
         <Form.Item
           name="categoryType"
-          label="Category Type"
+          label={
+            <span className="flex flex-row gap-2 items-center">
+              Category For
+              <Tooltip
+              className="cursor-pointer"
+                title={
+                  <>
+                    <div>The category is being added either to</div>
+                    <div>generate revenue or to record an expense.</div>
+                  </>
+                }
+              >
+               <BsInfoCircle />
+              </Tooltip>
+            </span>
+          }
           rules={[{ required: true, message: "Please select category type" }]}
 
         >
           <select placeholder="Select category type " className="w-full py-2 border border-gray-200 rounded-lg">
           <option value="">Select Type</option>
-            <option value="revenue">Revenue | Asset</option>
-            <option value="expense">Expense | Refund</option>
+            <option value="revenue">Revenue</option>
+            <option value="expense">Expense</option>
           </select>
         </Form.Item>
 
