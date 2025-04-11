@@ -1,9 +1,9 @@
 import React from "react";
 import TextInput from "./TextInput";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const ParentInfo = ({ studentInfo, handleInputChange, errors, inputRefs }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
 
   return (
     <div className="mt-6 mb-4">

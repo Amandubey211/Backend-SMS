@@ -246,3 +246,9 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.country-list .country.highlight,
+.country-list .country:hover {
+  background-color: #ffe4e6 !important; /* Light pink */
+  border-radius: 0 !important; /* Remove oval shape */
+}

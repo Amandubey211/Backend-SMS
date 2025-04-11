@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import TextInput from "./TextInput";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const AdmissionInfo = ({
   studentInfo,
@@ -10,7 +10,7 @@ const AdmissionInfo = ({
   errors,
   inputRefs,
 }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
   const classList = useSelector((store) => store.admin.class.classes);
   const dispatch = useDispatch();
 
@@ -52,7 +52,9 @@ const AdmissionInfo = ({
         </div>
 
         <div>
-          <label className="block text-gray-700">{t("Transport Requirement")}</label>
+          <label className="block text-gray-700">
+            {t("Transport Requirement")}
+          </label>
           <select
             name="transportRequirement"
             className={`mt-1 p-2 block w-full rounded-md border ${
@@ -75,7 +77,9 @@ const AdmissionInfo = ({
         </div>
 
         <div>
-          <label className="block text-gray-700">{t("Enrollment Status")}</label>
+          <label className="block text-gray-700">
+            {t("Enrollment Status")}
+          </label>
           <select
             name="enrollmentStatus"
             value={studentInfo.enrollmentStatus || ""}

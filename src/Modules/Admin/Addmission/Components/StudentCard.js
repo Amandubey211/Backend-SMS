@@ -1,87 +1,101 @@
 import React from "react";
-import { GiArmorUpgrade } from "react-icons/gi";
+import { motion } from "framer-motion";
+import { useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
+import { PiStudentDuotone } from "react-icons/pi";
 import CardBanner from "../../../../Assets/AdmissionCard/CardBanner.jpg";
 import Logo from "../../../../Components/Common/Logo";
-import { useSelector } from "react-redux";
-import { useTranslation } from 'react-i18next';
-import { PiStudentDuotone } from "react-icons/pi";
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
 
 const StudentCard = ({ studentInfo, imagePreview }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
   const {
-    firstName,
-    lastName,
-    Q_Id,
-    contactNumber,
-    applyingClass,
-    section,
-    bloodGroup,
-    religion,
-    email,
+    firstName = "",
+    lastName = "",
+    studentId = "",
+    phoneNumber = "",
+    gender = "",
+    nationality = "",
+    email = "",
   } = studentInfo;
+
   const classList = useSelector((store) => store.admin.class.classes);
   const selectedClass = classList.find(
-    (classItem) => classItem._id === applyingClass
+    (classItem) => classItem._id === studentInfo.applyingClass
   );
-
   const className = selectedClass ? selectedClass.className : "";
-  // Truncate email if it is longer than 20 characters
-  const truncateEmail = (email) => {
-    return email?.length > 20 ? email.substring(0, 20) + "..." : email;
+
+  const truncateText = (text, maxLength) => {
+    return text?.length > maxLength
+      ? text.substring(0, maxLength) + "..."
+      : text;
   };
 
   return (
-    <div className="pb-4 mt-2 bg-white rounded-lg shadow-md w-64 border">
-      <div className="flex flex-col ">
+    <motion.div
+      className="pb-3 mt-2 bg-white rounded-lg shadow-md w-60 border"
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <div className="flex flex-col">
         <div
-          className="w-full h-40 bg-cover bg-center rounded-t-md relative flex justify-center items-center"
+          className="w-full h-32 bg-cover bg-center rounded-t-md relative flex justify-center items-center"
           style={{ backgroundImage: `url(${CardBanner})` }}
         >
           <div className="absolute top-2 left-2 text-white text-sm font-semibold">
-            <div className="flex items-center space-x-1">
-              <Logo height="h-6" />
-            </div>
+            <Logo height="h-6" />
           </div>
-          <div className="mt-4 bg-white rounded-full flex justify-center items-center">
-          {imagePreview ? (
-            <img
-              src={imagePreview}
-              alt={firstName}
-              className="rounded-full w-24 h-24 object-cover"
-            />
-          ) : (
-            <PiStudentDuotone className="w-16 h-16 text-gray-800" />
-          )}
+          <div className="mt-2 bg-white rounded-full flex justify-center items-center">
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt={firstName}
+                className="rounded-full w-20 h-20 object-cover"
+              />
+            ) : (
+              <PiStudentDuotone className="w-12 h-12 text-gray-800" />
+            )}
           </div>
         </div>
-        <div className="mt-4  px-4">
-          <h2 className="text-lg text-center font-semibold">
-            {firstName + " " + lastName || t("Student Name")}
-          </h2>
-          <div className="text-sm text-gray-600 mt-2 space-y-1 ">
-            <p>
-              <span className="font-semibold">{t("QID")}</span>: {Q_Id}
-            </p>
-            <p>
-              <span className="font-semibold">{t("Class")}</span>: {className}
-            </p>
 
+        <div className="mt-2 px-3">
+          <h2 className="text-base text-center font-semibold">
+            {firstName || t("First Name")} {lastName || t("Last Name")}
+          </h2>
+          <div className="text-xs text-gray-600 mt-1 space-y-1">
             <p>
-              <span className="font-semibold">{t("Blood")}</span>: {bloodGroup}
+              <span className="font-semibold">{t("ID")}</span>:{" "}
+              {studentId || "N/A"}
             </p>
             <p>
-              <span className="font-semibold">{t("Religion")}</span>: {religion}
+              <span className="font-semibold">{t("Class")}</span>:{" "}
+              {className || "N/A"}
+            </p>
+            <p>
+              <span className="font-semibold">{t("Gender")}</span>:{" "}
+              {gender || "N/A"}
+            </p>
+            <p>
+              <span className="font-semibold">{t("Nationality")}</span>:{" "}
+              {nationality || "N/A"}
             </p>
             <p title={email}>
-              <span className="font-semibold">{t("Email")}</span>: {truncateEmail(email)}
+              <span className="font-semibold">{t("Email")}</span>:{" "}
+              {truncateText(email, 20) || "N/A"}
             </p>
             <p>
-              <span className="font-semibold">{t("Number")}</span>: {contactNumber}
+              <span className="font-semibold">{t("Phone")}</span>:{" "}
+              {phoneNumber || "N/A"}
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

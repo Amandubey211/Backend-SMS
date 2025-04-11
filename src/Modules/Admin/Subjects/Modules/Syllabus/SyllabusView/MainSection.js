@@ -86,7 +86,7 @@ const MainSection = () => {
         requiredPermission={PERMISSIONS.VIEW_SYLLABUS}
       >
         {/* Updated container: flex layout ensures content is centered when needed */}
-        <div className="border-l w-full py-1 px-4 relative flex flex-col h-full">
+        <div className="border-l w-full py-1 px-4 relative flex flex-col min-h-screen">
           {renderContent()}
         </div>
       </ProtectedSection>

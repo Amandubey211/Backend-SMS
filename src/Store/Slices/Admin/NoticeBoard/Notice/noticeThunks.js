@@ -42,7 +42,8 @@ export const createNoticeThunk = createAsyncThunk(
         `/${getRole}/create_notice?say=${say}`,
         noticeData
       );
-      dispatch(fetchNoticesThunk());
+      const currentpage = getState().admin.notice.currentPage;
+      dispatch(fetchNoticesThunk({ page: currentpage, limit: 10 }));
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -65,7 +66,8 @@ export const updateNoticeThunk = createAsyncThunk(
         `/${getRole}/update/notice/${noticeId}?say=${say}`,
         updatedData
       );
-      dispatch(fetchNoticesThunk());
+      const currentpage = getState().admin.notice.currentPage;
+      dispatch(fetchNoticesThunk({ page: currentpage, limit: 10 }));
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -83,7 +85,8 @@ export const deleteNoticeThunk = createAsyncThunk(
       dispatch(setShowError(false));
       await deleteData(`/${getRole}/delete/notice/${noticeId}?say=${say}`);
       toast.success("Notice Delete successfully");
-      dispatch(fetchNoticesThunk());
+      const currentpage = getState().admin.notice.currentPage;
+      dispatch(fetchNoticesThunk({ page: currentpage, limit: 10 }));
       return noticeId;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
