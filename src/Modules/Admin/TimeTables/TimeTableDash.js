@@ -72,6 +72,7 @@ export default function TimeTableDash() {
   // --------------------------
   const {
     timetables = [],
+    counts,
     loadingFetch,
     pagination = {}, // We'll store total, page, limit in here
   } = useSelector((store) => store?.admin?.timetable || {});
@@ -830,7 +831,7 @@ export default function TimeTableDash() {
 
       {/* Sidebar Stats */}
       {!sidebarCollapsed && (
-        <div className="w-72 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
+        <div className="w-64 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
           {loadingFetch ? (
             <div className="space-y-4">
               <Skeleton.Input active size="default" style={{ width: 150 }} />
@@ -875,6 +876,7 @@ export default function TimeTableDash() {
                 filteredTimetables={filteredTimetables}
                 onTypeClick={handleTypeFilter}
                 activeType={filters.type}
+                counts={counts}
               />
               <Divider />
               <div className="border rounded p-4 mb-4">

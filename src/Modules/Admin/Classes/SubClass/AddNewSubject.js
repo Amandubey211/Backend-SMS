@@ -13,7 +13,7 @@ import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/C
 import { useTranslation } from "react-i18next";
 import { fetchAllIcons } from "../../../../Store/Slices/Admin/Class/actions/iconThunk";
 import IconGrid from "../MainSection/IconGrid";
-import CreateEditIconModal from "../MainSection/IconGrid";
+import CreateEditIconModal from "../MainSection/CreateEditIconModal";
 import { selectIcon } from "../../../../Store/Slices/Admin/Class/reducer/iconSlice";
 
 const { Option } = Select;

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import TextInput from "./TextInput";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 const PersonalInfo = ({
   studentInfo,
@@ -8,7 +8,7 @@ const PersonalInfo = ({
   errors,
   inputRefs,
 }) => {
-  const { t } = useTranslation('admAdmission');
+  const { t } = useTranslation("admAdmission");
 
   const calculateAge = (dateOfBirth) => {
     const birthDate = new Date(dateOfBirth);

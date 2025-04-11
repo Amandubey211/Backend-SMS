@@ -66,7 +66,7 @@ const renderListRowPlaceholder = (key) => (
 const renderTopCardEmpty = (key, t) => (
   <div
     key={key}
-    className="text-center p-4 border-dashed border-2 border-gray-300 rounded-lg relative w-[30%] flex items-center justify-center h-52"
+    className="text-center p-4 border-dashed border-2 border-gray-300 rounded-lg relative w-[30%] flex items-center justify-center h-56"
   >
     <span className="text-gray-500 text-sm">{t("No student yet to come")}</span>
   </div>
