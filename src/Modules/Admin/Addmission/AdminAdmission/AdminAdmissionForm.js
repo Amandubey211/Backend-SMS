@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useState } from "react";
+import React, { useRef, useEffect } from "react";
 import { Formik, Form, useFormikContext } from "formik";
 import { Button, message, Form as AntForm } from "antd";
 import AcademicSessionCandidate from "./Sections/AcademicSessionCandidate";
@@ -10,14 +10,11 @@ import { initialValues, AdminAdmissionSchema } from "./validations";
 import { registerStudentDetails } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
 import { useDispatch, useSelector } from "react-redux";
 
-// Updated FormDataWatcher Component:
-// Uses a ref to store previous values and only calls onChange when values truly change.
 const FormDataWatcher = ({ onChange }) => {
   const { values } = useFormikContext();
   const prevValuesRef = useRef(values);
 
   useEffect(() => {
-    // Compare stringified versions of values to decide whether to update.
     if (JSON.stringify(values) !== JSON.stringify(prevValuesRef.current)) {
       prevValuesRef.current = values;
       onChange(values);
