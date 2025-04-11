@@ -1,21 +1,17 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { AutoComplete, Button, Input, Select, Avatar } from "antd";
+import { useSelector } from "react-redux";
+import { Button, Avatar } from "antd";
 import {
   EyeOutlined,
   EyeInvisibleOutlined,
-  SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useTranslation } from "react-i18next";
 import AdminAdmissionForm from "./AdminAdmission/AdminAdmissionForm";
 import StudentCard from "./Components/StudentCard";
 
-const { Option } = Select;
-
 const StudentInfo = () => {
   const { t } = useTranslation("admAdmission");
-  const dispatch = useDispatch();
   const classList = useSelector((store) => store.admin.class.classes);
 
   // State for toggling the student card view, search and class filters, and form data
@@ -25,50 +21,50 @@ const StudentInfo = () => {
   const [formData, setFormData] = useState({});
 
   // Default configuration with sample student data.
-  const defaultStudents = [
-    {
-      _id: "stu1",
-      candidateInformation: {
-        firstName: "Alice",
-        lastName: "Johnson",
-        phoneNumber: "555-1111",
-      },
-      classId: "class1",
-      profilePicture: "path/to/alice.png",
-    },
-    {
-      _id: "stu2",
-      candidateInformation: {
-        firstName: "Bob",
-        lastName: "Smith",
-        phoneNumber: "555-2222",
-      },
-      classId: "class2",
-      profilePicture: "path/to/bob.png",
-    },
-    {
-      _id: "stu3",
-      candidateInformation: {
-        firstName: "Charlie",
-        lastName: "Williams",
-        phoneNumber: "555-3333",
-      },
-      classId: "class1",
-      profilePicture: "path/to/charlie.png",
-    },
-    {
-      _id: "stu4",
-      candidateInformation: {
-        firstName: "Dana",
-        lastName: "Lee",
-        phoneNumber: "555-4444",
-      },
-      classId: "class3",
-      profilePicture: "", // No image provided, so default icon will show.
-    },
-  ];
+  // const defaultStudents = [
+  //   {
+  //     _id: "stu1",
+  //     candidateInformation: {
+  //       firstName: "Alice",
+  //       lastName: "Johnson",
+  //       phoneNumber: "555-1111",
+  //     },
+  //     classId: "class1",
+  //     profilePicture: "path/to/alice.png",
+  //   },
+  //   {
+  //     _id: "stu2",
+  //     candidateInformation: {
+  //       firstName: "Bob",
+  //       lastName: "Smith",
+  //       phoneNumber: "555-2222",
+  //     },
+  //     classId: "class2",
+  //     profilePicture: "path/to/bob.png",
+  //   },
+  //   {
+  //     _id: "stu3",
+  //     candidateInformation: {
+  //       firstName: "Charlie",
+  //       lastName: "Williams",
+  //       phoneNumber: "555-3333",
+  //     },
+  //     classId: "class1",
+  //     profilePicture: "path/to/charlie.png",
+  //   },
+  //   {
+  //     _id: "stu4",
+  //     candidateInformation: {
+  //       firstName: "Dana",
+  //       lastName: "Lee",
+  //       phoneNumber: "555-4444",
+  //     },
+  //     classId: "class3",
+  //     profilePicture: "", // No image provided, so default icon will show.
+  //   },
+  // ];
 
-  // Wrap the form data change callback in useCallback for stability and perform a deep equality check.
+  // // Wrap the form data change callback in useCallback for stability and perform a deep equality check.
   const handleFormDataChange = useCallback((newData) => {
     setFormData((prevData) => {
       // Compare previous form data with the new data.
@@ -89,57 +85,57 @@ const StudentInfo = () => {
     });
   }, []);
 
-  // Update search query when user types.
-  const handleSearch = (value) => {
-    console.log("Searching for:", value);
-    setSearchQuery(value);
-  };
+  // // Update search query when user types.
+  // const handleSearch = (value) => {
+  //   console.log("Searching for:", value);
+  //   setSearchQuery(value);
+  // };
 
-  // Update the selected class filter.
-  const handleClassChange = (value) => {
-    setSelectedClass(value);
-    console.log("Selected class:", value);
-  };
+  // // Update the selected class filter.
+  // const handleClassChange = (value) => {
+  //   setSelectedClass(value);
+  //   console.log("Selected class:", value);
+  // };
 
   // Compute filtered students.
-  const filteredStudents = useMemo(() => {
-    return defaultStudents.filter((student) => {
-      const fullName =
-        `${student.candidateInformation.firstName} ${student.candidateInformation.lastName}`.toLowerCase();
-      const matchesSearch = fullName.includes(searchQuery.toLowerCase());
-      const matchesClass = selectedClass
-        ? student.classId === selectedClass
-        : true;
-      return matchesSearch && matchesClass;
-    });
-  }, [defaultStudents, searchQuery, selectedClass]);
+  // const filteredStudents = useMemo(() => {
+  //   return defaultStudents.filter((student) => {
+  //     const fullName =
+  //       `${student.candidateInformation.firstName} ${student.candidateInformation.lastName}`.toLowerCase();
+  //     const matchesSearch = fullName.includes(searchQuery.toLowerCase());
+  //     const matchesClass = selectedClass
+  //       ? student.classId === selectedClass
+  //       : true;
+  //     return matchesSearch && matchesClass;
+  //   });
+  // }, [defaultStudents, searchQuery, selectedClass]);
 
   // Build auto-complete options with custom labels.
-  const searchOptions = useMemo(() => {
-    return filteredStudents.map((student) => {
-      const fullName = `${student.candidateInformation.firstName} ${student.candidateInformation.lastName}`;
-      const classObj = classList.find((cls) => cls._id === student.classId);
-      const className = classObj ? classObj.className : "N/A";
-      return {
-        value: student._id,
-        label: (
-          <div style={{ display: "flex", alignItems: "center" }}>
-            <Avatar
-              src={student.profilePicture || null}
-              icon={!student.profilePicture && <UserOutlined />}
-            />
-            <div style={{ marginLeft: 8 }}>
-              <div style={{ fontWeight: "bold" }}>{fullName}</div>
-              <div style={{ fontSize: 12, color: "#888" }}>{className}</div>
-              <div style={{ fontSize: 12, color: "#888" }}>
-                Admission No: {student._id}
-              </div>
-            </div>
-          </div>
-        ),
-      };
-    });
-  }, [filteredStudents, classList]);
+  // const searchOptions = useMemo(() => {
+  //   return filteredStudents.map((student) => {
+  //     const fullName = `${student.candidateInformation.firstName} ${student.candidateInformation.lastName}`;
+  //     const classObj = classList.find((cls) => cls._id === student.classId);
+  //     const className = classObj ? classObj.className : "N/A";
+  //     return {
+  //       value: student._id,
+  //       label: (
+  //         <div style={{ display: "flex", alignItems: "center" }}>
+  //           <Avatar
+  //             src={student.profilePicture || null}
+  //             icon={!student.profilePicture && <UserOutlined />}
+  //           />
+  //           <div style={{ marginLeft: 8 }}>
+  //             <div style={{ fontWeight: "bold" }}>{fullName}</div>
+  //             <div style={{ fontSize: 12, color: "#888" }}>{className}</div>
+  //             <div style={{ fontSize: 12, color: "#888" }}>
+  //               Admission No: {student._id}
+  //             </div>
+  //           </div>
+  //         </div>
+  //       ),
+  //     };
+  //   });
+  // }, [filteredStudents, classList]);
 
   return (
     <div className="h-full w-full">
@@ -174,7 +170,7 @@ const StudentInfo = () => {
         </div>
         {/* Right Section: Student Card from form data */}
         {showStudentCard && (
-          <div className="sticky top-4 w-25% transition-all duration-300">
+          <div className="sticky top-4 w-25% tr ansition-all duration-300">
             <StudentCard
               studentInfo={formData?.candidateInformation || {}}
               imagePreview={formData?.attachments?.mandatory?.studentPicture}
