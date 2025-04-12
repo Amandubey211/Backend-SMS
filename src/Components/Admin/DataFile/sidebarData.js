@@ -17,6 +17,7 @@ import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
 import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
+import { SiReadthedocs } from "react-icons/si";
 import {
   MdInventory2,
   MdLocalLibrary,
@@ -310,6 +311,13 @@ const sidebarData = [
         title: "Day Book",
         path: "/finance/day-book",
         icon: <LuBookText style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      },
+      {
+        title: "Bank Reconciliation",
+        path: "/finance/bank-reconciliation",
+        icon: <SiReadthedocs style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },

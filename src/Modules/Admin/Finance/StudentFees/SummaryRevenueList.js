@@ -6,7 +6,7 @@ import { fetchAllStudentFee } from "../../../../Store/Slices/Finance/StudentFees
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FaFileInvoice } from "react-icons/fa";
-import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import { MdCancel, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
@@ -32,7 +32,7 @@ const SummaryRevenueList = () => {
     setSearchText(value);
     dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize }));
   };
-
+  const [selectedIds, setSelectedIds] = useState([]);
   const columns = [
     {
       title: "Invoice",
@@ -64,7 +64,7 @@ const SummaryRevenueList = () => {
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (status) => {
-        const color = status === "paid" ? "green" : status === "unpaid" ? "red" : "yellow";
+        const color = status === "paid" ? "green" : status === "Unpaid" ? "red" : "yellow";
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -79,8 +79,10 @@ const SummaryRevenueList = () => {
           setSelectedInvoice(record);
           setInvoiceVisible(true)
         }}><FaFileInvoice size={20}/></button>
-        <button title="Edit"><MdOutlineEdit size={20}/></button>
-        <button title="Delete"><MdDeleteOutline size={20}/></button>
+       {
+        record?.history?.length > 0 && record?.paymentStatus == "Unpaid" ?
+         <button title="Cancel"><MdCancel size={20}/> </button>:''
+       }
         </div>
         );
       },
@@ -168,6 +170,13 @@ const navigate = useNavigate();
             columns={columns}
             dataSource={incomes}
             expandable={{ expandedRowRender }}
+            rowSelection={{
+              selectedRowKeys: selectedIds,
+              onChange: (selectedRowKeys) => setSelectedIds(selectedRowKeys),
+              getCheckboxProps: (record) => ({
+                disabled: record?.history?.length > 0 ? true:false,
+               }),
+            }}
             pagination={{
               current: currentPage, // Use currentPage from API response
               total: totalRecords,

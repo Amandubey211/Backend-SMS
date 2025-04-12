@@ -233,6 +233,7 @@ const CreateReceipt = () => {
       layout="vertical"
       onFinish={() => {dispatch(createReceipt({...receiptData,invoiceNumber:searchInvoiceNumber}))}}
       initialValues={receiptData}
+      className="mt-4"
     >
       {/* Row 1 */}
       <Row gutter={16}>
@@ -260,10 +261,10 @@ const CreateReceipt = () => {
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label="Paid By" name="paidBy">
+          <Form.Item label={`Payer Full Name (${'*Name on Bank Account'})`} name="paidBy" rules={[{ required: true ,message:"Payer Name is required"}]}>
             <Input
               value={receiptData.paidBy}
-              placeholder="self,parents..."
+              placeholder="Payer Full Name"
               onChange={(e) => handleChange("paidBy", e.target.value)}
             />
           </Form.Item>
@@ -275,7 +276,7 @@ const CreateReceipt = () => {
        
 
         {/* Conditional Fields */}
-        {receiptData.paymentType !== "cash" & receiptData.paymentType !== "cheque" ? (
+        {/* {receiptData.paymentType !== "cash" & receiptData.paymentType !== "cheque" ? (
           <>
             <Col span={6}>
               <Form.Item label="Online Transaction ID" name="onlineTransactionId"  rules={[{ required: true ,message:"Transaction ID is required"}]}>
@@ -286,7 +287,7 @@ const CreateReceipt = () => {
               </Form.Item>
             </Col>
           </>
-        ):null}
+        ):null} */}
 
         {/* Conditional Fields for Cheque */}
         {receiptData.paymentType === "cheque" && (

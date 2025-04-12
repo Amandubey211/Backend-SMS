@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Input, Tag } from "antd";
+import { Table, Input, Tag, Checkbox } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { SearchOutlined } from "@ant-design/icons";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FaFileInvoice } from "react-icons/fa";
-import { MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
+import { MdCancel, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
@@ -31,7 +31,7 @@ const SummaryRevenueList = () => {
     setSearchText(value);
     dispatch(fetchAllEntityRevenue({ page: 1, search: value, limit: computedPageSize }));
   };
-
+  const [selectedIds, setSelectedIds] = useState([]);
   const columns = [
     {
       title: "Invoice",
@@ -63,7 +63,7 @@ const SummaryRevenueList = () => {
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (status) => {
-        const color = status === "paid" ? "green" : status === "unpaid" ? "red" : "yellow";
+        const color = status === "paid" ? "green" : status === "Unpaid" ? "red" : "yellow";
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -78,8 +78,10 @@ const SummaryRevenueList = () => {
           setSelectedInvoice(record);
           setInvoiceVisible(true)
         }}><FaFileInvoice size={20}/></button>
-        <button title="Edit"><MdOutlineEdit size={20}/></button>
-        <button title="Delete"><MdDeleteOutline size={20}/></button>
+       {
+        record?.history?.length > 0 && record?.paymentStatus == "Unpaid" ?
+         <button title="Cancel"><MdCancel size={20}/> </button>:''
+       }
         </div>
         );
       },
@@ -159,13 +161,21 @@ const navigate = useNavigate();
             allowClear
             style={{ width: 300, marginBottom: 16 }}
           />
-          <div>
+          <div className="flex flex-row items-center gap-4">
+          {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>console.log(selectedIds)}>Delete</button>}
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/entity/add/revenue")}>Add New Invoice</button>
           </div>
          </div>
           <Table
             columns={columns}
             dataSource={incomes}
+            rowSelection={{
+              selectedRowKeys: selectedIds,
+              onChange: (selectedRowKeys) => setSelectedIds(selectedRowKeys),
+              getCheckboxProps: (record) => ({
+                disabled: record?.history?.length > 0 ? true:false,
+               }),
+            }}
             expandable={{ expandedRowRender }}
             pagination={{
               current: currentPage, // Use currentPage from API response

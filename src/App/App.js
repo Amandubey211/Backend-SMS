@@ -83,6 +83,15 @@ const BudgetPlannerDash = lazy(() =>
 const BudgetPlannerList = lazy(() =>
   import("../Modules/Admin/Finance/budget/BudgetList.js")
 );
+const BankReconciliationList = lazy(() =>
+  import("../Modules/Admin/Finance/bankRecon/BankReconciliationList.js")
+);
+const BankReconciliationDash = lazy(() =>
+  import("../Modules/Admin/Finance/bankRecon/BankReconciliation.js")
+);
+const StartReconciliation= lazy(() =>
+  import("../Modules/Admin/Finance/bankRecon/StartReconciliation.js")
+);
 const DayBook= lazy(() =>
   import("../Modules/Admin/Finance/dayBook/DayBookMain.js")
 );
@@ -1046,6 +1055,36 @@ function App() {
       element: (
         <ProtectRoute
           Component={BudgetPlannerList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/bank-reconciliation",
+      element: (
+        <ProtectRoute
+          Component={BankReconciliationDash}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/bank-reconciliation/list",
+      element: (
+        <ProtectRoute
+          Component={BankReconciliationList}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/start-reconciliation",
+      element: (
+        <ProtectRoute
+          Component={StartReconciliation}
           allowedRoles={["admin", "finance"]}
         />
       ),
