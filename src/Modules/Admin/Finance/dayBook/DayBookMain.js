@@ -55,7 +55,7 @@ const DayBookMain = () => {
       title: "Type",
       dataIndex: "transactionType",
       key: "transactionType",
-      render: (val) => <span className="capitalize">{val}</span>,
+      render: (val) => <span className={`capitalize text-${val=="revenue"?"green":"red"}-500`}>{val}</span>,
     },
     {
       title: "Category",

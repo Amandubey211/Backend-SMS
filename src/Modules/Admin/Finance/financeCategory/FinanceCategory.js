@@ -138,10 +138,7 @@ const FinanceCategory = () => {
               </Select>
 
             </div>
-            <div className="w-[15rem]">
-          
-              uese rangelpicker andt
-            </div>
+
 
           </div>
 

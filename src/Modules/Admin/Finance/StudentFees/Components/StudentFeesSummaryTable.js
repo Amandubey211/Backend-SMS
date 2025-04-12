@@ -61,7 +61,7 @@ const StudentFeesSummaryTable = () => {
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (status) => {
-        const color = status === "paid" ? "green" : status === "unpaid" ? "red" : "yellow";
+        const color = status === "paid" ? "green" : status === "Unpaid" ? "red" : "yellow";
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -76,8 +76,6 @@ const StudentFeesSummaryTable = () => {
           setSelectedInvoice(record);
           setInvoiceVisible(true)
         }}><FaFileInvoice size={20}/></button>
-        <button title="Edit"><MdOutlineEdit size={20}/></button>
-        <button title="Delete"><MdDeleteOutline size={20}/></button>
         </div>
         );
       },
