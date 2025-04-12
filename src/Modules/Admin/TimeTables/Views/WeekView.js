@@ -160,16 +160,17 @@ export default function WeekView({
       <div className="flex min-w-max bg-white rounded-lg shadow">
         {/* Time column - Full 24-hour timeline */}
         <div
-          className="w-20 flex-shrink-0"
-          style={{ height: `${24 * hourHeight + 40}px` }}
+          className="w-24 flex-shrink-0"
+          style={{ height: `${24 * hourHeight + 64}px` }}
         >
-          <div className="h-20 mt-2.5 border-b border-gray-200 flex justify-center items-center">
+          {/* Changed height from h-20 to h-16 to better match day headers */}
+          <div className="h-24 border border-gray-200 flex justify-center items-center">
             <TfiTime className="text-lg" />
           </div>
           {timeSlots.map((slot) => (
             <div
               key={slot.hour}
-              className="flex border-b border-gray-200 items-start justify-end pr-2 text-xs"
+              className="flex border-b border-r border-gray-200 items-center justify-end pr-2 text-sm"
               style={{
                 height: `${hourHeight}px`,
                 color: slot.isAM ? "#4a5568" : "#2d3748",
@@ -181,7 +182,7 @@ export default function WeekView({
         </div>
 
         {/* Days grid */}
-        <div className="flex-1 grid grid-cols-7 min-w-max">
+        <div className="flex-1 grid grid-cols-7 min-w-max ">
           {/* Day headers */}
           {daysInWeek.map((day) => {
             const dayString = format(day, "yyyy-MM-dd");
@@ -194,7 +195,7 @@ export default function WeekView({
             return (
               <div
                 key={dayString}
-                className={`text-center p-2 border-t border-l border-b border-gray-200 ${
+                className={`text-center p-2 border-t border-r border-b h-24 border-gray-200 ${
                   isToday ? "bg-blue-50 font-semibold" : ""
                 } ${isWeekend ? "bg-gray-50" : ""}`}
               >

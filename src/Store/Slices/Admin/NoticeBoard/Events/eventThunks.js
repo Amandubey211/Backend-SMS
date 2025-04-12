@@ -3,14 +3,17 @@ import toast from "react-hot-toast";
 import { handleError } from "../../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../../Common/Alerts/alertsSlice";
 import { getAY } from "../../../../../Utils/academivYear";
-import { customRequest, deleteData, getData, } from "../../../../../services/apiEndpoints";
+import {
+  customRequest,
+  deleteData,
+  getData,
+} from "../../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../../Utils/getRoles";
 
 // Fetch events
 export const fetchEventsThunk = createAsyncThunk(
   "events/fetchEvents",
   async (_, { rejectWithValue, dispatch, getState }) => {
-
     try {
       const say = getAY();
 
@@ -39,9 +42,12 @@ export const createEventThunk = createAsyncThunk(
         if (eventData[key]) formData.append(key, eventData[key]);
       });
 
-      const response = await customRequest("post",
+      const response = await customRequest(
+        "post",
         `/${getRole}/create_event?say=${say}`,
-        formData, { "Content-Type": "multipart/form-data" });
+        formData,
+        { "Content-Type": "multipart/form-data" }
+      );
 
       dispatch(fetchEventsThunk());
       toast.success("Event created successfully!");
@@ -65,9 +71,12 @@ export const updateEventThunk = createAsyncThunk(
         if (eventData[key]) formData.append(key, eventData[key]);
       });
 
-      const response = await customRequest("put",
+      const response = await customRequest(
+        "put",
         `/${getRole}/update/event/${eventId}?say=${say}`,
-        formData, { "Content-Type": "multipart/form-data" });
+        formData,
+        { "Content-Type": "multipart/form-data" }
+      );
 
       dispatch(fetchEventsThunk());
       return response;

@@ -135,9 +135,9 @@ const List = ({
                 </div>
                 <div className="flex items-center gap-3">
                   {item.publish ? (
-                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
+                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-8 w-8" />
                   ) : (
-                    <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
+                    <MdOutlineBlock className="text-gray-600 p-1 h-8 w-8" />
                   )}
                   <Popover
                     content={
@@ -158,7 +158,7 @@ const List = ({
                   >
                     <Button
                       shape="circle"
-                      type="primary"
+                      type="default"
                       icon={<FaEllipsisV />}
                     />
                   </Popover>

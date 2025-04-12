@@ -30,26 +30,12 @@ import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
 import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
 import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 
-// new Timetable
+// Staff Timetable
 import TimeTableDash from "../Modules/Admin/TimeTables/Timetable.js";
 
-// Timetable
-// Admin
-import TimeTablePage from "../Modules/Admin/TimeTable/TimeTablePage.js";
-import TableView from "../Modules/Admin/TimeTable/Components/TableView.js";
-import CreateTimeTable from "../Modules/Admin/TimeTable/Components/CreateTimeTable.js";
-import UpdateTimeTable from "../Modules/Admin/TimeTable/Components/UpdateTimeTable.js";
-
-// Student
+// Student and parent timetable
 import StudentParentTimeTablePage from "../Modules/Student/TimeTable/StudentParentTimetable.js";
 
-// Teacher
-import TeacherTimeTablePage from "../Components/Staff/Teacher/TimeTable/TimeTablePage.js";
-import TeacherTableView from "../Components/Staff/Teacher/TimeTable/Components/TableView.js";
-
-// Parent
-import ParentTimeTablePage from "../Modules/Parents/TimeTable/TimeTablePage.js";
-import ParentTableView from "../Modules/Parents/TimeTable/Components/TableView.js";
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
 import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentFeesForm.js";
@@ -324,6 +310,10 @@ const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
 const Addmission = lazy(() =>
   import("../Modules/Admin/Addmission/Addmission.js")
 );
+
+// const Addmission = lazy(() =>
+//   import("../Modules/Admin/Addmission/AdmissionWizard/AdmissionWizard.js")
+// );
 const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
 const Class = lazy(() => import("../Modules/Admin/Classes/SubClass/Class.js"));
 const StudentClass = lazy(() =>
@@ -541,7 +531,7 @@ function App() {
       element: (
         <ProtectRoute
           Component={InventoryList}
-          allowedRoles={["admin","finance"]}
+          allowedRoles={["admin", "finance"]}
         />
       ),
       errorElement: <Error />,
@@ -952,40 +942,8 @@ function App() {
         />
       ),
       errorElement: <Error />,
-      children: [
-        {
-          path: "viewtable/:tablename",
-          element: (
-            <ProtectRoute
-              Component={TableView}
-              allowedRoles={["admin", "teacher", "student", "parent", "staff"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-        {
-          path: "edit/:id", // New child route
-          element: (
-            <ProtectRoute
-              Component={UpdateTimeTable}
-              allowedRoles={["admin", "teacher", "staff"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-      ],
     },
 
-    {
-      path: "/timetable/create-new-timeTable",
-      element: (
-        <ProtectRoute
-          Component={CreateTimeTable}
-          allowedRoles={["admin", "teacher", "staff"]}
-        />
-      ),
-      errorElement: <Error />,
-    },
     {
       path: "/noticeboard/events",
       element: (
@@ -1417,21 +1375,7 @@ function App() {
         />
       ),
       errorElement: <Error />,
-      // children: [
-      //   {
-      //     path: "viewtable/:tablename", // Notice it’s a child path, not a full path
-      //     element: (
-      //       <ProtectRoute
-      //         Component={StudentTableView}
-      //         allowedRoles={["student"]}
-      //       />
-      //     ),
-      //     errorElement: <Error />,
-      //   },
-      // ],
     },
-
-    //{ path: "/student_class/:sid/createassignment", element: <ProtectRoute Component={StudentCreateAssignment} allowedRoles={["student"]} />, errorElement: <Error /> },
     {
       path: "/student_class/:cid/:sid/quizzes",
       element: (
@@ -1566,31 +1510,6 @@ function App() {
       errorElement: <Error />,
     },
 
-    // teacher----------------------------------------------------------------
-
-    {
-      path: "/teacher_timetable",
-      element: (
-        <ProtectRoute
-          Component={TeacherTimeTablePage}
-          allowedRoles={["teacher"]}
-        />
-      ),
-      errorElement: <Error />,
-      children: [
-        {
-          path: "viewtable/:tablename", // Notice it’s a child path, not a full path
-          element: (
-            <ProtectRoute
-              Component={TeacherTableView}
-              allowedRoles={["teacher"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-      ],
-    },
-
     // parent----------------------------------------------------------------
     {
       path: "/parent_dash",
@@ -1625,18 +1544,6 @@ function App() {
         />
       ),
       errorElement: <Error />,
-      children: [
-        {
-          path: "viewtable/:tablename",
-          element: (
-            <ProtectRoute
-              Component={ParentTableView}
-              allowedRoles={["parent"]}
-            />
-          ),
-          errorElement: <Error />,
-        },
-      ],
     },
     {
       path: "/parentchildnotice",
@@ -1703,3 +1610,60 @@ function App() {
 }
 
 export default App;
+
+// ---- to achieve a clean, modular, and scalable architecture.-------------
+
+// This code is a React application that uses React Router for routing and lazy loading for performance optimization. It includes various routes for different user roles (admin, student, parent, etc.) and handles online/offline status. The routes are organized into separate files for better maintainability.
+// import React, { Suspense, useEffect, useState } from "react";
+// import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+// import Offline from "./Components/Common/Offline";
+// import Fallback from "./Components/Common/Fallback";
+
+// // Import route arrays
+// import commonRoutes from "./Routes/CommonRoutes";
+// import adminRoutes from "./Routes/AdminRoutes";
+// import studentRoutes from "./Routes/StudentRoutes";
+// import parentRoutes from "./Routes/ParentRoutes";
+// // If you have staffRoutes, financeRoutes, etc., import them as well and merge below
+
+// function App() {
+//   // Online/Offline checking (optional)
+//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
+
+//   useEffect(() => {
+//     const handleOnline = () => setIsOnline(true);
+//     const handleOffline = () => setIsOnline(false);
+
+//     window.addEventListener("online", handleOnline);
+//     window.addEventListener("offline", handleOffline);
+
+//     return () => {
+//       window.removeEventListener("online", handleOnline);
+//       window.removeEventListener("offline", handleOffline);
+//     };
+//   }, []);
+
+//   // Combine all routes into a single array
+//   const routes = [
+//     ...commonRoutes,
+//     ...adminRoutes,
+//     ...studentRoutes,
+//     ...parentRoutes,
+//     // ...other role-based route arrays if you have them
+//   ];
+
+//   const router = createBrowserRouter(routes);
+
+//   return (
+//     <>
+//       {!isOnline && <Offline />}
+//       {/* Show an offline banner or message if you'd like */}
+//       <Suspense fallback={<Fallback />}>
+//         <RouterProvider router={router} />
+//       </Suspense>
+//     </>
+//   );
+// }
+
+// export default App;

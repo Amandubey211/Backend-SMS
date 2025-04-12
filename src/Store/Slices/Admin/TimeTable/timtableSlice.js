@@ -14,6 +14,7 @@ const initialState = {
     limit: 10,
     totalPages: 1,
   },
+  counts: {},
   loadingFetch: false,
   loadingCreate: false,
   loadingUpdate: false,
@@ -42,8 +43,14 @@ const timetableSlice = createSlice({
 
         // The thunk now returns the full response: { success, data, pagination }
         // If you only returned the data array before, adjust accordingly
-        const { data = [], pagination = {} } = action.payload || {};
+        const {
+          data = [],
+          pagination = {},
+          counts = {},
+        } = action.payload || {};
         state.timetables = data;
+        state.counts = counts;
+
         // If pagination is present, store it
         if (pagination.total !== undefined) {
           state.pagination = pagination;

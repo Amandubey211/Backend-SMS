@@ -92,7 +92,7 @@ const eventSlice = createSlice({
         state.events = state.events.filter(
           (event) => event._id !== action.payload
         );
-        state.selectedEvent = null
+        state.selectedEvent = null;
       })
       .addCase(deleteEventThunk.rejected, (state, action) => {
         state.deleteLoading = false;

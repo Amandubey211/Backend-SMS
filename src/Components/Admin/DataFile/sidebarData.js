@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
-import { LuBookText, LuUser } from "react-icons/lu";
+import { LuUser } from "react-icons/lu";
 import { HiOutlineCalculator } from "react-icons/hi2";
 import { ImTable2 } from "react-icons/im";
 import { RiUserAddLine } from "react-icons/ri";
@@ -25,6 +25,7 @@ import {
   MdOutlineCategory,
   MdOutlineInventory2,
 } from "react-icons/md";
+import { CiViewTable } from "react-icons/ci";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
@@ -191,7 +192,7 @@ const sidebarData = [
   },
   {
     title: "Time Table",
-    icon: <ImTable2 />,
+    icon: <CiViewTable />,
     path: "/timetable",
     roles: [ROLES.ADMIN, ROLES.STAFF, ROLES.TEACHER, ROLES.LIBRARIAN],
     //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
@@ -309,7 +310,7 @@ const sidebarData = [
       {
         title: "Day Book",
         path: "/finance/day-book",
-        icon: <LuBookText style={{ fontSize: "1.1rem" }} />,
+        icon: <GiStabbedNote style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },

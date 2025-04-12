@@ -102,15 +102,4 @@ const LogoutConfirmationModal = ({ isOpen, onClose, onConfirm, loading }) => {
   );
 };
 
-LogoutConfirmationModal.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
-  loading: PropTypes.bool,
-};
-
-LogoutConfirmationModal.defaultProps = {
-  loading: false,
-};
-
 export default LogoutConfirmationModal;
