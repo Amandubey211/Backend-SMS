@@ -562,7 +562,7 @@ const TimetableDetailsDrawer = ({
                           new Date(timetable.validity.startDate),
                           "dd MMM yyyy"
                         )}
-                        {" to "}
+
                         <span className="font-medium">To: </span>
                         {timetable.validity.endDate
                           ? format(

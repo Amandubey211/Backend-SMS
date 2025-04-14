@@ -16,7 +16,7 @@ const StudentGradeSummary = ({ grades, studentData }) => {
         <h2 className="mt-4 text-lg font-semibold">{studentData?.fullName}</h2>
       </div>
       {/* Enhanced Total Score UI */}
-      <div className="mt-4 p-4 border-t">
+      <div className="mt-4 p-4 ">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">{t("Total Score")}</p>
           <span className="bg-gradient-to-r from-pink-500 to-red-500 text-white text-xl font-bold px-4 py-2 rounded-full shadow-lg">
@@ -24,7 +24,7 @@ const StudentGradeSummary = ({ grades, studentData }) => {
           </span>
         </div>
       </div>
-      <div className="mt-4 p-3 border-l-2">
+      <div className="mt-4 p-3 ">
         <h3 className="text-md font-semibold mb-4">{t("Grade Summary")}</h3>
         <div className="flex justify-between mb-2">
           <p className="text-sm">{t("Assignment")}</p>
@@ -65,7 +65,7 @@ const StudentGradeSummary = ({ grades, studentData }) => {
           </p>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 

@@ -85,10 +85,16 @@ const LibraryAndBookIssue = () => {
             {/* Tab Buttons with Add Book button on right (if Library tab is active) */}
             <div className="flex justify-between items-center mb-2">
               <div className="flex gap-4">
-                <TabButton isActive={activeTab === "Library"} onClick={() => handleTabSwitch("Library")}>
+                <TabButton
+                  isActive={activeTab === "Library"}
+                  onClick={() => handleTabSwitch("Library")}
+                >
                   {t("Library")}
                 </TabButton>
-                <TabButton isActive={activeTab === "BookIssue"} onClick={() => handleTabSwitch("BookIssue")}>
+                <TabButton
+                  isActive={activeTab === "BookIssue"}
+                  onClick={() => handleTabSwitch("BookIssue")}
+                >
                   {t("Book Issue")}
                 </TabButton>
               </div>
@@ -146,8 +152,8 @@ const LibraryAndBookIssue = () => {
                 activeTab === "Library"
                   ? t("Add New Book")
                   : editIssueData
-                    ? t("Edit Book Issue")
-                    : t("Add Book Issue")
+                  ? t("Edit Book Issue")
+                  : t("Add Book Issue")
               }
             >
               {activeTab === "Library" ? (
