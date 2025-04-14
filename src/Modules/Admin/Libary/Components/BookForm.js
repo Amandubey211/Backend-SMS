@@ -241,8 +241,8 @@ const BookForm = ({ book, onClose }) => {
               size="large"
             >
               {categoriesList?.map((cat) => (
-                <Option key={cat._id} value={cat._id}>
-                  {cat.name}
+                <Option key={cat?._id} value={cat?._id}>
+                  {cat?.name}
                 </Option>
               ))}
             </Select>

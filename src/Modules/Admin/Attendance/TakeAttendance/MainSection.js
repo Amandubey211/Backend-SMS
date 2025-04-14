@@ -89,7 +89,6 @@ const MainSection = () => {
       <div className="w-4/12 p-4 bg-white flex flex-col space-y-4">
         {/* Keep enough vertical space for the stats below */}
         <Header onSubmit={handleMarkAttendance} loading={loading} />
-
         <div className="flex justify-center">
           <CustomCalendar
             selectedDate={selectedDate}
@@ -97,7 +96,6 @@ const MainSection = () => {
           />
         </div>
 
-        {/* Ensure enough space for stats */}
         <div className="flex-grow overflow-auto p-3  w-full">
           <Statistics />
         </div>

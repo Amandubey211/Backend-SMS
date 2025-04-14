@@ -70,7 +70,8 @@ export const addBookThunk = createAsyncThunk(
       );
       toast.success("Book added successfully!");
       dispatch(toggleSidebar());
-      dispatch(fetchBooksDetailsThunk());
+      const pageno = getState().library.currentPage || 1;
+      dispatch(fetchBooksDetailsThunk({ page: pageno, limit: 10 }));
       return response?.book;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -136,10 +137,16 @@ export const fetchBookIssuesThunk = createAsyncThunk(
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/${getRole}/all/bookIssue?say=${say}&page=${page}&limit=${limit}`);
+      const response = await getData(
+        `/${getRole}/all/bookIssue?say=${say}&page=${page}&limit=${limit}`
+      );
       return {
         issues: response?.books || [],
-        pagination: response?.pagination || { totalItems: 0, totalPages: 1, currentPage: 1 },
+        pagination: response?.pagination || {
+          totalItems: 0,
+          totalPages: 1,
+          currentPage: 1,
+        },
       };
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

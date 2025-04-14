@@ -413,9 +413,7 @@ const EditorComponent = ({
       )}
       <div
         className={`${
-          contentError
-            ? "border border-red-500 rounded-sm p-1"
-            : "border border-gray-300 rounded-sm p-1"
+          contentError ? "border border-red-500 rounded-sm p-1" : ""
         }`}
       >
         <JoditEditor

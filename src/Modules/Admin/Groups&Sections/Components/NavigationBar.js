@@ -35,8 +35,8 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           selectedSection === sectionItem.sectionName;
 
     return isActive
-      ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
+      ? "relative px-2 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+      : "relative px-2 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
   };
 
   // Sidebar toggles
@@ -69,64 +69,81 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     setDeleteModalOpen(true);
   };
 
+  // Conditionally show the blur if more than 3 sections exist
+  const showBlur = (sections?.length || 0) > 3;
+
   return (
     <>
       <div className="flex justify-between items-center border-b p-2">
-        <div className="flex space-x-2 pe-5 ps-3">
-          {/* "Everyone" */}
-          <button
-            className={
-              selectedSection === "Everyone"
-                ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-                : "relative px-4 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100"
-            }
-            onClick={() => onSectionChange("Everyone", null)}
-          >
-            Everyone
-          </button>
+        {/* Left side: scrollable "Everyone" + sections */}
+        <div className="flex items-center">
+          {/* Make this parent container relative to anchor the blur overlay and increase width */}
+          <div className="relative w-[40rem] pe-5 ps-3">
+            {/* The actual scrollable area */}
+            <div className="overflow-x-auto whitespace-nowrap no-scrollbar">
+              <div className="flex space-x-2">
+                {/* "Everyone" */}
+                <button
+                  className={
+                    selectedSection === "Everyone"
+                      ? "relative px-2 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+                      : "relative px-2 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100"
+                  }
+                  onClick={() => onSectionChange("Everyone", null)}
+                >
+                  Everyone
+                </button>
 
-          {/* Each Section */}
-          {sections?.map((item) => (
-            <button
-              key={item._id}
-              className={getButtonClass(item)}
-              onClick={() => onSectionChange(item.sectionName, item._id)}
-              onMouseEnter={() => setHoveredSection(item.sectionName)}
-              onMouseLeave={() => setHoveredSection(null)}
-            >
-              {item.sectionName}
-              {hoveredSection === item.sectionName && role !== "teacher" && (
-                <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
-                  <RiEdit2Line
-                    className="hover:text-blue-500"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditSection(item);
-                    }}
-                  />
-                  <RiDeleteBin5Line
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteClick(item);
-                    }}
-                  />
-                </span>
-              )}
-            </button>
-          ))}
+                {/* Each Section */}
+                {sections?.map((item) => (
+                  <button
+                    key={item._id}
+                    className={getButtonClass(item)}
+                    onClick={() => onSectionChange(item.sectionName, item._id)}
+                    onMouseEnter={() => setHoveredSection(item.sectionName)}
+                    onMouseLeave={() => setHoveredSection(null)}
+                  >
+                    {item.sectionName}
+                    {hoveredSection === item.sectionName &&
+                      role !== "teacher" && (
+                        <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
+                          <RiEdit2Line
+                            className="hover:text-blue-500"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditSection(item);
+                            }}
+                          />
+                          <RiDeleteBin5Line
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteClick(item);
+                            }}
+                          />
+                        </span>
+                      )}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Show blur only if needed */}
+            {showBlur && (
+              <div className="pointer-events-none absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-white to-transparent backdrop-blur-sm" />
+            )}
+          </div>
 
-          {/* Add Section (Admins only) */}
+          {/* Add Section (Admins only) - always visible, outside the scroll container */}
           {role === "admin" && (
             <button
               onClick={openAddSectionSidebar}
-              className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full"
+              className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full ml-2"
             >
               <span className="mr-2">+</span> Add Section
             </button>
           )}
         </div>
 
-        {/* Add Group (Admins only) */}
+        {/* Right side: Add Group (Admins only) */}
         {role === "admin" && (
           <button
             onClick={openAddGroupSidebar}
