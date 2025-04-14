@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { useTranslation } from "react-i18next";
+import { Button, Tooltip } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
 
 const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
   const { t } = useTranslation("admClass");
@@ -12,6 +14,9 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
   const { cid } = useParams();
+
+  const [hoveredSection, setHoveredSection] = useState(null);
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     dispatch(fetchSectionsByClass(cid));
@@ -33,14 +38,25 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
     [setActiveSection]
   );
 
+  // Conditionally show the blur if more than 3 sections exist
+  const showBlur = (Sections?.length || 0) > 3;
+
+  // Reset the active section to "Everyone"
+  const handleReset = () => {
+    setResetting(true);
+    setActiveSection("Everyone");
+
+    // Reset the spinning animation after 1 second
+    setTimeout(() => setResetting(false), 1000);
+  };
+
   return (
     <>
       <div className="flex justify-between items-center p-4">
         <div className="flex items-center space-x-4">
-          <h1 className="text-xl font-semibold">{t("All Students")}</h1>
-          <span className="bg-purple-200 text-purple-700 rounded-full px-2 py-1 text-sm">
-            {totalStudents}
-          </span>
+          <h1 className="text-lg font-semibold">
+            {t(`All Students (${totalStudents})`)}
+          </h1>
         </div>
         {role === "admin" && (
           <NavLink
@@ -54,24 +70,69 @@ const NavigationBar = ({ setActiveSection, activeSection, totalStudents }) => {
           </NavLink>
         )}
       </div>
-      <div className="flex space-x-2 px-5">
-        <button
-          className={getButtonClass("Everyone")}
-          onClick={() => handleSectionChange("Everyone")}
-          aria-pressed={activeSection === "Everyone"}
-        >
-          {t("Everyone")}
-        </button>
-        {Sections?.map((item) => (
-          <button
-            key={item.sectionName}
-            className={getButtonClass(item.sectionName)}
-            onClick={() => handleSectionChange(item.sectionName)}
-            aria-pressed={activeSection === item.sectionName}
-          >
-            {item.sectionName}
-          </button>
-        ))}
+
+      {/* Scrollable Section Navigation */}
+      <div className="relative w-[50rem] pe-5 ps-3">
+        <div className="overflow-x-auto whitespace-nowrap no-scrollbar">
+          <div className="flex space-x-2">
+            {/* "Everyone" section should always be visible */}
+            <button
+              className={getButtonClass("Everyone")}
+              onClick={() => handleSectionChange("Everyone")}
+              aria-pressed={activeSection === "Everyone"}
+            >
+              {t("Everyone")}
+            </button>
+
+            {/* Scrollable sections */}
+            <div className="flex space-x-2">
+              {Sections?.map((item) => (
+                <button
+                  key={item.sectionName}
+                  className={getButtonClass(item.sectionName)}
+                  onClick={() => handleSectionChange(item.sectionName)}
+                  aria-pressed={activeSection === item.sectionName}
+                  onMouseEnter={() => setHoveredSection(item.sectionName)}
+                  onMouseLeave={() => setHoveredSection(null)}
+                >
+                  {item.sectionName}
+                  {hoveredSection === item.sectionName &&
+                    role !== "teacher" && (
+                      <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
+                        {/* Edit and Delete Buttons (Visible only for Admin) */}
+                      </span>
+                    )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {showBlur && (
+          <div className="pointer-events-none absolute top-0 right-0 h-full w-10 bg-gradient-to-l from-white to-transparent backdrop-blur-sm" />
+        )}
+
+        {/* Reset Button with Animated Spin (Only visible if not in "Everyone") */}
+        {activeSection !== "Everyone" && (
+          <div className="absolute top-1/2 -right-20 transform -translate-y-1/2">
+            <Tooltip title="Reset to 'Everyone'">
+              <Button
+                onClick={handleReset}
+                className={`transition-all duration-500 ${
+                  resetting ? "animate-spin" : ""
+                } p-2 rounded-full border border-gray-300 bg-white flex items-center justify-center`}
+                icon={
+                  <ReloadOutlined
+                    style={{
+                      fontSize: "24px",
+                      color: "#4F4F4F",
+                    }}
+                  />
+                }
+              />
+            </Tooltip>
+          </div>
+        )}
       </div>
     </>
   );

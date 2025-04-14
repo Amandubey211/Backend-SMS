@@ -35,14 +35,14 @@ const BookItem = ({
               ))
             ) : (
               <span className="text-sm text-green-600">
-                {t("no Categories")}
+                {t("no Categories ")}
               </span>
             )}
           </div>
           <div className="flex items-top gap-2 mt-1">
-            <p className="text-md font-medium text-gray-800">
-              {className || t("No Class")}
-            </p>
+            {className && (
+              <p className="text-md font-medium text-gray-800">{className}</p>
+            )}
           </div>
         </div>
       </div>

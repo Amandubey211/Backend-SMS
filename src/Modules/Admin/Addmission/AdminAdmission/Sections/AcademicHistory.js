@@ -18,8 +18,9 @@ const AcademicHistory = () => {
         Academic History
       </h2>
       <div className="p-3">
+        {/* First row with wider inputs for previous school and previous class */}
         <Row gutter={[16, 16]}>
-          <Col xs={24} md={8}>
+          <Col xs={24} md={12}>
             <CompactIconInput
               name="academicHistory.previousSchoolName"
               icon={<ReadOutlined />}
@@ -27,19 +28,18 @@ const AcademicHistory = () => {
               placeholder="Previous School Name"
             />
           </Col>
-          <Col xs={24} md={8}>
-            <CompactIconSelect
+          <Col xs={24} md={12}>
+            <CompactIconInput
               name="academicHistory.previousClass"
               icon={<UserOutlined />}
               tooltip="Previous Class"
               placeholder="Previous Class"
-              options={[
-                { label: "Class 1", value: "class1" },
-                { label: "Class 2", value: "class2" },
-                { label: "Class 3", value: "class3" },
-              ]}
             />
           </Col>
+        </Row>
+
+        {/* Second row with the remaining fields */}
+        <Row gutter={[16, 16]} className="mt-4">
           <Col xs={24} md={8}>
             <CompactIconSelect
               name="academicHistory.curriculum"
@@ -47,14 +47,29 @@ const AcademicHistory = () => {
               tooltip="Curriculum"
               placeholder="Curriculum"
               options={[
+                { label: "American", value: "american" },
+                { label: "British", value: "british" },
+                { label: "IB (International Baccalaureate)", value: "ib" },
                 { label: "CBSE", value: "cbse" },
-                { label: "IGCSE", value: "igcse" },
-                { label: "IB", value: "ib" },
+                { label: "ICSE", value: "icse" },
+                { label: "K-12", value: "k12" },
+                { label: "Cambridge", value: "cambridge" },
+                { label: "Australian", value: "australian" },
+                { label: "Agha Khan", value: "agha_khan" },
+                { label: "Lebanese", value: "lebanese" },
+                { label: "Jordanian", value: "jordanian" },
+                { label: "Qatari", value: "qatari" },
+                { label: "Pakistani", value: "pakistani" },
+                { label: "Bangladeshi", value: "bangladeshi" },
+                { label: "Filipino", value: "filipino" },
+                { label: "Malaysian", value: "malaysian" },
+                { label: "Srilankan", value: "srilankan" },
+                { label: "Egyptian", value: "egyptian" },
+                { label: "Palestinian", value: "palestinian" },
+                { label: "Other (Please Specify)", value: "other" },
               ]}
             />
           </Col>
-        </Row>
-        <Row gutter={[16, 16]} className="mt-4">
           <Col xs={24} md={8}>
             <CompactIconDatePicker
               name="academicHistory.lastDayAtSchool"
@@ -74,9 +89,6 @@ const AcademicHistory = () => {
                 { label: "Company", value: "company" },
               ]}
             />
-          </Col>
-          <Col xs={24} md={8}>
-            {/* Empty column for layout alignment */}
           </Col>
         </Row>
       </div>

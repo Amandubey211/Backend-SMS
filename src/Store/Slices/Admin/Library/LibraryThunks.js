@@ -70,8 +70,8 @@ export const addBookThunk = createAsyncThunk(
       );
       toast.success("Book added successfully!");
       dispatch(toggleSidebar());
-      const pageno = getState().library.currentPage || 1;
-      dispatch(fetchBooksDetailsThunk({ page: pageno, limit: 10 }));
+      // const pageno = getState().library.currentPage || 1;
+      dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
       return response?.book;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
