@@ -313,8 +313,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
       </div>
 
       {/* PAGINATION */}
-      {!loading && totalPages > 1 && (
-        <div className="flex justify-end mt-4">
+      {!loading && totalPages > 0 && (
           <Pagination
             page={page}
             totalPages={totalPages}
@@ -324,7 +323,6 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
             setLimit={setLimit}
             t={t}
           />
-        </div>
       )}
 
       {/* SIDEBAR: BookForm */}
