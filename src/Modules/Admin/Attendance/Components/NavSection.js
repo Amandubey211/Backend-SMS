@@ -46,30 +46,31 @@ const NavSection = () => {
           {t("Student Attendance")}
         </h2>
         <ProtectedAction requiredPermission={PERMISSIONS.MARK_ATTENDANCE}>
-
-
-        <NavLink
-          to={`/class/${cid}/take_attendance`}
-          className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg"
-        >
-          {t("Take Attendance")}
-        </NavLink>
+          <NavLink
+            to={`/class/${cid}/take_attendance`}
+            className="px-6 py-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md shadow-lg"
+          >
+            {t("Take Attendance")}
+          </NavLink>
         </ProtectedAction>
       </div>
-<ProtectedSection requiredPermission={PERMISSIONS.ATTENDANCE_STATS} title={"Cards"}>
-      <div className="flex space-x-4">
-        {mappedData?.map((item) => (
-          <AttendanceNavCard
-            key={item.label}
-            label={item.label}
-            value={item.value}
-            bgColor={item.bgColor}
-            icon={item.icon}
-            iconBackground={item.iconColor}
-            textColor={item.textColor}
-          />
-        ))}
-      </div>
+      <ProtectedSection
+        requiredPermission={PERMISSIONS.ATTENDANCE_STATS}
+        title={"Cards"}
+      >
+        <div className="flex space-x-4">
+          {mappedData?.map((item) => (
+            <AttendanceNavCard
+              key={item.label}
+              label={item.label}
+              value={item.value}
+              bgColor={item.bgColor}
+              icon={item.icon}
+              iconBackground={item.iconColor}
+              textColor={item.textColor}
+            />
+          ))}
+        </div>
       </ProtectedSection>
     </div>
   );

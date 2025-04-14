@@ -3,6 +3,7 @@ import { IoCheckmarkCircle, IoCloseCircle } from "react-icons/io5";
 import { FaCircle, FaExclamationCircle } from "react-icons/fa";
 import profileIcon from "../../../../Assets/DashboardAssets/profileIcon.png";
 import { useSelector } from "react-redux";
+import { Empty, Skeleton } from "antd";
 
 // Utility to get the number of days in a month
 const getDaysInMonth = (month) => {
@@ -10,7 +11,7 @@ const getDaysInMonth = (month) => {
 };
 
 const AttendanceTable = () => {
-  const { monthlyAttendance, filters } = useSelector(
+  const { monthlyAttendance, filters, loading } = useSelector(
     (state) => state.admin.attendance
   );
   const { month } = filters;
@@ -60,6 +61,42 @@ const AttendanceTable = () => {
   };
 
   const filteredStudents = transformData(monthlyAttendance);
+
+  if (loading) {
+    return (
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white table-fixed">
+          <tbody>
+            {[...Array(5)].map((_, index) => (
+              <tr key={index}>
+                <td className="w-1/4 px-2 py-1 whitespace-no-wrap border-gray-300 border-b">
+                  <div className="flex items-center">
+                    <Skeleton.Avatar active size="small" shape="circle" />
+                    <div className="ml-2">
+                      <Skeleton.Input
+                        active
+                        size="small"
+                        style={{ width: 100 }}
+                      />
+                    </div>
+                  </div>
+                </td>
+                {[...Array(31)].map((_, dayIndex) => (
+                  <td
+                    key={dayIndex}
+                    className="whitespace-no-wrap border-gray-300 border-b text-center"
+                    style={{ width: "2%" }}
+                  >
+                    <Skeleton.Avatar active size="small" shape="circle" />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -119,11 +156,7 @@ const AttendanceTable = () => {
           </tbody>
         </table>
       ) : (
-        <div className="text-center py-10">
-          <h2 className="text-2xl font-semibold text-gray-600">
-            No attendance records found for the selected filters.
-          </h2>
-        </div>
+        <Empty description="No attendance records found for the selected filters." />
       )}
     </div>
   );

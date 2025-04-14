@@ -295,7 +295,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredBooks?.length ? (
           <div className="grid grid-cols-3 gap-4 w-full">
-            {filteredBooks?.map((book) => (
+            {filteredBooks?.reverse()?.map((book) => (
               <BookCard key={book._id} book={book} />
             ))}
           </div>

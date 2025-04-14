@@ -4,8 +4,8 @@ import { navData } from "../../Components/Data/NavData";
 import AttendanceNavCard from "../../Components/AttendanceNavCard";
 import { useParams } from "react-router-dom";
 import { fetchAttendanceStats } from "../../../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
+import { Skeleton, Empty } from "antd"; // Importing Ant Design components
 import Spinner from "../../../../../Components/Common/Spinner";
-import NoDataFound from "../../../../../Components/Common/NoDataFound";
 
 const Statistics = () => {
   const { stats, loading, error } = useSelector(
@@ -16,22 +16,18 @@ const Statistics = () => {
 
   // Define the mapping between the API response keys and the labels in navData
   const dataMapping = {
-    totalStudents: "Total Students",
-    totalPresent: "Present Today",
-    totalAbsent: "Absent Today",
-    totalLeave: "Leave Today",
+    "Total Students": "totalStudents",
+    "Present Today": "totalPresent",
+    "Absent Today": "totalAbsent",
+    "Leave Today": "totalLeave",
   };
 
   // Map the stats data from Redux and combine it with the navData structure
-  const mappedData = navData?.map((item) => {
-    const key = Object.keys(dataMapping).find(
-      (key) => dataMapping[key] === item.label
-    );
-    return {
-      ...item,
-      value: stats[key] || 0, // Use stat value or default to 0
-    };
-  });
+  const mappedData = navData?.map((item) => ({
+    ...item,
+    value: stats[dataMapping[item.label.trim()]] || 0, // Map values from the attendanceStat object
+    label: item.label.trim(), // Translate labels using i18n
+  }));
 
   // Fetch attendance stats when component mounts or class ID changes
   useEffect(() => {
@@ -53,18 +49,28 @@ const Statistics = () => {
   if (error) {
     return (
       <div className="flex justify-center items-center h-full">
-        <NoDataFound title="Statistics not available" />{" "}
-        {/* Show error message */}
+        <Empty description="Statistics not available" />
+        {/* Use Ant Design's Empty component to show the error state */}
+      </div>
+    );
+  }
+
+  // If there's no data available, show the Empty component
+  if (!mappedData || mappedData.length === 0) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Empty description="No attendance data available" />
+        {/* Display a message with an empty state using Ant Design's Empty */}
       </div>
     );
   }
 
   return (
     <div className="grid grid-cols-1 gap-2 w-full">
-      {" "}
       {/* Ensure the cards are displayed in a stable layout */}
       {mappedData?.map((item) => (
         <AttendanceNavCard
+          cardHeight="h-20"
           key={item.label}
           label={item.label}
           value={item.value}

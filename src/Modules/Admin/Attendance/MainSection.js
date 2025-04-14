@@ -4,8 +4,7 @@ import FilterAttendanceBar from "./Components/FilterAttendanceBar";
 import AttendanceTable from "./Components/AttendanceTable";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import Spinner from "../../../Components/Common/Spinner";
-import NoDataFound from "../../../Components/Common/NoDataFound";
+import { Skeleton, Empty } from "antd";
 import { fetchStudentsMonthAttendanceList } from "../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../config/permission";
@@ -38,10 +37,8 @@ const MainSection = () => {
     <div className="p-4">
       <NavSection />
       <FilterAttendanceBar />
-      {loading ? (
-        <Spinner />
-      ) : error ? (
-        <NoDataFound title="Attendance" />
+      {error ? (
+        <Empty description="No attendance data found" />
       ) : (
         <ProtectedSection
           requiredPermission={PERMISSIONS.STUDENT_MONTHLY_ATTENDANCE_LIST}
