@@ -192,7 +192,7 @@ export const fetchCategoriesThunk = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       // GET request to /:role/book/category
-      const response = await getData(`/${getRole}/book/category?say=${say}`);
+      const response = await getData(`/admin/book/category?say=${say}`);
       return response?.data || []; // 'data' property from the backend response
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
