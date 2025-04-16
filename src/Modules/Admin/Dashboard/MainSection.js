@@ -127,7 +127,7 @@ const MainSection = () => {
         requiredPermission={PERMISSIONS.GET_DASHBOARD_CARD}
         title={t("Cards")}
       >
-        <div className="flex flex-wrap justify-center gap-3 py-4">
+        <div className="flex flex-wrap justify-center gap-3 py-4 px-4 ">
           {loadingDashboard
             ? // Render 4 shimmer cards while data is loading
               [1, 2, 3, 4].map((_, index) => <DashCardShimmer key={index} />)

@@ -18,7 +18,7 @@ const formatDashboardData = (dashboardData) => {
 
   return [
     {
-      label: "Upcoming Exam",
+      label: "Upcoming Exams",
       value: dashboardData?.upcomingExam,
       bgColor: "bg-purple-100",
       textColor: "text-black-500",
@@ -36,7 +36,7 @@ const formatDashboardData = (dashboardData) => {
       url: "/student_finance",
     },
     {
-      label: "Upcoming Event",
+      label: "Upcoming Events",
       value: dashboardData?.events,
       bgColor: "bg-blue-100",
       textColor: "text-black-500",
@@ -45,7 +45,7 @@ const formatDashboardData = (dashboardData) => {
       url: "/student/noticeboard/events",
     },
     {
-      label: "Upcoming Notice",
+      label: "Upcoming Notices",
       value: dashboardData?.notices,
       bgColor: "bg-orange-100",
       textColor: "text-black-500",

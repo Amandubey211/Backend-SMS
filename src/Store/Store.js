@@ -17,6 +17,7 @@ import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice
 import financialYearReducer from "./Slices/Common/FinancialYear/financialYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
 import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
+import studentSignUpReducer from "./Slices/Common/User/actions/studentSignupSlice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
@@ -26,8 +27,8 @@ import budgetReducer from "./Slices/Finance/budget/budget.slice";
 import entityReducer from "./Slices/Finance/entitie/entity.slice";
 import entityRevenueReducer from "./Slices/Finance/EntityRevenue/EntityRevenue.slice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
-import classReducer from "./Slices/Admin/Class/reducer/classSlice"; 
-import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; 
+import classReducer from "./Slices/Admin/Class/reducer/classSlice";
+import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice";
 
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
@@ -169,6 +170,7 @@ const commonReducer = combineReducers({
   financialYear: financialYearReducer,
   branchs: branchReducer,
   sendEmail: sendEmailReducer,
+  studentSignup: studentSignUpReducer,
 });
 
 const AdminReducer = combineReducers({
@@ -210,8 +212,8 @@ const AdminReducer = combineReducers({
   entity: entityReducer,
   entityRevenue: entityRevenueReducer,
   budget: budgetReducer,
-  payroll:payrollReducer,
-  operationalExpenses:operationalExpensesReducer,
+  payroll: payrollReducer,
+  operationalExpenses: operationalExpensesReducer,
   // student_fees: studentFeesReducer,
 
   subject_grades: subjectGradesReducer,
