@@ -145,7 +145,7 @@ const StudentSignUp = () => {
 
     // For now, we'll just log it and reset the form
     dispatch(resetSignup());
-    navigate("/success"); // Or wherever you want to redirect after submission
+    navigate("/studentlogin"); // Or wherever you want to redirect after submission
   };
 
   return (
