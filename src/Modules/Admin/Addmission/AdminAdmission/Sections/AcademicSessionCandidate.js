@@ -32,7 +32,7 @@ import {
   bloodGroupOptions,
 } from "../Configs/selectOptionsConfig";
 
-const PhoneInputField = ({ name, icon, tooltip, placeholder }) => {
+export const PhoneInputField = ({ name, icon, tooltip, placeholder }) => {
   // Use useField to bind the component to the form state
   const [field, meta, helpers] = useField(name);
   const phoneValue = field.value || "";

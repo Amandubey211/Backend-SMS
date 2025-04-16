@@ -46,6 +46,7 @@ const StudentMainSection = () => {
     tasks,
     examResults: results,
   } = useSelector((state) => state.student.studentDashboard);
+  console.log(cardData,"cardDatacardData")
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo
   );
@@ -77,7 +78,7 @@ const StudentMainSection = () => {
             ? cardData
             : [
                 {
-                  label: "Upcoming Exam",
+                  label: "Upcoming Exams",
                   value: 0,
                   bgColor: "bg-purple-100",
                   textColor: "text-black-500",
@@ -95,7 +96,7 @@ const StudentMainSection = () => {
                   url: "/student_finance",
                 },
                 {
-                  label: "Upcoming Event",
+                  label: "Upcoming Events",
                   value: 0,
                   bgColor: "bg-blue-100",
                   textColor: "text-black-500",
@@ -104,7 +105,7 @@ const StudentMainSection = () => {
                   url: "/student/noticeboard/events",
                 },
                 {
-                  label: "Upcoming Notice",
+                  label: "Upcoming Notices",
                   value: 0,
                   bgColor: "bg-orange-100",
                   textColor: "text-black-500",
