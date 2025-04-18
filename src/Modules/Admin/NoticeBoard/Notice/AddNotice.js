@@ -126,7 +126,7 @@ const AddNotice = ({ isEditing, onClose }) => {
     (state) => state.admin.notice
   );
   const { classes } = useSelector((state) => state.admin.class);
-
+  const { role } = useSelector((store) => store.common.auth);
   const [form] = Form.useForm();
   const noticeTarget = Form.useWatch("noticeTarget", form);
   const titleRef = useRef(null);
@@ -151,7 +151,9 @@ const AddNotice = ({ isEditing, onClose }) => {
   // Fetch initial data
   useEffect(() => {
     dispatch(fetchAllClasses());
-    dispatch(fetchNoticeUsersThunk());
+    if (role === "admin") {
+      dispatch(fetchNoticeUsersThunk());
+    }
   }, [dispatch]);
 
   /**

@@ -2,8 +2,6 @@ import React from "react";
 import Library from "../LibraryModule/Library";
 import NoticeBoard from "../NoticeModule/NoticeBoard";
 import Events from "../EventModule/Event";
-import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
-import { PERMISSIONS } from "../../../../config/permission";
 
 const LibrarianSection = () => {
   return (
@@ -16,15 +14,14 @@ const LibrarianSection = () => {
         {/* Notice Board Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
-              <NoticeBoard descriptionLength={140} />
-         
+            <NoticeBoard descriptionLength={140} />
           </div>
         </div>
 
         {/* Events Section */}
         <div className="w-full md:w-1/2 p-4 flex items-center justify-center h-full">
           <div className="w-full h-full">
-              <Events />
+            <Events />
           </div>
         </div>
       </div>
@@ -34,7 +31,7 @@ const LibrarianSection = () => {
         {/* Library Section */}
         <div className="w-full p-4 h-full flex items-center justify-center">
           <div className="w-full h-full">
-              <Library />
+            <Library />
           </div>
         </div>
       </div>

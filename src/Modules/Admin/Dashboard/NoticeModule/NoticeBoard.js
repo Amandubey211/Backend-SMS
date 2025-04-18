@@ -127,7 +127,7 @@ const NoticeBoard = (descriptionLength) => {
 
   return (
     <ProtectedSection
-      requiredPermission={PERMISSIONS.SHOW_EVENTS}
+      requiredPermission={PERMISSIONS.VIEW_NOTICE}
       title={"Notices"}
     >
       <div className="p-2">

@@ -1,3 +1,4 @@
+// AdminNotice.jsx
 import React, { useEffect, useState } from "react";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -24,15 +25,16 @@ import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSectio
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { DatePicker, Select, Tooltip, Button } from "antd";
 import { motion } from "framer-motion";
-import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
-
 // Icons
 import { FiPlus } from "react-icons/fi";
 import { CiSearch } from "react-icons/ci";
 import { FaSync } from "react-icons/fa";
 import Pagination from "../../../../Components/Common/pagination";
+import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading ";
 
-// Custom shimmer component mimicking the Notice item layout
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+
 const ShimmerNoticeItem = () => {
   return (
     <motion.div
@@ -56,21 +58,10 @@ const ShimmerNoticeItem = () => {
   );
 };
 
-const { RangePicker } = DatePicker;
-const { Option } = Select;
-
 const AdminNotice = () => {
   const { t } = useTranslation("admNotice");
-  const {
-    loading,
-    error,
-    notices,
-    editMode,
-    titleToDelete,
-    currentPage,
-    totalNotices,
-  } = useSelector((store) => store.admin.notice);
-  const role = useSelector((store) => store.common.auth.role);
+  const { loading, error, notices, editMode, titleToDelete, totalNotices } =
+    useSelector((store) => store.admin.notice);
   const dispatch = useDispatch();
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -81,7 +72,7 @@ const AdminNotice = () => {
   // Search and Filter States
   const [searchQuery, setSearchQuery] = useState("");
   const [dateFilter, setDateFilter] = useState([]);
-  const [dateFilterValue, setDateFilterValue] = useState([]); // AntD RangePicker value
+  const [dateFilterValue, setDateFilterValue] = useState([]);
   const [priorityFilter, setPriorityFilter] = useState("all");
 
   const [page, setPage] = useState(1);
@@ -91,7 +82,7 @@ const AdminNotice = () => {
     dispatch(fetchNoticesThunk({ page, limit }));
   }, [dispatch, page, limit]);
 
-  // Filter logic: match on Title or Author, plus optional date and priority checks
+  // Filter logic
   const filteredNotices = notices?.filter((notice) => {
     const query = searchQuery.toLowerCase();
     const matchesSearch =
@@ -99,7 +90,7 @@ const AdminNotice = () => {
       notice?.authorName?.toLowerCase().includes(query);
 
     let matchesDate = true;
-    if (dateFilter && dateFilter[0] && dateFilter[1]) {
+    if (dateFilter[0] && dateFilter[1]) {
       const noticeDate = new Date(notice.startDate);
       const startFilter = new Date(dateFilter[0]);
       const endFilter = new Date(dateFilter[1]);
@@ -114,57 +105,38 @@ const AdminNotice = () => {
   });
 
   // Handlers
-  const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
-
+  const handleSearchChange = (e) => setSearchQuery(e.target.value);
   const handleDateFilter = (dates, dateStrings) => {
     setDateFilterValue(dates);
     setDateFilter(dateStrings);
   };
-
-  const handlePriorityFilter = (value) => {
-    setPriorityFilter(value);
-  };
-
+  const handlePriorityFilter = (value) => setPriorityFilter(value);
   const handleResetFilters = () => {
     setSearchQuery("");
     setDateFilter([]);
     setDateFilterValue([]);
     setPriorityFilter("all");
-    // Optionally re-fetch or reset to page 1
-    dispatch(fetchNoticesThunk(1));
+    dispatch(fetchNoticesThunk({ page: 1, limit }));
   };
-
   const handleDeleteModalClose = () => {
     setDeleteModalOpen(false);
     setNoticeToDelete(null);
     dispatch(resetTitleToDelete());
   };
-
   const confirmDelete = async () => {
     await dispatch(deleteNoticeThunk(noticeToDelete));
-    setDeleteModalOpen(false);
-    setNoticeToDelete(null);
-    dispatch(resetTitleToDelete());
+    handleDeleteModalClose();
   };
-
   const toggleAccordion = (index) =>
-    setActiveIndex((prevIndex) => (prevIndex === index ? null : index));
-
+    setActiveIndex((prev) => (prev === index ? null : index));
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     dispatch(resetEditMode());
   };
-
   const handleEditNotice = (notice) => {
     dispatch(setSelectedNotice(notice));
     dispatch(setEditMode(true));
     setSidebarOpen(true);
-  };
-
-  const handlePageChange = (page) => {
-    dispatch(fetchNoticesThunk(page));
   };
 
   useNavHeading(t("Noticeboard"), t("Notices"));
@@ -176,34 +148,32 @@ const AdminNotice = () => {
           {/* Filter Section */}
           <div className="flex flex-wrap gap-4 p-2 items-center justify-between">
             <div className="flex items-center gap-4">
-              {/* Search Box (Rounded Full) */}
+              {/* Search Box (Squared) */}
               <div className="relative flex items-center max-w-xs w-full">
                 <input
                   type="text"
                   placeholder={t("Search by Notice or Author")}
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+                  className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
                 />
-                <button className="absolute right-3">
-                  <CiSearch className="w-5 h-5 text-gray-500" />
-                </button>
+                <CiSearch className="absolute right-3 w-5 h-5 text-gray-500" />
               </div>
 
-              {/* Date Filter (Rounded Full) */}
+              {/* Date Filter */}
               <RangePicker
                 style={{ height: "40px" }}
                 onChange={handleDateFilter}
                 value={dateFilterValue}
               />
 
-              {/* Priority Filter (Rounded Full) */}
+              {/* Priority Filter */}
               <Select
                 value={priorityFilter}
                 style={{
                   minWidth: "150px",
                   height: "40px",
-                  borderRadius: "9999px",
+                  borderRadius: "8px",
                 }}
                 onChange={handlePriorityFilter}
               >
@@ -212,16 +182,14 @@ const AdminNotice = () => {
                 <Option value="low priority">{t("Low Priority")}</Option>
               </Select>
 
-              {/* Reset Filters Button with Spin Animation on Hover */}
+              {/* Reset Filters */}
               <Tooltip title={t("Reset Filters")}>
                 <Button
                   onClick={handleResetFilters}
                   type="default"
                   shape="circle"
-                  className="group border-gray-300 text-gray-600 hover:border-purple-500 hover:text-purple-600 transition-colors duration-300"
-                  icon={
-                    <FaSync className="group-hover:animate-spin transition-transform duration-300" />
-                  }
+                  className="border-gray-300 text-gray-600 hover:border-purple-500 hover:text-purple-600"
+                  icon={<FaSync className="group-hover:animate-spin" />}
                 />
               </Tooltip>
             </div>
@@ -229,7 +197,7 @@ const AdminNotice = () => {
             {/* Add Notice Button */}
             <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_NOTICE}>
               <button
-                className="flex items-center justify-center border border-transparent bg-gradient-to-r from-pink-500 to-purple-500 text-white font-semibold py-2 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-105 hover:shadow-xl"
+                className="flex items-center justify-center bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white font-semibold py-2 px-4 rounded-md shadow transition-transform duration-300 hover:scale-105"
                 onClick={() => {
                   dispatch(resetEditMode());
                   dispatch(setSelectedNotice(null));
@@ -245,28 +213,24 @@ const AdminNotice = () => {
           {/* Notices Section */}
           <ProtectedSection
             requiredPermission={PERMISSIONS.SHOW_NOTICES}
-            title={"Notices"}
+            title={t("Notices")}
           >
             <div className="mt-5">
               {loading ? (
-                <>
-                  <ShimmerNoticeItem />
-                  <ShimmerNoticeItem />
-                  <ShimmerNoticeItem />
-                  <ShimmerNoticeItem />
-                  <ShimmerNoticeItem />
-                </>
+                Array.from({ length: 5 }).map((_, i) => (
+                  <ShimmerNoticeItem key={i} />
+                ))
               ) : error ? (
                 <NoDataFound
-                  title={t(" Notices ")}
+                  title={t("Notices")}
                   desc={t("Create one by Clicking on Add Notice.")}
                 />
               ) : filteredNotices?.length > 0 ? (
-                filteredNotices.map((notice, index) => (
+                filteredNotices.map((notice, idx) => (
                   <AdminNoticeItem
-                    key={notice?._id}
+                    key={notice._id}
                     notice={notice}
-                    index={index}
+                    index={idx}
                     activeIndex={activeIndex}
                     toggleAccordion={toggleAccordion}
                     handleEditNotice={handleEditNotice}
@@ -276,14 +240,14 @@ const AdminNotice = () => {
                 ))
               ) : (
                 <NoDataFound
-                  title={t("Notices ")}
-                  desc={t(" Please add a new notice.")}
+                  title={t("Notices")}
+                  desc={t("Please add a new notice.")}
                 />
               )}
             </div>
           </ProtectedSection>
 
-          {/* Pagination on Bottom Right */}
+          {/* Pagination */}
           {totalNotices > 0 && (
             <Pagination
               page={page}
@@ -296,7 +260,7 @@ const AdminNotice = () => {
             />
           )}
 
-          {/* Sidebar for Add/Edit Notice */}
+          {/* Sidebar */}
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
@@ -306,12 +270,12 @@ const AdminNotice = () => {
             <AddNotice isEditing={editMode} onClose={handleSidebarClose} />
           </Sidebar>
 
-          {/* Delete Confirmation Modal */}
+          {/* Delete Modal */}
           <DeleteModal
             isOpen={isDeleteModalOpen}
             onClose={handleDeleteModalClose}
             onConfirm={confirmDelete}
-            title={`${t(titleToDelete)}`}
+            title={t(titleToDelete)}
           />
         </div>
       </DashLayout>

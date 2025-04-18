@@ -19,34 +19,33 @@ class ExportFunctions {
     this.dayjs = dayjs;
     this.isWithinValidity = isWithinValidity;
   }
-
   getColorByType(type) {
     switch (type) {
       case "weekly":
-        return "#4F46E5"; // Indigo
+        return "#FF99CC"; // from TIMETABLE_TYPES
       case "exam":
-        return "#DC2626"; // Red
+        return "#29ABE2";
       case "event":
-        return "#059669"; // Emerald
+        return "#77DD77";
       case "others":
-        return "#D97706"; // Amber
+        return "#FFD700";
       default:
-        return "#6B7280"; // Gray
+        return "#6B7280"; // Gray fallback
     }
   }
 
   getLightColorByType(type) {
     switch (type) {
       case "weekly":
-        return "#EEF2FF"; // Light indigo
+        return "rgba(255,153,204,0.2)";
       case "exam":
-        return "#FEE2E2"; // Light red
+        return "rgba(41,171,226,0.2)";
       case "event":
-        return "#D1FAE5"; // Light emerald
+        return "rgba(119,221,119,0.2)";
       case "others":
-        return "#FEF3C7"; // Light amber
+        return "rgba(255,215,0,0.2)";
       default:
-        return "#F3F4F6"; // Light gray
+        return "#F3F4F6"; // Light gray fallback
     }
   }
 
@@ -61,7 +60,7 @@ class ExportFunctions {
             this.filteredTimetables.filter((t) => t?.type === "event").length,
             this.filteredTimetables.filter((t) => t?.type === "others").length,
           ],
-          backgroundColor: ["#4F46E5", "#DC2626", "#059669", "#D97706"],
+          backgroundColor: ["#FF99CC", "#29ABE2", "#77DD77", "#FFD700"],
           borderColor: "#fff",
           borderWidth: 2,
           hoverOffset: 20,
@@ -135,7 +134,6 @@ class ExportFunctions {
     // Reset text color for content
     doc.setTextColor(0, 0, 0);
   }
-
   addFooter(doc) {
     const pageCount = doc.internal.getNumberOfPages();
 

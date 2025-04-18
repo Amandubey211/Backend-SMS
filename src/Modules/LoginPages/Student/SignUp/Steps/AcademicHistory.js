@@ -1,9 +1,18 @@
 // src/pages/StudentSignUp/Steps/AcademicHistory.jsx
-import React from "react";
-import { Form, Select, Button, DatePicker, Input } from "antd";
+import React, { useEffect } from "react";
+import { Form, Select, Button, DatePicker, Input, Row, Col } from "antd";
+import { useDispatch } from "react-redux";
+import {
+  nextStep,
+  prevStep,
+  updateFormData,
+} from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
+import { AcademicSchema } from "../Utils/validationSchemas";
+import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
 
 const { Option } = Select;
 
+/* static options */
 const curriculumOptions = [
   { label: "American", value: "american" },
   { label: "British", value: "british" },
@@ -27,11 +36,39 @@ const curriculumOptions = [
   { label: "Other (Please Specify)", value: "other" },
 ];
 
-const AcademicHistory = () => {
+const AcademicHistory = ({ formData }) => {
+  const dispatch = useDispatch();
   const [form] = Form.useForm();
 
-  const onFinish = (values) => {
-    console.log("AcademicHistory values:", values);
+  /* hydrate draft */
+  useEffect(() => {
+    if (formData) form.setFieldsValue(formData);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [formData]);
+
+  /* persist on every key‑stroke */
+  const handleValuesChange = () => {
+    dispatch(updateFormData({ academic: form.getFieldsValue(true) }));
+  };
+
+  /* navigation */
+  const handleBack = () => dispatch(prevStep());
+
+  const handleNext = async () => {
+    try {
+      await AcademicSchema.validate(form.getFieldsValue(true), {
+        abortEarly: false,
+      });
+      dispatch(updateFormData({ academic: form.getFieldsValue(true) }));
+      dispatch(nextStep());
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch (err) {
+      setYupErrorsToAnt(form, err);
+      const first =
+        err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
+      if (first)
+        form.scrollToField(first, { behavior: "smooth", block: "center" });
+    }
   };
 
   return (
@@ -39,104 +76,98 @@ const AcademicHistory = () => {
       <Form
         form={form}
         layout="vertical"
-        onFinish={onFinish}
+        onValuesChange={handleValuesChange}
         className="space-y-6"
       >
-        <Form.Item name="previousSchool" label="Previous School Name">
-          <Input
-            size="large"
-            placeholder="School Name"
-            className="w-full rounded-lg focus:border-pink-500 transition-colors"
-          />
+        <Form.Item
+          name="previousSchool"
+          label="Previous School Name"
+          rules={[{ required: true, message: "Required" }]}
+        >
+          <Input size="large" placeholder="School Name" />
         </Form.Item>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Form.Item name="previousClass" label="Previous Class">
-            <Input
-              size="large"
-              placeholder="Previous Class"
-              className="w-full rounded-lg focus:border-pink-500 transition-colors"
-            />
-          </Form.Item>
-          <Form.Item name="curriculum" label="Curriculum">
-            <Select
-              size="large"
-              placeholder="Select Curriculum"
-              className="w-full rounded-lg focus:border-pink-500 transition-colors"
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="previousClass"
+              label="Previous Class"
+              rules={[{ required: true, message: "Required" }]}
             >
-              {curriculumOptions.map((option) => (
-                <Option key={option.value} value={option.value}>
-                  {option.label}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </div>
+              <Input size="large" placeholder="Previous Class" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="curriculum"
+              label="Curriculum"
+              rules={[{ required: true, message: "Required" }]}
+            >
+              <Select size="large" placeholder="Select Curriculum">
+                {curriculumOptions.map((o) => (
+                  <Option key={o.value} value={o.value}>
+                    {o.label}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-        {/* Conditional Input for 'Other' Curriculum */}
+        {/* other curriculum */}
         <Form.Item
           noStyle
-          shouldUpdate={(prevValues, currentValues) =>
-            prevValues.curriculum !== currentValues.curriculum
-          }
+          shouldUpdate={(p, c) => p.curriculum !== c.curriculum}
         >
-          {({ getFieldValue }) =>
-            getFieldValue("curriculum") === "other" && (
+          {() =>
+            form.getFieldValue("curriculum") === "other" && (
               <Form.Item
                 name="otherCurriculum"
                 label="Please specify"
-                rules={[
-                  { required: true, message: "Please specify your curriculum" },
-                ]}
-                className="mb-4"
+                rules={[{ required: true, message: "Required" }]}
               >
-                <Input
-                  placeholder="Please specify"
-                  size="large"
-                  className="w-full rounded-lg focus:border-pink-500 transition-colors"
-                />
+                <Input size="large" placeholder="Specify curriculum" />
               </Form.Item>
             )
           }
         </Form.Item>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Form.Item name="lastDayAtSchool" label="Last Day at School">
-            <DatePicker
-              size="large"
-              className="w-full rounded-lg focus:border-pink-500 transition-colors"
-            />
-          </Form.Item>
-
-          <Form.Item name="sourceOfFee" label="Source of Fee">
-            <Select
-              size="large"
-              placeholder="Select Source"
-              className="w-full rounded-lg focus:border-pink-500 transition-colors"
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="lastDayAtSchool"
+              label="Last Day at School"
+              rules={[{ required: true, message: "Required" }]}
             >
-              <Option value="parent">Parent</Option>
-              <Option value="company">Company</Option>
-              <Option value="scholarship">Scholarship</Option>
-              <Option value="other">Other</Option>
-            </Select>
-          </Form.Item>
-        </div>
+              <DatePicker size="large" className="w-full" />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item
+              name="sourceOfFee"
+              label="Source of Fee"
+              rules={[{ required: true, message: "Required" }]}
+            >
+              <Select size="large" placeholder="Select Source">
+                <Option value="parent">Parent</Option>
+                <Option value="company">Company</Option>
+                <Option value="scholarship">Scholarship</Option>
+                <Option value="other">Other</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
-        {/* <Form.Item name="academicNotes" label="Additional Notes">
-          <textarea
-            rows={4}
-            placeholder="Any additional academic information..."
-            className="w-full rounded-lg focus:border-pink-500 transition-colors p-2"
-          />
-        </Form.Item> */}
-
+        {/* nav buttons */}
         <div className="flex justify-between mt-8">
-          <Button size="large">Back</Button>
+          <Button size="large" onClick={handleBack}>
+            Back
+          </Button>
           <Button
-            type="primary"
-            htmlType="submit"
             size="large"
-            className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-none hover:opacity-90 focus:opacity-90 transition-opacity"
+            type="primary"
+            onClick={handleNext}
+            className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-none"
           >
             Next
           </Button>

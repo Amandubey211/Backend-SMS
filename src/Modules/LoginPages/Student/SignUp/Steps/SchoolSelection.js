@@ -1,42 +1,79 @@
-// src/pages/StudentSignUp/Steps/SchoolSelection.jsx
-import React from "react";
+// SchoolSelection.jsx
+// UI unchanged – only wiring & bug‑fixes
+
+import React, { useEffect } from "react";
 import { Form, Select, Button, Avatar, Tag } from "antd";
 import { motion } from "framer-motion";
+import { useDispatch } from "react-redux";
 import useGetAllSchools from "../../../../../Hooks/CommonHooks/useGetAllSchool";
 import useGetClassesBySchool from "../../../../../Hooks/CommonHooks/useGetClassesBySchool";
 import CustomInput from "../Components/CustomInput";
 import { FaSchool } from "react-icons/fa";
+import {
+  nextStep,
+  updateFormData,
+} from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
+import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
+import { SchoolSchema } from "../Utils/validationSchemas";
 
 const { Option } = Select;
 
-const SchoolSelection = ({ formData, updateFormData }) => {
-  // Extract selected school id from parent's formData
-  const selectedSchoolId = formData?.schoolId || null;
+/**
+ * SchoolSelection component
+ * Handles user selection of school, class, and email for signup flow
+ */
+const SchoolSelection = ({ formData }) => {
+  const dispatch = useDispatch();
 
-  // Fetch the list of schools and classes using custom hooks
-  const { fetchSchools, schoolList } = useGetAllSchools();
-  const { classList } = useGetClassesBySchool(selectedSchoolId);
-
+  // Initialize Ant Design form instance
   const [form] = Form.useForm();
 
-  React.useEffect(() => {
-    // Fetch schools once on mount.
+  // Fetch all schools for dropdown
+  const {
+    fetchSchools,
+    schoolList,
+    loading: schoolFetchLoading,
+  } = useGetAllSchools();
+
+  // Fetch classes based on selected school
+  const { classList, loading: classFetchLoading } = useGetClassesBySchool(
+    formData?.schoolId
+  );
+
+  // Determine selected school's name for placeholder
+  const selectedSchool = schoolList?.find((s) => s._id === formData?.schoolId);
+  const selectedSchoolName = selectedSchool?.nameOfSchool;
+
+  // On component mount: load schools and populate form with saved data
+  useEffect(() => {
     fetchSchools();
-    // If parent provided previous form data, pre-fill the form.
     if (formData) {
       form.setFieldsValue(formData);
     }
   }, []);
 
-  // Handle form submission: update the parent's form data.
-  const onFinish = (values) => {
-    console.log("SchoolSelection values:", values);
-    updateFormData(values);
-    // Optionally, trigger a step change here if needed
-    // dispatch(nextStep());
+  /**
+   * Live-save draft on any field change
+   */
+  const handleValuesChange = (_, values) => {
+    dispatch(updateFormData({ school: values }));
   };
 
-  // Framer Motion animation variants
+  /**
+   * Final submission: validate and move to next step
+   */
+  const onFinish = async (values) => {
+    try {
+      await SchoolSchema.validate(values, { abortEarly: false });
+      // Save final form data before navigating
+      dispatch(updateFormData({ school: values }));
+      dispatch(nextStep());
+    } catch (err) {
+      setYupErrorsToAnt(form, err);
+    }
+  };
+
+  // Animation variants for form container
   const containerVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
@@ -53,9 +90,13 @@ const SchoolSelection = ({ formData, updateFormData }) => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
+        onValuesChange={handleValuesChange}
+        scrollToFirstError
         className="space-y-6"
       >
-        {/* School Selection Field */}
+        {/* ---------------------- */}
+        {/* Select School Section */}
+        {/* ---------------------- */}
         <Form.Item
           name="schoolId"
           label={
@@ -66,45 +107,38 @@ const SchoolSelection = ({ formData, updateFormData }) => {
           <Select
             placeholder="Select School"
             size="large"
+            loading={schoolFetchLoading}
             showSearch
             allowClear
-            // Set optionFilterProp to "label" so that search is performed on the label prop
             optionFilterProp="label"
             filterOption={(input, option) =>
               option.label.toLowerCase().includes(input.toLowerCase())
             }
             className="w-full rounded-md focus:border-pink-500 transition-colors"
-            onChange={(value) => {
-              // Update the parent's state with the selected school id.
-              updateFormData({ schoolId: value });
-              // Ensure the form field value is updated.
-              form.setFieldsValue({ schoolId: value });
+            onChange={() => {
+              // Reset class when school changes
+              form.setFieldsValue({ applyingClass: undefined });
             }}
           >
-            {schoolList?.map((school) => (
-              <Option
-                key={school._id}
-                value={school._id}
-                // Use the school name for filtering purposes
-                label={school.nameOfSchool}
-              >
+            {schoolList?.map((s) => (
+              <Option key={s._id} value={s._id} label={s.nameOfSchool}>
                 <div className="flex items-center space-x-3">
                   <Avatar
-                    src={school.logo}
-                    icon={!school.logo && <FaSchool />} // Updated fallback icon
+                    src={s.logo}
+                    icon={!s.logo && <FaSchool />}
                     size="small"
                   />
-                  <span className="font-semibold">{school.nameOfSchool}</span>
-                  <Tag color="blue">
-                    {school.branchName || school.city || "N/A"}
-                  </Tag>
+                  <span className="font-semibold">{s.nameOfSchool}</span>
+                  <Tag color="blue">{s.branchName || s.city || "N/A"}</Tag>
                 </div>
               </Option>
             ))}
           </Select>
         </Form.Item>
 
-        {/* Class Selection Field */}
+        {/* --------------------- */}
+        {/* Select Class Section */}
+        {/* --------------------- */}
         <Form.Item
           name="applyingClass"
           label={
@@ -113,20 +147,28 @@ const SchoolSelection = ({ formData, updateFormData }) => {
           rules={[{ required: true, message: "Please select a class" }]}
         >
           <Select
-            placeholder="Select Class"
+            // Show school name in placeholder if available
+            placeholder={
+              selectedSchoolName
+                ? `Select Class of ${selectedSchoolName}`
+                : "Select Class"
+            }
             size="large"
+            loading={classFetchLoading}
+            disabled={!formData?.schoolId}
+            showArrow
             showSearch
             allowClear
             optionFilterProp="children"
             filterOption={(input, option) =>
-              option?.children?.toLowerCase()?.includes(input.toLowerCase())
+              option.children.toLowerCase().includes(input.toLowerCase())
             }
             className="w-full focus:border-pink-500 transition-colors"
           >
-            {classList && classList.length > 0 ? (
-              classList.map((classItem) => (
-                <Option key={classItem._id} value={classItem._id}>
-                  {classItem?.className}
+            {classList?.length ? (
+              classList.map((c) => (
+                <Option key={c._id} value={c._id}>
+                  {c.className}
                 </Option>
               ))
             ) : (
@@ -137,7 +179,9 @@ const SchoolSelection = ({ formData, updateFormData }) => {
           </Select>
         </Form.Item>
 
-        {/* Student Email Field */}
+        {/* ------------------ */}
+        {/* Student Email */}
+        {/* ------------------ */}
         <Form.Item
           name="email"
           label={
@@ -155,13 +199,37 @@ const SchoolSelection = ({ formData, updateFormData }) => {
           />
         </Form.Item>
 
-        {/* Submit Button */}
+        {/* ------------------ */}
+        {/* Next Button */}
+        {/* ------------------ */}
         <div className="flex justify-end">
-          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+          <motion.div
+            initial={{ scale: 1, y: 0 }}
+            whileHover={{ scale: 1.03, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
             <Button
               htmlType="submit"
+              type="primary" // keep it as primary so AntD won’t revert to default hover
               size="large"
-              className="border-none text-white font-semibold rounded-md px-6 py-2 bg-gradient-to-r from-[#C83B62] to-[#7F35CD] hover:opacity-90 focus:opacity-90 transition-opacity"
+              className="
+      !bg-gradient-to-r       // override any AntD bg
+      !from-[#C83B62]         // initial gradient start
+      !to-[#7F35CD]           // initial gradient end
+      !border-none
+      !text-white
+      font-semibold
+      rounded-md
+      px-6
+      py-2
+      transition-all
+      duration-200
+      ease-in-out
+      hover:!from-[#A02D53]   // darker start on hover
+      hover:!to-[#6A28A4]     // darker end on hover
+      hover:!text-white       // make absolutely sure text stays white
+    "
             >
               Next
             </Button>

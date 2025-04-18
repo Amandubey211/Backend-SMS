@@ -17,7 +17,9 @@ import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice
 import financialYearReducer from "./Slices/Common/FinancialYear/financialYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
 import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
-import studentSignUpReducer from "./Slices/Common/User/actions/studentSignupSlice";
+import studentSignUpReducer, {
+  studentSignupMiddleware,
+} from "./Slices/Common/User/actions/studentSignupSlice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
@@ -102,6 +104,7 @@ import parentSemesterReducer from "./Slices/Parent/Semesters/parentSemesterSlice
 import parentChildGradesReducer from "./Slices/Parent/Grades/parentGradeSlice";
 // teacher
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
+import { saveDraft } from "../Utils/signupDraft";
 
 // Persist configuration for the Auth slice
 
@@ -287,9 +290,17 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(listenerMiddleware.middleware), // Thunk is automatically included by Redux Toolkit
+    }).concat(listenerMiddleware.middleware, studentSignupMiddleware), // Thunk is automatically included by Redux Toolkit
 });
-
+let prevDraft = store.getState().common.studentSignup;
+store.subscribe(() => {
+  const nextDraft = store.getState().common.studentSignup;
+  if (nextDraft !== prevDraft) {
+    /* write to localStorage on every change */
+    saveDraft(nextDraft);
+    prevDraft = nextDraft;
+  }
+});
 const persistor = persistStore(store);
 
 export { store, persistor };
