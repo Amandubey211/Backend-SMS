@@ -49,13 +49,13 @@ const ViewEvent = ({ onClose }) => {
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">
         {/* Event Image */}
-        {selectedEvent.image && (
-          <img
-            className="w-full h-64 object-cover rounded-lg"
-            src={selectedEvent.image}
-            alt="Event"
-          />
-        )}
+        {/* {selectedEvent.image && ( */}
+        <img
+          className="w-full h-64 object-cover rounded-lg"
+          src={selectedEvent?.image || "https://placehold.co/600x400"}
+          alt="Event"
+        />
+        {/* )} */}
 
         {/* Date and Time */}
         <div className="flex items-center text-sm text-gray-500 font-light mt-4">

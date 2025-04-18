@@ -101,7 +101,7 @@ export const fetchNoticeUsersThunk = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       // Call the new backend route
-      const response = await getData(`/${getRole}/all/notices/users`);
+      const response = await getData(`/admin/all/notices/users`);
       // Assuming the response has shape { error: false, data: [...] }
       return response.data;
     } catch (error) {

@@ -1,5 +1,4 @@
 // src/pages/StudentSignUp/Steps/GuardianInfo.jsx
-import React, { useEffect, useState } from "react";
 import {
   Form,
   Input,
@@ -12,16 +11,28 @@ import {
   Segmented,
   Tooltip,
   Space,
-  Modal,
 } from "antd";
-import { UploadOutlined, UserOutlined, TeamOutlined } from "@ant-design/icons";
+import { TeamOutlined } from "@ant-design/icons";
+import { LiaMaleSolid, LiaFemaleSolid } from "react-icons/lia";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { FaWhatsapp } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+
 import CustomUploadCard from "../Components/CustomUploadCard";
+import {
+  nextStep,
+  prevStep,
+  updateFormData,
+} from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
+import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
+import { GuardianSchema } from "../Utils/validationSchemas";
 
 const { Option } = Select;
 
+/* ─────────────────────────────── constants ────────────────────────── */
 const religionOptions = [
   { label: "Islam", value: "Islam" },
   { label: "Christianity", value: "Christianity" },
@@ -36,141 +47,180 @@ const nationalityOptions = [
   { label: "Indian", value: "indian" },
 ];
 
-const GuardianInfo = ({ formData, updateFormData, onBack }) => {
-  const [form] = Form.useForm();
-  const [activeTab, setActiveTab] = useState("father");
+/* ────────────────── reusable Phone + WhatsApp toggle ──────────────── */
+const PhoneField = ({
+  form,
+  name,
+  whatsappName,
+  label,
+  placeholder,
+  required = false,
+}) => {
+  const isWA = Form.useWatch(whatsappName, form) ?? false;
+  const errorList = form.getFieldError(name);
+  const hasError = errorList.length > 0;
+  const borderColor = hasError ? "#ff4d4f" : "#d9d9d9";
 
-  useEffect(() => {
-    if (formData) form.setFieldsValue(formData);
-  }, [formData, form]);
-
-  const handleTabChange = (val) => {
-    setActiveTab(val);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleNext = () => {
-    if (activeTab === "father") {
-      setActiveTab("mother");
-    } else if (activeTab === "mother") {
-      setActiveTab("guardian");
-    } else {
-      form.submit();
-    }
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleBack = () => {
-    if (activeTab === "guardian") {
-      setActiveTab("mother");
-    } else if (activeTab === "mother") {
-      setActiveTab("father");
-    } else if (onBack) {
-      onBack();
-    }
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const onFinish = (values) => {
-    updateFormData(values);
-  };
-
-  const renderPhoneInputWithWhatsapp = (
-    phoneField,
-    whatsappField,
-    label,
-    placeholder,
-    required = false
-  ) => (
-    <Form.Item label={label} required={required} className="mb-4">
-      <Space.Compact block className="w-full">
-        <PhoneInput
-          country="qa"
-          placeholder={placeholder}
-          inputStyle={{
-            width: "100%",
-            height: "40px",
-            fontSize: "16px",
-            border: "1px solid #d9d9d9",
-            borderRight: "none",
-            borderRadius: 0,
-          }}
-          containerStyle={{ width: "100%" }}
-          value={form.getFieldValue(phoneField) || ""}
-          onChange={(val) => form.setFieldValue(phoneField, val)}
-        />
-        <div
-          className={`flex items-center border border-l-0 rounded-r px-3 ${
-            form.getFieldValue(whatsappField) ? "bg-[#dcf8c6]" : "bg-white"
-          }`}
+  return (
+    <Form.Item
+      label={label}
+      required={required}
+      validateStatus={hasError ? "error" : ""}
+      help={hasError ? errorList[0] : undefined}
+      className="mb-4"
+    >
+      <Space.Compact
+        block
+        style={{
+          border: `1px solid ${borderColor}`,
+          borderRadius: 6,
+          height: 40,
+        }}
+      >
+        {/* Actual controlled input bound to AntD */}
+        <Form.Item
+          name={name}
+          noStyle
+          valuePropName="value"
+          trigger="onChange"
+          getValueFromEvent={(val) => val}
+          rules={
+            required
+              ? [{ required: true, message: "Phone number is required" }]
+              : []
+          }
         >
-          <Tooltip title="Mark this number as WhatsApp">
-            <div
-              className="cursor-pointer"
-              onClick={() => {
-                const current = form.getFieldValue(whatsappField);
-                form.setFieldValue(whatsappField, !current);
-              }}
-            >
-              <FaWhatsapp className="text-[#075E54] text-xl" />
-            </div>
-          </Tooltip>
-        </div>
+          <PhoneInput
+            country="qa"
+            placeholder={placeholder}
+            inputStyle={{
+              width: "100%",
+              height: "100%",
+              fontSize: 16,
+              border: "none",
+              borderRadius: "6px 0 0 6px",
+            }}
+            containerStyle={{ width: "100%" }}
+          />
+        </Form.Item>
+
+        {/* WhatsApp toggle */}
+        <Tooltip title={isWA ? "WhatsApp enabled" : "Click to enable WhatsApp"}>
+          <div
+            onClick={() => form.setFieldValue(whatsappName, !isWA)}
+            className={`flex items-center justify-center w-12 cursor-pointer transition-all ${
+              isWA ? "bg-[#25D366]" : "bg-gray-100"
+            }`}
+            style={{
+              borderLeft: `1px solid ${borderColor}`,
+              borderRadius: "0 6px 6px 0",
+              height: "100%",
+            }}
+          >
+            <FaWhatsapp
+              className={`text-xl ${isWA ? "text-white" : "text-[#075E54]"}`}
+            />
+          </div>
+        </Tooltip>
       </Space.Compact>
     </Form.Item>
   );
+};
 
-  const renderNameFields = (prefix) => (
+/* ─────────────────────────── component ────────────────────────────── */
+const GuardianInfo = ({ formData }) => {
+  const dispatch = useDispatch();
+  const [form] = Form.useForm();
+
+  /* refs */
+  const containerRef = useRef(null);
+  const firstInputRef = useRef(null);
+
+  /* state */
+  const [activeTab, setActiveTab] = useState("father");
+
+  /* ── hydrate draft data on mount ── */
+  useEffect(() => {
+    if (!formData) return;
+
+    const sanitized = JSON.parse(JSON.stringify(formData));
+    [
+      "fatherInfo.cell1",
+      "fatherInfo.cell2",
+      "motherInfo.cell1",
+      "motherInfo.cell2",
+      "guardianInformation.guardianContactNumber",
+    ].forEach((path) => {
+      const parts = path.split(".");
+      let curr = sanitized;
+      for (let i = 0; i < parts.length - 1; i++) {
+        if (!curr[parts[i]]) curr[parts[i]] = {};
+        curr = curr[parts[i]];
+      }
+      const leaf = parts.pop();
+      if (curr[leaf] !== undefined && curr[leaf] !== null)
+        curr[leaf] = curr[leaf].toString();
+    });
+
+    form.setFieldsValue(sanitized);
+  }, [formData, form]);
+
+  /* ── helpers ── */
+  const smoothToTop = () =>
+    containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
+  /* ── scroll & focus on tab change ── */
+  useEffect(() => {
+    smoothToTop();
+    firstInputRef.current?.focus({ cursor: "start" });
+    console.debug(`[GuardianInfo] switched → ${activeTab}`);
+  }, [activeTab]);
+
+  /* ── keep Redux draft in sync ── */
+  const handleValuesChange = () =>
+    dispatch(updateFormData({ guardian: form.getFieldsValue(true) }));
+
+  /* ───────────────────── helper render fns ────────────────────────── */
+  const renderNameFields = (p) => (
     <>
-      {/* First Name Field */}
       <Form.Item
-        name={[prefix, "firstName"]}
-        // label="First Name"
+        name={[p, "firstName"]}
         rules={[{ required: true, message: "Required" }]}
         className="mb-4"
       >
-        <Input size="large" placeholder="First Name" />
+        <Input
+          size="large"
+          placeholder="First Name"
+          ref={
+            p === "fatherInfo" && activeTab === "father" ? firstInputRef : null
+          }
+        />
       </Form.Item>
 
-      {/* Last Name Field */}
       <Form.Item
-        name={[prefix, "lastName"]}
-        // label="Last Name"
+        name={[p, "lastName"]}
         rules={[{ required: true, message: "Required" }]}
         className="mb-4"
       >
         <Input size="large" placeholder="Last Name" />
       </Form.Item>
 
-      {/* Middle Name Field */}
-      <Form.Item
-        name={[prefix, "middleName"]}
-        // label="Middle Name"
-        className="mb-4"
-      >
+      <Form.Item name={[p, "middleName"]} className="mb-4">
         <Input size="large" placeholder="Middle Name" />
       </Form.Item>
     </>
   );
 
-  const renderIdAndPersonalInfo = (prefix) => (
+  const renderIdAndPersonalInfo = (p) => (
     <>
-      <Row gutter={16} className="mb-0">
+      <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item
-            name={[prefix, "idNumber"]}
-            label={`${prefix === "fatherInfo" ? "Father" : "Mother"} ID`}
-            className="mb-4"
-          >
+          <Form.Item name={[p, "idNumber"]} label="ID #" className="mb-4">
             <Input size="large" placeholder="ID Number" />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item
-            name={[prefix, "idExpiry"]}
-            label="ID Expiry"
-            className="mb-4"
-          >
+          <Form.Item name={[p, "idExpiry"]} label="ID Expiry" className="mb-4">
             <DatePicker
               size="large"
               className="w-full"
@@ -179,17 +229,14 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
           </Form.Item>
         </Col>
       </Row>
-      <Row gutter={16} className="mb-0">
+
+      <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item
-            name={[prefix, "religion"]}
-            label="Religion"
-            className="mb-4"
-          >
+          <Form.Item name={[p, "religion"]} label="Religion" className="mb-4">
             <Select size="large" placeholder="Select Religion">
-              {religionOptions.map((opt) => (
-                <Option key={opt.value} value={opt.value}>
-                  {opt.label}
+              {religionOptions.map((o) => (
+                <Option key={o.value} value={o.value}>
+                  {o.label}
                 </Option>
               ))}
             </Select>
@@ -197,14 +244,14 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
-            name={[prefix, "nationality"]}
+            name={[p, "nationality"]}
             label="Nationality"
             className="mb-4"
           >
             <Select size="large" placeholder="Select Nationality">
-              {nationalityOptions.map((opt) => (
-                <Option key={opt.value} value={opt.value}>
-                  {opt.label}
+              {nationalityOptions.map((o) => (
+                <Option key={o.value} value={o.value}>
+                  {o.label}
                 </Option>
               ))}
             </Select>
@@ -214,47 +261,44 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
     </>
   );
 
-  const renderContactInfo = (prefix) => (
+  const renderContactInfo = (p) => (
     <>
-      <Row gutter={16} className="mb-0">
+      <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item
-            name={[prefix, "company"]}
-            label="Company"
-            className="mb-4"
-          >
+          <Form.Item name={[p, "company"]} label="Company" className="mb-4">
             <Input size="large" placeholder="Company Name" />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item
-            name={[prefix, "jobTitle"]}
-            label="Job Title"
-            className="mb-4"
-          >
+          <Form.Item name={[p, "jobTitle"]} label="Job Title" className="mb-4">
             <Input size="large" placeholder="Job Title" />
           </Form.Item>
         </Col>
       </Row>
-      {renderPhoneInputWithWhatsapp(
-        [prefix, "cell1"],
-        [prefix, "cell1IsWhatsapp"],
-        "Cell Phone 1",
-        "e.g. +974 1234 5678",
-        true
-      )}
-      {renderPhoneInputWithWhatsapp(
-        [prefix, "cell2"],
-        [prefix, "cell2IsWhatsapp"],
-        "Cell Phone 2",
-        "e.g. +974 1234 5679"
-      )}
-      <Row gutter={16} className="mb-0">
+
+      <PhoneField
+        form={form}
+        name={[p, "cell1"]}
+        whatsappName={[p, "cell1IsWhatsapp"]}
+        label="Cell Phone 1"
+        placeholder="e.g. +974 1234 5678"
+        required
+      />
+
+      <PhoneField
+        form={form}
+        name={[p, "cell2"]}
+        whatsappName={[p, "cell2IsWhatsapp"]}
+        label="Cell Phone 2"
+        placeholder="e.g. +974 1234 5679"
+      />
+
+      <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
-            name={[prefix, "email1"]}
+            name={[p, "email1"]}
             label="Email 1"
-            rules={[{ type: "email", message: "Enter a valid email" }]}
+            rules={[{ type: "email", message: "Invalid email" }]}
             className="mb-4"
           >
             <Input size="large" placeholder="primary@email.com" />
@@ -262,9 +306,9 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
-            name={[prefix, "email2"]}
+            name={[p, "email2"]}
             label="Email 2"
-            rules={[{ type: "email", message: "Enter a valid email" }]}
+            rules={[{ type: "email", message: "Invalid email" }]}
             className="mb-4"
           >
             <Input size="large" placeholder="secondary@email.com" />
@@ -274,14 +318,15 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
     </>
   );
 
+  /* ───────────────────── specific section UIs ─────────────────────── */
   const renderFatherInfo = () => (
     <>
       <Divider orientation="left" dashed>
         Father Information
       </Divider>
-      {/* Updated Layout: Father Photo & Name Fields */}
+
       <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <div className="md:w-[35%] relative">
+        <div className="md:w-[35%]">
           <CustomUploadCard
             name="fatherPhoto"
             label="Father Photo"
@@ -294,6 +339,7 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
         </div>
         <div className="md:w-[65%]">{renderNameFields("fatherInfo")}</div>
       </div>
+
       {renderIdAndPersonalInfo("fatherInfo")}
       {renderContactInfo("fatherInfo")}
     </>
@@ -304,10 +350,9 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
       <Divider orientation="left" dashed>
         Mother Information
       </Divider>
-      {/* Updated Layout: Mother Photo & Name Fields */}
+
       <div className="flex flex-col md:flex-row gap-4 mb-4">
-        {/* Left Column: Mother Photo (40% width) */}
-        <div className="md:w-[35%] relative">
+        <div className="md:w-[35%]">
           <CustomUploadCard
             name="motherPhoto"
             label="Mother Photo"
@@ -318,9 +363,9 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
             aspectRatio="aspect-square"
           />
         </div>
-        {/* Right Column: Mother Name Fields (60% width) */}
         <div className="md:w-[65%]">{renderNameFields("motherInfo")}</div>
       </div>
+
       {renderIdAndPersonalInfo("motherInfo")}
       {renderContactInfo("motherInfo")}
     </>
@@ -328,10 +373,11 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
 
   const renderGuardianInfo = () => (
     <>
-      <Divider orientation="left" dashed className="text-purple-500">
+      <Divider orientation="left" dashed>
         Guardian Information
       </Divider>
-      <Row gutter={16} className="mb-4">
+
+      <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
             name={["guardianInformation", "guardianName"]}
@@ -339,7 +385,11 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
             rules={[{ required: true, message: "Required" }]}
             className="mb-4"
           >
-            <Input size="large" placeholder="Guardian Name" />
+            <Input
+              size="large"
+              placeholder="Guardian Name"
+              ref={activeTab === "guardian" ? firstInputRef : null}
+            />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
@@ -353,17 +403,20 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
           </Form.Item>
         </Col>
       </Row>
-      {renderPhoneInputWithWhatsapp(
-        ["guardianInformation", "guardianContactNumber"],
-        ["guardianInformation", "guardianContactIsWhatsapp"],
-        "Contact Number",
-        "e.g. +974 1234 5678",
-        true
-      )}
+
+      <PhoneField
+        form={form}
+        name={["guardianInformation", "guardianContactNumber"]}
+        whatsappName={["guardianInformation", "guardianContactIsWhatsapp"]}
+        label="Contact Number"
+        placeholder="e.g. +974 1234 5678"
+        required
+      />
+
       <Form.Item
         name={["guardianInformation", "guardianEmail"]}
         label="Guardian Email"
-        rules={[{ type: "email", message: "Enter a valid email" }]}
+        rules={[{ type: "email", message: "Invalid email" }]}
         className="mb-4"
       >
         <Input size="large" placeholder="Guardian Email" />
@@ -371,70 +424,157 @@ const GuardianInfo = ({ formData, updateFormData, onBack }) => {
     </>
   );
 
+  /* ───────────────────────── navigation ───────────────────────────── */
+  const gradient = "linear-gradient(90deg,#C83B62 0%,#7F35CD 100%)";
+  const darkerGradient = "linear-gradient(90deg,#A02D53 0%,#6A28A4 100%)";
+
+  const handleNext = async () => {
+    try {
+      await form.validateFields();
+
+      if (activeTab === "father") {
+        setActiveTab("mother");
+        return;
+      }
+      if (activeTab === "mother") {
+        setActiveTab("guardian");
+        return;
+      }
+
+      await GuardianSchema.validate(form.getFieldsValue(true), {
+        abortEarly: false,
+      });
+
+      dispatch(updateFormData({ guardian: form.getFieldsValue(true) }));
+      dispatch(nextStep());
+    } catch (err) {
+      setYupErrorsToAnt(form, err);
+      const first =
+        err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
+      if (first)
+        form.scrollToField(first, { behavior: "smooth", block: "center" });
+    } finally {
+      smoothToTop();
+    }
+  };
+
+  const handleBack = () => {
+    if (activeTab === "guardian") setActiveTab("mother");
+    else if (activeTab === "mother") setActiveTab("father");
+    else dispatch(prevStep());
+    smoothToTop();
+  };
+
+  /* ───────────────────────────── render ───────────────────────────── */
   return (
-    <div className="max-w-4xl mx-auto p-3">
-      <Segmented
-        value={activeTab}
-        onChange={handleTabChange}
-        options={[
-          {
-            value: "father",
-            label: (
-              <span>
-                <UserOutlined className="mr-1" /> Father
-              </span>
-            ),
-          },
-          {
-            value: "mother",
-            label: (
-              <span>
-                <UserOutlined className="mr-1" /> Mother
-              </span>
-            ),
-          },
-          {
-            value: "guardian",
-            label: (
-              <span>
-                <TeamOutlined className="mr-1" /> Guardian
-              </span>
-            ),
-          },
-        ]}
-        className="mb-2 w-full"
-      />
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        className="space-y-4"
-      >
-        {activeTab === "father" && renderFatherInfo()}
-        {activeTab === "mother" && renderMotherInfo()}
-        {activeTab === "guardian" && renderGuardianInfo()}
-        <Row justify="space-between" className="mt-6">
-          <Col>
-            <Button size="large" onClick={handleBack}>
-              Back
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              type="primary"
-              onClick={handleNext}
-              size="large"
-              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-none hover:opacity-90"
-            >
-              {activeTab === "father"
-                ? "Mother Info"
-                : activeTab === "mother"
-                ? "Guardian Info"
-                : "Next"}
-            </Button>
-          </Col>
-        </Row>
-      </Form>
+    <div className="flex flex-col h-full">
+      {/* sticky segmented control - moved outside scrollable container */}
+      <div className="sticky top-0 z-20 pt-1 pb-2 bg-white shadow-sm">
+        <Segmented
+          size="large"
+          value={activeTab}
+          onChange={(val) => {
+            setActiveTab(val);
+            smoothToTop();
+          }}
+          options={[
+            {
+              value: "father",
+              label: (
+                <span className="flex items-center">
+                  <LiaMaleSolid className="mr-2" /> Father
+                </span>
+              ),
+            },
+            {
+              value: "mother",
+              label: (
+                <span className="flex items-center">
+                  <LiaFemaleSolid className="mr-2" /> Mother
+                </span>
+              ),
+            },
+            {
+              value: "guardian",
+              label: (
+                <span className="flex items-center">
+                  <TeamOutlined className="mr-2" /> Guardian
+                </span>
+              ),
+            },
+          ]}
+          style={{ width: "100%" }}
+        />
+      </div>
+
+      {/* form body - now scrollable independently */}
+      <div ref={containerRef} className="flex-1 overflow-y-auto px-4">
+        <Form
+          form={form}
+          layout="vertical"
+          onValuesChange={handleValuesChange}
+          className="max-w-4xl mx-auto py-2"
+        >
+          {activeTab === "father" && renderFatherInfo()}
+          {activeTab === "mother" && renderMotherInfo()}
+          {activeTab === "guardian" && renderGuardianInfo()}
+
+          <Row justify="space-between" className="mt-6 pb-4">
+            {/* Back */}
+            <Col>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button
+                  size="large"
+                  onClick={handleBack}
+                  style={{
+                    border: "2px solid transparent",
+                    backgroundOrigin: "border-box",
+                    backgroundImage: `${gradient},padding-box`,
+                    color: "#C83B62",
+                  }}
+                  className="font-semibold bg-white"
+                >
+                  Back
+                </Button>
+              </motion.div>
+            </Col>
+
+            {/* Next / Submit */}
+            <Col>
+              <motion.div
+                initial={{ scale: 1, y: 0 }}
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              >
+                <Button
+                  htmlType="button"
+                  onClick={handleNext}
+                  type="primary"
+                  size="large"
+                  className="!border-none !text-white font-semibold rounded-md px-6 py-2 transition-all duration-200 ease-in-out"
+                  style={{ backgroundImage: gradient }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundImage = darkerGradient)
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundImage = gradient)
+                  }
+                >
+                  {activeTab === "father"
+                    ? "Mother Info"
+                    : activeTab === "mother"
+                    ? "Guardian Info"
+                    : "Next"}
+                </Button>
+              </motion.div>
+            </Col>
+          </Row>
+        </Form>
+      </div>
     </div>
   );
 };

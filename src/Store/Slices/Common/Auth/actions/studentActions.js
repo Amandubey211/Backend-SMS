@@ -114,8 +114,6 @@ export const qidVerification = createAsyncThunk(
   }
 );
 
-// Import getUserRole from your utils/helpers
-
 // Thunk for registering student details
 export const registerStudentDetails = createAsyncThunk(
   "auth/registerStudentDetails",

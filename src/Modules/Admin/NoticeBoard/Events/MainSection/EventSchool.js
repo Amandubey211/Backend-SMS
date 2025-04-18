@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Calendar } from "antd";
+import { Calendar, Select, Skeleton } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   createEventThunk,
   updateEventThunk,
-  deleteEventThunk,
   fetchEventsThunk,
 } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventThunks";
 import {
@@ -13,7 +12,7 @@ import {
   setSidebarContent,
   resetSidebarContent,
 } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
-import { format, isValid, parse, parseISO } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -24,75 +23,80 @@ import Sidebar from "../../../../../Components/Common/Sidebar";
 import AddEvent from "../subComponents/AddEvent";
 import UpdateEvent from "../subComponents/UpdateEvent";
 import ViewEvent from "../subComponents/ViewEvent";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
-import { PERMISSIONS } from "../../../../../config/permission";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { PERMISSIONS } from "../../../../../config/permission";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
+
+const { Option } = Select;
+
+// Rainbow gradients
+const eventColors = [
+  "bg-gradient-to-r from-red-400 to-orange-400",
+  "bg-gradient-to-r from-orange-400 to-yellow-400",
+  "bg-gradient-to-r from-yellow-400 to-green-400",
+  "bg-gradient-to-r from-green-400 to-blue-400",
+  "bg-gradient-to-r from-blue-400 to-indigo-400",
+  "bg-gradient-to-r from-indigo-400 to-purple-400",
+  "bg-gradient-to-r from-purple-400 to-pink-400",
+];
+
+const eventBadgeColors = [
+  "bg-gradient-to-r from-red-600 to-orange-600",
+  "bg-gradient-to-r from-orange-600 to-yellow-600",
+  "bg-gradient-to-r from-yellow-600 to-green-600",
+  "bg-gradient-to-r from-green-600 to-blue-600",
+  "bg-gradient-to-r from-blue-600 to-indigo-600",
+  "bg-gradient-to-r from-indigo-600 to-purple-600",
+  "bg-gradient-to-r from-purple-600 to-pink-600",
+];
+
+const getColorIndex = (id) => {
+  if (!id) return 0;
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = (hash << 5) - hash + id.charCodeAt(i);
+    hash &= hash;
+  }
+  return Math.abs(hash) % eventColors.length;
+};
 
 const EventScheduler = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 4;
-
   const dispatch = useDispatch();
-  const { events, selectedEvent, sidebarContent } = useSelector(
-    (state) => state.admin.events
-  );
+  const {
+    events = [],
+    selectedEvent,
+    sidebarContent,
+    loading,
+  } = useSelector((state) => state.admin.events || {});
   const role = useSelector((state) => state.common.auth.role);
-  const { t } = useTranslation("admEvent"); // Hook for translation
+  const { t } = useTranslation("admEvent");
 
   useEffect(() => {
     dispatch(fetchEventsThunk());
   }, [dispatch]);
 
-  // Helper function to parse time strings
-  const parseTime = (timeStr) => {
-    const formats = ["h:mm a", "H:mm"];
-    for (let formatStr of formats) {
-      const parsed = parse(timeStr, formatStr, new Date());
-      if (isValid(parsed)) {
-        return parsed;
-      }
-    }
-    return null;
-  };
-
-  // Helper function to parse date and time into a single Date object
-  const parseDateTime = (dateStr, timeStr) => {
-    const date = parseISO(dateStr);
-    if (!isValid(date)) return null;
-
-    const time = parseTime(timeStr || "00:00");
-    if (!isValid(time)) return null;
-
-    // Set hours and minutes to the date object
-    date.setHours(time.getHours(), time.getMinutes(), 0, 0);
-    return date;
-  };
-
-  // Step 1: Sort the events by date and time in descending order
+  // Sort events descending by date+time
   const sortedEvents = useMemo(() => {
-    if (!events) return [];
-
-    return [...events].sort((a, b) => {
-      const dateTimeA = parseDateTime(a.date, a.time);
-      const dateTimeB = parseDateTime(b.date, b.time);
-
-      if (!dateTimeA && !dateTimeB) return 0;
-      if (!dateTimeA) return 1; // Invalid dates go to the end
-      if (!dateTimeB) return -1;
-
-      return dateTimeB - dateTimeA; // Descending order
-    });
+    return [...events]
+      .map((e) => {
+        const dt = e.date ? parseISO(e.date) : null;
+        return { ...e, _parsed: isValid(dt) ? dt : new Date(0) };
+      })
+      .sort((a, b) => b._parsed - a._parsed);
   }, [events]);
 
-  // Step 2: Paginate the sorted events
-  const filteredEvents = useMemo(() => {
-    return sortedEvents.slice(
-      currentPage * itemsPerPage,
-      (currentPage + 1) * itemsPerPage
-    );
-  }, [sortedEvents, currentPage, itemsPerPage]);
+  const pagedEvents = useMemo(
+    () =>
+      sortedEvents.slice(
+        currentPage * itemsPerPage,
+        (currentPage + 1) * itemsPerPage
+      ),
+    [sortedEvents, currentPage]
+  );
 
   const handleSidebarClose = () => {
     dispatch(resetSelectedEvent());
@@ -101,103 +105,96 @@ const EventScheduler = () => {
 
   useNavHeading(t("Noticeboard"), t("Events"));
 
-  const handleSaveEvent = async (eventData) => {
+  const handleSaveEvent = async (data) => {
     try {
       if (selectedEvent) {
-        await dispatch(updateEventThunk(eventData));
+        await dispatch(updateEventThunk(data));
         toast.success(t("Event updated successfully!"));
       } else {
-        await dispatch(createEventThunk(eventData));
+        await dispatch(createEventThunk(data));
         toast.success(t("Event created successfully!"));
       }
-
       handleSidebarClose();
       dispatch(fetchEventsThunk());
-    } catch (error) {
+    } catch {
       toast.error(t("Failed to save event"));
     }
   };
 
-  const handleEventClick = (event) => {
-    dispatch(setSelectedEvent(event));
+  const handleEventClick = (evt) => {
+    dispatch(setSelectedEvent(evt));
     dispatch(setSidebarContent("viewEvent"));
   };
 
-  // Predefined background colors for events
-  const bgColors = [
-    "bg-blue-200",
-    "bg-green-200",
-    "bg-pink-200",
-    "bg-purple-200",
-    "bg-yellow-200",
-  ];
+  // Calendar date-cell renderer
+  const dateCellRender = (value) => {
+    if (!events.length) return null;
+    const cellDate = value.toDate();
+    const formattedDate = isValid(cellDate)
+      ? format(cellDate, "yyyy-MM-dd")
+      : null;
 
-  // Custom date cell render for the calendar
-  const handleDateCellRender = (value) => {
-    if (events?.length > 0) {
-      // Format the date for comparison
-      const formattedDate = format(value?.toDate(), "yyyy-MM-dd");
+    const dayEvents = events.filter((e) => {
+      if (!e.date || !formattedDate) return false;
+      const d = parseISO(e.date);
+      return isValid(d) && format(d, "yyyy-MM-dd") === formattedDate;
+    });
 
-      // Filter events to match the formatted date
-      const dayEvents = events?.filter((event) => {
-        const eventDate = event?.date ? parseISO(event.date) : null;
-        return (
-          isValid(eventDate) &&
-          format(eventDate, "yyyy-MM-dd") === formattedDate
-        );
-      });
-
-      const cellBgColors = [
-        "bg-pink-500",
-        "bg-purple-500",
-        "bg-blue-500",
-        "bg-indigo-500",
-      ];
-
-      return (
-        <ul className="events space-y-1 max-h-20 overflow-y-auto">
-          {dayEvents?.map((event, index) => (
+    return (
+      <ul className="space-y-1 max-h-20 overflow-y-auto">
+        {dayEvents.map((e) => {
+          const idx = getColorIndex(e._id);
+          return (
             <li
-              key={event?._id}
-              className={`inline-block px-2 py-1 rounded text-white ${cellBgColors[index % cellBgColors.length]
-                } shadow-md cursor-pointer`}
-              onClick={() => handleEventClick(event)}
+              key={e._id}
+              className={`inline-block px-2 py-1 rounded text-white ${eventBadgeColors[idx]} shadow cursor-pointer`}
+              onClick={() => handleEventClick(e)}
             >
-              {event?.title} - {event?.time || "-"}
+              {e.title || t("Untitled event")} – {e.time || "-"}
             </li>
-          ))}
-        </ul>
-      );
-    }
-    return null;
+          );
+        })}
+      </ul>
+    );
   };
 
+  // Sidebar title logic
   const sidebarTitle =
     sidebarContent === "viewEvent" && selectedEvent
-      ? selectedEvent.title
+      ? selectedEvent.title || t("Event details")
       : sidebarContent === "addEvent"
-        ? t("Add New Event")
-        : sidebarContent === "updateEvent"
-          ? t("Update Event")
-          : t("Sidebar");
+      ? t("Add New Event")
+      : sidebarContent === "updateEvent"
+      ? t("Update Event")
+      : "";
+
+  // Month & year options
+  const now = new Date();
+  const months = now.toLocaleDateString(undefined, { month: "short" });
+  const currentYear = now.getFullYear();
+  const yearOptions = Array.from(
+    { length: 21 },
+    (_, i) => currentYear - 10 + i
+  );
 
   return (
     <Layout title={`${t("Event")} | ${t("Student Diwan")}`}>
       <DashLayout>
         <ProtectedSection
           requiredPermission={PERMISSIONS.SHOW_EVENTS}
-          title={"Events"}
+          title={t("Events")}
         >
-          <div className="min-h-screen p-4 bg-gray-50 max-w-screen">
-            <div className="flex flex-row justify-between">
-              <h1 className="mb-2 bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent font-semibold bg-clip-text">
-                {t("")}
+          <div className="p-4  min-h-screen">
+            {/* Header */}
+            <div className="flex justify-between mb-4">
+              <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-purple-500">
+                {t("Events")}
               </h1>
               <ProtectedAction requiredPermission={PERMISSIONS.ADD_NEW_EVENT}>
-                {!["parent", "studnt"].includes(role) && (
+                {!["parent", "student"].includes(role) && (
                   <button
-                    className="h-10 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md hover:from-pink-600 hover:to-purple-600"
                     onClick={() => dispatch(setSidebarContent("addEvent"))}
+                    className="px-4 py-2 rounded bg-gradient-to-r from-red-500 to-purple-500 text-white hover:from-red-600 hover:to-purple-600"
                   >
                     {t("Add New Event")}
                   </button>
@@ -205,144 +202,126 @@ const EventScheduler = () => {
               </ProtectedAction>
             </div>
 
-            {/* Event Cards Pagination */}
-            {/* Event Cards Pagination */}
-            <div className="my-4 h-40 flex justify-center items-center rounded-sm gap-8 px-8 relative">
-              {currentPage > 0 && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute left-0 top-1/2 transform -translate-y-1/2"
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 0))}
-                >
-                  <IoIosArrowBack style={{width:"20px", height:"20px"}}/>
-                </div>
-              )}
-
-              {filteredEvents?.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-gray-500 w-full">
-                  <IoCalendarOutline className="text-6xl" />
-                  <span>{t("No Events in this Month")}</span>
+            {/* Card Grid or Skeleton */}
+            <div className="relative my-4">
+              {loading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {Array(itemsPerPage)
+                    .fill(null)
+                    .map((_, i) => (
+                      <Skeleton
+                        key={i}
+                        active
+                        paragraph={{ rows: 4 }}
+                        className="w-full h-48"
+                      />
+                    ))}
                 </div>
               ) : (
-                <div className="flex justify-start items-center gap-4 w-full max-w-5xl mx-auto mt-8">
-                  {filteredEvents?.map((event) => (
-                    <EventCard
-                      key={event._id}
-                      event={event}
-                      onClick={() => handleEventClick(event)}
-                    />
-                  ))}
-                </div>
-              )}
-
-              {(currentPage + 1) * itemsPerPage < sortedEvents.length && (
-                <div
-                  className="p-1 rounded-full text-purple-500 bg-white border-2 cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2"
-                  onClick={() => setCurrentPage((prev) => prev + 1)}
-                >
-                  <IoIosArrowForward style={{width:"20px", height:"20px"}}/>
-                </div>
+                <>
+                  {currentPage > 0 && (
+                    <button
+                      onClick={() => setCurrentPage((p) => p - 1)}
+                      className="absolute left-0 top-1/2 transform -translate-y-1/2 p-2 bg-white rounded-full shadow"
+                    >
+                      <IoIosArrowBack size={20} />
+                    </button>
+                  )}
+                  {pagedEvents.length === 0 ? (
+                    <div className="flex flex-col items-center text-gray-500 py-20">
+                      <IoCalendarOutline size={48} />
+                      <p>{t("No Events in this Month")}</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {pagedEvents.map((evt) => (
+                        <EventCard
+                          key={evt._id}
+                          event={evt}
+                          colorIndex={getColorIndex(evt._id)}
+                          onClick={() => handleEventClick(evt)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                  {(currentPage + 1) * itemsPerPage < sortedEvents.length && (
+                    <button
+                      onClick={() => setCurrentPage((p) => p + 1)}
+                      className="absolute right-0 top-1/2 transform -translate-y-1/2 p-2 bg-white rounded-full shadow"
+                    >
+                      <IoIosArrowForward size={20} />
+                    </button>
+                  )}
+                </>
               )}
             </div>
 
-            {/* Add HR and margin bottom */}
-            <hr className="my-6 border-t-2 mt-12" />
+            <hr className="my-8" />
 
-            {/* Calendar Date Render */}
+            {/* AntD Calendar with Selects */}
             <Calendar
-              dateCellRender={handleDateCellRender}
+              dateCellRender={dateCellRender}
               headerRender={({ value, type, onChange, onTypeChange }) => {
-                const start = 0;
-                const end = 12;
-                const monthOptions = [];
-
-                const localeData = value.localeData();
-                const months = localeData.monthsShort();
-
-                for (let index = start; index < end; index++) {
-                  monthOptions.push(
-                    <option key={index} value={index}>
-                      {months[index]}
-                    </option>
-                  );
-                }
-
                 const year = value.year();
                 const month = value.month();
-                const yearOptions = [];
-                for (let i = year - 10; i < year + 10; i++) {
-                  yearOptions.push(
-                    <option key={i} value={i}>
-                      {i}
-                    </option>
-                  );
-                }
-
+                const monthNames = value.localeData().monthsShort();
                 return (
-                  <div className="flex items-center space-x-2 justify-end mt-2 pt-2 mb-4">
-                    <select
-                      className="border rounded px-2 py-1"
+                  <div className="flex justify-end items-center space-x-2 mb-4">
+                    <Select
                       value={year}
-                      onChange={(event) => {
-                        const newYear = parseInt(event.target.value, 10);
-                        const now = value.clone().year(newYear);
-                        onChange(now);
-                      }}
+                      onChange={(y) => onChange(value.clone().year(y))}
                     >
-                      {yearOptions}
-                    </select>
-                    <select
-                      className="border rounded px-2 py-1"
+                      {yearOptions.map((y) => (
+                        <Option key={y} value={y}>
+                          {y}
+                        </Option>
+                      ))}
+                    </Select>
+                    <Select
                       value={month}
-                      onChange={(event) => {
-                        const newMonth = parseInt(event.target.value, 10);
-                        const now = value.clone().month(newMonth);
-                        onChange(now);
-                      }}
+                      onChange={(m) => onChange(value.clone().month(m))}
                     >
-                      {monthOptions}
-                    </select>
-                    <div className="flex space-x-2">
-                      <button
-                        className={`border rounded px-2 py-1 ${type === "month"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                          }`}
-                        onClick={() => onTypeChange("month")}
-                      >
-                        {t("Month")}
-                      </button>
-                      <button
-                        className={`border rounded px-2 py-1 ${type === "year"
-                            ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white"
-                            : ""
-                          }`}
-                        onClick={() => onTypeChange("year")}
-                      >
-                        {t("Year")}
-                      </button>
-                    </div>
+                      {monthNames.map((m, i) => (
+                        <Option key={i} value={i}>
+                          {m}
+                        </Option>
+                      ))}
+                    </Select>
+                    <button
+                      onClick={() => onTypeChange("month")}
+                      className={`px-2 py-1 border rounded ${
+                        type === "month" ? "bg-red-500 text-white" : ""
+                      }`}
+                    >
+                      {t("Month")}
+                    </button>
+                    <button
+                      onClick={() => onTypeChange("year")}
+                      className={`px-2 py-1 border rounded ${
+                        type === "year" ? "bg-red-500 text-white" : ""
+                      }`}
+                    >
+                      {t("Year")}
+                    </button>
                   </div>
                 );
               }}
               className="custom-calendar"
             />
 
-            {/* Sidebar for Event Actions */}
+            {/* Sidebar */}
             <Sidebar
               title={sidebarTitle}
               isOpen={!!sidebarContent}
               onClose={handleSidebarClose}
+              width="50%"
             >
-              {sidebarContent === "viewEvent" && selectedEvent ? (
+              {sidebarContent === "viewEvent" && selectedEvent && (
                 <ViewEvent onClose={handleSidebarClose} />
-              ) : sidebarContent === "viewEvent" ? (
-                <p>{t("No event selected")}</p>
-              ) : null}
-
+              )}
               {sidebarContent === "addEvent" && (
                 <AddEvent onSave={handleSaveEvent} />
               )}
-
               {sidebarContent === "updateEvent" && (
                 <UpdateEvent onSave={handleSaveEvent} />
               )}

@@ -203,7 +203,7 @@ const AuthSlice = createSlice({
       })
       .addCase(registerStudentDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.signupSuccess = true;
+        // state.signupSuccess = true;
       })
       .addCase(registerStudentDetails.rejected, (state, action) => {
         state.loading = false;

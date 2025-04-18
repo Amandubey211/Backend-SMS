@@ -56,6 +56,11 @@ export const PERMISSIONS = {
   VIEW_STUDENT: "Get All Students",
   VIEW_PARENT: "View Parents",
 
+  // ------------
+  SHOW_STUDENT_INFO: "Shows Student Info",
+
+  //==========
+
   // Finance 3
 
   //earning
@@ -231,14 +236,14 @@ export const PERMISSIONS = {
   // USERS STAFFS 7
   // teacher
   VIEW_TEACHER: "view Teacher",
-  ADD_TEACHER: "Add Teacher",
+  ADD_TEACHER: "add Teacher",
   EDIT_TEACHER: "edit Teacher",
   ACTIVE_TEACHER: "activate Teacher",
   DEACTIVE_TEACHER: "deactivate Teacher",
 
   // other staff
   VIEW_STAFF: "view Staff",
-  ADD_STAFF: "Add Staff",
+  ADD_STAFF: "add Staff",
   EDIT_STAFF: "edit Staff",
   ACTIVE_STAFF: "activate Staff",
   DEACTIVE_STAFF: "deactivate Staff",

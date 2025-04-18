@@ -96,7 +96,7 @@ export const updateBookThunk = createAsyncThunk(
         }
       );
       toast.success("Book updated successfully!");
-      dispatch(fetchBooksDetailsThunk());
+      dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
       return response?.book;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -117,7 +117,7 @@ export const deleteBookThunk = createAsyncThunk(
       );
       if (response.success) {
         toast.success("Book deleted successfully!");
-        dispatch(fetchBooksDetailsThunk());
+        dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
         return bookId;
       } else {
         toast.error("Something went wrong");

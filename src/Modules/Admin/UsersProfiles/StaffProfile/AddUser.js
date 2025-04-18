@@ -596,7 +596,7 @@ const AddUser = ({ role, data }) => {
 
           {/* ---------- Enhanced AntD File Upload with Preview ---------- */}
           <div className="space-y-4 mt-6">
-            <label className="block text-base font-medium text-gray-700">
+            <label className="block text-base font-medium text-gray-700 my-2 ">
               Upload CV (PDF):
             </label>
             <Upload
