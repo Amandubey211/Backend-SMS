@@ -242,12 +242,18 @@ const AddOperationalExpenses = () => {
                     </Col>
                   </>}
                   
-
+                  {receiptData.status == "partial" &&
+                    <Col span={6}>
+                    <Form.Item name={["lineItems", index, "paidAmount"]} label="Paid Now" required>
+                      <input style={{ width: "100%" }} className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={item.paidAmount} onChange={(e) => handleInputChange(index, "paidAmount", e.target.value)} />
+                    </Form.Item>
+                  </Col>}
                   <Col span={6}>
                     <Form.Item name={["lineItems", index, "amount"]} label="Amount">
                       <p>= {item?.amount}</p>
                     </Form.Item>
                   </Col>
+
                 </Row>
                 <Button danger onClick={() => removeLineItem(index)}>Remove</Button>
                 {/* <Button onClick={() => copyLineItem(index)} 
@@ -272,7 +278,8 @@ const AddOperationalExpenses = () => {
                   </Form.Item>
 
                 </Col>
-                {receiptData.status == "paid" ||receiptData.status == "partial" && <>
+                {receiptData.status == "paid" | receiptData.status == "partial" ?
+                 <>
                   <Col span={6}>
                     <Form.Item label="Payment Type" name="paymentType" rules={[{ required: true, message: "Payment Type is required" }]}>
                       <Select value={receiptData.paymentType} onChange={(value) => handleChange("paymentType", value)}>
@@ -290,7 +297,7 @@ const AddOperationalExpenses = () => {
                       <input type="date" className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={receiptData.paymentDate} onChange={(e) => handleChange("paymentDate", e.target.value)} />
                     </Form.Item>
                   </Col>
-                </>}
+                </>:null}
               </Row>
 
               {receiptData.status == "paid" && receiptData.paymentType === "cheque" && (
@@ -325,6 +332,7 @@ const AddOperationalExpenses = () => {
             <SidebarEntitySelection entitiesIds={entitiesIds} setEntitiesIds={setEntitiesIds} />
           </Sidebar>
         </div>
+        
       </AdminDashLayout>
     </Layout>
   );

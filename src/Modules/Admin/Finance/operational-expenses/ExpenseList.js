@@ -11,6 +11,8 @@ import VoucherTemplate from "../../../../Utils/FinanceTemplate/VoucherTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
 import { deleteOperationalExpenses, fetchOperationalExpenses, updateOperationalExpenses } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
 import { GiTakeMyMoney } from "react-icons/gi";
+import Sidebar from "../../../../Components/Common/Sidebar";
+import EditOperationalExpenses from "./EditExpense";
 
 const ExpenseList = () => {
   const dispatch = useDispatch();
@@ -33,6 +35,7 @@ const ExpenseList = () => {
     dispatch(fetchOperationalExpenses({ page: 1, search: value, limit: computedPageSize, isCancel }));
   };
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const handleCancelrecord = (record) => {
     setSelectedInvoice(record);
@@ -97,7 +100,7 @@ const ExpenseList = () => {
               </> : null
             }
             {
-              ["pending", "hold", "partial"].includes(record.status) && !record?.isCancel ? <button title="Edit"><MdOutlineEdit size={20} /></button> : null
+              ["pending", "hold", "partial"].includes(record.status) && !record?.isCancel ? <button title="Edit" onClick={()=>{setSelectedInvoice(record);setIsModalVisible(true)}}><MdOutlineEdit size={20}  /></button> : null
             }
             {
               record?.isCancel ?
@@ -286,6 +289,9 @@ const ExpenseList = () => {
             </div>
           </div>
         )}
+        <Sidebar title="Update Expense" width="70%" isOpen={isModalVisible} onClose={() => setIsModalVisible(false)}>
+          <EditOperationalExpenses data= {selectedInvoice}/>
+        </Sidebar>
       </AdminDashLayout>
     </Layout>
   );
