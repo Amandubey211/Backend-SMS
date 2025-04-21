@@ -62,20 +62,30 @@ const StudentFeeForm = () => {
   const handleCategoryChange = async (index, categoryId) => {
     const category = categories.find((cat) => cat._id === categoryId);
     if (!category) return;
-
+    
     const res = await dispatch(fetchInventory({ status: "Available", search: category.categoryName, page: 1, limit: 1000 }));
     const fetchedItems = res.payload?.data || [];
 
     const updatedItems = [...lineItems];
-    updatedItems[index] = { ...updatedItems[index], categoryId, categoryName: category.categoryName, items: fetchedItems, itemId: "", itemDetails: "" };
+    updatedItems[index] = { ...updatedItems[index], categoryId, categoryName: category.categoryName, items: fetchedItems, itemId: "", itemDetails: "",rate:0 };
+  
     setLineItems(updatedItems);
+    form.setFieldsValue({
+      lineItems: updatedItems
+    });
   };
 
   const handleItemChange = (index, itemId) => {
+    
+    
     const updatedItems = [...lineItems];
     updatedItems[index].itemId = itemId;
     updatedItems[index].itemDetails = itemId ? updatedItems[index].items.find((item) => item._id === itemId)?.name : "";
+    updatedItems[index].rate = itemId ? updatedItems[index].items.find((item) => item._id === itemId)?.unitPrice : 0;
     setLineItems(updatedItems);
+    form.setFieldsValue({
+      lineItems: updatedItems
+    });
   };
 
   const handleInputChange = (index, field, value) => {
@@ -202,7 +212,8 @@ const navigate = useNavigate()
 
             <Col span={6}>
               <Form.Item name={["lineItems", index, "rate"]} label="Rate" rules={[{ required: true ,message:"Rate is required"}]}>
-                <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "rate", value)} />
+                
+                <input type="Number" className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={lineItems[index].rate} onChange={(e) => handleInputChange(index, "rate",  e.target.value)} />
               </Form.Item>
             </Col>
             <Col span={6}>

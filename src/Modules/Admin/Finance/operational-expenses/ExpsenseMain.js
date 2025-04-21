@@ -23,7 +23,7 @@ export default function OperationalExpensesMain() {
       
           <div className="flex flex-row items-center justify-between ">
               <div className="font-semibold text-2xl">
-                OperationalExpenses Planner
+                Operational Expenses
               </div>
         
             <button

@@ -7,7 +7,7 @@ export default function BankReconsilation() {
   useNavHeading("Finance", "Bank Reconciliation");
   return (
     
-    <Layout title="Finance | Bank Reconciliationr">
+    <Layout title="Finance | Bank Reconciliation">
         <AdminDashLayout>
         <BankReconciliationMain/>
         </AdminDashLayout>

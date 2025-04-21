@@ -81,6 +81,9 @@ const StartReconciliation= lazy(() =>
 const DayBook= lazy(() =>
   import("../Modules/Admin/Finance/dayBook/DayBookMain.js")
 );
+const ConfigurationMain= lazy(() =>
+  import("../Modules/Admin/Finance/Configuration/ConfigurationMain.js")
+);
 const PayRollDash = lazy(() =>
   import("../Modules/Admin/Finance/Payroll/PayRollDash.js")
 );
@@ -1053,6 +1056,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={DayBook}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/configuration",
+      element: (
+        <ProtectRoute
+          Component={ConfigurationMain}
           allowedRoles={["admin", "finance"]}
         />
       ),

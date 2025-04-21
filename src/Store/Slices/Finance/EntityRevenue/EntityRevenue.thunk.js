@@ -82,22 +82,47 @@ export const createEntityRevenue = createAsyncThunk(
 );
 
 
-export const updateEntityRevenue = createAsyncThunk(
-  "EntityRevenues/updateEntityRevenue",
+export const cancelEntityRevenue = createAsyncThunk(
+  "EntityRevenues/cancelEntityRevenue",
+
+  async (data, { rejectWithValue, dispatch, getState }) => {
+
+    try {
+
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/${getRole}/revenue/cancel/externalRevenue/${data._id}`);
+      if (response.success) {
+        toast.success(response.message);
+        dispatch(fetchAllEntityRevenue({ page: 1, limit: 10,search:'',isCancel:false }));
+      } else {
+        toast.error(response.message)
+      }
+      return response;
+    } catch (error) {
+      toast.error('Something is wrong')
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+export const deleteEntityRevenue = createAsyncThunk(
+  "EntityRevenues/deleteEntityRevenue",
 
   async (data, { rejectWithValue, dispatch, getState }) => {
 
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(
-        `/${getRole}/revenue/update/student/fee/${data.feeId}`,
+      const response = await customRequest('DELETE',
+        `/${getRole}/revenue/delete/externalRevenue`,
         data
       );
       if (response.success) {
-        toast.success('Data update successfully!')
+        toast.success(response.message);
+        dispatch(fetchAllEntityRevenue({ page: 1, limit: 10,search:'',isCancel:false }));
       } else {
-        toast.error('Something is wrong')
+        toast.error(response.message)
       }
       return response;
     } catch (error) {

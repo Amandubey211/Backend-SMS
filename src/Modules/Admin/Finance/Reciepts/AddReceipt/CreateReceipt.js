@@ -67,11 +67,9 @@ const CreateReceipt = () => {
     
     if(searchInvoiceNumber?.trim()?.split("-")?.length != 3){
       toast.error("Please Enter Correct Invoice Number");
-      alert('k')
       return
     }
     if(!["S", "E"].includes(searchInvoiceNumber.slice(-1))){
-      alert('a')
       toast.error("Please Enter Correct Invoice Number");
       return
     }
@@ -120,6 +118,14 @@ const CreateReceipt = () => {
       [field]: value,
     });
   };
+  const handlePaste = async()=>{
+    try {
+      const text = await navigator.clipboard.readText();
+      setSearchInvoiceNumber(text);
+    } catch (error) {
+      console.error("Failed to read clipboard contents: ", error);
+    }
+  }
 
 
   return (
@@ -129,8 +135,8 @@ const CreateReceipt = () => {
       <div className="p-4 ">
         <div className="flex flex-row items-start gap-4">
           <div className="flex flex-row items-center relative">
-            <input type="text" className="w-[20rem] h-[2.5rem] p-2 border border-gray-400 rounded-lg" placeholder="Enter Invoice Number" onChange={(e)=>setSearchInvoiceNumber(e.target.value)}/>
-            <MdOutlineFileCopy title="Paste" className="absolute right-1 cursor-pointer" size={20} />
+            <input type="text" className="w-[20rem] h-[2.5rem] p-2 border border-gray-400 rounded-lg" placeholder="Enter Invoice Number" onChange={(e)=>setSearchInvoiceNumber(e.target.value)} value={searchInvoiceNumber}/>
+            <MdOutlineFileCopy title="Paste" className="absolute right-1 cursor-pointer" size={20} onClick={()=>handlePaste()} />
           </div>
           <div>
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 rounded-lg shadow-lg h-[2.5rem]" onClick={()=>searchInvoice()}> <IoSearch /> Search</button>
@@ -329,9 +335,9 @@ const CreateReceipt = () => {
     </Form>
           </TabPane>
 
-          <TabPane tab="OverDue Invoices" key="2">
+          {/* <TabPane tab="OverDue Invoices" key="2">
         
-          </TabPane>
+          </TabPane> */}
         </Tabs>:<div className="w-full h-[80vh] flex flex-col items-center justify-center">
             <p className="text-gray-500">Enter or Paste Invoice Number and Get Data</p>
             <p className="text-gray-500"><TbFileInvoice size={50} /></p>

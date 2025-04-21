@@ -1,28 +1,43 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { GrDocumentVerified } from 'react-icons/gr';
 import { MdOutlinePendingActions } from 'react-icons/md';
 import { TbDeviceIpadHorizontalCancel } from 'react-icons/tb';
+import { RiCheckboxMultipleBlankFill } from "react-icons/ri";
+
 import { useDispatch } from 'react-redux';
+import { fetchAllReceiptsReconciliation } from '../../../../Store/Slices/Finance/Receipts/receiptsThunks';
 
 export default function BankReconciliationCard() {
     const dispatch = useDispatch();
 
+    const [alldata, setAlldata] = useState({});
 
+  useEffect(() => {
+    dispatch(fetchAllReceiptsReconciliation({ page: 1, limit: 5, pending: 'no' })).then((action) => {
+      setAlldata(action?.payload)
+    })
+  }, [])
     const BankReconciliationCardsData = [
       {
         title: "Total Verified Transactions",
-        value: 0,
+        value: alldata.verifiedReconciliationRecords ||0,
         icon: <GrDocumentVerified/>
         , 
       },
       {
+        title: "Total Resolved Transactions",
+        value: alldata.resolvedReconciliationRecords ||0,
+        icon: <RiCheckboxMultipleBlankFill />
+        , 
+      },
+      {
         title: "Total Pending Transactions",
-        value: 0,
+        value: alldata.pendingReconciliationRecords ||0,
         icon: <MdOutlinePendingActions />, 
       },
       {
         title: "Total Reject Transactions",
-        value: 0,
+        value: alldata.rejectReconciliationRecords ||0,
         icon: <TbDeviceIpadHorizontalCancel />, 
       },
     ];
@@ -30,7 +45,7 @@ export default function BankReconciliationCard() {
    
   
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-2 place-items-center">
+      <div className="grid grid-cols-1 sm:grid-cols-4 lg:grid-cols-2 gap-6 p-2 place-items-center">
         {BankReconciliationCardsData?.map((item, index) => (
           <div
           className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"

@@ -21,6 +21,7 @@ import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
 import financialCategoryReducer from "./Slices/Finance/Category/financeCategory.Slice";
+import financeConfigurationReducer from "./Slices/Finance/Configuration/configuration.slice";
 import inventoryReducer from "./Slices/Finance/inventory/inventory.slice";
 import budgetReducer from "./Slices/Finance/budget/budget.slice";
 import entityReducer from "./Slices/Finance/entitie/entity.slice";
@@ -205,6 +206,7 @@ const AdminReducer = combineReducers({
   all_parents: allParentReducer,
   all_staff: allstaffReducer,
   financialCategory: financialCategoryReducer,
+  configuration: financeConfigurationReducer,
   inventory: inventoryReducer,
   inventory: inventoryReducer,
   entity: entityReducer,
