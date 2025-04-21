@@ -135,7 +135,7 @@ const MainSection = ({ setIsEditing }) => {
         >
           <div className="flex">
             {/* Left Side: Editor (70%) */}
-            <div className="w-[70%] border-r">
+            <div className="w-[70%] ">
               <EditorComponent
                 inputPlaceHolder="Syllabus Heading"
                 assignmentLabel="Page Title"
@@ -146,7 +146,7 @@ const MainSection = ({ setIsEditing }) => {
               />
             </div>
             {/* Right Side: AudienceSelector (30%) */}
-            <div className="w-[30%] px-3">
+            <div className="w-[30%] px-3 min-h-screen border-l">
               <AudienceSelector
                 value={audience}
                 onChange={setAudience}

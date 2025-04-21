@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, Tag, Button, Modal, Spin, Input } from 'antd';
+import { Table, Tag, Button, Modal, Spin, Input, Select } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { cancelReceipt, fetchAllReceipts } from "../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import Layout from '../../../../Components/Common/Layout';
@@ -19,9 +19,10 @@ const ReceiptsList = () => {
   const [currentPage, setCurrentPage] = useState(1); // State for current page
   const [pageSize, setPageSize] = useState(10); // State for page size
   const currency = useSelector((store) => store.common.user.userDetails.currency);
+  const [isCancel,setIsCancel] = useState(false);
   useEffect(() => {
-    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize }));
-  }, [dispatch, currentPage, pageSize]);
+    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize,isCancel }));
+  }, [dispatch, currentPage, pageSize,isCancel]);
 
   const handleCancelReceipt = (receipt) => {
     setSelectedReceipt(receipt);
@@ -29,7 +30,6 @@ const ReceiptsList = () => {
   };
 
   const handleConfirmCancel = () => {
-    return
     dispatch(cancelReceipt(selectedReceipt._id)); 
     setCancelModalVisible(false);
     setSelectedReceipt(null);
@@ -90,7 +90,7 @@ const ReceiptsList = () => {
       render: (_, record) => (
       <div className='flex flex-row items-center gap-2' >
           <TbInvoice size={20} className='cursor-pointer' title='Receipt' onClick={()=>{setSelectedReciept(record);setRecieptVisible(true)}}  />
-          <MdCancel size={20} onClick={() => handleCancelReceipt(record)} type="danger" title='Cancel' className='cursor-pointer'/>
+          {!record?.isCancel ? <MdCancel size={20} onClick={() => handleCancelReceipt(record)} type="danger" title='Cancel' className='cursor-pointer'/>:<Tag color='red'>Canceled</Tag>}
         
         </div>
       ),
@@ -101,7 +101,7 @@ const ReceiptsList = () => {
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize,search:value }));
+    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize,search:value,isCancel }));
   };
   
 
@@ -110,14 +110,25 @@ const ReceiptsList = () => {
     <DashLayout>
     <div className='p-4'>
     <div className="flex flex-row items-center justify-between">
+      <div className="flex flex-row items-center gap-2">
          <Input
-            placeholder="Search by Reciept Number"
+            placeholder="Search by Invoice Number"
             prefix={<SearchOutlined />}
             value={searchText}
             onChange={handleSearch}
             allowClear
             style={{ width: 300, marginBottom: 16 }}
           />
+           <Select
+                className="px-1 w-[10rem] mb-4"
+                value={isCancel}
+                onChange={(value) => setIsCancel(value)}
+                placeholder="Select Status"
+              >
+                <Select.Option value={false}>Active</Select.Option>
+                <Select.Option value={true}>Canceled</Select.Option>
+              </Select>
+              </div>
           <div>
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/receipts/add-new-receipt")}>Add New Reciept</button>
           </div>

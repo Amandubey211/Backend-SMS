@@ -11,12 +11,12 @@ export const useForgotPassword = () => {
     try {
       const response = await forgotPassword(email, role);
       console.log('response', response)
-      if (response.data.success) {
+      if (response?.data?.success) {
         toast.success('Check your email to reset your password!');
         return response.data;
       } else {
         // Handle the case where success is false
-        const errorMessage = response.data.msg || "Failed to reset password. Please try again.";
+        const errorMessage = response?.data?.msg || "Failed to reset password. Please try again.";
         toast.error(errorMessage);
         throw new Error(errorMessage); // Throw error to handle it in the catch block
       }
@@ -43,7 +43,7 @@ export const useResetPassword = () => {
       const response = await apiResetPassword({ email, newPassword, confirmPassword, token });
 
       console.log('response---', response)
-      if (!response.success) {
+      if (!response?.success) {
         setTimeout(() => {
           navigate('/');
         }, 3000);

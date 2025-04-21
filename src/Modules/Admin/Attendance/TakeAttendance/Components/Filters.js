@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { FiRefreshCw } from "react-icons/fi";
+import { Select, Tooltip } from "antd"; // Importing Tooltip from Ant Design
 import {
   fetchGroupsByClass,
   fetchSectionsByClass,
 } from "../../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { setFilters } from "../../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
+
+const { Option } = Select;
 
 const Filters = ({ isSectionInvalid }) => {
   const { filters } = useSelector((state) => state.admin.attendance);
@@ -31,54 +34,63 @@ const Filters = ({ isSectionInvalid }) => {
   };
 
   const handleAllChange = () => {
-    dispatch(setFilters({ sectionId: "", groupId: "" }));
+    dispatch(setFilters({ sectionId: null, groupId: null }));
   };
 
   return (
     <div className="flex justify-between items-center my-2">
       <div className="flex space-x-4">
+        {/* Section Select with Ant Design */}
         <div className="flex flex-col">
           <label className="text-gray-600 mb-1">Section</label>
-          <select
-            className={`border rounded p-2 w-56 transition-all duration-300 ${
+          <Select
+            className={`w-56 ${
               isSectionInvalid ? "border-red-500" : "border-gray-300"
-            }`} // Apply red border if section is invalid
+            }`}
             value={sectionId}
-            onChange={(e) => handleFilterChange("sectionId", e.target.value)}
+            onChange={(value) => handleFilterChange("sectionId", value)}
+            placeholder="Choose Section"
+            allowClear
           >
-            <option value="">Choose Section</option>
             {sections?.map((section) => (
-              <option key={section._id} value={section._id}>
+              <Option key={section._id} value={section._id}>
                 {section.sectionName}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
         </div>
+
+        {/* Group Select with Ant Design */}
         <div className="flex flex-col">
           <label className="text-gray-600 mb-1">Group</label>
-          <select
-            className="border rounded p-2 w-56 border-gray-300"
+          <Select
+            className="w-56 border-gray-300"
             value={groupId}
-            onChange={(e) => handleFilterChange("groupId", e.target.value)}
+            onChange={(value) => handleFilterChange("groupId", value)}
+            placeholder="All Groups"
+            allowClear
           >
-            <option value="">All Groups</option>
             {groups?.map((group) => (
-              <option key={group._id} value={group._id}>
+              <Option key={group._id} value={group._id}>
                 {group.groupName}
-              </option>
+              </Option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
+
+      {/* Refresh Button with Ant Design Tooltip */}
       <div className="flex items-center">
-        <button
-          title="Reset"
-          onClick={handleAllChange}
-          className="text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
-          aria-label="Refresh attendance"
-        >
-          <FiRefreshCw size={24} />
-        </button>
+        <Tooltip title="Reset filters">
+          <button
+            title="Reset"
+            onClick={handleAllChange}
+            className="text-gray-600 rounded-full p-2 focus:outline-none transform transition-transform duration-300 hover:rotate-180"
+            aria-label="Refresh attendance"
+          >
+            <FiRefreshCw size={24} />
+          </button>
+        </Tooltip>
       </div>
     </div>
   );

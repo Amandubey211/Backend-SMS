@@ -9,7 +9,7 @@ import { handleError } from "../../Common/Alerts/errorhandling.action";
 
 export const fetchAllReceipts = createAsyncThunk(
   "receipts/fetchAllReceipts",
-  async ({ page, limit,search}, { dispatch, rejectWithValue, getState }) => {
+  async ({ page, limit,search,isCancel}, { dispatch, rejectWithValue, getState }) => {
     const say = getAY(); // Ensure academic year is retrieved
     const getRole = getUserRole(getState);
     dispatch(setShowError(false));
@@ -17,7 +17,7 @@ export const fetchAllReceipts = createAsyncThunk(
     try {
     
 
-      const response = await getData(`/${getRole}/all/receipt`,{ page, limit,search});
+      const response = await getData(`/${getRole}/all/receipt`,{ page, limit,search,isCancel});
 
       if (response?.data) {
         return  response

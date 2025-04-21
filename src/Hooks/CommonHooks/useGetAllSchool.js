@@ -2,14 +2,20 @@
 
 import { useState, useEffect } from "react";
 import { getData } from "../../services/apiEndpoints";
+
 const useGetAllSchools = () => {
   const [schoolList, setSchoolList] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const fetchSchools = async () => {
+    setLoading(true);
     try {
       const response = await getData(`/student_diwan/get_schools`);
-      return setSchoolList(response.schools);
+      setSchoolList(response.schools);
     } catch (error) {
       console.error("Error fetching schools:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -17,7 +23,7 @@ const useGetAllSchools = () => {
     fetchSchools();
   }, []);
 
-  return { schoolList, fetchSchools };
+  return { schoolList, loading, fetchSchools };
 };
 
 export default useGetAllSchools;

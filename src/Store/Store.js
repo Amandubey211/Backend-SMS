@@ -17,6 +17,9 @@ import academicYearReducer from "./Slices/Common/AcademicYear/academicYear.slice
 import financialYearReducer from "./Slices/Common/FinancialYear/financialYear.slice";
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
 import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
+import studentSignUpReducer, {
+  studentSignupMiddleware,
+} from "./Slices/Common/User/actions/studentSignupSlice";
 
 // admin
 import adminDashboardReducer from "./Slices/Admin/Dashboard/adminDashboardSlice";
@@ -26,8 +29,8 @@ import budgetReducer from "./Slices/Finance/budget/budget.slice";
 import entityReducer from "./Slices/Finance/entitie/entity.slice";
 import entityRevenueReducer from "./Slices/Finance/EntityRevenue/EntityRevenue.slice";
 import teacherReducer from "./Slices/Admin/Class/Teachers/teacherSlice";
-import classReducer from "./Slices/Admin/Class/reducer/classSlice"; 
-import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice"; 
+import classReducer from "./Slices/Admin/Class/reducer/classSlice";
+import semesterReducer from "./Slices/Admin/Class/Semester/semesterSlice";
 
 import subjectReducer from "./Slices/Admin/Class/Subject/subjectSlice";
 import subjectGradesReducer from "./Slices/Admin/Class/grades/gradesSlice";
@@ -101,6 +104,7 @@ import parentSemesterReducer from "./Slices/Parent/Semesters/parentSemesterSlice
 import parentChildGradesReducer from "./Slices/Parent/Grades/parentGradeSlice";
 // teacher
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
+import { saveDraft } from "../Utils/signupDraft";
 
 // Persist configuration for the Auth slice
 
@@ -169,6 +173,7 @@ const commonReducer = combineReducers({
   financialYear: financialYearReducer,
   branchs: branchReducer,
   sendEmail: sendEmailReducer,
+  studentSignup: studentSignUpReducer,
 });
 
 const AdminReducer = combineReducers({
@@ -210,8 +215,8 @@ const AdminReducer = combineReducers({
   entity: entityReducer,
   entityRevenue: entityRevenueReducer,
   budget: budgetReducer,
-  payroll:payrollReducer,
-  operationalExpenses:operationalExpensesReducer,
+  payroll: payrollReducer,
+  operationalExpenses: operationalExpensesReducer,
   // student_fees: studentFeesReducer,
 
   subject_grades: subjectGradesReducer,
@@ -285,9 +290,17 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(listenerMiddleware.middleware), // Thunk is automatically included by Redux Toolkit
+    }).concat(listenerMiddleware.middleware, studentSignupMiddleware), // Thunk is automatically included by Redux Toolkit
 });
-
+let prevDraft = store.getState().common.studentSignup;
+store.subscribe(() => {
+  const nextDraft = store.getState().common.studentSignup;
+  if (nextDraft !== prevDraft) {
+    /* write to localStorage on every change */
+    saveDraft(nextDraft);
+    prevDraft = nextDraft;
+  }
+});
 const persistor = persistStore(store);
 
 export { store, persistor };

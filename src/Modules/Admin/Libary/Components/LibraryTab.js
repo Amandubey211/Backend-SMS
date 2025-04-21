@@ -1,13 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Skeleton,
-  Select,
-  Tooltip,
-  Modal,
-  Button,
-  Badge,
-} from "antd";
+import { Skeleton, Select, Tooltip, Modal, Button, Badge } from "antd";
 import { FaBookOpen } from "react-icons/fa";
 import { FiEdit2, FiTrash2, FiEye, FiRefreshCcw } from "react-icons/fi";
 import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction";
@@ -18,12 +11,15 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import BookForm from "./BookForm";
 import CategorySidebar from "./CategorySidebar";
 import DeleteModal from "../../../../Components/Common/DeleteModal";
-import { setCurrentPage, setFilters } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
+import {
+  setCurrentPage,
+  setFilters,
+} from "../../../../Store/Slices/Admin/Library/LibrarySlice";
 import { fetchBooksDetailsThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { useTranslation } from "react-i18next";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { deleteCategoryThunk } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
-import Pagination from '../../../../Components/Common/pagination';
+import Pagination from "../../../../Components/Common/pagination";
 
 const { Option } = Select;
 
@@ -130,7 +126,6 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
     setPage(newPage);
   };
 
-
   const handleLimitChange = (newLimit) => {
     setLimit(newLimit);
     dispatch(setCurrentPage(1));
@@ -179,9 +174,12 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
     <div className="w-full">
       {/* TOP ROW: Categories on left; Filter controls on right */}
       <div className="flex items-center justify-between w-full gap-2">
-        {/* Left: Category badges in a scroll container */}
-        <div className="flex-1 relative">
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap pr-6 pt-3">
+        {/* Left: Category badges with a reduced width scroll and subtle blur on the right */}
+        <div
+          className="flex-1 relative overflow-x-auto whitespace-nowrap pb-3 pt-3 no-scrollbar"
+          style={{ maxWidth: "calc(100vw - 550px)" }}
+        >
+          <div className="flex gap-2">
             <Badge count={getBookCount(null)} showZero style={badgeStyle}>
               <button
                 className={getBubbleClasses(null)}
@@ -191,7 +189,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
               </button>
             </Badge>
             {categories?.map((cat) => (
-              <div key={cat._id} className="relative group inline-block">
+              <div key={cat._id} className="relative group inline-block z-30">
                 <Badge
                   count={getBookCount(cat._id)}
                   showZero
@@ -247,17 +245,20 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
                 )}
               </div>
             ))}
-            <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK_CATEGORY}>
-              <button
-                onClick={handleAddCategory}
-                className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-pink-600 rounded-full text-sm shrink-0"
-              >
-                <span className="mr-1">+</span> {t("Add Category")}
-              </button>
-            </ProtectedAction>
           </div>
-          <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent" />
+          {/* Right-side overlay with a subtle blur effect */}
+          <div className="pointer-events-none absolute top-0 right-0 h-full w-8 bg-gradient-to-l from-white to-transparent backdrop-blur-sm" />
         </div>
+
+        {/* "Add Category" button always visible */}
+        <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK_CATEGORY}>
+          <button
+            onClick={handleAddCategory}
+            className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-pink-600 rounded-full text-sm shrink-0"
+          >
+            <span className="mr-1">+</span> {t("Add Category")}
+          </button>
+        </ProtectedAction>
 
         {/* Right: Class select filter and Reset button */}
         <div className="flex-shrink-0 flex items-center gap-2">
@@ -294,7 +295,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredBooks?.length ? (
           <div className="grid grid-cols-3 gap-4 w-full">
-            {filteredBooks?.map((book) => (
+            {filteredBooks?.reverse()?.map((book) => (
               <BookCard key={book._id} book={book} />
             ))}
           </div>
@@ -312,8 +313,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
       </div>
 
       {/* PAGINATION */}
-      {!loading && totalPages > 1 && (
-        <div className="flex justify-end mt-4">
+      {!loading && totalPages > 0 && (
           <Pagination
             page={page}
             totalPages={totalPages}
@@ -323,7 +323,6 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
             setLimit={setLimit}
             t={t}
           />
-        </div>
       )}
 
       {/* SIDEBAR: BookForm */}

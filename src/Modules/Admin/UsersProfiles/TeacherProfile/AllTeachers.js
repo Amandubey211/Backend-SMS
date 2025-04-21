@@ -203,7 +203,6 @@ const AllTeachers = () => {
                 )}
               </div>
 
-              {/* Floating Action Button */}
               <ProtectedAction requiredPermission={PERMISSIONS.ADD_TEACHER}>
                 <button
                   onClick={() => handleSidebarOpen("addTeacher")}

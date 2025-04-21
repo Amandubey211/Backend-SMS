@@ -76,7 +76,7 @@ const librarySlice = createSlice({
     },
     setCurrentPage(state, action) {
       state.currentPage = action.payload;
-    },    
+    },
   },
   extraReducers: (builder) => {
     // ----------------- BOOKS ------------------
@@ -199,7 +199,7 @@ const librarySlice = createSlice({
         state.categoriesLoading = false;
         state.addCategorySuccess = true;
         // Add the new category to the store
-        state.categories.push(action.payload);
+        state.categories.push(action.payload || {});
       })
       .addCase(addCategoryThunk.rejected, (state, action) => {
         state.categoriesLoading = false;

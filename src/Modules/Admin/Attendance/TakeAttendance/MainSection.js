@@ -14,6 +14,7 @@ import {
 } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceThunks";
 import { setSelectedDate } from "../../../../Store/Slices/Admin/Class/Attendence/attendanceSlice";
 import toast from "react-hot-toast";
+import { Skeleton } from "antd";
 
 const MainSection = () => {
   const dispatch = useDispatch();
@@ -26,8 +27,6 @@ const MainSection = () => {
   const [isSectionInvalid, setIsSectionInvalid] = useState(false);
 
   const handleMarkAttendance = async () => {
-    console.log("--", attendanceData);
-
     // Validate sectionId before dispatching the markAttendance action
     if (!filters.sectionId) {
       toast.error("Please select a section first.");
@@ -73,23 +72,14 @@ const MainSection = () => {
       <div className="w-8/12 p-4 bg-white border-r flex flex-col">
         <div className="flex-grow">
           <Filters isSectionInvalid={isSectionInvalid} />
-          {loading ? (
-            <div className="h-96 flex justify-center items-center">
-              <Spinner />
-            </div>
-          ) : error ? (
-            <NoDataFound title="Attendance" />
-          ) : (
-            <AttendanceTable students={attendanceData} />
-          )}
+          <AttendanceTable students={attendanceData} />
         </div>
       </div>
 
       {/* Adjust the layout here */}
       <div className="w-4/12 p-4 bg-white flex flex-col space-y-4">
         {/* Keep enough vertical space for the stats below */}
-        <Header onSubmit={handleMarkAttendance} loading={loading} />
-
+        <Header onSubmit={handleMarkAttendance} />
         <div className="flex justify-center">
           <CustomCalendar
             selectedDate={selectedDate}
@@ -97,7 +87,6 @@ const MainSection = () => {
           />
         </div>
 
-        {/* Ensure enough space for stats */}
         <div className="flex-grow overflow-auto p-3  w-full">
           <Statistics />
         </div>

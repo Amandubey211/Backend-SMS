@@ -36,7 +36,7 @@ const AttachmentsUpload = () => {
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>
             <SingleFileUpload
-              label="Medical Report"
+              label="Medical Report / Certificate"
               name="attachments.optional.medicalReport"
             />
           </Col>

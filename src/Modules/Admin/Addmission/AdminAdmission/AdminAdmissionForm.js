@@ -202,7 +202,7 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
                 size="large"
                 htmlType="submit"
                 style={{
-                  background: "linear-gradient(to right, #ff0080, #ff99cc)",
+                  background: "linear-gradient(to right, #C83B62, #7F35CD)",
                   border: "none",
                   color: "#ffffff",
                 }}

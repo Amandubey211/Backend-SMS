@@ -137,7 +137,8 @@ export const createGroup = createAsyncThunk(
 
       if (response.status) {
         toast.success("Group added successfully!");
-        return response.data;
+        dispatch(fetchGroupsByClass(groupData.classId));
+        return response?.data?.classId?._id;
       } else {
         toast.error(response.message || "Failed to add group.");
         return rejectWithValue(response);

@@ -60,7 +60,7 @@ export const markAttendance = createAsyncThunk(
         `${baseUrl}/${getRole}/attendance/mark?say=${say}`,
         { ...attendanceData, date: formattedDate }
       );
-      toast.success("Attendance mark successfully");
+      toast.success("Attendance marked ");
       dispatch(setShowError(false));
       return response; // Return the response data
     } catch (error) {

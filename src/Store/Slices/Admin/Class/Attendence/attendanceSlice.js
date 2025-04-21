@@ -11,13 +11,14 @@ const initialState = {
   stats: {},
   monthlyAttendance: [], // Added monthly attendance state
   filters: {
-    sectionId: "",
-    groupId: "",
+    sectionId: null,
+    groupId: null,
     month: new Date().getMonth() + 1, // Default to the current month
     filter: "",
   },
   selectedDate: new Date(),
   loading: false,
+  markingAttendance: false,
   error: null,
 };
 
@@ -33,8 +34,8 @@ const attendanceSlice = createSlice({
     },
     resetFilters: (state) => {
       state.filters = {
-        sectionId: "",
-        groupId: "",
+        sectionId: null,
+        groupId: null,
         month: new Date().getMonth() + 1, // Reset to current month
         filter: "",
       };
@@ -79,7 +80,7 @@ const attendanceSlice = createSlice({
         (state, action) => {
           state.loading = false;
           state.attendanceData = action.payload.attendanceList || [];
-          state.stats = action.payload.attendanceStats || {};
+          // state.stats = action.payload.attendanceStats || {};
         }
       )
       .addCase(
@@ -92,14 +93,14 @@ const attendanceSlice = createSlice({
 
       // Mark attendance
       .addCase(markAttendance.pending, (state) => {
-        state.loading = true;
+        state.markingAttendance = true;
         state.error = null;
       })
       .addCase(markAttendance.fulfilled, (state) => {
-        state.loading = false;
+        state.markingAttendance = false;
       })
       .addCase(markAttendance.rejected, (state, action) => {
-        state.loading = false;
+        state.markingAttendance = false;
         state.error = action.payload;
       })
 

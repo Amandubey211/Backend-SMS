@@ -70,7 +70,8 @@ export const addBookThunk = createAsyncThunk(
       );
       toast.success("Book added successfully!");
       dispatch(toggleSidebar());
-      dispatch(fetchBooksDetailsThunk());
+      // const pageno = getState().library.currentPage || 1;
+      dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
       return response?.book;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -95,7 +96,7 @@ export const updateBookThunk = createAsyncThunk(
         }
       );
       toast.success("Book updated successfully!");
-      dispatch(fetchBooksDetailsThunk());
+      dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
       return response?.book;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -116,7 +117,7 @@ export const deleteBookThunk = createAsyncThunk(
       );
       if (response.success) {
         toast.success("Book deleted successfully!");
-        dispatch(fetchBooksDetailsThunk());
+        dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
         return bookId;
       } else {
         toast.error("Something went wrong");
@@ -136,10 +137,16 @@ export const fetchBookIssuesThunk = createAsyncThunk(
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/${getRole}/all/bookIssue?say=${say}&page=${page}&limit=${limit}`);
+      const response = await getData(
+        `/${getRole}/all/bookIssue?say=${say}&page=${page}&limit=${limit}`
+      );
       return {
         issues: response?.books || [],
-        pagination: response?.pagination || { totalItems: 0, totalPages: 1, currentPage: 1 },
+        pagination: response?.pagination || {
+          totalItems: 0,
+          totalPages: 1,
+          currentPage: 1,
+        },
       };
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -185,7 +192,7 @@ export const fetchCategoriesThunk = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       // GET request to /:role/book/category
-      const response = await getData(`/${getRole}/book/category?say=${say}`);
+      const response = await getData(`/admin/book/category?say=${say}`);
       return response?.data || []; // 'data' property from the backend response
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

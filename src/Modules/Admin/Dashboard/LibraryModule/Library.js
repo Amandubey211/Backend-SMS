@@ -124,7 +124,7 @@ const Library = () => {
               categories={book?.categories} // Pass the categories array here
               copies={book?.copies || 0}
               author={book?.author || t("Unknown")}
-              className={book?.className || t("No  Class")}
+              className={book?.className}
               role={role}
             />
           ))
