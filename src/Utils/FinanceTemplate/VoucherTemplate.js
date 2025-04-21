@@ -14,8 +14,12 @@ const VoucherTemplate = forwardRef((props, ref) => {
     isCancel,
     createdAt,
     remark,
-    status,
     entityDetails,
+    chequeDate,
+    chequeNumber,
+    paymentType,
+    paymentDate,
+    status,
   } = data;
 
   let totalAmount = 0;
@@ -98,9 +102,7 @@ const VoucherTemplate = forwardRef((props, ref) => {
       <div className="flex flex-row items-center border border-gray-300 text-xs ">
         <div className="flex flex-col items-start p-4 w-[60%]">
            <p>Payment Details</p>
-           <div className="w-full h-[90%]">
-
-           </div>
+          
 
         </div>
         <div className="flex flex-col items-start p-4 w-[40%] border-l-2 border-gray-300">

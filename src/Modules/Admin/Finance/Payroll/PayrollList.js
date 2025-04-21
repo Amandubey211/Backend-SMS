@@ -16,6 +16,8 @@ import {
   updatePayroll,
 } from "../../../../Store/Slices/Finance/payroll/payroll.thunk";
 import { isCancel } from "axios";
+import Sidebar from "../../../../Components/Common/Sidebar";
+import EditPayRoll from "./EditPayRoll";
 
 const PayrollList = () => {
   const dispatch = useDispatch();
@@ -31,6 +33,7 @@ const PayrollList = () => {
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [selectedIds, setSelectedIds] = useState([]);
   const [isCancel, setIsCancel] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(
@@ -116,7 +119,7 @@ const PayrollList = () => {
 
             {["pending", "hold", "partial"].includes(record.status) &&
               !record?.isCancel && (
-                <button title="Edit">
+                <button title="Edit" onClick={()=>{setSelectedInvoice(record);setIsModalVisible(true)}}>
                   <MdOutlineEdit size={20} />
                 </button>
               )}
@@ -312,6 +315,9 @@ const PayrollList = () => {
             </div>
           </div>
         )}
+        <Sidebar title="Update Payroll" width="70%" isOpen={isModalVisible} onClose={() => setIsModalVisible(false)}>
+          <EditPayRoll data= {selectedInvoice}/>
+        </Sidebar>
       </AdminDashLayout>
     </Layout>
   );

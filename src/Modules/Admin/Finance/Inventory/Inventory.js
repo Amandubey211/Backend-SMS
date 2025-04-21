@@ -184,7 +184,7 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
             {[{ title: "Total Inventory Items", value: `${total || 0} Items`, icon: <FiBox /> },
             { title: "Low-Stock Alerts", value: `${otherData?.totalLowStockItems?.length || 0} Items`, icon: <FaStackOverflow /> },
             { title: "Expiring Soon Item", value: `${otherData?.expiringSoonItems?.length || 0} Items`, icon: <MdCancelPresentation /> },
-            { title: "Total Asset Value", value: `${otherData?.totalAssestPrice || 0} ${schoolCurrency}`, icon: <BiMoneyWithdraw /> }
+            { title: "Total Asset Value", value: `${otherData?.totalAssestPrice == "undefined" ? 0 : otherData?.totalAssestPrice || 0} ${schoolCurrency}`, icon: <BiMoneyWithdraw /> }
             ].map((item, index) => (
               <>
               <div

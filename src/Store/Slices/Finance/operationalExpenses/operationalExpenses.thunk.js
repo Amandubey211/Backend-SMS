@@ -74,12 +74,12 @@ export const updateOperationalExpenses  = createAsyncThunk(
         })
       ); 
      }else{
-      toast.error(response.message);
+      toast.error("Something is Wrong");
      }
       return response;
     } catch (error) {
       toast.dismiss()
-      toast.error('operationalExpenses  not updated');
+      toast.error('Something is Wrong');
       return handleError(error, dispatch, rejectWithValue);
     }
   }

@@ -17,7 +17,7 @@ export default function BankReconciliationGraph() {
 
   useEffect(() => {
     dispatch(fetchReconciliationGraph()).then((action) => {
-      setGraphData(action.payload.data || []);
+      setGraphData(action.payload?.data || []);
     });
   }, [dispatch]);
 

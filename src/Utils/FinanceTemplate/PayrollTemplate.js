@@ -16,6 +16,11 @@ const PayrollTemplate = forwardRef((props, ref) => {
     remark,
     status,
     staffDetails,
+    chequeDate,
+    chequeNumber,
+    paymentType,
+    paymentDate,
+
   } = data;
 
   let totalAmount = 0;
@@ -106,9 +111,12 @@ const PayrollTemplate = forwardRef((props, ref) => {
       <div className="flex flex-row items-center border border-gray-300 text-xs ">
         <div className="flex flex-col items-start p-4 w-[60%]">
            <p>Payment Details</p>
-           <div className="w-full h-[90%]">
-
-           </div>
+           {status == "paid" && <div className="my-4 border-t border-gray-500">
+          <p><strong>Payment Date :</strong> {paymentDate?.slice(0,10)}</p>
+          <p><strong>Payment Method :</strong> {paymentType}</p>
+         {chequeNumber&& <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
+          {chequeDate &&<p><strong>Cheque Date:</strong> {chequeDate}</p>}
+        </div>}
 
         </div>
         <div className="flex flex-col items-start p-4 w-[40%] border-l-2 border-gray-300">
