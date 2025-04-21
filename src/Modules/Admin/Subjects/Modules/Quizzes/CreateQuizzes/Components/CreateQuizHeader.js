@@ -21,16 +21,18 @@ const CreateQuizHeader = ({ onSave, isEditing, activeTab }) => {
 
       {activeTab === "instructions" && (
         <div className="flex items-center space-x-2">
-          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_QUIZ}>
-            <button
-              onClick={() => onSave(true)} // attempt to Save & Publish
-              className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
-            >
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
-                {isEditing ? "Update & Publish" : "Save & Publish"}
-              </span>
-            </button>
-          </ProtectedAction>
+          {isEditing && (
+            <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_QUIZ}>
+              <button
+                onClick={() => onSave(true)} // attempt to Save & Publish
+                className="flex-grow rounded-md py-2 px-4 text-center bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200 transition"
+              >
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-rose-500 to-indigo-500">
+                  {isEditing ? "Update & Publish" : "Save & Publish"}
+                </span>
+              </button>
+            </ProtectedAction>
+          )}
 
           <ProtectedAction requiredPermission={PERMISSIONS.CREATE_QUIZ}>
             <button
