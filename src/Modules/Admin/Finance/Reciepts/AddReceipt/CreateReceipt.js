@@ -142,7 +142,8 @@ const CreateReceipt = () => {
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 rounded-lg shadow-lg h-[2.5rem]" onClick={()=>searchInvoice()}> <IoSearch /> Search</button>
           </div>
         </div>
-        {invoiceData ? <Tabs className="mt-4">
+        {invoiceData ?
+         <Tabs className="mt-4">
           <TabPane tab="Invoice Details" key="1">
           <div className="flex flex-col">
           <div>

@@ -101,15 +101,17 @@ export const updatePayroll  = createAsyncThunk(
           isCancel:false
         })
       ); 
+
      }else{
-      toast.error(response.message);
+      toast.error('Payroll  not updated');
+
      }
       
       fetchPayroll ()
       return response;
     } catch (error) {
       toast.dismiss()
-      toast.error('Payroll  not updated');
+      toast.error('Something is Wrong');
       return handleError(error, dispatch, rejectWithValue);
     }
   }

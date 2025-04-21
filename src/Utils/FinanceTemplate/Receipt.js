@@ -84,7 +84,6 @@ const ReceiptTemplate = forwardRef((props, ref) => {
           <p><strong>Payment Date :</strong> {paymentDate?.slice(0,10)}</p>
           <p><strong>Payment Type :</strong> {paymentType}</p>
           <p><strong>Paid By:</strong> {paidBy || "Self"}</p>
-         {onlineTransactionId && <p><strong>Online Transaction ID: </strong> {onlineTransactionId}</p>}
          {chequeNumber&& <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
           {chequeDate &&<p><strong>Cheque Date:</strong> {chequeDate}</p>}
         </div>
