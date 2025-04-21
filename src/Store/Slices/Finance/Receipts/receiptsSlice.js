@@ -4,11 +4,13 @@ import {
   createReceipt,
   cancelReceipt,
   fetchReceiptCardData,
+  fetchAllReceiptsReconciliation,
 } from "./receiptsThunks";
 
 const initialState = {
   receipts: [], 
-  receiptsSummary: {}, 
+  receiptsSummary: {},
+  totalCancelRecords:0,
   totalPages:0,
   totalRecords:0,
   loading: false, 
@@ -45,8 +47,25 @@ const receiptsSlice = createSlice({
         state.receipts = action.payload.data || [];
         state.totalPages = action.payload.totalPages || 0;
         state.totalRecords = action.payload.totalRecords || 0;
+        state.totalCancelRecords = action.payload.totalCancelRecords || 0;
       })
       .addCase(fetchAllReceipts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch receipts.";
+      })
+
+       // Fetch All Receipts
+       .addCase(fetchAllReceiptsReconciliation.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllReceiptsReconciliation.fulfilled, (state, action) => {
+        state.loading = false;
+        state.receipts = action.payload.data || [];
+        state.totalPages = action.payload.totalPages || 0;
+        state.totalRecords = action.payload.totalRecords || 0;
+      })
+      .addCase(fetchAllReceiptsReconciliation.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch receipts.";
       })

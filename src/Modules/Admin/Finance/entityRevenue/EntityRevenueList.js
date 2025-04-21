@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Input, Tag, Checkbox } from "antd";
+import { Table, Input, Tag, Checkbox, Select, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { SearchOutlined } from "@ant-design/icons";
+import { CopyOutlined, SearchOutlined } from "@ant-design/icons";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FaFileInvoice } from "react-icons/fa";
+import { FaFileInvoice, FaHistory } from "react-icons/fa";
 import { MdCancel, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
-import { fetchAllEntityRevenue } from "../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
+import { cancelEntityRevenue, deleteEntityRevenue, fetchAllEntityRevenue } from "../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
+import toast from "react-hot-toast";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
+  const [isCancel,setIsCancel] = useState(false);
   // Get data from Redux
   const { allEntityRevenue:incomes, loading, totalRecords, totalPages, currentPage } = useSelector(
     (state) => state.admin.entityRevenue
@@ -23,8 +25,8 @@ const SummaryRevenueList = () => {
   const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
 
   useEffect(() => {
-    dispatch(fetchAllEntityRevenue({ page: currentPage || 1, search: searchText, limit: computedPageSize }));
-  }, [dispatch, currentPage, computedPageSize]);
+    dispatch(fetchAllEntityRevenue({ page: currentPage || 1, search: searchText, limit: computedPageSize,isCancel }));
+  }, [dispatch, currentPage, computedPageSize,isCancel]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -37,7 +39,26 @@ const SummaryRevenueList = () => {
       title: "Invoice",
       dataIndex: "InvoiceNumber",
       key: "InvoiceNumber",
-      render: (InvoiceNumber) => `${InvoiceNumber}` || "N/A",
+      render: (InvoiceNumber) => {
+        const copyToClipboard = () => {
+          navigator.clipboard.writeText(InvoiceNumber);
+          toast.success("Invoice number copied!");
+        };
+    
+        return InvoiceNumber ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span>{InvoiceNumber}</span>
+            <Tooltip title="Copy">
+              <CopyOutlined
+                onClick={copyToClipboard}
+                style={{ cursor: "pointer", color: "#1890ff" }}
+              />
+            </Tooltip>
+          </div>
+        ) : (
+          "N/A"
+        );
+      },
     },
     {
       title: "Entity",
@@ -79,9 +100,12 @@ const SummaryRevenueList = () => {
           setInvoiceVisible(true)
         }}><FaFileInvoice size={20}/></button>
        {
-        record?.history?.length > 0 && record?.paymentStatus == "Unpaid" ?
-         <button title="Cancel"><MdCancel size={20}/> </button>:''
+        record?.history?.length > 0 && record?.paymentStatus == "Unpaid" && !record?.isCancel ?
+         <button title="Cancel" onClick={()=>dispatch(cancelEntityRevenue(record))}><MdCancel size={20}/> </button>:''
        }
+       {
+        record?.isCancel ?
+        <Tag color='red'>Canceled</Tag>   :null    }
         </div>
         );
       },
@@ -153,6 +177,7 @@ const navigate = useNavigate();
       <AdminDashLayout>
         <div className="p-4">
          <div className="flex flex-row items-center justify-between">
+          <div>
          <Input
             placeholder="Search by Name , Email..."
             prefix={<SearchOutlined />}
@@ -161,8 +186,18 @@ const navigate = useNavigate();
             allowClear
             style={{ width: 300, marginBottom: 16 }}
           />
+           <Select
+                className="px-1 w-[10rem] mb-4"
+                value={isCancel}
+                onChange={(value) => setIsCancel(value)}
+                placeholder="Select Status"
+              >
+                <Select.Option value={false}>Active</Select.Option>
+                <Select.Option value={true}>Canceled</Select.Option>
+              </Select>
+              </div>
           <div className="flex flex-row items-center gap-4">
-          {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>console.log(selectedIds)}>Delete</button>}
+          {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>dispatch(deleteEntityRevenue((selectedIds)))}>Delete <MdDeleteOutline /></button>}
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/entity/add/revenue")}>Add New Invoice</button>
           </div>
          </div>
@@ -187,11 +222,11 @@ const navigate = useNavigate();
               showTotal: () =>
                 `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
               onChange: (page, pageSize) => {
-                dispatch(fetchAllEntityRevenue({ page, search: searchText, limit:pageSize }));
+                dispatch(fetchAllEntityRevenue({ page, search: searchText, limit:pageSize,isCancel }));
               },
               onShowSizeChange: (current, size) => {
                 setComputedPageSize(size); // Update local state
-                dispatch(fetchAllEntityRevenue({ page: 1, search: searchText, limit: size }));
+                dispatch(fetchAllEntityRevenue({ page: 1, search: searchText, limit: size ,isCancel}));
               },
             }}
             rowKey="_id"
@@ -209,7 +244,7 @@ const navigate = useNavigate();
                         {/* Centered content */}
                         <div
                           ref={popupRef}
-                          className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                          className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {/* Close Button */}
@@ -229,8 +264,18 @@ const navigate = useNavigate();
                           </div>
         
                           {/* Hidden container for PDF generation */}
-                          <div >
-                            <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                          <div className="flex flex-row w-full gap-2">
+                          <div className="w-[80%]">
+                          <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                          </div>
+                          <div className="w-[20%]">
+                          <div className="px-4 py-2  font-semibold rounded-md  flex items-center justify-center mb-2 gap-2" >History <FaHistory /></div>
+                          <div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice(selectedInvoice)}}>
+                            {selectedInvoice?.generateDate?.slice(0,10)}
+                            <p className="text-xs">currency Verion </p>
+                             </div>
+                            {selectedInvoice?.history?.map((i)=>(<div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice(i?.oldData)}}>{i?.updatedAt?.slice(0,10)}</div>))}
+                          </div>
                           </div>
                         </div>
                       </div>

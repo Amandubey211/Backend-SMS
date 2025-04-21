@@ -19,47 +19,7 @@ import { Descriptions } from "antd";
  */
 const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
   const { values, setFieldValue, resetForm, isSubmitting } = useFormikContext();
-  const subCategories = {
-    studentFee: [
-      { label: "Tuition Fees", value: "tuition_fees" },
-      { label: "Transport Fees", value: "transport_fees" },
-      { label: "Hostel Fees", value: "hostel_fees" },
-      { label: "Exam Fees", value: "exam_fees" },
-      { label: "Event Fees", value: "event_fees" },
-      { label: "Certificate Fees", value: "certificate_fees" },
-      { label: "Meal Fees", value: "meal_fees" },
-      { label: "Application Fees", value: "application_fees" },
-      { label: "Other", value: "other" },
-    ],
-    FacilityRevenue: [
-      { label: "Rent Income", value: "rent_income" },
-      { label: "Exam Center Fees", value: "exam_center_fees" },
-      { label: "Parking Fees", value: "parking_fees" },
-      { label: "Other", value: "other" },
-    ],
-    service_based_revenue: [
-      { label: "Stationery Fees", value: "stationery_fees" },
-      { label: "Other Facility Fees", value: "other_facility_fees" },
-      { label: "Subscription Fees", value: "subscription_fees" },
-      { label: "Workshop/Training Fees", value: "workshop_training_fees" },
-      { label: "Canteen Profit", value: "canteen_profit" },
-      { label: "Other", value: "other" },
-    ],
-    community_externalaffair_revenue: [
-      { label: "Donations", value: "donations" },
-      { label: "Fundraising/Sponsorships", value: "fundraising_sponsorships" },
-      { label: "Other", value: "other" },
-    ],
-    financial_investment_revenue: [
-      { label: "Investments", value: "investments" },
-    ],
-    Penalties: [
-      { label: "Penalties", value: "penalties" },
-    ],
-    Other: [
-      { label: "Other", value: "other" },
-    ],
-  };
+  
   
   // Auto-calculate sub_amount (total_amount) and final_amount in real-time
   useEffect(() => {
@@ -194,30 +154,12 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
             <>
               {values.lineItems.map((item, index) => (
                 <div key={index} className="grid grid-cols-12 gap-2 items-center mb-6">
-                  <div className="col-span-2">
-                    <SelectInput
-                      name={`lineItems.${index}.revenueType`}
-                      label="Revenue Type"
-                      options={[
-                        { label: "Student Fee", value: "studentFee" },
-                        { label: "Facility Revenue", value: "FacilityRevenue" },
-                        { label: "Service-Based Revenue", value: "service_based_revenue" },
-                        { label: "Community & External Affairs Revenue", value: "community_externalaffair_revenue" },
-                        { label: "Financial Investment Revenue", value: "financial_investment_revenue" },
-                        { label: "Penalties", value: "Penalties" },
-                        { label: "Other", value: "Other" },
-                      ]}
-                      required={true}
-                      readOnly={readOnly}
-                      disabled={readOnly}
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <SelectInput
-                      name={`lineItems.${index}.subCategory`}
-                      label="Sub Category"
-                      options={subCategories[item.revenueType] || []} // Dynamically get options based on selected revenue type
-                      required={true}
+                  <div className="col-span-3">
+                    <TextInput
+                      name={`lineItems.${index}.category`}
+                      label="Category"
+                      type="text"
+                      placeholder="Enter Category"
                       readOnly={readOnly}
                       disabled={readOnly}
                     />

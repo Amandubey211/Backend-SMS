@@ -40,7 +40,7 @@ const OperationalExpensesGraph = () => {
 
   return (
     <EntityRevenueGraph
-      title="Operational Expense"
+      title="Operational Expenses"
       viewMode={viewMode}
       selectedMonth={selectedMonth}
       selectedYear={selectedYear}

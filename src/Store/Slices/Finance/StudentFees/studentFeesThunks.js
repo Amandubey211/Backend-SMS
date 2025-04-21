@@ -126,8 +126,8 @@ export const createStudentFeeRecordForClass = createAsyncThunk(
 );
 
 
-export const updateStudentFee = createAsyncThunk(
-  "studentFees/updateStudentFee",
+export const cancelStudentFee = createAsyncThunk(
+  "studentFees/cancelStudentFee",
 
   async (data, { rejectWithValue, dispatch, getState }) => {
 
@@ -135,13 +135,13 @@ export const updateStudentFee = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await putData(
-        `/${getRole}/revenue/update/student/fee/${data.feeId}`,
-        data
+        `/${getRole}/revenue/cancel/student/fee/${data._id}`
       );
       if (response.success) {
-        toast.success('Data update successfully!')
+        toast.success(response.message);
+        dispatch(fetchAllStudentFee({ page: 1, limit: 10,search:'',isCancel:false }));
       } else {
-        toast.error('Something is wrong')
+        toast.error(response.message)
       }
       return response;
     } catch (error) {
@@ -161,10 +161,15 @@ export const deleteStudentFees = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       // Since DELETE requests typically don't have a body, use customRequest to send data
-      const response = await customRequest('delete', `/${getRole}/revenue/delete/student/fee`,
+      const response = await customRequest('DELETE', `/${getRole}/revenue/delete/student/fee`,
         data
       );
-
+      if (response.success) {
+        toast.success(response.message);
+        dispatch(fetchAllStudentFee({ page: 1, limit: 10,search:'',isCancel:false }));
+      } else {
+        toast.error(response.message)
+      }
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

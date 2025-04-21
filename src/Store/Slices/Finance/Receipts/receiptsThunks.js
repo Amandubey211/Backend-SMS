@@ -30,6 +30,46 @@ export const fetchAllReceipts = createAsyncThunk(
     }
   }
 );
+export const fetchAllReceiptsReconciliation = createAsyncThunk(
+  "receipts/fetchAllReceiptsReconciliation",
+  async ({ page, limit,search,pending}, { dispatch, rejectWithValue, getState }) => {
+    const say = getAY(); // Ensure academic year is retrieved
+    const getRole = getUserRole(getState);
+    dispatch(setShowError(false));
+    try {
+      const response = await getData(`/${getRole}/all/receipt/reconciliation`,{ page, limit,search,pending});
+      if (response?.data) {
+        return  response
+      } else {
+       
+        return rejectWithValue(response?.message || "Failed to fetch receipts.");
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const fetchReconciliationGraph = createAsyncThunk(
+  "receipts/fetchReconciliationGraph",
+  async (params, { dispatch, rejectWithValue, getState }) => {
+    const say = getAY(); // Ensure academic year is retrieved
+    const getRole = getUserRole(getState);
+    dispatch(setShowError(false));
+    try {
+      const response = await getData(`/${getRole}/reconciliation/graph/data`,params);
+      if (response?.success) {
+        return  response
+      } else {
+       
+         rejectWithValue(response?.message || "Failed to fetch receipts.");
+        return []
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 
 
 
@@ -105,6 +145,26 @@ export const cancelReceipt = createAsyncThunk(
       }
     } catch (error) {
       return rejectWithValue(error.message || "Error canceling receipt.");
+    }
+  }
+);
+// Cancel a receipt
+export const updateReceipt = createAsyncThunk(
+  "receipts/updateReceipt",
+  async (data, { rejectWithValue , getState}) => {
+    try {
+      const getRole = getUserRole(getState);
+      const response = await putData(`/${getRole}/update/reconciliation/${data.receiptId}`,data);
+      if (response?.success) {
+        toast.success("Submit successfully!");
+        return response.data;
+
+      } else {
+        toast.error(response?.message || "Failed");
+        return rejectWithValue(response?.message || "Failed");
+      }
+    } catch (error) {
+      return rejectWithValue(error.message || "Failed");
     }
   }
 );

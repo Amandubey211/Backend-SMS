@@ -18,6 +18,8 @@ import { TbNotebook } from "react-icons/tb";
 import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
 import { SiReadthedocs } from "react-icons/si";
+import { VscSaveAll } from "react-icons/vsc";
+
 import {
   MdInventory2,
   MdLocalLibrary,
@@ -63,13 +65,7 @@ const sidebarData = [
     roles: [ROLES.ADMIN, ROLES.TEACHER, ROLES.STAFF],
     //requiredPermission: PERMISSIONS.VIEW_CLASSES, // Added permission reference
   },
-  {
-    title: "Library",
-    icon: <BsBook />,
-    path: "/library",
-    roles: [ROLES.TEACHER, ROLES.LIBRARIAN],
-    //requiredPermission: PERMISSIONS.MANAGE_LIBRARY, // Added permission reference
-  },
+
   {
     title: "Users",
     icon: <LuUser style={{ fontSize: "1.2rem" }} />,
@@ -192,26 +188,20 @@ const sidebarData = [
     ],
   },
   {
+    title: "Library",
+    icon: <BsBook />,
+    path: "/library",
+    roles: [ROLES.TEACHER, ROLES.LIBRARIAN, ROLES.ADMIN, ROLES.STAFF],
+    //requiredPermission: PERMISSIONS.MANAGE_LIBRARY, // Added permission reference
+  },
+  {
     title: "Time Table",
     icon: <CiViewTable />,
     path: "/timetable",
     roles: [ROLES.ADMIN, ROLES.STAFF, ROLES.TEACHER, ROLES.LIBRARIAN],
     //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
   },
-  // {
-  //   title: "Time Table",
-  //   icon: <ImTable2 />,
-  //   path: "/teacher_timetable",
-  //   roles: [ROLES.TEACHER],
-  //   //requiredPermission: PERMISSIONS.MANAGE_TIMETABLE, // Added permission reference
-  // },
-  {
-    title: "Library",
-    icon: <BsBook />,
-    path: "/library",
-    roles: [ROLES.ADMIN, ROLES.STAFF],
-    //requiredPermission: PERMISSIONS.MANAGE_LIBRARY, // Added permission reference
-  },
+
   {
     title: "Admissions",
     icon: <RiUserAddLine />,
@@ -319,6 +309,13 @@ const sidebarData = [
         title: "Bank Reconciliation",
         path: "/finance/bank-reconciliation",
         icon: <SiReadthedocs style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      },
+      {
+        title: "Finance Configuration",
+        path: "/finance/configuration",
+        icon: <VscSaveAll style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },

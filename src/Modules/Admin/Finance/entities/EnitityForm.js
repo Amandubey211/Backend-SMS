@@ -1,16 +1,31 @@
-import React, { useEffect } from "react";
-import { Input, Form, Row, Col } from "antd";
+import React, { useEffect, useState } from "react";
+import { Input, Form, Row, Col, Select } from "antd";
 import { useDispatch } from "react-redux";
 import { createEntity, updateEntity } from "../../../../Store/Slices/Finance/entitie/entity.thunk";
+
+const entityTypes = [
+  "Supplier", "Service Provider", "Utility Vendor", "Partner",
+  "Maintenance", "Transport", "Contractor", "Other"
+];
+
+const paymentTerms = [
+  "On Delivery", "Advance Payment", "Net 7", "Net 15",
+  "Net 30", "Net 45", "Net 60", "End of Month (EOM)",
+  "Monthly Billing Cycle", "Quarterly Billing Cycle", "Custom Terms"
+];
 
 const EntityAddForm = ({ onClose, editData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  let viewMode = editData?.mode === "view";
+  const viewMode = editData?.mode === "view";
+  const [entityType, setEntityType] = useState("");
+  const [paymentTerm, setPaymentTerm] = useState("");
 
   useEffect(() => {
     if (editData) {
       form.setFieldsValue(editData);
+      setEntityType(editData.entityType);
+      setPaymentTerm(editData.paymentTerms);
     } else {
       form.resetFields();
     }
@@ -27,33 +42,39 @@ const EntityAddForm = ({ onClose, editData }) => {
 
   return (
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
+      {/* Section 1: Basic Info */}
+      <Row gutter={16}><h1 className="text-gray-500">Basic Info</h1></Row>
+
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             name="entityName"
             label="Entity Name"
-            rules={[
-              { required: true, message: "Please enter entity name" },
-              { min: 3, message: "Entity name must be at least 3 characters" },
-              { max: 24, message: "Entity name cannot exceed 24 characters" },
-            ]}
+            rules={[{ required: true, message: "Please enter entity name" }]}
           >
             <Input placeholder="Enter entity name" disabled={viewMode} />
           </Form.Item>
         </Col>
+
         <Col span={12}>
-        <Form.Item
+          <Form.Item
             name="entityType"
             label="Entity Type"
-            rules={[
-              { required: true, message: "Please enter entity Type" },
-              { min: 3, message: "Entity Type must be at least 3 characters" },
-              { max: 24, message: "Entity Type cannot exceed 24 characters" },
-            ]}
-            normalize={(value) => value?.trim().toLowerCase() || ""}
+            rules={[{ required: true, message: "Please select entity type" }]}
           >
-            <Input placeholder="Enter entity Type" disabled={viewMode} />
+            <Select
+              disabled={viewMode}
+              onChange={setEntityType}
+              options={entityTypes.map((type) => ({ label: type, value: type }))}
+              placeholder="Select or type"
+            />
           </Form.Item>
+          {entityType === "Other" && (
+            <Form.Item   name="entityType"
+            label="Enter Entity Type">
+              <Input placeholder="Specify other entity type" disabled={viewMode} />
+            </Form.Item>
+          )}
         </Col>
       </Row>
 
@@ -86,33 +107,80 @@ const EntityAddForm = ({ onClose, editData }) => {
           </Form.Item>
         </Col>
       </Row>
-      <Row span={24}>
-        <h1 className="text-gray-500 mt-6">Enter Entity Bank Details (Optional)</h1>
-      </Row>
 
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item name={["bankDetails", "accountHolder"]} label="Account Holder">
+          <Form.Item name="country" label="Country">
+            <Input placeholder="Enter country" disabled={viewMode} />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {/* Section 2: Banking Details */}
+      <Row gutter={16}><h1 className="text-gray-500 mt-6">Banking Details (Optional)</h1></Row>
+
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item name={["bankDetails", "accountHolder"]} label="Account Holder Name">
             <Input placeholder="Enter account holder name" disabled={viewMode} />
           </Form.Item>
         </Col>
+        <Col span={12}>
+          <Form.Item name={["bankDetails", "bankName"]} label="Bank Name">
+            <Input placeholder="Enter bank name" disabled={viewMode} />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      <Row gutter={16}>
         <Col span={12}>
           <Form.Item name={["bankDetails", "accountNumber"]} label="Account Number">
             <Input placeholder="Enter account number" disabled={viewMode} />
           </Form.Item>
         </Col>
+        <Col span={12}>
+          <Form.Item name={["bankDetails", "iban"]} label="IBAN">
+            <Input placeholder="Enter IBAN" disabled={viewMode} />
+          </Form.Item>
+        </Col>
       </Row>
 
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item name={["bankDetails", "bankName"]} label="Bank Name">
-            <Input placeholder="Enter bank name" disabled={viewMode} />
+          <Form.Item name={["bankDetails", "swiftCode"]} label="SWIFT/BIC Code">
+            <Input placeholder="Enter SWIFT/BIC" disabled={viewMode} />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item name={["bankDetails", "ifscCode"]} label="IFSC Code">
             <Input placeholder="Enter IFSC code" disabled={viewMode} />
           </Form.Item>
+        </Col>
+      </Row>
+
+      {/* Section 3: Taxation & Terms */}
+      <Row gutter={16}><h1 className="text-gray-500 mt-6">Taxation & Terms</h1></Row>
+
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item name="vatTaxId" label="VAT / Tax ID">
+            <Input placeholder="Enter VAT / Tax ID" disabled={viewMode} />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item name="paymentTerms" label="Payment Terms">
+            <Select
+              disabled={viewMode}
+              onChange={setPaymentTerm}
+              placeholder="Select payment term"
+              options={paymentTerms.map((term) => ({ label: term, value: term }))}
+            />
+          </Form.Item>
+          {paymentTerm === "Custom Terms" && (
+            <Form.Item name="customPaymentTerms" label="Custom Terms">
+              <Input placeholder="Enter custom payment terms" disabled={viewMode} />
+            </Form.Item>
+          )}
         </Col>
       </Row>
 
