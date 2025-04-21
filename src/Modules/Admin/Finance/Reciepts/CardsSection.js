@@ -7,7 +7,7 @@ import { FaReceipt, FaMoneyBillAlt, FaBan } from "react-icons/fa";
 const CardsSection = () => {
   const dispatch = useDispatch();
 
-  const { receiptsSummary, loading = false, error = null } = useSelector(
+  const {  totalRecords,totalCancelRecords, loading = false, error = null } = useSelector(
     (state) => state.admin.receipts || {}
   );
 
@@ -20,10 +20,10 @@ const CardsSection = () => {
   const cards = [
     {
       title: "Total Receipts Issued",
-      count: loading || error ? "0" : receiptsSummary?.totalReceipts || "0",
+      count: totalRecords || 0,
       color: "bg-purple-100",
       textColor: "text-purple-700",
-      tag: "receipts",
+      tag: "",
       icon: (
 
         <FaReceipt className="text-white text-xl" />
@@ -31,11 +31,11 @@ const CardsSection = () => {
       ),
     },
     {
-      title: "Total Amount Collected",
-      count: loading || error ? "0" : receiptsSummary?.totalAmountCollected || "0",
+      title: "Total Active Receipts",
+      count: totalRecords -totalCancelRecords  || 0,
       color: "bg-green-100",
       textColor: "text-green-700",
-      tag: "QAR",
+      tag: "",
       icon: (
 
         <FaMoneyBillAlt className="text-white text-xl" />
@@ -43,11 +43,11 @@ const CardsSection = () => {
       ),
     },
     {
-      title: "Cancelled Receipts",
-      count: loading || error ? "0" : receiptsSummary?.cancelledReceipts || "0",
+      title: "Total Canceled Receipts",
+      count: totalCancelRecords  || 0,
       color: "bg-red-100",
       textColor: "text-red-700",
-      tag: "receipts",
+      tag: "",
       icon: (
 
         <FaBan className="text-white text-xl" />

@@ -12,17 +12,18 @@ import {
 import { getAY } from "../../../../Utils/academivYear";
 import toast from "react-hot-toast";
 import { getUserRole } from "../../../../Utils/getRoles";
+import { isCancel } from "axios";
 
 
 export const fetchPayroll  = createAsyncThunk(
   "finance/fetchPayroll ",
-  async ({categoryId,search, page, limit}, { rejectWithValue, dispatch, getState }) => {
+  async ({categoryId,search, page, limit,isCancel}, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/expense/get/all/payroll?say=${say}`,{ categoryId,search, page, limit}
+        `/${getRole}/expense/get/all/payroll?say=${say}`,{ categoryId,search, page, limit,isCancel}
       );
       return response;
     } catch (error) {
@@ -59,6 +60,7 @@ export const createPayroll  = createAsyncThunk(
       );
       if(response.success){
         toast.success(response.message);
+        data.navigate("/finance/payroll/list")
         dispatch(
           fetchPayroll({
             search: "",
@@ -86,7 +88,7 @@ export const updatePayroll  = createAsyncThunk(
     try {
       const getRole = getUserRole(getState);
       const response = await putData(
-        `/${getRole}/Payroll/update/${data.id}?say=${say}`,
+        `/${getRole}/expense/update/payroll/${data.id}?say=${say}`,
         data
       );
      if(response.success){
@@ -96,6 +98,7 @@ export const updatePayroll  = createAsyncThunk(
           search: "",
           page: 1,
           limit: 10,
+          isCancel:false
         })
       ); 
      }else{
@@ -107,6 +110,40 @@ export const updatePayroll  = createAsyncThunk(
     } catch (error) {
       toast.dismiss()
       toast.error('Payroll  not updated');
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+export const deletePayroll  = createAsyncThunk(
+  "finance/deletePayroll ",
+  async (data, { rejectWithValue, dispatch, getState }) => {
+    const say = getAY();
+    dispatch(setShowError(false));
+    try {
+      const getRole = getUserRole(getState);
+      const response = await customRequest('DELETE',
+        `/${getRole}/expense/delete/payroll/?say=${say}`,
+        data
+      );
+     if(response.success){
+      toast.success(response.message);
+      dispatch(
+        fetchPayroll ({
+          search: "",
+          page: 1,
+          limit: 10,
+          isCancel:false
+        })
+      ); 
+     }else{
+      toast.error(response.message);
+     }
+      
+      fetchPayroll ()
+      return response;
+    } catch (error) {
+      toast.dismiss()
+      toast.error('Payroll  not delete');
       return handleError(error, dispatch, rejectWithValue);
     }
   }

@@ -75,18 +75,7 @@ const EntityRevenueSlice = createSlice({
       });
     
     
-    builder
-      .addCase(updateEntityRevenue.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateEntityRevenue.fulfilled, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(updateEntityRevenue.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      });
+    
 
     
 

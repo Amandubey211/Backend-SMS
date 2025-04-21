@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Input, Tag } from "antd";
+import { Table, Input, Tag, Select, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
-import { SearchOutlined } from "@ant-design/icons";
-import { fetchAllStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
+import { CopyOutlined, SearchOutlined } from "@ant-design/icons";
+import { cancelStudentFee, deleteStudentFees, fetchAllStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { FaFileInvoice } from "react-icons/fa";
@@ -10,11 +10,12 @@ import { MdCancel, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
+import toast from "react-hot-toast";
 
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
-
+  const [isCancel,setIsCancel] = useState(false);
   // Get data from Redux
   const { allStudntFees: incomes, loading, totalRecords, totalPages, currentPage } = useSelector(
     (state) => state.admin.studentFees
@@ -24,13 +25,13 @@ const SummaryRevenueList = () => {
   const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
 
   useEffect(() => {
-    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize }));
-  }, [dispatch, currentPage, computedPageSize]);
+    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize,isCancel }));
+  }, [dispatch, currentPage, computedPageSize,isCancel]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize }));
+    dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize,isCancel }));
   };
   const [selectedIds, setSelectedIds] = useState([]);
   const columns = [
@@ -38,7 +39,26 @@ const SummaryRevenueList = () => {
       title: "Invoice",
       dataIndex: "InvoiceNumber",
       key: "InvoiceNumber",
-      render: (InvoiceNumber) => `${InvoiceNumber}` || "N/A",
+      render: (InvoiceNumber) => {
+        const copyToClipboard = () => {
+          navigator.clipboard.writeText(InvoiceNumber);
+          toast.success("Invoice number copied!");
+        };
+    
+        return InvoiceNumber ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span>{InvoiceNumber}</span>
+            <Tooltip title="Copy">
+              <CopyOutlined
+                onClick={copyToClipboard}
+                style={{ cursor: "pointer", color: "#1890ff" }}
+              />
+            </Tooltip>
+          </div>
+        ) : (
+          "N/A"
+        );
+      },
     },
     {
       title: "Student",
@@ -79,10 +99,14 @@ const SummaryRevenueList = () => {
           setSelectedInvoice(record);
           setInvoiceVisible(true)
         }}><FaFileInvoice size={20}/></button>
-       {
-        record?.history?.length > 0 && record?.paymentStatus == "Unpaid" ?
-         <button title="Cancel"><MdCancel size={20}/> </button>:''
-       }
+          {
+              record?.history?.length > 0 && record?.paymentStatus == "Unpaid" && !record?.isCancel ?
+               <button title="Cancel" onClick={()=>dispatch(cancelStudentFee(record))}><MdCancel size={20}/> </button>:''
+             }
+             {
+              record?.isCancel ?
+              <Tag color='red'>Canceled</Tag>   :null    }
+    
         </div>
         );
       },
@@ -154,6 +178,7 @@ const navigate = useNavigate();
       <AdminDashLayout>
         <div className="p-4">
          <div className="flex flex-row items-center justify-between">
+          <div>
          <Input
             placeholder="Search by Name QID Email..."
             prefix={<SearchOutlined />}
@@ -162,7 +187,18 @@ const navigate = useNavigate();
             allowClear
             style={{ width: 300, marginBottom: 16 }}
           />
-          <div>
+           <Select
+                className="px-1 w-[10rem] mb-4"
+                value={isCancel}
+                onChange={(value) => setIsCancel(value)}
+                placeholder="Select Status"
+              >
+                <Select.Option value={false}>Active</Select.Option>
+                <Select.Option value={true}>Canceled</Select.Option>
+              </Select>
+              </div>
+          <div className="flex flex-row gap-3">
+            {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>dispatch(deleteStudentFees((selectedIds)))}>Delete <MdDeleteOutline /></button>}
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/studentfees/add/form")}>Add New Fees</button>
           </div>
          </div>
@@ -187,11 +223,11 @@ const navigate = useNavigate();
               showTotal: () =>
                 `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
               onChange: (page, pageSize) => {
-                dispatch(fetchAllStudentFee({ page, search: searchText, limit:pageSize }));
+                dispatch(fetchAllStudentFee({ page, search: searchText, limit:pageSize,isCancel }));
               },
               onShowSizeChange: (current, size) => {
                 setComputedPageSize(size); // Update local state
-                dispatch(fetchAllStudentFee({ page: 1, search: searchText, limit: size }));
+                dispatch(fetchAllStudentFee({ page: 1, search: searchText, limit: size,isCancel}));
               },
             }}
             rowKey="_id"

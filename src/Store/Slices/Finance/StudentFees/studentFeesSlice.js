@@ -114,33 +114,7 @@ const studentFeesSlice = createSlice({
         state.error = action.payload || action.error.message;
       });
 
-    // Update student fee
-    builder
-      .addCase(updateStudentFee.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateStudentFee.fulfilled, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(updateStudentFee.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      });
-
-    // Delete student fees
-    builder
-      .addCase(deleteStudentFees.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteStudentFees.fulfilled, (state, action) => {
-        state.loading = false;
-      })
-      .addCase(deleteStudentFees.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      });
+ 
 
     //student fees graph
     builder

@@ -241,12 +241,7 @@ const AddOperationalExpenses = () => {
                       </Form.Item>
                     </Col>
                   </>}
-                  {receiptData.status == "partial" &&
-                    <Col span={6}>
-                    <Form.Item name={["lineItems", index, "paidAmount"]} label="Paid Now" required>
-                      <input style={{ width: "100%" }} className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={item.paidAmount} onChange={(e) => handleInputChange(index, "paidAmount", e.target.value)} />
-                    </Form.Item>
-                  </Col>}
+                  
 
                   <Col span={6}>
                     <Form.Item name={["lineItems", index, "amount"]} label="Amount">
@@ -277,7 +272,7 @@ const AddOperationalExpenses = () => {
                   </Form.Item>
 
                 </Col>
-                {receiptData.status == "paid" && <>
+                {receiptData.status == "paid" ||receiptData.status == "partial" && <>
                   <Col span={6}>
                     <Form.Item label="Payment Type" name="paymentType" rules={[{ required: true, message: "Payment Type is required" }]}>
                       <Select value={receiptData.paymentType} onChange={(value) => handleChange("paymentType", value)}>
@@ -297,17 +292,6 @@ const AddOperationalExpenses = () => {
                   </Col>
                 </>}
               </Row>
-
-              {/* Conditional Fields */}
-              {receiptData.status == "paid" && receiptData.paymentType !== "cash" && receiptData.paymentType !== "cheque" && (
-                <Row gutter={16}>
-                  <Col span={6}>
-                    <Form.Item label="Online Transaction ID" name="onlineTransactionId" rules={[{ required: true, message: "Transaction ID is required" }]}>
-                      <Input value={receiptData.onlineTransactionId} onChange={(e) => handleChange("onlineTransactionId", e.target.value)} />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              )}
 
               {receiptData.status == "paid" && receiptData.paymentType === "cheque" && (
                 <Row gutter={16}>

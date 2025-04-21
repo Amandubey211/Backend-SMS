@@ -367,16 +367,6 @@ const AddPayRoll = () => {
                 </>}
               </Row>
 
-              {/* Conditional Fields */}
-              {receiptData.status == "paid" && receiptData.paymentType !== "cash" && receiptData.paymentType !== "cheque" && (
-                <Row gutter={16}>
-                  <Col span={6}>
-                    <Form.Item label="Online Transaction ID" name="onlineTransactionId" rules={[{ required: true, message: "Transaction ID is required" }]}>
-                      <Input value={receiptData.onlineTransactionId} onChange={(e) => handleChange("onlineTransactionId", e.target.value)} />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              )}
 
               { receiptData.status == "paid" &&  receiptData.paymentType === "cheque" && (
                 <Row gutter={16}>
