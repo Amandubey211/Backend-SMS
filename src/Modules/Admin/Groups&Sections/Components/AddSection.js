@@ -7,7 +7,7 @@ import {
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 
-const AddSection = ({ initialSection = null, onCancel }) => {
+const AddSection = ({ initialSection, onCancel }) => {
   const [sectionName, setSectionName] = useState("");
   const dispatch = useDispatch();
   const { cid } = useParams();
@@ -37,6 +37,7 @@ const AddSection = ({ initialSection = null, onCancel }) => {
         await dispatch(createSection(sectionData));
       }
       onCancel();
+      setSectionName("");
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     }

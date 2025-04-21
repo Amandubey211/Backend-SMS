@@ -26,7 +26,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     (store) => store.admin.group_section.sectionsList
   );
 
-  // Decide which button is "active"
+  // Active button styling
   const getButtonClass = (sectionItem) => {
     const isActive =
       selectedSection === "Everyone"
@@ -35,11 +35,11 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
           selectedSection === sectionItem.sectionName;
 
     return isActive
-      ? "relative px-2 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-      : "relative px-2 py-2 rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
+      ? "relative px-3 py-2 text-sm rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
+      : "relative px-3 py-2 text-sm rounded-full border border-gray-300 hover:border-red-400 hover:bg-gray-100";
   };
 
-  // Sidebar toggles
+  // Sidebar controls
   const openAddGroupSidebar = useCallback(() => setSidebarType("addGroup"), []);
   const openAddSectionSidebar = useCallback(() => {
     setSidebarType("addSection");
@@ -50,39 +50,35 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
     setEditingSection(null);
   }, []);
 
-  // Delete confirm
+  // Delete flow
   const handleDeleteConfirm = async () => {
     await dispatch(deleteSection(sectionToDelete._id));
     setDeleteModalOpen(false);
     dispatch(fetchSectionsByClass(cid));
   };
-
-  // Edit
-  const handleEditSection = useCallback((section) => {
-    setEditingSection(section);
-    setSidebarType("editSection");
-  }, []);
-
-  // Delete
   const handleDeleteClick = (section) => {
     setSectionToDelete(section);
     setDeleteModalOpen(true);
   };
 
-  // Conditionally show the blur if more than 3 sections exist
+  // Edit flow
+  const handleEditSection = useCallback((section) => {
+    setEditingSection(section);
+    setSidebarType("editSection");
+  }, []);
+
+  // Blur if too many
   const showBlur = (sections?.length || 0) > 3;
 
   return (
     <>
       <div className="flex justify-between items-center border-b p-2">
-        {/* Left side: scrollable "Everyone" + sections */}
+        {/* Left: badges + Add Section */}
         <div className="flex items-center">
-          {/* Make this parent container relative to anchor the blur overlay and increase width */}
-          <div className="relative w-[40rem] pe-5 ps-3">
-            {/* The actual scrollable area */}
+          <div className="relative  max-w-[40rem] pe-5 ps-3">
             <div className="overflow-x-auto whitespace-nowrap no-scrollbar">
               <div className="flex space-x-2">
-                {/* "Everyone" */}
+                {/* Everyone */}
                 <button
                   className={
                     selectedSection === "Everyone"
@@ -94,7 +90,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
                   Everyone
                 </button>
 
-                {/* Each Section */}
+                {/* Sections */}
                 {sections?.map((item) => (
                   <button
                     key={item._id}
@@ -106,7 +102,7 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
                     {item.sectionName}
                     {hoveredSection === item.sectionName &&
                       role !== "teacher" && (
-                        <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg border -m-1 text-red-600 cursor-pointer">
+                        <span className="absolute top-0 right-0 p-1 flex space-x-2 rounded-full bg-white hover:bg-gray-200 text-lg z-20 border -m-1 text-red-600 cursor-pointer">
                           <RiEdit2Line
                             className="hover:text-blue-500"
                             onClick={(e) => {
@@ -126,24 +122,23 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
                 ))}
               </div>
             </div>
-            {/* Show blur only if needed */}
             {showBlur && (
               <div className="pointer-events-none absolute top-0 right-0 h-full w-12 bg-gradient-to-l from-white to-transparent backdrop-blur-sm" />
             )}
           </div>
 
-          {/* Add Section (Admins only) - always visible, outside the scroll container */}
+          {/* Add Section (Admins only) — now outside scroll container */}
           {role === "admin" && (
             <button
               onClick={openAddSectionSidebar}
-              className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full ml-2"
+              className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-gradient rounded-full "
             >
               <span className="mr-2">+</span> Add Section
             </button>
           )}
         </div>
 
-        {/* Right side: Add Group (Admins only) */}
+        {/* Right: Add Group */}
         {role === "admin" && (
           <button
             onClick={openAddGroupSidebar}
@@ -165,7 +160,6 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       >
         <AddSection onCancel={closeSidebar} />
       </Sidebar>
-
       <Sidebar
         isOpen={sidebarType === "addGroup"}
         onClose={closeSidebar}
@@ -173,7 +167,6 @@ const NavigationBar = ({ onSectionChange, selectedSection }) => {
       >
         <AddGroup onClose={closeSidebar} />
       </Sidebar>
-
       <Sidebar
         isOpen={sidebarType === "editSection"}
         onClose={closeSidebar}
