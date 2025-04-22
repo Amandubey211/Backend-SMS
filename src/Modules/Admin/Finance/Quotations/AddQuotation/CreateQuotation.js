@@ -17,7 +17,7 @@ import { Descriptions } from "antd";
  * Inner form component using useFormikContext
  * to handle real-time calculation of Sub Amount and Final Amount.
  */
-const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
+const QuotationFormInner = ({ readOnly, loading, formattedQuotation ,handleSubmit}) => {
   const { values, setFieldValue, resetForm, isSubmitting } = useFormikContext();
   
   
@@ -64,7 +64,8 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
 
 
   return (
-    <Form>
+    <Form
+    >
       <div className="flex justify-between gap-4 mb-6">
         <h1 className="text-2xl font-semibold">
           {readOnly ? "View Quotation" : ""}
@@ -79,8 +80,7 @@ const QuotationFormInner = ({ readOnly, loading, formattedQuotation }) => {
               Reset
             </button>
             <button
-              type="submit"
-              disabled={loading || isSubmitting}
+              onClick={()=>handleSubmit()}
               className="px-4 py-2 rounded-md text-white"
               style={{
                 background: "linear-gradient(to right, #ec4899, #a855f7)",
@@ -396,9 +396,9 @@ const CreateQuotation = () => {
 
   const dispatch = useDispatch();
 
-  const handleSubmit = async (values, { setSubmitting, resetForm }) => {
-    if (readOnly) return;
-    console.log("Submitting values:", values); // Debug log
+  const handleSubmit = async (values, { resetForm }) => {
+    console.log('aa');
+    
     setLoading(true);
     try {
       await dispatch(addQuotation(values)).unwrap();
@@ -408,7 +408,7 @@ const CreateQuotation = () => {
     } catch (error) {
     } finally {
       setLoading(false);
-      setSubmitting(false);
+     
     }
   };
 
@@ -466,6 +466,7 @@ const CreateQuotation = () => {
               readOnly={readOnly}
               loading={loading}
               formattedQuotation={formattedQuotation}
+              handleSubmit={handleSubmit}
             />
           </Formik>
         </div>

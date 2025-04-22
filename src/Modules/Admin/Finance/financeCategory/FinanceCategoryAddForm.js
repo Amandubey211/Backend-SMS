@@ -93,6 +93,8 @@ const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
           <option value="">Select Type</option>
             <option value="revenue">Revenue</option>
             <option value="expense">Expense</option>
+            <option value="asset">Asset</option>
+            {/* <option value="libility">libility</option> */}
           </select>
         </Form.Item>
 

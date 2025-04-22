@@ -281,13 +281,7 @@ const SideMenubar = () => {
                             {t(item.title)} <span></span>
                           </span>
                         )}
-                        {item.bedge && (
-                          <Tooltip title="This feature is in beta. It may have limited functionality and is subject to changes based on user feedback">
-                            <span className="ml-3 text-xs font-medium border-2 border-red-500 bg-red-100 text-black px-2 rounded-md">
-                              Beta
-                            </span>
-                          </Tooltip>
-                        )}
+                        
                       </div>
                       {isOpen &&
                         (openItems.includes(item.title) ? (

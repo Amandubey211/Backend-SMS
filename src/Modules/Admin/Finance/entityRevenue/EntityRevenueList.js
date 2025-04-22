@@ -244,7 +244,7 @@ const navigate = useNavigate();
                         {/* Centered content */}
                         <div
                           ref={popupRef}
-                          className="relative p-6 w-full max-w-[900px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                          className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {/* Close Button */}
@@ -268,14 +268,14 @@ const navigate = useNavigate();
                           <div className="w-[80%]">
                           <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
                           </div>
-                          <div className="w-[20%]">
+                          {/* <div className="w-[20%]">
                           <div className="px-4 py-2  font-semibold rounded-md  flex items-center justify-center mb-2 gap-2" >History <FaHistory /></div>
                           <div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice(selectedInvoice)}}>
                             {selectedInvoice?.generateDate?.slice(0,10)}
                             <p className="text-xs">currency Verion </p>
                              </div>
                             {selectedInvoice?.history?.map((i)=>(<div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice(i?.oldData)}}>{i?.updatedAt?.slice(0,10)}</div>))}
-                          </div>
+                          </div> */}
                           </div>
                         </div>
                       </div>
