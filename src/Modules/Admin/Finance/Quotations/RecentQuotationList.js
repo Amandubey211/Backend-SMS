@@ -53,6 +53,7 @@ const RecentQuotationList = () => {
     currentPage,
     pageSize,
   } = useSelector((state) => state.admin.quotations);
+  const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const [isExportModalVisible, setIsExportModalVisible] = useState(false);
   const [searchText, setSearchText] = useState("");
   const dispatch = useDispatch();
@@ -257,21 +258,6 @@ const RecentQuotationList = () => {
           </Menu.Item>
         </ProtectedAction>
       )}
-      <Menu.Item key="5" onClick={() => handleSendEmail(record)}>
-        <MailOutlined style={{ marginRight: 8 }} /> Send Mail
-      </Menu.Item>
-      <Menu.Item
-        key="6"
-        onClick={() => {
-          console.log("Selected Record for Export:", record);
-          setSelectedExportRecord(record);
-          setTimeout(() => {
-            setIsExportModalVisible(true);
-          }, 100);
-        }}
-      >
-        <ExportOutlined style={{ marginRight: 8 }} /> Export
-      </Menu.Item>
     </Menu>
   );
 
@@ -312,26 +298,26 @@ const RecentQuotationList = () => {
           </Tag>
         ) : (
           <Tag color="orange" className="text-xs">
-            {value || 0} QR
+            {value || 0} {schoolCurrency}
           </Tag>
         ),
       width: 100,
       ellipsis: true,
     },
     {
-      title: "Total Amount(QR)",
+      title: `Total Amount ${schoolCurrency}`,
       dataIndex: "total_amount",
       key: "total_amount",
-      render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+      render: (value) => <span className="text-xs">{value || "0"} {schoolCurrency}</span>,
       width: 120,
       ellipsis: true,
     },
     {
-      title: "Final Amount(QR)",
+      title: `Final Amount ${schoolCurrency}`,
       dataIndex: "final_amount",
       key: "final_amount",
       render: (value) => (
-        <span className="text-xs text-green-600">{value || "0"} QR</span>
+        <span className="text-xs text-green-600">{value || "0"} {schoolCurrency}</span>
       ),
       width: 120,
       ellipsis: true,
@@ -418,14 +404,14 @@ const RecentQuotationList = () => {
       discount:
         quotation?.discountType === "percentage"
           ? `${parseFloat(quotation.discount)} %`
-          : `${parseFloat(quotation.discount)} QR`,
+          : `${parseFloat(quotation.discount)} {schoolCurrency}`,
       discountType: quotation?.discountType || "N/A",
       totalAmount: quotation?.total_amount
-        ? `${parseFloat(quotation.total_amount)} QR`
-        : "0 QR",
+        ? `${parseFloat(quotation.total_amount)} {schoolCurrency}`
+        : "0 {schoolCurrency}",
       finalAmount: quotation?.final_amount
-        ? `${parseFloat(quotation.final_amount)} QR`
-        : "0 QR",
+        ? `${parseFloat(quotation.final_amount)} {schoolCurrency}`
+        : "0 {schoolCurrency}",
       purpose: quotation?.purpose || "N/A",
       status: quotation?.status || "N/A",
       govtRefNumber: quotation?.govtRefNumber || "N/A",
@@ -494,14 +480,6 @@ const RecentQuotationList = () => {
               }}
             />
             <div className="flex justify-end items-center gap-2">
-              <Button
-                type="primary"
-                icon={<ExportOutlined />}
-                onClick={() => setIsExportModalVisible(true)}
-                className="flex items-center bg-gradient-to-r from-pink-500 to-pink-400 text-white border-none hover:from-pink-600 hover:to-pink-500 transition duration-200 text-xs px-4 py-2 rounded-md shadow-md"
-              >
-                Export
-              </Button>
               <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_QUOTATION}>
                 <button
                   onClick={() => {
@@ -588,7 +566,7 @@ const RecentQuotationList = () => {
                   </button>
                 </div>
                 <div>
-                  <QuotationTemplate data={previewQuotation} ref={pdfRef} />
+                  <QuotationTemplate data={{...previewQuotation,schoolCurrency}} ref={pdfRef} />
                 </div>
               </div>
             </div>

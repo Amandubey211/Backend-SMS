@@ -63,7 +63,7 @@ const VoucherTemplate = forwardRef((props, ref) => {
           <p><strong>Contact:</strong> {entityDetails?.contactNumber }</p>
         </div>
         <div>
-          <p><strong>Invoice No:</strong> {voucherNumber || ""}</p>
+          <p><strong>Voucher No:</strong> {voucherNumber || ""}</p>
           <p><strong>Issue Date:</strong> {createdAt?.slice(0,10)}</p>
           <p><strong>Status:</strong> {status}</p>
           <p><strong>Currency:</strong> {currency}</p>

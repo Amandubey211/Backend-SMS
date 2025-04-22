@@ -12,7 +12,7 @@ import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedActi
 const RecentQuotation = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
     // Extracting necessary state from Redux store
     const { quotations, totalRecords, loading, error } = useSelector((state) => state.admin.quotations);
 
@@ -75,27 +75,27 @@ const RecentQuotation = () => {
                     </Tag>
                 ) : (
                     <Tag color="orange" className="text-xs">
-                        {value || 0} QR
+                        {value || 0} {schoolCurrency}
                     </Tag>
                 ),
             width: 100,
             ellipsis: true,
         },
         {
-            title: "Total Amount (QR)",
+            title: `Total Amount ${schoolCurrency}`,
             dataIndex: "total_amount",
             key: "total_amount",
             sorter: (a, b) => (a.total_amount || 0) - (b.total_amount || 0),
-            render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+            render: (value) => <span className="text-xs">{value || "0"} {schoolCurrency}</span>,
             width: 120,
             ellipsis: true,
         },
         {
-            title: "Final Amount (QR)",
+            title: `Final Amount ${schoolCurrency}`,
             dataIndex: "final_amount",
             key: "final_amount",
             sorter: (a, b) => (a.final_amount || 0) - (b.final_amount || 0),
-            render: (value) => <span className="text-xs">{value || "0"} QR</span>,
+            render: (value) => <span className="text-xs">{value || "0"} {schoolCurrency}</span>,
             width: 120,
             ellipsis: true,
         },

@@ -51,7 +51,7 @@ const PayrollTemplate = forwardRef((props, ref) => {
           {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
         </div>
         <div className="w-full text-center text-white font-bold py-2" style={{ backgroundColor: "#C83B62", fontSize: "18px" }}>
-        Voucher {isCancel && "CANCELLED"}
+       Pay Slip {isCancel && "CANCELLED"}
         </div>
       </div>
 
@@ -63,7 +63,7 @@ const PayrollTemplate = forwardRef((props, ref) => {
           <p><strong>Contact:</strong> {staffDetails?.contact }</p>
         </div>
         <div>
-          <p><strong>Invoice No:</strong> {voucherNumber || ""}</p>
+          <p><strong>Slip No:</strong> {voucherNumber || ""}</p>
           <p><strong>Issue Date:</strong> {createdAt?.slice(0,10)}</p>
           <p><strong>Status:</strong> {status}</p>
           <p><strong>Currency:</strong> {currency}</p>

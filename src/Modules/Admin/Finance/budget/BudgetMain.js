@@ -57,7 +57,7 @@ const BudgetMain= () => {
         {/* Graph Section */}
         <ProtectedSection requiredPermission={PERMISSIONS} title={'Graph'}>
         <div className="w-full h-full">
-          <BudgetGraph/>
+          {/* <BudgetGraph/> */}
         </div>
         </ProtectedSection>
         {/* Summary Table */}

@@ -221,6 +221,7 @@ const SidebarClassSelection = () => {
           )}
         </div>
       ))}
+     
     </div>
   );
 };
