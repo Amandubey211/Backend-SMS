@@ -59,7 +59,7 @@ const FinanceCategory = () => {
       title: "Category For",
       dataIndex: "categoryType",
       key: "categoryType",
-      render: (value) => <span className="text-md">{value == "revenue" ? "Revenue":"Expense" || "N/A"}</span>,
+      render: (value) => <span className="text-md">{value}</span>,
       ellipsis: true,
       width: 60,
     },
@@ -134,6 +134,7 @@ const FinanceCategory = () => {
                 <Select.Option value="">All</Select.Option>
                 <Select.Option value="revenue">Revenue</Select.Option>
                 <Select.Option value="expense">Expense</Select.Option>
+                <Select.Option value="asset">Asset</Select.Option>
 
               </Select>
 
