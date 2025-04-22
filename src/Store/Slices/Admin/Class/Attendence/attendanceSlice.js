@@ -79,8 +79,15 @@ const attendanceSlice = createSlice({
         fetchAttendanceByClassSectionGroupDate.fulfilled,
         (state, action) => {
           state.loading = false;
+          // Populate the detailed list
           state.attendanceData = action.payload.attendanceList || [];
-          // state.stats = action.payload.attendanceStats || {};
+          // Extract and store summary stats
+          state.stats = {
+            totalStudents: action.payload.totalStudents ?? 0,
+            presentCount: action.payload.presentCount ?? 0,
+            absentCount: action.payload.absentCount ?? 0,
+            leaveCount: action.payload.leaveCount ?? 0,
+          };
         }
       )
       .addCase(
@@ -90,7 +97,6 @@ const attendanceSlice = createSlice({
           state.error = action.payload;
         }
       )
-
       // Mark attendance
       .addCase(markAttendance.pending, (state) => {
         state.markingAttendance = true;

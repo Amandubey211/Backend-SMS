@@ -13,13 +13,12 @@ const Statistics = () => {
   ); // Get attendance stats, loading, and error from Redux
   const dispatch = useDispatch();
   const { cid } = useParams(); // Get class ID from route params
-
   // Define the mapping between the API response keys and the labels in navData
   const dataMapping = {
     "Total Students": "totalStudents",
-    "Present Today": "totalPresent",
-    "Absent Today": "totalAbsent",
-    "Leave Today": "totalLeave",
+    "Present Today": "presentCount",
+    "Absent Today": "absentCount",
+    "Leave Today": "leaveCount",
   };
 
   // Map the stats data from Redux and combine it with the navData structure
