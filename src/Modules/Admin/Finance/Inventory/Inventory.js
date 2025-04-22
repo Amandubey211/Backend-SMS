@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../../../Components/Common/Layout.js";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout.js";
 import { useDispatch, useSelector } from "react-redux";
-import { Input, Spin, Table, Select, DatePicker } from "antd";
+import { Input, Spin, Table, Select, DatePicker, Tooltip } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { FaStackOverflow, FaWarehouse } from "react-icons/fa";
 import { GiWeight, GiReceiveMoney } from "react-icons/gi";
@@ -83,6 +83,13 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
       width: 100,
     },
     {
+          title: "Expiry Date",
+          dataIndex: "expireDate",
+          key:"expireDate",
+          render:(value)=><p>{value?.slice(0,10) || "-"}</p>,
+          width: 100,
+        },
+    {
       title: "Low Stock Alert",
       render: (_, record) =>{
         return(
@@ -136,6 +143,7 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
       key: "inventoryStatus",
       width: 100,
     },
+    
     {
       title: "Reorder Level",
        dataIndex: "lowStockNumber",
@@ -143,16 +151,16 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
       width: 100,
       width: 100,
     },
-    {
-      title: "Action",
-      render: (_, record) => (
+    // {
+    //   title: "Action",
+    //   render: (_, record) => (
         
-          <a href="#" className="text-sm text-blue-500">
-          Generate Purchase Order
-          </a>
-      ),
-      width: 100,
-    },
+    //       <a href="#" className="text-sm text-blue-500">
+    //       Generate Purchase Order
+    //       </a>
+    //   ),
+    //   width: 100,
+    // },
   ];
   const navigate = useNavigate()
 
@@ -182,9 +190,9 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
           </div>
           <div className="flex flex-row gap-4 mb-4">
             {[{ title: "Total Inventory Items", value: `${total || 0} Items`, icon: <FiBox /> },
-            { title: "Low-Stock Alerts", value: `${otherData?.totalLowStockItems?.length || 0} Items`, icon: <FaStackOverflow /> },
-            { title: "Expiring Soon Item", value: `${otherData?.expiringSoonItems?.length || 0} Items`, icon: <MdCancelPresentation /> },
-            { title: "Total Asset Value", value: `${otherData?.totalAssestPrice == "undefined" ? 0 : otherData?.totalAssestPrice || 0} ${schoolCurrency}`, icon: <BiMoneyWithdraw /> }
+            { title: "Low-Stock Alerts", value: `${otherData?.expiringLowItems?.length || 0} Items`, icon: <FaStackOverflow /> },
+            { title: "Expiring Soon Items", value: `${otherData?.expiringSoonItems?.length || 0} Items`, icon: <MdCancelPresentation /> },
+            { title: "Total Assets Value", value: `${otherData?.totalAssestPrice == "undefined" ? 0 : otherData?.totalAssestPrice || 0} ${schoolCurrency}`, icon: <BiMoneyWithdraw /> }
             ].map((item, index) => (
               <>
               <div
@@ -222,13 +230,23 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
 
             {otherData?.inventoryCategories?.map((category, index) => (
               <>
-                <div className="flex items-center flex-col gap-1 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem]" key={index}>
+                <div className="flex items-center flex-col  gap-1 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem]" key={index}>
                   <div className="flex justify-between items-center">
                     <img src={category?.categoryId?.icon} alt="logo" className="w-10 h-10" />
                   </div>
                   <div className="flex justify-between items-center text-purple-900">
-                    {category?.categoryId?.categoryName}
-                  </div>
+  <Tooltip
+    title={category?.categoryId?.categoryName}
+    placement="top"
+    overlayClassName="max-w-xs"
+  >
+    <span>
+      {category?.categoryId?.categoryName?.length > 15
+        ? category.categoryId.categoryName.slice(0, 15) + '...'
+        : category?.categoryId?.categoryName}
+    </span>
+  </Tooltip>
+</div>
                 </div>
               </>
             ))}
@@ -262,15 +280,10 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
           </div>
 
           <Table
-            dataSource={inventories}
+            dataSource={inventories?.slice(0,5)}
             columns={columns}
             size="small"
-            pagination={{
-              current: currentPage,
-              total: total,
-              pageSize: pageSize,
-              showSizeChanger: true,
-            }}
+            
             loading={{ spinning: loading, indicator: <Spin size="large" /> }}
             bordered
           />
@@ -299,12 +312,7 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
             dataSource={lowStock.inventories}
             columns={lowStockcolumns}
             size="small"
-            pagination={{
-              current: lowStockcurrentPage,
-              total: lowStock.total,
-              pageSize: lowStockpageSize,
-              showSizeChanger: true,
-            }}
+            
             loading={{ spinning: lowStock.loading, indicator: <Spin size="large" /> }}
             bordered
           />

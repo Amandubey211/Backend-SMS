@@ -43,7 +43,6 @@ import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryReve
 import ReceiptsMain from "../Modules/Admin/Finance/Reciepts/ReceiptsMain.js";
 import RecentReceiptsList from "../Modules/Admin/Finance/Reciepts/RecentReceiptsList.js";
 import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js";
-import RecentQuotationList from "../Modules/Admin/Finance/Quotations/RecentQuotationList.js";
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
 import InventoryList from "../Modules/Admin/Finance/Inventory/InventoryList.js";
@@ -54,6 +53,9 @@ const AllStudents = lazy(() =>
   )
 );
 
+const RecentQuotationList  = lazy(() =>
+  import("../Modules/Admin/Finance/Quotations/RecentQuotationList.js")
+);
 const EntityRevenueDash = lazy(() =>
   import("../Modules/Admin/Finance/entityRevenue/EntityRevenueDash.js")
 );

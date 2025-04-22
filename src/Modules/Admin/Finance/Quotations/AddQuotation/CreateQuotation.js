@@ -1,418 +1,39 @@
-import React, { useState, useEffect } from "react";
-import { Formik, Form, FieldArray, useFormikContext } from "formik";
-import * as Yup from "yup";
-import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
-import TextInput from "./Components/TextInput";
-import SelectInput from "./Components/SelectInput";
-import FileInput from "./Components/FileInput";
+import React, { useEffect, useState } from "react";
+import {
+  Form,
+  Input,
+  Button,
+  InputNumber,
+  Select,
+  DatePicker,
+  Upload,
+  Space,
+  Row,
+  Col,
+  Typography,
+  Divider,
+  message
+} from "antd";
+import { PlusOutlined, MinusCircleOutlined, UploadOutlined } from "@ant-design/icons";
+import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { addQuotation } from "../../../../../Store/Slices/Finance/Quotations/quotationThunks";
-import toast from "react-hot-toast";
-import Layout from "../../../../../Components/Common/Layout";
 import { useNavigate } from "react-router-dom";
-import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading "; // Removed trailing space
-import { Descriptions } from "antd";
+import Layout from "../../../../../Components/Common/Layout";
+import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 
-/**
- * Inner form component using useFormikContext
- * to handle real-time calculation of Sub Amount and Final Amount.
- */
-const QuotationFormInner = ({ readOnly, loading, formattedQuotation ,handleSubmit}) => {
-  const { values, setFieldValue, resetForm, isSubmitting } = useFormikContext();
-  
-  
-  // Auto-calculate sub_amount (total_amount) and final_amount in real-time
-  useEffect(() => {
-    // Calculate subAmount from lineItems
-    const updatedLineItems = values.lineItems?.map((item, index) => {
-      const quantity = parseFloat(item.quantity) || 0;
-      const rate = parseFloat(item.amount) || 0;
-      const amount = quantity * rate;
+const { Title } = Typography;
 
-      // Update amount in each line item
-      setFieldValue(`lineItems.${index}.quantityAmount`, amount, false);
-      return amount;
-    });
-
-    const subAmount = updatedLineItems?.reduce((acc, curr) => acc + curr, 0) || 0;
-
-    // Convert tax and discount to number
-    const taxValue = parseFloat(values.tax) || 0;
-    const discountValue = parseFloat(values.discount) || 0;
-
-    let calculatedFinal = subAmount;
-
-    // If tax is a percentage
-    if (taxValue) {
-      calculatedFinal += (calculatedFinal * taxValue) / 100;
-    }
-
-    // Apply discount
-    if (discountValue) {
-      if (values.discountType === "percentage") {
-        calculatedFinal -= (calculatedFinal * discountValue) / 100;
-      } else {
-        calculatedFinal -= discountValue;
-      }
-    }
-
-    // Ensure amounts don’t go below zero
-    setFieldValue("total_amount", subAmount < 0 ? 0 : subAmount, false);
-    setFieldValue("final_amount", calculatedFinal < 0 ? 0 : calculatedFinal, false);
-
-  }, [values.lineItems, values.tax, values.discount, values.discountType, setFieldValue]);
-
-
-  return (
-    <Form
-    >
-      <div className="flex justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-semibold">
-          {readOnly ? "View Quotation" : ""}
-        </h1>
-        {!readOnly && (
-          <div className="gap-4">
-            <button
-              type="button"
-              onClick={() => resetForm({ values: formattedQuotation })}
-              className="border border-gray-300 text-gray-700 px-4 py-2 mx-2 rounded-md hover:bg-gray-100"
-            >
-              Reset
-            </button>
-            <button
-              onClick={()=>handleSubmit()}
-              className="px-4 py-2 rounded-md text-white"
-              style={{
-                background: "linear-gradient(to right, #ec4899, #a855f7)",
-              }}
-            >
-              {loading ? "Loading.." : "Save Quotation"}
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Quotation To Section */}
-      <h2 className="text-lg font-semibold mb-4">Quotation To</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <TextInput
-          name="receiver.name"
-          label="Receiver Name"
-          placeholder="Enter receiver's name"
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-        <TextInput
-          name="receiver.address"
-          label="Address"
-          placeholder="Enter Address"
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-        <TextInput
-          name="receiver.phone"
-          label="Contact Number"
-          placeholder="Enter contact number"
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-        <TextInput
-          name="receiver.email"
-          label="Email Id"
-          placeholder="Enter receiver's email"
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-        <TextInput
-          name="purpose"
-          label="Purpose"
-          placeholder="Enter purpose"
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-        <TextInput
-          name="date"
-          label="Quotation Date"
-          placeholder="Enter date"
-          type="date"
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-      </div>
-
-      {/* Items Section */}
-      <div
-        className="p-4 rounded-md flex flex-col items-center justify-center mb-7"
-        style={{ backgroundColor: "#ECECEC" }}
-      >
-        <h2 className="text-lg font-semibold mb-4">Items</h2>
-        <FieldArray name="lineItems">
-          {({ remove, push }) => (
-            <>
-              {values.lineItems.map((item, index) => (
-                <div key={index} className="grid grid-cols-12 gap-2 items-center mb-6">
-                  <div className="col-span-3">
-                    <TextInput
-                      name={`lineItems.${index}.category`}
-                      label="Category"
-                      type="text"
-                      placeholder="Enter Category"
-                      readOnly={readOnly}
-                      disabled={readOnly}
-                    />
-                  </div>
-
-                  <div className="col-span-3">
-                    <TextInput
-                      name={`lineItems.${index}.description`}
-                      label="Description"
-                      type="text"
-                      placeholder="Enter Description"
-                      readOnly={readOnly}
-                      disabled={readOnly}
-                    />
-                  </div>
-                  <div className="col-span-1">
-                    <TextInput
-                      name={`lineItems.${index}.quantity`}
-                      label="Quantity"
-                      type="number"
-                      placeholder="Enter Quantity"
-                      required={true}
-                      readOnly={readOnly}
-                      disabled={readOnly}
-                    />
-                  </div>
-
-                  <div className="col-span-1">
-                    <TextInput
-                      name={`lineItems.${index}.amount`}
-                      label="Rate (QAR)"
-                      type="number"
-                      placeholder="Enter Amount"
-                      required={true}
-                      readOnly={readOnly}
-                      disabled={readOnly}
-                    />
-                  </div>
-                  <div className="col-span-2">
-                    <TextInput
-                      name={`lineItems.${index}.quantityAmount`}
-                      label="Amount  (QAR)"
-                      type="number"
-                      placeholder={0}
-                      required={true}
-                      readOnly={true}
-                      disabled={true}
-                    />
-                  </div>
-
-                  <div className="col-span-1 flex items-center justify-center">
-                    {!readOnly && (
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        className="text-red-500 hover:text-red-700 text-lg"
-                      >
-                        ✖
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {!readOnly && (
-                <div className="flex flex-col justify-center items-center mt-6">
-                  <button
-                    type="button"
-                    onClick={() => push({ revenueType: "", quantity: 1, amount: 0 })}
-                    className="rounded-full w-12 h-12 flex items-center justify-center shadow-lg"
-                    style={{
-                      background: "linear-gradient(to right, #ec4899, #a855f7)",
-                    }}
-                  >
-                    <span className="text-white text-2xl">+</span>
-                  </button>
-                  <span className="text-gray-600 text-sm mt-2">Add Item</span>
-                </div>
-              )}
-            </>
-          )}
-        </FieldArray>
-      </div>
-
-      {/* Additional Details Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <TextInput
-          name="dueDate"
-          label="Due date"
-          placeholder="Enter Due date"
-          type="date"
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <TextInput
-          name="tax"
-          label="Tax (Inc/Exc)"
-          placeholder="Enter tax percentage"
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <SelectInput
-          name="discountType"
-          label="Discount Type"
-          options={[
-            { label: "Percentage", value: "percentage" },
-            { label: "Amount", value: "amount" },
-          ]}
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <TextInput
-          name="discount"
-          label={`Discount (${values.discountType === "percentage" ? "%" : "Amount"})`}
-          placeholder={`Enter discount ${values.discountType}`}
-          type="number"
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <SelectInput
-          name="status"
-          label="Status"
-          options={[
-            { label: "Pending", value: "pending" },
-            { label: "Accept", value: "accept" },
-            { label: "Reject", value: "reject" },
-          ]}
-          required={true}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <TextInput
-          name="govtRefNumber"
-          label="Govt Reference Number"
-          placeholder="Enter Govt Reference Number"
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <FileInput
-          name="document"
-          label="Add Document (if any)"
-          placeholder="Upload file"
-          onChange={(e) => {
-            // Example file handling: if you use an upload service, replace this with the URL returned
-            if (e.target.files && e.target.files[0]) {
-              const file = e.target.files[0];
-              // For demonstration, we use the file name. In real code, you might upload the file and use its URL.
-              setFieldValue("document", file.name);
-            }
-          }}
-          value={values.document}
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        <TextInput
-          name="remark"
-          label="Remark"
-          placeholder="Enter remark (if any)"
-          readOnly={readOnly}
-          disabled={readOnly}
-        />
-
-        {/* Auto-calculated fields */}
-        <TextInput
-          name="total_amount"
-          label="Sub Amount (QAR)"
-          placeholder="Auto-calculated sub total"
-          readOnly={true}
-          disabled={true}
-        />
-        <TextInput
-          name="final_amount"
-          label="Final Amount (After tax/discount)"
-          placeholder="Auto-calculated final amount"
-          readOnly={true}
-          disabled={true}
-        />
-      </div>
-    </Form>
-  );
-};
-
-const CreateQuotation = () => {
-  const formatDate = (date) => {
-    const d = new Date(date);
-    return d.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-  };
-
-  const [loading, setLoading] = useState(false);
-  const { readOnly, selectedQuotation } = useSelector(
-    (state) => state.admin.quotations
-  );
-  const navigate = useNavigate();
-  useNavHeading("Finance", "Create Quotations");
-
-  const validationSchema = Yup.object().shape({
-    receiver: Yup.object().shape({
-      name: Yup.string().required("Receiver Name is required"),
-      email: Yup.string().email("Invalid email"),
-    }),
-    purpose: Yup.string().required("Purpose is required"),
-    lineItems: Yup.array().of(
-      Yup.object().shape({
-        revenueType: Yup.string().required("Revenue Type is required"),
-        subCategory: Yup.string().required("Revenue Type is required"),
-        description: Yup.string(),
-        quantity: Yup.number().min(1).required("required"),
-        amount: Yup.number().min(0, "positive").required("required"),
-        quantityAmount: Yup.number().min(0, "positive").required("required"),
-      })
-    ),
-    discountType: Yup.string()
-      .oneOf(["percentage", "amount"], "Invalid discount type")
-      .required("Discount type is required"),
-    discount: Yup.number()
-      .min(0, "Discount must be positive")
-      .required("Discount is required"),
-    date: Yup.string().required("Quotation Date is required"),
-    final_amount: Yup.number().min(0, "Final amount must be positive"),
-    remainingAmount: Yup.number().min(0, "Remaining amount must be positive"),
-    document: Yup.string().nullable(),
-    tax: Yup.number().min(0, "Tax must be positive").nullable(),
-  });
-
+const CreateQuotationAntForm = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [form] = Form.useForm();
+  const [readOnly, setReadOnly] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { selectedQuotation } = useSelector(state => state.admin.quotations);
 
-  const handleSubmit = async (values, { resetForm }) => {
-    console.log('aa');
-    
-    setLoading(true);
-    try {
-      await dispatch(addQuotation(values)).unwrap();
-      toast.success("Quotation created successfully!");
-      resetForm();
-      navigate("/finance/quotations/quotations-list");
-    } catch (error) {
-    } finally {
-      setLoading(false);
-     
-    }
-  };
+  const formatDate = (date) => moment(date).format("YYYY-MM-DD");
 
-  // Prepare initial values
   const formattedQuotation = {
     receiver: selectedQuotation?.receiver || {
       name: "",
@@ -420,16 +41,11 @@ const CreateQuotation = () => {
       address: "",
       phone: "",
     },
-    lineItems:
-      selectedQuotation?.lineItems || [
-        { revenueType: "", subCategory: "", description: "", quantity: 1, amount: 0, },
-      ],
-    date: selectedQuotation?.date
-      ? formatDate(selectedQuotation.date)
-      : formatDate(new Date()),
-    dueDate: selectedQuotation?.dueDate
-      ? formatDate(selectedQuotation.dueDate)
-      : formatDate(new Date()),
+    lineItems: selectedQuotation?.lineItems || [
+      { revenueType: "", subCategory: "", description: "", quantity: 1, amount: 0, },
+    ],
+    date: selectedQuotation?.date ? moment(selectedQuotation.date) : moment(),
+    dueDate: selectedQuotation?.dueDate ? moment(selectedQuotation.dueDate) : moment(),
     purpose: selectedQuotation?.purpose || "",
     status: selectedQuotation?.status || "pending",
     total_amount: selectedQuotation?.total_amount || 0,
@@ -442,37 +58,223 @@ const CreateQuotation = () => {
     paymentStatus: selectedQuotation?.paymentStatus || "",
     remainingAmount: selectedQuotation?.remainingAmount || 0,
     remark: selectedQuotation?.remark || "",
-    govtRefNumber: selectedQuotation?.govtRefNumber || "",
+    govtRefNumber: selectedQuotation?.govtRefNumber || ""
   };
 
-  console.log("Initial Values:", formattedQuotation);
+  useEffect(() => {
+    form?.setFieldsValue(formattedQuotation);
+    setReadOnly(!!selectedQuotation);
+  }, [selectedQuotation]);
 
+  // useEffect(() => {
+  //   const unsubscribe = form.subscribe(({ values }) => {
+  //     const updatedItems = values?.lineItems?.map((item) => ({
+  //       ...item,
+  //       quantityAmount: (item.quantity || 0) * (item.amount || 0),
+  //     }));
+  //     form?.setFieldsValue({ lineItems: updatedItems });
+  //   });
+
+  //   return () => unsubscribe?.();
+  // }, [form]);
+
+  const onFinish = async (values) => {
+    const payload = {
+      ...values,
+      date: values.date.format("YYYY-MM-DD"),
+      dueDate: values.dueDate.format("YYYY-MM-DD"),
+    };
+    try {
+      setLoading(true);
+      await dispatch(addQuotation(payload)).unwrap();
+      message.success("Quotation created successfully");
+      navigate("/finance/quotations/quotations-list");
+    } catch (err) {
+      message.error("Error creating quotation");
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    const unsubscribe = form?.watch?.((changedValues, allValues) => {
+      if (changedValues?.lineItems) {
+        const updatedItems = allValues.lineItems.map((item) => ({
+          ...item,
+          quantityAmount: (item.quantity || 0) * (item.amount || 0),
+        }));
+        form.setFieldsValue({ lineItems: updatedItems });
+      }
+    });
+    return () => unsubscribe?.();
+  }, [form]);
+  
   return (
     <Layout>
       <DashLayout>
-        <div className="p-6 min-h-screen">
-          {readOnly && (
-            <div className="bg-yellow-100 text-yellow-900 px-4 py-2 rounded-md mb-4">
-              Currently in read-only mode. You cannot edit these fields.
-            </div>
-          )}
+        <div className="p-6 min-h-screen bg-white">
+          <Title level={3}>{readOnly ? "View Quotation" : "Create Quotation"}</Title>
+          <Divider />
 
-          <Formik
-            initialValues={formattedQuotation}
-            validationSchema={!readOnly ? validationSchema : null}
-            onSubmit={handleSubmit}
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onFinish}
+            disabled={readOnly}
+            onValuesChange={(changedValues, allValues) => {
+              if (changedValues?.lineItems) {
+                const updatedItems = allValues.lineItems.map((item) => ({
+                  ...item,
+                  quantityAmount: (item.quantity || 0) * (item.amount || 0),
+                }));
+                form.setFieldsValue({ lineItems: updatedItems });
+              }
+            }}
           >
-            <QuotationFormInner
-              readOnly={readOnly}
-              loading={loading}
-              formattedQuotation={formattedQuotation}
-              handleSubmit={handleSubmit}
-            />
-          </Formik>
+
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
+                <Form.Item label="Receiver Name" name={["receiver", "name"]} rules={[{ required: true }]}>
+                  <Input placeholder="Enter receiver's name" />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Address" name={["receiver", "address"]}>
+                  <Input placeholder="Enter address" />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Phone" name={["receiver", "phone"]}>
+                  <Input placeholder="Enter phone number" />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col span={8}>
+                <Form.Item label="Email" name={["receiver", "email"]}>
+                  <Input type="email" placeholder="Enter email" />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Purpose" name="purpose" rules={[{ required: true }]}>
+                  <Input placeholder="Enter purpose" />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="Quotation Date" name="date" rules={[{ required: true }]}>
+                  <DatePicker style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider orientation="left" className="px-10">Items</Divider>
+            <Form.List name="lineItems">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, ...restField }) => (
+                    <Row gutter={[16, 16]} key={key} align="middle">
+                      <Col span={5}>
+                        <Form.Item {...restField} name={[name, "category"]} label="Category">
+                          <Input placeholder="Category" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={5}>
+                        <Form.Item {...restField} name={[name, "description"]} label="Description">
+                          <Input placeholder="Description" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={3}>
+                        <Form.Item {...restField} name={[name, "quantity"]} label="Qty">
+                          <InputNumber min={1} style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={3}>
+                        <Form.Item {...restField} name={[name, "amount"]} label="Rate">
+                          <InputNumber min={0} style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={4}>
+                        <Form.Item {...restField} name={[name, "quantityAmount"]} label="Total">
+                          <InputNumber disabled style={{ width: "100%" }} />
+                        </Form.Item>
+                      </Col>
+                      <Col span={2}>
+                        {!readOnly && <MinusCircleOutlined onClick={() => remove(name)} />}
+                      </Col>
+                    </Row>
+                  ))}
+                  {!readOnly && (
+                    <Form.Item>
+                      <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                        Add Item
+                      </Button>
+                    </Form.Item>
+                  )}
+                </>
+              )}
+            </Form.List>
+
+            <Divider />
+
+            <Row gutter={[16, 16]}>
+              <Col span={6}>
+                <Form.Item label="Due Date" name="dueDate">
+                  <DatePicker style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Tax (%)" name="tax">
+                  <InputNumber min={0} style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Discount Type" name="discountType" rules={[{ required: true }]}>
+                  <Select>
+                    <Select.Option value="percentage">Percentage</Select.Option>
+                    <Select.Option value="amount">Amount</Select.Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Discount" name="discount">
+                  <InputNumber min={0} style={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col span={6}>
+                <Form.Item label="Govt Ref #" name="govtRefNumber">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Remark" name="remark">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item label="Upload Document" name="document" valuePropName="fileList">
+                  <Upload beforeUpload={() => false} maxCount={1}>
+                    <Button icon={<UploadOutlined />}>Upload</Button>
+                  </Upload>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            {!readOnly && (
+              <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Save Quotation
+                </Button>
+              </Form.Item>
+            )}
+          </Form>
+
         </div>
       </DashLayout>
     </Layout>
   );
 };
 
-export default CreateQuotation;
+export default CreateQuotationAntForm;
