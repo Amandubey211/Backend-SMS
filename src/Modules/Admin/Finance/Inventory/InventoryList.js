@@ -10,6 +10,7 @@ import Sidebar from "../../../../Components/Common/Sidebar.js";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import { MdEdit, MdRemoveRedEye } from "react-icons/md";
 import { GoPlus } from "react-icons/go";
+import { render } from "react-dom";
 
 const InventoryList = () => {
   const dispatch = useDispatch();
@@ -64,8 +65,16 @@ const InventoryList = () => {
       title: "Status",
       dataIndex: "inventoryStatus",
       key: "inventoryStatus",
+      width: 50,
+    },
+    {
+      title: "Expiry Date",
+      dataIndex: "expireDate",
+      key:"expireDate",
+      render:(value)=><p>{value?.slice(0,10) || "-"}</p>,
       width: 100,
     },
+   
     {
       title: "Low Stock Alert",
       render: (_, record) => {

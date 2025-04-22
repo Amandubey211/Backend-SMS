@@ -72,7 +72,7 @@ export const fetchQuotationCardData = createAsyncThunk(
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
-      const response = await getData(`/${getRole}/dashboard/quotation/cardData?academicYearId=${say}`, params);
+      const response = await getData(`/${getRole}/revenue/card/quotation?academicYearId=${say}`, params);
       if (response?.success) {
         //toast.success("Quotation canceled successfully!");
         return response.data;

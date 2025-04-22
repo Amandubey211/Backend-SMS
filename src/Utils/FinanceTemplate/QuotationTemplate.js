@@ -4,9 +4,12 @@ import IconLogo from "../../Assets/RBAC/Icon.svg";
 import Cookies from "js-cookie";
 // Import the common calculation helper function
 import { calculateFinalAmount } from "../../Utils/helperFunctions";
+import { useSelector } from "react-redux";
 
 const QuotationTemplate = forwardRef((props, ref) => {
+
   const { data } = props;
+  const schoolCurrency =props.data?.schoolCurrency
   if (!data) return null;
 
   // Destructure necessary fields from the response data
@@ -73,7 +76,7 @@ const QuotationTemplate = forwardRef((props, ref) => {
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
       {/* Show "Cancelled" label if isCancel is true */}
-      
+
       {/* Header */}
       <div className="flex flex-col items-center mb-6">
         <div className="w-full bg-pink-100 flex-row px-4 py-2 flex justify-between items-center rounded-t-lg">
@@ -143,10 +146,11 @@ const QuotationTemplate = forwardRef((props, ref) => {
         <thead>
           <tr className="bg-pink-200 text-left">
             <th className="p-2 border border-gray-300">S.No</th>
+            <th className="p-2 border border-gray-300">Category</th>
             <th className="p-2 border border-gray-300">Item Description</th>
             <th className="p-2 border border-gray-300">Quantity</th>
-            <th className="p-2 border border-gray-300">Rate (QAR)</th>
-            <th className="p-2 border border-gray-300">Amount (QAR)</th>
+            <th className="p-2 border border-gray-300">Rate </th>
+            <th className="p-2 border border-gray-300">Amount </th>
           </tr>
         </thead>
         <tbody>
@@ -154,18 +158,19 @@ const QuotationTemplate = forwardRef((props, ref) => {
             lineItems.map((item, index) => (
               <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                 <td className="p-2 border border-gray-300 text-center">{index + 1}</td>
-                <td className="p-2 border border-gray-300">{item.revenueType || "N/A"}</td>
+                <td className="p-2 border border-gray-300">{item.category || "N/A"}</td>
+                <td className="p-2 border border-gray-300">{item.description || "N/A"}</td>
                 <td className="p-2 border border-gray-300 text-center">{item.quantity || 1}</td>
                 <td className="p-2 border border-gray-300 text-right">
                   {item.amount && item.quantity
                     ? (item.amount / item.quantity).toFixed(2)
                     : item.amount
-                    ? item.amount.toFixed(2)
-                    : "0.00"}{" "}
-                  QAR
+                      ? item.amount.toFixed(2)
+                      : "0.00"}{" "}
+                  {schoolCurrency}
                 </td>
                 <td className="p-2 border border-gray-300 text-right">
-                  {item.amount ? parseFloat(item.amount).toLocaleString() + " QAR" : "0 QAR"}
+                  {item.amount ? parseFloat(item.amount).toLocaleString() : 0} {schoolCurrency}
                 </td>
               </tr>
             ))
@@ -178,38 +183,41 @@ const QuotationTemplate = forwardRef((props, ref) => {
           )}
           {/* Subtotal Row */}
           <tr className="font-bold bg-gray-50">
-            <td className="p-2 border border-gray-300" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="5">
               Subtotal
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {subtotal.toLocaleString()} QAR
+              {subtotal.toLocaleString()} {schoolCurrency}
             </td>
           </tr>
           {/* Tax Row */}
           <tr>
-            <td className="p-2 border border-gray-300" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="5">
               Tax
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {tax.toFixed(2)} %
+              {tax > 0 ? `${tax.toFixed(2)}%` : 0}
             </td>
           </tr>
           {/* Discount Row */}
           <tr>
-            <td className="p-2 border border-gray-300" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="5">
               Discount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {discountType === "percentage" ? `${displayedDiscountPercentage}%` : `${discountAmount.toFixed(2)} QAR`}
+              {
+                discountAmount > 0 ? <>{discountType === "percentage" ? `${displayedDiscountPercentage}%` : `${discountAmount.toFixed(2)} ${schoolCurrency}`}</> : 0
+              }
+
             </td>
           </tr>
           {/* Final Total Row */}
           <tr className="font-bold text-pink-600">
-            <td className="p-2 border border-gray-300" colSpan="4">
+            <td className="p-2 border border-gray-300" colSpan="5">
               Final Amount
             </td>
             <td className="p-2 border border-gray-300 text-right">
-              {finalAmount} QAR
+              {finalAmount}
             </td>
           </tr>
         </tbody>

@@ -74,14 +74,7 @@ const InventoryForm = ({ visible, onClose, editData }) => {
       <EntitySelect  onClose={onClose} onSelect={setSelectedEntity} disabled={viewMode} EntityName={editData?.supplierId.entityName}/>
       </Form.Item>
 </div>
-      <div className="grid grid-cols-2 gap-4">
-        <Form.Item name="orderDate" label="Order Date" rules={[{ required: true, message: "Please enter Order Date" }]}> 
-          <DatePicker className="w-full" disabled={viewMode} />
-        </Form.Item>
-        <Form.Item name="deliveryDate" label="Delivery Date" rules={[{ required: true, message: "Please enter Order Date" }]}> 
-          <DatePicker className="w-full" disabled={viewMode}/>
-        </Form.Item>
-      </div>
+      
       <div className="grid grid-cols-2 gap-4">
       <Form.Item name="lowStockAlert" label="Low Stock Alert" > 
         <select placeholder="Set Low Stock Alert" disabled={viewMode} className="w-full py-2 border border-gray-200 rounded-lg" > 
@@ -101,6 +94,17 @@ const InventoryForm = ({ visible, onClose, editData }) => {
           <Input type="number"  placeholder="Enter Low Stock Number" disabled={viewMode} />
         </Form.Item>
           </div>
+          <div className="grid grid-cols-3 gap-4">
+        <Form.Item name="orderDate" label="Order Date" rules={[{ required: true, message: "Please enter Order Date" }]}> 
+          <DatePicker className="w-full" disabled={viewMode} />
+        </Form.Item>
+        <Form.Item name="deliveryDate" label="Delivery Date" rules={[{ required: true, message: "Please enter Order Date" }]}> 
+          <DatePicker className="w-full" disabled={viewMode}/>
+        </Form.Item>
+        <Form.Item name="expireDate" label="Expire Date" > 
+          <DatePicker className="w-full" disabled={viewMode}/>
+        </Form.Item>
+      </div>
   
          <button disabled={viewMode} className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2" htmlType="submit"> 
           {editData ? "Update Inventory" : "Add Inventory"} 

@@ -307,6 +307,7 @@ const navigate = useNavigate()
           onClose={handleModalClose}
         >
           <SidebarClassSelection   onClose={handleModalClose}/>
+          {studentsIdsArray.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={()=>handleModalClose()}>Done</div>}
         </Sidebar>
     </div>
   );

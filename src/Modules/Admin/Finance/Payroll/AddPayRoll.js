@@ -398,6 +398,7 @@ const AddPayRoll = () => {
 
           <Sidebar title="Select Multiple Users" width="50%" isOpen={isModalVisible} onClose={() => setIsModalVisible(false)}>
             <SelectStaffs staffIds={staffIds} setStaffIds={setStaffIds} />
+            {staffIds?.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={()=>setIsModalVisible(false)}>Done</div>}
           </Sidebar>
         </div>
       </AdminDashLayout>

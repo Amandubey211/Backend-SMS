@@ -185,13 +185,23 @@ const EntityAddForm = ({ onClose, editData }) => {
       </Row>
 
       <Form.Item>
+        <div className="flex flex-row items-center justify-center gap-2">
+        <button
+         onClick={()=>form.resetFields()}
+         className="border border-purple-500 text-black flex items-center justify-center  w-[60%] py-2 rounded-lg"
+    
+       >
+         Clear 
+       </button>
         <button
           disabled={viewMode}
-          className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2"
+          className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2 rounded-lg"
           htmlType="submit"
         >
           {editData ? "Entity Full Detail" : "Add Entity"}
         </button>
+       
+        </div>
       </Form.Item>
     </Form>
   );

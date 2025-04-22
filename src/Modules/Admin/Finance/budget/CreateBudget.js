@@ -56,6 +56,7 @@ const CreateBudgetForm = ({ onClose, editData }) => {
 
         <Form.Item name="frequency" label="Frequency" rules={[{ required: true, message: "Select Frequency" }]}>
           <select placeholder="Select Frequency" className="w-[13rem] h-[2.5rem] border border-gray-200 rounded-lg">
+          <option  value=''>Select</option>
             {frequencyOptions.map(freq => (
               <option key={freq} value={freq}>{freq}</option>
             ))}
@@ -68,7 +69,7 @@ const CreateBudgetForm = ({ onClose, editData }) => {
 
       <button
         type="submit"
-        className="bg-gradient-to-r from-green-500 to-blue-500 text-white w-full py-2 rounded-md"
+        className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-full py-2 rounded-md"
       >
         Create Budget
       </button>
