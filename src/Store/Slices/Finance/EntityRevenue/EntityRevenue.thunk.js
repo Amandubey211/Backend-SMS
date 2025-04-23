@@ -70,12 +70,17 @@ export const createEntityRevenue = createAsyncThunk(
         toast.success('Invoice created  successfully!');
         navigate('/finance/entity/revenue/list')
       }else{
-        toast.error(response?.message);
+        
+        toast.error(response?.error || response?.message);
       }
       return response;
     } catch (error) {
-      toast.dismiss()
+    
+        toast.dismiss()
       toast.error('Please fill the required Fields !');
+      console.log(error);
+      
+      
       return handleError(error, dispatch, rejectWithValue);
     }
   }

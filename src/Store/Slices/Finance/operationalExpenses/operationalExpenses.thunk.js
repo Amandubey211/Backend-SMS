@@ -61,7 +61,7 @@ export const updateOperationalExpenses  = createAsyncThunk(
       const getRole = getUserRole(getState);
       const response = await putData(
         `/${getRole}/expense/update/generalExpense/${data.id}?say=${say}`,
-        data
+        {data}
       );
      if(response.success){
       toast.success(response.message);

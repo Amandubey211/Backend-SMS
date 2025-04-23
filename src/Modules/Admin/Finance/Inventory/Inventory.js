@@ -22,7 +22,7 @@ const Inventory = () => {
   const role = useSelector((store) => store.common.auth.role);
   const { inventories, loading, total, totalPages, page, otherData } = useSelector((store) => store.admin.inventory);
   const { lowStock } = useSelector((store) => store.admin.inventory);
-const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
+  const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const [searchText, setSearchText] = useState("");
   const [lowStocksearchText, setSowStockSearchText] = useState("");
   const [inventoryStatus, setInventoryStatus] = useState("");
@@ -44,9 +44,9 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
 
   }, [dispatch, inventoryStatus, searchText, currentPage, pageSize]);
   useEffect(() => {
-    dispatch(fetchLowInventory({  search: lowStocksearchText, page: lowStockcurrentPage, limit: lowStockpageSize }));
+    dispatch(fetchLowInventory({ search: lowStocksearchText, page: lowStockcurrentPage, limit: lowStockpageSize }));
 
-  }, [  lowStocksearchText, lowStockcurrentPage, lowStockpageSize]);
+  }, [lowStocksearchText, lowStockcurrentPage, lowStockpageSize]);
 
 
   const columns = [
@@ -83,17 +83,17 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
       width: 100,
     },
     {
-          title: "Expiry Date",
-          dataIndex: "expireDate",
-          key:"expireDate",
-          render:(value)=><p>{value?.slice(0,10) || "-"}</p>,
-          width: 100,
-        },
+      title: "Expiry Date",
+      dataIndex: "expireDate",
+      key: "expireDate",
+      render: (value) => <p>{value?.slice(0, 10) || "-"}</p>,
+      width: 100,
+    },
     {
       title: "Low Stock Alert",
-      render: (_, record) =>{
-        return(
-          <p className={`text-${record.lowStockAlert?"green":"red"}-500 font-bold px-14`}>{record.lowStockAlert?"Yes":"No"}</p>
+      render: (_, record) => {
+        return (
+          <p className={`text-${record.lowStockAlert ? "green" : "red"}-500 font-bold px-14`}>{record.lowStockAlert ? "Yes" : "No"}</p>
         )
       },
       width: 100,
@@ -143,10 +143,10 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
       key: "inventoryStatus",
       width: 100,
     },
-    
+
     {
       title: "Reorder Level",
-       dataIndex: "lowStockNumber",
+      dataIndex: "lowStockNumber",
       key: "lowStockNumber",
       width: 100,
       width: 100,
@@ -154,7 +154,7 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
     // {
     //   title: "Action",
     //   render: (_, record) => (
-        
+
     //       <a href="#" className="text-sm text-blue-500">
     //       Generate Purchase Order
     //       </a>
@@ -195,70 +195,73 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
             { title: "Total Assets Value", value: `${otherData?.totalAssestPrice == "undefined" ? 0 : otherData?.totalAssestPrice || 0} ${schoolCurrency}`, icon: <BiMoneyWithdraw /> }
             ].map((item, index) => (
               <>
-              <div
-        className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
-        style={{
-          background:
-            "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
-          borderColor: "#DABDFF",
-        }}
-      >
-        {/* Title and Icon */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
-            {item?.icon}
-          </div>
-          <h3 className="text-sm font-medium text-gray-800 truncate">{item?.title}</h3>
-        </div>
-  
-        {/* Value and Trend */}
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
-            {item?.value}
-          </h2>
-        </div>
-      </div>
-              </>
-            ))}
-          </div>
-
-         {otherData?.inventoryCategories?.length > 0 && <>
-          <h1 className="font-bold mb-2">
-          Inventory Categories
-        </h1>
-          <div className="flex flex-row item-center flex-wrap bg-gradient-to-t from-purple-100 to-pink-100 text-white p-4 mb-4 gap-2">
-
-            {otherData?.inventoryCategories?.map((category, index) => (
-              <>
-                <div className="flex items-center flex-col  gap-1 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem]" key={index}>
-                  <div className="flex justify-between items-center">
-                    <img src={category?.categoryId?.icon} alt="logo" className="w-10 h-10" />
+                <div
+                  className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
+                  style={{
+                    background:
+                      "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
+                    borderColor: "#DABDFF",
+                  }}
+                >
+                  {/* Title and Icon */}
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
+                      {item?.icon}
+                    </div>
+                    <h3 className="text-sm font-medium text-gray-800 truncate">{item?.title}</h3>
                   </div>
-                  <div className="flex justify-between items-center text-purple-900">
-  <Tooltip
-    title={category?.categoryId?.categoryName}
-    placement="top"
-    overlayClassName="max-w-xs"
-  >
-    <span>
-      {category?.categoryId?.categoryName?.length > 15
-        ? category.categoryId.categoryName.slice(0, 15) + '...'
-        : category?.categoryId?.categoryName}
-    </span>
-  </Tooltip>
-</div>
+
+                  {/* Value and Trend */}
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
+                      {item?.value}
+                    </h2>
+                  </div>
                 </div>
               </>
             ))}
-            <div className="flex items-center flex-col gap-2 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem] cursor-pointer" onClick={() => { navigate("/finance/categories")}}>
-              <div className="flex justify-between items-center">
-                <CgAddR size={34} className="text-purple-400" />
+          </div>
+
+          {otherData?.inventoryCategories?.length > 0 && <>
+            <h1 className="font-bold mb-2">
+              Inventory Categories
+            </h1>
+            <div className="flex flex-row item-center flex-wrap bg-gradient-to-t from-purple-100 to-pink-100 text-white p-4 mb-4 gap-2">
+
+              {otherData?.inventoryCategories?.filter(
+  (value, index, self) =>
+    index === self.findIndex((u) => u.categoryId?.categoryName === value.categoryId?.categoryName)
+)?.map((category, index) => (
+                <>
+                  <div className="flex items-center flex-col  gap-1 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem]" key={index}>
+                    <div className="flex justify-between items-center">
+                      <img src={category?.categoryId?.icon} alt="logo" className="w-10 h-10" />
+                    </div>
+                    <div className="flex justify-between items-center text-purple-900">
+                      <Tooltip
+                        title={category?.categoryId?.categoryName}
+                        placement="top"
+                        overlayClassName="max-w-xs"
+                      >
+                        <span>
+                          {category?.categoryId?.categoryName?.length > 15
+                            ? category.categoryId.categoryName.slice(0, 15) + '...'
+                            : category?.categoryId?.categoryName}
+                        </span>
+                      </Tooltip>
+                    </div>
+                  </div>
+                </>
+              ))}
+              <div className="flex items-center flex-col gap-2 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem] cursor-pointer" onClick={() => { navigate("/finance/categories") }}>
+                <div className="flex justify-between items-center">
+                  <CgAddR size={34} className="text-purple-400" />
+                </div>
+                <div className="flex justify-between items-center text-purple-900">
+                  Add New Category
+                </div>
               </div>
-              <div className="flex justify-between items-center text-purple-900">
-                Add New Category
-              </div>
-            </div>
-          </div></>}
+            </div></>}
 
           <div className="flex w-full flex-row items-center justify-between mb-4 gap-4">
             <div>
@@ -274,22 +277,22 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
                 allowClear
                 className="w-60 py-2"
               />
-              <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm" onClick={()=>navigate("/finance/Inventory/list")}>View More</button>
+              <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm" onClick={() => navigate("/finance/Inventory/list")}>View More</button>
             </div>
 
           </div>
 
           <Table
-            dataSource={inventories?.slice(0,5)}
+            dataSource={inventories?.slice(0, 5)}
             columns={columns}
             size="small"
-            
+
             loading={{ spinning: loading, indicator: <Spin size="large" /> }}
             bordered
           />
         </div>
-     <div className="p-4">
-     <div className="flex w-full flex-row items-center justify-between mb-4 gap-4">
+        <div className="p-4">
+          <div className="flex w-full flex-row items-center justify-between mb-4 gap-4">
             <div>
               <h1 className="font-bold">Low Inventory List</h1>
 
@@ -312,11 +315,11 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
             dataSource={lowStock.inventories}
             columns={lowStockcolumns}
             size="small"
-            
+
             loading={{ spinning: lowStock.loading, indicator: <Spin size="large" /> }}
             bordered
           />
-     </div>
+        </div>
         <Sidebar
           title={selectedInventory ? "Item Full Information" : "Add Inventory"}
           width="50%"

@@ -90,10 +90,11 @@ const PayrollList = () => {
       dataIndex: "status",
       key: "status",
       render: (status) => {
-        const color = status === "paid" ? "green" : "yellow";
-        return <Tag color={color}>{status}</Tag>;
+        const color = status == "paid" ? "green" : "yellow";
+        const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+        return <Tag color={color}>{capitalizedStatus}</Tag>;
       },
-    },
+    },    
     {
       title: "Action",
       key: "action",
@@ -292,7 +293,7 @@ const PayrollList = () => {
             />
             <div
               ref={popupRef}
-              className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+              className="relative p-6 w-full max-w-[70vw] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex justify-end space-x-2 mb-4">

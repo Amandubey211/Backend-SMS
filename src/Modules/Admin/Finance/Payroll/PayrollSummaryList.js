@@ -53,10 +53,12 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
       dataIndex: "status",
       key: "status",
       render: (status) => {
-        const color = status === "paid" ? "green"  : "yellow";
-        return <Tag color={color}>{status}</Tag>;
+        const color = status == "paid" ? "green" : "yellow";
+        const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
+        return <Tag color={color}>{capitalizedStatus}</Tag>;
       },
-    },
+    }
+    
     
     
   ];

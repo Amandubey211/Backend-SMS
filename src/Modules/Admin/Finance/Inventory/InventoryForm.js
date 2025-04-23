@@ -24,6 +24,7 @@ const InventoryForm = ({ visible, onClose, editData }) => {
         ...editData,
         orderDate: editData.orderDate ? dayjs(editData.orderDate) : null, 
         deliveryDate: editData.deliveryDate ? dayjs(editData.deliveryDate) : null,
+        expireDate: editData?.expireDate ? dayjs(editData.expireDate) : null,
       });
       setSelectedCategory({ _id: editData.categoryId, categoryName: editData.categoryName });
       setSelectedEntity({ _id: editData.supplierId._id});

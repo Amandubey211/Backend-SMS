@@ -547,7 +547,7 @@ const RecentQuotationList = () => {
               />
               <div
                 ref={popupRef}
-                className="relative p-6 w-full max-w-[700px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                className="relative p-6 w-full max-w-[70vw] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex justify-end space-x-2 mb-4">
