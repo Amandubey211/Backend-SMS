@@ -245,7 +245,7 @@ const navigate = useNavigate();
                         {/* Centered content */}
                         <div
                           ref={popupRef}
-                          className="relative p-6 w-full max-w-[800px] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
+                          className="relative p-6 w-full max-w-[70vw] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
                           {/* Close Button */}

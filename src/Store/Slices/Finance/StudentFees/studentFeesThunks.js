@@ -89,7 +89,7 @@ export const createStudentFee = createAsyncThunk(
         toast.success('Fees added  successfully!');
         navigate('/finance/studentfees/total-revenue')
       }else{
-        toast.error(response?.message);
+        toast.error(response?.error || response?.message);
       }
       return response;
     } catch (error) {
