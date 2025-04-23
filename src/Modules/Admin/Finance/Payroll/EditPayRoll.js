@@ -3,13 +3,14 @@ import { Form, Input, Select, Button, InputNumber, Row, Col } from "antd";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { updatePayroll } from "../../../../Store/Slices/Finance/payroll/payroll.thunk";
 
 const { Option } = Select;
 
 const EditPayRoll = ({ data }) => {
+    const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -41,15 +42,15 @@ const EditPayRoll = ({ data }) => {
                   <Col span={6}><strong>Category:</strong> {item?.categoryName}</Col>
                   <Col span={6}><strong>Sub Category:</strong> {item?.budgetName}</Col>
                   <Col span={6}><strong>Month:</strong> {item?.salaryMonth}</Col>
-                  <Col span={6}><strong>Basic Salary:</strong> ₹{item?.basicSalary}</Col>
-                  <Col span={6}><strong>Allowances:</strong> ₹{item?.allowances}</Col>
-                  <Col span={6}><strong>Leave Deductions:</strong> ₹{item?.leaveDeductions}</Col>
-                  <Col span={6}><strong>Overtime:</strong> ₹{item?.overtime}</Col>
-                  <Col span={6}><strong>Adjustments:</strong> ₹{item?.otherAdjustments}</Col>
-                  <Col span={6}><strong>Deductions:</strong> ₹{item?.deductions}</Col>
-                  <Col span={6}><strong>Tax:</strong> ₹{item?.tax}</Col>
-                  <Col span={6}><strong>Bonus:</strong> ₹{item?.bonus}</Col>
-                  <Col span={6}><strong>Net Salary:</strong> ₹{item?.netSalary}</Col>
+                  <Col span={6}><strong>Basic Salary:</strong>  {item?.basicSalary}</Col>
+                  <Col span={6}><strong>Allowances:</strong>  {item?.allowances}</Col>
+                  <Col span={6}><strong>Leave Deductions:</strong>  {item?.leaveDeductions}</Col>
+                  <Col span={6}><strong>Overtime:</strong>  {item?.overtime}</Col>
+                  <Col span={6}><strong>Adjustments:</strong>  {item?.otherAdjustments}</Col>
+                  <Col span={6}><strong>Deductions:</strong>  {item?.deductions}</Col>
+                  <Col span={6}><strong>Tax:</strong>  {item?.tax}</Col>
+                  <Col span={6}><strong>Bonus:</strong>  {item?.bonus}</Col>
+                  <Col span={6}><strong>Net Salary:</strong>  {item?.netSalary} {schoolCurrency}</Col>
                 </Row>
               </div>
             ))}
@@ -113,7 +114,7 @@ const EditPayRoll = ({ data }) => {
                 </Col>
               </Row>
             </div>
-            <Button htmlType="submit" className="bg-gradient-to-r from-green-500 to-blue-500 text-white mt-4">
+            <Button htmlType="submit" className="bg-gradient-to-r from-pink-500 to-purple-500 text-white mt-4">
               Update Payroll
             </Button>
           </Form>

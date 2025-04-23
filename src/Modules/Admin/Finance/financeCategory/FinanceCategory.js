@@ -59,7 +59,9 @@ const FinanceCategory = () => {
       title: "Category For",
       dataIndex: "categoryType",
       key: "categoryType",
-      render: (value) => <span className="text-md">{value}</span>,
+      render: (value) =>{ 
+        const capitalizedStatus = value?.charAt(0)?.toUpperCase() + value?.slice(1);
+       return <span className="text-md">{capitalizedStatus}</span>},
       ellipsis: true,
       width: 60,
     },
