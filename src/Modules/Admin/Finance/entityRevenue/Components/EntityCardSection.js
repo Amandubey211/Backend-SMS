@@ -19,7 +19,7 @@ const EntityCardSection = () => {
       icon: <FaDollarSign />, 
     },
     {
-      title: "Amount not collected",
+      title: "Amount Not Collected",
       value: totalAllAmount -paidAllAmount,
       icon: <FaExclamationCircle />, 
     },

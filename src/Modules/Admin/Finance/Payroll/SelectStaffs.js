@@ -55,7 +55,7 @@ const SelectStaffs = ({ staffIds,setStaffIds}) => {
       <div>
         <select onClick={(e)=>getStaff(e.target.value)} >
           {['teacher', 'finance', 'librarian', 'staff'].map((i)=>(
-            <option key={i} value={i}>{i}</option>
+            <option key={i} value={i}>{i.charAt(0).toUpperCase() + i.slice(1)}</option>
           ))}
         </select>
       </div>

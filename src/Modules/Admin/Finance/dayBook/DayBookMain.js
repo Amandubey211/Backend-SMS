@@ -72,6 +72,10 @@ const DayBookMain = () => {
       title: "Payment Method",
       dataIndex: "paymentMethod",
       key: "paymentMethod",
+      render: (value) => {
+        const capitalizedStatus = value.charAt(0).toUpperCase() + value.slice(1);
+        return <p>{capitalizedStatus}</p>;
+      },
     },
     {
       title: "Amount",

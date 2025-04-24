@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, InputNumber, Row, Col } from "antd";
+import { Form, Input, Select, Button, InputNumber, Row, Col, Tooltip, DatePicker } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { VscListSelection } from "react-icons/vsc";
 import Sidebar from "../../../../Components/Common/Sidebar";
@@ -11,6 +11,8 @@ import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { fetchBudget } from "../../../../Store/Slices/Finance/budget/budget.thunk";
 import SidebarEntitySelection from "../entityRevenue/Components/SelectEntities";
 import { createOperationalExpense } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
+import { BsInfoCircle } from "react-icons/bs";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -137,7 +139,9 @@ const AddOperationalExpenses = () => {
     });
   };
 
-
+  const { activeYear } = useSelector((store) => store.common.financialYear);
+  const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
+  const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
   return (
     <Layout title="Finance | Add Expense">
       <AdminDashLayout>
@@ -168,7 +172,24 @@ const AddOperationalExpenses = () => {
               <div key={index} className="p-4 border rounded-lg bg-gray-100 space-y-4 mb-4">
                 <Row gutter={16}>
                   <Col span={6}>
-                    <Form.Item name={["lineItems", index, "categoryId"]} label="Category" required>
+                    <Form.Item name={["lineItems", index, "categoryId"]} 
+                    label={
+                      <span className="flex items-center gap-1">
+                        <span className="font-medium">Category</span>
+                        <Tooltip
+                          title={
+                            <>
+                              <div className="text-xs">Shows Expense  categories only.
+                              Use this to track purchases.</div>
+      
+                            </>
+                          }
+                        >
+                          <BsInfoCircle className="cursor-pointer" />
+                        </Tooltip>
+                      </span>
+                    } 
+                    required>
                       <Select
                         style={{ width: "100%" }}
                         value={item.categoryId}
@@ -231,13 +252,18 @@ const AddOperationalExpenses = () => {
                   </> : <>
                     <Col span={6}>
                       <Form.Item name={["lineItems", index, "startDate"]} label="Start Date">
-                        <input type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.startDate} onChange={(e) => handleInputChange(index, "startDate", e.target.value)} />
+                        <DatePicker type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.startDate} onChange={(e) => handleInputChange(index, "startDate", e)} 
+                           disabledDate={(current) =>
+                            current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                          }/>
                       </Form.Item>
                     </Col>
 
                     <Col span={6}>
                       <Form.Item name={["lineItems", index, "endDate"]} label="End Date">
-                        <input type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.endDate} onChange={(e) => handleInputChange(index, "endDate", e.target.value)} />
+                        <DatePicker type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.endDate} onChange={(e) => handleInputChange(index, "endDate", e)}  disabledDate={(current) =>
+                    current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                  }/>
                       </Form.Item>
                     </Col>
                   </>}
@@ -294,7 +320,11 @@ const AddOperationalExpenses = () => {
 
                   <Col span={6}>
                     <Form.Item label="Payment Date" name="paymentDate" rules={[{ required: true, message: "Payment Date is required" }]}>
-                      <input type="date" className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={receiptData.paymentDate} onChange={(e) => handleChange("paymentDate", e.target.value)} />
+                      <DatePicker type="date" className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={receiptData.paymentDate} onChange={(e) => handleChange("paymentDate", e)}
+                       disabledDate={(current) =>
+                        current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                      }
+                       />
                     </Form.Item>
                   </Col>
                 </>:null}
@@ -309,7 +339,9 @@ const AddOperationalExpenses = () => {
                   </Col>
                   <Col span={6}>
                     <Form.Item label="Cheque Date" name="chequeDate" rules={[{ required: true, message: "Cheque Date is required" }]}>
-                      <input type="date" className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={receiptData.chequeDate} onChange={(e) => handleChange("chequeDate", e.target.value)} />
+                      <DatePicker type="date" className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2" value={receiptData.chequeDate} onChange={(e) => handleChange("chequeDate", e)}  disabledDate={(current) =>
+                    current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                  } />
                     </Form.Item>
                   </Col>
                 </Row>

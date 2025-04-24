@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, InputNumber, Row, Col } from "antd";
+import { Form, Input, Select, Button, InputNumber, Row, Col, DatePicker } from "antd";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { updatePayroll } from "../../../../Store/Slices/Finance/payroll/payroll.thunk";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -30,6 +31,9 @@ const EditPayRoll = ({ data }) => {
   const handleSubmit = () => {
     dispatch(updatePayroll({ id: data._id, data:receiptData }));
   };
+  const { activeYear } = useSelector((store) => store.common.financialYear);
+  const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
+  const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
 
   return (
     <>
@@ -84,7 +88,9 @@ const EditPayRoll = ({ data }) => {
 
                     <Col span={6}>
                       <Form.Item label="Payment Date" name="paymentDate" rules={[{ required: true }]}>
-                        <input type="date" className="w-full border p-2 rounded" value={receiptData.paymentDate} onChange={(e) => handleChange("paymentDate", e.target.value)} />
+                        <DatePicker type="date" className="w-full border p-2 rounded" value={receiptData.paymentDate} onChange={(e) => handleChange("paymentDate", e)}  disabledDate={(current) =>
+                    current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                  }/>
                       </Form.Item>
                     </Col>
                   </>
@@ -99,7 +105,9 @@ const EditPayRoll = ({ data }) => {
                     </Col>
                     <Col span={6}>
                       <Form.Item label="Cheque Date" name="chequeDate" rules={[{ required: true }]}>
-                        <input type="date" className="w-full border p-2 rounded" value={receiptData.chequeDate} onChange={(e) => handleChange("chequeDate", e.target.value)} />
+                        <DatePicker type="date" className="w-full border p-2 rounded" value={receiptData.chequeDate} onChange={(e) => handleChange("chequeDate", e)}  disabledDate={(current) =>
+                    current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                  } />
                       </Form.Item>
                     </Col>
                   </>

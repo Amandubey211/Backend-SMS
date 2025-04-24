@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, DatePicker, Select, InputNumber } from "antd";
+import { Form, Input, DatePicker, Select, InputNumber, Tooltip } from "antd";
 import { useDispatch } from "react-redux";
 import dayjs from "dayjs";
 import FinanceCategorySelect from "../financeCategory/FinanceCategorySelect";
 import { createBudget } from "../../../../Store/Slices/Finance/budget/budget.thunk";
+import { BsInfoCircle } from "react-icons/bs";
 
 const frequencyOptions = [
   "Monthly",  "Yearly",
@@ -33,7 +34,21 @@ const CreateBudgetForm = ({ onClose, editData }) => {
     <Form form={form} layout="vertical" onFinish={handleSubmit}>
       <div className="grid grid-cols-2 gap-4">
       <Form.Item
-          label="Category"
+          label={
+            <span className="flex items-center gap-1">
+              <span className="font-medium">Category</span>
+              <Tooltip
+                title={
+                  <>
+                    <div className="text-xs">Only Expense categories appear here.
+                    Use this to allocate budgets for salaries, rent, maintenance, etc.</div>
+                  </>
+                }
+              >
+                <BsInfoCircle className="cursor-pointer" />
+              </Tooltip>
+            </span>
+          } 
           required
           validateStatus={!selectedCategory ? "error" : ""}
           help={!selectedCategory ? "Please select a category" : ""}

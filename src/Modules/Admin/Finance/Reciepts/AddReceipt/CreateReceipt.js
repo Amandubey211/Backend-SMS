@@ -12,6 +12,7 @@ import { TbFileInvoice } from "react-icons/tb";
 import { createReceipt, fetchReciptInvoiceData } from "../../../../../Store/Slices/Finance/Receipts/receiptsThunks";
 import {  Form, Input, Button, Select, DatePicker } from "antd";
 import Layout from "../../../../../Components/Common/Layout";
+import dayjs from "dayjs";
 const CreateReceipt = () => {
  
   const dispatch = useDispatch()
@@ -31,7 +32,7 @@ const CreateReceipt = () => {
     paymentType: "",
     paymentStatus: "",
     paidBy: "",
-    paymentDate: new Date(),
+    paymentDate: '',
     paidItems: [],
     chequeNumber: "",
     chequeDate: null,
@@ -127,7 +128,9 @@ const CreateReceipt = () => {
     }
   }
 
-
+  const { activeYear } = useSelector((store) => store.common.financialYear);
+  const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
+  const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
   return (
     <Layout title="Finance | Create Reciept">
     <DashLayout>
@@ -260,15 +263,18 @@ const CreateReceipt = () => {
         </Col>
         <Col span={6}>
           <Form.Item label="Payment Date" name="paymentDate"  rules={[{ required: true ,message:"Payment Date is required"}]}>
-            <input type="date"
+            <DatePicker type="date"
             className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2"
               value={receiptData.paymentDate}
-              onChange={(e) => handleChange("paymentDate", e.target.value)}
+              onChange={(value) => handleChange("paymentDate", value)}
+              disabledDate={(current) =>
+                current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+              }
             />
           </Form.Item>
         </Col>
         <Col span={6}>
-          <Form.Item label={`Payer Full Name (${'*Name on Bank Account'})`} name="paidBy" rules={[{ required: true ,message:"Payer Name is required"}]}>
+          <Form.Item label={`Payer Full Name`} name="paidBy" rules={[{ required: true ,message:"Payer Name is required"}]}>
             <Input
               value={receiptData.paidBy}
               placeholder="Payer Full Name"
@@ -308,11 +314,14 @@ const CreateReceipt = () => {
               </Form.Item>
             </Col>
             <Col span={6}>
-              <Form.Item label="Cheque Date" name="chequeDate"  rules={[{ required: true ,message:"Cheque Date is required"}]}>
-                <input type="date"
+              <Form.Item label="Cheque Date" name="chequeDate" >
+                <DatePicker type="date"
                 className="w-[15rem] h-[2rem] border border-gray-300 rounded-lg p-2"
                   value={receiptData.chequeDate}
-                  onChange={(e) => handleChange("chequeDate", e.target.value)}
+                  onChange={(value) => handleChange("chequeDate", value)}
+                  disabledDate={(current) =>
+                    current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                  }
                 />
               </Form.Item>
             </Col>
