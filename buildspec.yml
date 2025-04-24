@@ -8,7 +8,7 @@ phases:
       - echo "Checking AWS CLI version...."
       - aws --version
       - echo "Installing NPM dependencies..."
-      - npm install --legacy-peer-deps
+      - npm install --force
 
   build:
     commands:
@@ -17,6 +17,7 @@ phases:
   post_build:
     commands:
       - echo "Invalidating CloudFront cache..."
+      - export NODE_OPTIONS=--max_old_space_size=4096
       - aws cloudfront create-invalidation --distribution-id E2Y3G8AHSNNLI1 --paths "/*"
 
 artifacts:
