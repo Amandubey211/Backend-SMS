@@ -8,7 +8,8 @@ phases:
       - echo "Checking AWS CLI version...."
       - aws --version
       - echo "Installing NPM dependencies..."
-      - npm install
+      - npm install --legacy-peer-deps
+
   build:
     commands:
       - echo "Build started on `date`"
