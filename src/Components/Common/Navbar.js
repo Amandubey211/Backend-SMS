@@ -12,6 +12,7 @@ import SettingDropdown from "./SettingDropdown";
 import { fetchAcademicYear } from "../../Store/Slices/Common/AcademicYear/academicYear.action";
 import { staffLogout } from "../../Store/Slices/Common/Auth/actions/staffActions";
 import { getAY } from "../../Utils/academivYear";
+import { fetchFinancialYear } from "../../Store/Slices/Common/FinancialYear/financialYear.action";
 
 const Navbar = () => {
   const [isOpenNotification, setIsOpenNotification] = useState(false);
@@ -25,7 +26,9 @@ const Navbar = () => {
   );
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
-
+const { FinancialYears } = useSelector(
+    (store) => store.common.financialYear
+  );
   const selectAcademicYear = useSelector((store) => {
     const say = getAY();
     return store.common.academicYear.academicYears?.find(
@@ -36,45 +39,48 @@ const Navbar = () => {
     if (!selectAcademicYear) {
       dispatch(fetchAcademicYear());
     }
+    if(FinancialYears?.length < 1){
+        dispatch(fetchFinancialYear());
+    }
   }, []);
 
   // Fetch notifications from IndexedDB
-  const getNotificationsFromIndexedDB = () => {
-    return new Promise((resolve, reject) => {
-      const dbPromise = indexedDB.open("firebase-messaging-store", 1);
+  // const getNotificationsFromIndexedDB = () => {
+  //   return new Promise((resolve, reject) => {
+  //     const dbPromise = indexedDB.open("firebase-messaging-store", 1);
 
-      dbPromise.onsuccess = function (event) {
-        const db = event.target.result;
-        const transaction = db.transaction(["notifications"], "readonly");
-        const objectStore = transaction.objectStore("notifications");
-        const request = objectStore.getAll();
+  //     dbPromise.onsuccess = function (event) {
+  //       const db = event.target.result;
+  //       const transaction = db.transaction(["notifications"], "readonly");
+  //       const objectStore = transaction.objectStore("notifications");
+  //       const request = objectStore.getAll();
 
-        request.onsuccess = function () {
-          resolve(request.result);
-        };
+  //       request.onsuccess = function () {
+  //         resolve(request.result);
+  //       };
 
-        request.onerror = function (event) {
-          reject(event);
-        };
-      };
+  //       request.onerror = function (event) {
+  //         reject(event);
+  //       };
+  //     };
 
-      dbPromise.onerror = function (event) {
-        reject(event);
-      };
-    });
-  };
+  //     dbPromise.onerror = function (event) {
+  //       reject(event);
+  //     };
+  //   });
+  // };
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const notifications = await getNotificationsFromIndexedDB();
-        localStorage.setItem("NotificationCount", notifications?.length);
-      } catch (error) {
-        console.error("Failed to retrieve notifications:", error);
-      }
-    };
-    fetchNotifications();
-  }, []);
+  // useEffect(() => {
+  //   const fetchNotifications = async () => {
+  //     try {
+  //       const notifications = await getNotificationsFromIndexedDB();
+  //       localStorage.setItem("NotificationCount", notifications?.length);
+  //     } catch (error) {
+  //       console.error("Failed to retrieve notifications:", error);
+  //     }
+  //   };
+  //   fetchNotifications();
+  // }, []);
 
   useEffect(() => {
     setNotificationCount(localStorage.getItem("NotificationCount"));

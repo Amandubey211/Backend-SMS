@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Input, Select, Button, Form, DatePicker } from "antd";
+import { Input, Select, Button, Form, DatePicker, Tooltip } from "antd";
 import { useDispatch } from "react-redux";
 import { createInventory, updateInventory } from "../../../../Store/Slices/Finance/inventory/inventory.thunk";
 import FinanceCategorySelect from "../financeCategory/FinanceCategorySelect";
 import dayjs from "dayjs";
 import EntitySelect from "../entities/EntitySelect";
+import { BsInfoCircle } from "react-icons/bs";
 
 const InventoryForm = ({ visible, onClose, editData }) => {
   const dispatch = useDispatch();
@@ -83,8 +84,25 @@ const InventoryForm = ({ visible, onClose, editData }) => {
           <option value={false}>No</option> 
         </select>
       </Form.Item>
-      <Form.Item label="Category" rules={[{ required: true, message: "Please select Category" }]}>
-        <FinanceCategorySelect categoryType="revenue" onSelect={setSelectedCategory} disabled={viewMode} categoryName={editData?.categoryName} onClose={onClose}/>
+      <Form.Item 
+      label={
+        <span className="flex items-center gap-1">
+          <span className="font-medium">Category</span>
+          <Tooltip
+            title={
+              <>
+                <div className="text-xs">All Asset, Expense, and Revenue categories appear here.
+                Use this to log stock items — whether they are durable assets, consumable supplies, or items meant for resale like uniforms and books.</div>
+
+              </>
+            }
+          >
+            <BsInfoCircle className="cursor-pointer" />
+          </Tooltip>
+        </span>
+      } 
+      rules={[{ required: true, message: "Please select Category" }]}>
+        <FinanceCategorySelect categoryType="" onSelect={setSelectedCategory} disabled={viewMode} categoryName={editData?.categoryName} onClose={onClose}/>
       </Form.Item>
 </div>
           <div className="grid grid-cols-2 gap-4">
@@ -102,7 +120,7 @@ const InventoryForm = ({ visible, onClose, editData }) => {
         <Form.Item name="deliveryDate" label="Delivery Date" rules={[{ required: true, message: "Please enter Order Date" }]}> 
           <DatePicker className="w-full" disabled={viewMode}/>
         </Form.Item>
-        <Form.Item name="expireDate" label="Expire Date" > 
+        <Form.Item name="expireDate" label="Expiry Date" > 
           <DatePicker className="w-full" disabled={viewMode}/>
         </Form.Item>
       </div>

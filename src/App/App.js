@@ -119,6 +119,9 @@ const FinanceCategory = lazy(() =>
 const Inventory = lazy(() =>
   import("../Modules/Admin/Finance/Inventory/Inventory.js")
 );
+const LowInventory = lazy(() =>
+  import("../Modules/Admin/Finance/Inventory/LowStockList.js")
+);
 const Entities = lazy(() =>
   import("../Modules/Admin/Finance/entities/Enities.js")
 );
@@ -535,6 +538,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={Inventory}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/lowStock/Inventory",
+      element: (
+        <ProtectRoute
+          Component={LowInventory}
           allowedRoles={["admin", "finance"]}
         />
       ),

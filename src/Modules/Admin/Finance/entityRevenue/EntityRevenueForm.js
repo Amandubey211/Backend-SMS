@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, DatePicker, InputNumber, Row, Col } from "antd";
+import { Form, Input, Select, Button, DatePicker, InputNumber, Row, Col, Tooltip } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
 import { fetchInventory } from "../../../../Store/Slices/Finance/inventory/inventory.thunk";
@@ -9,8 +9,9 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import SidebarEntitySelection from "./Components/SelectEntities";
 import { createEntityRevenue } from "../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
+import { BsInfoCircle } from "react-icons/bs";
+import dayjs from "dayjs";
 const { Option } = Select;
-
 const EntityRevenueForm = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.admin.financialCategory.categories);
@@ -40,14 +41,14 @@ const EntityRevenueForm = () => {
     dispatch(fetchCategory({ categoryType: "revenue", search: "", page: 1, limit: 10000 }));
   }, [dispatch]);
   const [description, setDescription] = useState('');
-  
-  
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    
-      const handleModalClose = (s) => {
-        setIsModalVisible(false);
 
-      };
+
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const handleModalClose = (s) => {
+    setIsModalVisible(false);
+
+  };
 
   const handleCategoryChange = async (index, categoryId) => {
     const category = categories.find((cat) => cat._id === categoryId);
@@ -123,173 +124,201 @@ const EntityRevenueForm = () => {
     updatedItems.splice(index, 1);
     setLineItems(updatedItems);
   };
-const navigate = useNavigate();
-const [entitiesIds,setEntitiesIds] = useState([]);
+  const navigate = useNavigate();
+  const [entitiesIds, setEntitiesIds] = useState([]);
   const handleSubmit = (values) => {
-    if(entitiesIds.length < 1){
+    if (entitiesIds.length < 1) {
       toast.error("Please select Entity")
-     return
+      return
     }
-  let entityIds = entitiesIds.map((e)=>{
-return {entityId:e}
-  })
+    let entityIds = entitiesIds.map((e) => {
+      return { entityId: e }
+    })
     const data = {
       description,
       lineItems,
-      entityIds 
+      entityIds
     }
-    
-  dispatch(createEntityRevenue({data,navigate}))
-    
-  };
 
- 
+    dispatch(createEntityRevenue({ data, navigate }))
+  };
+  const { activeYear } = useSelector((store) => store.common.financialYear);
+  const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
+  const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
+
   return (
     <div className="p-6 ">
       <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="font-bold pb-2">Add New Invoice</h1>
-          <button className=" flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 rounded-lg shadow-lg" onClick={()=> setIsModalVisible(true)} >Select Entities <span><VscListSelection /></span></button>
+          <button className=" flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 rounded-lg shadow-lg" onClick={() => setIsModalVisible(true)} >Select Entities <span><VscListSelection /></span></button>
         </div>
         <div>
-          <input type="text" className="w-[35rem] h-[3rem] border border-purple-600 rounded-lg p-2" placeholder="Enter Short Description " onClick={(e)=>setDescription(e.target.value)}/>
+          <input type="text" className="w-[35rem] h-[3rem] border border-purple-600 rounded-lg p-2" placeholder="Enter Short Description " onClick={(e) => setDescription(e.target.value)} />
         </div>
 
       </div>
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
-      {lineItems.map((item, index) => (
-        <div key={index} className="p-4 border rounded-lg bg-gray-100 space-y-4 mb-4">
-          {/* Row 1: Category, Item, Rate, Quantity */}
-          <Row gutter={16}>
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "categoryId"]} label="Category" rules={[{ required: true ,message:"Category is required"}]}>
-                <Select style={{ width: "100%" }} onChange={(value) => handleCategoryChange(index, value)}>
-                  {categories.map((cat) => (
-                    <Option key={cat._id} value={cat._id}>
-                      {cat.categoryName}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
+        {lineItems.map((item, index) => (
+          <div key={index} className="p-4 border rounded-lg bg-gray-100 space-y-4 mb-4">
+            {/* Row 1: Category, Item, Rate, Quantity */}
+            <Row gutter={16}>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "categoryId"]}
+                  label={
+                    <span className="flex items-center gap-1">
+                      <span className="font-medium">Category</span>
+                      <Tooltip
+                        title={
+                          <>
+                            <div className="text-xs">Only Asset and Revenue categories appear here. Use this to log income, grants, or asset-related earnings from entities</div>
 
-            
-            <Col span={6}>
-              {item.items.length > 0 ? (
-                <Form.Item name={["lineItems", index, "itemId"]} label="Item" rules={[{ required: true ,message:"Item is required"}]}>
-                  <Select style={{ width: "100%" }} onChange={(value) => handleItemChange(index, value)}>
-                    {item.items.map((item) => (
-                      <Option key={item._id} value={item._id}>
-                        {item.itemName}
+                          </>
+                        }
+                      >
+                        <BsInfoCircle className="cursor-pointer" />
+                      </Tooltip>
+                    </span>
+                  } rules={[{ required: true, message: "Category is required" }]}>
+
+                  <Select style={{ width: "100%" }} onChange={(value) => handleCategoryChange(index, value)}>
+                    {categories.map((cat) => (
+                      <Option key={cat._id} value={cat._id}>
+                        {cat.categoryName}
                       </Option>
                     ))}
                   </Select>
                 </Form.Item>
-              ) : (
-                <Form.Item name={["lineItems", index, "itemDetails"]} label="Item Details" rules={[{ required: true ,message:"Item is required"}]}>
-                  <Input style={{ width: "100%" }} onChange={(e) => handleInputChange(index, "itemDetails", e.target.value)} />
+              </Col>
+
+
+              <Col span={6}>
+                {item.items.length > 0 ? (
+                  <Form.Item name={["lineItems", index, "itemId"]} label="Item" rules={[{ required: true, message: "Item is required" }]}>
+                    <Select style={{ width: "100%" }} onChange={(value) => handleItemChange(index, value)}>
+                      {item.items.map((item) => (
+                        <Option key={item._id} value={item._id}>
+                          {item.itemName}
+                        </Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                ) : (
+                  <Form.Item name={["lineItems", index, "itemDetails"]} label="Item Details" rules={[{ required: true, message: "Item is required" }]}>
+                    <Input style={{ width: "100%" }} onChange={(e) => handleInputChange(index, "itemDetails", e.target.value)} />
+                  </Form.Item>
+                )}
+              </Col>
+
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "rate"]} label="Rate" rules={[{ required: true, message: "Rate is required" }]}>
+                  <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "rate", value)} />
                 </Form.Item>
-              )}
-            </Col>
+              </Col>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "quantity"]} label="Quantity">
+                  <InputNumber style={{ width: "100%" }} min={1} value={item.quantity} onChange={(value) => handleInputChange(index, "quantity", value)} />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "rate"]} label="Rate" rules={[{ required: true ,message:"Rate is required"}]}>
-                <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "rate", value)} />
-              </Form.Item>
-            </Col>
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "quantity"]} label="Quantity">
-                <InputNumber style={{ width: "100%" }} min={1} value={item.quantity} onChange={(value) => handleInputChange(index, "quantity", value)} />
-              </Form.Item>
-            </Col>
-          </Row>
+            {/* Row 2: Tax, Penalty, Discount Type, Discount Amount */}
+            <Row gutter={16}>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "tax"]} label="Tax (%)">
+                  <InputNumber style={{ width: "100%" }} min={0} max={100} onChange={(value) => handleInputChange(index, "tax", value)} />
+                </Form.Item>
+              </Col>
 
-          {/* Row 2: Tax, Penalty, Discount Type, Discount Amount */}
-          <Row gutter={16}>
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "tax"]} label="Tax (%)">
-                <InputNumber style={{ width: "100%" }} min={0} max={100} onChange={(value) => handleInputChange(index, "tax", value)} />
-              </Form.Item>
-            </Col>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "penalty"]} label="Penalty">
+                  <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "penalty", value)} />
+                </Form.Item>
+              </Col>
 
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "penalty"]} label="Penalty">
-                <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "penalty", value)} />
-              </Form.Item>
-            </Col>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "discountType"]} label="Discount Type">
+                  <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "discountType", value)}>
+                    <Option value="percentage">Percentage</Option>
+                    <Option value="amount">Amount</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
 
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "discountType"]} label="Discount Type">
-                <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "discountType", value)}>
-                  <Option value="percentage">Percentage</Option>
-                  <Option value="amount">Amount</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "discount"]} label="Discount">
-                <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "discount", value)} />
-              </Form.Item>
-            </Col>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "discount"]} label="Discount">
+                  <InputNumber style={{ width: "100%" }} min={0} onChange={(value) => handleInputChange(index, "discount", value)} />
+                </Form.Item>
+              </Col>
             </Row>
             <Row gutter={16}>
-            <Col span={6}>
-              <Form.Item name={["lineItems", index, "frequency"]} label="Frequency" rules={[{ required: true ,message:"frequency is required"}]}>
-                <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "frequency", value)}>
-                  <Option value="Permanent Purchase">Permanent Purchase</Option>
-                  <Option value="Monthly">Monthly</Option>
-                  <Option value="Half yearly">Half yearly</Option>
-                  <Option value="Yearly">Yearly</Option>
-                  <Option value="Custom Date">Custom Date</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-          
-          {item.frequency !== "Permanent Purchase" && (
-          <>
               <Col span={6}>
-                <Form.Item name={["lineItems", index, "startDate"]} label="Start Date" rules={[{ required: true ,message:"Start Date is required"}]}>
-                  <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "startDate", date)} />
+                <Form.Item name={["lineItems", index, "frequency"]} label="Frequency" rules={[{ required: true, message: "frequency is required" }]}>
+                  <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "frequency", value)}>
+                    <Option value="Permanent Purchase">Permanent Purchase</Option>
+                    <Option value="Monthly">Monthly</Option>
+                    <Option value="Half yearly">Half yearly</Option>
+                    <Option value="Yearly">Yearly</Option>
+                    <Option value="Custom Date">Custom Date</Option>
+                  </Select>
                 </Form.Item>
               </Col>
-              <Col span={6}>
-                <Form.Item name={["lineItems", index, "endDate"]} label="End Date">
-                  <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "endDate", date)} rules={[{ required: true ,message:"End Date is required"}]} />
-                </Form.Item>
-              </Col>
-           
-              </>
-          )}
-               <Col span={6}>
-                <Form.Item name={["lineItems", index, "dueDate"]} label="Due Date">
-                  <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "dueDate", date)} rules={[{ required: true ,message:"End Date is required"}]} />
-                </Form.Item>
-              </Col>
-          <Col span={6}>
-              <Form.Item name={["lineItems", index, "finalAmount"]} label="Sub Amount">
-                
-               <p className="font-bold"> = {item.finalAmount} </p>
-              </Form.Item>
-            </Col>
- </Row>
-          <Button danger onClick={() => removeLineItem(index)}>Remove</Button>
-        </div>
-      ))}
 
-      <Button type="dashed" onClick={addLineItem} className=" text-purple-500 " >Add New Item</Button>
-      <Button  htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Add Invoice</Button>
-      <Button  htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
-    </Form>
-    <Sidebar
-          title={ "Select Multiply Entities"}
-          width="50%"
-          isOpen={isModalVisible}
-          onClose={handleModalClose}
-        >
-         <SidebarEntitySelection entitiesIds={entitiesIds} setEntitiesIds={setEntitiesIds}/>
-         {entitiesIds?.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={()=>handleModalClose()}>Done</div>}
-        </Sidebar>
+              {item.frequency !== "Permanent Purchase" && (
+                <>
+                  <Col span={6}>
+                    <Form.Item name={["lineItems", index, "startDate"]} label="Start Date" rules={[{ required: true, message: "Start Date is required" }]}>
+                      <DatePicker style={{ width: "100%" }}
+                        onChange={(date) => handleInputChange(index, "startDate", date)}
+                        disabledDate={(current) =>
+                          current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+                  <Col span={6}>
+                    <Form.Item name={["lineItems", index, "endDate"]} label="End Date">
+                      <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "endDate", date)} rules={[{ required: true, message: "End Date is required" }]}
+                        disabledDate={(current) =>
+                          current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                        }
+                      />
+                    </Form.Item>
+                  </Col>
+
+                </>
+              )}
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "dueDate"]} label="Due Date">
+                  <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "dueDate", date)} rules={[{ required: true, message: "End Date is required" }]}  disabledDate={(current) =>
+                          current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                        }/>
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                <Form.Item name={["lineItems", index, "finalAmount"]} label="Sub Amount">
+
+                  <p className="font-bold"> = {item.finalAmount} </p>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Button danger onClick={() => removeLineItem(index)}>Remove</Button>
+          </div>
+        ))}
+
+        <Button type="dashed" onClick={addLineItem} className=" text-purple-500 " >Add New Item</Button>
+        <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Add Invoice</Button>
+        <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
+      </Form>
+      <Sidebar
+        title={"Select Multiply Entities"}
+        width="50%"
+        isOpen={isModalVisible}
+        onClose={handleModalClose}
+      >
+        <SidebarEntitySelection entitiesIds={entitiesIds} setEntitiesIds={setEntitiesIds} />
+        {entitiesIds?.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={() => handleModalClose()}>Done</div>}
+      </Sidebar>
     </div>
   );
 };

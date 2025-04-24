@@ -12,6 +12,7 @@ ChartJS.register(...registerables);
 // Custom BarGraphSkeleton component simulating a bar graph using Tailwind and animate-pulse
 const BarGraphSkeleton = () => {
   const bars = Array.from({ length: 10 });
+
   return (
     <div className="flex items-end space-x-2 h-72">
       {bars.map((_, index) => (
@@ -26,7 +27,7 @@ const BarGraphSkeleton = () => {
 };
 
 // Extracted Tooltip component for clarity
-const ChartTooltip = ({ tooltipData }) => (
+const ChartTooltip = ({ tooltipData ,schoolCurrency}) => (
   <div
     style={{
       position: "absolute",
@@ -40,16 +41,17 @@ const ChartTooltip = ({ tooltipData }) => (
       pointerEvents: "none",
     }}
   >
-    <div>{tooltipData.value} QR</div>
+    <div>{tooltipData.value} {schoolCurrency}</div>
     <div>{tooltipData.label}</div>
   </div>
 );
 
 const TotalEarningsGraph = () => {
+  const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const chartRef = useRef(null);
   const [tooltipData, setTooltipData] = useState(null);
   const [selectedOption, setSelectedOption] = useState("currentMonth");
-
+ 
   const { t } = useTranslation("dashboard");
   const dispatch = useDispatch();
   const { incomeGraphData, loading, error } = useSelector(
@@ -144,7 +146,7 @@ const TotalEarningsGraph = () => {
       y: {
         beginAtZero: true,
         ticks: {
-          callback: (value) => value?.toLocaleString() + " QR",
+          callback: (value) => value?.toLocaleString(),
         },
         grid: {
           display: false,
@@ -178,29 +180,6 @@ const TotalEarningsGraph = () => {
       </div>
     );
   }
-
-  if (error || incomeGraphData.length === 0) {
-    return (
-      <div className="p-4 bg-white flex flex-col min-h-[400px]">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">{t("Earnings")}</h2>
-          <select
-            className="border rounded p-2"
-            value={selectedOption}
-            onChange={(e) => setSelectedOption(e.target.value)}
-          >
-            <option value="currentMonth">{t("This month")}</option>
-            <option value="lastMonth">{t("Last month")}</option>
-          </select>
-        </div>
-        <div className="flex flex-col items-center justify-center text-center flex-1">
-          <FiCalendar size={40} className="mb-4 text-gray-400" />
-          <p className="text-gray-500">{t("No Earnings/Expense Data Found")}</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="p-4 bg-white flex flex-col min-h-[400px]">
       <div className="flex justify-between items-center mb-4">
@@ -208,7 +187,7 @@ const TotalEarningsGraph = () => {
       </div>
       <div className="relative" style={{ height: "350px" }}>
         <Line ref={chartRef} data={chartData} options={options} />
-        {tooltipData && <ChartTooltip tooltipData={tooltipData} />}
+        {tooltipData && <ChartTooltip tooltipData={tooltipData} schoolCurrency={schoolCurrency} />}
       </div>
 
       {/* Compact bottom stats with icon circle backgrounds */}
@@ -220,7 +199,7 @@ const TotalEarningsGraph = () => {
           <div>
             <div className="text-sm text-gray-700">{t("Total Earnings")}</div>
             <div className="text-lg font-bold text-green-600">
-              {totalEarnings?.toLocaleString()} QR
+              {totalEarnings?.toLocaleString()} {schoolCurrency}
             </div>
           </div>
         </div>
@@ -231,7 +210,7 @@ const TotalEarningsGraph = () => {
           <div>
             <div className="text-sm text-gray-700">{t("Total Expenses")}</div>
             <div className="text-lg font-bold text-red-600">
-              {totalExpenses?.toLocaleString()} QR
+              {totalExpenses?.toLocaleString()} {schoolCurrency}
             </div>
           </div>
         </div>

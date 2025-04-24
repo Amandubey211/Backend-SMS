@@ -3,6 +3,7 @@ import { addFinancialYear, fetchFinancialYear, updateFinancialYear } from "./fin
 
 const initialState = {
     FinancialYears:[],
+    activeYear:{},
     loading:false,
     error:null
 }
@@ -20,6 +21,7 @@ const FinancialYearSlice = createSlice({
             .addCase(fetchFinancialYear.fulfilled, (state, action) => {
                 state.loading = false;
                 state.FinancialYears = action.payload;
+                state.activeYear = action.payload?.find((i)=>i.isActive == true);
                 state.error = null;
             
             })
