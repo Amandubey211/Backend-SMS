@@ -178,7 +178,7 @@ const ReceiptsList = () => {
                           className="relative p-6 w-full max-w-[70vw] max-h-[90vh] bg-white rounded-md shadow-md overflow-auto"
                           onClick={(e) => e.stopPropagation()}
                         >
-                          {/* Close Button */}
+                          
                           <div className="flex justify-end space-x-2 mb-4">
                             <button
                               onClick={() => handleDownloadPDF(pdfRef, selectedReciept)}
@@ -194,7 +194,7 @@ const ReceiptsList = () => {
                             </button>
                           </div>
         
-                          {/* Hidden container for PDF generation */}
+                        
                           <div >
                             <ReceiptTemplate data={selectedReciept} ref={pdfRef} />
                           </div>
