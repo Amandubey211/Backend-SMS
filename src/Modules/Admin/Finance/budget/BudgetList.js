@@ -126,7 +126,7 @@ const BudgetList = () => {
         <div className="p-4">
           <div className="flex flex-row items-center justify-between">
             <Input
-              placeholder="Search by Sub-Category..."
+              placeholder="Search by Sub-Category.."
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={handleSearch}
@@ -190,8 +190,10 @@ const BudgetList = () => {
                       <Tooltip
                         title={
                           <>
-                            <div className="text-xs">Only Expense categories appear here.
-                            Use this to allocate budgets for salaries, rent, maintenance, etc.</div>
+                            <div className="text-xs">
+                            Only Expense categories appear here.
+                            Use this to allocate budgets for salaries, rent, maintenance, etc.
+                            </div>
                           </>
                         }
                       >
