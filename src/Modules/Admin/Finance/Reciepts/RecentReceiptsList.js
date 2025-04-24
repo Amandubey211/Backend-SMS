@@ -72,13 +72,18 @@ const ReceiptsList = () => {
       title: 'Payment Status',
       dataIndex: 'paymentStatus',
       render: (status) => {
-        const color = status === 'paid' ? 'green' : status === 'partial' ? 'orange' : 'red';
-        return <Tag color={color}>{status}</Tag>;
+        const color = status == "paid" ? "green" : "yellow";
+        const capitalizedStatus = status?.charAt(0)?.toUpperCase() + status.slice(1);
+        return <Tag color={color}>{capitalizedStatus}</Tag>;
       },
     },
     {
       title: 'Payment Method',
       dataIndex: 'paymentType',
+      render: (value) => {
+        const capitalizedStatus = value.charAt(0).toUpperCase() + value.slice(1);
+        return <p>{capitalizedStatus}</p>;
+      },
     },
     {
       title: 'Date',

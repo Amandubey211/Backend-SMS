@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, InputNumber, Row, Col } from "antd";
-import { useDispatch } from "react-redux";
+import { Form, Input, Select, Button, InputNumber, Row, Col, DatePicker } from "antd";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {  updateOperationalExpenses } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -28,17 +29,7 @@ const EditOperationalExpenses = ({ data }) => {
         ...item,
         payNow: item.remainingAmount || 0,
       }));
-      setLineItems(items);
-      setReceiptData({
-        ...receiptData,
-        status: data.status,
-        paymentType: data.paymentType,
-        paymentDate: data.paymentDate,
-        chequeNumber: data.chequeNumber,
-        chequeDate: data.chequeDate,
-        note: data.note,
-      });
-    }
+      setLineItems(items)}
   }, [data]);
 
   const handleInputChange = (index, value) => {
@@ -80,7 +71,9 @@ const EditOperationalExpenses = ({ data }) => {
 
     dispatch(updateOperationalExpenses({ id: data._id, data: updatedData, navigate }));
   };
-
+  const { activeYear } = useSelector((store) => store.common.financialYear);
+  const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
+  const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
   return (
     <>
         <div className="p-6">
@@ -156,11 +149,14 @@ const EditOperationalExpenses = ({ data }) => {
 
                 <Col span={6}>
                   <Form.Item label="Payment Date">
-                    <input
+                    <DatePicker
                       type="date"
                       value={receiptData.paymentDate?.split("T")[0] || ""}
                       className="w-full h-[2rem] border border-gray-300 rounded-lg p-2"
-                      onChange={(e) => handleReceiptChange("paymentDate", e.target.value)}
+                      onChange={(e) => handleReceiptChange("paymentDate", e)}
+                      disabledDate={(current) =>
+                        current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                      }
                     />
                   </Form.Item>
                 </Col>
@@ -177,11 +173,14 @@ const EditOperationalExpenses = ({ data }) => {
                     </Col>
                     <Col span={6}>
                       <Form.Item label="Cheque Date">
-                        <input
+                        <DatePicker
                           type="date"
                           className="w-full h-[2rem] border border-gray-300 rounded-lg p-2"
                           value={receiptData.chequeDate?.split("T")[0] || ""}
-                          onChange={(e) => handleReceiptChange("chequeDate", e.target.value)}
+                          onChange={(e) => handleReceiptChange("chequeDate", e)}
+                          disabledDate={(current) =>
+                            current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                          }
                         />
                       </Form.Item>
                     </Col>

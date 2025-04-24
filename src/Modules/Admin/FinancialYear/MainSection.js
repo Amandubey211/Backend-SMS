@@ -31,7 +31,6 @@ const MainSection = () => {
   };
 
   const handleCreate = async () => {
-    // If there are no academic years, force the new year to be active.
     if (FinancialYears.length === 0) {
       setNewYear((prev) => ({ ...prev, isActive: true }));
     }

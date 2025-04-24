@@ -5,8 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Input, Spin, Table, Select, DatePicker, Tooltip } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { FaStackOverflow, FaWarehouse } from "react-icons/fa";
-import { GiWeight, GiReceiveMoney } from "react-icons/gi";
-import { FaPlusCircle } from "react-icons/fa";
 import InventoryForm from "./InventoryForm.js";
 import { fetchInventory, fetchLowInventory } from "../../../../Store/Slices/Finance/inventory/inventory.thunk.js";
 import Sidebar from "../../../../Components/Common/Sidebar.js";
@@ -229,9 +227,9 @@ const Inventory = () => {
             <div className="flex flex-row item-center flex-wrap bg-gradient-to-t from-purple-100 to-pink-100 text-white p-4 mb-4 gap-2">
 
               {otherData?.inventoryCategories?.filter(
-  (value, index, self) =>
-    index === self.findIndex((u) => u.categoryId?.categoryName === value.categoryId?.categoryName)
-)?.map((category, index) => (
+                (value, index, self) =>
+                  index === self.findIndex((u) => u.categoryId?.categoryName === value.categoryId?.categoryName)
+              )?.map((category, index) => (
                 <>
                   <div className="flex items-center flex-col  gap-1 p-2 border border-purple-500 border-w-4 rounded-lg w-[10rem]" key={index}>
                     <div className="flex justify-between items-center">
@@ -298,15 +296,8 @@ const Inventory = () => {
 
             </div>
             <div className="flex  flex-row items-center gap-4">
-              <Input
-                placeholder="Search by name, SKU..."
-                prefix={<SearchOutlined />}
-                value={lowStocksearchText}
-                onChange={(e) => setSowStockSearchText(e.target.value)}
-                allowClear
-                className="w-60 py-2"
-              />
-              {/* <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm">View More</button> */}
+
+               <button className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex flex-row items-center p-2 text-sm" onClick={() => navigate("/finance/lowStock/Inventory")}>View More</button>
             </div>
 
           </div>

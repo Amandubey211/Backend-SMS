@@ -10,7 +10,8 @@ import { GiTakeMyMoney } from "react-icons/gi";
 import { fetchBudgetsummary, updateBudget } from "../../../../Store/Slices/Finance/budget/budget.thunk";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import CreateBudgetForm from "./CreateBudget";
-import { Form, Input, DatePicker, Select, InputNumber,Table } from "antd";
+import { Form, Input, DatePicker, Select, InputNumber,Table, Tooltip } from "antd";
+import { BsInfoCircle } from "react-icons/bs";
 const BudgetList = () => {
   const dispatch = useDispatch();
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
@@ -184,7 +185,19 @@ const BudgetList = () => {
               >
                 <div className="grid grid-cols-2 gap-4">
                   <Form.Item
-                    label="Category"
+                    label={<span className="flex items-center gap-1">
+                      <span className="font-medium">Category</span>
+                      <Tooltip
+                        title={
+                          <>
+                            <div className="text-xs">Only Expense categories appear here.
+                            Use this to allocate budgets for salaries, rent, maintenance, etc.</div>
+                          </>
+                        }
+                      >
+                        <BsInfoCircle className="cursor-pointer" />
+                      </Tooltip>
+                    </span>}
                     required
                   >
                     <Input placeholder="Category" readOnly value={selectedBudget?.category} />
@@ -212,7 +225,7 @@ const BudgetList = () => {
 
                 <button
                   type="submit"
-                  className="bg-gradient-to-r from-green-500 to-blue-500 text-white w-full py-2 rounded-md"
+                  className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-full py-2 rounded-md"
                 >
                   Update Budget
                 </button>
