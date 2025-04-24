@@ -20,7 +20,7 @@ const ReceiptsMain = () => {
             <AdminDashLayout>
                 <div className="p-6 space-y-6">
                     {/* Header Section */}
-                    <ProtectedAction requiredPermission={PERMISSIONS.CREATE_NEW_RECEIPT}>
+                    <ProtectedAction requiredPermission={""}>
                         <div className="flex justify-between items-center">
                             <div className="flex gap-4 justify-start items-center">
 
