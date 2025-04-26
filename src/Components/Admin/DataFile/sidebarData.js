@@ -348,6 +348,12 @@ const sidebarData = [
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
       {
+        title: "Vehicle Management", // New tab
+        icon: <MdDirectionsBus />, // You can choose a different icon if preferred
+        path: "/transportation/vehicle-management",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
         title: "Student & Staff Transportation",
         icon: <MdPeople />,
         path: "/transportation/student-staff",
