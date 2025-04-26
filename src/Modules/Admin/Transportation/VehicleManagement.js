@@ -9,11 +9,18 @@ import VehicleList from "../../../Components/Transportation/VehicleList";
 import VehicleForm from "../../../Components/Transportation/VehicleForm";
 import VehicleFilter from "../../../Components/Transportation/VehicleFilter";
 import { FaUserTie } from "react-icons/fa";
+import toast from "react-hot-toast";
+import { createVehicle, deleteVehicle, getAllVehicles, updateVehicle } from "../../../Store/Slices/Transportation/Vehicles/vehicles.action";
+import { useDispatch } from "react-redux";
 
 const VehicleManagement = () => {
   const { t } = useTranslation("transportation");
+  const dispatch = useDispatch();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingVehicleId, setEditingVehicleId] = useState(null);
+
   const [filterConfig, setFilterConfig] = useState({
     vehicleNumber: "",
     vehicleType: "all",
@@ -51,31 +58,71 @@ const VehicleManagement = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // Here you would typically send the data to your API
-    console.log("Submitting vehicle data:", vehicleData);
-
-    // Reset form and close sidebar
-    setVehicleData({
-      vehicleType: "",
-      customVehicleType: "",
-      vehicleNumber: "",
-      seatingCapacity: "",
-      status: "active",
-      fuelType: "",
-      vehicleCategory: "",
-      customVehicleCategory: "",
-      cameraInstalled: false,
-      firstAidAvailable: false,
-      speedGovernorInstalled: false,
-      documents: [],
-    });
-    setIsSidebarOpen(false);
+  
+  const handleSubmit = async (formData) => {
+    try {
+      const payload = { ...formData };  // <-- Use formData (not old vehicleData)
+  
+      if (payload.vehicleType === "other" && payload.customVehicleType) {
+        payload.vehicleType = payload.customVehicleType;
+      }
+      if (payload.vehicleCategory === "other" && payload.customVehicleCategory) {
+        payload.vehicleCategory = payload.customVehicleCategory;
+      }
+  
+      let resultAction;
+      if (isEditing && editingVehicleId) {
+        resultAction = await dispatch(updateVehicle({ vehicleId: editingVehicleId, payload }));
+      } else {
+        resultAction = await dispatch(createVehicle(payload));
+      }
+      
+  
+      if (createVehicle.fulfilled.match(resultAction) || updateVehicle.fulfilled.match(resultAction)) {
+        toast.success(isEditing ? "Vehicle updated successfully!" : "Vehicle added successfully!");
+  
+        // Reset form
+        setVehicleData({
+          vehicleType: "",
+          customVehicleType: "",
+          vehicleNumber: "",
+          seatingCapacity: "",
+          status: "active",
+          fuelType: "",
+          vehicleCategory: "",
+          customVehicleCategory: "",
+          cameraInstalled: false,
+          firstAidAvailable: false,
+          speedGovernorInstalled: false,
+          documents: [],
+        });
+  
+        setIsEditing(false);
+        setEditingVehicleId(null);
+        setIsSidebarOpen(false);
+  
+        dispatch(getAllVehicles({ page: 1, limit: 10 }));
+      } else {
+        toast.error(resultAction.payload?.message || (isEditing ? "Failed to update vehicle" : "Failed to add vehicle"));
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
+    }
   };
 
-  // Reset all filters
+  const handleEdit = (vehicle) => {
+    setIsEditing(true);
+    setEditingVehicleId(vehicle._id);
+    setVehicleData({
+      ...vehicle,
+      customVehicleType: vehicle.customVehicleType || "",
+      customVehicleCategory: vehicle.customVehicleCategory || "",
+      documents: vehicle.documents || [],
+    });
+    setIsSidebarOpen(true);
+  };
+
   const resetFilters = () => {
     setFilterConfig({
       vehicleNumber: "",
@@ -140,7 +187,25 @@ const VehicleManagement = () => {
 
               <button
                 className="flex items-center px-3 py-2 rounded-md bg-blue-600 text-white text-sm"
-                onClick={() => setIsSidebarOpen(true)}
+                onClick={() => {
+                  setIsEditing(false);
+                  setEditingVehicleId(null);
+                  setVehicleData({
+                    vehicleType: "",
+                    customVehicleType: "",
+                    vehicleNumber: "",
+                    seatingCapacity: "",
+                    status: "active",
+                    fuelType: "",
+                    vehicleCategory: "",
+                    customVehicleCategory: "",
+                    cameraInstalled: false,
+                    firstAidAvailable: false,
+                    speedGovernorInstalled: false,
+                    documents: [],
+                  });
+                  setIsSidebarOpen(true);
+                }}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -162,13 +227,17 @@ const VehicleManagement = () => {
           </div>
 
           {/* Vehicle List Component */}
-          <VehicleList />
+          <VehicleList handleEdit={handleEdit} />
 
           {/* Add Vehicle Sidebar */}
           <Sidebar
             isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
-            title="Add Vehicle"
+            onClose={() => {
+              setIsSidebarOpen(false);
+              setIsEditing(false);
+              setEditingVehicleId(null);
+            }}
+            title={isEditing ? "Edit Vehicle" : "Add Vehicle"}
             width="50%"
           >
             <div className="p-4 max-h-screen overflow-y-auto">
@@ -176,9 +245,11 @@ const VehicleManagement = () => {
                 vehicleData={vehicleData}
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
+                isEditing={isEditing}
               />
             </div>
           </Sidebar>
+
 
           {/* Filter Sidebar */}
           <Sidebar

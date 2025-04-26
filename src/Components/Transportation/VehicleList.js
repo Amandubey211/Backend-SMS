@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from "react";
 import { FaTrash, FaPen } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllVehicles } from "../../Store/Slices/Transportation/Vehicles/vehicles.action";
+import { deleteVehicle, getAllVehicles } from "../../Store/Slices/Transportation/Vehicles/vehicles.action";
+import toast from "react-hot-toast";
+import DeleteModal from "../Common/DeleteModal";
 
-const VehicleList = () => {
+const VehicleList = ({ handleEdit }) => {
 
   const dispatch = useDispatch();
 
@@ -29,6 +31,8 @@ const VehicleList = () => {
     direction: 'ascending'
   });
   const [filteredVehicles, setFilteredVehicles] = useState([]);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
 
   useEffect(() => {
     dispatch(getAllVehicles({ page: 1, limit: 10 })); // initial fetch
@@ -97,6 +101,39 @@ const VehicleList = () => {
   // Vehicle types for dropdown
   const vehicleTypes = ["bus", "van", "auto", "cab", "e-rickshaw", "other"];
 
+  const handleDeleteClick = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedVehicle) return;
+
+    try {
+      const resultAction = await dispatch(deleteVehicle(selectedVehicle._id));
+
+      if (deleteVehicle.fulfilled.match(resultAction)) {
+        toast.success("Vehicle deleted successfully!");
+        dispatch(getAllVehicles({ page: 1, limit: 10 }));
+      } else {
+        toast.error(resultAction.payload?.message || "Failed to delete vehicle.");
+      }
+    } catch (error) {
+      console.error("Error deleting vehicle:", error);
+      toast.error("Something went wrong.");
+    }
+  };
+
+  const handleEditClick = (vehicleId) => {
+    const fullVehicle = vehicles.find(v => v._id === vehicleId);
+    if (fullVehicle) {
+      handleEdit(fullVehicle);
+    } else {
+      console.error("Full vehicle data not found for edit!");
+    }
+  };
+
+  
   return (
     <div>
       {/* Quick filter */}
@@ -242,10 +279,14 @@ const VehicleList = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div className="flex items-center space-x-3">
-                          <button className="text-red-500 hover:text-red-600">
+                          <button
+                            onClick={() => handleDeleteClick(vehicle)}
+                            className="text-red-500 hover:text-red-600">
                             <FaTrash className="h-5 w-5" />
                           </button>
-                          <button className="text-blue-500 hover:text-blue-600">
+                          <button
+                            onClick={() => handleEditClick(vehicle._id)} 
+                            className="text-blue-500 hover:text-blue-600">
                             <FaPen className="h-5 w-5" />
                           </button>
                         </div>
@@ -264,6 +305,12 @@ const VehicleList = () => {
           </div>
         )}
       </div>
+      <DeleteModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title={selectedVehicle?.vehicleNumber || "Vehicle"}
+      />
     </div>
   );
 };

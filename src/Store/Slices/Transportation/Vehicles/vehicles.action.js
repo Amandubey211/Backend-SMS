@@ -7,12 +7,12 @@ import { deleteData, getData, postData, putData } from "../../../../services/api
 
 export const getAllVehicles = createAsyncThunk(
   "transportVehicle/getAllVehicles",  // 🔥 Slice के नाम के हिसाब से सही कर दिया
-  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch }) => { 
+  async ({ page = 1, limit = 10 }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
 
       const response = await getData(`/transport/get-vehicles?page=${page}&limit=${limit}`);
-      return response; 
+      return response;
     } catch (error) {
       console.error("Error in getAllVehicles:", error);
       return rejectWithValue(handleError(error, dispatch, rejectWithValue));
