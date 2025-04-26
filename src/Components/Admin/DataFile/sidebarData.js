@@ -6,6 +6,9 @@ import {
   FaUserGraduate,
   FaClipboardList,
   FaUniversity,
+  FaBusAlt,
+  FaRoute,
+  FaUserTie,
 } from "react-icons/fa";
 import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
@@ -27,6 +30,8 @@ import {
   MdOutlineBusinessCenter,
   MdOutlineCategory,
   MdOutlineInventory2,
+  MdDirectionsBus,
+  MdPeople,
 } from "react-icons/md";
 import { CiViewTable } from "react-icons/ci";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
@@ -42,7 +47,8 @@ import { RiHandCoinLine } from "react-icons/ri";
 import { TfiReceipt } from "react-icons/tfi";
 import { FaWpforms } from "react-icons/fa6";
 import { MdCategory } from "react-icons/md";
-import { GiStabbedNote } from "react-icons/gi";
+import { GiStabbedNote, GiAutoRepair } from "react-icons/gi";
+import { AiOutlineCreditCard } from "react-icons/ai";
 
 const sidebarData = [
   {
@@ -148,6 +154,8 @@ const sidebarData = [
     ],
   },
 
+  
+
   {
     title: "NoticeBoard",
     icon: <TbNotebook style={{ fontSize: "1.1rem" }} />,
@@ -238,7 +246,7 @@ const sidebarData = [
       {
         title: "Inventory",
         path: "/finance/Inventory",
-        icon: <MdOutlineInventory2 tyle={{ fontSize: "1.1rem" }} />,
+        icon: <MdOutlineInventory2 style={{ fontSize: "1.1rem" }} />,
         roles: [ROLES.ADMIN, ROLES.FINANCE],
       },
 
@@ -319,15 +327,51 @@ const sidebarData = [
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },
-      // {
-      //   title: "Financial Report",
-      //   path: "/finance/financialReport",
-      //   icon: <HiOutlineReceiptTax style={{ fontSize: "1.1rem" }} />,
-      //   roles: [ROLES.ADMIN, ROLES.FINANCE],
-      //   //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
-      // },
     ],
-    bedge: "Beta",
+  },
+  // Transportation Module - New Addition
+  {
+    title: "Transportation",
+    icon: <FaBusAlt style={{ fontSize: "1.1rem" }} />,
+    roles: [ROLES.ADMIN, ROLES.STAFF],
+    items: [
+      {
+        title: "Route & Bus",
+        icon: <FaRoute />,
+        path: "/transportation/routes-and-buses",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
+        title: "Route Management",
+        icon: <MdDirectionsBus />,
+        path: "/transportation/route-management",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
+        title: "Student & Staff Transportation",
+        icon: <MdPeople />,
+        path: "/transportation/student-staff",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
+        title: "Driver Management",
+        icon: <FaUserTie />,
+        path: "/transportation/driver-staff",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
+        title: "Maintenance",
+        icon: <GiAutoRepair />,
+        path: "/transportation/maintenance",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
+        title: "RFID",
+        icon: <AiOutlineCreditCard />,
+        path: "/transportation/rfid",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+    ],
   },
 ];
 
