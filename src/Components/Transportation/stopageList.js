@@ -1,47 +1,79 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'; // Leaflet for OpenStreetMap
-import 'leaflet/dist/leaflet.css';
-
-const sampleStops = [
-  { id: 1, name: 'Stop 1', lat: 28.7041, lng: 77.1025 },
-  { id: 2, name: 'Stop 2', lat: 28.7050, lng: 77.1080 },
-  { id: 3, name: 'Stop 3', lat: 28.7065, lng: 77.1150 },
-  // ... More stops
-];
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import DashLayout from "../Admin/AdminDashLayout";
+import Layout from "../Common/Layout";
+import { useDispatch, useSelector } from "react-redux";
+import { getRouteById } from "../../Store/Slices/Transportation/RoutesManagment/routes.action";
 
 const StoppageList = () => {
-  const { id } = useParams(); // routeId आएगा URL से
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { singleRoute } = useSelector((state) => state.transportation.transportRoute);
+  
+  useEffect(() => {
+    dispatch(getRouteById(id));
+  }, [id]);
+
+  const stoppages = singleRoute?.stops || [];
 
   return (
-    <div className="p-4">
-      <h2 className="text-2xl font-bold mb-4">Stoppages for Route {id}</h2>
+    <Layout>
+      <DashLayout>
+        <div className="p-6">
 
-      <div className="h-[500px] w-full mb-6">
-        <MapContainer center={[28.7041, 77.1025]} zoom={13} scrollWheelZoom={false} className="h-full w-full rounded-lg">
-          <TileLayer
-            attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {sampleStops.map((stop) => (
-            <Marker key={stop.id} position={[stop.lat, stop.lng]}>
-              <Popup>
-                {stop.name}
-              </Popup>
-            </Marker>
-          ))}
-        </MapContainer>
-      </div>
+          {/* Heading with Back Icon */}
+          <div className="flex items-center gap-3 mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="text-blue-600 hover:text-blue-800"
+            >
+              ←
+            </button>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Stoppages for Route <span className="text-blue-500">{singleRoute?.routeName}</span>
+            </h2>
+          </div>
 
-      {/* Stops List */}
-      <ul className="space-y-2">
-        {sampleStops.map((stop) => (
-          <li key={stop.id} className="p-2 border rounded-md bg-gray-100">
-            {stop.name}
-          </li>
-        ))}
-      </ul>
-    </div>
+          {/* Stoppage List */}
+          <div className="relative pl-8">
+            {/* Vertical Dashed Line */}
+            <div className="absolute top-0 left-4 bottom-0 border-l-2 border-dashed border-blue-400"></div>
+
+            <div className="flex flex-col gap-8">
+              {stoppages.map((stop, index) => {
+                const isFirst = index === 0;
+                const isLast = index === stoppages.length - 1;
+                return (
+                  <div key={stop._id} className="relative flex items-start gap-4">
+                    <div className="w-4 h-4 mt-1.5 rounded-full bg-blue-500 border-2 border-white z-10 shadow-md"></div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-gray-800">{stop.stopName}</h3>
+                        {isFirst && (
+                          <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full">Start</span>
+                        )}
+                        {isLast && (
+                          <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">End</span>
+                        )}
+                      </div>
+
+                      {/* Latitude and Longitude */}
+                      {stop.location?.lat && stop.location?.lng && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          <strong>Lat:</strong> {stop.location.lat}, <strong>Lng:</strong> {stop.location.lng}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+        </div>
+      </DashLayout>
+    </Layout>
   );
 };
 

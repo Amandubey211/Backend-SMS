@@ -107,6 +107,8 @@ import parentChildGradesReducer from "./Slices/Parent/Grades/parentGradeSlice";
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
 import { saveDraft } from "../Utils/signupDraft";
 
+// transportation
+import transportRouteReducer from "../Store/Slices/Transportation/RoutesManagment/routeSlice";
 // Persist configuration for the Auth slice
 
 const authPersistConfig = {
@@ -274,6 +276,10 @@ const ParentReducer = combineReducers({
   grades: parentChildGradesReducer,
 });
 
+const transportReducer = combineReducers({
+  transportRoute: transportRouteReducer,
+});
+
 // Create the store
 const store = configureStore({
   reducer: {
@@ -288,6 +294,7 @@ const store = configureStore({
 
     student: studentReducer,
     Parent: ParentReducer,
+    transportation: transportReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
