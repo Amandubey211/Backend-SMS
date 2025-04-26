@@ -1,71 +1,69 @@
 // Components/Transportation/VehicleList.js
 import React, { useState, useEffect } from "react";
 import { FaTrash, FaPen } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllVehicles } from "../../Store/Slices/Transportation/Vehicles/vehicles.action";
 
 const VehicleList = () => {
-  const [loading, setLoading] = useState(true);
-  const [vehicles, setVehicles] = useState([]);
-  const [filteredVehicles, setFilteredVehicles] = useState([]);
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: 'ascending' });
+
+  const dispatch = useDispatch();
+
+  const {
+    vehicles,
+    loading,
+    error,
+    currentPage,
+    totalPages,
+    totalVehicles
+  } = useSelector((state) => state.transportation.transportVehicle);
+
+
   const [filterConfig, setFilterConfig] = useState({
     vehicleNumber: '',
     vehicleType: 'all',
     status: 'all'
   });
 
-  // Load mock data
-  useEffect(() => {
-    // Mock data for vehicles
-    const mockVehicles = Array(15).fill().map((_, index) => ({
-      key: index,
-      vehicleNumber: `KA-01-${4000 + index}`,
-      vehicleType: index % 3 === 0 ? "bus" : index % 3 === 1 ? "van" : "cab",
-      seatingCapacity: index % 3 === 0 ? 50 : index % 3 === 1 ? 20 : 6,
-      fuelType: index % 2 === 0 ? "diesel" : "cng",
-      status: index === 4 || index === 9 || index === 12 ? "under_maintenance" : "active",
-    }));
-    
-    setVehicles(mockVehicles);
-    setFilteredVehicles(mockVehicles);
-    setLoading(false);
-  }, []);
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: 'ascending'
+  });
+  const [filteredVehicles, setFilteredVehicles] = useState([]);
 
-  // Apply filtering and sorting effects
+  useEffect(() => {
+    dispatch(getAllVehicles({ page: 1, limit: 10 })); // initial fetch
+  }, [dispatch]);
+
+  // Filtering and Sorting
   useEffect(() => {
     let result = [...vehicles];
-    
-    // Apply filtering
+    console.log('result--', result)
     if (filterConfig.vehicleNumber) {
-      result = result.filter(
-        vehicle => vehicle.vehicleNumber.toLowerCase().includes(filterConfig.vehicleNumber.toLowerCase())
+      result = result.filter(vehicle =>
+        (vehicle.vehicleNumber || '').toLowerCase().includes(filterConfig.vehicleNumber.toLowerCase())
       );
     }
-    
+
     if (filterConfig.vehicleType !== 'all') {
-      result = result.filter(
-        vehicle => vehicle.vehicleType === filterConfig.vehicleType
+      result = result.filter(vehicle =>
+        vehicle.vehicleType === filterConfig.vehicleType
       );
     }
-    
+
     if (filterConfig.status !== 'all') {
-      result = result.filter(
-        vehicle => vehicle.status === filterConfig.status
+      result = result.filter(vehicle =>
+        vehicle.status === filterConfig.status
       );
     }
-    
-    // Apply sorting
+
     if (sortConfig.key) {
       result.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'ascending' ? 1 : -1;
-        }
+        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
         return 0;
       });
     }
-    
+
     setFilteredVehicles(result);
   }, [vehicles, filterConfig, sortConfig]);
 
@@ -76,6 +74,7 @@ const VehicleList = () => {
       [name]: value
     }));
   };
+
 
   const handleSort = (key) => {
     let direction = 'ascending';
@@ -116,7 +115,7 @@ const VehicleList = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
-          
+
           <select
             name="vehicleType"
             value={filterConfig.vehicleType}
@@ -128,7 +127,7 @@ const VehicleList = () => {
               <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
             ))}
           </select>
-          
+
           <select
             name="status"
             value={filterConfig.status}
@@ -140,7 +139,7 @@ const VehicleList = () => {
             <option value="inactive">Inactive</option>
             <option value="under_maintenance">Under Maintenance</option>
           </select>
-          
+
           <button
             onClick={resetFilters}
             className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200"
@@ -149,7 +148,7 @@ const VehicleList = () => {
           </button>
         </div>
       </div>
-      
+
       {/* Table */}
       <div className="bg-white rounded-md shadow-sm border">
         {loading ? (
@@ -159,8 +158,8 @@ const VehicleList = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-blue-50">
                 <tr>
-                  <th 
-                    scope="col" 
+                  <th
+                    scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer"
                     onClick={() => handleSort('vehicleNumber')}
                   >
@@ -173,8 +172,8 @@ const VehicleList = () => {
                       )}
                     </div>
                   </th>
-                  <th 
-                    scope="col" 
+                  <th
+                    scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer"
                     onClick={() => handleSort('vehicleType')}
                   >
@@ -193,8 +192,8 @@ const VehicleList = () => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
                     Fuel Type
                   </th>
-                  <th 
-                    scope="col" 
+                  <th
+                    scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider cursor-pointer"
                     onClick={() => handleSort('status')}
                   >
@@ -230,14 +229,14 @@ const VehicleList = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <span className={
-                          vehicle.status === "active" 
-                            ? "text-green-600" 
-                            : vehicle.status === "inactive" 
-                              ? "text-red-500" 
+                          vehicle.status === "active"
+                            ? "text-green-600"
+                            : vehicle.status === "inactive"
+                              ? "text-red-500"
                               : "text-orange-500"
                         }>
-                          {vehicle.status === "under_maintenance" 
-                            ? "Under Maintenance" 
+                          {vehicle.status === "under_maintenance"
+                            ? "Under Maintenance"
                             : vehicle.status.charAt(0).toUpperCase() + vehicle.status.slice(1)}
                         </span>
                       </td>
