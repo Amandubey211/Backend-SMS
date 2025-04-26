@@ -146,10 +146,15 @@ const RFID = lazy(() => import("../Modules/Admin/Transportation/RFID.js"));
 const VehicleManagement = lazy(() =>
   import("../Modules/Admin/Transportation/VehicleManagement.js")
 );
+
+
+const ShiftManagement = lazy(() =>
+  import("../Modules/Admin/Transportation/ShiftManagement.js")
+);
 const DriverVehicleAssignmentPage = lazy(() =>
   import("../Modules/Admin/Transportation/DriverVehicleAssignmentPage.js")
 );
-const Stoppage = lazy(() => import("../Components/Transportation/stopageList.js"));
+const Stoppage = lazy(() => import("../Components/Transportation/StopageList.js"));
 
 
 const SelectBranch = lazy(() =>
@@ -823,6 +828,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={RouteManagement}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/shift-management",
+      element: (
+        <ProtectRoute
+          Component={ShiftManagement}
           allowedRoles={["admin", "staff"]}
         />
       ),

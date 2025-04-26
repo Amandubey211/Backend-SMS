@@ -29,7 +29,7 @@ const shiftSlice = createSlice({
       })
       .addCase(getAllShifts.fulfilled, (state, action) => {
         state.loading = false;
-        state.shifts = action.payload?.data?.shifts || [];
+        state.shifts = action.payload?.data || [];
         state.currentPage = action.payload?.data?.currentPage || 1;
         state.totalPages = action.payload?.data?.totalPages || 1;
         state.totalShifts = action.payload?.data?.totalShifts || 0;

@@ -21,10 +21,11 @@ export const createShift = createAsyncThunk(
 
 export const getAllShifts = createAsyncThunk(
   "shift/getAllShifts",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue, dispatch }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const data = await getData(`/transport/get-shifts?page=${page}&limit=${limit}`);
+      const data = await getData(`/transport/get-shifts`);
+      console.log("shift data ---->",data)
       return data;
     } catch (error) {
       console.error("Error in getAllShifts:", error);

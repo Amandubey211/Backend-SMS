@@ -335,16 +335,16 @@ const sidebarData = [
     icon: <FaBusAlt style={{ fontSize: "1.1rem" }} />,
     roles: [ROLES.ADMIN, ROLES.STAFF],
     items: [
+      // {
+      //   title: "Route & Bus",
+      //   icon: <FaRoute />,
+      //   path: "/transportation/routes-and-buses",
+      //   roles: [ROLES.ADMIN, ROLES.STAFF],
+      // },
       {
-        title: "Route & Bus",
-        icon: <FaRoute />,
-        path: "/transportation/routes-and-buses",
-        roles: [ROLES.ADMIN, ROLES.STAFF],
-      },
-      {
-        title: "Route Management",
-        icon: <MdDirectionsBus />,
-        path: "/transportation/route-management",
+        title: "Shift Management", // New tab
+        icon: <MdDirectionsBus />, // You can choose a different icon if preferred
+        path: "/transportation/shift-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
       {
@@ -353,12 +353,12 @@ const sidebarData = [
         path: "/transportation/vehicle-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
-      {
-        title: "Student & Staff Transportation",
-        icon: <MdPeople />,
-        path: "/transportation/student-staff",
-        roles: [ROLES.ADMIN, ROLES.STAFF],
-      },
+      // {
+      //   title: "Student & Staff Transportation",
+      //   icon: <MdPeople />,
+      //   path: "/transportation/student-staff",
+      //   roles: [ROLES.ADMIN, ROLES.STAFF],
+      // },
       {
         title: "Driver Management",
         icon: <FaUserTie />,
@@ -366,17 +366,23 @@ const sidebarData = [
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
       {
-        title: "Maintenance",
-        icon: <GiAutoRepair />,
-        path: "/transportation/maintenance",
+        title: "Route Management",
+        icon: <MdDirectionsBus />,
+        path: "/transportation/route-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
-      {
-        title: "RFID",
-        icon: <AiOutlineCreditCard />,
-        path: "/transportation/rfid",
-        roles: [ROLES.ADMIN, ROLES.STAFF],
-      },
+      // {
+      //   title: "Maintenance",
+      //   icon: <GiAutoRepair />,
+      //   path: "/transportation/maintenance",
+      //   roles: [ROLES.ADMIN, ROLES.STAFF],
+      // },
+      // {
+      //   title: "RFID",
+      //   icon: <AiOutlineCreditCard />,
+      //   path: "/transportation/rfid",
+      //   roles: [ROLES.ADMIN, ROLES.STAFF],
+      // },
     ],
   },
 ];
