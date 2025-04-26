@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import useNavHeading from '../../../Hooks/CommonHooks/useNavHeading ';
 import Layout from '../../../Components/Common/Layout';
 import DashLayout from '../../../Components/Admin/AdminDashLayout';
+import ShiftList from '../../../Components/Transportation/ShiftList';
 
 const ShiftManagement = () => {
     const { t } = useTranslation("transportation");
@@ -20,6 +21,7 @@ const ShiftManagement = () => {
               </button>
             </div>
           </div>
+          <ShiftList/>
         </div>
     </DashLayout>
     </Layout>
