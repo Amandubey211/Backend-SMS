@@ -12,7 +12,6 @@ export const getAllVehicles = createAsyncThunk(
       dispatch(setShowError(false));
 
       const response = await getData(`/transport/get-vehicles?page=${page}&limit=${limit}`);
-      
       return response; 
     } catch (error) {
       console.error("Error in getAllVehicles:", error);
