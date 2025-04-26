@@ -23,7 +23,7 @@ export const getRouteById =  createAsyncThunk(
       try {
         dispatch(setShowError(false));
         const data = await getData(`/transport/route/${id}`);
-        console.log("stttttt===>",data.data)
+        // console.log("stttttt===>",data.data)
         return data;
       } catch (error) {
         console.error("Error in transportRouteBy Id:", error);
@@ -31,3 +31,6 @@ export const getRouteById =  createAsyncThunk(
       }
     }
   );
+
+
+
