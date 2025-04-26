@@ -14,7 +14,7 @@ const initialState = {
   selectedVehicle: null,
   currentPage: 1,
   totalPages: 1,
-  totalVehicles: 0, 
+  totalVehicles: 0,
 };
 
 const transportvehicleSlice = createSlice({
@@ -36,8 +36,7 @@ const transportvehicleSlice = createSlice({
       .addCase(getAllVehicles.fulfilled, (state, action) => {
         state.loading = false;
         const response = action.payload?.data || {};
-
-        state.vehicles = response.vehicles || []; 
+        state.vehicles = response || [];
         state.currentPage = response.currentPage || 1;
         state.totalPages = response.totalPages || 1;
         state.totalVehicles = response.totalVehicles || 0;

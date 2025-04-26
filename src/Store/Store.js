@@ -111,8 +111,11 @@ import { saveDraft } from "../Utils/signupDraft";
 import transportRouteReducer from "../Store/Slices/Transportation/RoutesManagment/routeSlice";
 import transportVehicleReducer from "../Store/Slices/Transportation/Vehicles/vehiclesSlice";
 import transportShiftReducer from "../Store/Slices/Transportation/Shift/shiftSlice";
+
 import transportSubRouteReducer from "../Store/Slices/Transportation/SubRoute/subRouteSlice";
 import transportVDAssignmentReducer from "../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignmentSice";
+import transportDriverReducer from "../Store/Slices/Transportation/Driver/driver.slice";
+
 // Persist configuration for the Auth slice
 
 const authPersistConfig = {
@@ -284,8 +287,12 @@ const transportReducer = combineReducers({
   transportRoute: transportRouteReducer,
   transportVehicle: transportVehicleReducer,
   transportShift: transportShiftReducer,
+
   transportSubRoute: transportSubRouteReducer,
   transportVDAssignment:transportVDAssignmentReducer,
+
+  transportDriver: transportDriverReducer,
+
 });
 
 // Create the store
