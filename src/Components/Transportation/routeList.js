@@ -92,7 +92,6 @@ const RouteList = () => {
             <th className="p-2 text-left">End Point</th>
             <th className="p-2 text-left">Stoppages</th> {/* 👈 New Column */}
             <th className="p-2 text-left">No.of Vehicles</th>
-            <th className="p-2 text-left">Total Students</th>
             <th className="p-2 text-left">Actions</th>
           </tr>
         </thead>
@@ -129,7 +128,6 @@ const RouteList = () => {
                   </Link>
                 </td>
                 <td className="p-2">{route.vehicles?.length}</td>
-                <td className="p-2">{route.totalStudents}</td>
                 <td className="p-2">
                   <div className="flex gap-2">
                     <FaTrash
