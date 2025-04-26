@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createOrUpdateDriverVehicleAssignment, getDriverVehicleAssignments } from "../../../../../../sms_backend/Controller/Transportation/vehicleDriverAssignment.controller";
+import { createOrUpdateDriverVehicleAssignment, getDriverVehicleAssignments } from "./vehicleDriverAssignment.action";
 
 
 const initialState = {
