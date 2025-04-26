@@ -29,7 +29,7 @@ const driverVehicleAssignmentSlice = createSlice({
       })
       .addCase(getDriverVehicleAssignments.fulfilled, (state, action) => {
         state.loading = false;
-        state.assignments = action.payload?.data || [];
+        state.assignments = action.payload?.data?.assignments || [];
         state.currentPage = action.payload?.currentPage || 1;
         state.totalPages = action.payload?.totalPages || 1;
       })
@@ -45,16 +45,7 @@ const driverVehicleAssignmentSlice = createSlice({
       })
       .addCase(createOrUpdateDriverVehicleAssignment.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedAssignment = action.payload?.data;
-        const index = state.assignments.findIndex(
-          (a) => a._id === updatedAssignment._id
-        );
-
-        if (index !== -1) {
-          state.assignments[index] = updatedAssignment;
-        } else {
-          state.assignments.push(updatedAssignment);
-        }
+        
       })
       .addCase(createOrUpdateDriverVehicleAssignment.rejected, (state, action) => {
         state.loading = false;

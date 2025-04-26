@@ -1,4 +1,4 @@
-import { deleteData, postData, putData } from "../../../../services/apiEndpoints";
+import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
 import { getUserRole } from "../../../../Utils/getRoles";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
@@ -7,14 +7,14 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 export const fetchDriverList = createAsyncThunk(
     "transport/fetchDriverList",
-    async ({ rejectWithValue, getState, dispatch }) => {
+    async (_,{ rejectWithValue, getState, dispatch }) => {
         try {
-            const say = getAY();
+            // const say = getAY();
             const role = getUserRole(getState);
 
             dispatch(setShowError(false));
 
-            const response = await postData(`/${role}/transport/get-drivers?say=${say}`);
+            const response = await getData(`/transport/get-drivers`);
             return response;
         } catch (error) {
             return handleError(error, dispatch, rejectWithValue);

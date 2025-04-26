@@ -4,9 +4,8 @@ import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import { useTranslation } from "react-i18next";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
-import RouteList from "../../../Components/Transportation/routeList";
-import { useDispatch, useSelector } from "react-redux";
-import { getAllRoutes } from "../../../Store/Slices/Transportation/RoutesManagment/routes.action";
+import RouteList from "../../../Components/Transportation/RouteList";
+
 
 const RouteManagement = () => {
   const { t } = useTranslation("transportation");
