@@ -53,7 +53,7 @@ const AllStudents = lazy(() =>
   )
 );
 
-const RecentQuotationList  = lazy(() =>
+const RecentQuotationList = lazy(() =>
   import("../Modules/Admin/Finance/Quotations/RecentQuotationList.js")
 );
 const EntityRevenueDash = lazy(() =>
@@ -77,13 +77,13 @@ const BankReconciliationList = lazy(() =>
 const BankReconciliationDash = lazy(() =>
   import("../Modules/Admin/Finance/bankRecon/BankReconciliation.js")
 );
-const StartReconciliation= lazy(() =>
+const StartReconciliation = lazy(() =>
   import("../Modules/Admin/Finance/bankRecon/StartReconciliation.js")
 );
-const DayBook= lazy(() =>
+const DayBook = lazy(() =>
   import("../Modules/Admin/Finance/dayBook/DayBookMain.js")
 );
-const ConfigurationMain= lazy(() =>
+const ConfigurationMain = lazy(() =>
   import("../Modules/Admin/Finance/Configuration/ConfigurationMain.js")
 );
 const PayRollDash = lazy(() =>
@@ -126,14 +126,29 @@ const Entities = lazy(() =>
   import("../Modules/Admin/Finance/entities/Enities.js")
 );
 
-const RouteAndBus = lazy(() => import("../Modules/Admin/Transportation/RouteAndBus"));
-const RouteManagement = lazy(() => import("../Modules/Admin/Transportation/RouteManagement.js"));
-const StudentStaffTransportation = lazy(() => import("../Modules/Admin/Transportation/StudentStaffTransportation.js"));
-const DriverStaffTransportation = lazy(() => import("../Modules/Admin/Transportation/DriverStaffTransportation.js"));
-const Maintenance = lazy(() => import("../Modules/Admin/Transportation/Maintenance.js"));
+const RouteAndBus = lazy(() =>
+  import("../Modules/Admin/Transportation/RouteAndBus")
+);
+const RouteManagement = lazy(() =>
+  import("../Modules/Admin/Transportation/RouteManagement.js")
+);
+const StudentStaffTransportation = lazy(() =>
+  import("../Modules/Admin/Transportation/StudentStaffTransportation.js")
+);
+const DriverStaffTransportation = lazy(() =>
+  import("../Modules/Admin/Transportation/DriverStaffTransportation.js")
+);
+const Maintenance = lazy(() =>
+  import("../Modules/Admin/Transportation/Maintenance.js")
+);
 const RFID = lazy(() => import("../Modules/Admin/Transportation/RFID.js"));
 
-const VehicleManagement = lazy(() => import("../Modules/Admin/Transportation/VehicleManagement.js"));
+const VehicleManagement = lazy(() =>
+  import("../Modules/Admin/Transportation/VehicleManagement.js")
+);
+const DriverVehicleAssignmentPage = lazy(() =>
+  import("../Modules/Admin/Transportation/DriverVehicleAssignmentPage.js")
+);
 const Stoppage = lazy(() => import("../Components/Transportation/stopageList.js"));
 
 
@@ -794,6 +809,16 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/transportation/driver-vehicle-assignment",
+      element: (
+        <ProtectRoute
+          Component={DriverVehicleAssignmentPage}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/transportation/route-management",
       element: (
         <ProtectRoute
@@ -836,10 +861,7 @@ function App() {
     {
       path: "/transportation/rfid",
       element: (
-        <ProtectRoute
-          Component={RFID}
-          allowedRoles={["admin", "staff"]}
-        />
+        <ProtectRoute Component={RFID} allowedRoles={["admin", "staff"]} />
       ),
       errorElement: <Error />,
     },
@@ -1160,10 +1182,7 @@ function App() {
     {
       path: "/finance/day-book",
       element: (
-        <ProtectRoute
-          Component={DayBook}
-          allowedRoles={["admin", "finance"]}
-        />
+        <ProtectRoute Component={DayBook} allowedRoles={["admin", "finance"]} />
       ),
       errorElement: <Error />,
     },
