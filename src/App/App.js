@@ -132,7 +132,10 @@ const StudentStaffTransportation = lazy(() => import("../Modules/Admin/Transport
 const DriverStaffTransportation = lazy(() => import("../Modules/Admin/Transportation/DriverStaffTransportation.js"));
 const Maintenance = lazy(() => import("../Modules/Admin/Transportation/Maintenance.js"));
 const RFID = lazy(() => import("../Modules/Admin/Transportation/RFID.js"));
+
 const VehicleManagement = lazy(() => import("../Modules/Admin/Transportation/VehicleManagement.js"));
+const Stoppage = lazy(() => import("../Components/Transportation/stopageList.js"));
+
 
 const SelectBranch = lazy(() =>
   import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
@@ -835,6 +838,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={RFID}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/routes/:id/stoppages",
+      element: (
+        <ProtectRoute
+          Component={Stoppage}
           allowedRoles={["admin", "staff"]}
         />
       ),
