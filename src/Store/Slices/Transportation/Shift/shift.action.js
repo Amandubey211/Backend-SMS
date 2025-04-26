@@ -1,7 +1,8 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getData, postData, putData, deleteData } from "../../../ApiService";
-import { handleError } from "../../../utils/handleError"; 
-import { setShowError } from "../../Common/common.slice"; 
+import { setShowError } from "../../Common/Alerts/alertsSlice";
+import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
+import { handleError } from "../../Common/Alerts/errorhandling.action";
+
 
 export const createShift = createAsyncThunk(
   "shift/createShift",

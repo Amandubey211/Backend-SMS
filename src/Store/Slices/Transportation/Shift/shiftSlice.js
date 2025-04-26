@@ -1,12 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {
-  createShift,
-  getAllShifts,
-  getShiftById,
-  updateShift,
-  toggleShiftStatus,
-  deleteShift
-} from "./shift.actions"; 
+import { createShift, deleteShift, getAllShifts, getShiftById, toggleShiftStatus, updateShift } from "./shift.action";
+
 
 const initialState = {
   loading: false,
