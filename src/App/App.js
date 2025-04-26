@@ -126,6 +126,13 @@ const Entities = lazy(() =>
   import("../Modules/Admin/Finance/entities/Enities.js")
 );
 
+const RouteAndBus = lazy(() => import("../Modules/Admin/Transportation/RouteAndBus"));
+const RouteManagement = lazy(() => import("../Modules/Admin/Transportation/RouteManagement.js"));
+const StudentStaffTransportation = lazy(() => import("../Modules/Admin/Transportation/StudentStaffTransportation.js"));
+const DriverStaffTransportation = lazy(() => import("../Modules/Admin/Transportation/DriverStaffTransportation.js"));
+const Maintenance = lazy(() => import("../Modules/Admin/Transportation/Maintenance.js"));
+const RFID = lazy(() => import("../Modules/Admin/Transportation/RFID.js"));
+
 const SelectBranch = lazy(() =>
   import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
 );
@@ -758,6 +765,66 @@ function App() {
         <ProtectRoute
           Component={Quizzes}
           allowedRoles={["admin", "teacher", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/routes-and-buses",
+      element: (
+        <ProtectRoute
+          Component={RouteAndBus}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/route-management",
+      element: (
+        <ProtectRoute
+          Component={RouteManagement}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/student-staff",
+      element: (
+        <ProtectRoute
+          Component={StudentStaffTransportation}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/driver-staff",
+      element: (
+        <ProtectRoute
+          Component={DriverStaffTransportation}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/maintenance",
+      element: (
+        <ProtectRoute
+          Component={Maintenance}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/rfid",
+      element: (
+        <ProtectRoute
+          Component={RFID}
+          allowedRoles={["admin", "staff"]}
         />
       ),
       errorElement: <Error />,
