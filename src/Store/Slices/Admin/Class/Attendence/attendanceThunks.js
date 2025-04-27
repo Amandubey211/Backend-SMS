@@ -50,7 +50,7 @@ export const fetchAttendanceByClassSectionGroupDate = createAsyncThunk(
 export const markAttendance = createAsyncThunk(
   "attendance/markAttendance",
   async (attendanceData, { rejectWithValue, dispatch, getState }) => {
-    console.log(attendanceData,"attendanceData")
+    console.log(attendanceData, "attendanceData");
     try {
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
@@ -62,7 +62,14 @@ export const markAttendance = createAsyncThunk(
         { ...attendanceData, date: formattedDate }
       );
       toast.success("Attendance marked ");
-      dispatch(fetchAttendanceByClassSectionGroupDate( { classId : attendanceData.classId, sectionId:attendanceData.sectionId, groupId:attendanceData.groupId || null, date:attendanceData.date })); // Fetch updated attendance data
+      dispatch(
+        fetchAttendanceByClassSectionGroupDate({
+          classId: attendanceData.classId,
+          sectionId: attendanceData.sectionId,
+          groupId: attendanceData.groupId || null,
+          date: attendanceData.date,
+        })
+      ); // Fetch updated attendance data
       dispatch(setShowError(false));
       return response; // Return the response data
     } catch (error) {

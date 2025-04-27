@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from "react";
 import { Formik, Form, useFormikContext } from "formik";
-import { Button, message, Form as AntForm } from "antd";
+import { Button, message, Form as AntForm, Spin } from "antd";
 import AcademicSessionCandidate from "./Sections/AcademicSessionCandidate";
 import AcademicHistory from "./Sections/AcademicHistory";
 import AddressInformation from "./Sections/AddressInformation";
@@ -9,6 +9,8 @@ import AttachmentsUpload from "./Sections/AttachmentsUpload";
 import { initialValues, AdminAdmissionSchema } from "./validations";
 import { registerStudentDetails } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchSchoolAttachmentsById } from "../../../../Store/Slices/Admin/Admission/admissionThunk";
+import useDynamicAttachments from "../../../../Hooks/Admin/useDynamicAttachments";
 
 const FormDataWatcher = ({ onChange }) => {
   const { values } = useFormikContext();
@@ -30,7 +32,34 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
   const schoolId = useSelector(
     (state) => state.common.user.userDetails.schoolId
   );
+  const { attachments: attachmentsMeta, loading } = useSelector(
+    (state) => state.admin.admissionAttachment
+  );
 
+  useEffect(() => {
+    dispatch(fetchSchoolAttachmentsById());
+    console.log("fetchattachments");
+  }, []);
+  /* ------------------------------------------------------------------ */
+  /* 2. Build dynamic initialValues + Yup schema                        */
+  /* ------------------------------------------------------------------ */
+  const { attachmentsInitialValues, attachmentsSchema } =
+    useDynamicAttachments(attachmentsMeta);
+
+  const mergedInitialValues = React.useMemo(
+    () => ({
+      ...initialValues, // your static sections
+      attachments: attachmentsInitialValues,
+    }),
+    [attachmentsInitialValues]
+  );
+
+  const mergedValidation = React.useMemo(
+    () => AdminAdmissionSchema.concat(attachmentsSchema), // merge with static rules
+    [attachmentsSchema]
+  );
+
+  // if (loading) return <Spin />;
   const handleFormikErrorScroll = (errors) => {
     const errorKeys = Object.keys(errors);
     if (!errorKeys.length) return;
@@ -46,6 +75,8 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
 
   const handleFormSubmit = async (values, actions) => {
     try {
+      console.log("Form values:", values);
+      
       const formData = new FormData();
 
       // Candidate Information
@@ -163,8 +194,8 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
   return (
     <div className="bg-white rounded-md p-4">
       <Formik
-        initialValues={initialValues}
-        validationSchema={AdminAdmissionSchema}
+        initialValues={mergedInitialValues}
+        // validationSchema={mergedValidation}
         onSubmit={handleFormSubmit}
         validateOnMount
       >

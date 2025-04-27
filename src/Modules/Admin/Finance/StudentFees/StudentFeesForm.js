@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, DatePicker, InputNumber, Row, Col, Descriptions, Tooltip } from "antd";
+import { Form, Input, Select, Button, DatePicker, InputNumber, Row, Col, Descriptions, Tooltip, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
 import { fetchInventory } from "../../../../Store/Slices/Finance/inventory/inventory.thunk";
@@ -8,9 +8,11 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import SidebarClassSelection from "./Components/SelectClassAndSection.js";
 import toast from "react-hot-toast";
 import { createStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BsInfoCircle } from "react-icons/bs";
 import dayjs from "dayjs";
+import ConfigurationCreateModel from "../Configuration/ConfigurationCreateModel.js";
+import { setStudentId } from "../../../../Store/Slices/Common/User/reducers/userSlice.js";
 const { Option } = Select;
 
 const StudentFeeForm = () => {
@@ -18,6 +20,8 @@ const StudentFeeForm = () => {
   const categories = useSelector((state) => state.admin.financialCategory.categories);
 
   const [form] = Form.useForm();
+  const [studentIds, setStudentIds] = useState([]);
+
   const [lineItems, setLineItems] = useState([
     {
       categoryId: "",
@@ -35,10 +39,29 @@ const StudentFeeForm = () => {
       frequency: "Permanent Purchase",
       startDate: null,
       endDate: null,
+      dueDate: null,
     },
   ]);
-
+  const location = useLocation();
+  const [classAndSectionDetail, setClassAndSectionDetail] = useState([]);
   useEffect(() => {
+    if(location?.state){
+      let lIt =location?.state?.configData?.lineItems.map((i)=>{
+        return {
+          ...i,
+          dueDate: "",
+          startDate:"",
+          endDate:""
+
+        }
+      });
+        setLineItems(lIt);
+      setStudentIds(location?.state?.configData?.studentIds);
+      setClassAndSectionDetail(location?.state?.configData?.classAndSectionDetail);
+      form.setFieldsValue({
+        lineItems: lIt,
+      });
+    }
     dispatch(fetchCategory({ categoryType: "revenue", search: "", page: 1, limit: 10000 }));
   }, [dispatch]);
   const [description, setDescription] = useState('');
@@ -92,7 +115,7 @@ const StudentFeeForm = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedItems = [...lineItems];
-    updatedItems[index][field] = value;
+    updatedItems[index][field] = field.includes('Date') && value ? value.format('YYYY-MM-DD') : value;
 
     const rate = updatedItems[index].rate || 0;
     const quantity = updatedItems[index].quantity || 1;
@@ -146,7 +169,13 @@ const StudentFeeForm = () => {
     setLineItems(updatedItems);
   };
   const { studentsIdsArray } = useSelector((state) => state.admin.studentFees);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [configModel, setConfigModel] = useState(false);
+  const [isConfigData, setIsConfigData] = useState(false);
+  const closeConfigModel = ()=>{
+    setIsConfigData(false)
+    setConfigModel(false)
+  }
   const handleSubmit = (values) => {
     if (studentsIdsArray?.length < 1) {
       toast.error("Please Select Student");
@@ -157,15 +186,16 @@ const StudentFeeForm = () => {
       lineItems,
       studentIds: studentsIdsArray
     }
-    console.log(data);
-
-    dispatch(createStudentFee({ feeData: data, navigate }))
-
-
+    if(isConfigData){
+      setConfigModel(true)
+      return 
+    }else{
+    dispatch(createStudentFee({ feeData: data, navigate }))}
   };
   const { activeYear } = useSelector((store) => store.common.financialYear);
   const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
   const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
+
   return (
     <div className="p-6 ">
       <div className="flex items-center justify-between mb-2">
@@ -326,7 +356,7 @@ const StudentFeeForm = () => {
 
         <Button type="dashed" onClick={addLineItem} className=" text-purple-500 " >Add New Item</Button>
         <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Add Fees</Button>
-        <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
+        <Button htmlType="submit" onClick={()=> setIsConfigData(true)}  className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
       </Form>
       <Sidebar
         title={"Select Multiply classes & sections"}
@@ -334,9 +364,17 @@ const StudentFeeForm = () => {
         isOpen={isModalVisible}
         onClose={handleModalClose}
       >
-        <SidebarClassSelection onClose={handleModalClose} />
+        <SidebarClassSelection onClose={handleModalClose} studentIds={studentIds} setStudentIds={setStudentIds} classAndSectionDetail={classAndSectionDetail} setClassAndSectionDetail={setClassAndSectionDetail} />
         {studentsIdsArray.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={() => handleModalClose()}>Done</div>}
       </Sidebar>
+      <Modal
+      open={configModel}
+      onClose={()=>closeConfigModel()}
+      onCancel={()=>closeConfigModel()}
+      footer={null}
+      >
+       <ConfigurationCreateModel closeConfigModel={closeConfigModel} data={{lineItems,studentIds,classAndSectionDetail}} configType="studentRevenue"/>
+      </Modal>
     </div>
   );
 };

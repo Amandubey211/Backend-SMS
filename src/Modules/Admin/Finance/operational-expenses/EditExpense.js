@@ -17,7 +17,7 @@ const EditOperationalExpenses = ({ data }) => {
   const [receiptData, setReceiptData] = useState({
     status: "",
     paymentType: "",
-    paymentDate: "",
+    paymentDate: null,
     chequeNumber: "",
     chequeDate: "",
     note: "",
@@ -27,7 +27,7 @@ const EditOperationalExpenses = ({ data }) => {
     if (data?.lineItems) {
       const items = data.lineItems.map((item) => ({
         ...item,
-        payNow: item.remainingAmount || 0,
+        payNow:  0,
       }));
       setLineItems(items)}
   }, [data]);
@@ -54,7 +54,7 @@ const EditOperationalExpenses = ({ data }) => {
   const handleReceiptChange = (field, value) => {
     setReceiptData((prev) => ({
       ...prev,
-      [field]: value,
+      [field]: field.includes('Date') && value ? value.format('YYYY-MM-DD') : value,
     }));
   };
 
@@ -63,7 +63,6 @@ const EditOperationalExpenses = ({ data }) => {
       ...data,
       lineItems: lineItems.map((item) => ({
         ...item,
-        paidAmount: item.paidAmount + Number(item.payNow),
         remainingAmount: item.remainingAmount - Number(item.payNow),
       })),
       ...receiptData,
@@ -116,6 +115,7 @@ const EditOperationalExpenses = ({ data }) => {
                         value={item.payNow}
                         onChange={(value) => handleInputChange(index, value)}
                         style={{ width: "100%" }}
+                        required
                       />
                     </Form.Item>
                   </Col>
@@ -128,15 +128,16 @@ const EditOperationalExpenses = ({ data }) => {
               <Row gutter={16}>
                 <Col span={6}>
                   <Form.Item label="Status">
-                    <Input value={receiptData.status} disabled />
+                    <Input value={receiptData?.status} disabled />
                   </Form.Item>
                 </Col>
 
                 <Col span={6}>
                   <Form.Item label="Payment Type">
                     <Select
-                      value={receiptData.paymentType}
+                      value={receiptData?.paymentType}
                       onChange={(value) => handleReceiptChange("paymentType", value)}
+                      required
                     >
                       <Option value="cash">Cash</Option>
                       <Option value="card">Card</Option>
@@ -148,10 +149,10 @@ const EditOperationalExpenses = ({ data }) => {
                 </Col>
 
                 <Col span={6}>
-                  <Form.Item label="Payment Date">
+                  <Form.Item label="Payment Date" required>
                     <DatePicker
                       type="date"
-                      value={receiptData.paymentDate?.split("T")[0] || ""}
+                      value={receiptData?.paymentDate || ""}
                       className="w-full h-[2rem] border border-gray-300 rounded-lg p-2"
                       onChange={(e) => handleReceiptChange("paymentDate", e)}
                       disabledDate={(current) =>
@@ -166,7 +167,7 @@ const EditOperationalExpenses = ({ data }) => {
                     <Col span={6}>
                       <Form.Item label="Cheque Number">
                         <Input
-                          value={receiptData.chequeNumber}
+                          value={receiptData?.chequeNumber}
                           onChange={(e) => handleReceiptChange("chequeNumber", e.target.value)}
                         />
                       </Form.Item>
@@ -176,7 +177,7 @@ const EditOperationalExpenses = ({ data }) => {
                         <DatePicker
                           type="date"
                           className="w-full h-[2rem] border border-gray-300 rounded-lg p-2"
-                          value={receiptData.chequeDate?.split("T")[0] || ""}
+                          value={receiptData?.chequeDate?.split("T")[0] || ""}
                           onChange={(e) => handleReceiptChange("chequeDate", e)}
                           disabledDate={(current) =>
                             current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))

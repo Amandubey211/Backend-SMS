@@ -46,28 +46,28 @@ const BudgetList = () => {
     },
     {
       title: "Budget Allocated",
-      render: (_, record) => `${record.totalBudget} ${schoolCurrency} / ${record.frequency}  `,
+      render: (_,record) => `${record.totalBudget} ${schoolCurrency} (${record.frequency})  `,
     },
     {
-      title: "Total Spend Amount",
+      title: "Spend Amount",
       dataIndex: "spendAmount",
-      render: (spendAmount) => `${spendAmount} ${schoolCurrency}`
+      render:(spendAmount,record)=>` ${record.frequency == "monthly"?   (spendAmount/ record?.totalMonths)?.toFixed(2) :spendAmount} ${schoolCurrency} ${record.frequency == "monthly"? "/ Month":"" }`
     },
     {
       title: "Status",
       render: (_, record) => {
         let text = "With in budget";
-
-        if (record.frequency === "monthly") {
-          text = record?.totalBudget / 12 > record?.spendAmount / 12
-            ? "With in budget"
+    
+        if (record.frequency == "monthly") {
+          text = record?.totalBudget / record?.totalMonths > record?.spendAmount / 12 
+            ? "With in budget" 
             : "Over Budget";
         } else {
-          text = record?.totalBudget > record?.spendAmount
-            ? "With in budget"
+          text = record?.totalBudget > record?.spendAmount 
+            ? "With in budget" 
             : "Over Budget";
         }
-
+    
         return (
           <p className={`text-${text === "With in budget" ? "green" : "red"}-500`}>
             {text}

@@ -1,6 +1,6 @@
 // src/store/finance/Budget /Budget Slice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { createBudget, fetchBudget, fetchBudgetsummary, updateBudget } from "./budget.thunk";
+import { createBudget, fetchBudget, fetchBudgetGraph, fetchBudgetsummary, updateBudget } from "./budget.thunk";
 const initialState = {
   allBudget: [],
   allBudgetDetails:[],
@@ -12,7 +12,14 @@ const initialState = {
   loading: false,
   error: null,
   budgetGraph: [],
-  budgetCardData:{}
+  budgetCardData:{},
+  graphData:{
+    loading: false,
+    error: null,
+    data:[],
+    totalBudget:0,
+    totalSpend:0,
+  }
 };
 
 const budgetSlice = createSlice({
@@ -41,6 +48,23 @@ const budgetSlice = createSlice({
         state.loading = false;
         state.error = action.payload || action.error.message;
       });
+    builder
+      .addCase(fetchBudgetGraph.pending, (state) => {
+        state.graphData.loading = true;
+        state.graphData.error = null;
+      })
+      .addCase(fetchBudgetGraph.fulfilled, (state, action) => {
+        state.graphData.loading = false;
+        state.graphData.data  = action.payload.data || [];
+        state.graphData.totalBudget  = action.payload.totalBudget || 0;
+        state.graphData.totalSpend  = action.payload.totalSpend || 0;
+       
+      })
+      .addCase(fetchBudgetGraph.rejected, (state, action) => {
+        state.graphData.loading = false;
+        state.graphData.error = action.payload || action.error.message;
+      });
+
     builder
       .addCase(fetchBudgetsummary.pending, (state) => {
         state.loading = true;

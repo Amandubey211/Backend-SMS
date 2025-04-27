@@ -25,7 +25,7 @@ const EditPayRoll = ({ data }) => {
   });
 
   const handleChange = (field, value) => {
-    setReceiptData({ ...receiptData, [field]: value });
+    setReceiptData({ ...receiptData, [field]: field.includes('Date') && value ? value.format('YYYY-MM-DD') : value });
   };
 
   const handleSubmit = () => {
@@ -88,7 +88,7 @@ const EditPayRoll = ({ data }) => {
 
                     <Col span={6}>
                       <Form.Item label="Payment Date" name="paymentDate" rules={[{ required: true }]}>
-                        <DatePicker type="date" className="w-full border p-2 rounded" value={receiptData.paymentDate} onChange={(e) => handleChange("paymentDate", e)}  disabledDate={(current) =>
+                        <DatePicker type="date" className="w-full border p-2 rounded" value={receiptData?.paymentDate} onChange={(e) => handleChange("paymentDate", e)}  disabledDate={(current) =>
                     current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
                   }/>
                       </Form.Item>

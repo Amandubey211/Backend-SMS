@@ -66,7 +66,7 @@ import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSl
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
-
+import admissonAttachmentReducer from "./Slices/Admin/Admission/admissionSlice";
 import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
 import adminOfflineExamReducer from "./Slices/Admin/Class/OfflineExam/offlineExamSlice";
 import operationalExpensesReducer from "./Slices/Finance/operationalExpenses/operationalExpenses.slice";
@@ -106,6 +106,15 @@ import parentChildGradesReducer from "./Slices/Parent/Grades/parentGradeSlice";
 // teacher
 import teacherTimeTableReducer from "../Store/Slices/Teacher/teacherTimeTableSlice";
 import { saveDraft } from "../Utils/signupDraft";
+
+// transportation
+import transportRouteReducer from "../Store/Slices/Transportation/RoutesManagment/routeSlice";
+import transportVehicleReducer from "../Store/Slices/Transportation/Vehicles/vehiclesSlice";
+import transportShiftReducer from "../Store/Slices/Transportation/Shift/shiftSlice";
+
+import transportSubRouteReducer from "../Store/Slices/Transportation/SubRoute/subRouteSlice";
+import transportVDAssignmentReducer from "../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignmentSice";
+import transportDriverReducer from "../Store/Slices/Transportation/Driver/driver.slice";
 
 // Persist configuration for the Auth slice
 
@@ -219,6 +228,7 @@ const AdminReducer = combineReducers({
   budget: budgetReducer,
   payroll: payrollReducer,
   operationalExpenses: operationalExpensesReducer,
+  admissionAttachment: admissonAttachmentReducer,
   // student_fees: studentFeesReducer,
 
   subject_grades: subjectGradesReducer,
@@ -274,6 +284,18 @@ const ParentReducer = combineReducers({
   grades: parentChildGradesReducer,
 });
 
+const transportReducer = combineReducers({
+  transportRoute: transportRouteReducer,
+  transportVehicle: transportVehicleReducer,
+  transportShift: transportShiftReducer,
+
+  transportSubRoute: transportSubRouteReducer,
+  transportVDAssignment:transportVDAssignmentReducer,
+
+  transportDriver: transportDriverReducer,
+
+});
+
 // Create the store
 const store = configureStore({
   reducer: {
@@ -288,6 +310,7 @@ const store = configureStore({
 
     student: studentReducer,
     Parent: ParentReducer,
+    transportation: transportReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

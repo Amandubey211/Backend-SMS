@@ -6,14 +6,13 @@ import { fetchStudentsByClassAndSectionNames } from "../../../../../Store/Slices
 import { setSelectedStudentsIds } from "../../../../../Store/Slices/Finance/StudentFees/studentFeesSlice";
 
 
-const SidebarClassSelection = () => {
+const SidebarClassSelection = ({studentIds, setStudentIds,classAndSectionDetail, setClassAndSectionDetail}) => {
   const dispatch = useDispatch();
   const classList = useSelector((state) => state.admin.class.classes);
   const sectionsList = useSelector((state) => state.admin.group_section.sectionsList);
   const { studentsList } = useSelector((state) => state.admin.students);
 
-  const [classAndSectionDetail, setClassAndSectionDetail] = useState([]);
-  const [studentIds, setStudentIds] = useState([]);
+  
 
   useEffect(() => {
     dispatch(fetchAllClasses());

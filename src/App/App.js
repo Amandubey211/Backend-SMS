@@ -53,7 +53,7 @@ const AllStudents = lazy(() =>
   )
 );
 
-const RecentQuotationList  = lazy(() =>
+const RecentQuotationList = lazy(() =>
   import("../Modules/Admin/Finance/Quotations/RecentQuotationList.js")
 );
 const EntityRevenueDash = lazy(() =>
@@ -77,13 +77,13 @@ const BankReconciliationList = lazy(() =>
 const BankReconciliationDash = lazy(() =>
   import("../Modules/Admin/Finance/bankRecon/BankReconciliation.js")
 );
-const StartReconciliation= lazy(() =>
+const StartReconciliation = lazy(() =>
   import("../Modules/Admin/Finance/bankRecon/StartReconciliation.js")
 );
-const DayBook= lazy(() =>
+const DayBook = lazy(() =>
   import("../Modules/Admin/Finance/dayBook/DayBookMain.js")
 );
-const ConfigurationMain= lazy(() =>
+const ConfigurationMain = lazy(() =>
   import("../Modules/Admin/Finance/Configuration/ConfigurationMain.js")
 );
 const PayRollDash = lazy(() =>
@@ -125,6 +125,37 @@ const LowInventory = lazy(() =>
 const Entities = lazy(() =>
   import("../Modules/Admin/Finance/entities/Enities.js")
 );
+
+const RouteAndBus = lazy(() =>
+  import("../Modules/Admin/Transportation/RouteAndBus")
+);
+const RouteManagement = lazy(() =>
+  import("../Modules/Admin/Transportation/RouteManagement.js")
+);
+const StudentStaffTransportation = lazy(() =>
+  import("../Modules/Admin/Transportation/StudentStaffTransportation.js")
+);
+const DriverStaffTransportation = lazy(() =>
+  import("../Modules/Admin/Transportation/DriverStaffTransportation.js")
+);
+const Maintenance = lazy(() =>
+  import("../Modules/Admin/Transportation/Maintenance.js")
+);
+const RFID = lazy(() => import("../Modules/Admin/Transportation/RFID.js"));
+
+const VehicleManagement = lazy(() =>
+  import("../Modules/Admin/Transportation/VehicleManagement.js")
+);
+
+
+const ShiftManagement = lazy(() =>
+  import("../Modules/Admin/Transportation/ShiftManagement.js")
+);
+const DriverVehicleAssignmentPage = lazy(() =>
+  import("../Modules/Admin/Transportation/DriverVehicleAssignmentPage.js")
+);
+const Stoppage = lazy(() => import("../Components/Transportation/StopageList.js"));
+
 
 const SelectBranch = lazy(() =>
   import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
@@ -763,6 +794,103 @@ function App() {
       errorElement: <Error />,
     },
     {
+      path: "/transportation/routes-and-buses",
+      element: (
+        <ProtectRoute
+          Component={RouteAndBus}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/vehicle-management",
+      element: (
+        <ProtectRoute
+          Component={VehicleManagement}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/driver-vehicle-assignment",
+      element: (
+        <ProtectRoute
+          Component={DriverVehicleAssignmentPage}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/route-management",
+      element: (
+        <ProtectRoute
+          Component={RouteManagement}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/shift-management",
+      element: (
+        <ProtectRoute
+          Component={ShiftManagement}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/student-staff",
+      element: (
+        <ProtectRoute
+          Component={StudentStaffTransportation}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/driver-staff",
+      element: (
+        <ProtectRoute
+          Component={DriverStaffTransportation}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/maintenance",
+      element: (
+        <ProtectRoute
+          Component={Maintenance}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/rfid",
+      element: (
+        <ProtectRoute Component={RFID} allowedRoles={["admin", "staff"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/routes/:id/stoppages",
+      element: (
+        <ProtectRoute
+          Component={Stoppage}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
       path: "/class/:cid/:sid/create_quiz",
       element: (
         <ProtectRoute
@@ -1069,10 +1197,7 @@ function App() {
     {
       path: "/finance/day-book",
       element: (
-        <ProtectRoute
-          Component={DayBook}
-          allowedRoles={["admin", "finance"]}
-        />
+        <ProtectRoute Component={DayBook} allowedRoles={["admin", "finance"]} />
       ),
       errorElement: <Error />,
     },

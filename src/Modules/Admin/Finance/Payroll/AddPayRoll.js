@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, InputNumber, Row, Col, Tooltip, DatePicker } from "antd";
+import { Form, Input, Select, Button, InputNumber, Row, Col, Tooltip, DatePicker, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { VscListSelection } from "react-icons/vsc";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import SelectStaffs from "./SelectStaffs";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
 import Layout from '../../../../Components/Common/Layout';
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -14,6 +14,7 @@ import { fetchBudget } from "../../../../Store/Slices/Finance/budget/budget.thun
 import { createPayroll } from "../../../../Store/Slices/Finance/payroll/payroll.thunk";
 import { BsInfoCircle } from "react-icons/bs";
 import dayjs from "dayjs";
+import ConfigurationCreateModel from "../Configuration/ConfigurationCreateModel";
 
 const { Option } = Select;
 
@@ -53,8 +54,15 @@ const AddPayRoll = () => {
     chequeDate: "",
     note: "",
   });
-
+const location = useLocation();
   useEffect(() => {
+    if(location?.state){
+      setLineItems(location?.state?.configData?.lineItems);
+      setStaffIds(location?.state?.configData?.staffIds);
+      form.setFieldsValue({
+        lineItems: location?.state?.configData?.lineItems,
+      });
+    }
     dispatch(fetchCategory({ categoryType: "expense", search: "", page: 1, limit: 10000 }));
   }, [dispatch]);
 
@@ -76,7 +84,7 @@ const AddPayRoll = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedItems = [...lineItems];
-    updatedItems[index][field] = value;
+    updatedItems[index][field] = field.includes('Date') && value ? value.format('YYYY-MM-DD') : value;
 
     const { basicSalary, allowances, deductions, tax, bonus, otherAdjustments, leaveDeductions, overtime } = updatedItems[index];
     const netSalary = basicSalary + allowances + otherAdjustments + overtime + bonus - deductions - leaveDeductions - tax;
@@ -130,7 +138,12 @@ const AddPayRoll = () => {
        }]
        setLineItems(updatedItems);
      };
-
+     const [configModel, setConfigModel] = useState(false);
+     const [isConfigData, setIsConfigData] = useState(false);
+     const closeConfigModel = ()=>{
+       setIsConfigData(false)
+       setConfigModel(false)
+     }
   const handleSubmit = (values) => {
      if (staffIds.length < 1) {
        toast.error("Please select User");
@@ -142,16 +155,17 @@ const AddPayRoll = () => {
       staffIds,
       ...receiptData,
     };
-    console.log(data);
-    
-
-     dispatch(createPayroll({ data, navigate }));
+    if(isConfigData){
+      setConfigModel(true)
+      return 
+    }else{
+     dispatch(createPayroll({ data, navigate }));}
   };
 
   const handleChange = (field, value) => {
     setReceiptData({
       ...receiptData,
-      [field]: value,
+      [field]: field.includes('Date') && value ? value.format('YYYY-MM-DD') : value,
     });
   };
 
@@ -162,6 +176,7 @@ const AddPayRoll = () => {
   const { activeYear } = useSelector((store) => store.common.financialYear);
   const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
   const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
+
 
   return (
     <Layout title="Finance | PayRoll">
@@ -417,8 +432,9 @@ const AddPayRoll = () => {
                 </Col>
               </Row>
             </div>
-            <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 mt-4 ">Save in Config</Button>
+         
             <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 mt-4 ml-10 " htmlType="submit">Submit</Button>
+            <Button htmlType="submit" onClick={()=> setIsConfigData(true)}  className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
 
           </Form>
 
@@ -427,6 +443,15 @@ const AddPayRoll = () => {
             {staffIds?.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={()=>setIsModalVisible(false)}>Done</div>}
           </Sidebar>
         </div>
+        <Modal
+      open={configModel}
+      onClose={()=>closeConfigModel()}
+      onCancel={()=>closeConfigModel()}
+      footer={null}
+      >
+       <ConfigurationCreateModel closeConfigModel={closeConfigModel} data={{lineItems,staffIds}} 
+       configType="payroll"/>
+      </Modal>
       </AdminDashLayout>
     </Layout>
   );
