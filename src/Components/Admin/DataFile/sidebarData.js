@@ -32,6 +32,7 @@ import {
   MdOutlineInventory2,
   MdDirectionsBus,
   MdPeople,
+  MdAccessTime,
 } from "react-icons/md";
 import { CiViewTable } from "react-icons/ci";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
@@ -343,7 +344,7 @@ const sidebarData = [
       // },
       {
         title: "Shift Management", // New tab
-        icon: <MdDirectionsBus />, // You can choose a different icon if preferred
+        icon: <MdAccessTime />, // You can choose a different icon if preferred
         path: "/transportation/shift-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },

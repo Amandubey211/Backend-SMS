@@ -1,8 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
-import { deleteData, getData, postData, putData } from "../../../../services/apiEndpoints";
+import {
+  deleteData,
+  getData,
+  postData,
+  putData,
+} from "../../../../services/apiEndpoints";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
-
 
 export const createShift = createAsyncThunk(
   "shift/createShift",
@@ -10,6 +14,7 @@ export const createShift = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const data = await postData("/transport/create-shift", shiftData);
+      dispatch(getAllShifts());
       return data;
     } catch (error) {
       console.error("Error in createShift:", error);
@@ -18,14 +23,13 @@ export const createShift = createAsyncThunk(
   }
 );
 
-
 export const getAllShifts = createAsyncThunk(
   "shift/getAllShifts",
   async (_, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const data = await getData(`/transport/get-shifts`);
-      console.log("shift data ---->",data)
+      console.log("shift data ---->", data);
       return data;
     } catch (error) {
       console.error("Error in getAllShifts:", error);
@@ -54,6 +58,7 @@ export const updateShift = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const data = await putData(`/transport/update-shift/${id}`, updatedData);
+      dispatch(getAllShifts());
       return data;
     } catch (error) {
       console.error("Error in updateShift:", error);
@@ -62,13 +67,12 @@ export const updateShift = createAsyncThunk(
   }
 );
 
-
 export const toggleShiftStatus = createAsyncThunk(
   "shift/toggleShiftStatus",
-  async (id, { rejectWithValue, dispatch }) => {
+  async ({shiftId,deactivate}, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const data = await putData(`/transport/toggle-shift/${id}/status`);
+      const data = await putData(`/transport/toggle-shift/${shiftId}/status`,deactivate);
       return data;
     } catch (error) {
       console.error("Error in toggleShiftStatus:", error);
@@ -76,7 +80,6 @@ export const toggleShiftStatus = createAsyncThunk(
     }
   }
 );
-
 
 export const deleteShift = createAsyncThunk(
   "shift/deleteShift",

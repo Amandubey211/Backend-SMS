@@ -24,9 +24,6 @@ const DriverVehicleAssignmentPage = () => {
   };
 
   const handleSave = (formData) => {
-    // Here you would typically send the data to your API
-    console.log("Saving assignment data:", formData);
-
     // Close the sidebar after saving
     setIsSidebarOpen(false);
   };
@@ -79,7 +76,7 @@ const DriverVehicleAssignmentPage = () => {
           <Sidebar
             isOpen={isSidebarOpen}
             onClose={() => setIsSidebarOpen(false)}
-            title={selectedAssignment ? "Edit Assignment" : "New Assignment"}
+            title={selectedAssignment ? "Edit Assignment" : "Add New Assignment"}
             width="60%"
           >
             <DriverVehicleAssignment
