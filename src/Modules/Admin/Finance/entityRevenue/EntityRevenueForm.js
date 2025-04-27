@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, DatePicker, InputNumber, Row, Col, Tooltip } from "antd";
+import { Form, Input, Select, Button, DatePicker, InputNumber, Row, Col, Tooltip, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
 import { fetchInventory } from "../../../../Store/Slices/Finance/inventory/inventory.thunk";
 import { VscListSelection } from "react-icons/vsc";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import SidebarEntitySelection from "./Components/SelectEntities";
 import { createEntityRevenue } from "../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
 import { BsInfoCircle } from "react-icons/bs";
 import dayjs from "dayjs";
+import ConfigurationCreateModel from "../Configuration/ConfigurationCreateModel";
 const { Option } = Select;
 const EntityRevenueForm = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.admin.financialCategory.categories);
-
   const [form] = Form.useForm();
   const [lineItems, setLineItems] = useState([
     {
@@ -36,8 +36,26 @@ const EntityRevenueForm = () => {
       endDate: null,
     },
   ]);
+  const [entitiesIds, setEntitiesIds] = useState([]);
+  const location = useLocation();
 
   useEffect(() => {
+    if(location?.state){
+      let lIt =location?.state?.configData?.lineItems.map((i)=>{
+        return {
+          ...i,
+          dueDate: "",
+          startDate:"",
+          endDate:""
+
+        }
+      });
+      setLineItems(lIt);
+      setEntitiesIds(location?.state?.configData?.entitiesIds);
+      form.setFieldsValue({
+        lineItems: lIt,
+      });
+    }
     dispatch(fetchCategory({ categoryType: "revenue", search: "", page: 1, limit: 10000 }));
   }, [dispatch]);
   const [description, setDescription] = useState('');
@@ -71,7 +89,7 @@ const EntityRevenueForm = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedItems = [...lineItems];
-    updatedItems[index][field] = value;
+    updatedItems[index][field] = field.includes('Date') && value ? value.format('YYYY-MM-DD') : value;
 
     const rate = updatedItems[index].rate || 0;
     const quantity = updatedItems[index].quantity || 1;
@@ -125,11 +143,18 @@ const EntityRevenueForm = () => {
     setLineItems(updatedItems);
   };
   const navigate = useNavigate();
-  const [entitiesIds, setEntitiesIds] = useState([]);
+
+  const [configModel, setConfigModel] = useState(false);
+  const [isConfigData, setIsConfigData] = useState(false);
+  const closeConfigModel = ()=>{
+    setIsConfigData(false)
+    setConfigModel(false)
+  }
   const handleSubmit = (values) => {
+    
     if (entitiesIds.length < 1) {
       toast.error("Please select Entity")
-      return
+      return 
     }
     let entityIds = entitiesIds.map((e) => {
       return { entityId: e }
@@ -139,8 +164,13 @@ const EntityRevenueForm = () => {
       lineItems,
       entityIds
     }
-
-    dispatch(createEntityRevenue({ data, navigate }))
+    if(isConfigData){
+      setConfigModel(true)
+      return 
+    }else{
+      dispatch(createEntityRevenue({ data, navigate }))
+    }
+   
   };
   const { activeYear } = useSelector((store) => store.common.financialYear);
   const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
@@ -308,7 +338,7 @@ const EntityRevenueForm = () => {
 
         <Button type="dashed" onClick={addLineItem} className=" text-purple-500 " >Add New Item</Button>
         <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Add Invoice</Button>
-        <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
+        <Button htmlType="submit" onClick={()=> setIsConfigData(true)}  className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
       </Form>
       <Sidebar
         title={"Select Multiply Entities"}
@@ -319,6 +349,14 @@ const EntityRevenueForm = () => {
         <SidebarEntitySelection entitiesIds={entitiesIds} setEntitiesIds={setEntitiesIds} />
         {entitiesIds?.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={() => handleModalClose()}>Done</div>}
       </Sidebar>
+      <Modal
+      open={configModel}
+      onClose={()=>closeConfigModel()}
+      onCancel={()=>closeConfigModel()}
+      footer={null}
+      >
+       <ConfigurationCreateModel closeConfigModel={closeConfigModel} data={{lineItems,entitiesIds}} configType="entityRevenue"/>
+      </Modal>
     </div>
   );
 };

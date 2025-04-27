@@ -29,6 +29,22 @@ export const fetchBudgetsummary  = createAsyncThunk(
     }
   }
 );
+export const fetchBudgetGraph  = createAsyncThunk(
+  "finance/fetchBudgetGraph",
+  async ({subCategory,frequency,financialYearId}, {rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/${getRole}/budget/get/graph?say=${say}`,{subCategory,frequency,financialYearId}
+      );
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 export const fetchBudget  = createAsyncThunk(
   "finance/fetchBudget",
   async ({categoryId,search, page, limit}, { rejectWithValue, dispatch, getState }) => {

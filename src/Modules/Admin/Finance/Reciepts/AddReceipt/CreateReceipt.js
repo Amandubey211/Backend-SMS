@@ -13,6 +13,7 @@ import { createReceipt, fetchReciptInvoiceData } from "../../../../../Store/Slic
 import {  Form, Input, Button, Select, DatePicker } from "antd";
 import Layout from "../../../../../Components/Common/Layout";
 import dayjs from "dayjs";
+import { useNavigate } from "react-router-dom";
 const CreateReceipt = () => {
  
   const dispatch = useDispatch()
@@ -116,7 +117,7 @@ const CreateReceipt = () => {
   const handleChange = (field, value) => {
     setReceiptData({
       ...receiptData,
-      [field]: value,
+      [field]: field.includes('Date') && value ? value.format('YYYY-MM-DD') : value,
     });
   };
   const handlePaste = async()=>{
@@ -131,6 +132,7 @@ const CreateReceipt = () => {
   const { activeYear } = useSelector((store) => store.common.financialYear);
   const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
   const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
+  const navigate = useNavigate()
   return (
     <Layout title="Finance | Create Reciept">
     <DashLayout>
@@ -241,7 +243,7 @@ const CreateReceipt = () => {
        </div>
        <Form
       layout="vertical"
-      onFinish={() => {dispatch(createReceipt({...receiptData,invoiceNumber:searchInvoiceNumber}))}}
+      onFinish={() => {dispatch(createReceipt({...receiptData,invoiceNumber:searchInvoiceNumber})).then(navigate("/finance/receipts/receipt-list"))}}
       initialValues={receiptData}
       className="mt-4"
     >

@@ -6,7 +6,8 @@ import { Input, Select, Spin, Table } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import useNavHeading from "../../../../Hooks/CommonHooks/useNavHeading .js";
 import { MdDeleteOutline, MdPostAdd } from "react-icons/md";
-import { fetchConfiguration } from "../../../../Store/Slices/Finance/Configuration/configuration.thunk.js";
+import { deleteConfiguration, fetchConfiguration } from "../../../../Store/Slices/Finance/Configuration/configuration.thunk.js";
+import { useNavigate } from "react-router-dom";
 
 
 const ConfigurationMain = () => {
@@ -14,7 +15,7 @@ const ConfigurationMain = () => {
     useNavHeading(role, `Configuration`);
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const dispatch = useDispatch();
- 
+   const navigate = useNavigate()
   const [searchText, setSearchText] = useState("");
   const [configurationType, setConfigurationType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,7 +28,7 @@ const { configurations, loading, total,
 
 
   useEffect(() => {
-    dispatch(fetchConfiguration({ configurationType, search: searchText, page: currentPage, limit: pageSize }));
+    dispatch(fetchConfiguration({ configType:configurationType, search: searchText, page: currentPage, limit: pageSize }));
   }, [dispatch, configurationType, searchText, currentPage, pageSize]);
 
  
@@ -50,12 +51,31 @@ const { configurations, loading, total,
           render: (_,record) => {
          
             return (
-            <div className="flex items-center flex-row gap-2">
-             <button title="Apply" onClick={()=>{}}>Apply <MdPostAdd size={20}/> </button>
-             <button title="Delete" onClick={()=>{}}><MdDeleteOutline  size={20}/> </button>
+            <div className="flex items-center flex-row gap-3 justify-center">
+             <button className="flex items-center flex-row gap-2 justify-center" title="Apply" 
+             onClick={()=>{
+              if(record.configType == "entityRevenue"){
+                navigate('/finance/entity/add/revenue',{ state: record});
+                return
+              }
+              if(record.configType == "studentRevenue"){
+                navigate('/finance/studentfees/add/form',{ state: record});
+                return
+              }
+              if(record.configType == "payroll"){
+                navigate('/finance/add/payroll',{ state: record});
+                return
+              }
+              if(record.configType == "generalExpense"){
+                navigate('/finance/add/operational-expenses',{ state: record});
+                return
+              }
+              }}>Apply <MdPostAdd size={20}/> </button>
+             <button title="Delete" onClick={()=>{dispatch(deleteConfiguration(record._id))}}><MdDeleteOutline  size={20}/> </button>
             </div>
             );
           },
+          width:70,
         },
   ];
 
@@ -81,8 +101,10 @@ const { configurations, loading, total,
                 placeholder="Select Type"
               >
                 <Select.Option value="">All</Select.Option>
-                <Select.Option value="revenue">Revenue</Select.Option>
-                <Select.Option value="expense">Expense</Select.Option>
+                <Select.Option value="entityRevenue">Entity Revenue</Select.Option>
+                <Select.Option value="studentRevenue">Student Revenue</Select.Option>
+                <Select.Option value="generalExpense">Operational Expenses</Select.Option>
+                <Select.Option value="payroll">Payroll</Select.Option>
               </Select>
             </div>
           </div>
@@ -102,7 +124,7 @@ const { configurations, loading, total,
                          onChange: (page, size) => {
                            setCurrentPage(page);
                            setPageSize(size);
-                           dispatch(fetchConfiguration({ configurationType, search: searchText, page, limit: size }));
+                           dispatch(fetchConfiguration({ configType:configurationType, search: searchText, page, limit: size }));
                          },
                        }}
             loading={{ spinning: loading, indicator: <Spin size="large" /> }}
