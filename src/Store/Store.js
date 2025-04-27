@@ -66,7 +66,7 @@ import adminSpeedGradeReducer from "./Slices/Admin/Class/SpeedGrade/speedGradeSl
 import timetableReducer from "./Slices/Admin/TimeTable/timtableSlice";
 import adminClassIconsReducer from "./Slices/Admin/Class/reducer/iconSlice";
 import rbacReducer from "./Slices/Common/RBAC/rbacSlice";
-
+import admissonAttachmentReducer from "./Slices/Admin/Admission/admissionSlice";
 import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
 import adminOfflineExamReducer from "./Slices/Admin/Class/OfflineExam/offlineExamSlice";
 import operationalExpensesReducer from "./Slices/Finance/operationalExpenses/operationalExpenses.slice";
@@ -228,6 +228,7 @@ const AdminReducer = combineReducers({
   budget: budgetReducer,
   payroll: payrollReducer,
   operationalExpenses: operationalExpensesReducer,
+  admissionAttachment: admissonAttachmentReducer,
   // student_fees: studentFeesReducer,
 
   subject_grades: subjectGradesReducer,

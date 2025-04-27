@@ -120,8 +120,8 @@ const GroupList = ({ onSeeGradeClick, groups, groupsLoading }) => {
             {/* Group Header */}
             <div className="flex items-center justify-between py-3 bg-pink-50 px-2 rounded-md">
               <h3
-                className="text-lg font-semibold text-gradient cursor-pointer"
-                onClick={() =>
+                className="text-lg ps-5 font-semibold text-gradient cursor-pointer capitalize"
+                onClick={() => 
                   setExpandedGroupIndex(isExpanded ? null : groupIndex)
                 }
               >
