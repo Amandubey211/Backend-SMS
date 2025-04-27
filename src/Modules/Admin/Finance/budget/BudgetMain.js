@@ -13,6 +13,8 @@ import BudgetGraph from "./BudgetGraph.js";
 import Sidebar from "../../../../Components/Common/Sidebar.js";
 import BudgetForm from "./CreateBudget.js";
 import BudgetSummaryList from "./BudgetSummaryList.js";
+import { fetchBudgetGraph } from "../../../../Store/Slices/Finance/budget/budget.thunk.js";
+import { Select } from "antd";
 
 const BudgetMain= () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -20,18 +22,29 @@ const BudgetMain= () => {
   const dispatch = useDispatch();
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-
+  const [frequency,setFrequency] = useState("Monthly")
   const handleModalClose = () => {
     setIsModalVisible(false);
   };
-
+     useEffect(() => {
+       dispatch(fetchBudgetGraph({frequency}));
+     }, [frequency]);
   return ( 
     <div className="p-4">
       {/* Header Section */}
   
       <div className="flex flex-row items-center justify-between ">
-          <div className="font-semibold text-2xl">
-            Budget Planner
+          <div className="flex flex-row gap-2 items-center justify-center">
+           <p className="font-semibold text-2xl"> Budget Planner</p>
+           <Select
+                className="px-1 w-[10rem]"
+                value={frequency}
+                onChange={(value) => setFrequency(value)}
+                placeholder="Select Frequency"
+              >
+                <Select.Option value={"Monthly"}>Monthly</Select.Option>
+                <Select.Option value={"Yearly"}>Yearly</Select.Option>
+              </Select>
           </div>
     
         <button
@@ -52,13 +65,7 @@ const BudgetMain= () => {
       >
         <ProtectedSection requiredPermission={PERMISSIONS} title={'Cards'}>
         {/* Cards Section */}
-      <BudgetCards/>
-        </ProtectedSection>
-        {/* Graph Section */}
-        <ProtectedSection requiredPermission={PERMISSIONS} title={'Graph'}>
-        <div className="w-full h-full">
-          {/* <BudgetGraph/> */}
-        </div>
+      <BudgetCards frequency={frequency}/>
         </ProtectedSection>
         {/* Summary Table */}
         <ProtectedSection requiredPermission={PERMISSIONS} title={'Summary'}>

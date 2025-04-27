@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Select, Button, InputNumber, Row, Col, Tooltip, DatePicker } from "antd";
+import { Form, Input, Select, Button, InputNumber, Row, Col, Tooltip, DatePicker, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { VscListSelection } from "react-icons/vsc";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { fetchCategory } from "../../../../Store/Slices/Finance/Category/financeCategory.Thunk";
 import Layout from '../../../../Components/Common/Layout';
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -13,6 +13,7 @@ import SidebarEntitySelection from "../entityRevenue/Components/SelectEntities";
 import { createOperationalExpense } from "../../../../Store/Slices/Finance/operationalExpenses/operationalExpenses.thunk";
 import { BsInfoCircle } from "react-icons/bs";
 import dayjs from "dayjs";
+import ConfigurationCreateModel from "../Configuration/ConfigurationCreateModel";
 
 const { Option } = Select;
 
@@ -50,8 +51,22 @@ const AddOperationalExpenses = () => {
     chequeDate: "",
     note: "",
   });
-
+  const location = useLocation();
   useEffect(() => {
+    if(location?.state){
+      let lIt =location?.state?.configData?.lineItems.map((i)=>{
+        return {
+          ...i,
+             startDate:"",
+          endDate:""
+        }
+      });
+      setLineItems(lIt);
+      setEntitiesIds(location?.state?.configData?.entitiesIds);
+      form.setFieldsValue({
+        lineItems: lIt,
+      });
+    }
     dispatch(fetchCategory({ categoryType: "expense", search: "", page: 1, limit: 10000 }));
   }, [dispatch]);
 
@@ -73,7 +88,7 @@ const AddOperationalExpenses = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedItems = [...lineItems];
-    updatedItems[index][field] = value;
+    updatedItems[index][field] = field.includes('Date') && value ? value.format('YYYY-MM-DD') : value;
 
     // Auto-calculate amount if rate, quantity, or unit is updated
     const { rate, quantity } = updatedItems[index];
@@ -115,6 +130,12 @@ const AddOperationalExpenses = () => {
       newone
     ]);
   };
+  const [configModel, setConfigModel] = useState(false);
+  const [isConfigData, setIsConfigData] = useState(false);
+  const closeConfigModel = ()=>{
+    setIsConfigData(false)
+    setConfigModel(false)
+  }
   const handleSubmit = () => {
     if (entitiesIds.length < 1) {
       toast.error("Please select User");
@@ -126,16 +147,19 @@ const AddOperationalExpenses = () => {
       entitiesIds,
       ...receiptData,
     };
-    console.log(data);
+    if(isConfigData){
+      setConfigModel(true)
+      return 
+    }else{
     
-   dispatch(createOperationalExpense({data,navigate}))
+   dispatch(createOperationalExpense({data,navigate}))}
 
   };
 
   const handleChange = (field, value) => {
     setReceiptData({
       ...receiptData,
-      [field]: value,
+      [field]: field.includes('Date') && value ? value.format('YYYY-MM-DD') : value,
     });
   };
 
@@ -252,7 +276,7 @@ const AddOperationalExpenses = () => {
                   </> : <>
                     <Col span={6}>
                       <Form.Item name={["lineItems", index, "startDate"]} label="Start Date">
-                        <DatePicker type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.startDate} onChange={(e) => handleInputChange(index, "startDate", e)} 
+                        <DatePicker type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.startDate } onChange={(e) => handleInputChange(index, "startDate", e)} 
                            disabledDate={(current) =>
                             current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
                           }/>
@@ -261,7 +285,7 @@ const AddOperationalExpenses = () => {
 
                     <Col span={6}>
                       <Form.Item name={["lineItems", index, "endDate"]} label="End Date">
-                        <DatePicker type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.endDate} onChange={(e) => handleInputChange(index, "endDate", e)}  disabledDate={(current) =>
+                        <DatePicker type="date" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" value={item.endDate } onChange={(e) => handleInputChange(index, "endDate", e)}  disabledDate={(current) =>
                     current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
                   }/>
                       </Form.Item>
@@ -355,9 +379,8 @@ const AddOperationalExpenses = () => {
                 </Col>
               </Row>
             </div>
-            <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 mt-4 ">Save in Config</Button>
             <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 mt-4 ml-10 " htmlType="submit">Submit</Button>
-
+            <Button htmlType="submit" onClick={()=> setIsConfigData(true)}  className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
           </Form>
 
           <Sidebar title="Select Multiple Users" width="50%" isOpen={isModalVisible} onClose={() => setIsModalVisible(false)}>
@@ -365,7 +388,14 @@ const AddOperationalExpenses = () => {
             {entitiesIds?.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={()=>setIsModalVisible(false)}>Done</div>}
           </Sidebar>
         </div>
-        
+        <Modal
+      open={configModel}
+      onClose={()=>closeConfigModel()}
+      onCancel={()=>closeConfigModel()}
+      footer={null}
+      >
+       <ConfigurationCreateModel closeConfigModel={closeConfigModel} data={{lineItems,entitiesIds}} configType="generalExpense"/>
+      </Modal>
       </AdminDashLayout>
     </Layout>
   );
