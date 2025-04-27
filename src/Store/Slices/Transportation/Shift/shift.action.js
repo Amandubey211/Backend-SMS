@@ -72,7 +72,8 @@ export const toggleShiftStatus = createAsyncThunk(
   async ({shiftId,deactivate}, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const data = await putData(`/transport/toggle-shift/${shiftId}/status`,deactivate);
+      const data = await putData(`/transport/toggle-shift/${shiftId}/status?deactivate=${deactivate}`);
+      dispatch(getAllShifts());
       return data;
     } catch (error) {
       console.error("Error in toggleShiftStatus:", error);
