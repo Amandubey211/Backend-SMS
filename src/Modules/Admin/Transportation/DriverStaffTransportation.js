@@ -11,6 +11,7 @@ import {
   updateDriver,
   deleteDriver,
 } from "../../../Store/Slices/Transportation/Driver/driver.action";
+import { getAllVehicles } from "../../../Store/Slices/Transportation/Vehicles/vehicles.action";
 
 const DriverStaffTransportation = () => {
   const dispatch = useDispatch();
@@ -20,6 +21,11 @@ const DriverStaffTransportation = () => {
   const { drivers, loading, error } = useSelector(
     (state) => state.transportation.transportDriver
   );
+
+  const { vehicles } = useSelector(
+    (state) => state.transportation.transportVehicle
+  );
+
 
   const [filteredDrivers, setFilteredDrivers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -64,7 +70,10 @@ const DriverStaffTransportation = () => {
   // Fetch drivers when component mounts
   useEffect(() => {
     dispatch(fetchDriverList({}));
+    dispatch(getAllVehicles());
   }, [dispatch]);
+
+  // console.log("pp-->",vehicles)
 
   // Apply filtering and sorting effects
   useEffect(() => {
@@ -230,12 +239,12 @@ const DriverStaffTransportation = () => {
   };
 
   // List of available bus routes for dropdown
-  const busRoutes = [
-    "BUS 101 - Main Campus Route",
-    "BUS 102 - Downtown Route",
-    "BUS 103 - Residential Area Route",
-    "BUS 104 - Express Route",
-  ];
+  // const busRoutes = [
+  //   "BUS 101 - Main Campus Route",
+  //   "BUS 102 - Downtown Route",
+  //   "BUS 103 - Residential Area Route",
+  //   "BUS 104 - Express Route",
+  // ];
 
   // Blood group options
   const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
@@ -921,9 +930,9 @@ const DriverStaffTransportation = () => {
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
                       >
                         <option value="">Not Assigned</option>
-                        {busRoutes.map((route, index) => (
-                          <option key={index} value={route}>
-                            {route}
+                        {vehicles?.map((vehicle, index) => (
+                          <option key={vehicles._id} value={vehicle}>
+                            {vehicle?.vehicleNumber} ({vehicle?.vehicleType})
                           </option>
                         ))}
                       </select>
