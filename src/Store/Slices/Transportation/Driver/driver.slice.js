@@ -33,7 +33,7 @@ const driverSlice = createSlice({
       })
       .addCase(addDriver.fulfilled, (state, action) => {
         state.loading = false;
-        state.drivers.push(action.payload?.data); // Again, adjust based on your API response
+        // state.drivers.push(action.payload?.data); // Again, adjust based on your API response
       })
       .addCase(addDriver.rejected, (state, action) => {
         state.loading = false;
@@ -47,11 +47,11 @@ const driverSlice = createSlice({
       })
       .addCase(updateDriver.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedDriver = action.payload?.data;
-        const index = state.drivers.findIndex(driver => driver._id === updatedDriver._id);
-        if (index !== -1) {
-          state.drivers[index] = updatedDriver;
-        }
+        // const updatedDriver = action.payload?.data;
+        // const index = state.drivers.findIndex(driver => driver._id === updatedDriver._id);
+        // if (index !== -1) {
+        //   state.drivers[index] = updatedDriver;
+        // }
       })
       .addCase(updateDriver.rejected, (state, action) => {
         state.loading = false;
@@ -65,8 +65,8 @@ const driverSlice = createSlice({
       })
       .addCase(deleteDriver.fulfilled, (state, action) => {
         state.loading = false;
-        const deletedId = action.meta.arg; // since thunk arg is id
-        state.drivers = state.drivers.filter(driver => driver._id !== deletedId);
+        // const deletedId = action.meta.arg; // since thunk arg is id
+        // state.drivers = state.drivers.filter(driver => driver._id !== deletedId);
       })
       .addCase(deleteDriver.rejected, (state, action) => {
         state.loading = false;
