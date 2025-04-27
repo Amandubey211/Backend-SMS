@@ -1,18 +1,22 @@
+/* Path unchanged: features/transportation/SubRoute/subRouteSlice.js */
 import { createSlice } from "@reduxjs/toolkit";
-import { createSubRoute, deleteSubRoute, getSubRouteById, getSubRoutesBySchool, updateSubRoute } from "./subRoute.action";
-
+import {
+  createSubRoute,
+  deleteSubRoute,
+  getSubRouteById,
+  getSubRoutesBySchool,
+  updateSubRoute,
+} from "./subRoute.action";
 
 const initialState = {
   loading: false,
-  error: false,
+  error: null,
   subRoutes: [],
   selectedSubRoute: null,
-  currentPage: 1,
-  totalPages: 1,
 };
 
 const subRouteSlice = createSlice({
-  name: "subRoute",
+  name: "transportSubRoute",
   initialState,
   reducers: {
     resetSelectedSubRoute(state) {
@@ -20,84 +24,64 @@ const subRouteSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    /* helpers */
+    const pending = (state) => {
+      state.loading = true;
+      state.error = null;
+    };
+    const rejected = (state, action) => {
+      state.loading = false;
+      state.error = action.payload || true;
+    };
+
+    /* list */
     builder
+      .addCase(getSubRoutesBySchool.pending, pending)
+      .addCase(getSubRoutesBySchool.fulfilled, (state, { payload }) => {
+        state.loading = false;
+        state.subRoutes = payload?.data || [];
+      })
+      .addCase(getSubRoutesBySchool.rejected, rejected);
 
-      // Get SubRoutes By School
-      .addCase(getSubRoutesBySchool.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-      .addCase(getSubRoutesBySchool.fulfilled, (state, action) => {
+    /* single */
+    builder
+      .addCase(getSubRouteById.pending, pending)
+      .addCase(getSubRouteById.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.subRoutes = action.payload?.data || [];
-        state.currentPage = action.payload?.currentPage || 1;
-        state.totalPages = action.payload?.totalPages || 1;
+        state.selectedSubRoute = payload?.data || null;
       })
-      .addCase(getSubRoutesBySchool.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || true;
-      })
+      .addCase(getSubRouteById.rejected, rejected);
 
-      // Get SubRoute by ID
-      .addCase(getSubRouteById.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-      .addCase(getSubRouteById.fulfilled, (state, action) => {
+    /* create */
+    builder
+      .addCase(createSubRoute.pending, pending)
+      .addCase(createSubRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.selectedSubRoute = action.payload?.data || null;
+        if (payload?.data) state.subRoutes.push(payload.data);
       })
-      .addCase(getSubRouteById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || true;
-      })
+      .addCase(createSubRoute.rejected, rejected);
 
-      // Create SubRoute
-      .addCase(createSubRoute.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-      .addCase(createSubRoute.fulfilled, (state, action) => {
+    /* update */
+    builder
+      .addCase(updateSubRoute.pending, pending)
+      .addCase(updateSubRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.subRoutes.push(action.payload?.data);
+        const updated = payload?.data;
+        const idx = state.subRoutes.findIndex((s) => s._id === updated._id);
+        if (idx !== -1) state.subRoutes[idx] = updated;
+        if (state.selectedSubRoute?._id === updated._id)
+          state.selectedSubRoute = updated;
       })
-      .addCase(createSubRoute.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || true;
-      })
+      .addCase(updateSubRoute.rejected, rejected);
 
-      // Update SubRoute
-      .addCase(updateSubRoute.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-      .addCase(updateSubRoute.fulfilled, (state, action) => {
+    /* delete */
+    builder
+      .addCase(deleteSubRoute.pending, pending)
+      .addCase(deleteSubRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        const updated = action.payload?.data;
-        const index = state.subRoutes.findIndex(s => s._id === updated._id);
-        if (index !== -1) {
-          state.subRoutes[index] = updated;
-        }
+        state.subRoutes = state.subRoutes.filter((s) => s._id !== payload.id);
       })
-      .addCase(updateSubRoute.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || true;
-      })
-
-      // Delete SubRoute
-      .addCase(deleteSubRoute.pending, (state) => {
-        state.loading = true;
-        state.error = false;
-      })
-      .addCase(deleteSubRoute.fulfilled, (state, action) => {
-        state.loading = false;
-        const deletedId = action.meta.arg;
-        state.subRoutes = state.subRoutes.filter(s => s._id !== deletedId);
-      })
-      .addCase(deleteSubRoute.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || true;
-      });
+      .addCase(deleteSubRoute.rejected, rejected);
   },
 });
 
