@@ -60,7 +60,7 @@ const shiftSlice = createSlice({
       })
       .addCase(createShift.fulfilled, (state, action) => {
         state.loading = false;
-        state.shifts.push(action.payload?.data);
+        // state.shifts.push(action.payload?.data);
       })
       .addCase(createShift.rejected, (state, action) => {
         state.loading = false;
@@ -74,11 +74,11 @@ const shiftSlice = createSlice({
       })
       .addCase(updateShift.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedShift = action.payload?.data;
-        const index = state.shifts.findIndex(shift => shift._id === updatedShift._id);
-        if (index !== -1) {
-          state.shifts[index] = updatedShift;
-        }
+        // const updatedShift = action.payload?.data;
+        // const index = state.shifts.findIndex(shift => shift._id === updatedShift._id);
+        // if (index !== -1) {
+        //   state.shifts[index] = updatedShift;
+        // }
       })
       .addCase(updateShift.rejected, (state, action) => {
         state.loading = false;
@@ -92,11 +92,11 @@ const shiftSlice = createSlice({
       })
       .addCase(toggleShiftStatus.fulfilled, (state, action) => {
         state.loading = false;
-        const updatedShift = action.payload?.data;
-        const index = state.shifts.findIndex(shift => shift._id === updatedShift._id);
-        if (index !== -1) {
-          state.shifts[index].isActive = updatedShift.isActive; 
-        }
+        // const updatedShift = action.payload?.data;
+        // const index = state.shifts.findIndex(shift => shift._id === updatedShift._id);
+        // if (index !== -1) {
+        //   state.shifts[index].isActive = updatedShift.isActive; 
+        // }
       })
       .addCase(toggleShiftStatus.rejected, (state, action) => {
         state.loading = false;

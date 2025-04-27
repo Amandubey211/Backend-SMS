@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllShifts } from "../../Store/Slices/Transportation/Shift/shift.action";
-import { FaTrash, FaEdit } from "react-icons/fa"; // React Icons for Delete and Edit
+import { getAllShifts, toggleShiftStatus } from "../../Store/Slices/Transportation/Shift/shift.action";
+import { FaTrash, FaEdit, FaPowerOff, FaCheckCircle } from "react-icons/fa"; // React Icons for Delete, Edit, and Toggle Status
 
-const ShiftList = () => {
+const ShiftList = ({ onEdit }) => {
   const { shifts, loading, error } = useSelector(
     (store) => store?.transportation?.transportShift
   );
@@ -17,9 +17,13 @@ const ShiftList = () => {
     return <div className="p-4">Loading shifts...</div>;
   }
 
+  // Function to handle status toggle
+  const handleToggleStatus = (shiftId, currentStatus) => {
+    dispatch(toggleShiftStatus({ shiftId, deactivate: !currentStatus }));
+  };
+
   return (
     <div className="p-5">
-      {/* <h1 className="text-2xl font-bold mb-6 text-gray-800">Shift List</h1> */}
       <div className="overflow-x-auto shadow-md rounded-lg">
         <table className="min-w-full bg-white rounded-lg overflow-hidden">
           <thead className="bg-blue-50 text-gray-700 uppercase text-sm">
@@ -54,13 +58,28 @@ const ShiftList = () => {
                   </span>
                 </td>
                 <td className="py-4 px-6 flex items-center justify-center space-x-4">
-                <button className="text-blue-500 hover:text-blue-700">
+                  {/* Edit Button */}
+                  <button 
+                    onClick={() => onEdit(shift)}
+                    className="text-blue-500 hover:text-blue-700"
+                  >
                     <FaEdit size={18} />
                   </button>
+                  {/* Toggle Status Button */}
+                  <button
+                    onClick={() => handleToggleStatus(shift._id, shift.deactivateShift)}
+                    className="text-yellow-500 hover:text-yellow-700"
+                  >
+                    {shift.deactivateShift ? (
+                      <FaCheckCircle size={18} />
+                    ) : (
+                      <FaPowerOff size={18} />
+                    )}
+                  </button>
+                  {/* Delete Button */}
                   <button className="text-red-500 hover:text-red-700">
                     <FaTrash size={18} />
                   </button>
-              
                 </td>
               </tr>
             ))}
