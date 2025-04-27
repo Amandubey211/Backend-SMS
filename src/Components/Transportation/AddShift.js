@@ -20,14 +20,24 @@ const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
   useEffect(() => {
     if (initialData && selectedShift) {
       setFormData({
-        shiftName: selectedShift.shiftName || "",
-        fromTime: selectedShift.fromTime || "",
-        toTime: selectedShift.toTime || "",
-        shift: selectedShift.shift || "",
-        deactivateShift: selectedShift.deactivateShift || false,
+        shiftName: selectedShift?.shiftName || "",
+        fromTime: selectedShift?.fromTime || "",
+        toTime: selectedShift?.toTime || "",
+        shift: selectedShift?.shift || "",
+        deactivateShift: selectedShift?.deactivateShift || false,
+      });
+    } else {
+      // Reset form data when not editing
+      setFormData({
+        shiftName: "",
+        fromTime: "",
+        toTime: "",
+        shift: "",
+        deactivateShift: false,
       });
     }
-  }, [initialData, selectedShift]);
+  }, [initialData, selectedShift]);  // The form resets when either initialData or selectedShift changes
+  
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -53,9 +63,11 @@ const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
       ...formData,
       date: new Date().toISOString(),
     };
-    initialData ? dispatch(createShift(dataToSubmit)): dispatch(updateShift(dataToSubmit));
-  };
 
+
+    (initialData && selectedShift) ? dispatch(updateShift({id:selectedShift._id,updatedData: dataToSubmit})):dispatch(createShift(dataToSubmit));
+  };
+console.log("ssss-->",selectedShift)
   return (
     <div className="bg-white rounded-lg overflow-hidden">
       <form onSubmit={handleSubmit} className="p-4">
@@ -67,7 +79,7 @@ const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
               type="text"
               id="shiftName"
               name="shiftName"
-              value={formData.shiftName}
+              value={formData?.shiftName}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
