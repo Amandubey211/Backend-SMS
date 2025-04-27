@@ -1,11 +1,9 @@
 import React from "react";
 import {
   FaChalkboardTeacher,
-  FaUsers,
   FaBook,
   FaUserGraduate,
   FaClipboardList,
-  FaUniversity,
   FaBusAlt,
   FaRoute,
   FaUserTie,
@@ -14,7 +12,6 @@ import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { LuUser } from "react-icons/lu";
 import { HiOutlineCalculator } from "react-icons/hi2";
-import { ImTable2 } from "react-icons/im";
 import { RiUserAddLine } from "react-icons/ri";
 import { BsBook } from "react-icons/bs";
 import { TbNotebook } from "react-icons/tb";
@@ -24,14 +21,12 @@ import { SiReadthedocs } from "react-icons/si";
 import { VscSaveAll } from "react-icons/vsc";
 
 import {
-  MdInventory2,
   MdLocalLibrary,
   MdManageAccounts,
   MdOutlineBusinessCenter,
   MdOutlineCategory,
   MdOutlineInventory2,
   MdDirectionsBus,
-  MdPeople,
   MdAccessTime,
 } from "react-icons/md";
 import { CiViewTable } from "react-icons/ci";
@@ -40,16 +35,11 @@ import { MdOutlineManageAccounts } from "react-icons/md";
 import { ROLES, PERMISSIONS } from "../../../config/permission";
 import { BsCashCoin } from "react-icons/bs";
 import { IoReceiptOutline } from "react-icons/io5";
-import { TbFileInvoice } from "react-icons/tb";
-import { MdPayment } from "react-icons/md";
-import { HiOutlineReceiptTax } from "react-icons/hi";
-import { TbReport } from "react-icons/tb";
 import { RiHandCoinLine } from "react-icons/ri";
 import { TfiReceipt } from "react-icons/tfi";
 import { FaWpforms } from "react-icons/fa6";
-import { MdCategory } from "react-icons/md";
-import { GiStabbedNote, GiAutoRepair } from "react-icons/gi";
-import { AiOutlineCreditCard } from "react-icons/ai";
+import { GiStabbedNote, GiSteeringWheel } from "react-icons/gi";
+
 
 const sidebarData = [
   {
@@ -364,6 +354,12 @@ const sidebarData = [
         title: "Driver Management",
         icon: <FaUserTie />,
         path: "/transportation/driver-staff",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
+      {
+        title: "Driver Assignment",
+        icon: <GiSteeringWheel />,
+        path: "/transportation/driver-vehicle-assignment",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
       {
