@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FaTrash, FaPen, FaChevronDown } from "react-icons/fa"; // Icons
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { getAllRoutes } from "../../Store/Slices/Transportation/RoutesManagment/routes.action";
+import { getRoutesBySchool } from "../../Store/Slices/Transportation/RoutesManagment/routes.action";
 
 const RouteList = () => {
   const { loading, error, transportRoutes } = useSelector(
@@ -19,63 +19,12 @@ const RouteList = () => {
     }));
   };
 
-  // const routes = [
-  //   {
-  //     id: 1,
-  //     routeName: "Route 1",
-  //     startPoint: "Point A",
-  //     endPoint: "Point B",
-  //     stoppages: 12, // 👈 New field
-  //     vehicles: [
-  //       {
-  //         id: 101,
-  //         vehicleNo: "Bus 102",
-  //         driverName: "Kames",
-  //         startPoint: "Point A",
-  //         endPoint: "Point B",
-  //         contact: "874462459",
-  //         vehicleType: "Bus",
-  //         students: "35/50",
-  //       },
-  //       {
-  //         id: 102,
-  //         vehicleNo: "Bus 103",
-  //         driverName: "John",
-  //         startPoint: "Point A",
-  //         endPoint: "Point C",
-  //         contact: "987654321",
-  //         vehicleType: "Van",
-  //         students: "20/30",
-  //       },
-  //     ],
-  //     noOfVehicles: 2,
-  //     totalStudents: 55,
-  //   },
-  //   {
-  //     id: 2,
-  //     routeName: "Route 2",
-  //     startPoint: "Point X",
-  //     endPoint: "Point Y",
-  //     stoppages: 8, // 👈 New field
-  //     vehicles: [
-  //       {
-  //         id: 201,
-  //         vehicleNo: "Bus 202",
-  //         driverName: "Steve",
-  //         startPoint: "Point X",
-  //         endPoint: "Point Y",
-  //         contact: "7766554433",
-  //         vehicleType: "Bus",
-  //         students: "40/50",
-  //       },
-  //     ],
-  //     noOfVehicles: 1,
-  //     totalStudents: 40,
-  //   },
-  // ];
 
   useEffect(() => {
-    dispatch(getAllRoutes());
+    dispatch(getRoutesBySchool());
+
+
+
   }, []);
   console.log(transportRoutes);
 
