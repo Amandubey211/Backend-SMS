@@ -57,7 +57,7 @@ const subRouteSlice = createSlice({
       .addCase(createSubRoute.pending, pending)
       .addCase(createSubRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        if (payload?.data) state.subRoutes.push(payload.data);
+        // if (payload?.data) state.subRoutes.push(payload.data);
       })
       .addCase(createSubRoute.rejected, rejected);
 
@@ -66,11 +66,11 @@ const subRouteSlice = createSlice({
       .addCase(updateSubRoute.pending, pending)
       .addCase(updateSubRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        const updated = payload?.data;
-        const idx = state.subRoutes.findIndex((s) => s._id === updated._id);
-        if (idx !== -1) state.subRoutes[idx] = updated;
-        if (state.selectedSubRoute?._id === updated._id)
-          state.selectedSubRoute = updated;
+        // const updated = payload?.data;
+        // const idx = state.subRoutes.findIndex((s) => s._id === updated._id);
+        // if (idx !== -1) state.subRoutes[idx] = updated;
+        // if (state.selectedSubRoute?._id === updated._id)
+        //   state.selectedSubRoute = updated;
       })
       .addCase(updateSubRoute.rejected, rejected);
 
@@ -79,7 +79,7 @@ const subRouteSlice = createSlice({
       .addCase(deleteSubRoute.pending, pending)
       .addCase(deleteSubRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        state.subRoutes = state.subRoutes.filter((s) => s._id !== payload.id);
+        // state.subRoutes = state.subRoutes.filter((s) => s._id !== payload.id);
       })
       .addCase(deleteSubRoute.rejected, rejected);
   },

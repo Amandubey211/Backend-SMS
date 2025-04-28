@@ -1,15 +1,23 @@
-/* Path unchanged: features/Transportation/RoutesManagment/routes.action.js */
+/* Path: features/Transportation/RoutesManagment/routes.action.js */
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData,
+} from "../../../../services/apiEndpoints";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 
-/* 🔹 GET ALL ROUTES (BY SCHOOL) */
+/* helper to silence global alert */
+const silent = (dispatch) => dispatch(setShowError(false));
+
+/* 🔹 LIST ------------------------------------------------------- */
 export const getRoutesBySchool = createAsyncThunk(
   "routes/getAllBySchool",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
+      silent(dispatch);
       return await getData("/transport/route/school");
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
@@ -17,12 +25,12 @@ export const getRoutesBySchool = createAsyncThunk(
   }
 );
 
-/* 🔹 GET SINGLE ROUTE */
+/* 🔹 SINGLE ----------------------------------------------------- */
 export const getRouteById = createAsyncThunk(
   "routes/getById",
   async (id, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
+      silent(dispatch);
       return await getData(`/transport/route/${id}`);
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
@@ -30,26 +38,45 @@ export const getRouteById = createAsyncThunk(
   }
 );
 
-/* 🔹 CREATE ROUTE */
+/* 🔹 CREATE ----------------------------------------------------- */
 export const createRoute = createAsyncThunk(
   "routes/create",
   async (payload, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
-      return await postData("/transport/route", payload);
+      silent(dispatch);
+      const res = await postData("/transport/route", payload);
+      dispatch(getRoutesBySchool()); // refresh list
+      return res;
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
 
-/* 🔹 UPDATE ROUTE */
+/* 🔹 UPDATE ----------------------------------------------------- */
 export const updateRoute = createAsyncThunk(
   "routes/update",
   async ({ id, data }, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
-      return await putData(`/transport/route/${id}`, data);
+      silent(dispatch);
+      const res = await putData(`/transport/route/${id}`, data);
+      dispatch(getRoutesBySchool()); // refresh list
+      return res;
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/* 🔹 DELETE ----------------------------------------------------- */
+export const deleteRoute = createAsyncThunk(
+  "routes/delete",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      silent(dispatch);
+      await deleteData(`/transport/route/${id}`);
+      dispatch(getRoutesBySchool()); // refresh list
+      return { id };
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
     }
