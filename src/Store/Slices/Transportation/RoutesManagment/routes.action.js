@@ -1,6 +1,11 @@
-/* Path unchanged: features/Transportation/RoutesManagment/routes.action.js */
+/* Path: features/Transportation/RoutesManagment/routes.action.js */
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getData, postData, putData } from "../../../../services/apiEndpoints";
+import {
+  getData,
+  postData,
+  putData,
+  deleteData, // ⬅️ add in your apiEndpoints
+} from "../../../../services/apiEndpoints";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 
@@ -50,6 +55,19 @@ export const updateRoute = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       return await putData(`/transport/route/${id}`, data);
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/* 🔹 DELETE ROUTE */
+export const deleteRoute = createAsyncThunk(
+  "routes/delete",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setShowError(false));
+      return await deleteData(`/transport/route/${id}`);
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
     }

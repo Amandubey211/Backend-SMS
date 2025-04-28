@@ -1,11 +1,12 @@
-/* Path unchanged: features/Transportation/RoutesManagment/transportRouteSlice.js */
-import { createSlice } from '@reduxjs/toolkit';
+/* Path: features/Transportation/RoutesManagment/transportRouteSlice.js */
+import { createSlice } from "@reduxjs/toolkit";
 import {
   createRoute,
   getRoutesBySchool,
   getRouteById,
   updateRoute,
-} from './routes.action';
+  deleteRoute, // ⬅️ new
+} from "./routes.action";
 
 const initialState = {
   loading: false,
@@ -14,12 +15,12 @@ const initialState = {
   singleRoute: {},
 };
 
-const transportRouteSlice = createSlice({
-  name: 'transportRoute',
+const slice = createSlice({
+  name: "transportRoute",
   initialState,
   reducers: {},
-  extraReducers: builder => {
-    const pending = state => {
+  extraReducers: (builder) => {
+    const pending = (state) => {
       state.loading = true;
       state.error = null;
     };
@@ -28,7 +29,7 @@ const transportRouteSlice = createSlice({
       state.error = action.payload || true;
     };
 
-    /* 🔹 LIST */
+    /* list */
     builder
       .addCase(getRoutesBySchool.pending, pending)
       .addCase(getRoutesBySchool.fulfilled, (state, { payload }) => {
@@ -37,7 +38,7 @@ const transportRouteSlice = createSlice({
       })
       .addCase(getRoutesBySchool.rejected, rejected);
 
-    /* 🔹 SINGLE */
+    /* single */
     builder
       .addCase(getRouteById.pending, pending)
       .addCase(getRouteById.fulfilled, (state, { payload }) => {
@@ -46,7 +47,7 @@ const transportRouteSlice = createSlice({
       })
       .addCase(getRouteById.rejected, rejected);
 
-    /* 🔹 CREATE */
+    /* create */
     builder
       .addCase(createRoute.pending, pending)
       .addCase(createRoute.fulfilled, (state, { payload }) => {
@@ -55,18 +56,33 @@ const transportRouteSlice = createSlice({
       })
       .addCase(createRoute.rejected, rejected);
 
-    /* 🔹 UPDATE */
+    /* update */
     builder
       .addCase(updateRoute.pending, pending)
       .addCase(updateRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
         const updated = payload?.data;
-        const idx = state.transportRoutes.findIndex(r => r._id === updated._id);
+        const idx = state.transportRoutes.findIndex(
+          (r) => r._id === updated._id
+        );
         if (idx !== -1) state.transportRoutes[idx] = updated;
         if (state.singleRoute?._id === updated._id) state.singleRoute = updated;
       })
       .addCase(updateRoute.rejected, rejected);
+
+    /* delete */
+    builder
+      .addCase(deleteRoute.pending, pending)
+      .addCase(deleteRoute.fulfilled, (state, { meta }) => {
+        state.loading = false;
+        const id = meta.arg; // id passed to thunk
+        state.transportRoutes = state.transportRoutes.filter(
+          (r) => r._id !== id
+        );
+        if (state.singleRoute?._id === id) state.singleRoute = {};
+      })
+      .addCase(deleteRoute.rejected, rejected);
   },
 });
 
-export default transportRouteSlice.reducer;
+export default slice.reducer;
