@@ -63,3 +63,16 @@ export const bloodGroupOptions = [
   { label: "Rh+", value: "Rh+" },
   { label: "Rh-", value: "Rh-" },
 ];
+export const LANGUAGE_OPTIONS = ["Arabic", "Hindi", "Malayalam", "Tamil"].map(
+  (l) => ({ label: l, value: l.toLowerCase() })
+);
+
+export const VALUE_ED_OPTIONS = [
+  { label: "Moral", value: "moral" },
+  { label: "Islamic Studies", value: "islamic" },
+];
+
+export const YES_NO_OPTIONS = [
+  { label: "Yes", value: true },
+  { label: "No", value: false },
+];
