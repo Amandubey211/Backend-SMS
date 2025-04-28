@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { Row, Col } from "antd";
+import { Row, Col, Checkbox, Radio, Input } from "antd";
 import { useFormikContext } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -30,6 +30,9 @@ import {
   PRIMARY_CONTACT_OPTIONS,
   ENROLLMENT_STATUS_OPTIONS,
   bloodGroupOptions,
+  LANGUAGE_OPTIONS,
+  VALUE_ED_OPTIONS,
+  YES_NO_OPTIONS,
 } from "../Configs/selectOptionsConfig";
 
 export const PhoneInputField = ({ name, icon, tooltip, placeholder }) => {
@@ -196,6 +199,14 @@ const AcademicSessionCandidate = () => {
       })),
     [classes]
   );
+  /* ---------------- Show third language? ---------------- */
+  const showThirdLang = useMemo(() => {
+    const clsLabel =
+      classOptions.find((c) => c.value === values.academicSession.class)
+        ?.label || "";
+    const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
+    return gradeNum >= 3;
+  }, [values.academicSession.class, classOptions]);
 
   // Auto-calculate age from DOB
   useEffect(() => {
@@ -460,6 +471,79 @@ const AcademicSessionCandidate = () => {
             />
           </Col>
         </Row>
+      </div>
+
+      <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
+        Languages & Preferences
+      </h2>
+
+      <div className="p-3 flex flex-col gap-4">
+        {/* Second language */}
+        <div>
+          <label className="font-semibold block mb-1">
+            Second language preference
+          </label>
+          <Checkbox.Group
+            options={LANGUAGE_OPTIONS}
+            value={values.languagePrefs.second}
+            onChange={(v) => setFieldValue("languagePrefs.second", v)}
+          />
+        </div>
+
+        {/* Third language */}
+        {showThirdLang && (
+          <div>
+            <label className="font-semibold block mb-1 text-red-500">
+              Third language preference (Grade&nbsp;3+)
+            </label>
+            <Checkbox.Group
+              options={LANGUAGE_OPTIONS}
+              value={values.languagePrefs.third}
+              onChange={(v) => setFieldValue("languagePrefs.third", v)}
+            />
+          </div>
+        )}
+
+        {/* Value education */}
+        <div>
+          <label className="font-semibold block mb-1">
+            Value education preference
+          </label>
+          <Radio.Group
+            options={VALUE_ED_OPTIONS}
+            optionType="button"
+            value={values.languagePrefs.valueEd}
+            onChange={(e) =>
+              setFieldValue("languagePrefs.valueEd", e.target.value)
+            }
+          />
+        </div>
+
+        {/* Left-handed */}
+        <div>
+          <label className="font-semibold block mb-1">Left-handed</label>
+          <Radio.Group
+            options={YES_NO_OPTIONS}
+            optionType="button"
+            value={values.languagePrefs.leftHanded}
+            onChange={(e) =>
+              setFieldValue("languagePrefs.leftHanded", e.target.value)
+            }
+          />
+        </div>
+
+        {/* Medical information */}
+        <div>
+          <label className="font-semibold block mb-1">
+            Medical information (allergies / ailments)
+          </label>
+          <Input.TextArea
+            rows={4}
+            value={values.medicalInfo}
+            onChange={(e) => setFieldValue("medicalInfo", e.target.value)}
+            placeholder="Describe any condition the school should know…"
+          />
+        </div>
       </div>
     </div>
   );

@@ -39,6 +39,13 @@ export const initialValues = {
     lastDayAtSchool: "",
     sourceOfFee: "",
   },
+  languagePrefs: {
+    second: [], // ⬅️ check-box array
+    third: [], // ⬅️ check-box array (Grade 3+)
+    valueEd: "", // ⬅️ radio (moral / islamic)
+    leftHanded: false,
+  },
+  medicalInfo: "", // ⬅️ free-text
   addressInformation: {
     residenceType: "",
     unitNumber: "",
