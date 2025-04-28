@@ -41,64 +41,57 @@ const RouteList = ({ onEdit }) => {
 
   const [searchText, setSearchText] = useState("");
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
-  const [filters, setFilters] = useState({
-    status: null,
-    vehicleCount: null,
-  });
+  const [filters, setFilters] = useState({ status: null, vehicleCount: null });
 
-  /* confirmation-modal state */
+  /* delete-modal state */
   const [deleteInfo, setDeleteInfo] = useState({
     open: false,
     id: null,
     name: "",
   });
 
-  /* ------------ data fetch -------------- */
+  /* fetch */
   useEffect(() => {
     dispatch(getRoutesBySchool());
   }, [dispatch]);
 
-  /* ------------ handlers ---------------- */
-  const handleExpand = (expanded, record) => {
-    const keys = expanded
-      ? [...expandedRowKeys, record._id]
-      : expandedRowKeys.filter((k) => k !== record._id);
-    setExpandedRowKeys(keys);
-  };
-
-  const handleFilterChange = (name, value) =>
-    setFilters((prev) => ({ ...prev, [name]: value }));
+  /* helpers */
+  const handleExpand = (exp, rec) =>
+    setExpandedRowKeys((prev) =>
+      exp ? [...prev, rec._id] : prev.filter((k) => k !== rec._id)
+    );
 
   const confirmDelete = () =>
     dispatch(deleteRoute(deleteInfo.id)).then(() =>
       setDeleteInfo({ open: false, id: null, name: "" })
     );
 
-  /* ------------ filtering --------------- */
+  /* filter in memory */
   const filteredRoutes = transportRoutes?.filter((r) => {
     const q = searchText.toLowerCase();
-    const matchesSearch =
+    const matchTxt =
       r.routeName.toLowerCase().includes(q) ||
       r.stops[0]?.stopName.toLowerCase().includes(q) ||
       r.stops[r.stops.length - 1]?.stopName.toLowerCase().includes(q);
 
-    const matchesStatus =
+    const matchStatus =
       filters.status === null || r.isActive === filters.status;
-
-    const matchesVehicle =
+    const matchVeh =
       filters.vehicleCount === null ||
       (filters.vehicleCount === "empty"
         ? r.vehicles.length === 0
         : r.vehicles.length > 0);
-
-    return matchesSearch && matchesStatus && matchesVehicle;
+    return matchTxt && matchStatus && matchVeh;
   });
 
-  /* ------------ dropdown menus ---------- */
+  /* menus */
   const statusMenu = (
     <Menu
       onClick={({ key }) =>
-        handleFilterChange("status", key === "all" ? null : key === "active")
+        setFilters((p) => ({
+          ...p,
+          status: key === "all" ? null : key === "active",
+        }))
       }
       items={[
         { key: "all", label: "All Statuses" },
@@ -107,11 +100,10 @@ const RouteList = ({ onEdit }) => {
       ]}
     />
   );
-
   const vehicleMenu = (
     <Menu
       onClick={({ key }) =>
-        handleFilterChange("vehicleCount", key === "all" ? null : key)
+        setFilters((p) => ({ ...p, vehicleCount: key === "all" ? null : key }))
       }
       items={[
         { key: "all", label: "All Vehicles" },
@@ -121,17 +113,17 @@ const RouteList = ({ onEdit }) => {
     />
   );
 
-  /* ------------ main columns ------------ */
+  /* columns */
   const columns = [
     {
       title: "Route Name",
       dataIndex: "routeName",
-      render: (text, record) => (
+      render: (txt, r) => (
         <div className="flex items-center">
           <Button
             type="text"
             icon={
-              expandedRowKeys.includes(record._id) ? (
+              expandedRowKeys.includes(r._id) ? (
                 <UpOutlined />
               ) : (
                 <DownOutlined />
@@ -139,10 +131,10 @@ const RouteList = ({ onEdit }) => {
             }
             onClick={(e) => {
               e.stopPropagation();
-              handleExpand(!expandedRowKeys.includes(record._id), record);
+              handleExpand(!expandedRowKeys.includes(r._id), r);
             }}
           />
-          <span className="ml-2 font-medium">{text}</span>
+          <span className="ml-2 font-medium">{txt}</span>
         </div>
       ),
       sorter: (a, b) => a.routeName.localeCompare(b.routeName),
@@ -150,10 +142,8 @@ const RouteList = ({ onEdit }) => {
     {
       title: "Status",
       dataIndex: "isActive",
-      render: (isActive) => (
-        <Tag color={isActive ? "green" : "red"}>
-          {isActive ? "Active" : "Inactive"}
-        </Tag>
+      render: (v) => (
+        <Tag color={v ? "green" : "red"}>{v ? "Active" : "Inactive"}</Tag>
       ),
       filters: [
         { text: "Active", value: true },
@@ -161,10 +151,7 @@ const RouteList = ({ onEdit }) => {
       ],
       onFilter: (v, r) => r.isActive === v,
     },
-    {
-      title: "Start Point",
-      render: (_, r) => r.stops?.[0]?.stopName || "N/A",
-    },
+    { title: "Start Point", render: (_, r) => r.stops?.[0]?.stopName || "N/A" },
     {
       title: "End Point",
       render: (_, r) => r.stops?.[r.stops.length - 1]?.stopName || "N/A",
@@ -172,9 +159,13 @@ const RouteList = ({ onEdit }) => {
     {
       title: "Stops",
       render: (_, r) => (
-        <span className="text-blue-500">
-          {r.stops.length} {r.stops.length === 1 ? "Stop" : "Stops"}
-        </span>
+        <Link
+          to={`/transportation/routes/${r._id ?? r.routeId}/stoppages`}
+          className="text-blue-500 underline"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {r.stops.length} Stops
+        </Link>
       ),
       sorter: (a, b) => a.stops.length - b.stops.length,
     },
@@ -198,8 +189,10 @@ const RouteList = ({ onEdit }) => {
               icon={<EditOutlined className="text-blue-500" />}
               onClick={(e) => {
                 e.stopPropagation();
+                /* pass id under _id for the form */
                 onEdit({
                   ...r,
+                  _id: r._id ?? r.routeId,
                   stopage: r.stops.map((s, i) => ({
                     stopId: s.stopId ?? s._id,
                     order: i + 1,
@@ -216,7 +209,11 @@ const RouteList = ({ onEdit }) => {
               icon={<DeleteOutlined className="text-red-500" />}
               onClick={(e) => {
                 e.stopPropagation();
-                setDeleteInfo({ open: true, id: r._id, name: r.routeName });
+                setDeleteInfo({
+                  open: true,
+                  id: r._id ?? r.routeId,
+                  name: r.routeName,
+                });
               }}
             />
           </Tooltip>
@@ -225,7 +222,7 @@ const RouteList = ({ onEdit }) => {
     },
   ];
 
-  /* ------------ expanded row ------------- */
+  /* expanded vehicles */
   const expandedRowRender = (r) =>
     !r.vehicles.length ? (
       <div className="p-4 text-center">
@@ -240,11 +237,15 @@ const RouteList = ({ onEdit }) => {
       </div>
     ) : (
       <Table
+        size="small"
+        pagination={false}
+        rowKey="vehicleId"
+        dataSource={r.vehicles}
         columns={[
           {
             title: "Vehicle",
             dataIndex: "vehicleNumber",
-            render: (v) => <span className="font-medium">{v}</span>,
+            render: (v) => <strong>{v}</strong>,
           },
           {
             title: "Driver",
@@ -269,31 +270,26 @@ const RouteList = ({ onEdit }) => {
             ),
           },
         ]}
-        dataSource={r.vehicles}
-        rowKey="vehicleId"
-        pagination={false}
-        size="small"
       />
     );
 
-  /* ------------ render ------------------- */
+  /* render */
   return (
     <div>
-      {/* top bar */}
+      {/* filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <Input
           prefix={<SearchOutlined />}
-          placeholder="Search routes..."
           allowClear
+          placeholder="Search routes..."
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           className="w-full md:w-1/3"
         />
-
         <Space>
-          <Dropdown overlay={statusMenu} trigger={["click"]}>
+          <Dropdown overlay={statusMenu}>
             <Button>
-              <FilterOutlined /> Status&nbsp;
+              <FilterOutlined /> Status{" "}
               {filters.status === null
                 ? "All"
                 : filters.status
@@ -302,9 +298,9 @@ const RouteList = ({ onEdit }) => {
               <DownOutlined />
             </Button>
           </Dropdown>
-          <Dropdown overlay={vehicleMenu} trigger={["click"]}>
+          <Dropdown overlay={vehicleMenu}>
             <Button>
-              <FilterOutlined /> Vehicles&nbsp;
+              <FilterOutlined /> Vehicles{" "}
               {filters.vehicleCount === null
                 ? "All"
                 : filters.vehicleCount === "assigned"
@@ -320,9 +316,7 @@ const RouteList = ({ onEdit }) => {
         {error ? (
           <Empty
             description={
-              <span className="text-red-500">
-                Failed to load routes. Try again.
-              </span>
+              <span className="text-red-500">Failed to load routes.</span>
             }
           >
             <Button
@@ -334,15 +328,14 @@ const RouteList = ({ onEdit }) => {
           </Empty>
         ) : (
           <Table
-            columns={columns}
-            dataSource={filteredRoutes}
             rowKey="_id"
-            pagination={false} /* ⬅️ removed paging */
+            pagination={false}
+            dataSource={filteredRoutes}
+            columns={columns}
             expandable={{
               expandedRowRender,
               expandedRowKeys,
               onExpand: handleExpand,
-              rowExpandable: () => true,
             }}
             locale={{
               emptyText: (
@@ -356,17 +349,15 @@ const RouteList = ({ onEdit }) => {
                 </Empty>
               ),
             }}
-            className="rounded-lg overflow-hidden"
           />
         )}
       </Spin>
 
-      {/* delete-confirm modal */}
       <DeleteModal
         isOpen={deleteInfo.open}
-        onClose={() => setDeleteInfo({ open: false, id: null, name: "" })}
-        onConfirm={confirmDelete}
         title={deleteInfo.name}
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteInfo({ open: false, id: null, name: "" })}
       />
     </div>
   );

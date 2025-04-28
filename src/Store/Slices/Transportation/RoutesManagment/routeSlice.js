@@ -52,7 +52,7 @@ const slice = createSlice({
       .addCase(createRoute.pending, pending)
       .addCase(createRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        if (payload?.data) state.transportRoutes.unshift(payload.data);
+        // if (payload?.data) state.transportRoutes.unshift(payload.data);
       })
       .addCase(createRoute.rejected, rejected);
 
@@ -61,12 +61,12 @@ const slice = createSlice({
       .addCase(updateRoute.pending, pending)
       .addCase(updateRoute.fulfilled, (state, { payload }) => {
         state.loading = false;
-        const updated = payload?.data;
-        const idx = state.transportRoutes.findIndex(
-          (r) => r._id === updated._id
-        );
-        if (idx !== -1) state.transportRoutes[idx] = updated;
-        if (state.singleRoute?._id === updated._id) state.singleRoute = updated;
+        // const updated = payload?.data;
+        // const idx = state.transportRoutes.findIndex(
+        //   (r) => r._id === updated._id
+        // );
+        // if (idx !== -1) state.transportRoutes[idx] = updated;
+        // if (state.singleRoute?._id === updated._id) state.singleRoute = updated;
       })
       .addCase(updateRoute.rejected, rejected);
 
@@ -76,10 +76,10 @@ const slice = createSlice({
       .addCase(deleteRoute.fulfilled, (state, { meta }) => {
         state.loading = false;
         const id = meta.arg; // id passed to thunk
-        state.transportRoutes = state.transportRoutes.filter(
-          (r) => r._id !== id
-        );
-        if (state.singleRoute?._id === id) state.singleRoute = {};
+        // state.transportRoutes = state.transportRoutes.filter(
+        //   (r) => r._id !== id
+        // );
+        // if (state.singleRoute?._id === id) state.singleRoute = {};
       })
       .addCase(deleteRoute.rejected, rejected);
   },

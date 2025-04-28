@@ -10,8 +10,14 @@ import {
   message,
   Modal,
   Tag,
+  Spin,
 } from "antd";
-import { PlusOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  PlusOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  CheckOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext, Draggable } from "@hello-pangea/dnd";
 import { AiOutlineDrag } from "react-icons/ai";
@@ -33,18 +39,18 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
   const { subRoutes = [] } = useSelector(
     (s) => s.transportation.transportSubRoute ?? { subRoutes: [] }
   );
+  const { loading } = useSelector((s) => s.transportation.transportRoute);
 
   const [selectedStops, setSelectedStops] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
 
-  /* dirty-state */
-  const reportDirty = (d) => onDirtyChange?.(d);
+  /* dirty */
   useEffect(() => {
-    reportDirty(true);
-    return () => reportDirty(false);
-  }, []);
+    onDirtyChange?.(true);
+    return () => onDirtyChange?.(false);
+  }, [onDirtyChange]);
 
-  /* preload edit values – tolerant to .stopage or .stops */
+  /* preload edit */
   useEffect(() => {
     if (!routeData) {
       form.resetFields();
@@ -58,11 +64,11 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
 
     const raw = routeData.stopage
       ? routeData.stopage
-      : (routeData.stops || []).map((s, idx) => ({
+      : (routeData.stops || []).map((s, i, arr) => ({
           stopId: s.stopId ?? s._id,
-          order: idx + 1,
-          isStartingPoint: idx === 0,
-          isEndingPoint: idx === routeData.stops.length - 1,
+          order: i + 1,
+          isStartingPoint: i === 0,
+          isEndingPoint: i === arr.length - 1,
         }));
 
     setSelectedStops(
@@ -100,7 +106,6 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
           })),
         ])
       );
-
     if (drop.length)
       setSelectedStops((prev) =>
         reorder(prev.filter((s) => !drop.includes(s.stopId)))
@@ -150,9 +155,9 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
       ),
     };
     try {
-      if (routeData?._id) {
+      if (routeData?._id || routeData?.routeId) {
         await dispatch(
-          updateRoute({ id: routeData._id, data: payload })
+          updateRoute({ id: routeData._id ?? routeData.routeId, data: payload })
         ).unwrap();
         message.success(t("Route updated successfully"));
       } else {
@@ -160,14 +165,14 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
         message.success(t("Route created successfully"));
       }
       dispatch(getRoutesBySchool());
-      reportDirty(false);
-      onSuccess();
+      onDirtyChange?.(false);
+      onSuccess(); // close sidebar on success only
     } catch (err) {
       message.error(err.message ?? t("Failed to save route"));
     }
   };
 
-  /* table cols */
+  /* columns */
   const columns = [
     {
       title: "",
@@ -234,161 +239,168 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
     },
   ];
 
-  /* tag chip */
+  /* tag */
   const tagRender = ({ label, closable, onClose }) => (
     <Tag closable={closable} onClose={onClose} style={{ marginInlineEnd: 4 }}>
       {label}
     </Tag>
   );
 
-  /* UI */
+  const submitLabel = routeData ? t("Update Route") : t("Save Route");
+  const submitIcon = routeData ? <EditOutlined /> : <CheckOutlined />;
+
   return (
     <>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        onValuesChange={() => reportDirty(true)}
-        className="relative"
-      >
-        {/* top */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <Form.Item
-            name="routeName"
-            label={t("Route Name")}
-            rules={[{ required: true, message: t("Please input route name") }]}
-          >
-            <Input placeholder={t("e.g. Main Campus Route")} />
-          </Form.Item>
-          <Form.Item name="isActive" label={t("Status")} initialValue={true}>
-            <Select>
-              <Option value={true}>{t("Active")}</Option>
-              <Option value={false}>{t("Inactive")}</Option>
+      <Spin spinning={loading}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          onValuesChange={() => onDirtyChange?.(true)}
+          className="relative"
+        >
+          {/* top */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <Form.Item
+              name="routeName"
+              label={t("Route Name")}
+              rules={[
+                { required: true, message: t("Please input route name") },
+              ]}
+            >
+              <Input placeholder={t("e.g. Main Campus Route")} />
+            </Form.Item>
+            <Form.Item name="isActive" label={t("Status")} initialValue={true}>
+              <Select>
+                <Option value={true}>{t("Active")}</Option>
+                <Option value={false}>{t("Inactive")}</Option>
+              </Select>
+            </Form.Item>
+          </div>
+
+          {/* select */}
+          <Title level={5}>{t("Add Stops")}</Title>
+          <div className="flex gap-2 mb-2">
+            <Select
+              mode="multiple"
+              showSearch
+              tagRender={tagRender}
+              value={stopIds}
+              placeholder={t("Select stops")}
+              style={{ flexGrow: 1 }}
+              onChange={onStopsSelectChange}
+              optionFilterProp="label"
+              filterOption={(input, opt) =>
+                opt?.label.toLowerCase().includes(input.toLowerCase())
+              }
+            >
+              {subRoutes.map((sr) => (
+                <Option
+                  key={sr._id}
+                  value={sr._id}
+                  label={sr.stopName}
+                  className="flex justify-between items-center"
+                >
+                  <span>{sr.stopName}</span>
+                  {/* <div className="flex gap-1 ml-auto">
+                    <Tag color="geekblue" className="font-mono text-xs">
+                      {sr.location.lat.toFixed(6)}
+                    </Tag>
+                    <Tag color="volcano" className="font-mono text-xs">
+                      {sr.location.lng.toFixed(6)}
+                    </Tag>
+                  </div> */}
+                </Option>
+              ))}
             </Select>
-          </Form.Item>
-        </div>
+            <Button
+              icon={<PlusOutlined />}
+              type="dashed"
+              onClick={() => setModalOpen(true)}
+            >
+              {t("New Stop")}
+            </Button>
+          </div>
 
-        {/* multi-select */}
-        <Title level={5}>{t("Add Stops")}</Title>
-        <div className="flex gap-2 mb-2">
-          <Select
-            mode="multiple"
-            showSearch
-            tagRender={tagRender}
-            value={stopIds}
-            placeholder={t("Select stops")}
-            style={{ flexGrow: 1 }}
-            onChange={onStopsSelectChange}
-            optionFilterProp="label"
-            filterOption={(input, opt) =>
-              opt?.label.toLowerCase().includes(input.toLowerCase())
-            }
-          >
-            {subRoutes.map((sr) => (
-              <Option
-                key={sr._id}
-                value={sr._id}
-                label={sr.stopName}
-                className="flex justify-between items-center"
-              >
-                <span>{sr.stopName}</span>
-                <div className="flex gap-1 ml-auto">
-                  <Tag color="geekblue" className="font-mono text-xs">
-                    {sr.location.lat.toFixed(6)}
-                  </Tag>
-                  <Tag color="volcano" className="font-mono text-xs">
-                    {sr.location.lng.toFixed(6)}
-                  </Tag>
-                </div>
-              </Option>
-            ))}
-          </Select>
-          <Button
-            icon={<PlusOutlined />}
-            type="dashed"
-            onClick={() => setModalOpen(true)}
-          >
-            {t("New Stop")}
-          </Button>
-        </div>
-
-        {/* table */}
-        <Title level={5} className="mt-4">
-          {t("Selected Stops")}
-        </Title>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <StrictModeDroppable droppableId="table">
-            {(provided) => (
-              <Table
-                dataSource={selectedStops}
-                columns={columns}
-                rowKey="key"
-                pagination={false}
-                components={{
-                  body: {
-                    wrapper: (p) => (
-                      <tbody
-                        {...p}
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                      >
-                        {p.children}
-                        {provided.placeholder}
-                      </tbody>
-                    ),
-                    row: (p) => {
-                      const idx = selectedStops.findIndex(
-                        (s) => s.key === p["data-row-key"]
-                      );
-                      return (
-                        <Draggable
-                          draggableId={String(p["data-row-key"])}
-                          index={idx}
+          {/* table */}
+          <Title level={5} className="mt-4">
+            {t("Selected Stops")}
+          </Title>
+          <DragDropContext onDragEnd={onDragEnd}>
+            <StrictModeDroppable droppableId="table">
+              {(prov) => (
+                <Table
+                  rowKey="key"
+                  pagination={false}
+                  dataSource={selectedStops}
+                  columns={columns}
+                  components={{
+                    body: {
+                      wrapper: (p) => (
+                        <tbody
+                          {...p}
+                          ref={prov.innerRef}
+                          {...prov.droppableProps}
                         >
-                          {(dragProvided) => (
-                            <tr
-                              {...p}
-                              ref={dragProvided.innerRef}
-                              {...dragProvided.draggableProps}
-                              {...dragProvided.dragHandleProps}
-                            />
-                          )}
-                        </Draggable>
-                      );
+                          {p.children}
+                          {prov.placeholder}
+                        </tbody>
+                      ),
+                      row: (p) => {
+                        const idx = selectedStops.findIndex(
+                          (s) => s.key === p["data-row-key"]
+                        );
+                        return (
+                          <Draggable
+                            draggableId={String(p["data-row-key"])}
+                            index={idx}
+                          >
+                            {(dp) => (
+                              <tr
+                                {...p}
+                                ref={dp.innerRef}
+                                {...dp.draggableProps}
+                                {...dp.dragHandleProps}
+                              />
+                            )}
+                          </Draggable>
+                        );
+                      },
                     },
-                  },
-                }}
-              />
-            )}
-          </StrictModeDroppable>
-        </DragDropContext>
+                  }}
+                />
+              )}
+            </StrictModeDroppable>
+          </DragDropContext>
 
-        {/* footer */}
-        <div className="sticky bottom-0 bg-white py-3 flex justify-end gap-3 border-t">
-          <Button
-            className="h-10 rounded-lg"
-            onClick={() => form.resetFields()}
-          >
-            {t("Cancel")}
-          </Button>
-          <Button
-            htmlType="submit"
-            className="h-10 rounded-lg font-medium bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0 hover:opacity-90"
-            icon={routeData ? <EditOutlined /> : null}
-          >
-            {t("Save Route")}
-          </Button>
-        </div>
-      </Form>
+          {/* footer */}
+          <div className="sticky bottom-0 bg-white py-3 flex justify-end gap-3 border-t">
+            <Button
+              className="h-10 rounded-lg"
+              onClick={() => form.resetFields()}
+            >
+              {t("Cancel")}
+            </Button>
+            <Button
+              htmlType="submit"
+              disabled={loading}
+              icon={submitIcon}
+              className="h-10 rounded-lg font-medium bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0 hover:opacity-90"
+            >
+              {submitLabel}
+            </Button>
+          </div>
+        </Form>
+      </Spin>
 
       <Modal
         open={modalOpen}
         footer={null}
         title={t("Create Stop")}
-        onCancel={() => setModalOpen(false)}
+        centered
         destroyOnClose
         width={700}
-        centered
+        onCancel={() => setModalOpen(false)}
       >
         <SubRouteModal open={modalOpen} onClose={() => setModalOpen(false)} />
       </Modal>

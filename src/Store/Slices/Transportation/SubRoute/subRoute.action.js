@@ -1,4 +1,4 @@
-/* Path unchanged: features/transportation/SubRoute/subRoute.action.js */
+/* Path: features/transportation/SubRoute/subRoute.action.js */
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   deleteData,
@@ -9,25 +9,15 @@ import {
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 
-/* create */
-export const createSubRoute = createAsyncThunk(
-  "subRoute/create",
-  async (payload, { dispatch, rejectWithValue }) => {
-    try {
-      dispatch(setShowError(false));
-      return await postData("/transport/subRoute", payload);
-    } catch (err) {
-      return handleError(err, dispatch, rejectWithValue);
-    }
-  }
-);
+/* 🔹 helpers -------------------------------------------------------- */
+const silent = (dispatch) => dispatch(setShowError(false));
 
-/* list */
+/* 🔹 LIST ----------------------------------------------------------- */
 export const getSubRoutesBySchool = createAsyncThunk(
   "subRoute/getAllBySchool",
   async (_, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
+      silent(dispatch);
       return await getData("/transport/subRoute/school");
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
@@ -35,40 +25,64 @@ export const getSubRoutesBySchool = createAsyncThunk(
   }
 );
 
-/* single */
-export const getSubRouteById = createAsyncThunk(
-  "subRoute/getById",
-  async (id, { dispatch, rejectWithValue }) => {
+/* 🔹 CREATE --------------------------------------------------------- */
+export const createSubRoute = createAsyncThunk(
+  "subRoute/create",
+  async (payload, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
-      return await getData(`/transport/subRoute/${id}`);
+      silent(dispatch);
+      const res = await postData("/transport/subRoute", payload);
+      /* refresh list */
+      dispatch(getSubRoutesBySchool());
+      return res;
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
 
-/* update */
+/* 🔹 UPDATE --------------------------------------------------------- */
 export const updateSubRoute = createAsyncThunk(
   "subRoute/update",
   async ({ subRouteId, updateData }, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
-      return await putData(`/transport/subRoute/${subRouteId}`, updateData);
+      silent(dispatch);
+      const res = await putData(
+        `/transport/subRoute/${subRouteId}`,
+        updateData
+      );
+      /* refresh list */
+      dispatch(getSubRoutesBySchool());
+      return res;
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
 
-/* delete */
+/* 🔹 DELETE --------------------------------------------------------- */
 export const deleteSubRoute = createAsyncThunk(
   "subRoute/delete",
   async (id, { dispatch, rejectWithValue }) => {
     try {
-      dispatch(setShowError(false));
+      silent(dispatch);
       await deleteData(`/transport/subRoute/${id}`);
+      /* refresh list */
+      dispatch(getSubRoutesBySchool());
       return { id };
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/* 🔹 SINGLE --------------------------------------------------------- */
+export const getSubRouteById = createAsyncThunk(
+  "subRoute/getById",
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      silent(dispatch);
+      return await getData(`/transport/subRoute/${id}`);
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
     }
