@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
@@ -11,7 +11,7 @@ const cardVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
-const StudentCard = ({ studentInfo, imagePreview }) => {
+const StudentCard = memo(({ studentInfo, academicInfo, imagePreview }) => {
   const { t } = useTranslation("admAdmission");
   const {
     firstName = "",
@@ -25,7 +25,7 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
 
   const classList = useSelector((store) => store.admin.class.classes);
   const selectedClass = classList.find(
-    (classItem) => classItem._id === studentInfo.applyingClass
+    (classItem) => classItem._id === academicInfo?.class
   );
   const className = selectedClass ? selectedClass.className : "";
 
@@ -97,6 +97,6 @@ const StudentCard = ({ studentInfo, imagePreview }) => {
       </div>
     </motion.div>
   );
-};
+});
 
 export default StudentCard;
