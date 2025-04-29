@@ -180,7 +180,7 @@ const StudentLoginForm = () => {
             <span className="opacity-70">New to Student Diwan?</span>{" "}
             <NavLink
               className="text-indigo-600 hover:text-indigo-900"
-              to="/signup"
+              // to="/signup"
             >
               Apply Now
             </NavLink>

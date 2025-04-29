@@ -1,6 +1,6 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useMemo, useCallback, memo } from "react";
 import { Formik, Form, useFormikContext } from "formik";
-import { Button, message, Form as AntForm, Spin } from "antd";
+import { Button, message, Spin } from "antd";
 import AcademicSessionCandidate from "./Sections/AcademicSessionCandidate";
 import AcademicHistory from "./Sections/AcademicHistory";
 import AddressInformation from "./Sections/AddressInformation";
@@ -11,12 +11,12 @@ import { registerStudentDetails } from "../../../../Store/Slices/Common/Auth/act
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSchoolAttachmentsById } from "../../../../Store/Slices/Admin/Admission/admissionThunk";
 import useDynamicAttachments from "../../../../Hooks/Admin/useDynamicAttachments";
-
-const FormDataWatcher = ({ onChange }) => {
+const FormDataWatcher = memo(({ onChange }) => {
   const { values } = useFormikContext();
   const prevValuesRef = useRef(values);
 
   useEffect(() => {
+    // Check if values have changed and only then trigger the callback
     if (JSON.stringify(values) !== JSON.stringify(prevValuesRef.current)) {
       prevValuesRef.current = values;
       onChange(values);
@@ -24,9 +24,9 @@ const FormDataWatcher = ({ onChange }) => {
   }, [values, onChange]);
 
   return null;
-};
-
-const AdminAdmissionForm = ({ onFormDataChange }) => {
+});
+// Memoize AdminAdmissionForm to avoid unnecessary re-renders
+const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const formRefs = useRef({});
   const dispatch = useDispatch();
   const schoolId = useSelector(
@@ -36,170 +36,280 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
     (state) => state.admin.admissionAttachment
   );
 
+  // Fetch attachments once when the component is mounted
   useEffect(() => {
     dispatch(fetchSchoolAttachmentsById());
-    console.log("fetchattachments");
   }, []);
-  /* ------------------------------------------------------------------ */
-  /* 2. Build dynamic initialValues + Yup schema                        */
-  /* ------------------------------------------------------------------ */
+
   const { attachmentsInitialValues, attachmentsSchema } =
     useDynamicAttachments(attachmentsMeta);
 
-  const mergedInitialValues = React.useMemo(
+  const mergedInitialValues = useMemo(
     () => ({
-      ...initialValues, // your static sections
+      ...initialValues,
       attachments: attachmentsInitialValues,
     }),
     [attachmentsInitialValues]
   );
 
-  const mergedValidation = React.useMemo(
-    () => AdminAdmissionSchema.concat(attachmentsSchema), // merge with static rules
+  const mergedValidation = useMemo(
+    () => AdminAdmissionSchema.concat(attachmentsSchema),
     [attachmentsSchema]
   );
 
-  // if (loading) return <Spin />;
-  const handleFormikErrorScroll = (errors) => {
+  // Handle form validation errors by scrolling to the first error
+  const handleFormikErrorScroll = useCallback((errors) => {
     const errorKeys = Object.keys(errors);
+    console.log(errors, "errorserrors");
     if (!errorKeys.length) return;
     const firstErrorKey = errorKeys[0];
     const fieldRef = formRefs.current[firstErrorKey];
-    if (fieldRef && fieldRef.scrollIntoView) {
+    if (fieldRef?.scrollIntoView) {
       fieldRef.scrollIntoView({ behavior: "smooth", block: "center" });
       setTimeout(() => {
-        fieldRef.focus();
+        fieldRef.focus?.();
       }, 300);
     }
-  };
+  }, []);
 
-  const handleFormSubmit = async (values, actions) => {
-    try {
-      console.log("Form values:", values);
-      
-      const formData = new FormData();
+  // Validate mandatory attachments before form submission
+  const validateMandatoryAttachments = useCallback((values) => {
+    const missing = [];
+    if (!values.profile?.file) missing.push("Profile Picture");
 
-      // Candidate Information
-      formData.append("firstName", values.candidateInformation.firstName);
-      formData.append("lastName", values.candidateInformation.lastName);
-      formData.append("email", values.candidateInformation.email);
-      formData.append("dateOfBirth", values.candidateInformation.dob);
-      formData.append("placeOfBirth", values.candidateInformation.placeOfBirth);
-      formData.append("gender", values.candidateInformation.gender);
-      formData.append("contactNumber", values.candidateInformation.phoneNumber);
-      formData.append("religion", values.candidateInformation.religion);
-      formData.append("bloodGroup", values.candidateInformation.bloodGroup);
-      formData.append(
-        "emergencyNumber",
-        values.candidateInformation.emergencyNumber
-      );
-      formData.append("Q_Id", values.candidateInformation.studentId);
-      // Append bloodGroup again if needed
-      formData.append("bloodGroup", values.candidateInformation.bloodGroup);
-
-      // Academic & Class Information
-      formData.append(
-        "enrollmentStatus",
-        values.academicSession.enrollmentStats
-      );
-      formData.append("applyingClass", values.academicSession.class);
-      formData.append("schoolId", schoolId);
-
-      // Parent / Guardian Information
-      formData.append(
-        "fatherName",
-        `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
-      );
-      formData.append(
-        "motherName",
-        `${values.motherInfo.firstName} ${values.motherInfo.lastName}`
-      );
-      formData.append("motherPhoto", values.motherInfo.motherPhoto.file);
-      formData.append("fatherPhoto", values.fatherInfo.fatherPhoto.file);
-      formData.append("guardianName", values.guardianInformation.guardianName);
-      formData.append(
-        "guardianRelationToStudent",
-        values.guardianInformation.guardianRelationToStudent
-      );
-      formData.append(
-        "guardianContactNumber",
-        values.guardianInformation.guardianContactNumber
-      );
-      formData.append(
-        "guardianEmail",
-        values.guardianInformation.guardianEmail
-      );
-
-      // Address / Transport Information
-      formData.append(
-        "transportRequirement",
-        values.addressInformation.transportRequired
-      );
-
-      // Files from attachments
-      if (values.attachments.mandatory.studentIdCopy) {
-        formData.append(
-          "studentIdCopy",
-          values.attachments.mandatory.studentIdCopy.file
-        );
-      }
-      if (values.attachments.mandatory.studentPassport) {
-        formData.append(
-          "studentPassport",
-          values.attachments.mandatory.studentPassport.file
-        );
-      }
-      if (values.attachments.mandatory.studentPicture) {
-        formData.append(
-          "studentPicture",
-          values.attachments.mandatory.studentPicture.file
-        );
-      }
-      if (values.attachments.mandatory.lastReportCard) {
-        formData.append(
-          "lastReportCard",
-          values.attachments.mandatory.lastReportCard.file
-        );
-      }
-      if (values.attachments.optional.medicalReport) {
-        formData.append(
-          "medicalReport",
-          values.attachments.optional.medicalReport.file
-        );
-      }
-      if (values.attachments.optional.birthCertificate) {
-        formData.append(
-          "birthCertificate",
-          values.attachments.optional.birthCertificate.file
-        );
-      }
-      if (values.attachments.optional.vaccinationCard) {
-        formData.append(
-          "vaccinationCard",
-          values.attachments.optional.vaccinationCard.file
-        );
-      }
-
-      const response = await dispatch(registerStudentDetails(formData));
-      if (response?.success) {
-        message.success("Registration successful!");
-      }
-    } catch (error) {
-      message.error("Registration failed. Please try again.");
-    } finally {
-      actions.setSubmitting(false);
+    if (values.attachments?.mandatory) {
+      Object.entries(values.attachments.mandatory).forEach(([key, value]) => {
+        if (!value?.file) missing.push(key);
+      });
     }
-  };
+    return missing;
+  }, []);
+
+  const handleFormSubmit = useCallback(
+    async (values, actions) => {
+      try {
+        const missingAttachments = validateMandatoryAttachments(values);
+        if (missingAttachments.length > 0) {
+          message.error(
+            `Please upload all mandatory attachments: ${missingAttachments.join(
+              ", "
+            )}`
+          );
+          return;
+        }
+
+        const formData = new FormData();
+
+        // Basic Candidate Information
+        formData.append("firstName", values.candidateInformation.firstName);
+        formData.append("lastName", values.candidateInformation.lastName);
+        formData.append(
+          "email",
+          values.candidateInformation.email.toLowerCase()
+        );
+        formData.append("dateOfBirth", values.candidateInformation.dob);
+        formData.append(
+          "placeOfBirth",
+          values.candidateInformation.placeOfBirth
+        );
+        formData.append("gender", values.candidateInformation.gender);
+        formData.append(
+          "contactNumber",
+          values.candidateInformation.phoneNumber
+        );
+        formData.append("religion", values.candidateInformation.religion);
+        formData.append("bloodGroup", values.candidateInformation.bloodGroup);
+        formData.append(
+          "emergencyNumber",
+          values.candidateInformation.emergencyNumber
+        );
+        formData.append("Q_Id", values.candidateInformation.studentId);
+        formData.append("nationality", values.candidateInformation.nationality);
+
+        // Academic Information
+        formData.append(
+          "enrollmentStatus",
+          values.academicSession.enrollmentStats
+        );
+        formData.append("applyingClass", values.academicSession.class);
+        formData.append("schoolId", schoolId);
+        formData.append("academicYear", values.academicSession.academicYear);
+
+        // Parent/Guardian Information
+        formData.append(
+          "fatherName",
+          `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
+        );
+        formData.append(
+          "motherName",
+          `${values.motherInfo.firstName} ${values.motherInfo.lastName}`
+        );
+        formData.append(
+          "guardianName",
+          values.guardianInformation.guardianName
+        );
+        formData.append(
+          "guardianRelationToStudent",
+          values.guardianInformation.guardianRelationToStudent
+        );
+        formData.append(
+          "guardianContactNumber",
+          values.guardianInformation.guardianContactNumber
+        );
+        formData.append(
+          "guardianEmail",
+          values.guardianInformation.guardianEmail
+        );
+
+        // Parent photos
+        if (values.motherInfo.motherPhoto?.file) {
+          formData.append("motherPhoto", values.motherInfo.motherPhoto.file);
+        }
+        if (values.fatherInfo.fatherPhoto?.file) {
+          formData.append("fatherPhoto", values.fatherInfo.fatherPhoto.file);
+        }
+
+        // Address Information
+        const addressFields = [
+          "unitNumber",
+          "buildingNumber",
+          "streetNumber",
+          "streetName",
+          "zone",
+          "compoundName",
+          "city",
+          "nearestLandmark",
+          "proposedCampus",
+          "transportRequired",
+          "postalCode",
+          "state",
+          "country",
+        ];
+
+        addressFields.forEach((field) => {
+          formData.append(
+            `permanentAddress[${field}]`,
+            values.addressInformation[field] || ""
+          );
+          formData.append(
+            `residentialAddress[${field}]`,
+            values.addressInformation[field] || ""
+          );
+        });
+
+        // Academic History
+        formData.append(
+          "previousSchoolName",
+          values.academicHistory.previousSchoolName
+        );
+        formData.append("previousClass", values.academicHistory.previousClass);
+        formData.append("curriculum", values.academicHistory.curriculum);
+        if (values.academicHistory.lastDayAtSchool) {
+          formData.append(
+            "lastDayAtSchool",
+            values.academicHistory.lastDayAtSchool
+          );
+        }
+        formData.append(
+          "sourceOfFee",
+          values.academicHistory.sourceOfFee || "Parent"
+        );
+
+        // Language Preferences
+        formData.append(
+          "secondLanguage",
+          values.languagePrefs.second?.[0] || ""
+        );
+        formData.append("thirdLanguage", values.languagePrefs.third?.[0] || "");
+        formData.append("valueEducation", values.languagePrefs.valueEd || "");
+        formData.append(
+          "isLeftHanded",
+          values.languagePrefs.leftHanded ? "true" : "false"
+        );
+
+        // Medical Information
+        if (values.medicalInfo) {
+          formData.append("medicalCondition", values.medicalInfo);
+        }
+
+        // Profile Pictures (flattened to root)
+        if (values.profile?.file) {
+          formData.append("profile", values.profile.file);
+        }
+        if (values.profile?.file) {
+          formData.append("studentPicture", values.profile.file);
+        }
+
+        // Dynamic Attachments (flattened to root)
+        if (values.attachments?.mandatory) {
+          Object.entries(values.attachments.mandatory).forEach(
+            ([key, value]) => {
+              if (value?.file) {
+                // Ensure consistent field naming
+                const fieldName = key.replace(/\s+/g, "_").toLowerCase();
+                formData.append(fieldName, value.file);
+              }
+            }
+          );
+        }
+
+        if (values.attachments?.optional) {
+          Object.entries(values.attachments.optional).forEach(
+            ([key, value]) => {
+              if (value?.file) {
+                const fieldName = key.replace(/\s+/g, "_").toLowerCase();
+                formData.append(fieldName, value.file);
+              }
+            }
+          );
+        }
+
+        // Debug form data
+        // Debug form data before sending
+        console.log("FormData contents:");
+        for (let [key, value] of formData.entries()) {
+          console.log(
+            key,
+            value instanceof File
+              ? `File: ${value.name} (${value.size} bytes)`
+              : value
+          );
+        }
+
+        const registrationResponse = await dispatch(
+          registerStudentDetails(formData)
+        );
+
+        if (registrationResponse?.success) {
+          message.success("Registration successful!");
+        } else {
+          message.error(
+            registrationResponse?.message ||
+              "Registration failed. Please try again."
+          );
+        }
+      } catch (error) {
+        console.error("Submission error:", error);
+        message.error(
+          error.response?.data?.message ||
+            "An error occurred during registration. Please try again."
+        );
+      } finally {
+        actions.setSubmitting(false);
+      }
+    },
+    [dispatch, schoolId, validateMandatoryAttachments]
+  );
 
   return (
     <div className="bg-white rounded-md p-4">
       <Formik
         initialValues={mergedInitialValues}
-        // validationSchema={mergedValidation}
+        validationSchema={mergedValidation}
         onSubmit={handleFormSubmit}
         validateOnMount
       >
-        {({ errors, touched, handleSubmit, validateForm }) => (
+        {({ errors, touched, handleSubmit, validateForm, isSubmitting }) => (
           <Form onFinish={handleSubmit}>
             <FormDataWatcher onChange={onFormDataChange} />
             <AcademicSessionCandidate
@@ -232,6 +342,7 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
                 type="primary"
                 size="large"
                 htmlType="submit"
+                loading={isSubmitting}
                 style={{
                   background: "linear-gradient(to right, #C83B62, #7F35CD)",
                   border: "none",
@@ -246,7 +357,7 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
                 }}
                 block
               >
-                Save &amp; Submit
+                Save & Submit
               </Button>
             </div>
           </Form>
@@ -254,6 +365,6 @@ const AdminAdmissionForm = ({ onFormDataChange }) => {
       </Formik>
     </div>
   );
-};
+});
 
 export default AdminAdmissionForm;
