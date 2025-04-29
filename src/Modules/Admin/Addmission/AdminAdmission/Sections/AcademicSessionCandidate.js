@@ -1,5 +1,4 @@
-
-import React, { useEffect, useMemo, memo } from "react";
+import React, { useEffect, useMemo, memo, useState } from "react";
 import { Row, Col } from "antd";
 
 import { useFormikContext } from "formik";
@@ -31,14 +30,13 @@ import {
   PRIMARY_CONTACT_OPTIONS,
   ENROLLMENT_STATUS_OPTIONS,
   bloodGroupOptions,
-
 } from "../Configs/selectOptionsConfig";
 import { fetchAdmissionOptions } from "../../../../../Store/Slices/Common/User/actions/userActions";
 
 const PhoneInputField = memo(({ name, icon, tooltip, placeholder }) => {
   const [field, , helpers] = useField(name);
   const phoneValue = field.value || "";
-  
+
   return (
     <div className="flex items-center w-full rounded hover:border-blue-500 transition-colors">
       {icon && (
@@ -122,22 +120,22 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
     }
   }, [values.candidateInformation?.dob, setFieldValue]);
   const { userDetails } = useSelector((store) => store.common.user);
-  const [VALUE_ED_OPTIONS,setVALUE_ED_OPTIONS] = useState([]);
-  const [LANGUAGE_OPTIONS,setLANGUAGE_OPTIONS] = useState([]);
-    useEffect(() => {
-      dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
-        const { languages = [], valueEducation = [] } = res.payload?.data || {};
+  const [VALUE_ED_OPTIONS, setVALUE_ED_OPTIONS] = useState([]);
+  const [LANGUAGE_OPTIONS, setLANGUAGE_OPTIONS] = useState([]);
+  useEffect(() => {
+    dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
+      const { languages = [], valueEducation = [] } = res.payload?.data || {};
 
-       if(languages?.length > 0 ){
-       let la= languages.map((i)=>({label:i,value:i}));
-        setLANGUAGE_OPTIONS(la)
-       }
-       if(valueEducation?.length > 0 ){
-        let va =valueEducation.map((i)=>({label:i,value:i}));
-        setVALUE_ED_OPTIONS(va)
-       }
-      })
-    }, []);
+      if (languages?.length > 0) {
+        let la = languages.map((i) => ({ label: i, value: i }));
+        setLANGUAGE_OPTIONS(la);
+      }
+      if (valueEducation?.length > 0) {
+        let va = valueEducation.map((i) => ({ label: i, value: i }));
+        setVALUE_ED_OPTIONS(va);
+      }
+    });
+  }, []);
   return (
     <div>
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
@@ -445,10 +443,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
         </Row>
       </div>
 
-
       <LanguagePreferences showThirdLang={showThirdLang} formRefs={formRefs} />
-
-
     </div>
   );
 });
