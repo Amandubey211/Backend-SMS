@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Row, Col, Checkbox, Radio, Input } from "antd";
 import { useFormikContext } from "formik";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,16 +30,15 @@ import {
   PRIMARY_CONTACT_OPTIONS,
   ENROLLMENT_STATUS_OPTIONS,
   bloodGroupOptions,
-  LANGUAGE_OPTIONS,
-  VALUE_ED_OPTIONS,
   YES_NO_OPTIONS,
 } from "../Configs/selectOptionsConfig";
+import { fetchAdmissionOptions } from "../../../../../Store/Slices/Common/User/actions/userActions";
 
 export const PhoneInputField = ({ name, icon, tooltip, placeholder }) => {
   // Use useField to bind the component to the form state
   const [field, meta, helpers] = useField(name);
   const phoneValue = field.value || "";
-
+  
   return (
     <div className="flex items-center w-full rounded hover:border-blue-500 transition-colors">
       {icon && (
@@ -226,7 +225,23 @@ const AcademicSessionCandidate = () => {
       }
     }
   }, [values.candidateInformation?.dob, setFieldValue]);
+  const { userDetails } = useSelector((store) => store.common.user);
+  const [VALUE_ED_OPTIONS,setVALUE_ED_OPTIONS] = useState([]);
+  const [LANGUAGE_OPTIONS,setLANGUAGE_OPTIONS] = useState([]);
+    useEffect(() => {
+      dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
+        const { languages = [], valueEducation = [] } = res.payload?.data || {};
 
+       if(languages?.length > 0 ){
+       let la= languages.map((i)=>({label:i,value:i}));
+        setLANGUAGE_OPTIONS(la)
+       }
+       if(valueEducation?.length > 0 ){
+        let va =valueEducation.map((i)=>({label:i,value:i}));
+        setVALUE_ED_OPTIONS(va)
+       }
+      })
+    }, []);
   return (
     <div>
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
@@ -509,12 +524,11 @@ const AcademicSessionCandidate = () => {
           <label className="font-semibold block mb-1">
             Value education preference
           </label>
-          <Radio.Group
+          <Checkbox.Group
             options={VALUE_ED_OPTIONS}
-            optionType="button"
             value={values.languagePrefs.valueEd}
             onChange={(e) =>
-              setFieldValue("languagePrefs.valueEd", e.target.value)
+              setFieldValue("languagePrefs.valueEd", e)
             }
           />
         </div>
@@ -535,7 +549,7 @@ const AcademicSessionCandidate = () => {
         {/* Medical information */}
         <div>
           <label className="font-semibold block mb-1">
-            Medical information (allergies / ailments)
+            Medical information (Allergies/Ailments)
           </label>
           <Input.TextArea
             rows={4}

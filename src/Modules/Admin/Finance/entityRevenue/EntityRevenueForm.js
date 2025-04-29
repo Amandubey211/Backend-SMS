@@ -83,8 +83,12 @@ const EntityRevenueForm = () => {
   const handleItemChange = (index, itemId) => {
     const updatedItems = [...lineItems];
     updatedItems[index].itemId = itemId;
-    updatedItems[index].itemDetails = itemId ? updatedItems[index].items.find((item) => item._id == itemId)?.name : "";
+    updatedItems[index].itemDetails = itemId ? updatedItems[index].items.find((item) => item._id === itemId)?.name : "";
+    updatedItems[index].rate = itemId ? updatedItems[index].items.find((item) => item._id === itemId)?.unitPrice : 0;
     setLineItems(updatedItems);
+    form.setFieldsValue({
+      lineItems: updatedItems
+    });
   };
 
   const handleInputChange = (index, field, value) => {
