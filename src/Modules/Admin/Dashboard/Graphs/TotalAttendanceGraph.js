@@ -148,7 +148,7 @@ const TotalAttendanceGraph = () => {
             </div> */}
             {/* Textual Information in a single row */}
             <div className="flex items-center gap-1 whitespace-nowrap">
-              <span className="text-xl font-semibold">{t("Attendance")} :</span>
+              <span className="text-xl font-semibold">{t("Attendance")}:</span>
               <span className="text-lg font-semibold">
                 {attendanceData
                   ? attendanceData.totalMaleAttendance +
