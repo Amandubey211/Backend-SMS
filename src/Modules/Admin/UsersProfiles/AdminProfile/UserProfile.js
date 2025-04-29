@@ -16,6 +16,7 @@ import ImageUpload from "../../Libary/Components/ImageUpload";
 import useCloudinaryUpload from "../../../../Hooks/CommonHooks/useCloudinaryUpload";
 import Cookies from "js-cookie";
 import { setLocalCookies } from "../../../../Utils/academivYear";
+import AdmissionOption from "./AdmissionOption";
 const UserProfile = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation('admProfile');
@@ -62,8 +63,10 @@ const UserProfile = () => {
   };
 
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [isSidebar, setSidebar] = useState(false);
   const handleSidebarOpen = () => setSidebarOpen(true);
-  const handleSidebarClose = () => setSidebarOpen(false);
+  const handleSidebar = () => setSidebar(true);
+  const handleSidebarClose = () => {setSidebarOpen(false);setSidebar(false);};
   const [showPaasword, setShowPassword] = useState(false);
   const [logo, setLogo] = useState(null);
   const [disabledlogo, setDisabledlogo] = useState(true);
@@ -116,14 +119,23 @@ const UserProfile = () => {
                   <h2 className="text-lg text-gray-600 flex flex-row items-center gap-2"> <span><LuSchool /></span>{userDetails?.schoolName}</h2>
 
                 </div>
-
+              <div className="flex flex-col items-center justify-center gap-2">
                 <button
 
                   onClick={handleSidebarOpen}
-                  className="px-4 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+                  className=" px-8 py-2 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
                   {t("Update Profile")}
                 </button>
+                <button
+
+                  onClick={handleSidebar}
+                  className="px-4 py-2 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+                >
+                Admission Options
+                </button>
+                
+                </div>
               </div>
             </div>
             <h3 className="text-lg font-semibold mb-4">{t("personalInformation")}</h3>
@@ -236,6 +248,14 @@ const UserProfile = () => {
               width="50%"
             >
               <EditAdmin data={userDetails} />
+            </SidebarSlide>
+            <SidebarSlide
+              isOpen={isSidebar}
+              onClose={handleSidebarClose}
+              title={"Admission Options"}
+              width="50%"
+            >
+              <AdmissionOption schoolId={userDetails.schoolId}/>
             </SidebarSlide>
           </div>
         </DashLayout>

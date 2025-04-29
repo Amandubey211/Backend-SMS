@@ -45,17 +45,21 @@ const ReceiptTemplate = forwardRef((props, ref) => {
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
-      <div className="flex flex-col items-center mb-6">
-        <div className="w-full bg-pink-100 px-4 flex-row py-2 flex justify-between items-center rounded-t-lg">
-          <div>
-            <h1 className="font-bold text-lg">{nameOfSchool}</h1>
-            <p className="text-sm text-gray-500">{`${city}, ${branchName}`}</p>
-          </div>
-          {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
-        </div>
-        <div className="w-full text-center text-white font-bold py-2" style={{ backgroundColor: "#C83B62", fontSize: "18px" }}>
-          Receipt {isCancel && "CANCELLED"}
-        </div>
+     <div className="flex relative h-[10rem]">
+      <div className="w-[70%] h-[10rem]  bg-[#B874FF] z-40 [clip-path:polygon(0_0,100%_0,92%_18%,0_18%)] absolute top-0 left-0">
+      </div>
+      <div className="w-[70%] h-[10rem]  absolute top-9 left-0 flex flex-col gap-1">
+      {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
+      <h1 className="font-bold text-lg">{nameOfSchool}</h1>
+      <p className="text-sm text-gray-500">{`${city}, ${branchName}`}</p>
+      </div>
+      <div className="w-[60%] h-[16rem]  bg-gradient-to-r from-[#A535FF] to-[#C83BBA] z-20 [clip-path:polygon(0_0,100%_0%,100%_29%,26%_29%)] absolute top-0 right-0">
+      </div>
+      <div className=" z-40  text-white absolute top-4 right-4 p-2  font-bold">
+        RECEIPT
+      </div>
+      <div className="w-[44%] h-[10rem]  bg-[#B874FF] z-40 [clip-path:polygon(0_0,100%_0,100%_18%,9%_18%)] absolute top-20 right-0">
+      </div>
       </div>
 
       <div className="text-sm text-gray-800 mb-4 flex justify-between">
@@ -80,13 +84,41 @@ const ReceiptTemplate = forwardRef((props, ref) => {
         </div>
       </div>
       <div className="my-4 border-t border-gray-500">
-          <p><strong>Total Paid:</strong> {totalAmount} {currency}</p>
-          <p><strong>Payment Date :</strong> {paymentDate?.slice(0,10)}</p>
-          <p><strong>Payment Type :</strong> {paymentType}</p>
-          <p><strong>Paid By:</strong> {paidBy || "Self"}</p>
-         {chequeNumber&& <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
-          {chequeDate &&<p><strong>Cheque Date:</strong> {chequeDate}</p>}
-        </div>
+  <table className="w-full text-left border border-gray-400">
+    <tbody>
+      <tr className="border-b border-gray-400">
+        <td className="font-semibold py-2 px-4 border-r border-gray-400">Total Paid:</td>
+        <td className="py-2 px-4">{totalAmount} {currency}</td>
+      </tr>
+      <tr className="border-b border-gray-400">
+        <td className="font-semibold py-2 px-4 border-r border-gray-400">Payment Date:</td>
+        <td className="py-2 px-4">{paymentDate?.slice(0, 10)}</td>
+      </tr>
+      <tr className="border-b border-gray-400">
+        <td className="font-semibold py-2 px-4 border-r border-gray-400">Payment Type:</td>
+        <td className="py-2 px-4">{paymentType}</td>
+      </tr>
+      <tr className="border-b border-gray-400">
+        <td className="font-semibold py-2 px-4 border-r border-gray-400">Paid By:</td>
+        <td className="py-2 px-4">{paidBy || "Self"}</td>
+      </tr>
+      {chequeNumber && (
+        <tr className="border-b border-gray-400">
+          <td className="font-semibold py-2 px-4 border-r border-gray-400">Cheque Number:</td>
+          <td className="py-2 px-4">{chequeNumber}</td>
+        </tr>
+      )}
+      {chequeDate && (
+        <tr className="border-b border-gray-400">
+          <td className="font-semibold py-2 px-4 border-r border-gray-400">Cheque Date:</td>
+          <td className="py-2 px-4">{chequeDate}</td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
+
 
       <div className="text-sm text-gray-700">
         <p><strong>Remarks:</strong></p>
@@ -95,6 +127,15 @@ const ReceiptTemplate = forwardRef((props, ref) => {
           <li>Thank you for your business. Contact us for any queries.</li>
         </ul>
       </div>
+      <div>
+     <div className="relative flex h-[8rem] w-full items-start">
+  <div className="absolute left-0 top-0 w-[50%] h-[11rem] bg-gradient-to-r from-[#A535FF] to-[#C83BBA] z-20 [clip-path:polygon(0_0,87%_0,100%_20%,0_20%)]">
+  </div>
+  <div className="absolute right-0 top-[.2rem] w-[70%] h-[10rem] pr-[20%] bg-[#B874FF] z-40 [clip-path:polygon(14%_0,100%_0,100%_20%,0_20%)]">
+  </div>
+</div>
+
+     </div>
     </div>
   );
 });
