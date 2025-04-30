@@ -7,6 +7,7 @@ import AcademicHistory from "./Sections/AcademicHistory";
 import AddressInformation from "./Sections/AddressInformation";
 import ParentGuardianInfo from "./Sections/ParentGuardianInfo";
 import AttachmentsUpload from "./Sections/AttachmentsUpload";
+import { useNavigate } from "react-router-dom";
 import {
   initialValues as baseInitialValues,
   baseAdminAdmissionSchema,
@@ -33,13 +34,14 @@ const FormDataWatcher = memo(({ onChange }) => {
 const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const formRefs = useRef({});
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const schoolId = useSelector(
     (state) => state.common.user.userDetails.schoolId
   );
   const { attachments: attachmentsMeta, loading } = useSelector(
     (state) => state.admin.admissionAttachment
   );
-
+  console.log(attachmentsMeta, "attachmentsMeta");
   useEffect(() => {
     dispatch(fetchSchoolAttachmentsById());
   }, [dispatch]);
@@ -75,11 +77,14 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
 
   const validateMandatoryAttachments = useCallback((values) => {
     const missing = [];
-    if (!values.profile) missing.push("Profile Picture");
+    if (!values.profile?.file) missing.push("Profile Picture");
 
+    // Check dynamic mandatory attachments
     if (values.attachments?.mandatory) {
       Object.entries(values.attachments.mandatory).forEach(([key, value]) => {
-        if (!value?.file) missing.push(key);
+        if (!value?.file) {
+          missing.push(key);
+        }
       });
     }
     return missing;
@@ -88,6 +93,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const handleFormSubmit = useCallback(
     async (values, actions) => {
       try {
+        // Validate mandatory attachments and check for any missing files
         const missingAttachments = validateMandatoryAttachments(values);
         if (missingAttachments.length > 0) {
           message.error(`Please upload: ${missingAttachments.join(", ")}`);
@@ -96,7 +102,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
 
         const formData = new FormData();
 
-        // Basic student information
+        // Add student basic information to formData
         formData.append("firstName", values.candidateInformation.firstName);
         formData.append("lastName", values.candidateInformation.lastName);
         formData.append(
@@ -122,7 +128,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         formData.append("Q_Id", values.candidateInformation.studentId);
         formData.append("nationality", values.candidateInformation.nationality);
 
-        // Academic information
+        // Add academic information to formData
         formData.append(
           "enrollmentStatus",
           values.academicSession.enrollmentStats
@@ -131,7 +137,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         formData.append("schoolId", schoolId);
         formData.append("academicYear", values.academicSession.academicYear);
 
-        // Parent/guardian information
+        // Add parent/guardian information to formData
         formData.append(
           "fatherName",
           `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
@@ -157,7 +163,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           values.guardianInformation.guardianEmail
         );
 
-        // Address information
+        // Add address information to formData
         const addressFields = [
           "unitNumber",
           "buildingNumber",
@@ -185,7 +191,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           );
         });
 
-        // Academic history
+        // Add academic history information to formData
         formData.append(
           "previousSchoolName",
           values.academicHistory.previousSchoolName
@@ -203,79 +209,54 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           values.academicHistory.sourceOfFee || "Parent"
         );
 
-        // Additional fields
-        formData.append(
-          "secondLanguage",
-          values.languagePrefs.second || []
-        );
-        formData.append("thirdLanguage", values.languagePrefs.third|| []);
+        // Add language preferences to formData
+        formData.append("secondLanguage", values.languagePrefs.second || []);
+        formData.append("thirdLanguage", values.languagePrefs.third || []);
         formData.append("valueEducation", values.languagePrefs.valueEd || []);
         formData.append(
           "isLeftHanded",
           values.languagePrefs.leftHanded ? "true" : "false"
         );
 
+        // Add medical condition information to formData
         if (values.medicalInfo) {
           formData.append("medicalCondition", values.medicalInfo);
         }
 
-        // Handle file uploads
+        // Add profile picture if available
         if (values.profile?.file) {
           formData.append("profile", values.profile.file);
         }
-
-        // Handle dynamic attachments
-        // if (values.attachments?.mandatory) {
-        //   Object.entries(values.attachments.mandatory).forEach(
-        //     ([key, value]) => {
-        //       if (value?.file) {
-        //         formData.append(
-        //           key.replace(/\s+/g, "_").toLowerCase(),
-        //           value.file
-        //         );
-        //       }
-        //     }
-        //   );
-        // }
-
-        // if (values.attachments?.optional) {
-        //   Object.entries(values.attachments.optional).forEach(
-        //     ([key, value]) => {
-        //       if (value?.file) {
-        //         formData.append(
-        //           key.replace(/\s+/g, "_").toLowerCase(),
-        //           value.file
-        //         );
-        //       }
-        //     }
-        //   );
-        // }
-
-        const addDynamic = (bucket, isMandatory) => {
-          Object.values(bucket || {}).forEach((v) => {
-            if (!v?.file) return;
-            /* 👉  use ORIGINAL label sent by backend (v.fieldName) */
-            const apiKey = v.fieldName || "attachment";
-            formData.append(apiKey, v.file);
+        const addDynamicAttachments = (bucket) => {
+          Object.values(bucket || {}).forEach((attachment) => {
+            if (attachment?.file) {
+              formData.append(attachment.fieldName, attachment.file);
+              // Include ID if needed
+              if (attachment.fieldId) {
+                formData.append(
+                  `${attachment.fieldName}_id`,
+                  attachment.fieldId
+                );
+              }
+            }
           });
         };
-        addDynamic(values.attachments?.mandatory, true);
-        addDynamic(values.attachments?.optional, false);
+        // Process both mandatory and optional attachments
+        addDynamicAttachments(values.attachments?.mandatory);
+        addDynamicAttachments(values.attachments?.optional);
 
-        console.log(formData, "fromData");
-        const registrationResponse = await dispatch(
-          registerStudentDetails(formData)
-        );
+        // Handle submission of the form data to the backend
+        dispatch(registerStudentDetails(formData, navigate));
 
-        if (registrationResponse?.success) {
-          message.success("Registration successful!");
-        } else {
-          message.error(registrationResponse?.message || "Registration failed");
-        }
+        // if (registrationResponse?.success) {
+        //   message.success("Registration successful!");
+        // } else {
+        //   message.error(registrationResponse?.message || "Registration failed");
+        // }
       } catch (error) {
-        message.error(error.response?.data?.message || "Registration error");
+        message.error(error.response?.data?.message || "Registration failed");
       } finally {
-        actions.setSubmitting(false);
+        actions.setSubmitting(false); // Ensure form submission state is reset
       }
     },
     [dispatch, schoolId, validateMandatoryAttachments]
@@ -285,7 +266,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
     <div className="bg-white rounded-md p-4">
       <Formik
         initialValues={mergedInitialValues}
-        validationSchema={mergedValidation}
+        // validationSchema={mergedValidation}
         onSubmit={handleFormSubmit}
         validateOnMount
       >
@@ -330,6 +311,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
                 }}
                 onClick={async () => {
                   const formErrors = await validateForm();
+                  console.log(formErrors, "formErrorsformErrors");
                   if (Object.keys(formErrors).length > 0) {
                     handleFormikErrorScroll(formErrors);
                     message.error("Please correct the form errors");

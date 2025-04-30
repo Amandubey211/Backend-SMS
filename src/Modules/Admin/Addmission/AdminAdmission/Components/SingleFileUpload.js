@@ -70,7 +70,7 @@ const SingleFileUpload = memo(({ label, name, onEdit, onDelete, error }) => {
         helpers.setValue({
           file: f,
           preview: pv,
-          // Ensure we store the original field name
+
           fieldName: name.split(".").pop(),
         });
         setFile(f);

@@ -12,6 +12,7 @@ const StudentInfo = memo(() => {
 
   // Use useCallback to ensure this function is memoized and doesn't cause unnecessary re-renders
   const handleFormDataChange = useCallback((data) => {
+    console.log(data , "formData");
     setFormData(data);
   }, []);
 

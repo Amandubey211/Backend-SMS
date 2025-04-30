@@ -290,15 +290,28 @@ export default function useDynamicAttachments(attachmentsMetaInput) {
 
     metaArr.forEach(({ name, mandatory }) => {
       if (name) {
-        // Ensure field names are properly formatted
-        const fieldName = name.replace(/\s+/g, "_").toLowerCase();
+        // Store the original name in fieldName and use normalized key for form state
+        const fieldName = name; // Keep original name for backend
+        const formKey = name.replace(/\s+/g, "_").toLowerCase(); // Normalized for form state
+
         initialValues.attachments[mandatory ? "mandatory" : "optional"][
-          fieldName
-        ] = null;
+          formKey
+        ] = {
+          file: null,
+          preview: null,
+          fieldName: fieldName, // Store original name here
+        };
+
         schemaShape[
-          `attachments.${mandatory ? "mandatory" : "optional"}.${fieldName}`
+          `attachments.${mandatory ? "mandatory" : "optional"}.${formKey}`
         ] = mandatory
-          ? Yup.mixed().required(`${name} is required`)
+          ? Yup.mixed().test(
+              "file-required",
+              `${name} is required`,
+              (value) => {
+                return value?.file !== null && value?.file !== undefined;
+              }
+            )
           : Yup.mixed().nullable();
       }
     });
