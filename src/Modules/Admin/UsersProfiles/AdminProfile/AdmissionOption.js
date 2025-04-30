@@ -30,9 +30,9 @@ export default function AdmissionOption({ schoolId, onClose }) {
 
   useEffect(() => {
     // Setting the default languages for second and third languages
-    setSecondLanguages(["Arabic", "English"]);  // Default second languages
-    setThirdLanguages(["Hindi", "French"]);    // Default third languages
-    setValueEducation(["Moral Science"]);      // Default value education theme
+    setSecondLanguages([]);  // Default second languages
+    setThirdLanguages([]);    // Default third languages
+    setValueEducation([]);      // Default value education theme
     dispatch(fetchAdmissionOptions(schoolId)).then((res) => {
       const { languageOptions = {}, valueEducation = [] } = res.payload?.data || {};
       setSecondLanguages(prevState => [...prevState, ...languageOptions?.secondLanguages || []]);
