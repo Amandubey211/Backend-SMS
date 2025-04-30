@@ -285,6 +285,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Place of Birth"
                 placeholder="Place of Birth"
+                allowCustom
                 options={PLACE_OF_BIRTH_OPTIONS}
               />
             </div>
@@ -295,6 +296,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 tooltip="Nationality"
                 placeholder="Nationality"
                 options={NATIONALITY_OPTIONS}
+                allowCustom
                 ref={(el) =>
                   (formRefs.current["candidateInformation.nationality"] = el)
                 }
@@ -310,6 +312,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Religion"
                 placeholder="Religion"
+                allowCustom
                 options={RELIGION_OPTIONS}
               />
             </div>
