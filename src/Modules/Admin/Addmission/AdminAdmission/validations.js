@@ -103,7 +103,6 @@ import * as Yup from "yup";
 //     guardianEmail: "",
 //   },
 //   profile: null,
-//   studentPicture: null,
 // };
 
 export const initialValues = {
@@ -210,7 +209,24 @@ export const initialValues = {
   profile: "", // Placeholder for profile picture file
 };
 
-export const AdminAdmissionSchema = Yup.object().shape({
+export const baseAdminAdmissionSchema = Yup.object().shape({
+  candidateInformation: Yup.object().shape({
+    firstName: Yup.string().required("First name is required"),
+    lastName: Yup.string().required("Last name is required"),
+    dob: Yup.date().required("Date of birth is required"),
+    gender: Yup.string().required("Gender is required"),
+    phoneNumber: Yup.string().required("Phone number is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
+    emergencyNumber: Yup.string().required("Emergency number is required"),
+    bloodGroup: Yup.string().required("Blood group is required"),
+    studentId: Yup.string().required("Student ID is required"),
+    nationality: Yup.string().required("Nationality is required"),
+  }),
+  academicSession: Yup.object().shape({
+    academicYear: Yup.string().required("Academic year is required"),
+    class: Yup.string().required("Class is required"),
+    enrollmentStats: Yup.string().required("Enrollment status is required"),
+  }),
   fatherInfo: Yup.object().shape({
     idNumber: Yup.string().required("Father ID is required"),
     idExpiry: Yup.date().required("Father ID expiry is required"),
@@ -219,7 +235,6 @@ export const AdminAdmissionSchema = Yup.object().shape({
     cell1: Yup.object()
       .shape({
         value: Yup.string().required("Father primary contact is required"),
-        isWhatsapp: Yup.boolean(),
       })
       .required("Father primary contact is required"),
     email1: Yup.string()
@@ -234,33 +249,8 @@ export const AdminAdmissionSchema = Yup.object().shape({
     cell1: Yup.object()
       .shape({
         value: Yup.string().required("Mother primary contact is required"),
-        isWhatsapp: Yup.boolean(),
       })
       .required("Mother primary contact is required"),
-  }),
-  academicSession: Yup.object().shape({
-    academicYear: Yup.string().required("Academic year is required"),
-    class: Yup.string().required("Class is required"),
-    enrollmentStats: Yup.string().required("Enrollment status is required"),
-  }),
-  candidateInformation: Yup.object().shape({
-    studentId: Yup.string().required("Student ID is required"),
-    firstName: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
-    dob: Yup.date().required("Date of birth is required"),
-    gender: Yup.string().required("Gender is required"),
-    nationality: Yup.string().required("Nationality is required"),
-    phoneNumber: Yup.string().required("Phone number is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    emergencyNumber: Yup.string().required("Emergency number is required"),
-    bloodGroup: Yup.string().required("Blood group is required"),
-  }),
-  academicHistory: Yup.object().shape({
-    previousSchoolName: Yup.string().required(
-      "Previous school name is required"
-    ),
-    previousClass: Yup.string().required("Previous class is required"),
-    curriculum: Yup.string().required("Curriculum is required"),
   }),
   addressInformation: Yup.object().shape({
     unitNumber: Yup.string().required("Unit number is required"),
@@ -280,7 +270,6 @@ export const AdminAdmissionSchema = Yup.object().shape({
       .email("Invalid email")
       .required("Guardian email is required"),
   }),
-  profile: Yup.mixed().required("Profile picture is required"),
 });
 
 export default function useDynamicAttachments(attachmentsMetaInput) {
@@ -297,9 +286,7 @@ export default function useDynamicAttachments(attachmentsMetaInput) {
       },
     };
 
-    const schemaShape = {
-      profile: Yup.mixed().required("Profile picture is required"),
-    };
+    const schemaShape = {};
 
     metaArr.forEach(({ name, mandatory }) => {
       if (name) {
