@@ -87,7 +87,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
 
   const classOptions = useMemo(
     () =>
-      classes.map((cls) => ({
+      classes?.map((cls) => ({
         label: cls.className,
         value: cls._id,
       })),
@@ -96,7 +96,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
 
   const showThirdLang = useMemo(() => {
     const clsLabel =
-      classOptions.find((c) => c.value === values.academicSession.class)
+      classOptions?.find((c) => c.value === values.academicSession.class)
         ?.label || "";
     const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
     return gradeNum >= 3;

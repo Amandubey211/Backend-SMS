@@ -1,18 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { Input, Button, Space, Typography, Select } from "antd";
+import { Input, Button, Space, Select } from "antd";
 import { fetchAdmissionOptions, updateAdmissionOptions } from "../../../../Store/Slices/Common/User/actions/userActions";
 
 const { Option } = Select;
 
-export default function AdmissionOption({ schoolId ,onclose}) {
-  const [languages, setLanguages] = useState([]);
+export default function AdmissionOption({ schoolId, onClose }) {
+  const [secondLanguages, setSecondLanguages] = useState([]);
+  const [thirdLanguages, setThirdLanguages] = useState([]);
+  const [newSecondLanguage, setNewSecondLanguage] = useState(""); // For custom second language
+  const [newThirdLanguage, setNewThirdLanguage] = useState(""); // For custom third language
   const [valueEducation, setValueEducation] = useState([]);
-  const [newLanguage, setNewLanguage] = useState(""); // For custom languages
   const [newValueEducation, setNewValueEducation] = useState(""); // For custom value education
   const dispatch = useDispatch();
 
-  // Universal lists for languages and value education
+  // Universal lists for value education
+  const valueEducationOptions = [
+    "Moral Science", "Islamic Studies", "Christian Studies", 
+    "Ethics / Life Skills", "Other"
+  ];
+
+  // Static list of language options
   const languageOptions = [
     "Arabic", "Hindi", "Urdu", "Malayalam", "Tamil", "French", 
     "Bengali", "Tagalog (Filipino)", "Punjabi", "English", 
@@ -20,16 +28,16 @@ export default function AdmissionOption({ schoolId ,onclose}) {
     "German", "Mandarin"
   ];
 
-  const valueEducationOptions = [
-    "Moral Science", "Islamic Studies", "Christian Studies", 
-    "Ethics / Life Skills", "Other"
-  ];
-
   useEffect(() => {
+    // Setting the default languages for second and third languages
+    setSecondLanguages(["Arabic", "English"]);  // Default second languages
+    setThirdLanguages(["Hindi", "French"]);    // Default third languages
+    setValueEducation(["Moral Science"]);      // Default value education theme
     dispatch(fetchAdmissionOptions(schoolId)).then((res) => {
-      const { languages = [], valueEducation = [] } = res.payload?.data || {};
-      setLanguages(languages);
-      setValueEducation(valueEducation);
+      const { languageOptions = {}, valueEducation = [] } = res.payload?.data || {};
+      setSecondLanguages(prevState => [...prevState, ...languageOptions?.secondLanguages || []]);
+      setThirdLanguages(prevState => [...prevState, ...languageOptions?.thirdLanguages || []]);
+      setValueEducation(prevState => [...prevState, ...valueEducation]);
     });
   }, [dispatch, schoolId]);
 
@@ -37,25 +45,38 @@ export default function AdmissionOption({ schoolId ,onclose}) {
     dispatch(updateAdmissionOptions({
       schoolId,
       admissionOptions: {
-        languages,
+        languageOptions: {
+          secondLanguages,
+          thirdLanguages
+        },
         valueEducation
       }
-    })).then(()=>onclose());
-
+    })).then(() => onClose());
   };
 
-  const handleLanguageChange = (selectedLanguages) => {
-    setLanguages(selectedLanguages);
+  const handleSecondLanguageChange = (selectedLanguages) => {
+    setSecondLanguages(selectedLanguages);
+  };
+
+  const handleThirdLanguageChange = (selectedLanguages) => {
+    setThirdLanguages(selectedLanguages);
   };
 
   const handleValueEducationChange = (selectedValues) => {
     setValueEducation(selectedValues);
   };
 
-  const handleAddCustomLanguage = () => {
-    if (newLanguage.trim() && !languages.includes(newLanguage)) {
-      setLanguages([...languages, newLanguage.trim()]);
-      setNewLanguage(""); // Clear the input
+  const handleAddCustomSecondLanguage = () => {
+    if (newSecondLanguage.trim() && !secondLanguages.includes(newSecondLanguage)) {
+      setSecondLanguages([...secondLanguages, newSecondLanguage.trim()]);
+      setNewSecondLanguage(""); // Clear the input
+    }
+  };
+
+  const handleAddCustomThirdLanguage = () => {
+    if (newThirdLanguage.trim() && !thirdLanguages.includes(newThirdLanguage)) {
+      setThirdLanguages([...thirdLanguages, newThirdLanguage.trim()]);
+      setNewThirdLanguage(""); // Clear the input
     }
   };
 
@@ -73,22 +94,44 @@ export default function AdmissionOption({ schoolId ,onclose}) {
         <Select
           mode="multiple"
           style={{ width: "100%" }}
-          placeholder="Select languages"
-          value={languages}
-          onChange={handleLanguageChange}
+          placeholder="Select second languages"
+          value={secondLanguages}
+          onChange={handleSecondLanguageChange}
         >
           {languageOptions.map((language) => (
             <Option key={language} value={language}>{language}</Option>
           ))}
         </Select>
         <Input
-          value={newLanguage}
-          onChange={(e) => setNewLanguage(e.target.value)}
-          placeholder="Add custom language"
+          value={newSecondLanguage}
+          onChange={(e) => setNewSecondLanguage(e.target.value)}
+          placeholder="Add custom second language"
           style={{ marginTop: 10 }}
         />
-        <Button onClick={handleAddCustomLanguage} className="mt-2">
-          Add Custom Language
+        <Button onClick={handleAddCustomSecondLanguage} className="mt-2">
+          Add Custom Second Language
+        </Button>
+
+        <p className="font-semibold text-gray-700">Specify Available Third Languages for Students</p>
+        <Select
+          mode="multiple"
+          style={{ width: "100%" }}
+          placeholder="Select third languages"
+          value={thirdLanguages}
+          onChange={handleThirdLanguageChange}
+        >
+          {languageOptions.map((language) => (
+            <Option key={language} value={language}>{language}</Option>
+          ))}
+        </Select>
+        <Input
+          value={newThirdLanguage}
+          onChange={(e) => setNewThirdLanguage(e.target.value)}
+          placeholder="Add custom third language"
+          style={{ marginTop: 10 }}
+        />
+        <Button onClick={handleAddCustomThirdLanguage} className="mt-2">
+          Add Custom Third Language
         </Button>
 
         <p className="font-semibold text-gray-700">Specify Core Value Education Themes</p>

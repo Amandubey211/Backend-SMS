@@ -255,7 +255,7 @@ const UserProfile = () => {
               title={"Admission Options"}
               width="50%"
             >
-              <AdmissionOption schoolId={userDetails.schoolId} onclose={handleSidebarClose}/>
+              <AdmissionOption schoolId={userDetails.schoolId} onClose={handleSidebarClose}/>
             </SidebarSlide>
           </div>
         </DashLayout>
