@@ -119,7 +119,7 @@ const PayrollTemplate = forwardRef((props, ref) => {
           <p><strong>Payment Date :</strong> {paymentDate?.slice(0,10)}</p>
           <p><strong>Payment Method :</strong> {paymentType}</p>
          {chequeNumber&& <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
-          {chequeDate &&<p><strong>Cheque Date:</strong> {chequeDate}</p>}
+          {chequeDate &&<p><strong>Cheque Date:</strong> {chequeDate?.slice(0,10)}</p>}
         </div>}
 
         </div>

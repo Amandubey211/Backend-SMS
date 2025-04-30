@@ -152,7 +152,7 @@ const EditOperationalExpenses = ({ data }) => {
                   <Form.Item label="Payment Date" required>
                     <DatePicker
                       type="date"
-                      value={receiptData?.paymentDate || ""}
+                      value={receiptData?.paymentDate ? dayjs(receiptData?.paymentDate) : null}
                       className="w-full h-[2rem] border border-gray-300 rounded-lg p-2"
                       onChange={(e) => handleReceiptChange("paymentDate", e)}
                       disabledDate={(current) =>
@@ -177,7 +177,7 @@ const EditOperationalExpenses = ({ data }) => {
                         <DatePicker
                           type="date"
                           className="w-full h-[2rem] border border-gray-300 rounded-lg p-2"
-                          value={receiptData?.chequeDate?.split("T")[0] || ""}
+                          value={receiptData?.chequeDate ? dayjs(receiptData?.chequeDate) : null}
                           onChange={(e) => handleReceiptChange("chequeDate", e)}
                           disabledDate={(current) =>
                             current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))

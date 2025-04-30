@@ -34,6 +34,12 @@ const SummaryRevenueList = () => {
     dispatch(fetchAllEntityRevenue({ page: 1, search: value, limit: computedPageSize }));
   };
   const [selectedIds, setSelectedIds] = useState([]);
+  const handelselectinvoice = (record)=>{
+ 
+      setSelectedInvoice(record);
+      setInvoiceVisible(true)
+   
+  }
   const columns = [
     {
       title: "Invoice",
@@ -95,10 +101,7 @@ const SummaryRevenueList = () => {
      
         return (
         <div className="flex items-center flex-row gap-2">
-        <button title="Invoice" onClick={()=>{
-          setSelectedInvoice(record);
-          setInvoiceVisible(true)
-        }}><FaFileInvoice size={20}/></button>
+        <button title="Invoice" onClick={()=>handelselectinvoice(record)}><FaFileInvoice size={20}/></button>
        {
         record?.history?.length > 0 && record?.paymentStatus == "Unpaid" && !record?.isCancel ?
          <button title="Cancel" onClick={()=>dispatch(cancelEntityRevenue(record))}><MdCancel size={20}/> </button>:''
@@ -268,14 +271,13 @@ const navigate = useNavigate();
                           <div className="w-[80%]">
                           <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
                           </div>
-                          {/* <div className="w-[20%]">
+                           <div className="w-[20%]">
                           <div className="px-4 py-2  font-semibold rounded-md  flex items-center justify-center mb-2 gap-2" >History <FaHistory /></div>
-                          <div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice(selectedInvoice)}}>
-                            {selectedInvoice?.generateDate?.slice(0,10)}
-                            <p className="text-xs">currency Verion </p>
+                          <div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice({...selectedInvoice,lineItems:selectedInvoice?.currentItmes?.length > 0 ?selectedInvoice?.currentItmes:selectedInvoice?.lineItems})}}>
+                            <p className="text-md">Current Verion</p>
                              </div>
-                            {selectedInvoice?.history?.map((i)=>(<div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice(i?.oldData)}}>{i?.updatedAt?.slice(0,10)}</div>))}
-                          </div> */}
+                            {selectedInvoice?.history?.map((i)=>(<div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice({...selectedInvoice,lineItems:i?.oldData?.lineItems,currentItmes:selectedInvoice?.lineItems})}}>{i?.updatedAt?.slice(11,16)}, {i?.updatedAt?.slice(0,10)}</div>))}
+                          </div> 
                           </div>
                         </div>
                       </div>
