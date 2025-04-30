@@ -15,13 +15,10 @@ import CompactIconDatePicker from "../Components/CompactIconDatePicker";
 import CompactIconSelect from "../Components/CompactIconSelect";
 import CompactPhoneInputWithWhatsApp from "../Components/CompactPhoneInputWithWhatsApp ";
 
-const religionOptions = [
-  { label: "Islam", value: "Islam" },
-  { label: "Christianity", value: "Christianity" },
-  { label: "Hinduism", value: "Hinduism" },
-  { label: "Buddhism", value: "Buddhism" },
-  { label: "Judaism", value: "Judaism" },
-];
+import {
+  NATIONALITY_OPTIONS,
+  RELIGION_OPTIONS,
+} from "../Configs/selectOptionsConfig";
 
 const ParentGuardianInfo = () => {
   return (
@@ -89,7 +86,8 @@ const ParentGuardianInfo = () => {
                 icon={<GlobalOutlined />}
                 tooltip="Father's Religion"
                 placeholder="Religion"
-                options={religionOptions}
+                allowCustom
+                options={RELIGION_OPTIONS}
               />
             </Col>
           </Row>
@@ -100,11 +98,8 @@ const ParentGuardianInfo = () => {
                 icon={<GlobalOutlined />}
                 tooltip="Father's Nationality"
                 placeholder="Nationality"
-                options={[
-                  { label: "Qatari", value: "qatari" },
-                  { label: "Egyptian", value: "egyptian" },
-                  { label: "Indian", value: "indian" },
-                ]}
+                allowCustom
+                options={NATIONALITY_OPTIONS}
               />
             </Col>
             <Col xs={24} md={8}>
@@ -226,7 +221,8 @@ const ParentGuardianInfo = () => {
                 icon={<GlobalOutlined />}
                 tooltip="Mother's Religion"
                 placeholder="Religion"
-                options={religionOptions}
+                allowCustom
+                options={RELIGION_OPTIONS}
               />
             </Col>
           </Row>
@@ -236,12 +232,9 @@ const ParentGuardianInfo = () => {
                 name="motherInfo.nationality"
                 icon={<GlobalOutlined />}
                 tooltip="Mother's Nationality"
+                allowCustom
                 placeholder="Nationality"
-                options={[
-                  { label: "Qatari", value: "qatari" },
-                  { label: "Egyptian", value: "egyptian" },
-                  { label: "Indian", value: "indian" },
-                ]}
+                options={NATIONALITY_OPTIONS}
               />
             </Col>
             <Col xs={24} md={8}>
