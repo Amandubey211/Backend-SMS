@@ -111,7 +111,7 @@ export const initialValues = {
     middleName: "Doe",
     lastName: "Smith",
     dob: "2005-05-15", // Format: YYYY-MM-DD
-    gender: "Male",
+    gender: "male",
     placeOfBirth: "New York",
     bloodGroup: "O+",
     nationality: "American",
