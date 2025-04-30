@@ -246,7 +246,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         addDynamicAttachments(values.attachments?.optional);
 
         // Handle submission of the form data to the backend
-        dispatch(registerStudentDetails(formData, navigate));
+        dispatch(registerStudentDetails({ formData, navigate }));
 
         // if (registrationResponse?.success) {
         //   message.success("Registration successful!");

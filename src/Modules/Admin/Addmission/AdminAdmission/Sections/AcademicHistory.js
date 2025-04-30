@@ -104,8 +104,8 @@ const AcademicHistory = memo(({ formRefs, errors, touched }) => {
               tooltip="Source of Fee"
               placeholder="Source of Fee"
               options={[
-                { label: "Parent", value: "parent" },
-                { label: "Company", value: "company" },
+                { label: "Parent", value: "Parent" },
+                { label: "Company", value: "Company" },
               ]}
             />
           </Col>
