@@ -70,7 +70,6 @@ const SingleFileUpload = memo(({ label, name, onEdit, onDelete, error }) => {
         helpers.setValue({
           file: f,
           preview: pv,
-          // Ensure we store the original field name
           fieldName: name.split(".").pop(),
         });
         setFile(f);
@@ -138,8 +137,8 @@ const SingleFileUpload = memo(({ label, name, onEdit, onDelete, error }) => {
           </Popover>
 
           <Tooltip title={label}>
-            <div className="w-1/3 px-3 py-2 bg-gray-50 h-10 flex items-center border-x border-gray-300">
-              <span className="truncate">{truncateText(label, 20)}</span>
+            <div className="w-[60%] px-3 py-2 bg-gray-50 h-10 flex items-center border-x border-gray-300">
+              <span className="truncate">{truncateText(label, 140)}</span>
             </div>
           </Tooltip>
 

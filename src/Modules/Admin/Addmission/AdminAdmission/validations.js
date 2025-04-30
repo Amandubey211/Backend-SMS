@@ -1,213 +1,213 @@
 import { useMemo } from "react";
 import * as Yup from "yup";
 
-// export const initialValues = {
-//   candidateInformation: {
-//     firstName: "",
-//     middleName: "",
-//     lastName: "",
-//     dob: "",
-//     gender: "",
-//     placeOfBirth: "",
-//     bloodGroup: "",
-//     nationality: "",
-//     religion: "",
-//     passportNumber: "",
-//     passportExpiry: "",
-//     studentId: "",
-//     idExpiry: "",
-//     nativeLanguage: "",
-//     primaryContact: "",
-//     phoneNumber: "",
-//     email: "",
-//     emergencyNumber: "",
-//     age: "",
-//   },
-//   academicSession: {
-//     academicYear: "",
-//     class: "",
-//     enrollmentStats: "Full Time",
-//   },
-//   academicHistory: {
-//     previousSchoolName: "",
-//     previousClass: "",
-//     curriculum: "",
-//     lastDayAtSchool: "",
-//     sourceOfFee: "Parent",
-//   },
-//   languagePrefs: {
-//     second: [],
-//     third: [],
-//     valueEd: "",
-//     leftHanded: false,
-//   },
-//   medicalInfo: "",
-//   addressInformation: {
-//     residenceType: "flat",
-//     unitNumber: "",
-//     buildingNumber: "",
-//     streetNumber: "",
-//     streetName: "",
-//     zone: "",
-//     dwellingType: "compound",
-//     compoundName: "",
-//     city: "",
-//     nearestLandmark: "",
-//     proposedCampus: "",
-//     transportRequired: true,
-//     postalCode: "",
-//     state: "",
-//     country: "",
-//   },
-//   fatherInfo: {
-//     idNumber: "",
-//     idExpiry: "",
-//     fatherPhoto: null,
-//     firstName: "",
-//     middleName: "",
-//     lastName: "",
-//     religion: "",
-//     nationality: "",
-//     company: "",
-//     jobTitle: "",
-//     cell1: { value: "", isWhatsapp: false },
-//     cell2: { value: "", isWhatsapp: false },
-//     email1: "",
-//     email2: "",
-//     workPhone: "",
-//     homePhone: "",
-//   },
-//   motherInfo: {
-//     idNumber: "",
-//     profileImage: null,
-//     motherPhoto: null,
-//     idExpiry: "",
-//     firstName: "",
-//     middleName: "",
-//     lastName: "",
-//     religion: "",
-//     nationality: "",
-//     company: "",
-//     jobTitle: "",
-//     cell1: { value: "", isWhatsapp: false },
-//     cell2: { value: "", isWhatsapp: false },
-//     workPhone: "",
-//     homePhone: "",
-//     email1: "",
-//     email2: "",
-//   },
-//   guardianInformation: {
-//     guardianName: "",
-//     guardianRelationToStudent: "",
-//     guardianContactNumber: "",
-//     guardianEmail: "",
-//   },
-//   profile: null,
-// };
-
 export const initialValues = {
   candidateInformation: {
-    firstName: "John",
-    middleName: "Doe",
-    lastName: "Smith",
-    dob: "2005-05-15", // Format: YYYY-MM-DD
-    gender: "male",
-    placeOfBirth: "New York",
-    bloodGroup: "O+",
-    nationality: "American",
-    religion: "Christian",
-    passportNumber: "1234567890",
-    passportExpiry: "2030-12-31", // Format: YYYY-MM-DD
-    studentId: "S12345",
-    idExpiry: "2025-05-15", // Format: YYYY-MM-DD
-    nativeLanguage: "English",
-    primaryContact: "Father",
-    phoneNumber: "+1234567890",
-    email: "john.doe@example.com",
-    emergencyNumber: "+0987654321",
-    age: "18",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    dob: "",
+    gender: "",
+    placeOfBirth: "",
+    bloodGroup: "",
+    nationality: "",
+    religion: "",
+    passportNumber: "",
+    passportExpiry: "",
+    studentId: "",
+    idExpiry: "",
+    nativeLanguage: "",
+    primaryContact: "",
+    phoneNumber: "",
+    email: "",
+    emergencyNumber: "",
+    age: "",
   },
   academicSession: {
-    academicYear: "2024-2025",
-    class: "Grade 12",
+    academicYear: "",
+    class: "",
     enrollmentStats: "Full Time",
   },
   academicHistory: {
-    previousSchoolName: "XYZ High School",
-    previousClass: "Grade 11",
-    curriculum: "CBSE",
-    lastDayAtSchool: "2024-04-30", // Format: YYYY-MM-DD
+    previousSchoolName: "",
+    previousClass: "",
+    curriculum: "",
+    lastDayAtSchool: "",
     sourceOfFee: "Parent",
   },
   languagePrefs: {
-    second: ["French", "Spanish"], // Array of selected second languages
-    third: ["German"], // Array of selected third languages (for grade 3+)
-    valueEd: "moral", // "moral" or "islamic"
-    leftHanded: false, // boolean
+    second: [],
+    third: [],
+    valueEd: "",
+    leftHanded: false,
   },
-  medicalInfo: "Asthma, allergy to peanuts", // ⬅️ free-text
+  medicalInfo: "",
   addressInformation: {
-    residenceType: "flat", // "flat" or "villa"
-    unitNumber: "5B",
-    buildingNumber: "120",
-    streetNumber: "15",
-    streetName: "Main St.",
-    zone: "North",
-    dwellingType: "compound", // "compound" or "standAlone"
-    compoundName: "Sunny Meadows",
-    city: "New York",
-    nearestLandmark: "Central Park",
-    proposedCampus: "Downtown Campus",
+    residenceType: "flat",
+    unitNumber: "",
+    buildingNumber: "",
+    streetNumber: "",
+    streetName: "",
+    zone: "",
+    dwellingType: "compound",
+    compoundName: "",
+    city: "",
+    nearestLandmark: "",
+    proposedCampus: "",
     transportRequired: true,
-    postalCode: "10001",
-    state: "NY",
-    country: "USA",
+    postalCode: "",
+    state: "",
+    country: "",
   },
   fatherInfo: {
-    idNumber: "F123456789",
-    idExpiry: "2035-12-31", // Format: YYYY-MM-DD
-    fatherPhoto: null, // Placeholder for photo upload
-    firstName: "Michael",
-    middleName: "James",
-    lastName: "Doe",
-    religion: "Christian",
-    nationality: "American",
-    company: "ABC Corp",
-    jobTitle: "Manager",
-    cell1: { value: "+1234567890", isWhatsapp: true },
-    cell2: { value: "+0987654321", isWhatsapp: false },
-    email1: "michael.doe@example.com",
-    email2: "michael.doe@company.com",
-    workPhone: "+11234567890",
-    homePhone: "+1234567890",
+    idNumber: "",
+    idExpiry: "",
+    fatherPhoto: null,
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    religion: "",
+    nationality: "",
+    company: "",
+    jobTitle: "",
+    cell1: { value: "", isWhatsapp: false },
+    cell2: { value: "", isWhatsapp: false },
+    email1: "",
+    email2: "",
+    workPhone: "",
+    homePhone: "",
   },
   motherInfo: {
-    idNumber: "M123456789",
-    profileImage: null, // Placeholder for mother profile image upload
-    motherPhoto: null, // Placeholder for mother photo upload
-    idExpiry: "2035-12-31", // Format: YYYY-MM-DD
-    firstName: "Sarah",
-    middleName: "Lee",
-    lastName: "Doe",
-    religion: "Christian",
-    nationality: "American",
-    company: "XYZ Ltd",
-    jobTitle: "Teacher",
-    cell1: { value: "+1234567890", isWhatsapp: true },
-    cell2: { value: "+0987654321", isWhatsapp: false },
-    workPhone: "+11234567890",
-    homePhone: "+1234567890",
-    email1: "sarah.doe@example.com",
-    email2: "sarah.doe@xyz.com",
+    idNumber: "",
+    profileImage: null,
+    motherPhoto: null,
+    idExpiry: "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    religion: "",
+    nationality: "",
+    company: "",
+    jobTitle: "",
+    cell1: { value: "", isWhatsapp: false },
+    cell2: { value: "", isWhatsapp: false },
+    workPhone: "",
+    homePhone: "",
+    email1: "",
+    email2: "",
   },
   guardianInformation: {
-    guardianName: "Elizabeth Smith",
-    guardianRelationToStudent: "Aunt",
-    guardianContactNumber: "+1122334455",
-    guardianEmail: "elizabeth.smith@example.com",
+    guardianName: "",
+    guardianRelationToStudent: "",
+    guardianContactNumber: "",
+    guardianEmail: "",
   },
-  profile: "", // Placeholder for profile picture file
+  profile: null,
 };
+
+// export const initialValues = {
+//   candidateInformation: {
+//     firstName: "John",
+//     middleName: "Doe",
+//     lastName: "Smith",
+//     dob: "2005-05-15", // Format: YYYY-MM-DD
+//     gender: "male",
+//     placeOfBirth: "New York",
+//     bloodGroup: "O+",
+//     nationality: "American",
+//     religion: "Christian",
+//     passportNumber: "1234567890",
+//     passportExpiry: "2030-12-31", // Format: YYYY-MM-DD
+//     studentId: "S12345",
+//     idExpiry: "2025-05-15", // Format: YYYY-MM-DD
+//     nativeLanguage: "English",
+//     primaryContact: "Father",
+//     phoneNumber: "+1234567890",
+//     email: "john.doe@example.com",
+//     emergencyNumber: "+0987654321",
+//     age: "18",
+//   },
+//   academicSession: {
+//     academicYear: "2024-2025",
+//     class: "Grade 12",
+//     enrollmentStats: "Full Time",
+//   },
+//   academicHistory: {
+//     previousSchoolName: "XYZ High School",
+//     previousClass: "Grade 11",
+//     curriculum: "CBSE",
+//     lastDayAtSchool: "2024-04-30", // Format: YYYY-MM-DD
+//     sourceOfFee: "Parent",
+//   },
+//   languagePrefs: {
+//     second: ["French", "Spanish"], // Array of selected second languages
+//     third: ["German"], // Array of selected third languages (for grade 3+)
+//     valueEd: "moral", // "moral" or "islamic"
+//     leftHanded: false, // boolean
+//   },
+//   medicalInfo: "Asthma, allergy to peanuts", // ⬅️ free-text
+//   addressInformation: {
+//     residenceType: "flat", // "flat" or "villa"
+//     unitNumber: "5B",
+//     buildingNumber: "120",
+//     streetNumber: "15",
+//     streetName: "Main St.",
+//     zone: "North",
+//     dwellingType: "compound", // "compound" or "standAlone"
+//     compoundName: "Sunny Meadows",
+//     city: "New York",
+//     nearestLandmark: "Central Park",
+//     proposedCampus: "Downtown Campus",
+//     transportRequired: true,
+//     postalCode: "10001",
+//     state: "NY",
+//     country: "USA",
+//   },
+//   fatherInfo: {
+//     idNumber: "F123456789",
+//     idExpiry: "2035-12-31", // Format: YYYY-MM-DD
+//     fatherPhoto: null, // Placeholder for photo upload
+//     firstName: "Michael",
+//     middleName: "James",
+//     lastName: "Doe",
+//     religion: "Christian",
+//     nationality: "American",
+//     company: "ABC Corp",
+//     jobTitle: "Manager",
+//     cell1: { value: "+1234567890", isWhatsapp: true },
+//     cell2: { value: "+0987654321", isWhatsapp: false },
+//     email1: "michael.doe@example.com",
+//     email2: "michael.doe@company.com",
+//     workPhone: "+11234567890",
+//     homePhone: "+1234567890",
+//   },
+//   motherInfo: {
+//     idNumber: "M123456789",
+//     profileImage: null, // Placeholder for mother profile image upload
+//     motherPhoto: null, // Placeholder for mother photo upload
+//     idExpiry: "2035-12-31", // Format: YYYY-MM-DD
+//     firstName: "Sarah",
+//     middleName: "Lee",
+//     lastName: "Doe",
+//     religion: "Christian",
+//     nationality: "American",
+//     company: "XYZ Ltd",
+//     jobTitle: "Teacher",
+//     cell1: { value: "+1234567890", isWhatsapp: true },
+//     cell2: { value: "+0987654321", isWhatsapp: false },
+//     workPhone: "+11234567890",
+//     homePhone: "+1234567890",
+//     email1: "sarah.doe@example.com",
+//     email2: "sarah.doe@xyz.com",
+//   },
+//   guardianInformation: {
+//     guardianName: "Elizabeth Smith",
+//     guardianRelationToStudent: "Aunt",
+//     guardianContactNumber: "+1122334455",
+//     guardianEmail: "elizabeth.smith@example.com",
+//   },
+//   profile: "", // Placeholder for profile picture file
+// };
 
 export const baseAdminAdmissionSchema = Yup.object().shape({
   candidateInformation: Yup.object().shape({
@@ -290,15 +290,28 @@ export default function useDynamicAttachments(attachmentsMetaInput) {
 
     metaArr.forEach(({ name, mandatory }) => {
       if (name) {
-        // Ensure field names are properly formatted
-        const fieldName = name.replace(/\s+/g, "_").toLowerCase();
+        // Store the original name in fieldName and use normalized key for form state
+        const fieldName = name; // Keep original name for backend
+        const formKey = name.replace(/\s+/g, "_").toLowerCase(); // Normalized for form state
+
         initialValues.attachments[mandatory ? "mandatory" : "optional"][
-          fieldName
-        ] = null;
+          formKey
+        ] = {
+          file: null,
+          preview: null,
+          fieldName: fieldName, // Store original name here
+        };
+
         schemaShape[
-          `attachments.${mandatory ? "mandatory" : "optional"}.${fieldName}`
+          `attachments.${mandatory ? "mandatory" : "optional"}.${formKey}`
         ] = mandatory
-          ? Yup.mixed().required(`${name} is required`)
+          ? Yup.mixed().test(
+              "file-required",
+              `${name} is required`,
+              (value) => {
+                return value?.file !== null && value?.file !== undefined;
+              }
+            )
           : Yup.mixed().nullable();
       }
     });

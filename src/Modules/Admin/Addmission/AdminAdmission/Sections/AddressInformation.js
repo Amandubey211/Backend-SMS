@@ -1,5 +1,5 @@
 import React from "react";
-import { Row, Col, Radio, Switch, Form } from "antd";
+import { Row, Col, Radio, Form } from "antd";
 import {
   HomeOutlined,
   NumberOutlined,
@@ -23,8 +23,8 @@ const AddressInformation = () => {
 
       {/* Content Wrapper with background */}
       <div className="p-3">
-        {/* Row 1: Radio Button Group (Flat/Villa), Unit #, Building # */}
-        <Row gutter={[16, 16]}>
+        {/* First Row: Residence Type, Dwelling Type, Transport Required */}
+        <Row gutter={[16, 16]} className="mb-4">
           <Col xs={24} md={8}>
             <Form.Item label="Residence Type" className="mb-2">
               <Radio.Group
@@ -37,6 +37,34 @@ const AddressInformation = () => {
               </Radio.Group>
             </Form.Item>
           </Col>
+          <Col xs={24} md={8}>
+            <Form.Item label="Dwelling Type" className="mb-2">
+              <Radio.Group
+                name="addressInformation.dwellingType"
+                optionType="button"
+                buttonStyle="solid"
+              >
+                <Radio.Button value="compound">Compound</Radio.Button>
+                <Radio.Button value="standAlone">Stand Alone</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item label="Transport Required" className="mb-2">
+              <Radio.Group
+                name="addressInformation.transportRequired"
+                optionType="button"
+                buttonStyle="solid"
+              >
+                <Radio.Button value={true}>Yes</Radio.Button>
+                <Radio.Button value={false}>No</Radio.Button>
+              </Radio.Group>
+            </Form.Item>
+          </Col>
+        </Row>
+
+        {/* Second Row: Unit #, Building #, Street # */}
+        <Row gutter={[16, 16]} className="mb-4">
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.unitNumber"
@@ -54,10 +82,6 @@ const AddressInformation = () => {
               placeholder="Building #"
             />
           </Col>
-        </Row>
-
-        {/* Row 2: Street #, Street Name, Zone # */}
-        <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.streetNumber"
@@ -66,6 +90,10 @@ const AddressInformation = () => {
               placeholder="Street #"
             />
           </Col>
+        </Row>
+
+        {/* Third Row: Street Name, Zone #, Compound Name */}
+        <Row gutter={[16, 16]} className="mb-4">
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.streetName"
@@ -87,22 +115,6 @@ const AddressInformation = () => {
               ]}
             />
           </Col>
-        </Row>
-
-        {/* Row 3: Radio Button Group (Compound/Stand Alone), Compound Name, City */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={8}>
-            <Form.Item label="Dwelling Type" className="mb-2">
-              <Radio.Group
-                name="addressInformation.dwellingType"
-                optionType="button"
-                buttonStyle="solid"
-              >
-                <Radio.Button value="compound">Compound</Radio.Button>
-                <Radio.Button value="standAlone">Stand Alone</Radio.Button>
-              </Radio.Group>
-            </Form.Item>
-          </Col>
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.compoundName"
@@ -111,6 +123,10 @@ const AddressInformation = () => {
               placeholder="Compound Name"
             />
           </Col>
+        </Row>
+
+        {/* Fourth Row: City, Nearest Landmark, Proposed Campus */}
+        <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <CompactIconSelect
               name="addressInformation.city"
@@ -124,10 +140,6 @@ const AddressInformation = () => {
               ]}
             />
           </Col>
-        </Row>
-
-        {/* Row 4: Nearest Landmark, Proposed Campus, Transport Required (Switch) */}
-        <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.nearestLandmark"
@@ -143,11 +155,6 @@ const AddressInformation = () => {
               tooltip="Enter Proposed Campus"
               placeholder="Proposed Campus"
             />
-          </Col>
-          <Col xs={24} md={8}>
-            <Form.Item label="Transport Required" className="mb-0">
-              <Switch name="addressInformation.transportRequired" />
-            </Form.Item>
           </Col>
         </Row>
       </div>

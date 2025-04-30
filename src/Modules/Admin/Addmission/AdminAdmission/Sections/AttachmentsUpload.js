@@ -180,7 +180,7 @@ const AttachmentsUpload = () => {
   const renderCol = useCallback(
     (list, isMan) =>
       list.map((a) => (
-        <Col xs={24} md={12} key={a.key}>
+        <Col span={24} key={a.key}>
           <SingleFileUpload
             label={`${a.name}${isMan ? " *" : ""}`}
             name={`attachments.${isMan ? "mandatory" : "optional"}.${a.name}`}
@@ -221,13 +221,13 @@ const AttachmentsUpload = () => {
         {!!mandatory.length && (
           <>
             <h3 className="text-base font-bold mb-3">Mandatory</h3>
-            <Row gutter={[16, 16]}>{renderCol(mandatory, true)}</Row>
+            <Row gutter={[0, 16]}>{renderCol(mandatory, true)}</Row>
           </>
         )}
         {!!optional.length && (
           <>
             <h3 className="text-base font-bold mt-4 mb-3">Optional</h3>
-            <Row gutter={[16, 16]}>{renderCol(optional, false)}</Row>
+            <Row gutter={[0, 16]}>{renderCol(optional, false)}</Row>
           </>
         )}
       </div>

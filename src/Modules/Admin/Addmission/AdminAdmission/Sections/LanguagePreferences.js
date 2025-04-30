@@ -153,6 +153,11 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
     [admissionOptions, dispatch]
   );
 
+  const showLanguageModal = (type) => {
+    setModalType(type);
+    setIsLanguageModalVisible(true);
+  };
+
   return (
     <div>
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
@@ -170,9 +175,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
               placeholder="Select Second Language"
               value={values.languagePrefs.second}
               mode="multiple"
-              onChange={(value) =>
-                setFieldValue("languagePrefs.second", value)  // Store the value as an array
-              }
+              onChange={(value) => setFieldValue("languagePrefs.second", value)}
               loading={loading}
               ref={(el) => (formRefs.current["languagePrefs.second"] = el)}
             >
@@ -187,20 +190,14 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
             <Button
               type="primary"
               className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
-              onClick={() => {
-                setModalType("second");
-                setIsLanguageModalVisible(true);
-              }}
+              onClick={() => showLanguageModal("second")}
             >
               Add
             </Button>
             {languageOptions.secondLanguages?.length > 0 && (
               <Button
                 className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
-                onClick={() => {
-                  setModalType("second");
-                  setIsLanguageModalVisible(true);
-                }}
+                onClick={() => showLanguageModal("second")}
               >
                 Manage
               </Button>
@@ -220,7 +217,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
                 value={values.languagePrefs.third}
                 mode="multiple"
                 onChange={(value) =>
-                  setFieldValue("languagePrefs.third", value)  // Store the value as an array
+                  setFieldValue("languagePrefs.third", value)
                 }
                 loading={loading}
                 ref={(el) => (formRefs.current["languagePrefs.third"] = el)}
@@ -236,20 +233,14 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
               <Button
                 type="primary"
                 className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
-                onClick={() => {
-                  setModalType("third");
-                  setIsLanguageModalVisible(true);
-                }}
+                onClick={() => showLanguageModal("third")}
               >
                 Add
               </Button>
               {languageOptions.thirdLanguages?.length > 0 && (
                 <Button
                   className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
-                  onClick={() => {
-                    setModalType("third");
-                    setIsLanguageModalVisible(true);
-                  }}
+                  onClick={() => showLanguageModal("third")}
                 >
                   Manage
                 </Button>
@@ -266,7 +257,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
             <Select
               style={{ width: "100%" }}
               value={values.languagePrefs.valueEd}
-              mode="multiple"  // Store the value as an array
+              mode="multiple"
               onChange={(value) =>
                 setFieldValue("languagePrefs.valueEd", value)
               }
@@ -302,7 +293,10 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
         <div>
           <label className="font-semibold block mb-1">Left-handed</label>
           <Radio.Group
-            options={[{ label: "Yes", value: true }, { label: "No", value: false }]}
+            options={[
+              { label: "Yes", value: true },
+              { label: "No", value: false },
+            ]}
             optionType="button"
             value={values.languagePrefs.leftHanded}
             onChange={(e) =>
@@ -325,8 +319,93 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
         </div>
       </div>
 
-      {/* Modal for managing languages and value education */}
-      {/* (Same as your current Modal code, just ensuring valueEd and languages are handled correctly) */}
+      {/* Language Modal */}
+      <Modal
+        title={`Add ${modalType === "second" ? "Second" : "Third"} Language`}
+        visible={isLanguageModalVisible}
+        onOk={handleAddLanguage}
+        onCancel={() => {
+          setIsLanguageModalVisible(false);
+          setNewLanguage("");
+        }}
+        okText="Add Language"
+        okButtonProps={{
+          className: "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white",
+        }}
+      >
+        <Input
+          placeholder="Enter language name"
+          value={newLanguage}
+          onChange={(e) => setNewLanguage(e.target.value)}
+        />
+        {languageOptions[`${modalType}Languages`]?.length > 0 && (
+          <div className="mt-4">
+            <h4>Current Options:</h4>
+            <ul className="list-disc pl-5">
+              {languageOptions[`${modalType}Languages`]?.map((lang) => (
+                <li
+                  key={lang}
+                  className="flex justify-between items-center py-1"
+                >
+                  {lang}
+                  <Button
+                    type="text"
+                    danger
+                    size="small"
+                    onClick={() => handleRemoveLanguage(lang, modalType)}
+                  >
+                    Remove
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </Modal>
+
+      {/* Value Education Modal */}
+      <Modal
+        title="Add Value Education Option"
+        visible={isValueEdModalVisible}
+        onOk={handleAddValueEd}
+        onCancel={() => {
+          setIsValueEdModalVisible(false);
+          setNewValueEd("");
+        }}
+        okText="Add Option"
+        okButtonProps={{
+          className: "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white",
+        }}
+      >
+        <Input
+          placeholder="Enter value education option"
+          value={newValueEd}
+          onChange={(e) => setNewValueEd(e.target.value)}
+        />
+        {admissionOptions?.valueEducation?.length > 0 && (
+          <div className="mt-4">
+            <h4>Current Options:</h4>
+            <ul className="list-disc pl-5">
+              {admissionOptions.valueEducation.map((option) => (
+                <li
+                  key={option}
+                  className="flex justify-between items-center py-1"
+                >
+                  {option}
+                  <Button
+                    type="text"
+                    danger
+                    size="small"
+                    onClick={() => handleRemoveValueEd(option)}
+                  >
+                    Remove
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 });
