@@ -206,10 +206,10 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         // Additional fields
         formData.append(
           "secondLanguage",
-          values.languagePrefs.second?.[0] || ""
+          values.languagePrefs.second || []
         );
-        formData.append("thirdLanguage", values.languagePrefs.third?.[0] || "");
-        formData.append("valueEducation", values.languagePrefs.valueEd || "");
+        formData.append("thirdLanguage", values.languagePrefs.third|| []);
+        formData.append("valueEducation", values.languagePrefs.valueEd || []);
         formData.append(
           "isLeftHanded",
           values.languagePrefs.leftHanded ? "true" : "false"
