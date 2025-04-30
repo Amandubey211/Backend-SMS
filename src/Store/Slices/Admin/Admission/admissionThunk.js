@@ -78,7 +78,7 @@ export const updateSchoolOption = createAsyncThunk(
       );
 
       // Show success message after updating
-      toast.success("School admission options updated successfully.");
+      // toast.success(" options updated successfully.");
 
       // Fetch the updated school data (or handle as needed)
       dispatch(fetchAdmissionOptionsBySchoolId());
