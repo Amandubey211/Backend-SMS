@@ -53,7 +53,7 @@ const StudentCard = memo(({ studentInfo, academicInfo, imagePreview }) => {
           <div className="mt-2 bg-white rounded-full flex justify-center items-center">
             {imagePreview ? (
               <img
-                src={imagePreview}
+                src={imagePreview?.preview}
                 alt={firstName}
                 className="rounded-full w-20 h-20 object-cover"
               />
