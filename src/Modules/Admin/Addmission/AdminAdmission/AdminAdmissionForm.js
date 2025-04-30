@@ -1,22 +1,26 @@
 import React, { useRef, useEffect, useMemo, useCallback, memo } from "react";
 import { Formik, Form, useFormikContext } from "formik";
-import { Button, message, Spin } from "antd";
+import { Button, message } from "antd";
+import * as Yup from "yup";
 import AcademicSessionCandidate from "./Sections/AcademicSessionCandidate";
 import AcademicHistory from "./Sections/AcademicHistory";
 import AddressInformation from "./Sections/AddressInformation";
 import ParentGuardianInfo from "./Sections/ParentGuardianInfo";
 import AttachmentsUpload from "./Sections/AttachmentsUpload";
-import { initialValues, AdminAdmissionSchema } from "./validations";
+import {
+  initialValues as baseInitialValues,
+  baseAdminAdmissionSchema,
+} from "./validations";
 import { registerStudentDetails } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSchoolAttachmentsById } from "../../../../Store/Slices/Admin/Admission/admissionThunk";
 import useDynamicAttachments from "../../../../Hooks/Admin/useDynamicAttachments";
+
 const FormDataWatcher = memo(({ onChange }) => {
   const { values } = useFormikContext();
   const prevValuesRef = useRef(values);
 
   useEffect(() => {
-    // Check if values have changed and only then trigger the callback
     if (JSON.stringify(values) !== JSON.stringify(prevValuesRef.current)) {
       prevValuesRef.current = values;
       onChange(values);
@@ -25,7 +29,7 @@ const FormDataWatcher = memo(({ onChange }) => {
 
   return null;
 });
-// Memoize AdminAdmissionForm to avoid unnecessary re-renders
+
 const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const formRefs = useRef({});
   const dispatch = useDispatch();
@@ -36,46 +40,42 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
     (state) => state.admin.admissionAttachment
   );
 
-  // Fetch attachments once when the component is mounted
   useEffect(() => {
     dispatch(fetchSchoolAttachmentsById());
-  }, []);
+  }, [dispatch]);
 
   const { attachmentsInitialValues, attachmentsSchema } =
     useDynamicAttachments(attachmentsMeta);
 
   const mergedInitialValues = useMemo(
     () => ({
-      ...initialValues,
-      attachments: attachmentsInitialValues,
+      ...baseInitialValues,
+      attachments: attachmentsInitialValues.attachments,
     }),
     [attachmentsInitialValues]
   );
 
-  const mergedValidation = useMemo(
-    () => AdminAdmissionSchema.concat(attachmentsSchema),
-    [attachmentsSchema]
-  );
+  const mergedValidation = useMemo(() => {
+    const s = baseAdminAdmissionSchema.concat(attachmentsSchema);
+    delete s.fields.studentPicture; //  ⬅️  force-remove
+    return s;
+  }, [attachmentsSchema]);
 
-  // Handle form validation errors by scrolling to the first error
-  const handleFormikErrorScroll = useCallback((errors) => {
-    const errorKeys = Object.keys(errors);
+  const handleFormikErrorScroll = (errors) => {
     console.log(errors, "errorserrors");
+    const errorKeys = Object.keys(errors);
     if (!errorKeys.length) return;
     const firstErrorKey = errorKeys[0];
     const fieldRef = formRefs.current[firstErrorKey];
     if (fieldRef?.scrollIntoView) {
       fieldRef.scrollIntoView({ behavior: "smooth", block: "center" });
-      setTimeout(() => {
-        fieldRef.focus?.();
-      }, 300);
+      setTimeout(() => fieldRef.focus?.(), 300);
     }
-  }, []);
+  };
 
-  // Validate mandatory attachments before form submission
   const validateMandatoryAttachments = useCallback((values) => {
     const missing = [];
-    if (!values.profile?.file) missing.push("Profile Picture");
+    if (!values.profile) missing.push("Profile Picture");
 
     if (values.attachments?.mandatory) {
       Object.entries(values.attachments.mandatory).forEach(([key, value]) => {
@@ -90,17 +90,13 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       try {
         const missingAttachments = validateMandatoryAttachments(values);
         if (missingAttachments.length > 0) {
-          message.error(
-            `Please upload all mandatory attachments: ${missingAttachments.join(
-              ", "
-            )}`
-          );
+          message.error(`Please upload: ${missingAttachments.join(", ")}`);
           return;
         }
 
         const formData = new FormData();
 
-        // Basic Candidate Information
+        // Basic student information
         formData.append("firstName", values.candidateInformation.firstName);
         formData.append("lastName", values.candidateInformation.lastName);
         formData.append(
@@ -126,7 +122,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         formData.append("Q_Id", values.candidateInformation.studentId);
         formData.append("nationality", values.candidateInformation.nationality);
 
-        // Academic Information
+        // Academic information
         formData.append(
           "enrollmentStatus",
           values.academicSession.enrollmentStats
@@ -135,7 +131,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         formData.append("schoolId", schoolId);
         formData.append("academicYear", values.academicSession.academicYear);
 
-        // Parent/Guardian Information
+        // Parent/guardian information
         formData.append(
           "fatherName",
           `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
@@ -161,15 +157,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           values.guardianInformation.guardianEmail
         );
 
-        // Parent photos
-        if (values.motherInfo.motherPhoto?.file) {
-          formData.append("motherPhoto", values.motherInfo.motherPhoto.file);
-        }
-        if (values.fatherInfo.fatherPhoto?.file) {
-          formData.append("fatherPhoto", values.fatherInfo.fatherPhoto.file);
-        }
-
-        // Address Information
+        // Address information
         const addressFields = [
           "unitNumber",
           "buildingNumber",
@@ -197,7 +185,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           );
         });
 
-        // Academic History
+        // Academic history
         formData.append(
           "previousSchoolName",
           values.academicHistory.previousSchoolName
@@ -215,7 +203,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           values.academicHistory.sourceOfFee || "Parent"
         );
 
-        // Language Preferences
+        // Additional fields
         formData.append(
           "secondLanguage",
           values.languagePrefs.second?.[0] || ""
@@ -227,55 +215,54 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           values.languagePrefs.leftHanded ? "true" : "false"
         );
 
-        // Medical Information
         if (values.medicalInfo) {
           formData.append("medicalCondition", values.medicalInfo);
         }
 
-        // Profile Pictures (flattened to root)
+        // Handle file uploads
         if (values.profile?.file) {
           formData.append("profile", values.profile.file);
         }
-        if (values.profile?.file) {
-          formData.append("studentPicture", values.profile.file);
-        }
 
-        // Dynamic Attachments (flattened to root)
-        if (values.attachments?.mandatory) {
-          Object.entries(values.attachments.mandatory).forEach(
-            ([key, value]) => {
-              if (value?.file) {
-                // Ensure consistent field naming
-                const fieldName = key.replace(/\s+/g, "_").toLowerCase();
-                formData.append(fieldName, value.file);
-              }
-            }
-          );
-        }
+        // Handle dynamic attachments
+        // if (values.attachments?.mandatory) {
+        //   Object.entries(values.attachments.mandatory).forEach(
+        //     ([key, value]) => {
+        //       if (value?.file) {
+        //         formData.append(
+        //           key.replace(/\s+/g, "_").toLowerCase(),
+        //           value.file
+        //         );
+        //       }
+        //     }
+        //   );
+        // }
 
-        if (values.attachments?.optional) {
-          Object.entries(values.attachments.optional).forEach(
-            ([key, value]) => {
-              if (value?.file) {
-                const fieldName = key.replace(/\s+/g, "_").toLowerCase();
-                formData.append(fieldName, value.file);
-              }
-            }
-          );
-        }
+        // if (values.attachments?.optional) {
+        //   Object.entries(values.attachments.optional).forEach(
+        //     ([key, value]) => {
+        //       if (value?.file) {
+        //         formData.append(
+        //           key.replace(/\s+/g, "_").toLowerCase(),
+        //           value.file
+        //         );
+        //       }
+        //     }
+        //   );
+        // }
 
-        // Debug form data
-        // Debug form data before sending
-        console.log("FormData contents:");
-        for (let [key, value] of formData.entries()) {
-          console.log(
-            key,
-            value instanceof File
-              ? `File: ${value.name} (${value.size} bytes)`
-              : value
-          );
-        }
+        const addDynamic = (bucket, isMandatory) => {
+          Object.values(bucket || {}).forEach((v) => {
+            if (!v?.file) return;
+            /* 👉  use ORIGINAL label sent by backend (v.fieldName) */
+            const apiKey = v.fieldName || "attachment";
+            formData.append(apiKey, v.file);
+          });
+        };
+        addDynamic(values.attachments?.mandatory, true);
+        addDynamic(values.attachments?.optional, false);
 
+        console.log(formData, "fromData");
         const registrationResponse = await dispatch(
           registerStudentDetails(formData)
         );
@@ -283,17 +270,10 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         if (registrationResponse?.success) {
           message.success("Registration successful!");
         } else {
-          message.error(
-            registrationResponse?.message ||
-              "Registration failed. Please try again."
-          );
+          message.error(registrationResponse?.message || "Registration failed");
         }
       } catch (error) {
-        console.error("Submission error:", error);
-        message.error(
-          error.response?.data?.message ||
-            "An error occurred during registration. Please try again."
-        );
+        message.error(error.response?.data?.message || "Registration error");
       } finally {
         actions.setSubmitting(false);
       }
@@ -352,7 +332,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
                   const formErrors = await validateForm();
                   if (Object.keys(formErrors).length > 0) {
                     handleFormikErrorScroll(formErrors);
-                    message.error("Please correct the errors in the form.");
+                    message.error("Please correct the form errors");
                   }
                 }}
                 block
