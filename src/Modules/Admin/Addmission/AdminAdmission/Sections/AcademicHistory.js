@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { Row, Col } from "antd";
 import {
   BookOutlined,
@@ -11,14 +11,13 @@ import CompactIconInput from "../Components/CompactIconInput";
 import CompactIconSelect from "../Components/CompactIconSelect";
 import CompactIconDatePicker from "../Components/CompactIconDatePicker";
 
-const AcademicHistory = () => {
+const AcademicHistory = memo(({ formRefs, errors, touched }) => {
   return (
     <div>
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
         Academic History
       </h2>
       <div className="p-3">
-        {/* First row with wider inputs for previous school and previous class */}
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12}>
             <CompactIconInput
@@ -26,6 +25,13 @@ const AcademicHistory = () => {
               icon={<ReadOutlined />}
               tooltip="Previous School Name"
               placeholder="Previous School Name"
+              ref={(el) =>
+                (formRefs.current["academicHistory.previousSchoolName"] = el)
+              }
+              error={
+                touched.academicHistory?.previousSchoolName &&
+                errors.academicHistory?.previousSchoolName
+              }
             />
           </Col>
           <Col xs={24} md={12}>
@@ -34,11 +40,17 @@ const AcademicHistory = () => {
               icon={<UserOutlined />}
               tooltip="Previous Class"
               placeholder="Previous Class"
+              ref={(el) =>
+                (formRefs.current["academicHistory.previousClass"] = el)
+              }
+              error={
+                touched.academicHistory?.previousClass &&
+                errors.academicHistory?.previousClass
+              }
             />
           </Col>
         </Row>
 
-        {/* Second row with the remaining fields */}
         <Row gutter={[16, 16]} className="mt-4">
           <Col xs={24} md={8}>
             <CompactIconSelect
@@ -68,6 +80,13 @@ const AcademicHistory = () => {
                 { label: "Palestinian", value: "palestinian" },
                 { label: "Other (Please Specify)", value: "other" },
               ]}
+              ref={(el) =>
+                (formRefs.current["academicHistory.curriculum"] = el)
+              }
+              error={
+                touched.academicHistory?.curriculum &&
+                errors.academicHistory?.curriculum
+              }
             />
           </Col>
           <Col xs={24} md={8}>
@@ -85,8 +104,8 @@ const AcademicHistory = () => {
               tooltip="Source of Fee"
               placeholder="Source of Fee"
               options={[
-                { label: "Parent", value: "parent" },
-                { label: "Company", value: "company" },
+                { label: "Parent", value: "Parent" },
+                { label: "Company", value: "Company" },
               ]}
             />
           </Col>
@@ -94,6 +113,6 @@ const AcademicHistory = () => {
       </div>
     </div>
   );
-};
+});
 
 export default AcademicHistory;

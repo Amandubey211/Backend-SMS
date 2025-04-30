@@ -24,12 +24,12 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
   };
 
   // Dropdown options
-  const vehicleTypes = ["bus", "van", "auto", "cab", "e-rickshaw", "other"];
-  const fuelTypes = ["diesel", "petrol", "cng", "electric", "hybrid"];
+  const vehicleTypes = ["Bus", "Van", "Cab", "Others"];
+  const fuelTypes = ["Diesel", "Petrol", "CNG", "Electric", "Hybrid"];
   const vehicleCategories = [
-    "ac", "non-ac", "sleeper", "semi-sleeper", "mini",
-    "double-decker", "hatchback", "sedan", "e-rickshaw",
-    "open", "cargo", "other"
+    "AC", "Non-AC", "Sleeper", "Semi-Sleeper", "Mini",
+    "Double-Decker", "Hatchback", "Sedan",
+    "Open", "Cargo", "Others"
   ];
 
   return (
@@ -66,9 +66,23 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
               ))}
             </select>
           </div>
-
+          <div>
+            <label htmlFor="vehicleName" className="block text-sm font-medium text-gray-700 mb-1">
+              Vehicle Name & Model
+            </label>
+            <input
+              type="text"
+              id="vehicleName"
+              name="vehicleName"
+              value={localVehicleData?.vehicleName}
+              onChange={handleLocalChange}
+              placeholder="Enter Vehicle Name & Model"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              required
+            />
+          </div>
           {/* Custom Vehicle Type */}
-          {localVehicleData.vehicleType === "other" && (
+          {localVehicleData.vehicleType === "Others" && (
             <div>
               <label htmlFor="customVehicleType" className="block text-sm font-medium text-gray-700 mb-1">
                 Custom Vehicle Type *

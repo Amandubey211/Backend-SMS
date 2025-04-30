@@ -23,6 +23,7 @@ const baseForm = {
   address: {},
   documents: [],
   consent: {},
+ 
 };
 
 const initialState = {

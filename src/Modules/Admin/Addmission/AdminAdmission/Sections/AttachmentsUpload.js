@@ -1,22 +1,17 @@
-/***********************************************************************
- * Sections/AttachmentsUpload.jsx
- * (gradient “Add Attachment” button + matching modal OK button)
- **********************************************************************/
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
   Row,
   Col,
   Button,
-  Tooltip,
-  message,
   Modal,
   Form,
   Input,
   Select,
   Skeleton,
+  message,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useDispatch, useSelector, useStore } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import SingleFileUpload from "../Components/SingleFileUpload";
 import DeleteModal from "../../../../../Components/Common/DeleteModal";
 import {
@@ -24,7 +19,8 @@ import {
   fetchSchoolAttachmentsById,
 } from "../../../../../Store/Slices/Admin/Admission/admissionThunk";
 
-/* ---------- helpers ---------- */
+const { Option } = Select;
+
 const GRADIENT = {
   background: "linear-gradient(to right, #C83B62, #7F35CD)",
   border: "none",
@@ -51,48 +47,57 @@ const group = (arr) =>
     { mandatory: [], optional: [] }
   );
 
-/* ---------- Add / Edit modal ---------- */
-const { Option } = Select;
-
-const AttachmentModal = ({ open, initial, onClose }) => {
+const AttachmentModal = ({ open, initial, onClose, attachments }) => {
   const [form] = Form.useForm();
   const [saving, setSaving] = useState(false);
   const dispatch = useDispatch();
-  const store = useStore();
 
   const strip = (arr) =>
     arr.map(({ name, mandatory }) => ({ name, mandatory }));
 
   const onFinish = async ({ label, category }) => {
     setSaving(true);
-    const raw = store.getState().admin.admissionAttachment.attachments;
-    const cur = withKey(raw);
-    const next = cur.map((a) =>
-      initial && a.key === initial.key
-        ? { ...a, name: label, mandatory: category === "mandatory" }
-        : a
-    );
+    try {
+      const cur = withKey(attachments);
+      const next = cur.map((a) =>
+        initial && a.key === initial.key
+          ? { ...a, name: label, mandatory: category === "mandatory" }
+          : a
+      );
 
-    if (!initial) {
-      next.push({
-        name: label,
-        mandatory: category === "mandatory",
-        key: makeKey({ name: label }),
-      });
-    }
+      if (!initial) {
+        next.push({
+          name: label,
+          mandatory: category === "mandatory",
+          key: makeKey({ name: label }),
+        });
+      }
 
-    const res = await dispatch(
-      updateSchoolAttachments({ attachments: strip(next) })
-    );
-    setSaving(false);
-    if (res?.payload) {
-      message.success(initial ? "Attachment updated" : "Attachment added");
-      dispatch(fetchSchoolAttachmentsById());
-      onClose();
-    } else {
-      message.error("Operation failed");
+      const res = await dispatch(
+        updateSchoolAttachments({ attachments: strip(next) })
+      );
+
+      if (res?.payload) {
+        message.success(initial ? "Attachment updated" : "Attachment added");
+        onClose();
+      } else {
+        throw new Error("Operation failed");
+      }
+    } catch (error) {
+      message.error(error.message);
+    } finally {
+      setSaving(false);
     }
   };
+
+  useEffect(() => {
+    if (open) {
+      form.setFieldsValue({
+        label: initial?.name ?? "",
+        category: initial?.mandatory ? "mandatory" : "optional",
+      });
+    }
+  }, [open, initial, form]);
 
   return (
     <Modal
@@ -106,15 +111,7 @@ const AttachmentModal = ({ open, initial, onClose }) => {
       okText={initial ? "Update" : "Save"}
       okButtonProps={{ loading: saving, style: GRADIENT }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        initialValues={{
-          label: initial?.name ?? "",
-          category: initial?.mandatory ? "mandatory" : "optional",
-        }}
-      >
+      <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           name="label"
           label="Label"
@@ -137,39 +134,63 @@ const AttachmentModal = ({ open, initial, onClose }) => {
   );
 };
 
-/* ---------- main component ---------- */
 const AttachmentsUpload = () => {
   const dispatch = useDispatch();
-  const store = useStore();
   const { attachments: raw, loading } = useSelector(
     (s) => s.admin.admissionAttachment
   );
 
-  const attachments = withKey(raw);
-  const { mandatory, optional } = group(attachments);
-
   const [modal, setModal] = useState({ open: false, editItem: null });
   const [del, setDel] = useState({ open: false, item: null });
+
+  useEffect(() => {
+    dispatch(fetchSchoolAttachmentsById());
+  }, [dispatch]);
+
+  const attachments = useMemo(() => withKey(raw), [raw]);
+  const { mandatory, optional } = useMemo(
+    () => group(attachments),
+    [attachments]
+  );
 
   const strip = useCallback(
     (arr) => arr.map(({ name, mandatory }) => ({ name, mandatory })),
     []
   );
 
-  const confirmDelete = async () => {
-    const raw = store.getState().admin.admissionAttachment.attachments;
-    const next = withKey(raw).filter((a) => a.key !== del.item.key);
+  const confirmDelete = useCallback(async () => {
+    try {
+      const next = withKey(raw).filter((a) => a.key !== del.item.key);
+      const res = await dispatch(
+        updateSchoolAttachments({ attachments: strip(next) })
+      );
 
-    const res = await dispatch(
-      updateSchoolAttachments({ attachments: strip(next) })
-    );
-    if (res?.payload) {
-      message.success("Attachment removed");
-      dispatch(fetchSchoolAttachmentsById());
-    } else {
-      throw new Error();
+      if (res?.payload) {
+        message.success("Attachment removed");
+      } else {
+        throw new Error();
+      }
+    } catch (error) {
+      message.error("Failed to remove attachment");
+    } finally {
+      setDel({ open: false, item: null });
     }
-  };
+  }, [del.item, dispatch, raw, strip]);
+
+  const renderCol = useCallback(
+    (list, isMan) =>
+      list.map((a) => (
+        <Col span={24} key={a.key}>
+          <SingleFileUpload
+            label={`${a.name}${isMan ? " *" : ""}`}
+            name={`attachments.${isMan ? "mandatory" : "optional"}.${a.name}`}
+            onEdit={() => setModal({ open: true, editItem: a })}
+            onDelete={() => setDel({ open: true, item: a })}
+          />
+        </Col>
+      )),
+    []
+  );
 
   if (loading) {
     return (
@@ -181,46 +202,32 @@ const AttachmentsUpload = () => {
     );
   }
 
-  const renderCol = (list, isMan) =>
-    list.map((a) => (
-      <Col xs={24} md={12} key={a.key}>
-        <SingleFileUpload
-          label={`${a.name}${isMan ? " *" : ""}`}
-          name={`attachments.${a.key}`}
-          onEdit={() => setModal({ open: true, editItem: a })}
-          onDelete={() => setDel({ open: true, item: a })}
-        />
-      </Col>
-    ));
-
   return (
     <div>
-      {/* header */}
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 m-0">
-          Attachments
-        </h2>
-        <Button
-          icon={<PlusOutlined />}
-          onClick={() => setModal({ open: true, editItem: null })}
-          style={GRADIENT}
-        >
-          Add Attachment
-        </Button>
+      <div className="mb-3">
+        <div className="flex items-center justify-between bg-purple-100 rounded-md py-2 px-3">
+          <h2 className="text-purple-500 m-0">Attachments</h2>
+          <Button
+            icon={<PlusOutlined />}
+            onClick={() => setModal({ open: true, editItem: null })}
+            style={GRADIENT}
+          >
+            Add Attachment
+          </Button>
+        </div>
       </div>
 
-      {/* fields */}
       <div className="p-3">
         {!!mandatory.length && (
           <>
             <h3 className="text-base font-bold mb-3">Mandatory</h3>
-            <Row gutter={[16, 16]}>{renderCol(mandatory, true)}</Row>
+            <Row gutter={[0, 16]}>{renderCol(mandatory, true)}</Row>
           </>
         )}
         {!!optional.length && (
           <>
             <h3 className="text-base font-bold mt-4 mb-3">Optional</h3>
-            <Row gutter={[16, 16]}>{renderCol(optional, false)}</Row>
+            <Row gutter={[0, 16]}>{renderCol(optional, false)}</Row>
           </>
         )}
       </div>
@@ -229,16 +236,15 @@ const AttachmentsUpload = () => {
         open={modal.open}
         initial={modal.editItem}
         onClose={() => setModal({ open: false, editItem: null })}
+        attachments={raw}
       />
 
-      {del.item && (
-        <DeleteModal
-          isOpen={del.open}
-          onClose={() => setDel({ open: false, item: null })}
-          onConfirm={confirmDelete}
-          title={del.item.name}
-        />
-      )}
+      <DeleteModal
+        isOpen={del.open}
+        onClose={() => setDel({ open: false, item: null })}
+        onConfirm={confirmDelete}
+        title={del.item?.name}
+      />
     </div>
   );
 };

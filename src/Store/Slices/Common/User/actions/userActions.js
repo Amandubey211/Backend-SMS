@@ -87,6 +87,21 @@ export const updateAdminProfile = createAsyncThunk(
     }
   }
 );
+export const fetchAdmissionOptions = createAsyncThunk(
+  "User/fetchAdmissionOptions",
+  async (schoolId, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await getData(
+        `/student_diwan/admission/option/${schoolId}`
+      );
+      return response;
+    } catch (error) {
+      toast.error("Something is wrong");
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 export const updateSchoolLogo = createAsyncThunk(
   "User/updateSchoolLogo",
   async (data, { rejectWithValue, dispatch }) => {
@@ -105,6 +120,23 @@ export const updateSchoolLogo = createAsyncThunk(
     }
   }
 );
+export const updateAdmissionOptions = createAsyncThunk(
+  "User/updateAdmissionOptions",
+  async (data, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/student_diwan/update_school/${data.schoolId}`,
+        { admissionOptions: data.admissionOptions }
+      );
+      return response;
+    } catch (error) {
+      toast.error("Update failed");
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
 export const updateStudentInfoThunk = createAsyncThunk(
   "Student/updateStudentInfo",
   async (data, { rejectWithValue, dispatch }) => {

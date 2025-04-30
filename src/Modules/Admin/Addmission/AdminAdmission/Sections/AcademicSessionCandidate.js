@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, memo, useState } from "react";
 import { Row, Col } from "antd";
+
 import { useFormikContext } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -11,9 +12,7 @@ import {
 } from "@ant-design/icons";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import AsyncSelect from "react-select/async";
-import { components } from "react-select";
-import { HeartOutlined } from "@ant-design/icons"; // Import an appropriate icon
+import { HeartOutlined } from "@ant-design/icons";
 import CompactIconDatePicker from "../Components/CompactIconDatePicker";
 import CompactIconInput from "../Components/CompactIconInput";
 import CompactIconSelect from "../Components/CompactIconSelect";
@@ -21,6 +20,7 @@ import ImageUploader from "../Components/ImageUploader";
 import { fetchAcademicYear } from "../../../../../Store/Slices/Common/AcademicYear/academicYear.action";
 import { fetchAllClasses } from "../../../../../Store/Slices/Admin/Class/actions/classThunk";
 import { useField } from "formik";
+import LanguagePreferences from "./LanguagePreferences";
 import {
   GENDER_OPTIONS,
   PLACE_OF_BIRTH_OPTIONS,
@@ -31,10 +31,10 @@ import {
   ENROLLMENT_STATUS_OPTIONS,
   bloodGroupOptions,
 } from "../Configs/selectOptionsConfig";
+import { fetchAdmissionOptions } from "../../../../../Store/Slices/Common/User/actions/userActions";
 
-export const PhoneInputField = ({ name, icon, tooltip, placeholder }) => {
-  // Use useField to bind the component to the form state
-  const [field, meta, helpers] = useField(name);
+const PhoneInputField = memo(({ name, icon, tooltip, placeholder }) => {
+  const [field, , helpers] = useField(name);
   const phoneValue = field.value || "";
 
   return (
@@ -58,113 +58,12 @@ export const PhoneInputField = ({ name, icon, tooltip, placeholder }) => {
       />
     </div>
   );
-};
+});
 
-// Searchable select component
-const SearchableSelect = ({
-  name,
-  icon,
-  tooltip,
-  placeholder,
-  loadOptions,
-  defaultOptions,
-  value,
-  onChange,
-}) => {
-  const CustomControl = ({ children, ...props }) => (
-    <components.Control {...props}>
-      {icon && (
-        <span className="mr-2 text-gray-400" title={tooltip}>
-          {icon}
-        </span>
-      )}
-      {children}
-    </components.Control>
-  );
-
-  return (
-    <AsyncSelect
-      cacheOptions
-      defaultOptions={defaultOptions}
-      loadOptions={loadOptions}
-      value={value}
-      onChange={onChange}
-      components={{ Control: CustomControl }}
-      placeholder={placeholder}
-      className="react-select-container"
-      classNamePrefix="react-select"
-      styles={{
-        control: (base) => ({
-          ...base,
-          minHeight: "32px",
-          height: "32px",
-        }),
-        dropdownIndicator: (base) => ({
-          ...base,
-          padding: "4px",
-        }),
-        clearIndicator: (base) => ({
-          ...base,
-          padding: "4px",
-        }),
-        valueContainer: (base) => ({
-          ...base,
-          padding: "0px 8px",
-        }),
-        input: (base) => ({
-          ...base,
-          margin: "0px",
-          paddingBottom: "0px",
-          paddingTop: "0px",
-        }),
-      }}
-    />
-  );
-};
-
-// Nationality options (can be moved to a separate file)
-const nationalityOptions = [
-  { label: "Qatari", value: "qatari" },
-  { label: "Egyptian", value: "egyptian" },
-  { label: "Indian", value: "indian" },
-  { label: "Pakistani", value: "pakistani" },
-  { label: "Bangladeshi", value: "bangladeshi" },
-  // Add more nationalities as needed
-];
-
-const loadNationalities = (inputValue) => {
-  return Promise.resolve(
-    nationalityOptions.filter((option) =>
-      option.label.toLowerCase().includes(inputValue.toLowerCase())
-    )
-  );
-};
-
-// Religion options
-const religionOptions = [
-  { label: "Islam", value: "islam" },
-  { label: "Christianity", value: "christianity" },
-  { label: "Hinduism", value: "hinduism" },
-  { label: "Buddhism", value: "buddhism" },
-  { label: "Judaism", value: "judaism" },
-  { label: "Sikhism", value: "sikhism" },
-  { label: "Shinto", value: "shinto" },
-  { label: "Other", value: "other" },
-];
-
-const loadReligions = (inputValue) => {
-  return Promise.resolve(
-    religionOptions.filter((option) =>
-      option.label.toLowerCase().includes(inputValue.toLowerCase())
-    )
-  );
-};
-
-const AcademicSessionCandidate = () => {
+const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
   const dispatch = useDispatch();
   const { values, setFieldValue } = useFormikContext();
 
-  // Subscribe to the Redux store for academic years and classes
   const { academicYears, loading: ayLoading } = useSelector(
     (state) => state.common.academicYear
   );
@@ -172,13 +71,11 @@ const AcademicSessionCandidate = () => {
     (state) => state.admin.class
   );
 
-  // On mount, fetch the data
   useEffect(() => {
     dispatch(fetchAcademicYear());
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
-  // Build the options for academic year and class
   const academicYearOptions = useMemo(
     () =>
       academicYears.map((ay) => ({
@@ -190,14 +87,21 @@ const AcademicSessionCandidate = () => {
 
   const classOptions = useMemo(
     () =>
-      classes.map((cls) => ({
+      classes?.map((cls) => ({
         label: cls.className,
         value: cls._id,
       })),
     [classes]
   );
 
-  // Auto-calculate age from DOB
+  const showThirdLang = useMemo(() => {
+    const clsLabel =
+      classOptions?.find((c) => c.value === values.academicSession.class)
+        ?.label || "";
+    const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
+    return gradeNum >= 3;
+  }, [values.academicSession.class, classOptions]);
+
   useEffect(() => {
     if (values.candidateInformation?.dob) {
       const birthDate = new Date(values.candidateInformation.dob);
@@ -215,18 +119,33 @@ const AcademicSessionCandidate = () => {
       }
     }
   }, [values.candidateInformation?.dob, setFieldValue]);
+  const { userDetails } = useSelector((store) => store.common.user);
+  const [VALUE_ED_OPTIONS, setVALUE_ED_OPTIONS] = useState([]);
+  const [LANGUAGE_OPTIONS, setLANGUAGE_OPTIONS] = useState([]);
+  useEffect(() => {
+    dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
+      const { languages = [], valueEducation = [] } = res.payload?.data || {};
 
+      if (languages?.length > 0) {
+        let la = languages.map((i) => ({ label: i, value: i }));
+        setLANGUAGE_OPTIONS(la);
+      }
+      if (valueEducation?.length > 0) {
+        let va = valueEducation.map((i) => ({ label: i, value: i }));
+        setVALUE_ED_OPTIONS(va);
+      }
+    });
+  }, []);
   return (
     <div>
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
         Candidate Information
       </h2>
       <div className="p-3 flex gap-2 flex-wrap">
-        {/* Left Column: Photo Upload & DOB */}
         <div className="w-1/4 flex flex-col gap-6">
           <ImageUploader
             height="h-64"
-            name="attachments.mandatory.studentPicture"
+            name="profile"
             recommendedSize="300x400px"
             previewTitle="Student Picture Preview"
           />
@@ -240,9 +159,7 @@ const AcademicSessionCandidate = () => {
           </div>
         </div>
 
-        {/* Right Column: Candidate Basic Info */}
         <div className="flex-1 min-w-[60%] flex flex-col">
-          {/* Row 1: Names */}
           <div className="flex gap-3">
             <div className="flex-1">
               <CompactIconInput
@@ -250,6 +167,13 @@ const AcademicSessionCandidate = () => {
                 icon={<UserOutlined />}
                 tooltip="First Name"
                 placeholder="First Name"
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.firstName"] = el)
+                }
+                error={
+                  touched.candidateInformation?.firstName &&
+                  errors.candidateInformation?.firstName
+                }
               />
             </div>
             <div className="flex-1">
@@ -266,11 +190,17 @@ const AcademicSessionCandidate = () => {
                 icon={<UserOutlined />}
                 tooltip="Last Name"
                 placeholder="Last Name"
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.lastName"] = el)
+                }
+                error={
+                  touched.candidateInformation?.lastName &&
+                  errors.candidateInformation?.lastName
+                }
               />
             </div>
           </div>
 
-          {/* Row 2: Student ID, ID Expiry */}
           <div className="flex gap-3">
             <div className="flex-1">
               <CompactIconInput
@@ -278,6 +208,13 @@ const AcademicSessionCandidate = () => {
                 icon={<IdcardOutlined />}
                 tooltip="Student ID"
                 placeholder="Student ID"
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.studentId"] = el)
+                }
+                error={
+                  touched.candidateInformation?.studentId &&
+                  errors.candidateInformation?.studentId
+                }
               />
             </div>
             <div className="flex-1">
@@ -295,11 +232,17 @@ const AcademicSessionCandidate = () => {
                 tooltip="Blood Group"
                 placeholder="Select Blood Group"
                 options={bloodGroupOptions}
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.bloodGroup"] = el)
+                }
+                error={
+                  touched.candidateInformation?.bloodGroup &&
+                  errors.candidateInformation?.bloodGroup
+                }
               />
             </div>
           </div>
 
-          {/* Row 3: Gender, Passport */}
           <div className="flex gap-3">
             <div className="flex-1">
               <CompactIconSelect
@@ -308,6 +251,13 @@ const AcademicSessionCandidate = () => {
                 tooltip="Gender"
                 placeholder="Gender"
                 options={GENDER_OPTIONS}
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.gender"] = el)
+                }
+                error={
+                  touched.candidateInformation?.gender &&
+                  errors.candidateInformation?.gender
+                }
               />
             </div>
             <div className="flex-1">
@@ -328,7 +278,6 @@ const AcademicSessionCandidate = () => {
             </div>
           </div>
 
-          {/* Row 4: Place of Birth, Nationality, Religion */}
           <div className="flex gap-3">
             <div className="flex-1">
               <CompactIconSelect
@@ -345,13 +294,14 @@ const AcademicSessionCandidate = () => {
                 icon={<GlobalOutlined />}
                 tooltip="Nationality"
                 placeholder="Nationality"
-                options={[
-                  { label: "Qatari", value: "qatari" },
-                  { label: "Egyptian", value: "egyptian" },
-                  { label: "Indian", value: "indian" },
-                  { label: "Pakistani", value: "pakistani" },
-                  { label: "Bangladeshi", value: "bangladeshi" },
-                ]}
+                options={NATIONALITY_OPTIONS}
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.nationality"] = el)
+                }
+                error={
+                  touched.candidateInformation?.nationality &&
+                  errors.candidateInformation?.nationality
+                }
               />
             </div>
             <div className="flex-1">
@@ -360,12 +310,11 @@ const AcademicSessionCandidate = () => {
                 icon={<GlobalOutlined />}
                 tooltip="Religion"
                 placeholder="Religion"
-                options={religionOptions}
+                options={RELIGION_OPTIONS}
               />
             </div>
           </div>
 
-          {/* Row 5: Phone, Email, Age */}
           <div className="flex gap-3">
             <div className="flex-1" style={{ flex: 2 }}>
               <PhoneInputField
@@ -380,6 +329,13 @@ const AcademicSessionCandidate = () => {
                 icon={<MailOutlined />}
                 tooltip="Candidate Email"
                 placeholder="Email"
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.email"] = el)
+                }
+                error={
+                  touched.candidateInformation?.email &&
+                  errors.candidateInformation?.email
+                }
               />
             </div>
             <div className="flex-1" style={{ flex: 1 }}>
@@ -394,13 +350,20 @@ const AcademicSessionCandidate = () => {
             </div>
           </div>
 
-          {/* Row 6: Emergency Number, Native Language, Primary Contact */}
           <div className="flex gap-3">
             <div className="flex-1">
               <PhoneInputField
                 name="candidateInformation.emergencyNumber"
                 tooltip="Emergency Number"
                 placeholder="Emergency #"
+                ref={(el) =>
+                  (formRefs.current["candidateInformation.emergencyNumber"] =
+                    el)
+                }
+                error={
+                  touched.candidateInformation?.emergencyNumber &&
+                  errors.candidateInformation?.emergencyNumber
+                }
               />
             </div>
             <div className="flex-1">
@@ -438,6 +401,10 @@ const AcademicSessionCandidate = () => {
               placeholder="Select Class"
               options={classOptions}
               loading={classLoading}
+              ref={(el) => (formRefs.current["academicSession.class"] = el)}
+              error={
+                touched.academicSession?.class && errors.academicSession?.class
+              }
             />
           </Col>
           <Col xs={24} md={8}>
@@ -448,6 +415,13 @@ const AcademicSessionCandidate = () => {
               placeholder="Select Academic Year"
               options={academicYearOptions}
               loading={ayLoading}
+              ref={(el) =>
+                (formRefs.current["academicSession.academicYear"] = el)
+              }
+              error={
+                touched.academicSession?.academicYear &&
+                errors.academicSession?.academicYear
+              }
             />
           </Col>
           <Col xs={24} md={8}>
@@ -457,12 +431,21 @@ const AcademicSessionCandidate = () => {
               tooltip="Enrollment Status"
               placeholder="Select Enrollment Status"
               options={ENROLLMENT_STATUS_OPTIONS}
+              ref={(el) =>
+                (formRefs.current["academicSession.enrollmentStats"] = el)
+              }
+              error={
+                touched.academicSession?.enrollmentStats &&
+                errors.academicSession?.enrollmentStats
+              }
             />
           </Col>
         </Row>
       </div>
+
+      <LanguagePreferences showThirdLang={showThirdLang} formRefs={formRefs} />
     </div>
   );
-};
+});
 
 export default AcademicSessionCandidate;

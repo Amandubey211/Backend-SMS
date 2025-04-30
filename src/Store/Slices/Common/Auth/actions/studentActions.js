@@ -117,18 +117,19 @@ export const qidVerification = createAsyncThunk(
 // Thunk for registering student details
 export const registerStudentDetails = createAsyncThunk(
   "auth/registerStudentDetails",
-  async (formData, { rejectWithValue, dispatch, getState }) => {
+  async ({ formData, navigate }, { rejectWithValue, dispatch, getState }) => {
     try {
       // Get the user role; default to 'student' if not authenticated
       const role = getUserRole(getState) || "student";
       const endpoint = `/${role}/student_register`;
 
-      const response = await customRequest("post", endpoint, formData, {
+      const response = await customRequest("put", endpoint, formData, {
         "Content-Type": "multipart/form-data",
       });
 
       if (response?.success) {
         toast.success("Registered Successfully");
+        navigate("/verify_students");
         return response;
       } else {
         return rejectWithValue(
