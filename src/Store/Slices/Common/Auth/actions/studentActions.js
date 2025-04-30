@@ -123,7 +123,7 @@ export const registerStudentDetails = createAsyncThunk(
       const role = getUserRole(getState) || "student";
       const endpoint = `/${role}/student_register`;
 
-      const response = await customRequest("post", endpoint, formData, {
+      const response = await customRequest("put", endpoint, formData, {
         "Content-Type": "multipart/form-data",
       });
 

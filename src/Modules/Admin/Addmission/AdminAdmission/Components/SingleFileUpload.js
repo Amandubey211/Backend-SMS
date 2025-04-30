@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo, memo } from "react";
 import {
   Upload,
   Button,
@@ -19,75 +19,91 @@ import {
 } from "@ant-design/icons";
 import { useField } from "formik";
 
-/* ---------- helpers ---------- */
-const getBase64 = (f) =>
-  new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload = () => res(r.result);
-    r.onerror = rej;
-    r.readAsDataURL(f);
-  });
-
 const MAX_MB = 5;
 const BYTES = MAX_MB * 1024 * 1024;
 
-/* ---------- component ---------- */
-const SingleFileUpload = ({ label, name, onEdit, onDelete }) => {
+const SingleFileUpload = memo(({ label, name, onEdit, onDelete, error }) => {
   const [, meta, helpers] = useField(name);
   const [file, setFile] = useState(null);
   const [prev, setPrev] = useState(null);
   const [type, setType] = useState(null);
   const [show, setShow] = useState(false);
 
-  /* revoke object URL */
-  useEffect(
-    () => () => {
-      if (prev && type === "pdf") URL.revokeObjectURL(prev);
-    },
-    [prev, type]
-  );
-
-  const ok = (f) => {
+  const ok = useCallback((f) => {
     const allowed = ["image/jpeg", "image/png", "image/gif", "application/pdf"];
     if (!allowed.includes(f.type)) {
-      message.error("Invalid type");
+      message.error("Only JPG, PNG, GIF, or PDF files are allowed");
       return false;
     }
     if (f.size > BYTES) {
-      message.error(`Max ${MAX_MB} MB`);
+      message.error(`File too large (max ${MAX_MB} MB)`);
       return false;
     }
     return true;
-  };
+  }, []);
 
-  const handle = async (info) => {
-    if (info.file.status === "removed") {
-      helpers.setValue(null);
-      setFile(null);
-      setPrev(null);
-      return;
-    }
-    const f = info.file.originFileObj || info.file;
-    if (!f || !ok(f)) return Upload.LIST_IGNORE;
+  const handle = useCallback(
+    async (info) => {
+      if (info.file.status === "removed") {
+        helpers.setValue(null);
+        setFile(null);
+        setPrev(null);
+        return;
+      }
 
-    const pv = f.type.startsWith("image/")
-      ? await getBase64(f)
-      : URL.createObjectURL(f);
+      const f = info.file.originFileObj || info.file;
+      if (!f || !ok(f)) return Upload.LIST_IGNORE;
 
-    helpers.setValue({ file: f, preview: pv });
-    setFile(f);
-    setPrev(pv);
-    setType(f.type.startsWith("image/") ? "img" : "pdf");
-  };
+      try {
+        let pv;
+        if (f.type.startsWith("image/")) {
+          pv = await new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result);
+            r.onerror = rej;
+            r.readAsDataURL(f);
+          });
+        } else {
+          pv = URL.createObjectURL(f);
+        }
 
-  const clear = () => {
+        helpers.setValue({
+          file: f,
+          preview: pv,
+          // Ensure we store the original field name
+          fieldName: name.split(".").pop(),
+        });
+        setFile(f);
+        setPrev(pv);
+        setType(f.type.startsWith("image/") ? "img" : "pdf");
+      } catch (err) {
+        message.error("Failed to process file");
+      }
+    },
+    [helpers, ok, name]
+  );
+  const clear = useCallback(() => {
     helpers.setValue(null);
     setFile(null);
+    if (prev && type === "pdf") {
+      URL.revokeObjectURL(prev);
+    }
     setPrev(null);
-  };
+  }, [helpers, prev, type]);
 
-  const truncateText = (text, maxLength) =>
-    text.length <= maxLength ? text : `${text.slice(0, maxLength - 3)}…`;
+  const truncateText = useCallback(
+    (text, maxLength) =>
+      text.length <= maxLength ? text : `${text.slice(0, maxLength - 3)}…`,
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      if (prev && type === "pdf") {
+        URL.revokeObjectURL(prev);
+      }
+    };
+  }, [prev, type]);
 
   const menu = (
     <div className="flex flex-col text-left items-start">
@@ -104,16 +120,14 @@ const SingleFileUpload = ({ label, name, onEdit, onDelete }) => {
     </div>
   );
 
-  /* ---------------- render ---------------- */
   return (
     <>
       <Form.Item
-        validateStatus={meta.touched && meta.error ? "error" : ""}
-        help={meta.touched && meta.error}
+        validateStatus={error ? "error" : ""}
+        help={error}
         className="mb-4"
       >
         <div className="flex items-center w-full border border-gray-300 rounded-md overflow-hidden">
-          {/* Three dots menu button */}
           <Popover content={menu} trigger="click" placement="bottomLeft">
             <Button
               type="text"
@@ -123,14 +137,12 @@ const SingleFileUpload = ({ label, name, onEdit, onDelete }) => {
             />
           </Popover>
 
-          {/* Label with tooltip */}
           <Tooltip title={label}>
             <div className="w-1/3 px-3 py-2 bg-gray-50 h-10 flex items-center border-x border-gray-300">
               <span className="truncate">{truncateText(label, 20)}</span>
             </div>
           </Tooltip>
 
-          {/* File upload/display area */}
           <div className="flex-1">
             {!file ? (
               <Upload
@@ -140,6 +152,7 @@ const SingleFileUpload = ({ label, name, onEdit, onDelete }) => {
                 onChange={handle}
                 maxCount={1}
                 className="w-full h-full"
+                accept="image/*,.pdf"
               >
                 <Button
                   type="text"
@@ -181,7 +194,6 @@ const SingleFileUpload = ({ label, name, onEdit, onDelete }) => {
         </div>
       </Form.Item>
 
-      {/* preview modal */}
       <Modal
         centered
         open={show}
@@ -202,6 +214,6 @@ const SingleFileUpload = ({ label, name, onEdit, onDelete }) => {
       </Modal>
     </>
   );
-};
+});
 
 export default SingleFileUpload;
