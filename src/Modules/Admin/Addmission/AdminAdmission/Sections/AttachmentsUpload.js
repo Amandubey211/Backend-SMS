@@ -204,17 +204,17 @@ const AttachmentsUpload = () => {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 m-0">
-          Attachments
-        </h2>
-        <Button
-          icon={<PlusOutlined />}
-          onClick={() => setModal({ open: true, editItem: null })}
-          style={GRADIENT}
-        >
-          Add Attachment
-        </Button>
+      <div className="mb-3">
+        <div className="flex items-center justify-between bg-purple-100 rounded-md py-2 px-3">
+          <h2 className="text-purple-500 m-0">Attachments</h2>
+          <Button
+            icon={<PlusOutlined />}
+            onClick={() => setModal({ open: true, editItem: null })}
+            style={GRADIENT}
+          >
+            Add Attachment
+          </Button>
+        </div>
       </div>
 
       <div className="p-3">
