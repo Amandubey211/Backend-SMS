@@ -20,6 +20,7 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
     studentDetails,
     paymentStatus,
     entityDetails,
+    receiptIds,
   } = data;
 
 
@@ -135,9 +136,10 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
       </table>
       <div className="flex flex-row items-center border border-gray-300 text-xs ">
         <div className="flex flex-col items-start p-4 w-[60%]">
-           <p>Payment Details</p>
-           <div className="w-full h-[90%]">
-
+           <p className="mb-4">Payment Details</p>
+           <div className="w-full">
+           {receiptIds?.length > 0 && <p className="mb-1 text-gray-600">Receipts of Paid Payments</p>}
+              {receiptIds?.map((i)=>(<p>Receipt Number: {i?.toUpperCase()}</p>))}
            </div>
 
         </div>

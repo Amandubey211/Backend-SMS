@@ -5,7 +5,7 @@ import { CopyOutlined, SearchOutlined } from "@ant-design/icons";
 import { cancelStudentFee, deleteStudentFees, fetchAllStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FaFileInvoice } from "react-icons/fa";
+import { FaFileInvoice, FaHistory } from "react-icons/fa";
 import { MdCancel, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
@@ -265,8 +265,17 @@ const navigate = useNavigate();
                           </div>
         
                           {/* Hidden container for PDF generation */}
-                          <div >
-                            <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                          <div className="flex flex-row w-full gap-2">
+                          <div className="w-[80%]">
+                          <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
+                          </div>
+                           <div className="w-[20%]">
+                          <div className="px-4 py-2  font-semibold rounded-md  flex items-center justify-center mb-2 gap-2" >History <FaHistory /></div>
+                          <div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice({...selectedInvoice,lineItems:selectedInvoice?.currentItmes?.length > 0 ?selectedInvoice?.currentItmes:selectedInvoice?.lineItems})}}>
+                            <p className="text-md">Current Verion</p>
+                             </div>
+                            {selectedInvoice?.history?.map((i)=>(<div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e)=>{e.stopPropagation(); setSelectedInvoice({...selectedInvoice,lineItems:i?.oldData?.lineItems,currentItmes:selectedInvoice?.lineItems})}}>{i?.updatedAt?.slice(11,16)}, {i?.updatedAt?.slice(0,10)}</div>))}
+                          </div> 
                           </div>
                         </div>
                       </div>
