@@ -10,7 +10,7 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { FaSchool } from "react-icons/fa";
 import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
-import { fetchNoticeUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import { fetchAllUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
 
 const { Option } = Select;
 
@@ -55,7 +55,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
     (state) => state.admin.group_section.sectionsList
   );
   const classList = useSelector((state) => state.admin.class.classes);
-  const { noticeUsers } = useSelector((state) => state.admin.notice);
+  const { allUsers } = useSelector((state) => state.admin.notice);
   const { loading } = useSelector((state) => state.admin.students);
 
   // Local form state
@@ -77,7 +77,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchNoticeUsersThunk());
+    dispatch(fetchAllUsersThunk());
   }, [dispatch]);
 
   // Pre-populate form if editing
@@ -159,7 +159,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
 
   // Filter out any user whose role is 'admin', then apply role-based filter using fuzzy search
   const filteredUsers =
-    noticeUsers
+    allUsers
       ?.filter((user) => user.role?.toLowerCase() !== "admin")
       .filter((user) =>
         selectedRole === "all"
@@ -171,7 +171,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    const selectedUser = noticeUsers?.find(
+    const selectedUser = allUsers?.find(
       (usr) => usr.userId === issueData.user
     );
     const userRole = selectedUser ? selectedUser.role : "";

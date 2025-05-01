@@ -74,7 +74,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
   useEffect(() => {
     dispatch(fetchAcademicYear());
     dispatch(fetchAllClasses());
-  }, [dispatch]);
+  }, []);
 
   const academicYearOptions = useMemo(
     () =>
@@ -285,6 +285,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Place of Birth"
                 placeholder="Place of Birth"
+                allowCustom
                 options={PLACE_OF_BIRTH_OPTIONS}
               />
             </div>
@@ -295,6 +296,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 tooltip="Nationality"
                 placeholder="Nationality"
                 options={NATIONALITY_OPTIONS}
+                allowCustom
                 ref={(el) =>
                   (formRefs.current["candidateInformation.nationality"] = el)
                 }
@@ -310,6 +312,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Religion"
                 placeholder="Religion"
+                allowCustom
                 options={RELIGION_OPTIONS}
               />
             </div>
@@ -373,6 +376,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 tooltip="Native Language"
                 placeholder="Native Language"
                 options={NATIVE_LANGUAGE_OPTIONS}
+                allowCustom
               />
             </div>
             <div className="flex-1">

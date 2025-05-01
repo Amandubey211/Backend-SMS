@@ -46,6 +46,7 @@ import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js"
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
 import InventoryList from "../Modules/Admin/Finance/Inventory/InventoryList.js";
+import CustomCursor from "../Components/Common/CustomCursor.js";
 // lazy loaded routes
 const AllStudents = lazy(() =>
   import(
@@ -147,15 +148,15 @@ const VehicleManagement = lazy(() =>
   import("../Modules/Admin/Transportation/VehicleManagement.js")
 );
 
-
 const ShiftManagement = lazy(() =>
   import("../Modules/Admin/Transportation/ShiftManagement.js")
 );
 const DriverVehicleAssignmentPage = lazy(() =>
   import("../Modules/Admin/Transportation/DriverVehicleAssignmentPage.js")
 );
-const Stoppage = lazy(() => import("../Components/Transportation/StopageList.js"));
-
+const Stoppage = lazy(() =>
+  import("../Components/Transportation/StopageList.js")
+);
 
 const SelectBranch = lazy(() =>
   import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
@@ -883,10 +884,7 @@ function App() {
     {
       path: "/transportation/routes/:id/stoppages",
       element: (
-        <ProtectRoute
-          Component={Stoppage}
-          allowedRoles={["admin", "staff"]}
-        />
+        <ProtectRoute Component={Stoppage} allowedRoles={["admin", "staff"]} />
       ),
       errorElement: <Error />,
     },
@@ -1794,6 +1792,7 @@ function App() {
   return (
     <>
       {!isOnline && <Offline />}
+      {/* <CustomCursor /> */}
       <Suspense fallback={<Fallback />}>
         <RouterProvider router={AppRouter} />
       </Suspense>

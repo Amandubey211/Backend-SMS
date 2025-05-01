@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import {
   createNoticeThunk,
   updateNoticeThunk,
-  fetchNoticeUsersThunk,
+  fetchAllUsersThunk,
 } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import {
@@ -64,10 +64,10 @@ const roleOptions = [
  * by matching user.userId === value. Then we display the user's
  * avatar, name, and role. If not found, we fallback to showing the value.
  */
-const userTagRender = (props, noticeUsers) => {
+const userTagRender = (props, allUsers) => {
   const { value, closable, onClose } = props;
   // 'value' is userId from the form
-  const user = noticeUsers?.find((u) => u.userId === value);
+  const user = allUsers?.find((u) => u.userId === value);
 
   if (!user) {
     return (
@@ -122,7 +122,7 @@ const userTagRender = (props, noticeUsers) => {
 const AddNotice = ({ isEditing, onClose }) => {
   const { t } = useTranslation("admNotice");
   const dispatch = useDispatch();
-  const { selectedNotice, loading, noticeUsers } = useSelector(
+  const { selectedNotice, loading, allUsers } = useSelector(
     (state) => state.admin.notice
   );
   const { classes } = useSelector((state) => state.admin.class);
@@ -152,7 +152,7 @@ const AddNotice = ({ isEditing, onClose }) => {
   useEffect(() => {
     dispatch(fetchAllClasses());
     if (role === "admin") {
-      dispatch(fetchNoticeUsersThunk());
+      dispatch(fetchAllUsersThunk());
     }
   }, [dispatch]);
 
@@ -169,7 +169,7 @@ const AddNotice = ({ isEditing, onClose }) => {
       const mappedUserIds = [];
       if (selectedNotice.noticeForUsers?.length) {
         selectedNotice.noticeForUsers.forEach((nfUser) => {
-          const matchedUser = noticeUsers?.find(
+          const matchedUser = allUsers?.find(
             (nu) => nu.userId === nfUser._id
           );
           // If we found a user whose userId == nfUser._id,
@@ -213,19 +213,19 @@ const AddNotice = ({ isEditing, onClose }) => {
       form.resetFields();
       setEditorContent("");
     }
-  }, [isEditing, selectedNotice, noticeUsers, form]);
+  }, [isEditing, selectedNotice, allUsers, form]);
 
   /**
    * Filter user list for the full-screen user picker
    */
   const filteredUsers = useMemo(() => {
     const query = searchQuery.toLowerCase();
-    return (noticeUsers || []).filter(
+    return (allUsers || []).filter(
       (u) =>
         u.name?.toLowerCase().includes(query) ||
         u.role?.toLowerCase().includes(query)
     );
-  }, [noticeUsers, searchQuery]);
+  }, [allUsers, searchQuery]);
 
   /**
    * Toggle user selection in the full-screen modal
@@ -259,8 +259,8 @@ const AddNotice = ({ isEditing, onClose }) => {
     // Convert userIds to _id for final payload
     let finalNoticeForUsers = values.noticeForUsers || [];
     finalNoticeForUsers = finalNoticeForUsers.map((uid) => {
-      // find matching user in noticeUsers
-      const matched = noticeUsers?.find((nu) => nu.userId === uid);
+      // find matching user in allUsers
+      const matched = allUsers?.find((nu) => nu.userId === uid);
       // if found, return matched userId or _id
       // in your data, you want the `_id` that matches the original backend references
       // but we only have userId. If your backend expects `_id`, you must have a link.
@@ -666,9 +666,9 @@ const AddNotice = ({ isEditing, onClose }) => {
                 }
                 aria-label={t("Notice for Users")}
                 style={{ flex: 1 }}
-                tagRender={(props) => userTagRender(props, noticeUsers)}
+                tagRender={(props) => userTagRender(props, allUsers)}
               >
-                {(noticeUsers || []).map(({ userId, name, role, profile }) => (
+                {(allUsers || []).map(({ userId, name, role, profile }) => (
                   <Option
                     key={userId}
                     value={userId}
