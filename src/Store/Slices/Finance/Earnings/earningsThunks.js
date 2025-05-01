@@ -135,7 +135,8 @@ export const fetchIncomesGraph = createAsyncThunk(
         `/${getRole}/dashboard/expenseAndEarningGraph?say=${say}`,
         params
       );
-      return response.data
+      let data = response.data?.sort((a, b) =>new Date(a?.time) - new Date(b?.time))
+      return data
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

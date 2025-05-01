@@ -95,7 +95,7 @@ export const deleteNoticeThunk = createAsyncThunk(
 );
 
 // New Thunk: Fetch all notice users
-export const fetchNoticeUsersThunk = createAsyncThunk(
+export const fetchAllUsersThunk = createAsyncThunk(
   "notice/fetchNoticeUsers",
   async (_, { rejectWithValue, dispatch, getState }) => {
     try {

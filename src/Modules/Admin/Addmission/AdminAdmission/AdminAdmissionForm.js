@@ -41,6 +41,9 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const { attachments: attachmentsMeta, loading } = useSelector(
     (state) => state.admin.admissionAttachment
   );
+  const { loading: regLoading } = useSelector(
+    (state) => state.common.auth.loading
+  );
   console.log(attachmentsMeta, "attachmentsMeta");
   useEffect(() => {
     dispatch(fetchSchoolAttachmentsById());
@@ -303,7 +306,8 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
                 type="primary"
                 size="large"
                 htmlType="submit"
-                loading={isSubmitting}
+                loading={regLoading || isSubmitting}
+                disabled={regLoading || isSubmitting}
                 style={{
                   background: "linear-gradient(to right, #C83B62, #7F35CD)",
                   border: "none",

@@ -100,24 +100,33 @@ export const RELIGION_OPTIONS = [
 ];
 
 export const NATIVE_LANGUAGE_OPTIONS = [
-  { label: "Arabic", value: "ar" },
-  { label: "English", value: "en" },
-  { label: "French", value: "fr" },
-  { label: "Urdu", value: "ur" },
-  { label: "Hindi", value: "hi" },
-  { label: "Bengali", value: "bn" },
-  { label: "Tamil", value: "ta" },
-  { label: "Malayalam", value: "ml" },
-  { label: "Telugu", value: "te" },
-  { label: "Punjabi", value: "pa" },
-  { label: "Nepali", value: "ne" },
-  { label: "Tagalog", value: "tl" },
-  { label: "Turkish", value: "tr" },
+  { label: "Arabic", value: "ar" },         // Gulf
+  { label: "English", value: "en" },        // Europe
+  { label: "French", value: "fr" },         // Europe
+  { label: "German", value: "de" },         // Europe
+  { label: "Italian", value: "it" },        // Europe
+  { label: "Spanish", value: "es" },        // Europe
+  { label: "Portuguese", value: "pt" },     // Europe
+  { label: "Russian", value: "ru" },        // Europe
+  { label: "Turkish", value: "tr" },        // Europe/Gulf bridge
   { label: "Persian (Farsi)", value: "fa" },
+  { label: "Kurdish", value: "ku" },        
+  { label: "Hebrew", value: "he" },         
+
+  { label: "Hindi", value: "hi" },
+  { label: "Urdu", value: "ur" },
+  { label: "Bengali", value: "bn" },
+  { label: "Punjabi", value: "pa" },
+  { label: "Tamil", value: "ta" },
+  { label: "Malay", value: "ms" },
+  { label: "Vietnamese", value: "vi" },
   { label: "Swahili", value: "sw" },
-  { label: "Mandarin Chinese", value: "zh" },
-  { label: "Spanish", value: "es" },
+  { label: "Korean", value: "ko" },
+  { label: "Japanese", value: "ja" },
+  { label: "Chinese", value: "zh" },
+
 ];
+;
 
 export const PRIMARY_CONTACT_OPTIONS = [
   { label: "Father", value: "father" },
