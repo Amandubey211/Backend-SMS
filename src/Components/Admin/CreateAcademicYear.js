@@ -106,59 +106,49 @@ const CreateAcademicYear = () => {
    * to avoid "Invalid Date" rendering in the calendar cells.
    */
   const handleStartDateChange = (date, dateString) => {
-    if (!date || !date.isValid()) {
-      setYearData((prev) => ({ ...prev, startDate: "" }));
-      setErrors((prev) => ({
-        ...prev,
-        startDate: dateString
-          ? "Invalid date format."
-          : "Start Date is required.",
-      }));
-    } else {
-      setYearData({ ...yearData, startDate: dateString });
-      setErrors((prev) => ({
-        ...prev,
-        startDate: validateStartDate(dateString),
-      }));
-    }
+    setYearData((prev) => ({
+      ...prev,
+      startDate: date && date.isValid() ? dateString : "",
+    }));
+  
+    setErrors((prev) => ({
+      ...prev,
+      startDate: "",
+      endDate:
+        yearData.endDate && date && dayjs(dateString, "DD-MM-YYYY").isAfter(dayjs(yearData.endDate, "DD-MM-YYYY"))
+          ? "End Date must be after Start Date."
+          : "",
+    }));
   };
-
+  
   const handleEndDateChange = (date, dateString) => {
-    if (!date || !date.isValid()) {
-      setYearData((prev) => ({ ...prev, endDate: "" }));
-      setErrors((prev) => ({
-        ...prev,
-        endDate: dateString ? "Invalid date format." : "End Date is required.",
-      }));
-    } else {
-      setYearData({ ...yearData, endDate: dateString });
-      setErrors((prev) => ({
-        ...prev,
-        endDate: validateEndDate(dateString),
-      }));
-    }
+    setYearData((prev) => ({
+      ...prev,
+      endDate: date && date.isValid() ? dateString : "",
+    }));
+  
+    setErrors((prev) => ({
+      ...prev,
+      endDate:
+        date && yearData.startDate && dayjs(dateString, "DD-MM-YYYY").isBefore(dayjs(yearData.startDate, "DD-MM-YYYY"))
+          ? "End Date must be after Start Date."
+          : "",
+    }));
   };
-
+  
   const handleSubmit = (e) => {
     e.preventDefault();
-    const finalYearError = validateYear(yearData.year);
-    const finalStartError = validateStartDate(yearData.startDate);
-    const finalEndError = validateEndDate(yearData.endDate);
-
-    if (finalYearError || finalStartError || finalEndError) {
-      setErrors({
-        year: finalYearError,
-        startDate: finalStartError,
-        endDate: finalEndError,
-      });
+  
+    if (!yearData.startDate || !yearData.endDate) {
+      toast.error("Both Start Date and End Date are required.");
       return;
     }
-
-    if (!isDateRangeValid()) {
-      toast.error("Start Date must be earlier than End Date");
+  
+    if (dayjs(yearData.startDate, "DD-MM-YYYY").isAfter(dayjs(yearData.endDate, "DD-MM-YYYY"))) {
+      toast.error("End Date must be after Start Date.");
       return;
     }
-
+  
     dispatch(createAcademicYear(yearData))
       .unwrap()
       .then(() => {
@@ -169,6 +159,7 @@ const CreateAcademicYear = () => {
         toast.error(error);
       });
   };
+  
 
   return (
     <Layout title="Create Academic Year | Student Diwan">
