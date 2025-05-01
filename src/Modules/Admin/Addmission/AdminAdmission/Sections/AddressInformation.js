@@ -103,16 +103,11 @@ const AddressInformation = () => {
             />
           </Col>
           <Col xs={24} md={8}>
-            <CompactIconSelect
+            <CompactIconInput
               name="addressInformation.zone"
               icon={<EnvironmentOutlined />}
-              tooltip="Select Zone"
-              placeholder="Select Zone #"
-              options={[
-                { label: "Zone 1", value: "zone1" },
-                { label: "Zone 2", value: "zone2" },
-                { label: "Zone 3", value: "zone3" },
-              ]}
+              tooltip="Enter Zone"
+              placeholder="Zone #"
             />
           </Col>
           <Col xs={24} md={8}>
@@ -128,16 +123,11 @@ const AddressInformation = () => {
         {/* Fourth Row: City, Nearest Landmark, Proposed Campus */}
         <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
-            <CompactIconSelect
+            <CompactIconInput
               name="addressInformation.city"
               icon={<EnvironmentOutlined />}
-              tooltip="Select City"
-              placeholder="Select City"
-              options={[
-                { label: "Doha", value: "doha" },
-                { label: "Al Rayyan", value: "alRayyan" },
-                { label: "Al Wakrah", value: "alWakrah" },
-              ]}
+              tooltip="Enter City"
+              placeholder="City"
             />
           </Col>
           <Col xs={24} md={8}>
