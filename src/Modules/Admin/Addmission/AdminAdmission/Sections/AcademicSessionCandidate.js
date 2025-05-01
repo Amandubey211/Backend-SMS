@@ -376,6 +376,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 tooltip="Native Language"
                 placeholder="Native Language"
                 options={NATIVE_LANGUAGE_OPTIONS}
+                allowCustom
               />
             </div>
             <div className="flex-1">
