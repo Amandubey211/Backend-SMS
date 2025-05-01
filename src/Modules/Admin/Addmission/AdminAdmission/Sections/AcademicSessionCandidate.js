@@ -74,7 +74,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
   useEffect(() => {
     dispatch(fetchAcademicYear());
     dispatch(fetchAllClasses());
-  }, [dispatch]);
+  }, []);
 
   const academicYearOptions = useMemo(
     () =>

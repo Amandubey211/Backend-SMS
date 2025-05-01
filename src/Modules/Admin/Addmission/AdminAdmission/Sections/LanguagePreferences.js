@@ -258,6 +258,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
               style={{ width: "100%" }}
               value={values.languagePrefs.valueEd}
               mode="multiple"
+              placeholder="Select Value Education Option"
               onChange={(value) =>
                 setFieldValue("languagePrefs.valueEd", value)
               }
