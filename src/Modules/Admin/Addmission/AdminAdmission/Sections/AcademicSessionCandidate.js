@@ -285,7 +285,6 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Place of Birth"
                 placeholder="Place of Birth"
-                allowCustom
                 options={PLACE_OF_BIRTH_OPTIONS}
               />
             </div>

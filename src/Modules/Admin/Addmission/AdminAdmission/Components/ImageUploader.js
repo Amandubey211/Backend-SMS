@@ -1,12 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Modal, message } from "antd";
+import { Modal, message, Button, Row, Col, Radio, Slider } from "antd";
 import { useFormikContext, getIn } from "formik";
+import { PiCropLight, PiFlipHorizontalLight } from "react-icons/pi";
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
+import { GrRotateRight, GrRotateLeft } from "react-icons/gr";
 
 const ImageUploader = ({
   name,
   previewTitle = "Image Preview",
   recommendedSize = "300x400px",
-  aspectRatio = "aspect-[3/4]",
+  aspectRatio = 3 / 4,
   width = "w-full",
   height = "h-32",
 }) => {
@@ -14,8 +18,13 @@ const ImageUploader = ({
   const fileInputRef = useRef(null);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [localPreview, setLocalPreview] = useState(null);
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState();
+  const [rotation, setRotation] = useState(0);
+  const [flipHorizontal, setFlipHorizontal] = useState(false);
+  const imgRef = useRef(null);
+  const previewCanvasRef = useRef(null);
 
-  // Use Formik's getIn to reliably access nested fields
   const currentFile = getIn(values, name);
 
   useEffect(() => {
@@ -25,6 +34,51 @@ const ImageUploader = ({
       setLocalPreview(null);
     }
   }, [currentFile]);
+
+  useEffect(() => {
+    if (!completedCrop || !previewCanvasRef.current || !imgRef.current) {
+      return;
+    }
+
+    const image = imgRef.current;
+    const canvas = previewCanvasRef.current;
+    const crop = completedCrop;
+
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    const ctx = canvas.getContext("2d");
+    const pixelRatio = window.devicePixelRatio;
+
+    canvas.width = crop.width * pixelRatio;
+    canvas.height = crop.height * pixelRatio;
+
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    ctx.imageSmoothingQuality = "high";
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+
+    ctx.rotate((rotation * Math.PI) / 180);
+
+    if (flipHorizontal) {
+      ctx.scale(-1, 1);
+    }
+
+    ctx.translate(-canvas.width / 2, -canvas.height / 2);
+    ctx.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+
+    ctx.restore();
+  }, [completedCrop, rotation, flipHorizontal]);
 
   const openFileDialog = () => {
     fileInputRef.current?.click();
@@ -38,14 +92,13 @@ const ImageUploader = ({
       return;
     }
 
-    // Create object URL for preview
     const fileURL = URL.createObjectURL(selectedFile);
-
-    // Set both file and preview in Formik
     setFieldValue(name, {
       file: selectedFile,
       preview: fileURL,
     });
+    setRotation(0);
+    setFlipHorizontal(false);
   };
 
   const clearFile = (e) => {
@@ -60,13 +113,51 @@ const ImageUploader = ({
     e.stopPropagation();
     if (currentFile && currentFile.preview) {
       setPreviewVisible(true);
+      setCrop({
+        unit: "%",
+        width: 100,
+        aspect: aspectRatio,
+      });
     }
+  };
+
+  const handleCrop = () => {
+    if (!completedCrop || !previewCanvasRef.current) {
+      message.error("Please crop the image first");
+      return;
+    }
+
+    previewCanvasRef.current.toBlob(
+      (blob) => {
+        if (!blob) {
+          message.error("Failed to crop image");
+          return;
+        }
+
+        const fileURL = URL.createObjectURL(blob);
+        setFieldValue(name, {
+          file: blob,
+          preview: fileURL,
+        });
+        setPreviewVisible(false);
+      },
+      "image/jpeg",
+      0.9
+    );
+  };
+
+  const rotateImage = (degrees) => {
+    setRotation((prev) => (prev + degrees) % 360);
+  };
+
+  const toggleFlipHorizontal = () => {
+    setFlipHorizontal((prev) => !prev);
   };
 
   return (
     <>
       <div
-        className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height} ${aspectRatio}`}
+        className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
         onClick={openFileDialog}
       >
         {currentFile ? (
@@ -83,6 +174,12 @@ const ImageUploader = ({
             >
               Clear
             </button>
+            <div
+              className="absolute top-2 left-2 cursor-pointer"
+              onClick={handlePreview}
+            >
+              <PiCropLight style={{ fontSize: 25, color: "#ffff" }} />
+            </div>
           </>
         ) : (
           <div className="text-center p-4">
@@ -108,12 +205,121 @@ const ImageUploader = ({
       <Modal
         open={previewVisible}
         footer={null}
+        centered
         title={previewTitle}
         onCancel={() => setPreviewVisible(false)}
+        onOk={handleCrop}
+        width={1000} // Adjust modal width for better view of the cropper and layout
       >
-        {localPreview && (
-          <img alt="upload preview" className="w-full" src={localPreview} />
-        )}
+        <Row gutter={[16, 16]}>
+          {/* Left Column (Image Cropping) */}
+          <Col xs={24} md={12} className=" h-full  w-full  p-3">
+            <h4 className="text-center mb-2">Crop Image</h4>
+            <div className="my-8 flex flex-col justify-center  items-center">
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                aspect={aspectRatio}
+                className="max-h-[50vh]"
+              >
+                <img
+                  ref={imgRef}
+                  src={localPreview}
+                  alt="Crop preview"
+                  style={{
+                    maxWidth: "100%",
+                    maxHeight: "50vh",
+                    transform: `rotate(${rotation}deg) scaleX(${
+                      flipHorizontal ? -1 : 1
+                    })`,
+                  }}
+                />
+              </ReactCrop>
+            </div>
+
+            <div className="flex justify-between items-center mb-4  px-5 ">
+              <div className="flex space-x-2">
+                <Button
+                  icon={<GrRotateLeft />}
+                  onClick={() => rotateImage(-90)}
+                />
+                <Button
+                  icon={<GrRotateRight />}
+                  onClick={() => rotateImage(90)}
+                />
+              </div>
+              <Button
+                icon={<PiFlipHorizontalLight />}
+                onClick={toggleFlipHorizontal}
+              />
+              {/* <Radio.Group
+                value={aspectRatio}
+                onChange={(e) =>
+                  setCrop((prev) => ({ ...prev, aspect: e.target.value }))
+                }
+              >
+                <Radio.Button value={1}>1:1</Radio.Button>
+                <Radio.Button value={3 / 4}>3:4</Radio.Button>
+                <Radio.Button value={16 / 9}>16:9</Radio.Button>
+                <Radio.Button value={0}>Free</Radio.Button>
+              </Radio.Group> */}
+            </div>
+            <div className="px-5">
+              <Slider
+                min={0}
+                max={360}
+                value={rotation}
+                onChange={setRotation}
+                marks={{
+                  0: "0°",
+                  90: "90°",
+                  180: "180°",
+                  270: "270°",
+                  360: "360°",
+                }}
+              />
+            </div>
+          </Col>
+
+          <Col xs={24} md={12} className="flex flex-col h-full p-3">
+            {/* Preview Section */}
+            <div className="flex-1 overflow-hidden">
+              <h4 className="text-center mb-2">Preview</h4>
+              <div
+                className=" border rounded-md p-2 flex justify-center items-center h-[30rem] w-full"
+                style={{ aspectRatio: `${aspectRatio}` }}
+              >
+                {completedCrop ? (
+                  <canvas
+                    ref={previewCanvasRef}
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "100%",
+                      objectFit: "contain",
+                    }}
+                  />
+                ) : (
+                  <div className="text-gray-400 text-center p-4">
+                    Crop area will appear here
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Options Section */}
+            <div className="flex-1 mt-4">
+              <Button
+                type="primary"
+                className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white mt-4"
+                onClick={handleCrop}
+                block
+              >
+                Save Cropped Image
+              </Button>
+            </div>
+          </Col>
+        </Row>
       </Modal>
     </>
   );
