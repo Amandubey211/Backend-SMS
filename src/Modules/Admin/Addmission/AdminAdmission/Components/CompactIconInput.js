@@ -8,6 +8,7 @@ const CompactIconInput = ({
   tooltip,
   placeholder,
   type = "text",
+  required,
   ...rest
 }) => {
   const [field, meta, helpers] = useField(name);
@@ -32,6 +33,8 @@ const CompactIconInput = ({
             onBlur={() => helpers.setTouched(true)}
             addonBefore={icon}
             placeholder={placeholder}
+            required={required||false}
+            
             // size="large"
           />
         </Space.Compact>

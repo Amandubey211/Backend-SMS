@@ -55,6 +55,7 @@ const PhoneInputField = memo(({ name, icon, tooltip, placeholder }) => {
           borderRadius: "0.25rem",
         }}
         placeholder={placeholder}
+        required={true}
       />
     </div>
   );
@@ -78,7 +79,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
 
   const academicYearOptions = useMemo(
     () =>
-      academicYears.map((ay) => ({
+      academicYears?.map((ay) => ({
         label: ay.year,
         value: ay._id,
       })),
@@ -124,7 +125,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
   const [LANGUAGE_OPTIONS, setLANGUAGE_OPTIONS] = useState([]);
   useEffect(() => {
     dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
-      const { languages = [], valueEducation = [] } = res.payload?.data || {};
+      const { languages = [], valueEducation = []} = res.payload?.data || {};
 
       if (languages?.length > 0) {
         let la = languages.map((i) => ({ label: i, value: i }));
@@ -285,7 +286,6 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Place of Birth"
                 placeholder="Place of Birth"
-                allowCustom
                 options={PLACE_OF_BIRTH_OPTIONS}
               />
             </div>
@@ -321,7 +321,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
           <div className="flex gap-3">
             <div className="flex-1" style={{ flex: 2 }}>
               <PhoneInputField
-                name="candidateInformation.phoneNumber"
+                name="candidateInformation.contactNumber"
                 tooltip="Candidate Phone Number"
                 placeholder="Phone"
               />

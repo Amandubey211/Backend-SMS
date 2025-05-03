@@ -8,6 +8,7 @@ const CompactIconDatePicker = ({
   icon,
   tooltip,
   placeholder,
+  required,
   ...rest
 }) => {
   const [field, meta, helpers] = useField(name);
@@ -49,6 +50,7 @@ const CompactIconDatePicker = ({
               helpers.setValue(date ? date.format("YYYY-MM-DD") : "");
             }}
             onBlur={() => helpers.setTouched(true)}
+            required={required||false}
           />
         </Space.Compact>
       </Tooltip>

@@ -6,7 +6,6 @@ import {
   Button,
   Table,
   Typography,
-  message,
   Modal,
   Tag,
   Spin,
@@ -15,6 +14,7 @@ import {
   Badge,
   Card,
   Alert,
+  message,
 } from "antd";
 import {
   PlusOutlined,
@@ -26,6 +26,7 @@ import {
   SearchOutlined,
   InfoCircleOutlined,
   CloseOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext, Draggable } from "@hello-pangea/dnd";
@@ -39,7 +40,8 @@ import {
 } from "../../../../../Store/Slices/Transportation/RoutesManagment/routes.action";
 import SubRouteModal from "./AddSubRouteModal";
 import StrictModeDroppable from "./StrictModeDroppable";
-import { fetchAllUsersThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import VehicleAssignment from "./VehicleAssignment";
+import Sidebar from "../../../../../Components/Common/Sidebar";
 
 const { Option } = Select;
 const { Title, Text } = Typography;
@@ -50,7 +52,7 @@ const UserAssignmentModal = ({
   onOk,
   stopId,
   subRoutes,
-  allUsers,
+  transportUsers,
   assignedUsers,
 }) => {
   const [form] = Form.useForm();
@@ -73,23 +75,28 @@ const UserAssignmentModal = ({
   }, [visible, stopId, form, subRoutes]);
 
   const filteredUsers = useMemo(() => {
-    if (!allUsers) return [];
-    return allUsers.filter(
-      (user) =>
-        user.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.role.toLowerCase().includes(searchText.toLowerCase())
-    );
-  }, [allUsers, searchText]);
+    if (!transportUsers) return { students: [], staffs: [] };
 
-  const students = useMemo(
-    () => filteredUsers.filter((u) => u.role === "student"),
-    [filteredUsers]
-  );
+    const students = transportUsers.students || [];
+    const staffs = transportUsers.staffs || [];
 
-  const staff = useMemo(
-    () => filteredUsers.filter((u) => u.role !== "student"),
-    [filteredUsers]
-  );
+    return {
+      students: students.filter(
+        (user) =>
+          `${user.firstName} ${user.lastName}`
+            .toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          user.studentId?.toLowerCase().includes(searchText.toLowerCase())
+      ),
+      staffs: staffs.filter(
+        (user) =>
+          `${user.firstName} ${user.lastName}`
+            .toLowerCase()
+            .includes(searchText.toLowerCase()) ||
+          user.staffId?.toLowerCase().includes(searchText.toLowerCase())
+      ),
+    };
+  }, [transportUsers, searchText]);
 
   const handleSubmit = () => {
     const values = form.getFieldsValue();
@@ -150,7 +157,7 @@ const UserAssignmentModal = ({
       <Card className="border-0 shadow-none">
         <Form form={form} layout="vertical">
           <Input
-            placeholder="Search users by name or role..."
+            placeholder="Search users by name or ID..."
             prefix={<SearchOutlined className="text-gray-400" />}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
@@ -177,20 +184,29 @@ const UserAssignmentModal = ({
                   dropdownStyle={{ maxHeight: 250, overflow: "auto" }}
                   className="user-select-dropdown"
                 >
-                  {students.map((user) => (
+                  {filteredUsers.students.map((user) => (
                     <Option
-                      key={user.userId}
-                      value={user.userId}
-                      label={user.name}
-                      disabled={isUserAssignedElsewhere(user.userId, stopId)}
+                      key={user._id}
+                      value={user._id}
+                      label={`${user.firstName} ${user.lastName}`}
+                      disabled={isUserAssignedElsewhere(user._id, stopId)}
                     >
-                      <UserItem
-                        user={user}
-                        isAssignedElsewhere={isUserAssignedElsewhere(
-                          user.userId,
-                          stopId
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          src={user.profile}
+                          size="small"
+                          icon={<UserOutlined />}
+                        />
+
+                        <div className="font-medium">
+                          {user.firstName} {user.lastName}
+                        </div>
+                        {isUserAssignedElsewhere(user._id, stopId) && (
+                          <Tag color="orange" className="ml-2 text-xs">
+                            Assigned elsewhere
+                          </Tag>
                         )}
-                      />
+                      </div>
                     </Option>
                   ))}
                 </Select>
@@ -215,21 +231,28 @@ const UserAssignmentModal = ({
                   dropdownStyle={{ maxHeight: 250, overflow: "auto" }}
                   className="user-select-dropdown"
                 >
-                  {staff.map((user) => (
+                  {filteredUsers.staffs.map((user) => (
                     <Option
-                      key={user.userId}
-                      value={user.userId}
-                      label={user.name}
-                      disabled={isUserAssignedElsewhere(user.userId, stopId)}
+                      key={user._id}
+                      value={user._id}
+                      label={`${user.firstName} ${user.lastName}`}
+                      disabled={isUserAssignedElsewhere(user._id, stopId)}
                     >
-                      <UserItem
-                        user={user}
-                        isAssignedElsewhere={isUserAssignedElsewhere(
-                          user.userId,
-                          stopId
+                      <div className="flex items-center gap-3">
+                        <Avatar
+                          src={user.profile}
+                          size="small"
+                          icon={<UserOutlined />}
+                        />
+
+                        <div className="font-medium">{user.firstName}</div>
+
+                        {isUserAssignedElsewhere(user._id, stopId) && (
+                          <Tag color="orange" className="ml-2 text-xs">
+                            Assigned elsewhere
+                          </Tag>
                         )}
-                        showRole
-                      />
+                      </div>
                     </Option>
                   ))}
                 </Select>
@@ -242,45 +265,21 @@ const UserAssignmentModal = ({
   );
 };
 
-const UserItem = ({ user, isAssignedElsewhere, showRole = false }) => (
-  <div className="flex items-center gap-3">
-    <Avatar
-      src={user.profile}
-      size="small"
-      icon={<UserOutlined />}
-      className="flex-shrink-0"
-    />
-    <div className="flex-1 min-w-0">
-      <Text ellipsis className="block font-medium">
-        {user.name}
-      </Text>
-      {showRole && (
-        <Text type="secondary" className="text-xs block">
-          {user.role}
-        </Text>
-      )}
-    </div>
-    {isAssignedElsewhere && (
-      <Tag color="orange" className="ml-2 text-xs">
-        Assigned elsewhere
-      </Tag>
-    )}
-  </div>
-);
-
-// export default UserAssignmentModal;
-
-export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
+export default function RouteForm({
+  routeData,
+  onSuccess,
+  onDirtyChange,
+  t,
+  transportUsers,
+}) {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const { subRoutes = [] } = useSelector(
     (s) => s.transportation.transportSubRoute ?? { subRoutes: [] }
   );
-  const { loading } = useSelector((s) => s.transportation.transportRoute);
-  const { allUsers, loading: usersLoading } = useSelector(
-    (s) => s.admin.notice
-  );
 
+  console.log(subRoutes,"subRoutessubRoutes")
+  const { loading } = useSelector((s) => s.transportation.transportRoute);
   const [selectedStops, setSelectedStops] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [assignModal, setAssignModal] = useState({
@@ -292,11 +291,14 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
     hasStartPoint: true,
     hasEndPoint: true,
   });
-
-  /* Fetch users on mount */
-  useEffect(() => {
-    dispatch(fetchAllUsersThunk());
-  }, [dispatch]);
+  const [vehicleSidebar, setVehicleSidebar] = useState({
+    open: false,
+  });
+  const stopIds = useMemo(
+    () => selectedStops.map((s) => s.stopId),
+    [selectedStops]
+  );
+  const reorder = (arr) => arr.map((s, i) => ({ ...s, order: i + 1 }));
 
   /* Update assigned users list and validate start/end points */
   useEffect(() => {
@@ -333,9 +335,7 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
       isActive: routeData.isActive,
     });
 
-    // Use stops data if available, otherwise use stopage
     const stopsData = routeData.stops || routeData.stopage || [];
-
     const raw = stopsData.map((s, i, arr) => ({
       key: s.stopId ?? s._id,
       stopId: s.stopId ?? s._id,
@@ -348,12 +348,6 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
 
     setSelectedStops(raw);
   }, [routeData, form]);
-
-  const stopIds = useMemo(
-    () => selectedStops.map((s) => s.stopId),
-    [selectedStops]
-  );
-  const reorder = (arr) => arr.map((s, i) => ({ ...s, order: i + 1 }));
 
   /* add/remove */
   const onStopsSelectChange = (ids) => {
@@ -416,11 +410,11 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
               ...stop,
               students: studentIds.map((id) => ({
                 studentId: id,
-                ...allUsers.find((u) => u.userId === id),
+                ...transportUsers.students.find((u) => u.studentId === id),
               })),
               staffs: staffIds.map((id) => ({
                 staffId: id,
-                ...allUsers.find((u) => u.userId === id),
+                ...transportUsers.staffs.find((u) => u.staffId === id),
               })),
             }
           : stop
@@ -452,26 +446,31 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
   };
 
   /* submit */
-  const handleSubmit = async (vals) => {
-    // Validate start and end points
-    if (!formErrors.hasStartPoint || !formErrors.hasEndPoint) {
-      message.error(
-        "Please select both a starting and ending point for the route"
-      );
-      return;
-    }
+/* submit */
+const handleSubmit = async (vals) => {
+  // Validate start and end points
+  if (!formErrors.hasStartPoint || !formErrors.hasEndPoint) {
+    message.error(
+      "Please select both a starting and ending point for the route"
+    );
+    return;
+  }
 
-    const payload = {
-      ...vals,
-      stopage: selectedStops.map(
-        ({
-          stopId,
-          order,
-          isStartingPoint,
-          isEndingPoint,
-          students,
-          staffs,
-        }) => ({
+  const payload = {
+    ...vals,
+    stopage: selectedStops.map(
+      ({
+        stopId,
+        order,
+        isStartingPoint,
+        isEndingPoint,
+        students,
+        staffs,
+      }) => {
+        // Find the corresponding subRoute to get location data
+        const subRoute = subRoutes.find(sr => sr._id === stopId);
+        
+        return {
           stopId,
           order,
           isStartingPoint,
@@ -479,27 +478,35 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
           isActive: true,
           studentIds: students?.map((s) => s.studentId) || [],
           staffIds: staffs?.map((s) => s.staffId) || [],
-        })
-      ),
-    };
-
-    try {
-      if (routeData?._id || routeData?.routeId) {
-        await dispatch(
-          updateRoute({ id: routeData._id ?? routeData.routeId, data: payload })
-        ).unwrap();
-        message.success(t("Route updated successfully"));
-      } else {
-        await dispatch(createRoute(payload)).unwrap();
-        message.success(t("Route created successfully"));
+          // Include location data from subRoute
+          location: subRoute?.location 
+            ? { 
+                lat: subRoute.location.lat,
+                lng: subRoute.location.lng 
+              }
+            : null,
+          stopName: subRoute?.stopName || ''
+        };
       }
-      dispatch(getRoutesBySchool());
-      onDirtyChange?.(false);
-      onSuccess();
-    } catch (err) {
-      message.error(err.message ?? t("Failed to save route"));
-    }
+    ),
   };
+
+  try {
+    if (routeData?._id || routeData?.routeId) {
+      await dispatch(
+        updateRoute({ id: routeData._id ?? routeData.routeId, data: payload })
+      ).unwrap();
+      message.success(t("Route updated successfully"));
+    } else {
+      await dispatch(createRoute(payload)).unwrap();
+      message.success(t("Route created successfully"));
+    }
+    onDirtyChange?.(false);
+    onSuccess();
+  } catch (err) {
+    message.error(err.message ?? t("Failed to save route"));
+  }
+};
 
   /* columns */
   const columns = [
@@ -621,7 +628,7 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
 
   return (
     <>
-      <Spin spinning={loading || usersLoading}>
+      <Spin spinning={loading}>
         <Form
           form={form}
           layout="vertical"
@@ -631,7 +638,6 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
         >
           {(!formErrors.hasStartPoint || !formErrors.hasEndPoint) && (
             <Alert
-              // message="Route Configuration Required"
               description="Please select both a starting and ending point for the route"
               type="warning"
               showIcon
@@ -658,6 +664,31 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
               </Select>
             </Form.Item>
           </div>
+
+          {/* Vehicle assignment button (only shown when editing) */}
+          {routeData && (
+            <div className="mb-4">
+              <Button
+                type="primary"
+                icon={<CarOutlined />}
+                onClick={() => {
+                  setVehicleSidebar({
+                    open: true,
+                    routeId: routeData._id ?? routeData.routeId,
+                    currentVehicles:
+                      routeData.vehicles?.map((v) => v._id) || [],
+                  });
+                }}
+              >
+                Assign Vehicles to Route
+              </Button>
+              {routeData.vehicles?.length > 0 && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Currently assigned: {routeData.vehicles.length} vehicle(s)
+                </div>
+              )}
+            </div>
+          )}
 
           {/* select */}
           <Title level={5}>{t("Add Stops")}</Title>
@@ -780,13 +811,31 @@ export default function RouteForm({ routeData, onSuccess, onDirtyChange, t }) {
         <SubRouteModal open={modalOpen} onClose={() => setModalOpen(false)} />
       </Modal>
 
+      <Sidebar
+        isOpen={vehicleSidebar.open}
+        onClose={() => setVehicleSidebar({ open: false })}
+        title="Assign Vehicles to Route"
+        width="40%"
+      >
+        {vehicleSidebar.open && (
+          <VehicleAssignment
+            routeId={vehicleSidebar.routeId}
+            currentVehicles={vehicleSidebar.currentVehicles}
+            onSuccess={() => {
+              dispatch(getRoutesBySchool());
+              setVehicleSidebar({ open: false });
+            }}
+          />
+        )}
+      </Sidebar>
+
       <UserAssignmentModal
         visible={assignModal.visible}
         onCancel={() => setAssignModal({ visible: false, stopId: null })}
         onOk={handleUserAssignmentSubmit}
         stopId={assignModal.stopId}
         subRoutes={subRoutes}
-        allUsers={allUsers}
+        transportUsers={transportUsers}
         assignedUsers={assignedUsers}
       />
     </>
