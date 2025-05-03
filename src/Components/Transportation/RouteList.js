@@ -160,7 +160,7 @@ const RouteList = ({ onEdit }) => {
       title: "Stops",
       render: (_, r) => (
         <Link
-          to={`/transportation/routes/${r._id ?? r.routeId}/stoppages`}
+          to={`/transportation/route-management/routes/${r._id ?? r.routeId}/stoppages`}
           className="text-blue-500 underline"
           onClick={(e) => e.stopPropagation()}
         >

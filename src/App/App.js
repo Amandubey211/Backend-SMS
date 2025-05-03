@@ -163,6 +163,10 @@ const Stoppage = lazy(() =>
   import("../Components/Transportation/StopageList.js")
 );
 
+const ViewTripLogs = lazy(() =>
+  import("../Modules/Admin/Transportation/ViewTripLogs.js")
+);
+
 // 3. Academic Management
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
@@ -899,9 +903,16 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/transportation/routes/:id/stoppages",
+      path: "/transportation/route-management/routes/:id/stoppages",
       element: (
         <ProtectRoute Component={Stoppage} allowedRoles={["admin", "staff"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/route-management/view-trip/1/logs",
+      element: (
+        <ProtectRoute Component={ViewTripLogs} allowedRoles={["admin", "staff"]} />
       ),
       errorElement: <Error />,
     },
