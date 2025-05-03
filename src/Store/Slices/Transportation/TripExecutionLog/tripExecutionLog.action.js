@@ -18,7 +18,6 @@ export const createTripLog = createAsyncThunk(
         return handleError(error, dispatch, rejectWithValue);
       }
     }
-  }
 );
 
 export const startTripLog = createAsyncThunk(
