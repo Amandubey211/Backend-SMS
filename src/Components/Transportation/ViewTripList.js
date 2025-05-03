@@ -25,7 +25,11 @@ import {
 } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTripLogsByVehicle } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
+import {
+  endTripLog,
+  getTripLogsByVehicle,
+  startTripLog,
+} from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
 import {
   Tabs,
   Table,
@@ -111,7 +115,7 @@ const ViewTripsList = () => {
   const [showDetailsSidebar, setShowDetailsSidebar] = useState(false);
   const [selectedTripForDetails, setSelectedTripForDetails] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-
+  const [isGpsOn, setIsGpsOn] = useState(false);
   const { loading, error, vehicleWiseLogs } = useSelector(
     (s) => s.transportation.tripExecutionLog
   );
@@ -254,13 +258,12 @@ const ViewTripsList = () => {
           </div>
           <div>
             <div className="font-medium">
-              {record.routeId?.routeName || "N/A"}
+              {record.tripType === "pickup"
+                ? "Pick Up"
+                : "Drop Off"}
             </div>
             <div className="text-xs text-gray-500">
               {dayjs(record.tripDate).format("MMM D, YYYY")}
-              {record.tripType === "pickup"
-                ? " • Morning Pickup"
-                : " • Afternoon Drop"}
             </div>
           </div>
         </div>
@@ -454,7 +457,18 @@ const ViewTripsList = () => {
           message.success(`Trip ${trip._id} started successfully`);
           setConfirmLoading(false);
           // In a real app, you would dispatch an action here
-          // dispatch(startTrip(trip._id));
+          const payload = {
+            DEFAULT_SPEED_KMPH: 40,
+            HALT_TIME_MINUTES: 2,
+          };
+          dispatch(
+            startTripLog({
+              tripId: trip._id,
+              isGPSOn: isGpsOn,
+              payload,
+              vehicleId,
+            })
+          );
         }, 1500);
       },
     });
@@ -475,7 +489,7 @@ const ViewTripsList = () => {
           message.success(`Trip ${trip._id} ended successfully`);
           setConfirmLoading(false);
           // In a real app, you would dispatch an action here
-          // dispatch(endTrip(trip._id));
+          dispatch(endTripLog({ tripId: trip._id, vehicleId }));
         }, 1500);
       },
     });

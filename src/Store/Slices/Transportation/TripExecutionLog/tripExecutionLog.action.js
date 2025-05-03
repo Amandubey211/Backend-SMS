@@ -22,14 +22,15 @@ export const createTripLog = createAsyncThunk(
 
 export const startTripLog = createAsyncThunk(
   "tripExecutionLog/start",
-  async ({ tripId, isGPSOn, bodyData }, { rejectWithValue, dispatch }) => {
+  async ({ tripId, isGPSOn, payload,vehicleId }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const query = `isGPSOn=${isGPSOn}`;
       const data = await postData(
         `/transport/start-trip/${tripId}?${query}`,
-        bodyData
+        payload
       );
+      dispatch(getTripLogsByVehicle(vehicleId))
       return data;
     } catch (error) {
       console.error("Error in startTripLog:", error);
@@ -40,10 +41,11 @@ export const startTripLog = createAsyncThunk(
 
 export const endTripLog = createAsyncThunk(
   "tripExecutionLog/end",
-  async (tripId, { rejectWithValue, dispatch }) => {
+  async ({tripId,vehicleId}, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const data = await postData(`/transport/trip/${tripId}/end`);
+      dispatch(getTripLogsByVehicle(vehicleId));
       return data;
     } catch (error) {
       console.error("Error in endTripLog:", error);
