@@ -28,7 +28,7 @@ import {
   UnorderedListOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 
 import {
@@ -57,7 +57,7 @@ const RouteList = ({ onEdit }) => {
     content: null,
     title: "",
   });
-
+  const navigate = useNavigate();
   /* delete-modal state */
   const [deleteInfo, setDeleteInfo] = useState({
     open: false,
@@ -175,7 +175,9 @@ const RouteList = ({ onEdit }) => {
       title: "Stops",
       render: (_, r) => (
         <Link
-          to={`/transportation/route-management/routes/${r._id ?? r.routeId}/stoppages`}
+          to={`/transportation/route-management/routes/${
+            r._id ?? r.routeId
+          }/stoppages`}
           className="text-blue-500 underline"
           onClick={(e) => e.stopPropagation()}
         >
@@ -300,7 +302,7 @@ const RouteList = ({ onEdit }) => {
                 render: (d) => (
                   <div className="flex items-center">
                     <UserOutlined className="mr-2" />
-                    {d || "N/A"}
+                    {d || "Driver Name"}
                   </div>
                 ),
               },
@@ -375,7 +377,12 @@ const RouteList = ({ onEdit }) => {
                       <Button
                         size="small"
                         icon={<UnorderedListOutlined />}
-                        onClick={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(
+                            `/transportation/route-management/view-trip/${v.vehicleId}/logs`
+                          ); // Navigate to the logs page with vehicleId
+                        }}
                       >
                         View Trips
                       </Button>
