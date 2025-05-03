@@ -18,7 +18,7 @@ export const initialValues = {
     idExpiry: "",
     nativeLanguage: "",
     primaryContact: "",
-    phoneNumber: "",
+    contactNumber: "",
     email: "",
     emergencyNumber: "",
     age: "",
@@ -38,7 +38,7 @@ export const initialValues = {
   languagePrefs: {
     second: [],
     third: [],
-    valueEd: "",
+    valueEd: [],
     leftHanded: false,
   },
   medicalInfo: "",
@@ -79,7 +79,6 @@ export const initialValues = {
   },
   motherInfo: {
     idNumber: "",
-    profileImage: null,
     motherPhoto: null,
     idExpiry: "",
     firstName: "",

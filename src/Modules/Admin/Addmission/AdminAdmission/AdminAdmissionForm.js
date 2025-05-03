@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useCallback, memo } from "react";
+import React, { useRef, useEffect, useMemo, useCallback, memo, useState } from "react";
 import { Formik, Form, useFormikContext } from "formik";
 import { Button, message } from "antd";
 import * as Yup from "yup";
@@ -16,6 +16,8 @@ import { registerStudentDetails } from "../../../../Store/Slices/Common/Auth/act
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSchoolAttachmentsById } from "../../../../Store/Slices/Admin/Admission/admissionThunk";
 import useDynamicAttachments from "../../../../Hooks/Admin/useDynamicAttachments";
+import { fetchAdmissionOptions } from "../../../../Store/Slices/Common/User/actions/userActions";
+import toast from "react-hot-toast";
 
 const FormDataWatcher = memo(({ onChange }) => {
   const { values } = useFormikContext();
@@ -92,10 +94,159 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
     }
     return missing;
   }, []);
-
-  const handleFormSubmit = useCallback(
-    async (values, actions) => {
+  const [fields, setFields] = useState([]);
+    const { classes, loading: classLoading } = useSelector(
+      (state) => state.admin.class
+    );
+  useEffect(() => {
+    dispatch(fetchAdmissionOptions(schoolId)).then((res) => {
+      const {fieldOptionality} = res.payload?.data || {};
+      if(fieldOptionality?.length > 0){
+        setFields(fieldOptionality)
+      }
+    });
+  }, []);
+  const formatLabel = (text)=> {
+    return text
+      .split('.')
+      .map(part =>
+        part
+          .replace(/([A-Z])/g, ' $1') 
+          .replace(/^./, str => str.toUpperCase()) 
+      )
+      .join(' - ');
+  }
+  const handleFormSubmit = async (values, actions) => {
       try {
+        for (let key of Object.keys(values?.candidateInformation || {})) {
+          const val = fields?.find((field) => field?.fieldName == key);
+          console.log(key,val);
+          if(!val){
+            if(!values?.candidateInformation[key]){
+              toast.error(`Candidate ${formatLabel(key)} is requireds`);
+              return;
+            }
+          }
+          if (val?.required == true) {
+            if (!values?.candidateInformation[val.fieldName]) {
+              toast.error(`Candidate ${formatLabel(val.fieldName)} is requiredd`);
+
+              return;
+            }
+          }
+        }
+        for (let key of Object.keys(values?.academicSession || {})) {
+          if(!values?.academicSession[key]){
+            toast.error(`In "Academic Session" Section: ${formatLabel(key)} is required`);
+            return;
+        }
+      }
+            if (fields?.find((field) => field?.fieldName == "secondLanguage").required &  values?.languagePrefs?.second?.length < 1) {
+              toast.error(`Second Language is required`);
+              return;
+            }
+            if (fields?.find((field) => field?.fieldName == "thirdLanguage").required &  values?.languagePrefs?.third?.length < 1) {
+              toast.error(`Third Language is required`);
+              return;
+            }
+
+           //academic history
+            for (let key of Object.keys(values?.academicHistory || {})) {
+              const val = fields?.find((field) => field?.fieldName?.toString() == key?.toString());
+              if(!val){
+                if(!values?.academicHistory[key]){
+                  toast.error(`Academic History: ${formatLabel(key)} is required`);
+                  return;
+                }
+              }
+              if (val?.required === true) {
+                if (!values?.academicHistory[val.fieldName]) {
+                  toast.error(`Academic History: ${formatLabel(val.fieldName)} is required`);
+                  return;
+                }
+              }
+            }
+            //address 
+            for (let key of Object.keys(values?.addressInformation || {})) {
+              const val = fields?.find((field) => field?.fieldName?.toString() == `address.${key.toString()}`);
+              if(!val){
+                if(!values?.addressInformation[key]){
+                  toast.error(`Address Information: ${formatLabel(key)} is required`);
+                  return;
+                }
+              }
+              if (val?.required === true) {
+                if (!values?.addressInformation[val.fieldName?.split('.')[1]]) {
+                  toast.error(`Address Information: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+    
+                  return;
+                }
+              }
+            }
+            //father info
+            for (let key of Object.keys(values?.fatherInfo || {})) {
+              const val = fields?.find((field) => field?.fieldName?.toString() == `fatherInfo.${key.toString()}`);
+              if(!val){
+                if(!values?.fatherInfo[key]){
+                  toast.error(`Father Info: ${formatLabel(key)} is required`);
+                  return;
+                }
+              }
+              if (val?.required === true) {
+                if(["cell1","cell2"].includes(key)){
+                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
+                    toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+                    return;
+                  }
+                }else{
+                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
+                    toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+                    return;
+                  }
+                }
+               
+              }
+            }
+            //mother info
+            for (let key of Object.keys(values?.motherInfo|| {})) {
+              const val = fields?.find((field) => field?.fieldName?.toString() == `motherInfo.${key.toString()}`);
+              if(!val){
+                if(!values?.motherInfo[key]){
+                  toast.error(`Mother Info: ${formatLabel(key)} is required`);
+                  return;
+                }
+              }
+              if (val?.required === true) {
+                if(["cell1","cell2"].includes(key)){
+
+                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
+                    toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+      
+                    return;
+                  }
+                }else{
+                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
+                    toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+      
+                    return;
+                  }
+                }
+               
+              }
+            }
+
+            const showThirdLang = () => {
+                const clsLabel =
+                classes?.find((c) => c._id == values.academicSession.class)
+                    ?.label || "";
+                const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
+                return gradeNum >= 3;
+              }
+            if ( showThirdLang & fields?.find((field) => field?.fieldName == "valueEducation").required & 
+             values?.languagePrefs?.valueEd?.length < 1) {
+              toast.error(`Value Education is required`);
+              return;
+            }
         // Validate mandatory attachments and check for any missing files
         const missingAttachments = validateMandatoryAttachments(values);
         if (missingAttachments.length > 0) {
@@ -261,9 +412,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       } finally {
         actions.setSubmitting(false); // Ensure form submission state is reset
       }
-    },
-    [dispatch, schoolId, validateMandatoryAttachments]
-  );
+    }
 
   return (
     <div className="bg-white rounded-md p-4">
@@ -313,15 +462,6 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
                   border: "none",
                   color: "#ffffff",
                 }}
-                onClick={async () => {
-                  const formErrors = await validateForm();
-                  console.log(formErrors, "formErrorsformErrors");
-                  if (Object.keys(formErrors).length > 0) {
-                    handleFormikErrorScroll(formErrors);
-                    message.error("Please correct the form errors");
-                  }
-                }}
-                block
               >
                 Save & Submit
               </Button>

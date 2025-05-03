@@ -146,6 +146,36 @@ const AddressInformation = () => {
               placeholder="Proposed Campus"
             />
           </Col>
+       
+        
+        </Row>
+        <Row gutter={[16, 16]}>
+        <Col xs={24} md={8}>
+            <CompactIconInput
+              name="addressInformation.state"
+              icon={<BankFilled />}
+              tooltip="Enter State/region"
+              placeholder="Enter State/region"
+            />
+          </Col>
+          <Col xs={24} md={8}>
+            <CompactIconInput
+              name="addressInformation.country"
+              icon={<PushpinOutlined />}
+              tooltip="Enter country"
+              placeholder="country"
+            />
+          </Col>
+          <Col xs={24} md={8}>
+            <CompactIconInput
+              name="addressInformation.postalCode"
+              icon={<BankFilled />}
+              tooltip="Enter postal Code/Zip Code"
+              placeholder="Enter postal Code/Zip Code"
+            />
+          </Col>
+       
+        
         </Row>
       </div>
     </div>

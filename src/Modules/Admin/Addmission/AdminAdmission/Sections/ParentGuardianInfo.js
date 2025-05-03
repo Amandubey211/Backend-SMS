@@ -280,7 +280,7 @@ const ParentGuardianInfo = () => {
                 type="email"
               />
             </Col>
-            <Col xs={24} md={12}>
+            {/* <Col xs={24} md={12}>
               <CompactIconInput
                 name="motherInfo.email2"
                 icon={<MailOutlined />}
@@ -288,7 +288,7 @@ const ParentGuardianInfo = () => {
                 placeholder="Email 2"
                 type="email"
               />
-            </Col>
+            </Col> */}
           </Row>
         </Col>
       </Row>
