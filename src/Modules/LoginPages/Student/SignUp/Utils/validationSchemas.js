@@ -46,8 +46,8 @@ export const CandidateSchema = yup.object({
 
   dob: yup.date().typeError("Required").required(),
 
-  idExpiry: yup.string().transform(toDate).nullable(),
-  passportExpiry: yup.string().transform(toDate).nullable(),
+  // idExpiry: yup.string().transform(toDate).nullable(),
+  // passportExpiry: yup.string().transform(toDate).nullable(),
 
   gender: yup.string().required("Gender is required"),
   placeOfBirth: yup.string().required("Place of birth is required"),

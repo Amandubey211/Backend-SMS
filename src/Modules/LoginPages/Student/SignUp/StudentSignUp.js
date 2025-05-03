@@ -23,10 +23,7 @@ import {
 
 import { clearDraft } from "../../../../Utils/signupDraft";
 
-import {
-  registerStudentDetails,
-  uploadStudentDocuments,
-} from "../../../../Store/Slices/Common/Auth/actions/studentActions";
+import { registerStudentDetails } from "../../../../Store/Slices/Common/Auth/actions/studentActions";
 import { stepSchemas } from "./Utils/validationSchemas";
 
 /* Derive completion checker directly from Yup schemas */
@@ -146,16 +143,6 @@ const StudentSignUp = () => {
       const { documents, ...details } = formData;
 
       await dispatch(registerStudentDetails(details)).unwrap();
-
-      if (documents?.length) {
-        await dispatch(
-          uploadStudentDocuments({
-            email: details?.candidate?.email,
-            schoolId: details?.school?.schoolId,
-            studentDocuments: { documents },
-          })
-        ).unwrap();
-      }
 
       dispatch(resetSignup());
       clearDraft();
