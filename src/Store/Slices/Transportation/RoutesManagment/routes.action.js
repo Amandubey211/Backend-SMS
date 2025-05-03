@@ -82,3 +82,33 @@ export const deleteRoute = createAsyncThunk(
     }
   }
 );
+
+/* 🔹 GET TRANSPORT USERS ---------------------------------------- */
+export const getTransportUsers = createAsyncThunk(
+  "routes/getTransportUsers",
+  async (_, { dispatch, rejectWithValue }) => {
+    try {
+      silent(dispatch);
+      return await getData("/transport/route/student/staff/list");
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
+    }
+  }
+);
+
+/* 🔹 ASSIGN VEHICLES TO ROUTE ----------------------------------- */
+export const assignVehiclesToRoute = createAsyncThunk(
+  "routes/assignVehicles",
+  async ({ routeId, vehicleIds }, { dispatch, rejectWithValue }) => {
+    try {
+      silent(dispatch);
+      const res = await putData(`/transport/route/assignVehicle/${routeId}`, {
+        vehicleIds,
+      });
+      dispatch(getRoutesBySchool()); // refresh list
+      return res;
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
+    }
+  }
+);

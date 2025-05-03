@@ -1,4 +1,4 @@
-/* Path: Modules/Admin/Transportation/RouteManagement/Components/RouteList.jsx */
+// RouteList.jsx (updated)
 import React, { useEffect, useState } from "react";
 import {
   Table,
@@ -21,17 +21,25 @@ import {
   EditOutlined,
   DeleteOutlined,
   PlusOutlined,
-  UserOutlined,
   CarOutlined,
+  UserOutlined,
+  UserAddOutlined,
+  PlusCircleOutlined,
+  UnorderedListOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 import {
   deleteRoute,
   getRoutesBySchool,
 } from "../../Store/Slices/Transportation/RoutesManagment/routes.action";
 import DeleteModal from "../Common/DeleteModal";
+import CreateTrip from "../../Modules/Admin/Transportation/RouteManagement/Components/CreateTrip";
+import AddUsers from "../../Modules/Admin/Transportation/RouteManagement/Components/AddUsers";
+import Sidebar from "../Common/Sidebar";
+import VehicleAssignment from "../../Modules/Admin/Transportation/RouteManagement/Components/VehicleAssignment";
 
 const RouteList = ({ onEdit }) => {
   const { loading, error, transportRoutes } = useSelector(
@@ -43,6 +51,13 @@ const RouteList = ({ onEdit }) => {
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [filters, setFilters] = useState({ status: null, vehicleCount: null });
 
+  /* Sidebar states */
+  const [sidebarState, setSidebarState] = useState({
+    isOpen: false,
+    content: null,
+    title: "",
+  });
+
   /* delete-modal state */
   const [deleteInfo, setDeleteInfo] = useState({
     open: false,
@@ -50,16 +65,19 @@ const RouteList = ({ onEdit }) => {
     name: "",
   });
 
-  /* fetch */
-  useEffect(() => {
-    dispatch(getRoutesBySchool());
-  }, [dispatch]);
+  const handleExpand = (expanded, record) => {
+    const recordId = record._id ?? record.routeId;
 
-  /* helpers */
-  const handleExpand = (exp, rec) =>
-    setExpandedRowKeys((prev) =>
-      exp ? [...prev, rec._id] : prev.filter((k) => k !== rec._id)
-    );
+    if (expanded) {
+      if (expandedRowKeys.includes(recordId)) {
+        setExpandedRowKeys([]);
+      } else {
+        setExpandedRowKeys([recordId]);
+      }
+    } else {
+      setExpandedRowKeys(expandedRowKeys.filter((k) => k !== recordId));
+    }
+  };
 
   const confirmDelete = () =>
     dispatch(deleteRoute(deleteInfo.id)).then(() =>
@@ -72,15 +90,15 @@ const RouteList = ({ onEdit }) => {
     const matchTxt =
       r.routeName.toLowerCase().includes(q) ||
       r.stops[0]?.stopName.toLowerCase().includes(q) ||
-      r.stops[r.stops.length - 1]?.stopName.toLowerCase().includes(q);
+      r.stops[r.stops?.length - 1]?.stopName.toLowerCase().includes(q);
 
     const matchStatus =
       filters.status === null || r.isActive === filters.status;
     const matchVeh =
       filters.vehicleCount === null ||
       (filters.vehicleCount === "empty"
-        ? r.vehicles.length === 0
-        : r.vehicles.length > 0);
+        ? r.vehicles?.length === 0
+        : r.vehicles?.length > 0);
     return matchTxt && matchStatus && matchVeh;
   });
 
@@ -118,25 +136,22 @@ const RouteList = ({ onEdit }) => {
     {
       title: "Route Name",
       dataIndex: "routeName",
-      render: (txt, r) => (
-        <div className="flex items-center">
-          <Button
-            type="text"
-            icon={
-              expandedRowKeys.includes(r._id) ? (
-                <UpOutlined />
-              ) : (
-                <DownOutlined />
-              )
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-              handleExpand(!expandedRowKeys.includes(r._id), r);
-            }}
-          />
-          <span className="ml-2 font-medium">{txt}</span>
-        </div>
-      ),
+      render: (txt, r) => {
+        const isExpanded = expandedRowKeys.includes(r._id ?? r.routeId);
+        return (
+          <div className="flex items-center">
+            <Button
+              type="text"
+              icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleExpand(!isExpanded, r);
+              }}
+            />
+            <span className="ml-2 font-medium">{txt}</span>
+          </div>
+        );
+      },
       sorter: (a, b) => a.routeName.localeCompare(b.routeName),
     },
     {
@@ -154,7 +169,7 @@ const RouteList = ({ onEdit }) => {
     { title: "Start Point", render: (_, r) => r.stops?.[0]?.stopName || "N/A" },
     {
       title: "End Point",
-      render: (_, r) => r.stops?.[r.stops.length - 1]?.stopName || "N/A",
+      render: (_, r) => r.stops?.[r.stops?.length - 1]?.stopName || "N/A",
     },
     {
       title: "Stops",
@@ -164,20 +179,20 @@ const RouteList = ({ onEdit }) => {
           className="text-blue-500 underline"
           onClick={(e) => e.stopPropagation()}
         >
-          {r.stops.length} Stops
+          {r.stops?.length} Stops
         </Link>
       ),
-      sorter: (a, b) => a.stops.length - b.stops.length,
+      sorter: (a, b) => a.stops?.length - b.stops?.length,
     },
     {
       title: "Vehicles",
       render: (_, r) => (
         <div className="flex items-center">
           <CarOutlined className="mr-1" />
-          {r.vehicles.length}
+          {r.vehicles?.length || 0}
         </div>
       ),
-      sorter: (a, b) => a.vehicles.length - b.vehicles.length,
+      sorter: (a, b) => (a.vehicles?.length || 0) - (b.vehicles?.length || 0),
     },
     {
       title: "Actions",
@@ -189,7 +204,6 @@ const RouteList = ({ onEdit }) => {
               icon={<EditOutlined className="text-blue-500" />}
               onClick={(e) => {
                 e.stopPropagation();
-                /* pass id under _id for the form */
                 onEdit({
                   ...r,
                   _id: r._id ?? r.routeId,
@@ -197,7 +211,7 @@ const RouteList = ({ onEdit }) => {
                     stopId: s.stopId ?? s._id,
                     order: i + 1,
                     isStartingPoint: i === 0,
-                    isEndingPoint: i === r.stops.length - 1,
+                    isEndingPoint: i === r.stops?.length - 1,
                   })),
                 });
               }}
@@ -223,59 +237,172 @@ const RouteList = ({ onEdit }) => {
   ];
 
   /* expanded vehicles */
-  const expandedRowRender = (r) =>
-    !r.vehicles.length ? (
-      <div className="p-4 text-center">
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No vehicles assigned"
-        >
-          <Button type="primary" icon={<PlusOutlined />}>
-            Assign Vehicle
+  const expandedRowRender = (r) => {
+    console.log(r, "sdfsdfsdfsdf");
+    const isExpanded = expandedRowKeys.includes(r._id ?? r.routeId);
+
+    return isExpanded ? (
+      <motion.div
+        initial={{ opacity: 0, height: 0 }}
+        animate={{ opacity: 1, height: "auto" }}
+        exit={{ opacity: 0, height: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-gray-50 rounded-lg p-4 mb-4"
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-lg m-0">Assigned Vehicles</h3>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => {
+              setSidebarState({
+                isOpen: true,
+                title: `Assign Vehicles to ${r.routeName}`,
+                content: (
+                  <VehicleAssignment
+                    routeId={r._id ?? r.routeId}
+                    currentVehicles={r.vehicles?.map((v) => v.vehicleId) || []}
+                    onSuccess={() => {
+                      dispatch(getRoutesBySchool());
+                      setSidebarState({ isOpen: false });
+                    }}
+                  />
+                ),
+              });
+            }}
+          >
+            Assign Vehicles
           </Button>
-        </Empty>
-      </div>
-    ) : (
-      <Table
-        size="small"
-        pagination={false}
-        rowKey="vehicleId"
-        dataSource={r.vehicles}
-        columns={[
-          {
-            title: "Vehicle",
-            dataIndex: "vehicleNumber",
-            render: (v) => <strong>{v}</strong>,
-          },
-          {
-            title: "Driver",
-            dataIndex: "driverName",
-            render: (d) => (
-              <div className="flex items-center">
-                <UserOutlined className="mr-2" />
-                {d || "N/A"}
-              </div>
-            ),
-          },
-          { title: "Type", dataIndex: "vehicleType" },
-          {
-            title: "Capacity",
-            dataIndex: "seatingCapacity",
-            render: (c) => `${c} seats`,
-          },
-          {
-            title: "Students",
-            render: (_, v) => (
-              <Badge count={v.students?.length || 0} showZero color="#7F35CD" />
-            ),
-          },
-        ]}
-      />
-    );
+        </div>
+
+        {!r.vehicles?.length ? (
+          <div className="p-4 text-center bg-white rounded-lg">
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No vehicles assigned"
+            />
+          </div>
+        ) : (
+          <Table
+            size="small"
+            pagination={false}
+            rowKey="vehicleId"
+            dataSource={r.vehicles}
+            columns={[
+              {
+                title: "Vehicle",
+                dataIndex: "vehicleNumber",
+                render: (v) => <strong>{v}</strong>,
+              },
+              {
+                title: "Driver",
+                dataIndex: "driverName",
+                render: (d) => (
+                  <div className="flex items-center">
+                    <UserOutlined className="mr-2" />
+                    {d || "N/A"}
+                  </div>
+                ),
+              },
+              { title: "Type", dataIndex: "vehicleType" },
+              {
+                title: "Capacity",
+                dataIndex: "seatingCapacity",
+                render: (c) => `${c} seats`,
+              },
+              {
+                title: "Students",
+                render: (_, v) => (
+                  <Badge
+                    count={v.students?.length || 0}
+                    showZero
+                    color="#7F35CD"
+                  />
+                ),
+              },
+              {
+                title: "Actions",
+                render: (_, v) => (
+                  <Space>
+                    <Tooltip title="Add Users">
+                      <Button
+                        size="small"
+                        icon={<UserAddOutlined />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSidebarState({
+                            isOpen: true,
+                            title: `Add Users to ${v.vehicleNumber}`,
+                            content: (
+                              <AddUsers
+                                vehicle={v}
+                                onClose={() =>
+                                  setSidebarState({ isOpen: false })
+                                }
+                              />
+                            ),
+                          });
+                        }}
+                      >
+                        Add Users
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="Create Trip">
+                      <Button
+                        size="small"
+                        icon={<PlusCircleOutlined />}
+                        type="primary"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSidebarState({
+                            isOpen: true,
+                            title: `Create Trip for ${v.vehicleNumber}`,
+                            content: (
+                              <CreateTrip
+                                vehicle={v}
+                                onClose={() =>
+                                  setSidebarState({ isOpen: false })
+                                }
+                              />
+                            ),
+                          });
+                        }}
+                      >
+                        Create Trip
+                      </Button>
+                    </Tooltip>
+                    <Tooltip title="View Trips">
+                      <Button
+                        size="small"
+                        icon={<UnorderedListOutlined />}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        View Trips
+                      </Button>
+                    </Tooltip>
+                  </Space>
+                ),
+              },
+            ]}
+            className="rounded-lg overflow-hidden"
+          />
+        )}
+      </motion.div>
+    ) : null;
+  };
 
   /* render */
   return (
     <div>
+      {/* Sidebar for Add Users and Create Trip */}
+      <Sidebar
+        isOpen={sidebarState.isOpen}
+        title={sidebarState.title}
+        onClose={() => setSidebarState({ isOpen: false })}
+      >
+        {sidebarState.content}
+      </Sidebar>
+
       {/* filters */}
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <Input
@@ -328,7 +455,7 @@ const RouteList = ({ onEdit }) => {
           </Empty>
         ) : (
           <Table
-            rowKey="_id"
+            rowKey={(record) => record._id ?? record.routeId}
             pagination={false}
             dataSource={filteredRoutes}
             columns={columns}
@@ -336,6 +463,7 @@ const RouteList = ({ onEdit }) => {
               expandedRowRender,
               expandedRowKeys,
               onExpand: handleExpand,
+              expandRowByClick: true,
             }}
             locale={{
               emptyText: (
@@ -349,6 +477,7 @@ const RouteList = ({ onEdit }) => {
                 </Empty>
               ),
             }}
+            className="rounded-lg overflow-hidden"
           />
         )}
       </Spin>
