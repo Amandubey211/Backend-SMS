@@ -46,7 +46,7 @@ const RouteList = ({ onEdit }) => {
     (s) => s.transportation.transportRoute
   );
   const dispatch = useDispatch();
- console.log("trnasport route",transportRoutes)
+  console.log("trnasport route", transportRoutes);
   const [searchText, setSearchText] = useState("");
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [filters, setFilters] = useState({ status: null, vehicleCount: null });
@@ -306,6 +306,16 @@ const RouteList = ({ onEdit }) => {
                   </div>
                 ),
               },
+              {
+                title: "Helper",
+                dataIndex: "helperName",
+                render: (helperName) => (
+                  <div className="flex items-center">
+                    <UserOutlined className="mr-2" />
+                    {helperName || "Helper Name"}
+                  </div>
+                ),
+              },
               { title: "Type", dataIndex: "vehicleType" },
               {
                 title: "Capacity",
@@ -316,9 +326,19 @@ const RouteList = ({ onEdit }) => {
                 title: "Students",
                 render: (_, v) => (
                   <Badge
-                    count={v.students?.length || 0}
+                    count={v.students?.length || v?.totalStudents || 0}
                     showZero
                     color="#7F35CD"
+                  />
+                ),
+              },
+              {
+                title: "Staff",
+                render: (_, v) => (
+                  <Badge
+                    count={v.staffs?.length || v?.totalStaffs || 0} // Assuming the field is called 'staffs'
+                    showZero
+                    color="#1890ff" // Different color to distinguish from students
                   />
                 ),
               },

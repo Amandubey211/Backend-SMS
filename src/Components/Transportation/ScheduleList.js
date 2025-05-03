@@ -27,9 +27,9 @@ const ScheduleList = () => {
   const filteredSchedules = schedules?.filter((schedule) => {
     const q = searchText.toLowerCase();
     return (
-      schedule.shift.toLowerCase().includes(q) ||
-      schedule.fromTime.toLowerCase().includes(q) ||
-      schedule.toTime.toLowerCase().includes(q)
+      schedule.shift?.toLowerCase().includes(q) ||
+      schedule.fromTime?.toLowerCase().includes(q) ||
+      schedule.toTime?.toLowerCase().includes(q)
     );
   });
 

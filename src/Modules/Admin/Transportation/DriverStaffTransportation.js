@@ -19,6 +19,11 @@ import DriverSidebarForm from "../../../Components/Transportation/DriverSidebarF
 import DriverFilterSidebar from "../../../Components/Transportation/DriverFilterSidebar";
 import DeleteModal from "../../../Components/Common/DeleteModal";
 import TabButton from "./TabButton";
+import HelperTable from "../../../Components/Transportation/HelperTable";
+import { addHelper, deleteHelper, fetchHelperList, updateHelper } from "../../../Store/Slices/Transportation/Helper/helper.action";
+import HelperQuickFilter from "../../../Components/Transportation/HelperQuickFilter";
+import HelperSidebarForm from "../../../Components/Transportation/HelperSidebarForm";
+import HelperFilterSidebar from "../../../Components/Transportation/HelperFilterSidebar";
 
 const DriverStaffTransportation = () => {
   const dispatch = useDispatch();
@@ -33,6 +38,9 @@ const DriverStaffTransportation = () => {
     (state) => state.transportation.transportVehicle
   );
 
+  const { helpers } = useSelector(
+    (state) => state.transportation.transportHelper
+  );
 
   const [filteredDrivers, setFilteredDrivers] = useState([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -49,10 +57,23 @@ const DriverStaffTransportation = () => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedDriverId, setSelectedDriverId] = useState(null);
+  const [selectedHelperId, setSelectedHelperId] = useState(null);
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteHelperModalOpen, setDeleteHelperModalOpen] = useState(false);
   const [selectedDriver, setSelectedDriver] = useState(null);
-
+  const [selectedHelper, setSelectedHelper] = useState(null);
+  const [filteredHelpers, setFilteredHelpers] = useState([]);
+  const [helperData, setHelperData] = useState({
+    fullName: "",
+    helperBadgeNumber: "",
+    gender: "",
+    email: "",
+    contactNumber: "",
+    status: "active",
+    assignedBus: "",
+    documents: [],
+  });
 
   const [driverData, setDriverData] = useState({
     fullName: "",
@@ -81,6 +102,7 @@ const DriverStaffTransportation = () => {
   // Fetch drivers when component mounts
   useEffect(() => {
     dispatch(fetchDriverList({}));
+    dispatch(fetchHelperList());
     dispatch(getAllVehicles());
   }, [dispatch]);
 
@@ -125,9 +147,42 @@ const DriverStaffTransportation = () => {
     setFilteredDrivers(result);
   }, [drivers, filterConfig, sortConfig]);
 
+  // Apply filtering for helpers (similar to drivers)
+  useEffect(() => {
+    if (!helpers) return;
+    console.log("helperss----", helpers)
+    let result = [...helpers];
+
+    if (filterConfig.name) {
+      result = result.filter((helper) =>
+        helper.fullName?.toLowerCase().includes(filterConfig.name.toLowerCase())
+      );
+    }
+
+    if (filterConfig.status !== "all") {
+      result = result.filter((helper) => helper.status === filterConfig.status);
+    }
+
+    if (filterConfig.assignedBus !== "all") {
+      result = result.filter(
+        (helper) => helper.assignedBus === filterConfig.assignedBus
+      );
+    }
+    setFilteredHelpers(result);
+  }, [helpers, filterConfig]);
+
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setDriverData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleHelperChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setHelperData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
@@ -184,36 +239,81 @@ const DriverStaffTransportation = () => {
     setIsSidebarOpen(true);
   };
 
+  const handleHelperEdit = (helper) => {
+    setIsEditing(true);
+    setSelectedHelperId(helper._id);
+
+    // Helper function to format the date if it's available
+    const formatDate = (date) => date ? new Date(date).toISOString().split('T')[0] : "";
+
+    // Populate the form with driver data
+    setHelperData({
+      fullName: helper.fullName || "",
+      driverBadgeNumber: helper.helperBadgeNumber || "",
+      gender: helper.gender || "",
+      religion: helper.religion || "",
+      email: helper.email || "",
+      contactNumber: helper.contactNumber || "",
+      emergencyContact: helper.emergencyContact || "",
+      bloodGroup: helper.bloodGroup || "",
+      photo: helper.photo || "",
+      policeVerificationDone: helper.policeVerificationDone || false,
+      joiningDate: formatDate(helper.joiningDate),  // Ensure correct format
+      resignationDate: formatDate(helper.resignationDate),  // Ensure correct format
+      national_Id: helper.national_Id || "",
+      address: helper.address || "",
+      dateOfBirth: formatDate(helper.dateOfBirth),  // Ensure correct format
+      status: helper.status || "active",
+      assignedBus: helper.assignedBus || "",
+      documents: helper.documents || [],
+    });
+
+    setIsSidebarOpen(true);
+  }
   const openDeleteModal = (driver) => {
     setSelectedDriver(driver);
     setDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
+  const openHelperDeleteModal = (helper)=>{
+    setSelectedHelper(helper);
+    setDeleteHelperModalOpen(true)
+  }
+  const handleDriverConfirmDelete = () => {
     if (selectedDriver?._id) {
       dispatch(deleteDriver(selectedDriver._id));
-      setDeleteModalOpen(false);
-      setSelectedDriver(null);
     }
+    setDeleteModalOpen(false);
+    setSelectedDriver(null);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleHelperConfirmDelete = () => {
+    console.log('selectedHelper delete', selectedHelper)
+    if (selectedHelper?._id) {
+      dispatch(deleteHelper(selectedHelper._id));
+    }
+    setDeleteHelperModalOpen(false);
+    setSelectedHelper(null);
+  }
 
+  const handleSubmitDriver = (e) => {
+    e.preventDefault();
     if (isEditing && selectedDriverId) {
-      // Update existing driver
-      dispatch(
-        updateDriver({
-          id: selectedDriverId,
-          data: driverData,
-        })
-      );
+      dispatch(updateDriver({ id: selectedDriverId, data: driverData }));
     } else {
-      // Create new driver
       dispatch(addDriver(driverData));
     }
+    resetForm();
+  };
 
-    // Reset form and close sidebar
+
+  const handleSubmitHelper = (e) => {
+    e.preventDefault();
+    if (isEditing && selectedHelperId) {
+      dispatch(updateHelper({ id: selectedHelperId, data: helperData }));
+    } else {
+      dispatch(addHelper(helperData));
+    }
     resetForm();
   };
 
@@ -241,8 +341,19 @@ const DriverStaffTransportation = () => {
       assignedBus: "",
       documents: [],
     });
+    setHelperData({
+      fullName: "",
+      helperBadgeNumber: "",
+      gender: "",
+      email: "",
+      contactNumber: "",
+      status: "active",
+      assignedBus: "",
+      documents: [],
+    });
     setIsEditing(false);
     setSelectedDriverId(null);
+    setSelectedHelperId(null);
     setIsSidebarOpen(false);
   };
 
@@ -333,28 +444,28 @@ const DriverStaffTransportation = () => {
               <>
                 <DriverQuickFilter {...{ filterConfig, handleFilterChange, resetFilters, uniqueBusRoutes }} />
                 <DriverTable drivers={filteredDrivers} loading={loading} error={error} onEdit={handleEdit} openDeleteModal={openDeleteModal} />
-                <DriverSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} driverData={driverData} setDriverData={setDriverData} handleChange={handleChange} handleSubmit={handleSubmit} resetForm={resetForm} vehicles={vehicles} />
+                <DriverSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} driverData={driverData} setDriverData={setDriverData} handleChange={handleChange} handleSubmit={handleSubmitDriver} resetForm={resetForm} vehicles={vehicles} />
                 <DriverFilterSidebar isOpen={isFilterSidebarOpen} setIsOpen={setIsFilterSidebarOpen} filterConfig={filterConfig} handleFilterChange={handleFilterChange} resetFilters={resetFilters} uniqueBusRoutes={uniqueBusRoutes} />
                 <DeleteModal
                   isOpen={deleteModalOpen}
                   onClose={() => setDeleteModalOpen(false)}
-                  onConfirm={handleConfirmDelete}
+                  onConfirm={handleDriverConfirmDelete}
                   title={selectedDriver?.fullName || "Driver"}
                 />
               </>
             ) : (
               <>
                 {/* Helper Management Components (similar to Driver) */}
-                {/* <HelperQuickFilter {...{ filterConfig, handleFilterChange, resetFilters, uniqueBusRoutes }} />
-                <HelperTable helpers={filteredHelpers} loading={loading} error={error} onEdit={handleEdit} openDeleteModal={openDeleteModal} />
-                <HelperSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} helperData={helperData} setHelperData={setHelperData} handleChange={handleChange} handleSubmit={handleSubmit} resetForm={resetForm} vehicles={vehicles} />
+                <HelperQuickFilter {...{ filterConfig, handleFilterChange, resetFilters, uniqueBusRoutes }} />
+                <HelperTable helpers={filteredHelpers} loading={loading} error={error} onEdit={handleHelperEdit} openDeleteModal={openHelperDeleteModal} />
+                <HelperSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} helperData={helperData} setHelperData={setHelperData} handleChange={handleHelperChange} handleSubmit={handleSubmitHelper} resetForm={resetForm} vehicles={vehicles} />
                 <HelperFilterSidebar isOpen={isFilterSidebarOpen} setIsOpen={setIsFilterSidebarOpen} filterConfig={filterConfig} handleFilterChange={handleFilterChange} resetFilters={resetFilters} uniqueBusRoutes={uniqueBusRoutes} />
                 <DeleteModal
-                  isOpen={deleteModalOpen}
-                  onClose={() => setDeleteModalOpen(false)}
-                  onConfirm={handleConfirmDelete}
+                  isOpen={deleteHelperModalOpen}
+                  onClose={() => setDeleteHelperModalOpen(false)}
+                  onConfirm={handleHelperConfirmDelete}
                   title={selectedHelper?.fullName || "Helper"}
-                /> */}
+                />
               </>
             )}
           </div>
