@@ -35,7 +35,6 @@ import { CandidateSchema } from "../Utils/validationSchemas";
 import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
 
 const { Option } = Select;
-
 /* ☎️ reusable ------------------------------------------------------ */
 const PhoneField = ({
   form,
@@ -48,13 +47,14 @@ const PhoneField = ({
   const value = Form.useWatch(name, form);
   const isWA = Form.useWatch(whatsappName, form);
 
+  // Convert value to string and ensure it's not undefined
+  const phoneValue = value ? value.toString() : "";
+
   return (
     <Form.Item
       name={name}
       label={label}
       rules={required ? [{ required: true, message: "Required" }] : []}
-      valuePropName="value"
-      getValueFromEvent={(v) => v}
       className="mb-4"
     >
       <Space.Compact block>
@@ -70,8 +70,11 @@ const PhoneField = ({
             borderRadius: 0,
           }}
           containerStyle={{ width: "100%" }}
-          value={value || ""}
-          onChange={(v) => form.setFieldValue(name, v)}
+          value={phoneValue}
+          onChange={(value, country, e, formattedValue) => {
+            // Update the form value directly
+            form.setFieldValue(name, value);
+          }}
         />
         <div
           className={`flex items-center border border-l-0 rounded-r px-3 ${
@@ -383,8 +386,8 @@ const CandidateInfo = ({ formData }) => {
           <Col xs={24} md={12}>
             <PhoneField
               form={form}
-              name={["phoneNumber"]}
-              whatsappName={["phoneNumberIsWhatsapp"]}
+              name="phoneNumber"
+              whatsappName="phoneNumberIsWhatsapp"
               label="Phone"
               placeholder="e.g. +974 1234 5678"
               required

@@ -1,15 +1,33 @@
 import React, { Suspense, lazy, useEffect, useState } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import "./App.css";
+import "../Utils/translator/i18n.js";
+
+// Common Components
 import Error from "../Components/Common/Error.js";
 import Offline from "../Components/Common/Offline.js";
+import Fallback from "../Components/Common/Fallback.js";
+import CustomCursor from "../Components/Common/CustomCursor.js";
+import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
+import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
+import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
+
+// Login Pages and Auth Related
 import Home from "../Modules/HomePage/Home";
 import ParentLogin from "../Modules/LoginPages/Parent/ParentLogin";
 import StudentLogin from "../Modules/LoginPages/Student/Login/StudentLogin.js";
 import StudentSignUp from "../Modules/LoginPages/Student/SignUp/StudentSignUp.js";
 import ResetPassword from "../Modules/LoginPages/Student/ResetPassword/ResetPassword.js";
-import Fallback from "../Components/Common/Fallback.js";
-import ProtectRoute from "../Routes/ProtectedRoutes/ProtectedRoute";
-import { useFirebaseMessaging } from "../Hooks/NotificationHooks/NotificationHooks.js";
+import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
+import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
+import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
+
+// Policy Pages
+import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
+import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
+import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
+
+// Admin Profile Management
 import SingleStudent from "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/SingleStudent.js";
 import AllTeachers from "../Modules/Admin/UsersProfiles/TeacherProfile/AllTeachers.js";
 import AllLibrarian from "../Modules/Admin/UsersProfiles/LibrarianProfile/AllLibrarian.js";
@@ -17,26 +35,16 @@ import AllStaff from "../Modules/Admin/UsersProfiles/StaffProfile/AllStaff.js";
 import AllAccountants from "../Modules/Admin/UsersProfiles/AccountantProfile/AllAccountants.js";
 import StudentParentProfile from "../Modules/Admin/UsersProfiles/StudentParentsProfile/StudentParentProfile.js";
 import UserProfile from "../Modules/Admin/UsersProfiles/AdminProfile/UserProfile.js";
-import "./App.css";
-import StaffLogin from "../Modules/LoginPages/Staff/StaffLogin.js";
-import ForgetPassword from "../Modules/LoginPages/Student/Login/ForgetPassword/ForgetPassword.js";
+
+// Parent Modules
 import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
-import QIDLogin from "../Modules/LoginPages/Student/Login/QIDLogin.js";
 import ParentProfile from "../Components/Parents/ParentProfile.js";
-import StaffMyProfile from "../Components/Common/StaffMyProfile.js";
-import "../Utils/translator/i18n.js";
-import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
-import PrivacyPolicy from "../Modules/LoginPages/Policys/PrivacyPolicy.jsx";
-import TermsAndConditions from "../Modules/LoginPages/Policys/TermsAndConditions.jsx";
-import CookiePolicy from "../Modules/LoginPages/Policys/CookiePolicy.jsx";
 
-// Staff Timetable
+// Timetable Modules
 import TimeTableDash from "../Modules/Admin/TimeTables/Timetable.js";
-
-// Student and parent timetable
 import StudentParentTimeTablePage from "../Modules/Student/TimeTable/StudentParentTimetable.js";
 
-import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
+// Finance Modules (Non-lazy)
 import StudentFeesDash from "../Modules/Admin/Finance/StudentFees/StudentFeesDash.js";
 import addStudentFeesForm from "../Modules/Admin/Finance/StudentFees/AddStudentFeesForm.js";
 import SummaryRevenueList from "../Modules/Admin/Finance/StudentFees/SummaryRevenueList.js";
@@ -46,14 +54,21 @@ import QuotationMain from "../Modules/Admin/Finance/Quotations/QuotationMain.js"
 import CreateReceipt from "../Modules/Admin/Finance/Reciepts/AddReceipt/CreateReceipt.js";
 import CreateQuotation from "../Modules/Admin/Finance/Quotations/AddQuotation/CreateQuotation.js";
 import InventoryList from "../Modules/Admin/Finance/Inventory/InventoryList.js";
-import CustomCursor from "../Components/Common/CustomCursor.js";
-// lazy loaded routes
+import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
+
+// RBAC (Role-Based Access Control)
+import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
+
+// =================================================================
+// Lazy Loaded Components (Grouped by functionality)
+// =================================================================
+
+// 1. Finance Related Lazy Components
 const AllStudents = lazy(() =>
   import(
     "../Modules/Admin/UsersProfiles/StudentProfile/MainSection.js/AllStudents.js"
   )
 );
-
 const RecentQuotationList = lazy(() =>
   import("../Modules/Admin/Finance/Quotations/RecentQuotationList.js")
 );
@@ -105,15 +120,6 @@ const AddOperationalExpenses = lazy(() =>
 const ExpenseList = lazy(() =>
   import("../Modules/Admin/Finance/operational-expenses/ExpenseList.js")
 );
-const RoleSelector = lazy(() =>
-  import("../Components/Common/RBAC/RoleSelector.js")
-);
-const Academic = lazy(() =>
-  import("../Modules/Admin/AcademicYear/Academic.js")
-);
-const FinancialYear = lazy(() =>
-  import("../Modules/Admin/FinancialYear/FinanceYear.js")
-);
 const FinanceCategory = lazy(() =>
   import("../Modules/Admin/Finance/financeCategory/FinanceCategory.js")
 );
@@ -127,6 +133,7 @@ const Entities = lazy(() =>
   import("../Modules/Admin/Finance/entities/Enities.js")
 );
 
+// 2. Transportation Related
 const RouteAndBus = lazy(() =>
   import("../Modules/Admin/Transportation/RouteAndBus")
 );
@@ -143,11 +150,9 @@ const Maintenance = lazy(() =>
   import("../Modules/Admin/Transportation/Maintenance.js")
 );
 const RFID = lazy(() => import("../Modules/Admin/Transportation/RFID.js"));
-
 const VehicleManagement = lazy(() =>
   import("../Modules/Admin/Transportation/VehicleManagement.js")
 );
-
 const ShiftManagement = lazy(() =>
   import("../Modules/Admin/Transportation/ShiftManagement.js")
 );
@@ -158,6 +163,13 @@ const Stoppage = lazy(() =>
   import("../Components/Transportation/StopageList.js")
 );
 
+// 3. Academic Management
+const Academic = lazy(() =>
+  import("../Modules/Admin/AcademicYear/Academic.js")
+);
+const FinancialYear = lazy(() =>
+  import("../Modules/Admin/FinancialYear/FinanceYear.js")
+);
 const SelectBranch = lazy(() =>
   import("../Modules/LoginPages/Staff/Admin/SelectBranch.js")
 );
@@ -165,16 +177,13 @@ const Branch = lazy(() => import("../Modules/Admin/Branchs/Branch.js"));
 const commonAcademic = lazy(() =>
   import("../Components/Common/AcademicYear/Academic.js")
 );
-
 const CreateAcademicYear = lazy(() =>
   import("../Components/Admin/CreateAcademicYear.js")
 );
 
+// 4. Student Related
 const StudentProfile = lazy(() =>
   import("../Modules/Student/profile/StudentProfile.js")
-);
-const SpeedGrade = lazy(() =>
-  import("../Modules/Admin/Subjects/Modules/SpeedGrade/SpeedGrade.js")
 );
 const StudentFinance = lazy(() =>
   import("../Modules/Student/Finance/StudentFinance.js")
@@ -188,6 +197,11 @@ const StudentAnnounce = lazy(() =>
 const StudentLibrarySection = lazy(() =>
   import("../Modules/Student/Library/MainSection/Libary.js")
 );
+const StudentDash = lazy(() =>
+  import("../Modules/Student/Dashboard/StudentDash.js")
+);
+
+// 5. Subject and Curriculum Management
 const ViewPage = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Pages/ViewPage/ViewPage.js")
 );
@@ -199,6 +213,9 @@ const Page = lazy(() =>
 );
 const Grade = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Grades/Grade.js")
+);
+const SpeedGrade = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/SpeedGrade/SpeedGrade.js")
 );
 const CreateAnnouncement = lazy(() =>
   import(
@@ -218,10 +235,6 @@ const CreateSyllabus = lazy(() =>
     "../Modules/Admin/Subjects/Modules/Syllabus/CreateSyllabus/CreateSyllabus.js"
   )
 );
-
-const AccountingSection = lazy(() =>
-  import("../Modules/Admin/Accounting/MainSection/AccountingSection.js")
-);
 const Syllabus = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Syllabus/SyllabusView/Syllabus.js")
 );
@@ -235,19 +248,6 @@ const DiscussionView = lazy(() =>
     "../Modules/Admin/Subjects/Modules/Discussion/DiscussionView/DiscussionView.js"
   )
 );
-const Libary = lazy(() =>
-  import("../Modules/Admin/Libary/MainSection/Libary.js")
-);
-const Events = lazy(() =>
-  import("../Modules/Admin/Dashboard/EventModule/Event.js")
-);
-const EventSchool = lazy(() =>
-  import("../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js")
-);
-const AdminNotice = lazy(() =>
-  import("../Modules/Admin/NoticeBoard/Notice/AdminNotice.js")
-);
-
 const AssignmentList = lazy(() =>
   import(
     "../Modules/Admin/Subjects/Modules/Assignments/AllAssignments/AssignmentList.js"
@@ -292,6 +292,14 @@ const Assignment = lazy(() =>
 const Module = lazy(() =>
   import("../Modules/Admin/Subjects/Modules/Module/Module.js")
 );
+const OfflineExamList = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamList.js")
+);
+const OfflineExamViewList = lazy(() =>
+  import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamViewList.js")
+);
+
+// 6. Student Subject Modules
 const StudentModule = lazy(() =>
   import("../Modules/Student/StudentClass/Subjects/Modules/Module/Module.js")
 );
@@ -352,6 +360,8 @@ const StudentPageView = lazy(() =>
 const StudentRubric = lazy(() =>
   import("../Modules/Student/StudentClass/Subjects/Modules/Rubrics/Rubrics.js")
 );
+
+// 7. Attendance and Student Management
 const Attendance = lazy(() =>
   import("../Modules/Admin/Attendance/Attendance.js")
 );
@@ -359,10 +369,6 @@ const Students = lazy(() => import("../Modules/Admin/Students/Students.js"));
 const Addmission = lazy(() =>
   import("../Modules/Admin/Addmission/Addmission.js")
 );
-
-// const Addmission = lazy(() =>
-//   import("../Modules/Admin/Addmission/AdmissionWizard/AdmissionWizard.js")
-// );
 const Classes = lazy(() => import("../Modules/Admin/Classes/Classes.js"));
 const Class = lazy(() => import("../Modules/Admin/Classes/SubClass/Class.js"));
 const StudentClass = lazy(() =>
@@ -377,13 +383,11 @@ const UnVerifiedStudentDetails = lazy(() =>
 const VerificationPage = lazy(() =>
   import("../Modules/Admin/Verification/VerificationPage.js")
 );
-const StudentDash = lazy(() =>
-  import("../Modules/Student/Dashboard/StudentDash.js")
-);
+
+// 8. Parent Modules
 const ParentDash = lazy(() =>
   import("../Modules/Parents/Dashboard/ParentDash.js")
 );
-
 const MyChildren = lazy(() =>
   import("../Modules/Parents/Childrens/ChildScreen.js")
 );
@@ -407,6 +411,7 @@ const ChildGrade = lazy(() =>
   import("../Modules/Parents/GradeChild/GradeChild.js")
 );
 
+// 9. Student Class Components
 const StudentTeacher = lazy(() =>
   import(
     "../Modules/Student/StudentClass/SubClass/Components/Teacher/StudentTeacher.js"
@@ -422,14 +427,26 @@ const StudentAttendance = lazy(() =>
     "../Modules/Student/StudentClass/SubClass/Components/Attendance/AttendanceMain.js"
   )
 );
+
+// 10. Admin Dashboard and Miscellaneous
 const Dash = lazy(() => import("../Modules/Admin/Dashboard/Dash.js"));
-
-const OfflineExamList = lazy(() =>
-  import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamList.js")
+const Libary = lazy(() =>
+  import("../Modules/Admin/Libary/MainSection/Libary.js")
 );
-
-const OfflineExamViewList = lazy(() =>
-  import("../Modules/Admin/Subjects/Modules/OfflineExam/OfflineExamViewList.js")
+const Events = lazy(() =>
+  import("../Modules/Admin/Dashboard/EventModule/Event.js")
+);
+const EventSchool = lazy(() =>
+  import("../Modules/Admin/NoticeBoard/Events/MainSection/EventSchool.js")
+);
+const AdminNotice = lazy(() =>
+  import("../Modules/Admin/NoticeBoard/Notice/AdminNotice.js")
+);
+const AccountingSection = lazy(() =>
+  import("../Modules/Admin/Accounting/MainSection/AccountingSection.js")
+);
+const RoleSelector = lazy(() =>
+  import("../Components/Common/RBAC/RoleSelector.js")
 );
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
@@ -1792,6 +1809,7 @@ function App() {
   return (
     <>
       {!isOnline && <Offline />}
+      {/* //For Custom Cursor */}
       {/* <CustomCursor /> */}
       <Suspense fallback={<Fallback />}>
         <RouterProvider router={AppRouter} />
@@ -1801,60 +1819,3 @@ function App() {
 }
 
 export default App;
-
-// ---- to achieve a clean, modular, and scalable architecture.-------------
-
-// This code is a React application that uses React Router for routing and lazy loading for performance optimization. It includes various routes for different user roles (admin, student, parent, etc.) and handles online/offline status. The routes are organized into separate files for better maintainability.
-// import React, { Suspense, useEffect, useState } from "react";
-// import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
-// import Offline from "./Components/Common/Offline";
-// import Fallback from "./Components/Common/Fallback";
-
-// // Import route arrays
-// import commonRoutes from "./Routes/CommonRoutes";
-// import adminRoutes from "./Routes/AdminRoutes";
-// import studentRoutes from "./Routes/StudentRoutes";
-// import parentRoutes from "./Routes/ParentRoutes";
-// // If you have staffRoutes, financeRoutes, etc., import them as well and merge below
-
-// function App() {
-//   // Online/Offline checking (optional)
-//   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
-
-//   useEffect(() => {
-//     const handleOnline = () => setIsOnline(true);
-//     const handleOffline = () => setIsOnline(false);
-
-//     window.addEventListener("online", handleOnline);
-//     window.addEventListener("offline", handleOffline);
-
-//     return () => {
-//       window.removeEventListener("online", handleOnline);
-//       window.removeEventListener("offline", handleOffline);
-//     };
-//   }, []);
-
-//   // Combine all routes into a single array
-//   const routes = [
-//     ...commonRoutes,
-//     ...adminRoutes,
-//     ...studentRoutes,
-//     ...parentRoutes,
-//     // ...other role-based route arrays if you have them
-//   ];
-
-//   const router = createBrowserRouter(routes);
-
-//   return (
-//     <>
-//       {!isOnline && <Offline />}
-//       {/* Show an offline banner or message if you'd like */}
-//       <Suspense fallback={<Fallback />}>
-//         <RouterProvider router={router} />
-//       </Suspense>
-//     </>
-//   );
-// }
-
-// export default App;

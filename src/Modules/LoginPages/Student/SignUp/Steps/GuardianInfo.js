@@ -11,6 +11,7 @@ import {
   Segmented,
   Tooltip,
   Space,
+  message,
 } from "antd";
 import { TeamOutlined } from "@ant-design/icons";
 import { LiaMaleSolid, LiaFemaleSolid } from "react-icons/lia";
@@ -19,12 +20,14 @@ import "react-phone-input-2/lib/style.css";
 import { FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import CustomUploadCard from "../Components/CustomUploadCard";
 import {
   nextStep,
   prevStep,
+  registerStudentDetails,
   updateFormData,
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
@@ -77,7 +80,6 @@ const PhoneField = ({
           height: 40,
         }}
       >
-        {/* Actual controlled input bound to AntD */}
         <Form.Item
           name={name}
           noStyle
@@ -104,7 +106,6 @@ const PhoneField = ({
           />
         </Form.Item>
 
-        {/* WhatsApp toggle */}
         <Tooltip title={isWA ? "WhatsApp enabled" : "Click to enable WhatsApp"}>
           <div
             onClick={() => form.setFieldValue(whatsappName, !isWA)}
@@ -131,13 +132,20 @@ const PhoneField = ({
 const GuardianInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const navigate = useNavigate();
+  const { isLoading, formData: completeFormData } = useSelector(
+    (s) => s.common.studentSignup
+  );
 
   /* refs */
   const containerRef = useRef(null);
   const firstInputRef = useRef(null);
+  const motherSectionRef = useRef(null);
+  const guardianSectionRef = useRef(null);
 
   /* state */
   const [activeTab, setActiveTab] = useState("father");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   /* ── hydrate draft data on mount ── */
   useEffect(() => {
@@ -165,16 +173,24 @@ const GuardianInfo = ({ formData }) => {
     form.setFieldsValue(sanitized);
   }, [formData, form]);
 
+  /* ── scroll to appropriate section on tab change ── */
+  useEffect(() => {
+    if (activeTab === "mother" && motherSectionRef.current) {
+      motherSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    } else if (activeTab === "guardian" && guardianSectionRef.current) {
+      guardianSectionRef.current.scrollIntoView({ behavior: "smooth" });
+    } else {
+      smoothToTop();
+    }
+
+    setTimeout(() => {
+      firstInputRef.current?.focus({ cursor: "start" });
+    }, 300);
+  }, [activeTab]);
+
   /* ── helpers ── */
   const smoothToTop = () =>
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-
-  /* ── scroll & focus on tab change ── */
-  useEffect(() => {
-    smoothToTop();
-    firstInputRef.current?.focus({ cursor: "start" });
-    console.debug(`[GuardianInfo] switched → ${activeTab}`);
-  }, [activeTab]);
 
   /* ── keep Redux draft in sync ── */
   const handleValuesChange = () =>
@@ -346,7 +362,7 @@ const GuardianInfo = ({ formData }) => {
   );
 
   const renderMotherInfo = () => (
-    <>
+    <div ref={motherSectionRef}>
       <Divider orientation="left" dashed>
         Mother Information
       </Divider>
@@ -368,11 +384,11 @@ const GuardianInfo = ({ formData }) => {
 
       {renderIdAndPersonalInfo("motherInfo")}
       {renderContactInfo("motherInfo")}
-    </>
+    </div>
   );
 
   const renderGuardianInfo = () => (
-    <>
+    <div ref={guardianSectionRef}>
       <Divider orientation="left" dashed>
         Guardian Information
       </Divider>
@@ -421,17 +437,70 @@ const GuardianInfo = ({ formData }) => {
       >
         <Input size="large" placeholder="Guardian Email" />
       </Form.Item>
-    </>
+    </div>
   );
 
   /* ───────────────────────── navigation ───────────────────────────── */
   const gradient = "linear-gradient(90deg,#C83B62 0%,#7F35CD 100%)";
   const darkerGradient = "linear-gradient(90deg,#A02D53 0%,#6A28A4 100%)";
 
+  const prepareFormData = () => {
+    const formValues = form.getFieldsValue(true);
+    const formData = new FormData();
+
+    // Add all form data from all steps (from Redux store)
+    Object.entries(completeFormData).forEach(([section, data]) => {
+      if (typeof data === "object" && data !== null) {
+        formData.append(section, JSON.stringify(data));
+      } else {
+        formData.append(section, data);
+      }
+    });
+
+    // Handle file uploads
+    if (formValues.fatherPhoto?.file) {
+      formData.append("fatherPhoto", formValues.fatherPhoto.file);
+    }
+    if (formValues.motherPhoto?.file) {
+      formData.append("motherPhoto", formValues.motherPhoto.file);
+    }
+
+    return formData;
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const formData = prepareFormData();
+
+      // Dispatch the registration thunk
+      await dispatch(
+        registerStudentDetails({
+          formData,
+          navigate,
+        })
+      ).unwrap();
+
+      // Only proceed to next step if submission was successful
+      dispatch(nextStep());
+    } catch (error) {
+      message.error("Failed to save guardian information");
+      console.error("Submission error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleNext = async () => {
     try {
+      // Validate current tab fields
       await form.validateFields();
 
+      // Update Redux store with current form data
+      const currentFormData = form.getFieldsValue(true);
+      dispatch(updateFormData({ guardian: currentFormData }));
+
+      // Determine next action based on current tab
       if (activeTab === "father") {
         setActiveTab("mother");
         return;
@@ -441,12 +510,13 @@ const GuardianInfo = ({ formData }) => {
         return;
       }
 
-      await GuardianSchema.validate(form.getFieldsValue(true), {
+      // On final tab, validate all guardian data
+      await GuardianSchema.validate(currentFormData, {
         abortEarly: false,
       });
 
-      dispatch(updateFormData({ guardian: form.getFieldsValue(true) }));
-      dispatch(nextStep());
+      // Submit the form when all guardian info is complete
+      await handleSubmit();
     } catch (err) {
       setYupErrorsToAnt(form, err);
       const first =
@@ -468,7 +538,7 @@ const GuardianInfo = ({ formData }) => {
   /* ───────────────────────────── render ───────────────────────────── */
   return (
     <div className="flex flex-col h-full">
-      {/* sticky segmented control - moved outside scrollable container */}
+      {/* sticky segmented control */}
       <div className="sticky top-0 z-20 pt-1 pb-2 bg-white shadow-sm">
         <Segmented
           size="large"
@@ -507,7 +577,7 @@ const GuardianInfo = ({ formData }) => {
         />
       </div>
 
-      {/* form body - now scrollable independently */}
+      {/* form body */}
       <div ref={containerRef} className="flex-1 overflow-y-auto px-4">
         <Form
           form={form}
@@ -555,6 +625,7 @@ const GuardianInfo = ({ formData }) => {
                   onClick={handleNext}
                   type="primary"
                   size="large"
+                  loading={isLoading || isSubmitting}
                   className="!border-none !text-white font-semibold rounded-md px-6 py-2 transition-all duration-200 ease-in-out"
                   style={{ backgroundImage: gradient }}
                   onMouseEnter={(e) =>
@@ -568,7 +639,7 @@ const GuardianInfo = ({ formData }) => {
                     ? "Mother Info"
                     : activeTab === "mother"
                     ? "Guardian Info"
-                    : "Next"}
+                    : "Save & Continue"}
                 </Button>
               </motion.div>
             </Col>
