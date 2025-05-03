@@ -307,9 +307,14 @@ const RouteList = ({ onEdit }) => {
                 ),
               },
               {
-                title: "Badge No.",
-                dataIndex: "driverBadgeNo",
-                render: (badgeNo) => <Tag color="blue">{badgeNo || "N/A"}</Tag>,
+                title: "Helper",
+                dataIndex: "helperName",
+                render: (helperName) => (
+                  <div className="flex items-center">
+                    <UserOutlined className="mr-2" />
+                    {helperName || "Helper Name"}
+                  </div>
+                ),
               },
               { title: "Type", dataIndex: "vehicleType" },
               {
@@ -321,7 +326,7 @@ const RouteList = ({ onEdit }) => {
                 title: "Students",
                 render: (_, v) => (
                   <Badge
-                    count={v.students?.length || 0}
+                    count={v.students?.length || v?.totalStudents || 0}
                     showZero
                     color="#7F35CD"
                   />
@@ -331,7 +336,7 @@ const RouteList = ({ onEdit }) => {
                 title: "Staff",
                 render: (_, v) => (
                   <Badge
-                    count={v.staffs?.length || 0} // Assuming the field is called 'staffs'
+                    count={v.staffs?.length || v?.totalStaffs || 0} // Assuming the field is called 'staffs'
                     showZero
                     color="#1890ff" // Different color to distinguish from students
                   />
