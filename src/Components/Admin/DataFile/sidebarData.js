@@ -19,6 +19,7 @@ import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
 import { SiReadthedocs } from "react-icons/si";
 import { VscSaveAll } from "react-icons/vsc";
+import { FaRegCalendarTimes } from "react-icons/fa";
 
 import {
   MdLocalLibrary,
@@ -334,7 +335,7 @@ const sidebarData = [
       // },
       {
         title: "Vehicle Schedule", // New tab
-        icon: <MdAccessTime />, // You can choose a different icon if preferred
+        icon: <FaRegCalendarTimes />, // You can choose a different icon if preferred
         path: "/transportation/schedule",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
