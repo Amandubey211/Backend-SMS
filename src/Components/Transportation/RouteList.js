@@ -46,7 +46,7 @@ const RouteList = ({ onEdit }) => {
     (s) => s.transportation.transportRoute
   );
   const dispatch = useDispatch();
- console.log("trnasport route",transportRoutes)
+  console.log("trnasport route", transportRoutes);
   const [searchText, setSearchText] = useState("");
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [filters, setFilters] = useState({ status: null, vehicleCount: null });
@@ -306,6 +306,11 @@ const RouteList = ({ onEdit }) => {
                   </div>
                 ),
               },
+              {
+                title: "Badge No.",
+                dataIndex: "driverBadgeNo",
+                render: (badgeNo) => <Tag color="blue">{badgeNo || "N/A"}</Tag>,
+              },
               { title: "Type", dataIndex: "vehicleType" },
               {
                 title: "Capacity",
@@ -319,6 +324,16 @@ const RouteList = ({ onEdit }) => {
                     count={v.students?.length || 0}
                     showZero
                     color="#7F35CD"
+                  />
+                ),
+              },
+              {
+                title: "Staff",
+                render: (_, v) => (
+                  <Badge
+                    count={v.staffs?.length || 0} // Assuming the field is called 'staffs'
+                    showZero
+                    color="#1890ff" // Different color to distinguish from students
                   />
                 ),
               },
