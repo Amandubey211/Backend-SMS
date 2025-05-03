@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getData, postData } from "../../../../services/apiEndpoints";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
+import toast from "react-hot-toast";
 
 
 export const createTripLog = createAsyncThunk(
@@ -10,8 +11,10 @@ export const createTripLog = createAsyncThunk(
       try {
         dispatch(setShowError(false));
         const data = await postData(`/transport/create-trip-log`, bodyData);
+        toast.success(data.message)
         return data;
       } catch (error) {
+        toast.error(error.message)
         console.error("Error in createTripLog:", error);
         return handleError(error, dispatch, rejectWithValue);
       }

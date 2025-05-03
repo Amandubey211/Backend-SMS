@@ -46,7 +46,7 @@ const RouteList = ({ onEdit }) => {
     (s) => s.transportation.transportRoute
   );
   const dispatch = useDispatch();
-
+ console.log("trnasport route",transportRoutes)
   const [searchText, setSearchText] = useState("");
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [filters, setFilters] = useState({ status: null, vehicleCount: null });
@@ -336,6 +336,7 @@ const RouteList = ({ onEdit }) => {
                             content: (
                               <AddUsers
                                 vehicle={v}
+                                route={r}
                                 onClose={() =>
                                   setSidebarState({ isOpen: false })
                                 }
@@ -360,6 +361,7 @@ const RouteList = ({ onEdit }) => {
                             content: (
                               <CreateTrip
                                 vehicle={v}
+                                route={r}
                                 onClose={() =>
                                   setSidebarState({ isOpen: false })
                                 }
