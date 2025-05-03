@@ -368,12 +368,12 @@ const MapView = ({ trip, stops }) => {
 
           <InfoGrid
             items={[
-              {
-                label: "Vehicle",
-                value: `${trip.vehicleId?.vehicleNumber || "N/A"} (${
-                  trip.vehicleId?.vehicleType || "N/A"
-                })`,
-              },
+              //   {
+              //     label: "Vehicle",
+              //     value: `${trip.vehicleId?.vehicleNumber || "N/A"} (${
+              //       trip.vehicleId?.vehicleType || "N/A"
+              //     })`,
+              //   },
               {
                 label: "Trip Type",
                 value:
@@ -385,14 +385,14 @@ const MapView = ({ trip, stops }) => {
                 label: "Date",
                 value: dayjs(trip.tripDate).format("MMM D, YYYY"),
               },
-              {
-                label: "Status",
-                value: (
-                  <span style={statusBadgeStyle(statusColor[trip.status])}>
-                    {statusText[trip.status] || trip.status}
-                  </span>
-                ),
-              },
+              //   {
+              //     label: "Status",
+              //     value: (
+              //       <span style={statusBadgeStyle(statusColor[trip.status])}>
+              //         {statusText[trip.status] || trip.status}
+              //       </span>
+              //     ),
+              //   },
               ...(trip.startedAt
                 ? [
                     {

@@ -13,6 +13,7 @@ import {
   FaCalendarAlt,
   FaFilter,
   FaSearch,
+  FaInfoCircle,
 } from "react-icons/fa";
 import {
   MdLocationOn,
@@ -172,8 +173,8 @@ const ViewTripsList = () => {
 
   const getStopLogsDetails = (stopLogs) => {
     return (
-      <div className="stop-logs-details">
-        <Timeline mode="left">
+      <div className=" overflow-x-auto px-4 ">
+        <Timeline mode="left" className="pt-2 ">
           {stopLogs?.map((log, index) => (
             <Timeline.Item
               key={index}
@@ -195,17 +196,23 @@ const ViewTripsList = () => {
                       {stopStatusText[log.status]}
                     </Tag>
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {log.actualArrival ? (
-                      <>
-                        Arrived: {formatTime(log.actualArrival)}
-                        {log.actualDeparture && (
-                          <> | Departed: {formatTime(log.actualDeparture)}</>
-                        )}
-                      </>
-                    ) : (
-                      "Not arrived yet"
-                    )}
+                  <div className="text-xs">
+                    <span
+                      className={
+                        log.actualArrival ? "text-gray-500" : "text-red-500"
+                      }
+                    >
+                      {log.actualArrival ? (
+                        <>
+                          Arrived: {formatTime(log.actualArrival)}
+                          {log.actualDeparture && (
+                            <> | Departed: {formatTime(log.actualDeparture)}</>
+                          )}
+                        </>
+                      ) : (
+                        "Not arrived yet"
+                      )}
+                    </span>
                   </div>
                 </div>
                 {log.stopId?.location && (
@@ -376,18 +383,35 @@ const ViewTripsList = () => {
               onClick={() => handleStop(record)}
               className="flex items-center"
               size="small"
+              style={{ width: "100px" }} // Set fixed width for all buttons
             >
               End
             </Button>
-          ) : record.status === "pending" ? (
+          ) : record.status === "not_started" ? (
             <Button
               type="primary"
               icon={<PlayCircleOutlined />}
               onClick={() => handleStart(record)}
               className="flex items-center"
               size="small"
+              style={{
+                backgroundColor: "green",
+                borderColor: "green",
+                width: "100px",
+              }} // Set fixed width
             >
               Start
+            </Button>
+          ) : record.status === "completed" ? (
+            <Button
+              type="dashed"
+              icon={<StopOutlined />}
+              className="flex items-center"
+              size="small"
+              disabled
+              style={{ width: "100px" }} // Set fixed width
+            >
+              Ended
             </Button>
           ) : null}
 
@@ -396,6 +420,7 @@ const ViewTripsList = () => {
             onClick={() => handleViewDetails(record)}
             className="flex items-center"
             size="small"
+            style={{ width: "100px" }} // Set fixed width
           >
             Details
           </Button>
@@ -405,6 +430,7 @@ const ViewTripsList = () => {
             onClick={() => handleViewMap(record)}
             className="flex items-center"
             size="small"
+            style={{ width: "100px" }} // Set fixed width
           >
             Map
           </Button>
@@ -476,34 +502,61 @@ const ViewTripsList = () => {
     const progressPercent = Math.round((completedStops / totalStops) * 100);
 
     return (
-      <div className="p-4 h-full">
-        <div className="grid grid-cols-3 gap-4 h-full">
-          {/* Left Column - Timeline (2/3 width) */}
-          <div className="col-span-2 h-full">
+      <div className="p-6 h-full bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="grid grid-cols-5 gap-6 h-full">
+          {/* Left Column - Timeline (60% width) */}
+          <div className="col-span-3 h-full">
             <Card
-              title="Timeline"
+              title={
+                <div className="flex items-center">
+                  <MdTimelapse className="mr-2 text-indigo-600" />
+                  <span className="font-semibold text-gray-800">
+                    Trip Timeline
+                  </span>
+                </div>
+              }
               size="small"
-              className="h-full"
-              bodyStyle={{ height: "calc(100% - 56px)", overflow: "auto" }}
+              className="h-full shadow-lg border-0"
+              headStyle={{ borderBottom: "1px solid #e2e8f0" }}
+              bodyStyle={{
+                height: "calc(100% - 56px)",
+                overflow: "auto",
+                padding: "16px 0",
+              }}
             >
               {getStopLogsDetails(record.stopLogs)}
             </Card>
           </div>
 
-          {/* Right Column - Trip Progress and Summary (1/3 width) */}
-          <div className="col-span-1 space-y-4 h-full">
+          {/* Right Column - Trip Progress and Summary (40% width) */}
+          <div className="col-span-2 space-y-6 h-full">
             {/* Trip Progress Card */}
-            <Card title="Trip Progress" size="small">
-              <div className="space-y-3">
+            <Card
+              title={
+                <div className="flex items-center">
+                  <FaChartLine className="mr-2 text-green-600" />
+                  <span className="font-semibold text-gray-800">
+                    Trip Progress
+                  </span>
+                </div>
+              }
+              size="small"
+              className="shadow-lg border-0"
+            >
+              <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span>Stops Completed</span>
-                    <span>
-                      {completedStops}/{totalStops}
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-600">
+                      Completion
+                    </span>
+                    <span className="text-sm font-semibold bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
+                      {completedStops}/{totalStops} stops
                     </span>
                   </div>
                   <Progress
                     percent={progressPercent}
+                    strokeWidth={12}
+                    strokeLinecap="round"
                     status={
                       progressPercent === 100
                         ? "success"
@@ -513,37 +566,45 @@ const ViewTripsList = () => {
                     }
                     strokeColor={
                       progressPercent === 100
-                        ? "#52c41a"
+                        ? "#10b981"
                         : record.status === "in_progress"
-                        ? "#1890ff"
-                        : "#722ed1"
+                        ? "#3b82f6"
+                        : "#8b5cf6"
                     }
+                    trailColor="#e2e8f0"
+                    className="mb-1"
                   />
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span>0%</span>
+                    <span>100%</span>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">GPS Status</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                    <div className="text-xs font-medium text-gray-500 mb-1">
+                      GPS Status
+                    </div>
                     <Tag
                       color={record.isGPSOn ? "green" : "red"}
                       icon={
                         record.isGPSOn ? <CheckOutlined /> : <CloseOutlined />
                       }
-                      className="w-full text-center"
+                      className="w-full text-center font-medium shadow-sm"
                     >
                       {record.isGPSOn ? "Active" : "Inactive"}
                     </Tag>
                   </div>
 
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                    <div className="text-xs font-medium text-gray-500 mb-1">
                       Vehicle Status
                     </div>
                     <Tag
                       color={
                         record.vehicleStatus === "active" ? "green" : "orange"
                       }
-                      className="w-full text-center"
+                      className="w-full text-center font-medium shadow-sm"
                     >
                       {record.vehicleStatus === "active"
                         ? "Operational"
@@ -552,29 +613,37 @@ const ViewTripsList = () => {
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-xs text-gray-500 mb-1">
-                    Trip Duration
-                  </div>
-                  <div className="text-sm font-medium">
-                    {record.startedAt && record.endedAt
-                      ? formatDuration(record.startedAt, record.endedAt)
-                      : "N/A"}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                  <div className="flex justify-between items-center mb-1">
+                    <div className="text-xs font-medium text-gray-500">
+                      Duration
+                    </div>
+                    <div className="text-sm font-semibold text-indigo-700">
+                      {record.startedAt && record.endedAt
+                        ? formatDuration(record.startedAt, record.endedAt)
+                        : "N/A"}
+                    </div>
                   </div>
                   {record.startedAt && (
                     <div className="text-xs text-gray-500">
-                      Started {dayjs(record.startedAt).fromNow()}
+                      <span className="font-medium">Started:</span>{" "}
+                      {dayjs(record.startedAt).format("h:mm A")}
                       {record.endedAt && (
-                        <>, ended {dayjs(record.endedAt).fromNow()}</>
+                        <>
+                          , <span className="font-medium">Ended:</span>{" "}
+                          {dayjs(record.endedAt).format("h:mm A")}
+                        </>
                       )}
                     </div>
                   )}
                 </div>
 
                 {record.notes && (
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">Trip Notes</div>
-                    <div className="text-xs p-2 bg-gray-100 rounded">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                    <div className="text-xs font-medium text-gray-500 mb-1">
+                      Trip Notes
+                    </div>
+                    <div className="text-sm p-2 bg-white rounded border border-gray-200">
                       {record.notes}
                     </div>
                   </div>
@@ -583,67 +652,108 @@ const ViewTripsList = () => {
             </Card>
 
             {/* Trip Summary Card */}
-            <Card title="Trip Summary" size="small">
-              <div className="space-y-2">
-                <div>
-                  <div className="text-xs text-gray-500">Route</div>
+            <Card
+              title={
+                <div className="flex items-center">
+                  <FaInfoCircle className="mr-2 text-blue-600" />
+                  <span className="font-semibold text-gray-800">
+                    Trip Summary
+                  </span>
+                </div>
+              }
+              size="small"
+              className="shadow-lg border-0"
+            >
+              <div className="space-y-4">
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                  <div className="text-xs font-medium text-gray-500 mb-1">
+                    Route Details
+                  </div>
                   <div className="flex items-center">
-                    <FaRoute className="mr-2 text-blue-500" />
-                    <span className="text-sm font-medium">
-                      {record.routeId?.routeName || "N/A"}
-                    </span>
+                    <FaRoute className="mr-3 text-blue-500 text-lg" />
+                    <div>
+                      <div className="text-sm font-semibold text-gray-800">
+                        {record.routeId?.routeName || "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {record.tripType === "pickup"
+                          ? "Morning Pickup"
+                          : "Afternoon Drop"}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-xs text-gray-500">Vehicle</div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                  <div className="text-xs font-medium text-gray-500 mb-1">
+                    Vehicle Details
+                  </div>
                   <div className="flex items-center">
-                    <FaBus className="mr-2 text-green-500" />
-                    <span className="text-sm font-medium">
-                      {record.vehicleId?.vehicleNumber || "N/A"} (
-                      {record.vehicleId?.vehicleType || "N/A"})
-                    </span>
+                    <FaBus className="mr-3 text-green-500 text-lg" />
+                    <div>
+                      <div className="text-sm font-semibold text-gray-800">
+                        {record.vehicleId?.vehicleNumber || "N/A"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {record.vehicleId?.vehicleType || "N/A"} •{" "}
+                        {record.vehicleId?.capacity || "N/A"} seats
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <div className="text-xs text-gray-500">Speed</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                    <div className="text-xs font-medium text-gray-500 mb-1">
+                      Speed
+                    </div>
                     <div className="flex items-center">
                       <MdSpeed className="mr-2 text-purple-500" />
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-800">
                         {record.DEFAULT_SPEED_KMPH || "N/A"} km/h
                       </span>
                     </div>
                   </div>
 
-                  <div>
-                    <div className="text-xs text-gray-500">Halt Time</div>
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                    <div className="text-xs font-medium text-gray-500 mb-1">
+                      Halt Time
+                    </div>
                     <div className="flex items-center">
                       <FaClock className="mr-2 text-orange-500" />
-                      <span className="text-sm font-medium">
+                      <span className="text-sm font-semibold text-gray-800">
                         {record.HALT_TIME_MINUTES || "N/A"} mins
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-xs text-gray-500">Passengers</div>
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                  <div className="text-xs font-medium text-gray-500 mb-1">
+                    Passengers
+                  </div>
                   <div className="flex items-center">
-                    <FaUsers className="mr-2 text-teal-500" />
-                    <span className="text-sm font-medium">
-                      {record.stopLogs.reduce(
-                        (sum, stop) => sum + (stop.students?.length || 0),
-                        0
-                      )}{" "}
-                      students,{" "}
-                      {record.stopLogs.reduce(
-                        (sum, stop) => sum + (stop.staffs?.length || 0),
-                        0
-                      )}{" "}
-                      staff
-                    </span>
+                    <FaUsers className="mr-3 text-teal-500 text-lg" />
+                    <div className="flex space-x-4">
+                      <div>
+                        <div className="text-sm font-semibold text-gray-800">
+                          {record.stopLogs.reduce(
+                            (sum, stop) => sum + (stop.students?.length || 0),
+                            0
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500">Students</div>
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-800">
+                          {record.stopLogs.reduce(
+                            (sum, stop) => sum + (stop.staffs?.length || 0),
+                            0
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-500">Staff</div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
