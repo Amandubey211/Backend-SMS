@@ -4,7 +4,6 @@ import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
 
-
 export const createTripLog = createAsyncThunk(
     "tripExecutionLog/create",
     async (bodyData, { rejectWithValue, dispatch }) => {
@@ -19,54 +18,53 @@ export const createTripLog = createAsyncThunk(
         return handleError(error, dispatch, rejectWithValue);
       }
     }
-  );
-  
+  }
+);
 
-  export const startTripLog = createAsyncThunk(
-    "tripExecutionLog/start",
-    async ({ tripId, isGPSOn, bodyData }, { rejectWithValue, dispatch }) => {
-      try {
-        dispatch(setShowError(false));
-        const query = `isGPSOn=${isGPSOn}`;
-        const data = await postData(`/transport/start-trip/${tripId}?${query}`, bodyData);
-        return data;
-      } catch (error) {
-        console.error("Error in startTripLog:", error);
-        return handleError(error, dispatch, rejectWithValue);
-      }
+export const startTripLog = createAsyncThunk(
+  "tripExecutionLog/start",
+  async ({ tripId, isGPSOn, bodyData }, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const query = `isGPSOn=${isGPSOn}`;
+      const data = await postData(
+        `/transport/start-trip/${tripId}?${query}`,
+        bodyData
+      );
+      return data;
+    } catch (error) {
+      console.error("Error in startTripLog:", error);
+      return handleError(error, dispatch, rejectWithValue);
     }
-  );
+  }
+);
 
-  
-  export const endTripLog = createAsyncThunk(
-    "tripExecutionLog/end",
-    async (tripId, { rejectWithValue, dispatch }) => {
-      try {
-        dispatch(setShowError(false));
-        const data = await postData(`/transport/trip/${tripId}/end`);
-        return data;
-      } catch (error) {
-        console.error("Error in endTripLog:", error);
-        return handleError(error, dispatch, rejectWithValue);
-      }
+export const endTripLog = createAsyncThunk(
+  "tripExecutionLog/end",
+  async (tripId, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const data = await postData(`/transport/trip/${tripId}/end`);
+      return data;
+    } catch (error) {
+      console.error("Error in endTripLog:", error);
+      return handleError(error, dispatch, rejectWithValue);
     }
-  );
+  }
+);
 
-  
-
-  export const getTripLogsByVehicle = createAsyncThunk(
-    "tripExecutionLog/getByVehicle",
-    async (vehicleId, { rejectWithValue, dispatch }) => {
-      try {
-        const data = await getData(`/transport/trip-logs/vehicle/${vehicleId}`);
-        return data;
-      } catch (error) {
-        console.error("Error in getTripLogsByVehicle:", error);
-        return handleError(error, dispatch, rejectWithValue);
-      }
+export const getTripLogsByVehicle = createAsyncThunk(
+  "tripExecutionLog/getByVehicle",
+  async (vehicleId, { rejectWithValue, dispatch }) => {
+    try {
+      const data = await getData(`/transport/trip-logs/vehicle/${vehicleId}`);
+      return data.trips;
+    } catch (error) {
+      console.error("Error in getTripLogsByVehicle:", error);
+      return handleError(error, dispatch, rejectWithValue);
     }
-  );
-  
+  }
+);
 
 export const getAllTripLogs = createAsyncThunk(
   "tripExecutionLog/getAll",

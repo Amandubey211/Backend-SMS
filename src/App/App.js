@@ -170,7 +170,11 @@ const Scheduling = lazy(()=>
 const ViewTripLogs = lazy(() =>
   import("../Modules/Admin/Transportation/ViewTripLogs.js")
 );
-
+const ViewTrip = lazy(() =>
+  import(
+    "../Modules/Admin/Transportation/RouteManagement/Components/ViewTrip/ViewTrip.js"
+  )
+);
 // 3. Academic Management
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
@@ -924,9 +928,19 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/transportation/route-management/view-trip/1/logs",
+      path: "/transportation/route-management/view-trip/:vehicleId/logs",
       element: (
-        <ProtectRoute Component={ViewTripLogs} allowedRoles={["admin", "staff"]} />
+        <ProtectRoute
+          Component={ViewTripLogs}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/route-management/trio/:tripId/view",
+      element: (
+        <ProtectRoute Component={ViewTrip} allowedRoles={["admin", "staff"]} />
       ),
       errorElement: <Error />,
     },

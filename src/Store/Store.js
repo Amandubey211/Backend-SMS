@@ -117,6 +117,7 @@ import transportSubRouteReducer from "../Store/Slices/Transportation/SubRoute/su
 import transportVDAssignmentReducer from "../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignmentSice";
 import transportDriverReducer from "../Store/Slices/Transportation/Driver/driver.slice";
 import vehicleUserAssignmentReducer from "../Store/Slices/Transportation/VehiclePersonAssignment/vehiclePersonAssignmentSlice";
+import transportHelperReducer from "../Store/Slices/Transportation/Helper/helperSlice";
 import tripExecutionLogReducer from "../Store/Slices/Transportation/TripExecutionLog/tripExecutionLogSlice";
 // Persist configuration for the Auth slice
 
@@ -296,7 +297,9 @@ const transportReducer = combineReducers({
   transportSchedule: transportScheduleReducer,
   transportDriver: transportDriverReducer,
   vehicleUserAssignment: vehicleUserAssignmentReducer,
+  transportHelper: transportHelperReducer,
   tripExecutionLog: tripExecutionLogReducer,
+
 });
 
 // Create the store

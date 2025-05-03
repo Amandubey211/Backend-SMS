@@ -19,7 +19,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
   const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
   const [isValueEdModalVisible, setIsValueEdModalVisible] = useState(false);
   const [newLanguage, setNewLanguage] = useState("");
-  const [newValueEd, setNewValueEd] = useState("");
+  const [newValueEd, setNewValueEd] = useState(null);
   const [modalType, setModalType] = useState("");
 
   const languageOptions = useMemo(
@@ -387,7 +387,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
           <div className="mt-4">
             <h4>Current Options:</h4>
             <ul className="list-disc pl-5">
-              {admissionOptions.valueEducation.map((option) => (
+              {admissionOptions?.valueEducation?.map((option) => (
                 <li
                   key={option}
                   className="flex justify-between items-center py-1"

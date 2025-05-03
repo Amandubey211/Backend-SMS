@@ -1,8 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createTripLog, endTripLog, getAllTripLogs, getTripLogsByVehicle, startTripLog } from "./tripExecutionLog.action";
-
-
-
+import {
+  createTripLog,
+  endTripLog,
+  getAllTripLogs,
+  getTripLogsByVehicle,
+  startTripLog,
+} from "./tripExecutionLog.action";
 
 const initialState = {
   loading: false,

@@ -132,11 +132,14 @@ export const registerStudentDetails = createAsyncThunk(
         navigate("/verify_students");
         return response;
       } else {
+        toast.success("Something is wrong")
         return rejectWithValue(
+      
           response?.msg || "Failed to save student details."
         );
       }
     } catch (error) {
+      toast.success("Something is wrong")
       return handleError(error, dispatch, rejectWithValue);
     }
   }
