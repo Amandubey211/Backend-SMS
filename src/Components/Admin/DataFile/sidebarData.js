@@ -9,8 +9,8 @@ import {
   FaUserTie,
 } from "react-icons/fa";
 import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
-import { RiGraduationCapLine } from "react-icons/ri";
-import { LuUser } from "react-icons/lu";
+import { RiGraduationCapLine, RiUserSettingsLine } from "react-icons/ri";
+import { LuCalendarClock, LuUser } from "react-icons/lu";
 import { HiOutlineCalculator } from "react-icons/hi2";
 import { RiUserAddLine } from "react-icons/ri";
 import { BsBook } from "react-icons/bs";
@@ -19,6 +19,7 @@ import { BsCheckCircle } from "react-icons/bs";
 import { GrUserWorker } from "react-icons/gr";
 import { SiReadthedocs } from "react-icons/si";
 import { VscSaveAll } from "react-icons/vsc";
+import { FaRegCalendarTimes } from "react-icons/fa";
 
 import {
   MdLocalLibrary,
@@ -333,14 +334,14 @@ const sidebarData = [
       //   roles: [ROLES.ADMIN, ROLES.STAFF],
       // },
       {
-        title: "Schedule", // New tab
-        icon: <MdAccessTime />, // You can choose a different icon if preferred
+        title: "Vehicle Schedule", // New tab
+        icon: <LuCalendarClock />, // You can choose a different icon if preferred
         path: "/transportation/schedule",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },
       {
         title: "Shift Management", // New tab
-        icon: <MdAccessTime />, // You can choose a different icon if preferred
+        icon:<RiUserSettingsLine />, // You can choose a different icon if preferred
         path: "/transportation/shift-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },

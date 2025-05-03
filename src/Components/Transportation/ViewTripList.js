@@ -25,7 +25,11 @@ import {
 } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { getTripLogsByVehicle } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
+import {
+  endTripLog,
+  getTripLogsByVehicle,
+  startTripLog,
+} from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
 import {
   Tabs,
   Table,
@@ -111,7 +115,7 @@ const ViewTripsList = () => {
   const [showDetailsSidebar, setShowDetailsSidebar] = useState(false);
   const [selectedTripForDetails, setSelectedTripForDetails] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-
+  const [isGpsOn, setIsGpsOn] = useState(false);
   const { loading, error, vehicleWiseLogs } = useSelector(
     (s) => s.transportation.tripExecutionLog
   );
@@ -172,65 +176,157 @@ const ViewTripsList = () => {
   };
 
   const getStopLogsDetails = (stopLogs) => {
+    const formatDateTime = (dateString) => {
+      if (!dateString) return "Not scheduled";
+      return dayjs(dateString).format("ddd, MMM D [•] h:mm A");
+    };
+
     return (
-      <div className=" overflow-x-auto px-4 ">
-        <Timeline mode="left" className="pt-2 ">
+      <div className="overflow-x-auto px-6 py-4">
+        <Timeline mode="left" className="custom-timeline">
           {stopLogs?.map((log, index) => (
             <Timeline.Item
               key={index}
               color={stopStatusColor[log.status] || "gray"}
+              dot={
+                <div className="timeline-dot-container">
+                  <div
+                    className={`timeline-dot ${
+                      log.status === "start_point"
+                        ? "start-point-dot"
+                        : log.status === "completed"
+                        ? "completed-dot"
+                        : log.status === "in_progress"
+                        ? "in-progress-dot"
+                        : "pending-dot"
+                    }`}
+                  />
+                </div>
+              }
               label={
-                <div className="timeline-label">
-                  <div className="font-medium">{log.stopId?.stopName}</div>
-                  <div className="text-xs text-gray-500">
-                    {formatTime(log.scheduledArrival)} -{" "}
-                    {formatTime(log.scheduledDeparture)}
+                <div className="timeline-label bg-white p-3 rounded-lg shadow-xs border border-gray-100">
+                  <div className="font-semibold text-gray-800 flex items-center">
+                    <span className="stop-order mr-2 bg-indigo-100 text-indigo-800 rounded-full w-6 h-6 flex items-center justify-center text-xs">
+                      {log.order}
+                    </span>
+                    {log.stopId?.stopName}
+                  </div>
+                  <div className="mt-2 space-y-1">
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">Scheduled:</span>{" "}
+                      {formatDateTime(log.scheduledArrival)} →{" "}
+                      {formatDateTime(log.scheduledDeparture)}
+                    </div>
                   </div>
                 </div>
               }
             >
-              <div className="timeline-content">
-                <div className="flex justify-between">
-                  <div>
-                    <Tag color={stopStatusColor[log.status]}>
+              <div className=" bg-white p-4 rounded-lg shadow-xs border border-gray-100 ml-4">
+                <div className="flex flex-col  items-start">
+                  <div className="flex items-center mb-3 ">
+                    <Tag
+                      color={stopStatusColor[log.status]}
+                      className="!font-medium !text-sm !px-3 !py-1 !rounded-full"
+                    >
                       {stopStatusText[log.status]}
                     </Tag>
                   </div>
-                  <div className="text-xs">
-                    <span
-                      className={
-                        log.actualArrival ? "text-gray-500" : "text-red-500"
-                      }
+
+                  <div className="text-sm">
+                    <div
+                      className={`font-medium ${
+                        log.actualArrival ? "text-green-600" : "text-red-500"
+                      }`}
                     >
-                      {log.actualArrival ? (
-                        <>
-                          Arrived: {formatTime(log.actualArrival)}
-                          {log.actualDeparture && (
-                            <> | Departed: {formatTime(log.actualDeparture)}</>
-                          )}
-                        </>
-                      ) : (
-                        "Not arrived yet"
+                      {/* Status row */}
+                      <div className="mb-2">
+                        <span className="font-medium">
+                          {!log.actualArrival && "Pending arrival"}
+                        </span>
+                      </div>
+                      {/* Arrival row */}
+                      {log.actualArrival && (
+                        <div className="mb-2  ">
+                          <span className="text-gray-600">Arrived: </span>
+                          <span className="font-medium">
+                            {formatDateTime(log.actualArrival)}
+                          </span>
+                        </div>
                       )}
-                    </span>
+                      {/* Departure row */}
+                      {log.actualDeparture && (
+                        <div>
+                          <span className="text-gray-600">Departed: </span>
+                          <span className="font-medium">
+                            {formatDateTime(log.actualDeparture)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-                {log.stopId?.location && (
-                  <div className="mt-1 text-xs">
-                    <span className="text-gray-500">Location:</span>{" "}
-                    {log.stopId.location.lat.toFixed(6)},{" "}
-                    {log.stopId.location.lng.toFixed(6)}
+
+                {/* {log.stopId?.location && (
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium">Location:</span>{" "}
+                      <span className="font-mono">
+                        {log.stopId.location.lat.toFixed(6)},{" "}
+                        {log.stopId.location.lng.toFixed(6)}
+                      </span>
+                    </div>
                   </div>
-                )}
+                )} */}
+
                 {log.notes && (
-                  <div className="mt-1 text-xs">
-                    <span className="text-gray-500">Notes:</span> {log.notes}
+                  <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="text-sm">
+                      <span className="font-medium text-gray-600">Notes:</span>{" "}
+                      <span className="text-gray-700">{log.notes}</span>
+                    </div>
                   </div>
                 )}
               </div>
             </Timeline.Item>
           ))}
         </Timeline>
+
+        <style jsx>{`
+          .custom-timeline .ant-timeline-item {
+            padding-bottom: 28px;
+          }
+          .timeline-dot-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            border: 2px solid #e2e8f0;
+          }
+          .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+          }
+          .start-point-dot {
+            background: #10b981;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+          }
+          .completed-dot {
+            background: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+          }
+          .in-progress-dot {
+            background: #f59e0b;
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+          }
+          .pending-dot {
+            background: #f97316;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2);
+          }
+        `}</style>
       </div>
     );
   };
@@ -254,13 +350,10 @@ const ViewTripsList = () => {
           </div>
           <div>
             <div className="font-medium">
-              {record.routeId?.routeName || "N/A"}
+              {record.tripType === "pickup" ? "Pick Up" : "Drop Off"}
             </div>
             <div className="text-xs text-gray-500">
               {dayjs(record.tripDate).format("MMM D, YYYY")}
-              {record.tripType === "pickup"
-                ? " • Morning Pickup"
-                : " • Afternoon Drop"}
             </div>
           </div>
         </div>
@@ -454,7 +547,18 @@ const ViewTripsList = () => {
           message.success(`Trip ${trip._id} started successfully`);
           setConfirmLoading(false);
           // In a real app, you would dispatch an action here
-          // dispatch(startTrip(trip._id));
+          const payload = {
+            DEFAULT_SPEED_KMPH: 40,
+            HALT_TIME_MINUTES: 2,
+          };
+          dispatch(
+            startTripLog({
+              tripId: trip._id,
+              isGPSOn: isGpsOn,
+              payload,
+              vehicleId,
+            })
+          );
         }, 1500);
       },
     });
@@ -475,7 +579,7 @@ const ViewTripsList = () => {
           message.success(`Trip ${trip._id} ended successfully`);
           setConfirmLoading(false);
           // In a real app, you would dispatch an action here
-          // dispatch(endTrip(trip._id));
+          dispatch(endTripLog({ tripId: trip._id, vehicleId }));
         }, 1500);
       },
     });
@@ -495,11 +599,26 @@ const ViewTripsList = () => {
     if (!selectedTripForDetails) return null;
 
     const record = selectedTripForDetails;
-    const completedStops = record.stopLogs.filter(
-      (s) => s.status === "completed" || s.status === "start_point"
+
+    // Filter out the starting point when counting stops
+    const actualStops = record.stopLogs.filter(
+      (stop) => stop.status !== "start_point"
+    );
+
+    const completedStops = actualStops.filter(
+      (s) => s.status === "completed"
     ).length;
-    const totalStops = record.stopLogs.length;
-    const progressPercent = Math.round((completedStops / totalStops) * 100);
+
+    const totalStops = actualStops.length;
+
+    // Calculate progress percentage (0 if not started, otherwise based on completed stops)
+    const progressPercent =
+      record.status === "not_started" ||
+      (record.status === "in_progress" && completedStops === 0)
+        ? 0
+        : totalStops > 0
+        ? Math.round((completedStops / totalStops) * 100)
+        : 0;
 
     return (
       <div className="p-6 h-full bg-gradient-to-br from-gray-50 to-gray-100">
@@ -580,6 +699,7 @@ const ViewTripsList = () => {
                   </div>
                 </div>
 
+                {/* Rest of the card content remains the same */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
                     <div className="text-xs font-medium text-gray-500 mb-1">

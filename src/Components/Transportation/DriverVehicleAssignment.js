@@ -16,9 +16,11 @@ import {
   createOrUpdateDriverVehicleAssignment,
   getDriverVehicleAssignments,
 } from "../../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignment.action";
+import { fetchHelperList } from "../../Store/Slices/Transportation/Helper/helper.action";
+
 const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignment }) => {
   const dispatch = useDispatch();
-  console.log("selectedAssignment==>",selectedAssignment)
+  console.log("selectedAssignment==>", selectedAssignment)
   // Redux states for drivers, shifts, and vehicles
   const { drivers, loading: driversLoading } = useSelector(
     (store) => store.transportation?.transportDriver
@@ -29,6 +31,9 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
   const { vehicles, loading: vehiclesLoading } = useSelector(
     (store) => store.transportation?.transportVehicle
   );
+  const { helpers } = useSelector(
+    (store) => store.transportation?.transportHelper
+  )
 
   // Form Data State
   const [formData, setFormData] = useState({
@@ -48,6 +53,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
     dispatch(fetchDriverList());
     dispatch(getAllShifts());
     dispatch(getAllVehicles());
+    dispatch(fetchHelperList());
   }, [dispatch]);
 
   useEffect(() => {
@@ -235,13 +241,11 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
                 disabled={!formData.assigned_driver}
               >
                 <option value="">Select a helper (optional)</option>
-                {drivers
-                  .filter((d) => d._id !== formData.assigned_driver)
-                  .map((driver) => (
-                    <option key={driver._id} value={driver._id}>
-                      {driver.fullName} ({driver.driverBadgeNumber})
-                    </option>
-                  ))}
+                {helpers?.map((helper) => (
+                  <option key={helper._id} value={helper._id}>
+                    {helper.fullName} ({helper.helperBadgeNumber})
+                  </option>
+                ))}
               </select>
             </div>
 

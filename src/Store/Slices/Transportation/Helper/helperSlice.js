@@ -1,64 +1,64 @@
-// driverSlice.js
+// helperSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchHelperList, addHelper, updateHelper, deleteHelper } from "./helper.action";
 
-const driverSlice = createSlice({
+const helperSlice = createSlice({
   name: "helper",
   initialState: {
-    drivers: [],
+    helpers: [],
     loading: false,
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Drivers
+      // Fetch helpers
       .addCase(fetchHelperList.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchHelperList.fulfilled, (state, action) => {
         state.loading = false;
-        state.drivers = action.payload?.data || [];
+        state.helpers = action.payload?.data || [];
       })
       .addCase(fetchHelperList.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to fetch drivers";
+        state.error = action.payload || "Failed to fetch helpers";
       })
 
-      // Add Driver
+      // Add helper
       .addCase(addHelper.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(addHelper.fulfilled, (state, action) => {
         state.loading = false;
-        // state.drivers.push(action.payload?.data); // Again, adjust based on your API response
+        // state.helpers.push(action.payload?.data); // Again, adjust based on your API response
       })
       .addCase(addHelper.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to add driver";
+        state.error = action.payload || "Failed to add helper";
       })
 
-      // Update Driver
+      // Update helper
       .addCase(updateHelper.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(updateHelper.fulfilled, (state, action) => {
         state.loading = false;
-        // const updatedDriver = action.payload?.data;
-        // const index = state.drivers.findIndex(driver => driver._id === updatedDriver._id);
+        // const updatedhelper = action.payload?.data;
+        // const index = state.helpers.findIndex(helper => helper._id === updatedhelper._id);
         // if (index !== -1) {
-        //   state.drivers[index] = updatedDriver;
+        //   state.helpers[index] = updatedhelper;
         // }
       })
       .addCase(updateHelper.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to update driver";
+        state.error = action.payload || "Failed to update helper";
       })
 
-      // Delete Driver
+      // Delete helper
       .addCase(deleteHelper.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -66,13 +66,13 @@ const driverSlice = createSlice({
       .addCase(deleteHelper.fulfilled, (state, action) => {
         state.loading = false;
         // const deletedId = action.meta.arg; // since thunk arg is id
-        // state.drivers = state.drivers.filter(driver => driver._id !== deletedId);
+        // state.helpers = state.helpers.filter(helper => helper._id !== deletedId);
       })
       .addCase(deleteHelper.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Failed to delete driver";
+        state.error = action.payload || "Failed to delete helper";
       });
   },
 });
 
-export default driverSlice.reducer;
+export default helperSlice.reducer;
