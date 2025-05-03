@@ -116,7 +116,7 @@ import transportScheduleReducer from '../Store/Slices/Transportation/Schedule/sc
 import transportSubRouteReducer from "../Store/Slices/Transportation/SubRoute/subRouteSlice";
 import transportVDAssignmentReducer from "../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignmentSice";
 import transportDriverReducer from "../Store/Slices/Transportation/Driver/driver.slice";
-
+import tripExecutionLogReducer from "../Store/Slices/Transportation/TripExecutionLog/tripExecutionLogSlice";
 // Persist configuration for the Auth slice
 
 const authPersistConfig = {
@@ -294,6 +294,7 @@ const transportReducer = combineReducers({
   transportVDAssignment:transportVDAssignmentReducer,
   transportSchedule:transportScheduleReducer,
   transportDriver: transportDriverReducer,
+  tripExecutionLog:tripExecutionLogReducer,
 
 });
 

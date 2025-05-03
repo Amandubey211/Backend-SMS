@@ -1,3 +1,4 @@
+/* Path: features/Transportation/RoutesManagment/RouteManagement.jsx */
 import React, { useState, useCallback, useEffect } from "react";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
@@ -14,32 +15,32 @@ import { MdSubdirectoryArrowRight } from "react-icons/md";
 
 import { Modal } from "antd";
 import { getSubRoutesBySchool } from "../../../Store/Slices/Transportation/SubRoute/subRoute.action";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getRoutesBySchool,
+  getTransportUsers,
+} from "../../../Store/Slices/Transportation/RoutesManagment/routes.action";
+import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 
-/* ------------------------------------------------------------------ */
-/*  RouteManagement                                                    */
-/* ------------------------------------------------------------------ */
 const RouteManagement = () => {
   const { t } = useTranslation("transportation");
+  const dispatch = useDispatch();
+  const { transportUsers } = useSelector(
+    (s) => s.transportation.transportRoute
+  );
 
   /* -------- page heading ------------------------------------------------ */
-  // useNavHeading adds the breadcrumb / navbar title in the admin shell
-  // (keep it if your project uses this custom hook; otherwise remove)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const useNavHeading =
-    require("../../../Hooks/CommonHooks/useNavHeading ").default;
+
   useNavHeading(t("Transportation"), t("Route Management"));
-  const dispatch = useDispatch();
+
   /* -------- local state ------------------------------------------------- */
   const [sidebar, setSidebar] = useState({
     open: false,
-    type: null, // "route"
-    route: null, // data of the route being edited
+    type: null,
+    route: null,
   });
 
   const [subRouteModal, setSubRouteModal] = useState(false);
-
-  /* a single Boolean lifted from RouteForm so we can guard close-actions */
   const [formDirty, setFormDirty] = useState(false);
 
   /* ------------------------------------------------------------------ */
@@ -53,15 +54,22 @@ const RouteManagement = () => {
 
     Modal.confirm({
       title: t("Discard unsaved changes?"),
-      content: t("You’ll lose everything you typed."),
+      content: t("You'll lose everything you typed."),
       okText: t("Discard"),
       cancelText: t("Keep editing"),
       onOk: hardCloseSidebar,
     });
   }, [formDirty, t]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Data fetching                                                     */
+  /* ------------------------------------------------------------------ */
   useEffect(() => {
     dispatch(getSubRoutesBySchool());
+    dispatch(getRoutesBySchool());
+    dispatch(getTransportUsers());
   }, [dispatch]);
+
   /* ------------------------------------------------------------------ */
   /*  Render                                                            */
   /* ------------------------------------------------------------------ */
@@ -118,11 +126,12 @@ const RouteManagement = () => {
             {sidebar.type === "route" && (
               <RouteForm
                 routeData={sidebar.route}
+                transportUsers={transportUsers}
                 onSuccess={() => {
                   setFormDirty(false);
                   hardCloseSidebar();
                 }}
-                onDirtyChange={setFormDirty} /* <-- new prop */
+                onDirtyChange={setFormDirty}
                 t={t}
               />
             )}
