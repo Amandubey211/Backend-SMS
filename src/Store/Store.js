@@ -111,11 +111,12 @@ import { saveDraft } from "../Utils/signupDraft";
 import transportRouteReducer from "../Store/Slices/Transportation/RoutesManagment/routeSlice";
 import transportVehicleReducer from "../Store/Slices/Transportation/Vehicles/vehiclesSlice";
 import transportShiftReducer from "../Store/Slices/Transportation/Shift/shiftSlice";
-import transportScheduleReducer from '../Store/Slices/Transportation/Schedule/scheduleSlice';
+import transportScheduleReducer from "../Store/Slices/Transportation/Schedule/scheduleSlice";
 
 import transportSubRouteReducer from "../Store/Slices/Transportation/SubRoute/subRouteSlice";
 import transportVDAssignmentReducer from "../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignmentSice";
 import transportDriverReducer from "../Store/Slices/Transportation/Driver/driver.slice";
+import vehicleUserAssignmentReducer from "../Store/Slices/Transportation/VehiclePersonAssignment/vehiclePersonAssignmentSlice";
 import transportHelperReducer from "../Store/Slices/Transportation/Helper/helperSlice";
 import tripExecutionLogReducer from "../Store/Slices/Transportation/TripExecutionLog/tripExecutionLogSlice";
 // Persist configuration for the Auth slice
@@ -292,11 +293,12 @@ const transportReducer = combineReducers({
   transportShift: transportShiftReducer,
 
   transportSubRoute: transportSubRouteReducer,
-  transportVDAssignment:transportVDAssignmentReducer,
-  transportSchedule:transportScheduleReducer,
+  transportVDAssignment: transportVDAssignmentReducer,
+  transportSchedule: transportScheduleReducer,
   transportDriver: transportDriverReducer,
+  vehicleUserAssignment: vehicleUserAssignmentReducer,
   transportHelper: transportHelperReducer,
-  tripExecutionLog:tripExecutionLogReducer,
+  tripExecutionLog: tripExecutionLogReducer,
 
 });
 
