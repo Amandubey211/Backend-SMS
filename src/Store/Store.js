@@ -111,6 +111,7 @@ import { saveDraft } from "../Utils/signupDraft";
 import transportRouteReducer from "../Store/Slices/Transportation/RoutesManagment/routeSlice";
 import transportVehicleReducer from "../Store/Slices/Transportation/Vehicles/vehiclesSlice";
 import transportShiftReducer from "../Store/Slices/Transportation/Shift/shiftSlice";
+import transportScheduleReducer from '../Store/Slices/Transportation/Schedule/scheduleSlice';
 
 import transportSubRouteReducer from "../Store/Slices/Transportation/SubRoute/subRouteSlice";
 import transportVDAssignmentReducer from "../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignmentSice";
@@ -291,7 +292,7 @@ const transportReducer = combineReducers({
 
   transportSubRoute: transportSubRouteReducer,
   transportVDAssignment:transportVDAssignmentReducer,
-
+  transportSchedule:transportScheduleReducer,
   transportDriver: transportDriverReducer,
 
 });
