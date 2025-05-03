@@ -163,6 +163,10 @@ const Stoppage = lazy(() =>
   import("../Components/Transportation/StopageList.js")
 );
 
+const Scheduling = lazy(()=>
+  import("../Modules/Admin/Transportation/Scheduling.js")
+)
+
 // 3. Academic Management
 const Academic = lazy(() =>
   import("../Modules/Admin/AcademicYear/Academic.js")
@@ -856,6 +860,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={ShiftManagement}
+          allowedRoles={["admin", "staff"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/transportation/schedule",
+      element: (
+        <ProtectRoute
+          Component={Scheduling}
           allowedRoles={["admin", "staff"]}
         />
       ),

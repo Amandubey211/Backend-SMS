@@ -145,7 +145,7 @@ const sidebarData = [
     ],
   },
 
-  
+
 
   {
     title: "NoticeBoard",
@@ -332,6 +332,12 @@ const sidebarData = [
       //   path: "/transportation/routes-and-buses",
       //   roles: [ROLES.ADMIN, ROLES.STAFF],
       // },
+      {
+        title: "Schedule", // New tab
+        icon: <MdAccessTime />, // You can choose a different icon if preferred
+        path: "/transportation/schedule",
+        roles: [ROLES.ADMIN, ROLES.STAFF],
+      },
       {
         title: "Shift Management", // New tab
         icon: <MdAccessTime />, // You can choose a different icon if preferred
