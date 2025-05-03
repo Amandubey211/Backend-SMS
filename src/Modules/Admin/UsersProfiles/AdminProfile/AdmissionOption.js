@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Input, Button, Space, Select } from "antd";
 import { fetchAdmissionOptions, updateAdmissionOptions } from "../../../../Store/Slices/Common/User/actions/userActions";
+import FieldOptionalityForm from "./FieldOptionalityForm";
 
 const { Option } = Select;
 
@@ -27,31 +28,22 @@ export default function AdmissionOption({ schoolId, onClose }) {
     "Spanish", "Farsi", "Sinhala", "Turkish", "Pashto", "Russian", 
     "German", "Mandarin"
   ];
-
+  const [fields, setFields] = useState([]);
   useEffect(() => {
     setSecondLanguages([]);
     setThirdLanguages([]);
     setValueEducation([]);
     dispatch(fetchAdmissionOptions(schoolId)).then((res) => {
-      const { languageOptions = {}, valueEducation = [] } = res.payload?.data || {};
+      const { languageOptions = {}, valueEducation = [] ,fieldOptionality} = res.payload?.data || {};
       setSecondLanguages(prevState => [...prevState, ...languageOptions?.secondLanguages || []]);
       setThirdLanguages(prevState => [...prevState, ...languageOptions?.thirdLanguages || []]);
       setValueEducation(prevState => [...prevState, ...valueEducation]);
+      if(fieldOptionality?.length > 0){
+        setFields(fieldOptionality)
+      }
     });
   }, [dispatch, schoolId]);
 
-  const handleSubmit = () => {
-    dispatch(updateAdmissionOptions({
-      schoolId,
-      admissionOptions: {
-        languageOptions: {
-          secondLanguages,
-          thirdLanguages
-        },
-        valueEducation
-      }
-    })).then(() => onClose());
-  };
 
   const handleSecondLanguageChange = (selectedLanguages) => {
     setSecondLanguages(selectedLanguages);
@@ -75,17 +67,31 @@ export default function AdmissionOption({ schoolId, onClose }) {
   const handleAddCustomThirdLanguage = () => {
     if (newThirdLanguage.trim() && !thirdLanguages.includes(newThirdLanguage)) {
       setThirdLanguages([...thirdLanguages, newThirdLanguage.trim()]);
-      setNewThirdLanguage(""); // Clear the input
+      setNewThirdLanguage(""); 
     }
   };
 
   const handleAddCustomValueEducation = () => {
     if (newValueEducation.trim() && !valueEducation.includes(newValueEducation)) {
       setValueEducation([...valueEducation, newValueEducation.trim()]);
-      setNewValueEducation(""); // Clear the input
+      setNewValueEducation(""); 
     }
   };
-
+ 
+  
+  const handleSubmit = () => {
+    dispatch(updateAdmissionOptions({
+      schoolId,
+      admissionOptions: {
+        languageOptions: {
+          secondLanguages,
+          thirdLanguages
+        },
+        valueEducation,
+        fieldOptionality:fields
+      }
+    })).then(() => onClose());
+  };
   return (
     <div className="p-4">
       <Space direction="vertical" style={{ width: "100%" }}>
@@ -155,7 +161,10 @@ export default function AdmissionOption({ schoolId, onClose }) {
           Add Custom Value Education
         </Button>
 
-        <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white" onClick={handleSubmit}>
+<div>
+  <FieldOptionalityForm fields={fields} setFields={setFields} schoolId={schoolId} handleSubmit={handleSubmit}/>
+</div>
+        <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white m-4 mb-10 w-full" onClick={handleSubmit}>
           Save Options
         </Button>
       </Space>

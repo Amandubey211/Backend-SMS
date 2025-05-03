@@ -80,6 +80,7 @@ const CompactIconSelect = ({
   options = [],
   tooltip,
   placeholder,
+  required,
   allowCustom = false, // enable typed entries
   ...rest
 }) => {
@@ -127,6 +128,7 @@ const CompactIconSelect = ({
     <Form.Item
       validateStatus={hasError ? "error" : ""}
       help={hasError && meta.error}
+      required={required}
     >
       <Tooltip title={tooltip}>
         <Space.Compact className="w-full">
