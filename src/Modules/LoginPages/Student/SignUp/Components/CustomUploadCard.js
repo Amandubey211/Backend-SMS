@@ -1,5 +1,9 @@
-import { Modal } from "antd";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
+import { Modal, Button, message, Slider, Row, Col } from "antd";
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
+import { GrRotateRight, GrRotateLeft } from "react-icons/gr";
+import { PiCropLight, PiFlipHorizontalLight } from "react-icons/pi";
 
 const CustomUploadCard = ({
   name,
@@ -8,27 +12,36 @@ const CustomUploadCard = ({
   recommendedSize = "500x500",
   width = "w-full",
   height = "h-52",
-  aspectRatio = "aspect-square",
+  aspectRatio = 1,
 }) => {
   const [currentFile, setCurrentFile] = useState(null);
   const [localPreview, setLocalPreview] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
-  const fileInputRef = useRef(null);
 
-  const openFileDialog = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
+  const [crop, setCrop] = useState();
+  const [completedCrop, setCompletedCrop] = useState(null);
+  const [rotation, setRotation] = useState(0);
+  const [flipHorizontal, setFlipHorizontal] = useState(false);
+
+  const fileInputRef = useRef(null);
+  const imgRef = useRef(null);
+  const previewCanvasRef = useRef(null);
+
+  const openFileDialog = () => fileInputRef.current?.click();
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setCurrentFile(file);
-      const previewUrl = URL.createObjectURL(file);
-      setLocalPreview(previewUrl);
-      form.setFieldsValue({ [name]: file });
+    if (!file?.type.startsWith("image/")) {
+      message.error("Please upload a valid image.");
+      return;
     }
+
+    const previewUrl = URL.createObjectURL(file);
+    setCurrentFile(file);
+    setLocalPreview(previewUrl);
+    setRotation(0);
+    setFlipHorizontal(false);
+    form.setFieldsValue({ [name]: file });
   };
 
   const clearFile = (e) => {
@@ -36,22 +49,104 @@ const CustomUploadCard = ({
     setCurrentFile(null);
     setLocalPreview(null);
     form.setFieldsValue({ [name]: null });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handlePreview = (e) => {
     e.stopPropagation();
     if (localPreview) {
       setPreviewVisible(true);
+      setCrop({
+        unit: "%",
+        width: 100,
+        aspect: aspectRatio,
+      });
     }
   };
+
+  const handleImageLoaded = (img) => {
+    imgRef.current = img;
+    return false; // suppress built-in crop auto-set
+  };
+
+  const handleCropSave = () => {
+    if (
+      !completedCrop ||
+      !completedCrop.width ||
+      !completedCrop.height ||
+      !previewCanvasRef.current
+    ) {
+      message.error("Please crop the image.");
+      return;
+    }
+
+    previewCanvasRef.current.toBlob(
+      (blob) => {
+        if (!blob) {
+          message.error("Failed to crop image.");
+          return;
+        }
+
+        const fileURL = URL.createObjectURL(blob);
+        setLocalPreview(fileURL);
+        setCurrentFile(blob);
+        form.setFieldsValue({ [name]: blob });
+        setPreviewVisible(false);
+      },
+      "image/jpeg",
+      0.95
+    );
+  };
+
+  const rotateImage = (deg) => setRotation((prev) => (prev + deg) % 360);
+  const toggleFlip = () => setFlipHorizontal((prev) => !prev);
+
+  useEffect(() => {
+    if (
+      !completedCrop ||
+      !completedCrop.width ||
+      !completedCrop.height ||
+      !previewCanvasRef.current ||
+      !imgRef.current
+    )
+      return;
+
+    const canvas = previewCanvasRef.current;
+    const image = imgRef.current;
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    const ctx = canvas.getContext("2d");
+    const pixelRatio = window.devicePixelRatio;
+
+    canvas.width = completedCrop.width * pixelRatio;
+    canvas.height = completedCrop.height * pixelRatio;
+
+    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    ctx.imageSmoothingQuality = "high";
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((rotation * Math.PI) / 180);
+    if (flipHorizontal) ctx.scale(-1, 1);
+    ctx.translate(-canvas.width / 2, -canvas.height / 2);
+    ctx.drawImage(
+      image,
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY,
+      0,
+      0,
+      completedCrop.width,
+      completedCrop.height
+    );
+    ctx.restore();
+  }, [completedCrop, rotation, flipHorizontal]);
 
   return (
     <>
       <div
-        className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height} ${aspectRatio}`}
+        className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
         onClick={openFileDialog}
       >
         {currentFile ? (
@@ -64,10 +159,16 @@ const CustomUploadCard = ({
             />
             <button
               onClick={clearFile}
-              className="absolute top-2 right-2 bg-white border border-gray-300 rounded px-2 py-0.5 text-xs cursor-pointer hover:bg-gray-50"
+              className="absolute top-2 right-2 bg-white border px-2 py-0.5 text-xs rounded hover:bg-gray-100"
             >
               Clear
             </button>
+            <div
+              className="absolute top-2 left-2 cursor-pointer"
+              onClick={handlePreview}
+            >
+              <PiCropLight style={{ fontSize: 24, color: "#fff" }} />
+            </div>
           </>
         ) : (
           <div className="text-center p-4">
@@ -84,20 +185,78 @@ const CustomUploadCard = ({
           type="file"
           ref={fileInputRef}
           accept="image/*"
-          onChange={handleFileChange}
           name={name}
-          style={{ display: "none" }}
+          onChange={handleFileChange}
+          hidden
         />
       </div>
+
       <Modal
         open={previewVisible}
         footer={null}
-        title="Preview"
         onCancel={() => setPreviewVisible(false)}
+        title="Edit Image"
+        width={1000}
       >
-        {localPreview && (
-          <img alt="upload preview" className="w-full" src={localPreview} />
-        )}
+        <Row gutter={24}>
+          <Col md={12}>
+            <h4>Crop Image</h4>
+            <ReactCrop
+              crop={crop}
+              onChange={(c) => setCrop(c)}
+              onComplete={(c) => setCompletedCrop(c)}
+              onImageLoaded={handleImageLoaded}
+              aspect={aspectRatio}
+            >
+              <img
+                ref={imgRef}
+                src={localPreview}
+                alt="Crop Source"
+                style={{
+                  maxWidth: "100%",
+                  transform: `rotate(${rotation}deg) scaleX(${
+                    flipHorizontal ? -1 : 1
+                  })`,
+                }}
+              />
+            </ReactCrop>
+
+            <div className="flex items-center justify-between mt-3">
+              <div className="flex space-x-2">
+                <Button icon={<GrRotateLeft />} onClick={() => rotateImage(-90)} />
+                <Button icon={<GrRotateRight />} onClick={() => rotateImage(90)} />
+              </div>
+              <Button icon={<PiFlipHorizontalLight />} onClick={toggleFlip} />
+            </div>
+
+            <Slider
+              min={0}
+              max={360}
+              value={rotation}
+              onChange={setRotation}
+              marks={{ 0: "0°", 90: "90°", 180: "180°", 270: "270°" }}
+              className="mt-4"
+            />
+          </Col>
+
+          <Col md={12}>
+            <h4>Preview</h4>
+            <div className="border p-2 rounded-md flex items-center justify-center min-h-[200px]">
+              {completedCrop ? (
+                <canvas ref={previewCanvasRef} style={{ maxWidth: "100%" }} />
+              ) : (
+                <div className="text-gray-400">Crop area will appear here</div>
+              )}
+            </div>
+            <Button
+              type="primary"
+              className="mt-4 w-full"
+              onClick={handleCropSave}
+            >
+              Save Cropped Image
+            </Button>
+          </Col>
+        </Row>
       </Modal>
     </>
   );

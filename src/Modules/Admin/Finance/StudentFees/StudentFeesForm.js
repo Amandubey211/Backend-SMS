@@ -45,17 +45,17 @@ const StudentFeeForm = () => {
   const location = useLocation();
   const [classAndSectionDetail, setClassAndSectionDetail] = useState([]);
   useEffect(() => {
-    if(location?.state){
-      let lIt =location?.state?.configData?.lineItems.map((i)=>{
+    if (location?.state) {
+      let lIt = location?.state?.configData?.lineItems.map((i) => {
         return {
           ...i,
-          dueDate: "",
-          startDate:"",
-          endDate:""
+          dueDate: null,
+          startDate: null,
+          endDate: null
 
         }
       });
-        setLineItems(lIt);
+      setLineItems(lIt);
       setStudentIds(location?.state?.configData?.studentIds);
       setClassAndSectionDetail(location?.state?.configData?.classAndSectionDetail);
       form.setFieldsValue({
@@ -92,11 +92,16 @@ const StudentFeeForm = () => {
     const fetchedItems = res.payload?.data || [];
 
     const updatedItems = [...lineItems];
-    updatedItems[index] = { ...updatedItems[index], categoryId, categoryName: category.categoryName, items: fetchedItems, itemId: "", itemDetails: "", rate: 0 };
-
-    setLineItems(updatedItems);
+    updatedItems[index] = { ...updatedItems[index], categoryId, categoryName: category.categoryName, items: fetchedItems, itemId: "", itemDetails: "", rate: 0, };
+    console.log(updatedItems);
+    let updatedItemsfix = updatedItems.map((i) => ({ ...i, 
+      startDate:  i?.startDate?.length > 0 ? dayjs(i?.startDate?.slice(0, 10)) : null,
+      enfDate: i?.endDate?.length >0 ? dayjs(i?.endDate?.slice(0, 10)) : null,
+      dueDate:  i?.dueDate?.length >0 ? dayjs(i?.dueDate?.slice(0, 10)) : null,
+     }))
+    setLineItems(updatedItemsfix);
     form.setFieldsValue({
-      lineItems: updatedItems
+      lineItems: updatedItemsfix
     });
   };
 
@@ -115,7 +120,8 @@ const StudentFeeForm = () => {
 
   const handleInputChange = (index, field, value) => {
     const updatedItems = [...lineItems];
-    updatedItems[index][field] = field.includes('Date') && value ? value.format('YYYY-MM-DD') : value;
+    updatedItems[index][field] = field.includes('Date') && value ? value?.format('YYYY-MM-DD') : value;
+
 
     const rate = updatedItems[index].rate || 0;
     const quantity = updatedItems[index].quantity || 1;
@@ -172,7 +178,7 @@ const StudentFeeForm = () => {
   const navigate = useNavigate();
   const [configModel, setConfigModel] = useState(false);
   const [isConfigData, setIsConfigData] = useState(false);
-  const closeConfigModel = ()=>{
+  const closeConfigModel = () => {
     setIsConfigData(false)
     setConfigModel(false)
   }
@@ -186,11 +192,12 @@ const StudentFeeForm = () => {
       lineItems,
       studentIds: studentsIdsArray
     }
-    if(isConfigData){
+    if (isConfigData) {
       setConfigModel(true)
-      return 
-    }else{
-    dispatch(createStudentFee({ feeData: data, navigate }))}
+      return
+    } else {
+      dispatch(createStudentFee({ feeData: data, navigate }))
+    }
   };
   const { activeYear } = useSelector((store) => store.common.financialYear);
   const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
@@ -215,7 +222,7 @@ const StudentFeeForm = () => {
             <Row gutter={16}>
               <Col span={6}>
                 <Form.Item name={["lineItems", index, "categoryId"]} label=
-              {
+                  {
                     <span className="flex items-center gap-1">
                       <span className="font-medium">Category</span>
                       <Tooltip
@@ -321,16 +328,16 @@ const StudentFeeForm = () => {
                 <>
                   <Col span={6}>
                     <Form.Item name={["lineItems", index, "startDate"]} label="Start Date" rules={[{ required: true, message: "Start Date is required" }]}>
-                      <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "startDate", date)}  disabledDate={(current) =>
-                          current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
-                        }/>
+                      <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "startDate", date)} disabledDate={(current) =>
+                        current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                      } />
                     </Form.Item>
                   </Col>
                   <Col span={6}>
                     <Form.Item name={["lineItems", index, "endDate"]} label="End Date">
-                      <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "endDate", date)} rules={[{ required: true, message: "End Date is required" }]}  disabledDate={(current) =>
-                          current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
-                        } />
+                      <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "endDate", date)} rules={[{ required: true, message: "End Date is required" }]} disabledDate={(current) =>
+                        current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                      } />
                     </Form.Item>
                   </Col>
 
@@ -338,9 +345,9 @@ const StudentFeeForm = () => {
               )}
               <Col span={6}>
                 <Form.Item name={["lineItems", index, "dueDate"]} label="Due Date">
-                  <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "dueDate", date)} rules={[{ required: true, message: "End Date is required" }]}  disabledDate={(current) =>
-                          current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
-                        } />
+                  <DatePicker style={{ width: "100%" }} onChange={(date) => handleInputChange(index, "dueDate", date)} rules={[{ required: true, message: "End Date is required" }]} disabledDate={(current) =>
+                    current && (current.isBefore(minDate, 'day') || current.isAfter(maxDate, 'day'))
+                  } />
                 </Form.Item>
               </Col>
               <Col span={6}>
@@ -356,7 +363,7 @@ const StudentFeeForm = () => {
 
         <Button type="dashed" onClick={addLineItem} className=" text-purple-500 " >Add New Item</Button>
         <Button htmlType="submit" className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Add Fees</Button>
-        <Button htmlType="submit" onClick={()=> setIsConfigData(true)}  className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
+        <Button htmlType="submit" onClick={() => setIsConfigData(true)} className=" ml-10 bg-gradient-to-r from-pink-500 to-purple-500 text-white">Save In Config</Button>
       </Form>
       <Sidebar
         title={"Select Multiply classes & sections"}
@@ -368,12 +375,12 @@ const StudentFeeForm = () => {
         {studentsIdsArray.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={() => handleModalClose()}>Done</div>}
       </Sidebar>
       <Modal
-      open={configModel}
-      onClose={()=>closeConfigModel()}
-      onCancel={()=>closeConfigModel()}
-      footer={null}
+        open={configModel}
+        onClose={() => closeConfigModel()}
+        onCancel={() => closeConfigModel()}
+        footer={null}
       >
-       <ConfigurationCreateModel closeConfigModel={closeConfigModel} data={{lineItems,studentIds,classAndSectionDetail}} configType="studentRevenue"/>
+        <ConfigurationCreateModel closeConfigModel={closeConfigModel} data={{ lineItems, studentIds, classAndSectionDetail }} configType="studentRevenue" />
       </Modal>
     </div>
   );
