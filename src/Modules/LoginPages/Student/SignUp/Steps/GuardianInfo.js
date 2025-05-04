@@ -447,6 +447,7 @@ const GuardianInfo = ({ formData }) => {
   const prepareFormData = () => {
     const formValues = form.getFieldsValue(true);
     const formData = new FormData();
+console.log(formValues);
 
     // Add all form data from all steps (from Redux store)
     Object.entries(completeFormData).forEach(([section, data]) => {
@@ -470,25 +471,28 @@ const GuardianInfo = ({ formData }) => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    try {
+   // try {
       const formData = prepareFormData();
+      console.log(formData);
+      
 
       // Dispatch the registration thunk
-      await dispatch(
-        registerStudentDetails({
-          formData,
-          navigate,
-        })
-      ).unwrap();
+      // await dispatch(
+      //   registerStudentDetails({
+      //     formData,
+      //     navigate,
+      //   })
+      // ).unwrap();
 
-      // Only proceed to next step if submission was successful
-      dispatch(nextStep());
-    } catch (error) {
-      message.error("Failed to save guardian information");
-      console.error("Submission error:", error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    //   // Only proceed to next step if submission was successful
+    //   dispatch(nextStep());
+    // } catch (error) {
+    //   message.error("Failed to save guardian information");
+    //   console.error("Submission error:", error);
+    // } finally {
+    //   setIsSubmitting(false);
+    // }
+    setIsSubmitting(false);
   };
 
   const handleNext = async () => {

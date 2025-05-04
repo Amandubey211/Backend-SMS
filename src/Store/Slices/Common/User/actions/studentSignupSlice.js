@@ -216,24 +216,6 @@ const studentSignupSlice = createSlice({
       })
       .addCase(checkStudentByEmail.fulfilled, (state, action) => {
         state.isCheckingStudent = false;
-        const { exists, data } = action.payload;
-
-        if (exists && data) {
-          // Map the existing data to our form structure
-          state.formData = {
-            school: data.school || {},
-            guardian: data.guardian || {},
-            candidate: {
-              firstName: data.firstName,
-              lastName: data.lastName,
-              // ... other candidate fields
-            },
-            academic: data.academic || {},
-            address: data.address || {},
-            documents: data.documents || [],
-            consent: {},
-          };
-        }
       })
       .addCase(checkStudentByEmail.rejected, (state) => {
         state.isCheckingStudent = false;
