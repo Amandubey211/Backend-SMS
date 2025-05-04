@@ -93,8 +93,7 @@ const SchoolSelection = ({ formData }) => {
       ).unwrap();
 
       // 2. Check if student exists
-      const { payload } = await dispatch(checkStudentByEmail(values.email));
-
+      const  payload  = await dispatch(checkStudentByEmail(values.email));
       if (payload?.success) {
         // 3. Update form data with either existing or empty structure
         dispatch(
@@ -116,16 +115,17 @@ const SchoolSelection = ({ formData }) => {
         setOtpModalVisible(false);
 
         // 6. Show appropriate message
-        if (payload.exists) {
-          message.success(
-            "Existing application found. Some fields have been pre-filled."
-          );
-        } else {
-          message.success(
-            "Email verified successfully. Please continue with your application."
-          );
-        }
+        // if (payload.exists) {
+        //   message.success(
+        //     "Existing application found. Some fields have been pre-filled."
+        //   );
+        // } else {
+        //   message.success(
+        //     "Email verified successfully. Please continue with your application."
+        //   );
+        // }
       }
+      dispatch(nextStep());
     } catch (error) {
       console.error("Verification failed:", error);
     }

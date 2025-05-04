@@ -139,7 +139,7 @@ export const registerStudentDetails = createAsyncThunk(
         );
       }
     } catch (error) {
-      toast.success("Something is wrong")
+      toast.success("Something is wrong");
       return handleError(error, dispatch, rejectWithValue);
     }
   }
