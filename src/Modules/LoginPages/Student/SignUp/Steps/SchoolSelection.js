@@ -1,30 +1,41 @@
-import React, { useEffect, useState } from "react";
+// src/pages/StudentSignUp/Steps/SchoolSelection.jsx
+import React, { useEffect, useRef, useState } from "react";
 import { Form, Select, Button, Avatar, Tag, Input, Modal, message } from "antd";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
+import { FaSchool } from "react-icons/fa";
+
 import useGetAllSchools from "../../../../../Hooks/CommonHooks/useGetAllSchool";
 import useGetClassesBySchool from "../../../../../Hooks/CommonHooks/useGetClassesBySchool";
 import CustomInput from "../Components/CustomInput";
-import { FaSchool } from "react-icons/fa";
+
 import {
   nextStep,
   updateFormData,
   sendStudentOtp,
   verifyStudentOtp,
-  clearOtpState,
   setEmailVerified,
   clearVerification,
-  checkStudentByEmail,
+  fetchStudentDraft,
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 
 const { Option } = Select;
 
+/* ---------- local helpers ---------- */
+const cacheKey = "signupStep1";
+const loadCache = () => JSON.parse(sessionStorage.getItem(cacheKey) || "{}");
+
+const saveCache = (data) =>
+  sessionStorage.setItem(cacheKey, JSON.stringify(data || {}));
+
+/* -------------------------------------------------------------------- */
 const SchoolSelection = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [otpModalVisible, setOtpModalVisible] = useState(false);
   const [otp, setOtp] = useState("");
-
+  const prevRef = useRef(loadCache());
+  /* redux flags */
   const {
     isLoading: schoolFetchLoading,
     isOtpLoading,
@@ -35,55 +46,74 @@ const SchoolSelection = ({ formData }) => {
     verifiedEmail,
   } = useSelector((s) => s.common.studentSignup);
 
+  /* API hooks */
   const { fetchSchools, schoolList } = useGetAllSchools();
-
   const { classList, loading: classFetchLoading } = useGetClassesBySchool(
     formData?.schoolId
   );
 
-  const selectedSchool = schoolList?.find((s) => s._id === formData?.schoolId);
-  const selectedSchoolName = selectedSchool?.nameOfSchool;
+  const selectedSchool = schoolList?.find((s) => s?._id === formData?.schoolId);
 
+  /* ------------------ mount ------------------ */
   useEffect(() => {
     fetchSchools();
-    if (formData) {
-      form.setFieldsValue(formData);
 
-      // Check if current email is already verified
-      if (isEmailVerified && formData.email === verifiedEmail) {
-        form.setFieldsValue({ isVerified: true });
-      }
+    /* 1️⃣  restore from Redux (after soft‑nav) */
+    if (formData) form.setFieldsValue(formData);
+
+    /* 2️⃣  restore from sessionStorage (after full reload) */
+    const cached = loadCache();
+    if (Object.keys(cached).length) {
+      const merged = { ...cached, ...formData };
+      form.setFieldsValue(merged);
+      dispatch(updateFormData({ school: merged }));
     }
-    dispatch(clearOtpState());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleValuesChange = (_, values) => {
-    // Clear verification if email changes
-    if (values.email && values.email !== verifiedEmail) {
+  /* ------------------ keep Form in sync when redux changes (reload after draft fetch) ------------------ */
+  useEffect(() => {
+    if (!formData) return;
+    const { email, schoolId, applyingClass, ...rest } = form.getFieldsValue();
+    form.setFieldsValue({ ...rest, ...formData }); // keep existing key fields
+  }, [formData, form]);
+
+  /* ------------------ on any change ------------------ */
+  const handleValuesChange = (_, allValues) => {
+    const { email, schoolId, applyingClass } = allValues;
+    const changed =
+      email !== prevRef.current.email ||
+      schoolId !== prevRef.current.schoolId ||
+      applyingClass !== prevRef.current.applyingClass;
+
+    /* if any of the key fields changes -> clear verification */
+    if (changed) {
       dispatch(clearVerification());
+      allValues.isVerified = false;
     }
-    dispatch(updateFormData({ school: values }));
+
+    /* push to Redux & cache */
+    dispatch(updateFormData({ school: allValues }));
+    saveCache({ ...prevRef.current, ...allValues });
+
+    /* finally update prev snapshot */
+    prevRef.current = { ...prevRef.current, ...allValues };
   };
 
+  /* ------------------ send OTP ------------------ */
   const handleSendOtp = async () => {
-    const values = await form.validateFields(["email", "schoolId"]);
-    try {
-      await dispatch(
-        sendStudentOtp({
-          email: values.email,
-          schoolId: values.schoolId,
-        })
-      ).unwrap();
-      setOtpModalVisible(true);
-    } catch (error) {
-      console.error("Failed to send OTP:", error);
-    }
+    const { email, schoolId } = await form.validateFields([
+      "email",
+      "schoolId",
+    ]);
+    await dispatch(sendStudentOtp({ email, schoolId })).unwrap();
+    setOtpModalVisible(true);
   };
 
+  /* ------------------ verify OTP ------------------ */
   const handleVerifyOtp = async () => {
-    const values = form.getFieldsValue();
+    const values = form.getFieldsValue(); // { email, schoolId, … }
     try {
-      // 1. Verify OTP first
       await dispatch(
         verifyStudentOtp({
           email: values.email,
@@ -92,63 +122,79 @@ const SchoolSelection = ({ formData }) => {
         })
       ).unwrap();
 
-      // 2. Check if student exists
-      const  payload  = await dispatch(checkStudentByEmail(values.email));
-      if (payload?.success) {
-        // 3. Update form data with either existing or empty structure
+      /* fetch draft after verification */
+      const { payload } = await dispatch(
+        fetchStudentDraft({
+          email: values.email,
+          schoolId: values.schoolId,
+        })
+      );
+
+      if (payload?.success && payload.exists) {
+        dispatch(updateFormData(mapDraft(payload.data)));
+        message.success("Existing application found and pre‑filled.");
+      } else {
         dispatch(
           updateFormData({
-            school: payload.exists
-              ? payload.data.school
-              : {
-                  ...values,
-                  isVerified: true,
-                },
-            // Other sections will be either populated or empty
+            school: { ...values, isVerified: true },
           })
         );
-
-        // 4. Mark email as verified
-        dispatch(setEmailVerified(values.email));
-
-        // 5. Close modal
-        setOtpModalVisible(false);
-
-        // 6. Show appropriate message
-        // if (payload.exists) {
-        //   message.success(
-        //     "Existing application found. Some fields have been pre-filled."
-        //   );
-        // } else {
-        //   message.success(
-        //     "Email verified successfully. Please continue with your application."
-        //   );
-        // }
+        message.success("Email verified successfully.");
       }
-      dispatch(nextStep());
-    } catch (error) {
-      console.error("Verification failed:", error);
+
+      dispatch(setEmailVerified(values.email));
+      saveCache({ ...values, isVerified: true });
+
+      setOtpModalVisible(false);
+    } catch (err) {
+      console.error(err);
     }
   };
 
+  /* ------------------ navigation ------------------ */
   const handleNext = async () => {
-    try {
-      const values = await form.validateFields();
-      dispatch(updateFormData({ school: values }));
-      dispatch(nextStep());
-    } catch (err) {
-      // setYupErrorsToAnt(form, err);
-      console.log(err);
-    }
+    const vals = await form.validateFields();
+    dispatch(updateFormData({ school: vals }));
+    dispatch(nextStep());
   };
+
+  /* ------------------ utilities ------------------ */
+  const mapDraft = (doc) => ({
+    school: {
+      schoolId: doc.schoolId ?? undefined,
+      // applyingClass: doc.applyingClass?._id ?? undefined,
+      email: doc.email,
+      isVerified: true,
+    },
+    guardian: doc.guardian ?? {},
+    candidate: {
+      firstName: doc.firstName,
+      lastName: doc.lastName,
+      email: doc.email,
+      dob: doc.dateOfBirth,
+      gender: doc.gender,
+      contactNumber: doc.contactNumber,
+      ...doc.candidate,
+    },
+    academic: doc.academicHistory ?? {},
+    address: doc.permanentAddress ?? {},
+    documents: doc.attachments?.mandatory
+      ? Object.entries(doc.attachments.mandatory).map(([name, url]) => ({
+          name,
+          url,
+          mandatory: true,
+        }))
+      : [],
+  });
+  console.log(form.getFieldValue("isVerified"), "formform");
+  /* ------------------ render ------------------ */
+  const isCurrentEmailVerified =
+    isEmailVerified && form.getFieldValue("isVerified");
 
   const containerVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
   };
-
-  const isCurrentEmailVerified =
-    isEmailVerified && formData?.email === verifiedEmail;
 
   return (
     <>
@@ -165,7 +211,7 @@ const SchoolSelection = ({ formData }) => {
           scrollToFirstError
           className="space-y-6"
         >
-          {/* School Selection */}
+          {/* ------------ School ------------- */}
           <Form.Item
             name="schoolId"
             label={
@@ -180,13 +226,11 @@ const SchoolSelection = ({ formData }) => {
               showSearch
               allowClear
               optionFilterProp="label"
-              filterOption={(input, option) =>
-                option.label.toLowerCase().includes(input.toLowerCase())
+              filterOption={(i, o) =>
+                o.label.toLowerCase().includes(i.toLowerCase())
               }
-              className="w-full rounded-md focus:border-pink-500 transition-colors"
-              onChange={() => {
-                form.setFieldsValue({ applyingClass: undefined });
-              }}
+              className="w-full rounded-md focus:border-pink-500"
+              onChange={() => form.setFieldsValue({ applyingClass: undefined })}
             >
               {schoolList?.map((s) => (
                 <Option key={s._id} value={s._id} label={s.nameOfSchool}>
@@ -204,7 +248,7 @@ const SchoolSelection = ({ formData }) => {
             </Select>
           </Form.Item>
 
-          {/* Class Selection */}
+          {/* ------------ Class ------------- */}
           <Form.Item
             name="applyingClass"
             label={
@@ -216,21 +260,20 @@ const SchoolSelection = ({ formData }) => {
           >
             <Select
               placeholder={
-                selectedSchoolName
-                  ? `Select Class of ${selectedSchoolName}`
+                selectedSchool
+                  ? `Select Class of ${selectedSchool.nameOfSchool}`
                   : "Select Class"
               }
               size="large"
               loading={classFetchLoading}
-              disabled={!formData?.schoolId}
-              showArrow
+              disabled={!form.getFieldValue("schoolId")}
               showSearch
               allowClear
               optionFilterProp="children"
-              filterOption={(input, option) =>
-                option.children.toLowerCase().includes(input.toLowerCase())
+              filterOption={(i, o) =>
+                o.children.toLowerCase().includes(i.toLowerCase())
               }
-              className="w-full focus:border-pink-500 transition-colors"
+              className="w-full focus:border-pink-500"
             >
               {classList?.length ? (
                 classList.map((c) => (
@@ -246,7 +289,7 @@ const SchoolSelection = ({ formData }) => {
             </Select>
           </Form.Item>
 
-          {/* Student Email */}
+          {/* ------------ Email ------------- */}
           <Form.Item
             name="email"
             label={
@@ -264,7 +307,7 @@ const SchoolSelection = ({ formData }) => {
             />
           </Form.Item>
 
-          {/* Verified Status */}
+          {/* ------------ Verified badge ------------- */}
           {isCurrentEmailVerified && (
             <div className="flex items-center text-green-500 mb-4">
               <svg
@@ -282,7 +325,7 @@ const SchoolSelection = ({ formData }) => {
             </div>
           )}
 
-          {/* Action Button */}
+          {/* ------------ action button ------------- */}
           <div className="flex justify-end">
             <motion.div
               initial={{ scale: 1, y: 0 }}
@@ -291,28 +334,11 @@ const SchoolSelection = ({ formData }) => {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             >
               {isCurrentEmailVerified ? (
-                // {true ? (
                 <Button
                   onClick={handleNext}
                   type="primary"
                   size="large"
-                  className="
-                    !bg-gradient-to-r
-                    !from-[#C83B62]
-                    !to-[#7F35CD]
-                    !border-none
-                    !text-white
-                    font-semibold
-                    rounded-md
-                    px-6
-                    py-2
-                    transition-all
-                    duration-200
-                    ease-in-out
-                    hover:!from-[#A02D53]
-                    hover:!to-[#6A28A4]
-                    hover:!text-white
-                  "
+                  className="!bg-gradient-to-r !from-[#C83B62] !to-[#7F35CD] !border-none !text-white font-semibold"
                 >
                   Next
                 </Button>
@@ -322,23 +348,7 @@ const SchoolSelection = ({ formData }) => {
                   loading={isOtpLoading}
                   type="primary"
                   size="large"
-                  className="
-                    !bg-gradient-to-r
-                    !from-[#C83B62]
-                    !to-[#7F35CD]
-                    !border-none
-                    !text-white
-                    font-semibold
-                    rounded-md
-                    px-6
-                    py-2
-                    transition-all
-                    duration-200
-                    ease-in-out
-                    hover:!from-[#A02D53]
-                    hover:!to-[#6A28A4]
-                    hover:!text-white
-                  "
+                  className="!bg-gradient-to-r !from-[#C83B62] !to-[#7F35CD] !border-none !text-white font-semibold"
                 >
                   Verify Email
                 </Button>
@@ -348,26 +358,13 @@ const SchoolSelection = ({ formData }) => {
         </Form>
       </motion.div>
 
-      {/* OTP Verification Modal */}
+      {/* ---------------- OTP Modal ---------------- */}
       <Modal
         title="Verify Your Email"
-        visible={otpModalVisible}
+        open={otpModalVisible}
         onCancel={() => setOtpModalVisible(false)}
         footer={[
-          <Button
-            key="back"
-            onClick={() => setOtpModalVisible(false)}
-            className="
-              border border-gray-300
-              text-gray-700
-              hover:bg-gray-50
-              rounded-md
-              px-4
-              py-2
-              transition-colors
-              duration-200
-            "
-          >
+          <Button key="back" onClick={() => setOtpModalVisible(false)}>
             Cancel
           </Button>,
           <Button
@@ -375,24 +372,6 @@ const SchoolSelection = ({ formData }) => {
             type="primary"
             loading={isVerifying}
             onClick={handleVerifyOtp}
-            className="
-              bg-gradient-to-r
-              from-[#C83B62]
-              to-[#7F35CD]
-              text-white
-              border-none
-              rounded-md
-              px-4
-              py-2
-              transition-all
-              duration-200
-              hover:from-[#A02D53]
-              hover:to-[#6A28A4]
-              hover:text-white
-              focus:ring-2
-              focus:ring-pink-300
-              focus:ring-offset-2
-            "
           >
             Verify OTP
           </Button>,
@@ -400,69 +379,41 @@ const SchoolSelection = ({ formData }) => {
         centered
         maskClosable={false}
       >
-        <div className="space-y-6">
-          <p className="text-gray-600">
-            We've sent a 6-digit verification code to{" "}
-            <span className="font-semibold">{form.getFieldValue("email")}</span>
-            . Please enter it below to continue:
-          </p>
+        <p className="text-gray-600 mb-4">
+          We've sent a 6‑digit verification code to{" "}
+          <span className="font-semibold">{form.getFieldValue("email")}</span>.
+          Please enter it below:
+        </p>
 
-          {otpError && (
-            <div className="text-red-500 text-sm">
-              {otpError.message || "Failed to send OTP"}
-            </div>
-          )}
-
-          {verificationError && (
-            <div className="text-red-500 text-sm">
-              {verificationError.message || "Invalid OTP. Please try again."}
-            </div>
-          )}
-
-          <div className="flex justify-center">
-            <Input.OTP
-              length={6}
-              value={otp}
-              onChange={setOtp}
-              formatter={(str) => str.toUpperCase()}
-              className="otp-input-group"
-              inputClassName="
-                w-12 h-12
-                text-2xl
-                font-semibold
-                border-2
-                border-gray-300
-                rounded-lg
-                focus:border-pink-500
-                focus:ring-2
-                focus:ring-pink-200
-                transition-all
-                duration-200
-              "
-            />
+        {otpError && (
+          <div className="text-red-500 text-sm mb-2">
+            {otpError.message || "Failed to send OTP"}
           </div>
+        )}
 
-          <div className="text-center text-sm text-gray-500">
-            Didn't receive the code?{" "}
-            <button
-              onClick={handleSendOtp}
-              className="
-                text-[#7F35CD]
-                hover:text-[#C83B62]
-                font-medium
-                underline
-                underline-offset-2
-                transition-colors
-                duration-200
-                focus:outline-none
-                focus:ring-2
-                focus:ring-pink-200
-                rounded
-              "
-            >
-              Resend OTP
-            </button>
+        {verificationError && (
+          <div className="text-red-500 text-sm mb-2">
+            {verificationError.message || "Invalid OTP. Please try again."}
           </div>
+        )}
+
+        <div className="flex justify-center mb-4">
+          <Input.OTP
+            length={6}
+            value={otp}
+            onChange={setOtp}
+            formatter={(str) => str.toUpperCase()}
+          />
+        </div>
+
+        <div className="text-center text-sm text-gray-500">
+          Didn't receive the code?{" "}
+          <button
+            onClick={handleSendOtp}
+            className="text-[#7F35CD] hover:text-[#C83B62] underline"
+          >
+            Resend OTP
+          </button>
         </div>
       </Modal>
     </>

@@ -4,7 +4,7 @@ export const setYupErrorsToAnt = (form, yupError) => {
 
   form.setFields(
     yupError.inner.map((e) => ({
-      name: e.path.split("."), // "fatherInfo.firstName" → ["fatherInfo","firstName"]
+      name: e.path.split("."),
       errors: [e.message],
     }))
   );

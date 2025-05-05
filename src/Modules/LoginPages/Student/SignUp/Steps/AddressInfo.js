@@ -1,3 +1,4 @@
+// src/pages/StudentSignUp/Steps/AddressInfo.jsx
 import React, { useEffect } from "react";
 import { Form, Select, Button, Radio, Switch, Input, Row, Col } from "antd";
 import { useDispatch } from "react-redux";
@@ -11,48 +12,51 @@ import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
 
 const { Option } = Select;
 
-/* quick demo list – replace with API list if you have one */
+/* demo data – replace with API lists when available */
 const cityList = ["Doha", "Al Wakrah", "Al Khor", "Dukhan"];
+const countryList = [
+  "Qatar",
+  "Saudi Arabia",
+  "United Arab Emirates",
+  "Bahrain",
+];
+const stateList = ["Doha Municipality", "Al Rayyan", "Al Daayen", "Umm Salal"];
 
 const AddressInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
-  /* ────── hydrate local‑storage draft ────── */
+  /* hydrate on mount */
   useEffect(() => {
     if (formData) form.setFieldsValue(formData);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [formData]);
+  }, [formData, form]);
 
-  /* watch residence type for dynamic labels */
+  /* watch residence type */
   const residenceType = Form.useWatch("residenceType", form) || "flat";
 
-  /* persist every change */
+  /* keep Redux in sync */
   const handleValuesChange = () =>
     dispatch(updateFormData({ address: form.getFieldsValue(true) }));
 
-  /* navigation */
+  /* nav */
   const handleNext = async () => {
     try {
       const vals = form.getFieldsValue(true);
       await AddressSchema.validate(vals, { abortEarly: false });
-      handleValuesChange(); // ensure latest snapshot
+      handleValuesChange();
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
       const first =
         err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
       if (first)
-        form.scrollToField(first, {
-          behavior: "smooth",
-          block: "center",
-        });
+        form.scrollToField(first, { behavior: "smooth", block: "center" });
     }
   };
-
   const handleBack = () => dispatch(prevStep());
 
-  /* ────── UI ────── */
+  /* UI */
   return (
     <div className="max-w-4xl mx-auto p-4">
       <Form
@@ -82,10 +86,10 @@ const AddressInfo = ({ formData }) => {
               rules={[{ required: true, message: "Required" }]}
             >
               <Input
+                size="large"
                 placeholder={
                   residenceType === "flat" ? "Unit Number" : "House Number"
                 }
-                size="large"
               />
             </Form.Item>
           </Col>
@@ -96,21 +100,22 @@ const AddressInfo = ({ formData }) => {
               rules={[{ required: true, message: "Required" }]}
             >
               <Input
+                size="large"
                 placeholder={
                   residenceType === "flat" ? "Building Number" : "Street Number"
                 }
-                size="large"
               />
             </Form.Item>
           </Col>
         </Row>
 
+        {/* street */}
         <Form.Item
           name="streetName"
           label="Street Name"
           rules={[{ required: true, message: "Required" }]}
         >
-          <Input placeholder="Street Name" size="large" />
+          <Input size="large" placeholder="Street Name" />
         </Form.Item>
 
         {/* zone */}
@@ -121,7 +126,7 @@ const AddressInfo = ({ formData }) => {
               label="Zone #"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select placeholder="Select Zone" size="large">
+              <Select size="large" placeholder="Select Zone">
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((z) => (
                   <Option key={z} value={z}>
                     Zone {z}
@@ -132,7 +137,7 @@ const AddressInfo = ({ formData }) => {
           </Col>
           <Col xs={24} md={12}>
             <Form.Item name="zoneName" label="Zone Name">
-              <Input placeholder="Zone Name" size="large" />
+              <Input size="large" placeholder="Zone Name" />
             </Form.Item>
           </Col>
         </Row>
@@ -144,9 +149,8 @@ const AddressInfo = ({ formData }) => {
             <Radio value="standalone">Stand‑Alone</Radio>
           </Radio.Group>
         </Form.Item>
-
         <Form.Item name="compoundName" label="Compound Name">
-          <Input placeholder="Compound Name (if applicable)" size="large" />
+          <Input size="large" placeholder="Compound Name (if applicable)" />
         </Form.Item>
 
         {/* city / landmark */}
@@ -157,7 +161,7 @@ const AddressInfo = ({ formData }) => {
               label="City"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select placeholder="City" size="large">
+              <Select size="large" placeholder="City">
                 {cityList.map((c) => (
                   <Option key={c}>{c}</Option>
                 ))}
@@ -166,13 +170,45 @@ const AddressInfo = ({ formData }) => {
           </Col>
           <Col xs={24} md={12}>
             <Form.Item name="nearestLandmark" label="Nearest Landmark">
-              <Input placeholder="Landmark" size="large" />
+              <Input size="large" placeholder="Landmark" />
             </Form.Item>
           </Col>
         </Row>
 
+        {/* NEW: state / country / postal code */}
+        <Row gutter={16}>
+          <Col xs={24} md={8}>
+            <Form.Item name="state" label="State / Province">
+              <Select size="large" placeholder="State / Province">
+                {stateList.map((s) => (
+                  <Option key={s}>{s}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item
+              name="country"
+              label="Country"
+              rules={[{ required: true, message: "Required" }]}
+            >
+              <Select size="large" placeholder="Country">
+                {countryList.map((cntry) => (
+                  <Option key={cntry}>{cntry}</Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item name="postalCode" label="Postal Code">
+              <Input size="large" placeholder="Postal Code" />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        {/* proposed campus */}
         <Form.Item name="proposedCampus" label="Proposed Campus (optional)">
-          <Input placeholder="Campus" size="large" />
+          <Input size="large" placeholder="Campus" />
         </Form.Item>
 
         {/* transport */}
@@ -186,14 +222,14 @@ const AddressInfo = ({ formData }) => {
 
         {/* nav buttons */}
         <Row justify="space-between" className="mt-8">
-          <Button onClick={handleBack} size="large">
+          <Button size="large" onClick={handleBack}>
             Back
           </Button>
           <Button
+            size="large"
             type="primary"
             className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
             onClick={handleNext}
-            size="large"
           >
             Next
           </Button>
