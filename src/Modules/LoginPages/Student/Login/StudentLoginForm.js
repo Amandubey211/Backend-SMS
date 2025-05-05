@@ -176,7 +176,9 @@ const StudentLoginForm = () => {
               )}
             </button>
           </form>
+
           <div className="text-center py-2">
+
             <span className="opacity-70">New to Student Diwan?</span>{" "}
             <NavLink
               className="text-indigo-600 hover:text-indigo-900"
@@ -184,7 +186,9 @@ const StudentLoginForm = () => {
             >
               Apply Now
             </NavLink>
+
           </div>
+
         </div>
       </div>
 

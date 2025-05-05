@@ -77,7 +77,12 @@ const AddOperationalExpenses = () => {
     updatedItems[index].categoryId = categoryId;
     updatedItems[index].budgetId = "";
     updatedItems[index].budgets = a?.payload?.data || [];
-    setLineItems(updatedItems);
+    let updatedItemsfix = updatedItems.map((i) => ({ ...i, 
+      startDate:  i?.startDate?.length > 0 ? dayjs(i?.startDate?.slice(0, 10)) : null,
+      enfDate: i?.endDate?.length >0 ? dayjs(i?.endDate?.slice(0, 10)) : null,
+      dueDate:  i?.dueDate?.length >0 ? dayjs(i?.dueDate?.slice(0, 10)) : null,
+     }))
+    setLineItems(updatedItemsfix);
   };
 
   const handleBudgetChange = (index, budgetId) => {
