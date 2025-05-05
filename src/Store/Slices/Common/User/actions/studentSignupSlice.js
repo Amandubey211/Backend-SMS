@@ -178,22 +178,22 @@ export const saveStudentDraft = createAsyncThunk(
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
-
       const email = (formData.candidate?.email || "").toLowerCase();
       const schoolId = formData.school?.schoolId;
 
-      /* no step‑1 → nothing to save yet */
       if (!email || !schoolId) return true;
 
       await putData("/student/register/student?formStatus=draft", {
         ...formData,
         candidate: { ...formData.candidate, email },
-        currentStep: getState().common.studentSignup.currentStep, // 🔸
+        currentStep: getState().common.studentSignup.currentStep,
       });
-      // dispatch(fetchStudentDraft({ email }));
+
       return true;
-    } catch {
-      return rejectWithValue("draft‑save‑failed");
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.error || "draft-save-failed"
+      );
     }
   }
 );
@@ -204,25 +204,57 @@ export const registerStudentDetails = createAsyncThunk(
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
-      const role = getUserRole(getState) || "student";
-      const endpoint = `/${role}/student_register?formStatus=submitted`;
+      // const role = getUserRole(getState) || "student";
+      const endpoint = `/student/register/student?formStatus=submitted`;
 
       const fd = new FormData();
-      fd.append("json", JSON.stringify(formData));
-      formData.documents?.forEach((file) => fd.append("documents", file));
+
+      // Ensure documents is properly structured
+      const documents = formData.documents || {};
+      const filesToUpload = Array.isArray(documents.files)
+        ? documents.files
+        : [];
+      const documentRequirements = Array.isArray(documents.documentRequirements)
+        ? documents.documentRequirements
+        : [];
+
+      // Append JSON data
+      fd.append(
+        "json",
+        JSON.stringify({
+          ...formData,
+          documents: {
+            documentRequirements,
+            files: filesToUpload.map((file) => ({
+              documentId: file.documentId,
+              documentName: file.documentName,
+            })),
+          },
+        })
+      );
+
+      // Append files with document IDs as field names
+      filesToUpload.forEach((file) => {
+        if (file.originFileObj) {
+          fd.append(file.documentId, file.originFileObj);
+        }
+      });
 
       const res = await customRequest("put", endpoint, fd, {
-        "Content-Type": "multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
-      toast.success("Application submitted");
-      return res;
+
+      toast.success("Application submitted successfully");
+      return res.data;
     } catch (err) {
-      toast.error("Submit failed");
+      console.log(err, "errerr");
+      toast.error("Submission failed");
       return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
-
 /* ------------------------------------------------------------------ */
 /* 🔸  STATE SHAPE                                                     */
 /* ------------------------------------------------------------------ */

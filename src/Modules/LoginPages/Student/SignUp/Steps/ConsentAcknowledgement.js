@@ -1,4 +1,3 @@
-// src/pages/StudentSignUp/Steps/ConsentAcknowledgement.jsx
 import React, { useState } from "react";
 import {
   Form,
@@ -14,9 +13,14 @@ import { CheckCircleFilled, DownloadOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { updateFormData } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
+import {
+  nextStep,
+  prevStep,
+  updateFormData,
+  registerStudentDetails,
+} from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 
-const ConsentAcknowledgement = () => {
+const ConsentAcknowledgement = ({ formData }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -26,21 +30,25 @@ const ConsentAcknowledgement = () => {
 
   /* helper: download receipt */
   const handleDownload = () => {
-    // Replace with your real download URL or thunk
-    // window.open("/student/application/receipt", "_blank");
     message.success("Download link is not implemented yet.");
+  };
+
+  /* handle back navigation */
+  const handleBack = () => {
+    dispatch(prevStep());
   };
 
   /* final submit */
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      // store consent section
+      // Update consent data in Redux store
       dispatch(updateFormData({ consent: values }));
 
-      // TODO: optionally trigger final registerStudentDetails thunk here
+      // Submit all form data to the server
+      await dispatch(registerStudentDetails()).unwrap();
 
-      // glam modal instead of plain message
+      // Show success modal
       setOpenModal(true);
     } catch (err) {
       console.error(err);
@@ -57,6 +65,7 @@ const ConsentAcknowledgement = () => {
         layout="vertical"
         onFinish={onFinish}
         className="space-y-6"
+        initialValues={formData} // Initialize form with existing data
       >
         {/* ───────── photo / video consent ───────── */}
         <Card
@@ -114,7 +123,7 @@ const ConsentAcknowledgement = () => {
           <Button
             size="large"
             className="text-gray-600 border-gray-300"
-            onClick={() => navigate(-1)}
+            onClick={handleBack}
           >
             Back
           </Button>
@@ -141,7 +150,7 @@ const ConsentAcknowledgement = () => {
         </div>
       </Form>
 
-      {/* glam confirmation modal */}
+      {/* Success confirmation modal */}
       <Modal
         open={openModal}
         footer={null}
