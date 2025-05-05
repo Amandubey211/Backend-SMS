@@ -25,6 +25,7 @@ import {
 import { registerStudentDetails } from "../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 
 import { stepSchemas } from "./Utils/validationSchemas";
+import { message } from "antd";
 
 /* build an “is‑done” checker for each step with Yup */
 
@@ -53,10 +54,20 @@ const StudentSignUp = () => {
 
   /* hydrate draft after verified email reload */
 
+  // Update the useEffect for draft hydration
   useEffect(() => {
-    const { isVerified, email, schoolId } = loadCache();
+    const cached = JSON.parse(sessionStorage.getItem("signupStep1") || "{}");
+    const { isVerified, email, schoolId } = cached;
+
+    // Only fetch draft if email is verified and we have required fields
     if (isVerified && email && schoolId) {
-      dispatch(fetchStudentDraft({ email, schoolId }));
+      dispatch(fetchStudentDraft({ email, schoolId }))
+        .unwrap()
+        .then((response) => {
+          if (response?.exists) {
+            message.success("Resuming your application...");
+          }
+        });
     }
   }, [dispatch]);
   /* persist draft when step changes */
@@ -126,6 +137,7 @@ const StudentSignUp = () => {
   const handleSubmit = async () => {
     try {
       await dispatch(registerStudentDetails()).unwrap();
+      sessionStorage.removeItem("signupStep1"); // Clear cache
       dispatch(resetSignup());
       navigate("/studentlogin");
     } catch (e) {
@@ -314,7 +326,16 @@ const StudentSignUp = () => {
 
   /* helpers */
   function canJumpTo(idx) {
-    if (idx <= currentStep) return true;
+    // For step 0 (school selection), check verification status
+    if (idx === 0) return true;
+
+    const cached = JSON.parse(sessionStorage.getItem("signupStep1") || "{}");
+    const isVerified = cached.isVerified === true;
+
+    // If not verified, can't jump past school selection
+    if (!isVerified && idx > 0) return false;
+
+    // For other steps, check completion as before
     for (let i = 0; i < idx; i++) {
       if (!stepDoneCheckers[i](formData)) return false;
     }

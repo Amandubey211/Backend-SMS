@@ -138,6 +138,7 @@ const GuardianInfo = ({ formData }) => {
   /* hydrate draft */
   useEffect(() => {
     if (!formData) return;
+    console.log(formData, "formDataformData");
     const sanitized = JSON.parse(JSON.stringify(formData));
     [
       "fatherInfo.cell1",
@@ -213,11 +214,11 @@ const GuardianInfo = ({ formData }) => {
         </Col>
         <Col xs={24} md={12}>
           <Form.Item name={[p, "idExpiry"]} label="ID Expiry" className="mb-4">
-            <DatePicker
+            {/* <DatePicker
               size="large"
               className="w-full"
               placeholder="ID Expiry"
-            />
+            /> */}
           </Form.Item>
         </Col>
       </Row>

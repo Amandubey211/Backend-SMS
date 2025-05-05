@@ -53,7 +53,20 @@ const SchoolSelection = ({ formData }) => {
   );
 
   const selectedSchool = schoolList?.find((s) => s?._id === formData?.schoolId);
+  useEffect(() => {
+    const cached = loadCache();
+    const isVerified = cached.isVerified === true;
 
+    // Only restore from cache if verified
+    if (isVerified && cached.email && cached.schoolId) {
+      const merged = { ...cached, ...formData };
+      form.setFieldsValue(merged);
+      dispatch(updateFormData({ school: merged }));
+
+      // Automatically mark as verified in form state
+      form.setFieldsValue({ isVerified: true });
+    }
+  }, []);
   /* ------------------ mount ------------------ */
   useEffect(() => {
     fetchSchools();

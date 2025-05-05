@@ -140,7 +140,7 @@ listenerMiddleware.startListening({
   matcher: isAnyOf(setSelectedSemester),
   effect: async (action, listenerApi) => {
     // Wait 500ms to allow state persistence to complete
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     window.location.reload();
   },
 });
@@ -307,11 +307,13 @@ listenerMiddleware.startListening({
     current.common?.studentSignup?.formData !==
     previous.common?.studentSignup?.formData,
   effect: debounce(async (_action, api) => {
-    try { await api.dispatch(saveStudentDraft()).unwrap(); }
-    catch { /* ignore – offline etc. */ }
-  }, 1000)
+    try {
+      await api.dispatch(saveStudentDraft()).unwrap();
+    } catch {
+      /* ignore – offline etc. */
+    }
+  }, 1000),
 });
-
 
 // Create the store
 const store = configureStore({
