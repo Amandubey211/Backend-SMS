@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { Form, Select, Button, DatePicker, Input, Row, Col } from "antd";
 import { useDispatch } from "react-redux";
+
 import {
   nextStep,
   prevStep,
@@ -12,7 +13,7 @@ import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
 
 const { Option } = Select;
 
-/* static options */
+/* static curriculum list */
 const curriculumOptions = [
   { label: "American", value: "american" },
   { label: "British", value: "british" },
@@ -44,22 +45,20 @@ const AcademicHistory = ({ formData }) => {
   useEffect(() => {
     if (formData) form.setFieldsValue(formData);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [formData]);
+  }, [formData, form]);
 
-  /* persist on every key‑stroke */
-  const handleValuesChange = () => {
+  /* sync redux on every edit */
+  const handleValuesChange = () =>
     dispatch(updateFormData({ academic: form.getFieldsValue(true) }));
-  };
 
-  /* navigation */
+  /* nav handlers */
   const handleBack = () => dispatch(prevStep());
 
   const handleNext = async () => {
     try {
-      await AcademicSchema.validate(form.getFieldsValue(true), {
-        abortEarly: false,
-      });
-      dispatch(updateFormData({ academic: form.getFieldsValue(true) }));
+      const vals = form.getFieldsValue(true);
+      await AcademicSchema.validate(vals, { abortEarly: false });
+      dispatch(updateFormData({ academic: vals }));
       dispatch(nextStep());
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
@@ -71,6 +70,7 @@ const AcademicHistory = ({ formData }) => {
     }
   };
 
+  /* ---------- UI ---------- */
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <Form
@@ -114,7 +114,7 @@ const AcademicHistory = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* other curriculum */}
+        {/* show “other curriculum” textbox when chosen */}
         <Form.Item
           noStyle
           shouldUpdate={(p, c) => p.curriculum !== c.curriculum}

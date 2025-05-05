@@ -1,110 +1,124 @@
-// src/Store/Slices/Common/User/actions/studentSignupSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import {
-  loadDraft,
-  saveDraft,
-  clearDraft,
-} from "../../../../../Utils/signupDraft";
 import { toast } from "react-hot-toast";
 import {
-  customRequest,
-  getData,
   postData,
+  getData,
+  putData,
+  customRequest,
 } from "../../../../../services/apiEndpoints";
 import { setShowError } from "../../Alerts/alertsSlice";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { getUserRole } from "../../../../../Utils/getRoles";
 
 /* ------------------------------------------------------------------ */
-/* 1️⃣  Thunks ────────────────────────────────────────────────────── */
+/* 🔸  THUNKS                                                          */
 /* ------------------------------------------------------------------ */
+/* ––––– helpers ––––– */
+const cacheKey = "signupStep1";
+const loadCache = () => JSON.parse(sessionStorage.getItem(cacheKey) || "{}");
 
-// Send OTP to student email
+/* ---------- OTP ---------- */
 export const sendStudentOtp = createAsyncThunk(
   "studentSignup/sendOtp",
   async ({ email, schoolId }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const response = await postData("/student/send_otp", {
-        email,
-        schoolId,
-      });
-      toast.success("OTP sent successfully");
-      return response;
-    } catch (error) {
+      const res = await postData("/student/send_otp", { email, schoolId });
+      toast.success("OTP sent");
+      return res;
+    } catch (err) {
       toast.error("Failed to send OTP");
-      return handleError(error, dispatch, rejectWithValue);
+      return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
 
-// Verify student OTP
 export const verifyStudentOtp = createAsyncThunk(
   "studentSignup/verifyOtp",
   async ({ email, schoolId, otp }, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const response = await postData("/student/verify_otp", {
+      const res = await postData("/student/verify_otp", {
         email,
         schoolId,
         otp,
       });
-      toast.success("OTP verified successfully");
-      return response;
-    } catch (error) {
+      toast.success("OTP verified");
+      return res;
+    } catch (err) {
       toast.error("Invalid OTP");
-      return handleError(error, dispatch, rejectWithValue);
+      return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
 
-// Check if student exists by email
-export const checkStudentByEmail = createAsyncThunk(
-  "studentSignup/checkStudent",
-  async (email, { rejectWithValue, dispatch }) => {
+/* ---------- draft helpers ---------- */
+export const fetchStudentDraft = createAsyncThunk(
+  "studentSignup/fetchDraft",
+  async ({ email }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await getData(
-        `/student/register/student?email=${email}`
-      );
-      return response;
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
+      const res = await getData(`/student/register/student?email=${email}`);
+      return res; // { success, exists, data }
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
+
+export const saveStudentDraft = createAsyncThunk(
+  "studentSignup/saveDraft",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const { formData } = getState().common.studentSignup;
+
+      const email = (formData.candidate?.email || "").toLowerCase();
+      const schoolId = formData.school?.schoolId;
+
+      /* no step‑1 → nothing to save yet */
+      if (!email || !schoolId) return true;
+
+      await putData("/student/register/student?formStatus=draft", {
+        ...formData,
+        candidate: { ...formData.candidate, email },
+      });
+      return true;
+    } catch {
+      return rejectWithValue("draft‑save‑failed");
+    }
+  }
+);
+
+/* ---------- final submit ---------- */
 export const registerStudentDetails = createAsyncThunk(
-  "auth/registerStudentDetails",
-  async ({ formData, navigate }, { rejectWithValue, dispatch, getState }) => {
+  "studentSignup/register",
+  async (_, { getState, rejectWithValue, dispatch }) => {
     try {
-      // Get the user role; default to 'student' if not authenticated
+      const { formData } = getState().common.studentSignup;
       const role = getUserRole(getState) || "student";
-      const endpoint = `/${role}/student_register`;
+      const endpoint = `/${role}/student_register?formStatus=submitted`;
 
-      const response = await customRequest("put", endpoint, formData, {
+      const fd = new FormData();
+      fd.append("json", JSON.stringify(formData));
+      formData.documents?.forEach((file) => fd.append("documents", file));
+
+      const res = await customRequest("put", endpoint, fd, {
         "Content-Type": "multipart/form-data",
       });
-
-      if (response?.success) {
-        // toast.success("Registered Successfully");
-        // navigate("/verify_students");
-        return response;
-      } else {
-        return rejectWithValue(
-          response?.msg || "Failed to save student details."
-        );
-      }
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
+      toast.success("Application submitted");
+      return res;
+    } catch (err) {
+      toast.error("Submit failed");
+      return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
+
 /* ------------------------------------------------------------------ */
-/* 2️⃣  Initial‑state ─────────────── hydrate from localStorage draft  */
+/* 🔸  STATE SHAPE                                                     */
 /* ------------------------------------------------------------------ */
-const draft = loadDraft();
 
 const baseForm = {
-  school: {},
+  school: loadCache(),
   guardian: {},
   candidate: {},
   academic: {},
@@ -114,147 +128,140 @@ const baseForm = {
 };
 
 const initialState = {
-  currentStep: draft?.currentStep ?? 0,
-  formData: { ...baseForm, ...(draft?.formData || {}) },
-  isLoading: false,
+  currentStep: 0,
+  formData: baseForm,
+
+  /* flags */
   isOtpLoading: false,
-  isVerifying: false,
-  isCheckingStudent: false,
-  isRegistering: false,
-  isUploading: false,
-  error: null,
   otpError: null,
+  isVerifying: false,
   verificationError: null,
-  registrationError: null,
-  uploadError: null,
-  studentExists: false,
-  registrationSuccess: false,
-  uploadSuccess: false,
-  isEmailVerified: false,
-  verifiedEmail: null,
+
+  isRegistering: false,
+  isEmailVerified: loadCache().isVerified || false,
+  verifiedEmail: loadCache().isVerified ? loadCache().email : null,
 };
 
+/* helper – grab cached step‑1 from sessionStorage */
+const loadStep1Cache = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem("step1Cache") || "{}");
+  } catch {
+    return {};
+  }
+};
+
+/* helper – map Mongo draft → wizard sections */
+const mapDraftToSections = (doc) => ({
+  /* STEP‑1 remains exactly as user/cache already has */
+  guardian: doc.guardian ?? {},
+  candidate: {
+    firstName: doc.firstName,
+    lastName: doc.lastName,
+    dob: doc.dateOfBirth,
+    gender: doc.gender,
+    contactNumber: doc.contactNumber,
+    email: doc.email,
+  },
+  academic: doc.academicHistory ?? {},
+  address: doc.permanentAddress ?? {},
+  documents: Object.entries(doc.attachments?.mandatory || {}).map(
+    ([name, url]) => ({ name, url, mandatory: true })
+  ),
+  // consent left empty
+});
+
 /* ------------------------------------------------------------------ */
-/* 3️⃣ Slice definition                                                */
+/* 🔸  SLICE                                                           */
 /* ------------------------------------------------------------------ */
+
 const studentSignupSlice = createSlice({
   name: "studentSignup",
   initialState,
   reducers: {
-    setCurrentStep(state, { payload }) {
-      state.currentStep = payload;
+    setCurrentStep: (s, a) => {
+      s.currentStep = a.payload;
     },
-    nextStep(state) {
-      if (state.currentStep < 6) state.currentStep += 1;
+    nextStep: (s) => {
+      if (s.currentStep < 6) s.currentStep += 1;
     },
-    prevStep(state) {
-      if (state.currentStep > 0) state.currentStep -= 1;
+    prevStep: (s) => {
+      if (s.currentStep > 0) s.currentStep -= 1;
     },
-    updateFormData(state, { payload }) {
-      state.formData = { ...state.formData, ...payload };
+    updateFormData: (s, a) => {
+      s.formData = { ...s.formData, ...a.payload };
     },
-    resetSignup() {
-      /* clear LS draft and return *fresh* state */
-      clearDraft();
-      return { ...initialState, currentStep: 0, formData: { ...baseForm } };
+    resetSignup: () => initialState,
+
+    /* email verification flags */
+    setEmailVerified: (s, a) => {
+      s.isEmailVerified = true;
+      s.verifiedEmail = a.payload;
+      /* also annotate formData.school.isVerified so Yup passes */
+      s.formData.school = {
+        ...s.formData.school,
+        isVerified: true,
+      };
     },
-    clearOtpState(state) {
-      state.otpError = null;
-      state.verificationError = null;
+    clearOtpState: (s) => {
+      s.otpError = null;
     },
-    clearRegistrationState(state) {
-      state.registrationError = null;
-      state.registrationSuccess = false;
-    },
-    clearUploadState(state) {
-      state.uploadError = null;
-      state.uploadSuccess = false;
-    },
-    setEmailVerified(state, { payload }) {
-      state.isEmailVerified = true;
-      state.verifiedEmail = payload;
-    },
-    clearVerification(state) {
-      state.isEmailVerified = false;
-      state.verifiedEmail = null;
+    clearVerification: (s) => {
+      s.isEmailVerified = false;
+      s.verifiedEmail = null;
+      s.formData.school = { ...s.formData.school, isVerified: false };
     },
   },
+
   extraReducers: (builder) => {
+    /* ---------- OTP send ---------- */
     builder
-      /* OTP sending */
-      .addCase(sendStudentOtp.pending, (state) => {
-        state.isOtpLoading = true;
-        state.otpError = null;
+      .addCase(sendStudentOtp.pending, (s) => {
+        s.isOtpLoading = true;
+        s.otpError = null;
       })
-      .addCase(sendStudentOtp.fulfilled, (state) => {
-        state.isOtpLoading = false;
-        state.otpError = null;
+      .addCase(sendStudentOtp.fulfilled, (s) => {
+        s.isOtpLoading = false;
       })
-      .addCase(sendStudentOtp.rejected, (state, action) => {
-        state.isOtpLoading = false;
-        state.otpError = action.payload;
-      })
+      .addCase(sendStudentOtp.rejected, (s, a) => {
+        s.isOtpLoading = false;
+        s.otpError = a.payload;
+      });
 
-      /* OTP verification */
-      .addCase(verifyStudentOtp.pending, (state) => {
-        state.isVerifying = true;
-        state.verificationError = null;
+    /* ---------- OTP verify ---------- */
+    builder
+      .addCase(verifyStudentOtp.pending, (s) => {
+        s.isVerifying = true;
+        s.verificationError = null;
       })
-      .addCase(verifyStudentOtp.fulfilled, (state) => {
-        state.isVerifying = false;
-        state.verificationError = null;
+      .addCase(verifyStudentOtp.fulfilled, (s) => {
+        s.isVerifying = false;
       })
-      .addCase(verifyStudentOtp.rejected, (state, action) => {
-        state.isVerifying = false;
-        state.verificationError = action.payload;
-      })
+      .addCase(verifyStudentOtp.rejected, (s, a) => {
+        s.isVerifying = false;
+        s.verificationError = a.payload;
+      });
 
-      /* Student check */
-      .addCase(checkStudentByEmail.pending, (state) => {
-        state.isCheckingStudent = true;
-        state.studentExists = false;
-      })
-      .addCase(checkStudentByEmail.fulfilled, (state, action) => {
-        state.isCheckingStudent = false;
-        const { exists, data } = action.payload;
+    /* ---------- fetch draft ---------- */
+    builder.addCase(fetchStudentDraft.fulfilled, (s, a) => {
+      if (a.payload?.success && a.payload.exists) {
+        /* only merge non‑step‑1 sections */
+        s.formData = { ...s.formData, ...mapDraftToSections(a.payload.data) };
+      }
+    });
 
-        if (exists && data) {
-          // Map the existing data to our form structure
-          state.formData = {
-            school: data.school || {},
-            guardian: data.guardian || {},
-            candidate: {
-              firstName: data.firstName,
-              lastName: data.lastName,
-              // ... other candidate fields
-            },
-            academic: data.academic || {},
-            address: data.address || {},
-            documents: data.documents || [],
-            consent: {},
-          };
-        }
-      })
-      .addCase(checkStudentByEmail.rejected, (state) => {
-        state.isCheckingStudent = false;
-        state.studentExists = false;
-      })
+    /* ---------- save draft (no ui‑state change) ---------- */
 
-      /* Student registration */
-      .addCase(registerStudentDetails.pending, (state) => {
-        state.isRegistering = true;
-        state.registrationError = null;
-        state.registrationSuccess = false;
+    /* ---------- final submit ---------- */
+    builder
+      .addCase(registerStudentDetails.pending, (s) => {
+        s.isRegistering = true;
       })
-      .addCase(registerStudentDetails.fulfilled, (state) => {
-        state.isRegistering = false;
-        state.registrationError = null;
-        state.registrationSuccess = true;
+      .addCase(registerStudentDetails.fulfilled, (s) => {
+        s.isRegistering = false;
       })
-      .addCase(registerStudentDetails.rejected, (state, action) => {
-        state.isRegistering = false;
-        state.registrationError = action.payload;
-        state.registrationSuccess = false;
+      .addCase(registerStudentDetails.rejected, (s) => {
+        s.isRegistering = false;
       });
   },
 });
@@ -265,26 +272,9 @@ export const {
   prevStep,
   updateFormData,
   resetSignup,
-  clearOtpState,
-  clearRegistrationState,
-  clearUploadState,
-  clearVerification,
   setEmailVerified,
+  clearOtpState,
+  clearVerification,
 } = studentSignupSlice.actions;
 
 export default studentSignupSlice.reducer;
-
-/* ------------------------------------------------------------------ */
-/* 4️⃣  Middleware – persist draft on every mutation                   */
-/* ------------------------------------------------------------------ */
-export const studentSignupMiddleware = (store) => (next) => (action) => {
-  const result = next(action);
-
-  /* save only when this slice changes */
-  if (action.type.startsWith("studentSignup/")) {
-    const { currentStep, formData } = store.getState().common.studentSignup;
-    saveDraft({ currentStep, formData });
-  }
-
-  return result;
-};

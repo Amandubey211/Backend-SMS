@@ -1,21 +1,49 @@
 // src/pages/StudentSignUp/Steps/ConsentAcknowledgement.jsx
-import React from "react";
-import { Form, Button, Checkbox, Radio, Card, message } from "antd";
+import React, { useState } from "react";
+import {
+  Form,
+  Button,
+  Checkbox,
+  Radio,
+  Card,
+  Modal,
+  Result,
+  message,
+} from "antd";
+import { CheckCircleFilled, DownloadOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+import { updateFormData } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 
 const ConsentAcknowledgement = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [loading, setLoading] = React.useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
+
+  /* helper: download receipt */
+  const handleDownload = () => {
+    // Replace with your real download URL or thunk
+    // window.open("/student/application/receipt", "_blank");
+    message.success("Download link is not implemented yet.");
+  };
+
+  /* final submit */
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      message.success("Application submitted successfully!");
-      navigate("/studentlogin");
-    } catch (error) {
+      // store consent section
+      dispatch(updateFormData({ consent: values }));
+
+      // TODO: optionally trigger final registerStudentDetails thunk here
+
+      // glam modal instead of plain message
+      setOpenModal(true);
+    } catch (err) {
+      console.error(err);
       message.error("Submission failed. Please try again.");
     } finally {
       setLoading(false);
@@ -30,6 +58,7 @@ const ConsentAcknowledgement = () => {
         onFinish={onFinish}
         className="space-y-6"
       >
+        {/* ───────── photo / video consent ───────── */}
         <Card
           title="Parental Consent for Photos & Videos"
           className="rounded-xl shadow-md mb-6"
@@ -40,22 +69,23 @@ const ConsentAcknowledgement = () => {
           >
             <Radio.Group className="space-y-4">
               <Radio value="yes" className="text-lg">
-                I give permission to use my child's photograph/videos
+                I give permission to use my child's photographs / videos
               </Radio>
               <Radio value="no" className="text-lg">
-                I DO NOT give permission to use my child's photograph/videos
+                I DO NOT give permission to use my child's photographs / videos
               </Radio>
             </Radio.Group>
           </Form.Item>
         </Card>
 
+        {/* ───────── acknowledgements ───────── */}
         <Card title="Acknowledgement" className="rounded-xl shadow-md mb-6">
           <Form.Item
             name="acknowledgements"
             rules={[
               {
-                validator: (_, value) =>
-                  value && value.length >= 4
+                validator: (_, v) =>
+                  v && v.length >= 4
                     ? Promise.resolve()
                     : Promise.reject("Please acknowledge all statements"),
               },
@@ -79,21 +109,75 @@ const ConsentAcknowledgement = () => {
           </Form.Item>
         </Card>
 
+        {/* nav buttons */}
         <div className="flex justify-between mt-6">
-          <Button size="large" className="text-gray-600 border-gray-300">
+          <Button
+            size="large"
+            className="text-gray-600 border-gray-300"
+            onClick={() => navigate(-1)}
+          >
             Back
           </Button>
-          <Button
-            type="primary"
-            htmlType="submit"
-            size="large"
-            loading={loading}
-            className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-none hover:opacity-90 focus:opacity-90 transition-opacity"
-          >
-            Save & Submit
-          </Button>
+
+          <div className="flex gap-3">
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={handleDownload}
+              size="large"
+            >
+              Download Copy
+            </Button>
+
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              loading={loading}
+              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-none hover:opacity-90 focus:opacity-90 transition-opacity"
+            >
+              Save&nbsp;&amp;&nbsp;Submit
+            </Button>
+          </div>
         </div>
       </Form>
+
+      {/* glam confirmation modal */}
+      <Modal
+        open={openModal}
+        footer={null}
+        centered
+        onCancel={() => {
+          setOpenModal(false);
+          navigate("/studentlogin");
+        }}
+        width={500}
+        closeIcon={false}
+      >
+        <Result
+          icon={<CheckCircleFilled style={{ color: "#52c41a" }} />}
+          title="Application Submitted!"
+          subTitle="Thank you. Your application has been received. You may download a copy for your records."
+          extra={[
+            <Button
+              key="download"
+              type="primary"
+              icon={<DownloadOutlined />}
+              onClick={handleDownload}
+            >
+              Download Copy
+            </Button>,
+            <Button
+              key="done"
+              onClick={() => {
+                setOpenModal(false);
+                navigate("/studentlogin");
+              }}
+            >
+              Done
+            </Button>,
+          ]}
+        />
+      </Modal>
     </div>
   );
 };
