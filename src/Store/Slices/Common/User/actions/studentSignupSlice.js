@@ -9,13 +9,112 @@ import {
 import { setShowError } from "../../Alerts/alertsSlice";
 import { handleError } from "../../Alerts/errorhandling.action";
 import { getUserRole } from "../../../../../Utils/getRoles";
+import { stepSchemas } from "../../../../../Modules/LoginPages/Student/SignUp/Utils/validationSchemas";
 
 /* ------------------------------------------------------------------ */
 /* 🔸  THUNKS                                                          */
 /* ------------------------------------------------------------------ */
+
+/* helper – returns first incomplete step index */
+const firstIncompleteStep = (data) => {
+  for (let i = 0; i < stepSchemas.length; i += 1) {
+    if (!stepSchemas[i].isValidSync(data, { strict: false })) return i;
+  }
+  return stepSchemas.length - 1; // everything valid → last step (Submit)
+};
 /* ––––– helpers ––––– */
 const cacheKey = "signupStep1";
 const loadCache = () => JSON.parse(sessionStorage.getItem(cacheKey) || "{}");
+/* ---------- helper utilities ---------- */
+const extractPhone = (contactObj) => contactObj?.value ?? "";
+const extractIsWA = (contactObj) => !!contactObj?.isWhatsApp;
+
+/** transforms mongo‑doc → { guardian, candidate, academic, address, documents } */
+const mapDraftToSections = (doc) => {
+  /* ----- father & mother (phones split into value + flag) ----- */
+  const father = doc.fatherInfo || {};
+  const mother = doc.motherInfo || {};
+
+  const fatherSection = {
+    ...father,
+    cell1: extractPhone(father.cell1),
+    cell1IsWhatsapp: extractIsWA(father.cell1),
+    cell2: extractPhone(father.cell2),
+    cell2IsWhatsapp: extractIsWA(father.cell2),
+  };
+
+  const motherSection = {
+    ...mother,
+    cell1: extractPhone(mother.cell1),
+    cell1IsWhatsapp: extractIsWA(mother.cell1),
+    cell2: extractPhone(mother.cell2),
+    cell2IsWhatsapp: extractIsWA(mother.cell2),
+  };
+
+  /* ---------- build section payloads ---------- */
+  return {
+    /* STEP‑1 (school) – untouched, already in state/cache */
+
+    /* Guardian tab (3‑in‑1) */
+    guardian: {
+      fatherInfo: fatherSection,
+      motherInfo: motherSection,
+      guardianInformation: {
+        guardianName: doc.guardianName ?? "",
+        guardianRelationToStudent: doc.guardianRelationToStudent ?? "",
+        guardianContactNumber: doc.guardianContactNumber ?? "",
+        guardianContactIsWhatsapp: false, // backend keeps plain string; adjust if you store flag
+        guardianEmail: doc.guardianEmail ?? "",
+      },
+    },
+
+    /* Candidate tab */
+    candidate: {
+      firstName: doc.firstName ?? "",
+      lastName: doc.lastName ?? "",
+      dob: doc.dateOfBirth ?? null,
+      gender: doc.gender ?? "",
+      contactNumber: doc.contactNumber ?? "",
+      placeOfBirth: doc.placeOfBirth ?? "",
+      religion: doc.religion ?? "",
+      bloodGroup: doc.bloodGroup ?? "",
+      email: doc.email, // verified already
+    },
+
+    /* Academic tab */
+    academic: {
+      ...doc.academicHistory, // previousSchoolName, previousClass, etc.
+      // applyingClass: doc.applyingClass ?? "",
+      // academicYear: doc.academicYear ?? "",
+      sourceOfFee: doc.academicHistory?.sourceOfFee ?? "Parent",
+    },
+
+    /* Address tab */
+    address: {
+      permanentAddress: doc.permanentAddress ?? {},
+      residentialAddress: doc.residentialAddress ?? {},
+      transportRequired: doc.permanentAddress?.transportRequired ?? false,
+    },
+
+    /* Documents tab */
+    documents: [
+      ...Object.entries(doc.attachments?.mandatory || {}).map(
+        ([name, url]) => ({
+          name,
+          url,
+          mandatory: true,
+        })
+      ),
+      ...Object.entries(doc.attachments?.optional || {}).map(([name, url]) => ({
+        name,
+        url,
+        mandatory: false,
+      })),
+    ],
+
+    /* Consent tab left empty – user fills it later */
+  };
+};
 
 /* ---------- OTP ---------- */
 export const sendStudentOtp = createAsyncThunk(
@@ -58,6 +157,15 @@ export const fetchStudentDraft = createAsyncThunk(
   async ({ email }, { rejectWithValue, dispatch }) => {
     try {
       const res = await getData(`/student/register/student?email=${email}`);
+      if (res.success && res.exists) {
+        return {
+          ...res,
+          data: {
+            ...res.data,
+            isVerified: true, // Mark as verified
+          },
+        };
+      }
       return res; // { success, exists, data }
     } catch (err) {
       return handleError(err, dispatch, rejectWithValue);
@@ -67,7 +175,7 @@ export const fetchStudentDraft = createAsyncThunk(
 
 export const saveStudentDraft = createAsyncThunk(
   "studentSignup/saveDraft",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
 
@@ -80,7 +188,9 @@ export const saveStudentDraft = createAsyncThunk(
       await putData("/student/register/student?formStatus=draft", {
         ...formData,
         candidate: { ...formData.candidate, email },
+        currentStep: getState().common.studentSignup.currentStep, // 🔸
       });
+      // dispatch(fetchStudentDraft({ email }));
       return true;
     } catch {
       return rejectWithValue("draft‑save‑failed");
@@ -141,35 +251,6 @@ const initialState = {
   isEmailVerified: loadCache().isVerified || false,
   verifiedEmail: loadCache().isVerified ? loadCache().email : null,
 };
-
-/* helper – grab cached step‑1 from sessionStorage */
-const loadStep1Cache = () => {
-  try {
-    return JSON.parse(sessionStorage.getItem("step1Cache") || "{}");
-  } catch {
-    return {};
-  }
-};
-
-/* helper – map Mongo draft → wizard sections */
-const mapDraftToSections = (doc) => ({
-  /* STEP‑1 remains exactly as user/cache already has */
-  guardian: doc.guardian ?? {},
-  candidate: {
-    firstName: doc.firstName,
-    lastName: doc.lastName,
-    dob: doc.dateOfBirth,
-    gender: doc.gender,
-    contactNumber: doc.contactNumber,
-    email: doc.email,
-  },
-  academic: doc.academicHistory ?? {},
-  address: doc.permanentAddress ?? {},
-  documents: Object.entries(doc.attachments?.mandatory || {}).map(
-    ([name, url]) => ({ name, url, mandatory: true })
-  ),
-  // consent left empty
-});
 
 /* ------------------------------------------------------------------ */
 /* 🔸  SLICE                                                           */
@@ -245,8 +326,15 @@ const studentSignupSlice = createSlice({
     /* ---------- fetch draft ---------- */
     builder.addCase(fetchStudentDraft.fulfilled, (s, a) => {
       if (a.payload?.success && a.payload.exists) {
-        /* only merge non‑step‑1 sections */
+        console.log(a.payload.data, "sdfsdfsdfs");
         s.formData = { ...s.formData, ...mapDraftToSections(a.payload.data) };
+
+        // 🔸  use step from DB if present, fallback to firstIncompleteStep()
+        const stepFromDb = a.payload.data.currentStep;
+        s.currentStep =
+          typeof stepFromDb === "number"
+            ? stepFromDb
+            : firstIncompleteStep(s.formData);
       }
     });
 

@@ -57,6 +57,7 @@ const AcademicHistory = ({ formData }) => {
   const handleNext = async () => {
     try {
       const vals = form.getFieldsValue(true);
+      console.log("Academic History", vals);
       await AcademicSchema.validate(vals, { abortEarly: false });
       dispatch(updateFormData({ academic: vals }));
       dispatch(nextStep());
@@ -139,7 +140,7 @@ const AcademicHistory = ({ formData }) => {
               label="Last Day at School"
               rules={[{ required: true, message: "Required" }]}
             >
-              <DatePicker size="large" className="w-full" />
+              {/* <DatePicker size="large" className="w-full" /> */}
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>

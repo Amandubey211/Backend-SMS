@@ -10,28 +10,49 @@ export const SchoolSchema = yup.object({
     .email("Invalid e‑mail")
     .required("Student e‑mail required"),
 });
-
+// Create a reusable date validation function
+const dateSchema = yup
+  .mixed()
+  .test(
+    "is-date",
+    "Invalid date format",
+    (value) => !value || dayjs(value, "YYYY-MM-DD", true).isValid()
+  );
 const toDate = (v) => (v ? dayjs(v).toDate() : null);
 
-const baseContact = {
-  firstName: yup.string().required("First name"),
-  lastName: yup.string().required("Last name"),
-  cell1: yup.string().required("Cell phone"),
-};
-
-export const GuardianSchema = yup.object({
-  fatherInfo: yup.object(baseContact),
-  motherInfo: yup.object(baseContact).shape({
-    firstName: yup.string().required("First name"),
-  }),
-  guardianInformation: yup.object({
-    guardianName: yup.string().required("Guardian name"),
-    guardianRelationToStudent: yup.string().required("Relation is required"),
-    guardianContactNumber: yup.string().required("Contact number"),
-    guardianEmail: yup.string().email("Invalid email").nullable(),
-  }),
+const baseContact = yup.object().shape({
+  firstName: yup.string().required("First name is required"),
+  lastName: yup.string().required("Last name is required"),
+  middleName: yup.string().nullable(),
+  idNumber: yup.string().nullable(),
+  idExpiry: dateSchema.nullable(),
+  religion: yup.string().nullable(),
+  nationality: yup.string().nullable(),
+  company: yup.string().nullable(),
+  jobTitle: yup.string().nullable(),
+  cell1: yup.string().required("Phone number is required"),
+  cell1IsWhatsapp: yup.boolean(),
+  cell2: yup.string().nullable(),
+  cell2IsWhatsapp: yup.boolean(),
+  email1: yup.string().email("Invalid email").nullable(),
+  email2: yup.string().email("Invalid email").nullable(),
 });
 
+export const GuardianSchema = yup.object().shape({
+  fatherInfo: baseContact,
+  motherInfo: baseContact.shape({
+    firstName: yup.string().required("First name is required"),
+  }),
+  guardianInformation: yup.object().shape({
+    guardianName: yup.string().required("Guardian name is required"),
+    guardianRelationToStudent: yup.string().required("Relation is required"),
+    guardianContactNumber: yup.string().required("Contact number is required"),
+    guardianEmail: yup.string().email("Invalid email").nullable(),
+    guardianContactIsWhatsapp: yup.boolean(),
+  }),
+  fatherPhoto: yup.mixed().nullable(),
+  motherPhoto: yup.mixed().nullable(),
+});
 /* Skeletons for remaining steps (extend later) */
 
 export const CandidateSchema = yup.object({
