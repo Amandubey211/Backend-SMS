@@ -86,7 +86,6 @@ const AddressInfo = ({ formData }) => {
       const first =
         err?.errorFields?.[0]?.name || err?.inner?.[0]?.path.split(".");
       if (first) {
-        // Determine which tab contains the error
         const tabForError =
           first[0] === "permanentAddress" ? "permanent" : "residential";
         setActiveTab(tabForError);
@@ -94,6 +93,7 @@ const AddressInfo = ({ formData }) => {
       }
     }
   };
+
   const handleBack = () => dispatch(prevStep());
 
   /* Address form section - reusable component */
@@ -117,9 +117,9 @@ const AddressInfo = ({ formData }) => {
       <Form.Item
         name={[prefix, "residenceType"]}
         label="Residence Type"
-        rules={[{ required: true, message: "Select residence type" }]}
+        // rules={[{ required: true, message: "Select residence type" }]}
       >
-        <Radio.Group>
+        <Radio.Group value="flat">
           <Radio value="flat">Flat / Villa</Radio>
           <Radio value="house">House</Radio>
         </Radio.Group>
@@ -131,7 +131,7 @@ const AddressInfo = ({ formData }) => {
           <Form.Item
             name={[prefix, "unitNumber"]}
             label={residenceType === "flat" ? "Unit #" : "House #"}
-            rules={[{ required: true, message: "Required" }]}
+            // rules={[{ required: true, message: "Required" }]}
           >
             <Input
               size="large"
@@ -145,7 +145,7 @@ const AddressInfo = ({ formData }) => {
           <Form.Item
             name={[prefix, "buildingNumber"]}
             label={residenceType === "flat" ? "Building #" : "Street #"}
-            rules={[{ required: true, message: "Required" }]}
+            // rules={[{ required: true, message: "Required" }]}
           >
             <Input
               size="large"
@@ -161,7 +161,7 @@ const AddressInfo = ({ formData }) => {
       <Form.Item
         name={[prefix, "streetName"]}
         label="Street Name"
-        rules={[{ required: true, message: "Required" }]}
+        // rules={[{ required: true, message: "Required" }]}
       >
         <Input size="large" placeholder="Street Name" />
       </Form.Item>
@@ -197,7 +197,7 @@ const AddressInfo = ({ formData }) => {
           <Form.Item
             name={[prefix, "city"]}
             label="City"
-            rules={[{ required: true, message: "Required" }]}
+            // rules={[{ required: true, message: "Required" }]}
           >
             <Input size="large" placeholder="City" allowClear />
           </Form.Item>
@@ -223,7 +223,7 @@ const AddressInfo = ({ formData }) => {
           <Form.Item
             name={[prefix, "country"]}
             label="Country"
-            rules={[{ required: true, message: "Required" }]}
+            // rules={[{ required: true, message: "Required" }]}
           >
             <Select
               size="large"

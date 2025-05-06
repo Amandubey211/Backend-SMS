@@ -178,7 +178,7 @@ const CandidateInfo = ({ formData }) => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="md:w-[40%]">
             <CustomUploadCard
-              name="candidatePicture"
+              name="profile"
               label="Candidate Photo"
               form={form} // Pass the form prop
               recommendedSize="300x400"
@@ -198,7 +198,10 @@ const CandidateInfo = ({ formData }) => {
                 prefix={<UserOutlined />}
               />
             </Form.Item>
-            <Form.Item name="middleName">
+            <Form.Item
+              name="middleName"
+              rules={[{ required: true, message: "Required" }]}
+            >
               <Input
                 size="large"
                 placeholder="Middle Name"

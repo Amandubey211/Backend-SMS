@@ -58,6 +58,7 @@ export const GuardianSchema = yup.object().shape({
 export const CandidateSchema = yup.object({
   firstName: yup.string().required("First name is required"),
   lastName: yup.string().required("Last name is required"),
+  middleName: yup.string().required("Middle name is required"),
 
   // dob: yup
   //   .string()
@@ -118,12 +119,12 @@ export const LanguagePreferenceSchema = yup.object().shape({
 });
 
 export const AddressSchema = yup.object({
-  residenceType: yup.string().required(),
-  unitNumber: yup.string().required(),
-  buildingNumber: yup.string().required(),
-  streetName: yup.string().required(),
-  city: yup.string().required(),
-  transportRequired: yup.boolean(),
+  // residenceType: yup.string().required(),
+  // // unitNumber: yup.string().required(),
+  // buildingNumber: yup.string().required(),
+  // streetName: yup.string().required(),
+  // city: yup.string().required(),
+  // transportRequired: yup.boolean(),
 });
 export const DocsSchema = yup.object({});
 export const ConsentSchema = yup.object({});

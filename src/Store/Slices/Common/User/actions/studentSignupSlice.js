@@ -244,52 +244,27 @@ export const saveStudentDraft = createAsyncThunk(
 /* ---------- Final Submission ---------- */
 export const registerStudentDetails = createAsyncThunk(
   "studentSignup/register",
-  async (_, { getState, rejectWithValue, dispatch }) => {
+  async (navigate, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
-      console.log(formData, "formDataformData");
-      const endpoint = `/student/register/student?formStatus=submitted`;
-
-      const fd = new FormData();
-
-      // Ensure documents is properly structured
-      const documents = formData.documents || {};
-      const filesToUpload = Array.isArray(documents.files)
-        ? documents.files
-        : [];
-      const documentRequirements = Array.isArray(documents.documentRequirements)
-        ? documents.documentRequirements
-        : [];
-
-      // Append JSON data
-      fd.append(
-        "json",
-        JSON.stringify({
+      const endpoint = `/student/register/student`;
+      const email = (formData.candidate?.email || "").toLowerCase();
+      const res = await customRequest(
+        "put",
+        endpoint,
+        {
           ...formData,
-          documents: {
-            documentRequirements,
-            files: filesToUpload.map((file) => ({
-              documentId: file.documentId,
-              documentName: file.documentName,
-            })),
-          },
-        })
+          candidate: { ...formData.candidate, email },
+          currentStep: getState().common.studentSignup.currentStep,
+        },
+        {
+          "Content-Type": "multipart/form-data",
+        }
       );
 
-      // Append files with document IDs as field names
-      filesToUpload.forEach((file) => {
-        if (file.originFileObj) {
-          fd.append(file.documentId, file.originFileObj);
-        }
-      });
-
-      const res = await customRequest("put", endpoint, fd, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
       toast.success("Application submitted successfully");
+
+      // navigate("/studentlogin");
       return res.data;
     } catch (err) {
       console.error("Submission failed:", err);
@@ -400,7 +375,7 @@ const studentSignupSlice = createSlice({
       })
       .addCase(verifyStudentOtp.rejected, (s, a) => {
         s.isVerifying = false;
-        s.verificationError = true
+        s.verificationError = true;
       });
 
     /* ---------- Fetch draft ---------- */
