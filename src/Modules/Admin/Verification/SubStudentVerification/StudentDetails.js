@@ -71,45 +71,50 @@ const StudentDetail = () => {
               {t("Document Previews")}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {student?.documentId?.documents?.map((doc, index) => (
-                <div
-                  key={index}
-                  className={`${getColor(
-                    index
-                  )} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
-                >
-                  {doc?.documentType?.startsWith("image/") ? (
-                    <img
-                      src={doc?.documentUrl}
-                      alt={`${t("Document")} ${index + 1}`}
-                      className="w-full h-40 object-cover mb-2 rounded-md"
-                    />
-                  ) : (
-                    <embed
-                      src={doc?.documentUrl}
-                      type={doc.documentType}
-                      className="w-full h-40 mb-2 rounded-md"
-                    />
-                  )}
-                  <div className="flex justify-between items-center">
-                    <p className="text-white">
-                      <span className="font-medium">
-                        {t("Document")} {index + 1}:
-                      </span>{" "}
-                      {doc?.documentLabel}
-                    </p>
-                    <button
-                      title={t("Open Modal")}
-                      className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
-                      onClick={() =>
-                        handlePreviewClick(doc?.documentUrl, doc.documentType)
-                      }
-                    >
-                      <AiOutlineEye size={20} />
-                    </button>
+              {Object.keys(student?.attachments?.optional || {}).map((key, index) => {
+                const docUrl = student?.attachments?.optional[key];
+                const docLabel = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the key for label
+
+                return (
+                  <div
+                    key={key} // Use a unique identifier if available
+                    className={`${getColor(index)} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
+                  >
+                    {docUrl?.startsWith("http") && docUrl?.match(/\.(jpg|jpeg|png)$/) ? (
+                      <img
+                        src={docUrl}
+                        alt={`${t("Document")} ${docLabel}`}
+                        className="w-full h-40 object-cover mb-2 rounded-md"
+                        onError={(e) => e.target.src = "/path/to/default-image.jpg"} // Handle broken image URLs
+                      />
+                    ) : (
+                      <embed
+                        src={docUrl}
+                        type="application/pdf"
+                        className="w-full h-40 mb-2 rounded-md"
+                        alt={`${t("Document")} ${docLabel}`} // Ensure accessibility for embedded files
+                      />
+                    )}
+                    <div className="flex justify-between items-center">
+                      <p className="text-white">
+                        <span className="font-medium">
+                          {t("Document")} {index + 1}:
+                        </span>{" "}
+                        {docLabel}
+                      </p>
+                      <button
+                        title={t("Open Modal")}
+                        className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
+                        onClick={() =>
+                          handlePreviewClick(docUrl, docUrl?.startsWith("http") && docUrl?.match(/\.(jpg|jpeg|png)$/) ?"image":"pdf")
+                        }
+                      >
+                        <AiOutlineEye size={20} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -125,7 +130,7 @@ const StudentDetail = () => {
               </button>
               <div>
                 {preview ? (
-                  previewType.startsWith("image/") ? (
+                  previewType == "image" ? (
                     <img
                       src={preview}
                       alt={t("Preview")}
@@ -134,7 +139,7 @@ const StudentDetail = () => {
                   ) : (
                     <embed
                       src={preview}
-                      type={previewType}
+                      type={'application/pdf'}
                       className="w-full h-[80vh] object-contain"
                     />
                   )

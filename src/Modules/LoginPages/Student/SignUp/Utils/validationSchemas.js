@@ -10,33 +10,55 @@ export const SchoolSchema = yup.object({
     .email("Invalid e‑mail")
     .required("Student e‑mail required"),
 });
-
+// Create a reusable date validation function
+const dateSchema = yup
+  .mixed()
+  .test(
+    "is-date",
+    "Invalid date format",
+    (value) => !value || dayjs(value, "YYYY-MM-DD", true).isValid()
+  );
 const toDate = (v) => (v ? dayjs(v).toDate() : null);
 
-const baseContact = {
-  firstName: yup.string().required("First name"),
-  lastName: yup.string().required("Last name"),
-  cell1: yup.string().required("Cell phone"),
-};
-
-export const GuardianSchema = yup.object({
-  fatherInfo: yup.object(baseContact),
-  motherInfo: yup.object(baseContact).shape({
-    firstName: yup.string().required("First name"),
-  }),
-  guardianInformation: yup.object({
-    guardianName: yup.string().required("Guardian name"),
-    guardianRelationToStudent: yup.string().required("Relation is required"),
-    guardianContactNumber: yup.string().required("Contact number"),
-    guardianEmail: yup.string().email("Invalid email").nullable(),
-  }),
+const baseContact = yup.object().shape({
+  firstName: yup.string().required("First name is required"),
+  lastName: yup.string().required("Last name is required"),
+  middleName: yup.string().nullable(),
+  idNumber: yup.string().nullable(),
+  idExpiry: dateSchema.nullable(),
+  religion: yup.string().nullable(),
+  nationality: yup.string().nullable(),
+  company: yup.string().nullable(),
+  jobTitle: yup.string().nullable(),
+  cell1: yup.string().required("Phone number is required"),
+  cell1IsWhatsapp: yup.boolean(),
+  cell2: yup.string().nullable(),
+  cell2IsWhatsapp: yup.boolean(),
+  email1: yup.string().email("Invalid email").nullable(),
+  email2: yup.string().email("Invalid email").nullable(),
 });
 
+export const GuardianSchema = yup.object().shape({
+  fatherInfo: baseContact,
+  motherInfo: baseContact.shape({
+    firstName: yup.string().required("First name is required"),
+  }),
+  guardianInformation: yup.object().shape({
+    guardianName: yup.string().required("Guardian name is required"),
+    guardianRelationToStudent: yup.string().required("Relation is required"),
+    guardianContactNumber: yup.string().required("Contact number is required"),
+    guardianEmail: yup.string().email("Invalid email").nullable(),
+    guardianContactIsWhatsapp: yup.boolean(),
+  }),
+  fatherPhoto: yup.mixed().nullable(),
+  motherPhoto: yup.mixed().nullable(),
+});
 /* Skeletons for remaining steps (extend later) */
 
 export const CandidateSchema = yup.object({
   firstName: yup.string().required("First name is required"),
   lastName: yup.string().required("Last name is required"),
+  middleName: yup.string().required("Middle name is required"),
 
   // dob: yup
   //   .string()
@@ -76,29 +98,43 @@ export const AcademicSchema = yup.object({
         : schema.strip() // strip from output when not needed
   ),
 
-  lastDayAtSchool: yup
-    .date()
-    .typeError("Last day is required") // nicer message for empty picker
-    .required("Last day is required"),
   sourceOfFee: yup.string().required("Source of fee is required"),
 });
 
+export const LanguagePreferenceSchema = yup.object().shape({
+  secondLanguage: yup
+    .array()
+    .min(1, "Please select at least one second language")
+    .required("Required"),
+  thirdLanguage: yup
+    .array()
+    .min(1, "Please select at least one third language")
+    .required("Required"),
+  valueEducation: yup
+    .array()
+    .min(1, "Please select at least one value education")
+    .required("Required"),
+  isLeftHanded: yup.boolean().default(false),
+  medicalCondition: yup.string().nullable(),
+});
+
 export const AddressSchema = yup.object({
-  residenceType: yup.string().required(),
-  unitNumber: yup.string().required(),
-  buildingNumber: yup.string().required(),
-  streetName: yup.string().required(),
-  zoneNumber: yup.number().typeError("Zone is required").required(),
-  city: yup.string().required(),
-  transportRequired: yup.boolean(),
+  // residenceType: yup.string().required(),
+  // // unitNumber: yup.string().required(),
+  // buildingNumber: yup.string().required(),
+  // streetName: yup.string().required(),
+  // city: yup.string().required(),
+  // transportRequired: yup.boolean(),
 });
 export const DocsSchema = yup.object({});
 export const ConsentSchema = yup.object({});
 
 export const stepSchemas = [
   SchoolSchema,
-  GuardianSchema,
+
   CandidateSchema,
+  GuardianSchema,
+  LanguagePreferenceSchema,
   AcademicSchema,
   AddressSchema,
   DocsSchema,

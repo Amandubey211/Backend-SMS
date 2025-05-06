@@ -6,7 +6,7 @@ import {
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage"; // Defaults to localStorage for web
 import { combineReducers } from "redux";
-
+import debounce from "lodash-es/debounce";
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer, {
@@ -18,7 +18,7 @@ import financialYearReducer from "./Slices/Common/FinancialYear/financialYear.sl
 import branchReducer from "./Slices/Admin/branchs/branch.slice";
 import sendEmailReducer from "./Slices/Common/SendPDFEmail/sendEmailSlice";
 import studentSignUpReducer, {
-  studentSignupMiddleware,
+  saveStudentDraft,
 } from "./Slices/Common/User/actions/studentSignupSlice";
 
 // admin
@@ -140,7 +140,7 @@ listenerMiddleware.startListening({
   matcher: isAnyOf(setSelectedSemester),
   effect: async (action, listenerApi) => {
     // Wait 500ms to allow state persistence to complete
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     window.location.reload();
   },
 });
@@ -299,7 +299,20 @@ const transportReducer = combineReducers({
   vehicleUserAssignment: vehicleUserAssignmentReducer,
   transportHelper: transportHelperReducer,
   tripExecutionLog: tripExecutionLogReducer,
+});
 
+/* any change to studentSignup.formData triggers a debounced save */
+listenerMiddleware.startListening({
+  predicate: (action, current, previous) =>
+    current.common?.studentSignup?.formData !==
+    previous.common?.studentSignup?.formData,
+  effect: debounce(async (_action, api) => {
+    try {
+      await api.dispatch(saveStudentDraft()).unwrap();
+    } catch {
+      /* ignore – offline etc. */
+    }
+  }, 1000),
 });
 
 // Create the store
@@ -321,17 +334,9 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }).concat(listenerMiddleware.middleware, studentSignupMiddleware), // Thunk is automatically included by Redux Toolkit
+    }).prepend(listenerMiddleware.middleware), // Thunk is automatically included by Redux Toolkit
 });
-let prevDraft = store.getState().common.studentSignup;
-store.subscribe(() => {
-  const nextDraft = store.getState().common.studentSignup;
-  if (nextDraft !== prevDraft) {
-    /* write to localStorage on every change */
-    saveDraft(nextDraft);
-    prevDraft = nextDraft;
-  }
-});
+
 const persistor = persistStore(store);
 
 export { store, persistor };

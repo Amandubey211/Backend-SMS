@@ -13,6 +13,8 @@ const formatDate = (dateString) => {
 };
 
 const Details = ({ student }) => {
+  console.log(student);
+  
   const { t } = useTranslation('admVerification'); // Initialize useTranslation hook
 
   return (
@@ -20,7 +22,7 @@ const Details = ({ student }) => {
       {/* Main container to hold details and form */}
       <div className="relative">
         {/* Main Details Section */}
-        <div className="relative z-0 flex-1  bg-white rounded-lg overflow-hidden  ">
+        <div className="relative z-0 flex-1 bg-white rounded-lg overflow-hidden">
           <div className="flex bg-pink-100 rounded-tl-full rounded-tr-full flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 mb-6">
             <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-white flex justify-center items-center bg-gray-200 text-gray-800">
               {student?.profile ? (
@@ -52,9 +54,7 @@ const Details = ({ student }) => {
                 <p className="text-gray-600 truncate">{student?.email}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Contact Number')}:
-                </span>
+                <span className="font-medium text-gray-700">{t('Contact Number')}:</span>
                 <p className="text-gray-600">{student?.contactNumber}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
@@ -62,9 +62,7 @@ const Details = ({ student }) => {
                 <p className="text-gray-600">{student?.age}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Date of Birth')}:
-                </span>
+                <span className="font-medium text-gray-700">{t('Date of Birth')}:</span>
                 <p className="text-gray-600">
                   {formatDate(student?.dateOfBirth)}
                 </p>
@@ -77,93 +75,202 @@ const Details = ({ student }) => {
                 <span className="font-medium text-gray-700">{t('Gender')}:</span>
                 <p className="text-gray-600">{student?.gender}</p>
               </div>
-            </div>
-            <h3 className="text-lg font-medium text-gray-800 mb-4">
-              {t('Parent Information')}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Mother\'s Name')}:
-                </span>
-                <p className="text-gray-600">{student?.motherName}</p>
+                <span className="font-medium text-gray-700">{t('Blood Group')}:</span>
+                <p className="text-gray-600">{student?.bloodGroup}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Guardian\'s Name')}:
-                </span>
-                <p className="text-gray-600">{student?.guardianName}</p>
+                <span className="font-medium text-gray-700">{t('Religion')}:</span>
+                <p className="text-gray-600">{student?.religion}</p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Guardian\'s Contact')}:
-                </span>
-                <p className="text-gray-600">
-                  {student?.guardianContactNumber}
-                </p>
+                <span className="font-medium text-gray-700">{t('Transport Requirement')}:</span>
+                <p className="text-gray-600">{student?.transportRequirement ? 'Yes':'No'}</p>
               </div>
             </div>
 
-            {/* Addresses */}
+            {/* Father Information */}
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
+              {t('Father Information')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s First Name')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.firstName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Middle Name')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.middleName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Last Name')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.lastName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Religion')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.religion}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Nationality')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.nationality}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Job Title')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.jobTitle}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Cell Number')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.cell1?.value}</p>
+                <p className="text-gray-600">{student?.fatherInfo?.cell2?.value}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Work Phone')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.workPhone}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Father\'s Email')}:</span>
+                <p className="text-gray-600">{student?.fatherInfo?.email1} </p>
+                <p className="text-gray-600">{student?.fatherInfo?.email2} </p>
+              </div>
+            </div>
+
+            {/* Mother Information */}
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
+              {t('Mother Information')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s First Name')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.firstName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Middle Name')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.middleName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Last Name')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.lastName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Religion')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.religion}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Nationality')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.nationality}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Job Title')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.jobTitle}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Cell Number')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.cell1?.value}</p>
+                <p className="text-gray-600">{student?.motherInfo?.cell2?.value}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Work Phone')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.workPhone}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Mother\'s Email')}:</span>
+                <p className="text-gray-600">{student?.motherInfo?.email1}</p>
+                <p className="text-gray-600">{student?.motherInfo?.email2}</p>
+              </div>
+            </div>
+
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
+              {t('Guardian Information')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Guardian Name')}:</span>
+                <p className="text-gray-600">{student?.guardianName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Guardian Relation To Student')}:</span>
+                <p className="text-gray-600">{student?.guardianRelationToStudent}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Guardian Contact Number:')}:</span>
+                <p className="text-gray-600">{student?.guardianContactNumber}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Guardian Email')}:</span>
+                <p className="text-gray-600">{student?.guardianEmail}</p>
+              </div>
+         
+
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
+              {t('Previous School Info')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Previous School Name')}:</span>
+                <p className="text-gray-600">{student?.academicHistory?.previousSchoolName}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Previous Class')}:</span>
+                <p className="text-gray-600">{student?.academicHistory?.previousClass}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Curriculum')}:</span>
+                <p className="text-gray-600">{student?.academicHistory?.curriculum}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('last Day At School')}:</span>
+                <p className="text-gray-600">{student?.academicHistory?.lastDayAtSchoo?.slice(0,10)}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('source Of Fee')}:</span>
+                <p className="text-gray-600">{student?.academicHistory?.sourceOfFee}</p>
+              </div>
+           
+         
+
+            </div>
+            <h3 className="text-lg font-medium text-gray-800 mb-4">
+              {t('preferences')}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Second Language')}:</span>
+                {student?.secondLanguage?.map((i)=>(<p className="text-gray-600">{i}</p>))}
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Third Language')}:</span>
+                {student?.thirdLanguage?.map((i)=>(<p className="text-gray-600">{i}</p>))}
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Value Education')}:</span>
+                {student?.valueEducation?.map((i)=>(<p className="text-gray-600">{i}</p>))}
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Is Left Handed')}:</span>
+                <p className="text-gray-600">{student?.isLeftHanded ? 'Yes':'No'}</p>
+              </div>
+              <div className="bg-pink-100 rounded-md p-4">
+                <span className="font-medium text-gray-700">{t('Medical Condition')}:</span>
+                <p className="text-gray-600">{student?.medicalCondition}</p>
+              </div>
+            </div>
+
+            {/* Address Information */}
             <h3 className="text-lg font-medium text-gray-800 mb-4 border-t pt-4">
               {t('Addresses')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Permanent Address')}:
-                </span>
+                <span className="font-medium text-gray-700">{t('Permanent Address')}:</span>
                 <p className="text-gray-600">
-                  {student?.permanentAddress?.street},{" "}
-                  {student?.permanentAddress?.city},{" "}
-                  {student?.permanentAddress?.state},{" "}
-                  {student?.permanentAddress?.postalCode}
+                  {student?.permanentAddress?.unitNumber} {student?.permanentAddress?.buildingNumber}, {student?.permanentAddress?.streetName}, {student?.permanentAddress?.compoundName}, {student?.permanentAddress?.city}, {student?.permanentAddress?.state}, {student?.permanentAddress?.postalCode}, {student?.permanentAddress?.country}
                 </p>
               </div>
               <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Residential Address')}:
-                </span>
+                <span className="font-medium text-gray-700">{t('Residential Address')}:</span>
                 <p className="text-gray-600">
-                  {student?.residentialAddress?.street},{" "}
-                  {student?.residentialAddress?.city},{" "}
-                  {student?.residentialAddress?.state},{" "}
-                  {student?.residentialAddress?.postalCode}
-                </p>
-              </div>
-            </div>
-
-            {/* Other Details */}
-            <h3 className="text-lg font-medium text-gray-800 mb-4 border-t pt-4">
-              {t('Status')}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">{t('QID')}:</span>
-                <p className="text-gray-600">{student?.Q_Id}</p>
-              </div>
-              <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Student Applied for Class')}:
-                </span>
-                <p className="text-gray-600">
-                  {student?.applyingClass?.className}
-                </p>
-              </div>
-              <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Verified Documents')}:
-                </span>
-                <p className="text-gray-600">
-                  {student?.isVerifiedDocuments ? t('Yes') : t('No')}
-                </p>
-              </div>
-              <div className="bg-pink-100 rounded-md p-4">
-                <span className="font-medium text-gray-700">
-                  {t('Verified School ID')}:
-                </span>
-                <p className="text-gray-600">
-                  {student?.isVerifiedSchoolId ? t('Yes') : t('No')}
+                  {student?.residentialAddress?.unitNumber} {student?.residentialAddress?.buildingNumber}, {student?.residentialAddress?.streetName}, {student?.residentialAddress?.compoundName}, {student?.residentialAddress?.city}, {student?.residentialAddress?.state}, {student?.residentialAddress?.postalCode}, {student?.residentialAddress?.country}
                 </p>
               </div>
             </div>

@@ -57,7 +57,7 @@ const UnVerifiedStudentCard = ({ studentId }) => {
           to={`/verify_students/${student._id}`}
           className="absolute top-4 right-4 bg-white text-gray-800 font-semibold py-1 px-3 rounded-full shadow-md hover:bg-gray-200 transition-colors"
         >
-          Verify Student
+          View Student
         </NavLink>
       </ProtectedAction>
 

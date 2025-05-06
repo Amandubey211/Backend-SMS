@@ -21,61 +21,50 @@ import { FaWhatsapp } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
 
 import CustomUploadCard from "../Components/CustomUploadCard";
 import {
   nextStep,
   prevStep,
-  registerStudentDetails,
   updateFormData,
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
 import { GuardianSchema } from "../Utils/validationSchemas";
+import {
+  COUNTRY_OPTIONS,
+  LANGUAGE_OPTIONS,
+  RELIGION_OPTIONS,
+} from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 
 const { Option } = Select;
 
-/* ─────────────────────────────── constants ────────────────────────── */
-const religionOptions = [
-  { label: "Islam", value: "Islam" },
-  { label: "Christianity", value: "Christianity" },
-  { label: "Hinduism", value: "Hinduism" },
-  { label: "Buddhism", value: "Buddhism" },
-  { label: "Judaism", value: "Judaism" },
-];
+/* ─── static options ─── */
 
-const nationalityOptions = [
-  { label: "Qatari", value: "qatari" },
-  { label: "Egyptian", value: "egyptian" },
-  { label: "Indian", value: "indian" },
-];
-
-/* ────────────────── reusable Phone + WhatsApp toggle ──────────────── */
+/* ─── phone + WhatsApp toggle ─── */
 const PhoneField = ({
   form,
   name,
   whatsappName,
   label,
   placeholder,
-  required = false,
+  required,
 }) => {
   const isWA = Form.useWatch(whatsappName, form) ?? false;
-  const errorList = form.getFieldError(name);
-  const hasError = errorList.length > 0;
-  const borderColor = hasError ? "#ff4d4f" : "#d9d9d9";
+  const hasError = form.getFieldError(name).length > 0;
+  const borderCol = hasError ? "#ff4d4f" : "#d9d9d9";
 
   return (
     <Form.Item
       label={label}
       required={required}
       validateStatus={hasError ? "error" : ""}
-      help={hasError ? errorList[0] : undefined}
+      help={hasError ? form.getFieldError(name)[0] : undefined}
       className="mb-4"
     >
       <Space.Compact
         block
         style={{
-          border: `1px solid ${borderColor}`,
+          border: `1px solid ${borderCol}`,
           borderRadius: 6,
           height: 40,
         }}
@@ -85,7 +74,6 @@ const PhoneField = ({
           noStyle
           valuePropName="value"
           trigger="onChange"
-          getValueFromEvent={(val) => val}
           rules={
             required
               ? [{ required: true, message: "Phone number is required" }]
@@ -105,15 +93,13 @@ const PhoneField = ({
             containerStyle={{ width: "100%" }}
           />
         </Form.Item>
-
         <Tooltip title={isWA ? "WhatsApp enabled" : "Click to enable WhatsApp"}>
           <div
             onClick={() => form.setFieldValue(whatsappName, !isWA)}
-            className={`flex items-center justify-center w-12 cursor-pointer transition-all ${
-              isWA ? "bg-[#25D366]" : "bg-gray-100"
-            }`}
+            className={`flex items-center justify-center w-12 cursor-pointer
+                        ${isWA ? "bg-[#25D366]" : "bg-gray-100"}`}
             style={{
-              borderLeft: `1px solid ${borderColor}`,
+              borderLeft: `1px solid ${borderCol}`,
               borderRadius: "0 6px 6px 0",
               height: "100%",
             }}
@@ -128,30 +114,28 @@ const PhoneField = ({
   );
 };
 
-/* ─────────────────────────── component ────────────────────────────── */
+/* ─── main component ─── */
 const GuardianInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-  const navigate = useNavigate();
-  const { isLoading, formData: completeFormData } = useSelector(
-    (s) => s.common.studentSignup
-  );
 
-  /* refs */
+  const { isCheckingStudent } = useSelector((s) => s.common.studentSignup);
+
   const containerRef = useRef(null);
   const firstInputRef = useRef(null);
   const motherSectionRef = useRef(null);
   const guardianSectionRef = useRef(null);
 
-  /* state */
   const [activeTab, setActiveTab] = useState("father");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  /* ── hydrate draft data on mount ── */
+  /* Hydrate form with initial data */
   useEffect(() => {
     if (!formData) return;
 
+    // Create a deep copy and handle file objects properly
     const sanitized = JSON.parse(JSON.stringify(formData));
+
+    // Convert phone numbers to strings
     [
       "fatherInfo.cell1",
       "fatherInfo.cell2",
@@ -162,41 +146,33 @@ const GuardianInfo = ({ formData }) => {
       const parts = path.split(".");
       let curr = sanitized;
       for (let i = 0; i < parts.length - 1; i++) {
-        if (!curr[parts[i]]) curr[parts[i]] = {};
-        curr = curr[parts[i]];
+        curr = curr[parts[i]] ||= {};
       }
       const leaf = parts.pop();
-      if (curr[leaf] !== undefined && curr[leaf] !== null)
+      if (curr[leaf] !== undefined && curr[leaf] !== null) {
         curr[leaf] = curr[leaf].toString();
+      }
     });
 
     form.setFieldsValue(sanitized);
   }, [formData, form]);
-
-  /* ── scroll to appropriate section on tab change ── */
+  /* auto scroll on tab change */
   useEffect(() => {
-    if (activeTab === "mother" && motherSectionRef.current) {
-      motherSectionRef.current.scrollIntoView({ behavior: "smooth" });
-    } else if (activeTab === "guardian" && guardianSectionRef.current) {
-      guardianSectionRef.current.scrollIntoView({ behavior: "smooth" });
-    } else {
-      smoothToTop();
-    }
+    if (activeTab === "mother")
+      motherSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    else if (activeTab === "guardian")
+      guardianSectionRef.current?.scrollIntoView({ behavior: "smooth" });
+    else smoothToTop();
 
-    setTimeout(() => {
-      firstInputRef.current?.focus({ cursor: "start" });
-    }, 300);
+    setTimeout(() => firstInputRef.current?.focus({ cursor: "start" }), 300);
   }, [activeTab]);
 
-  /* ── helpers ── */
   const smoothToTop = () =>
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-
-  /* ── keep Redux draft in sync ── */
   const handleValuesChange = () =>
     dispatch(updateFormData({ guardian: form.getFieldsValue(true) }));
 
-  /* ───────────────────── helper render fns ────────────────────────── */
+  /* ------------- reusable render helpers ------------- */
   const renderNameFields = (p) => (
     <>
       <Form.Item
@@ -212,7 +188,6 @@ const GuardianInfo = ({ formData }) => {
           }
         />
       </Form.Item>
-
       <Form.Item
         name={[p, "lastName"]}
         rules={[{ required: true, message: "Required" }]}
@@ -220,7 +195,6 @@ const GuardianInfo = ({ formData }) => {
       >
         <Input size="large" placeholder="Last Name" />
       </Form.Item>
-
       <Form.Item name={[p, "middleName"]} className="mb-4">
         <Input size="large" placeholder="Middle Name" />
       </Form.Item>
@@ -238,22 +212,21 @@ const GuardianInfo = ({ formData }) => {
         <Col xs={24} md={12}>
           <Form.Item name={[p, "idExpiry"]} label="ID Expiry" className="mb-4">
             <DatePicker
+              disabled
               size="large"
               className="w-full"
               placeholder="ID Expiry"
+              format="DD/MM/YYYY"
             />
           </Form.Item>
         </Col>
       </Row>
-
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item name={[p, "religion"]} label="Religion" className="mb-4">
             <Select size="large" placeholder="Select Religion">
-              {religionOptions.map((o) => (
-                <Option key={o.value} value={o.value}>
-                  {o.label}
-                </Option>
+              {RELIGION_OPTIONS.map((o) => (
+                <Option key={o.value}>{o.label}</Option>
               ))}
             </Select>
           </Form.Item>
@@ -265,10 +238,8 @@ const GuardianInfo = ({ formData }) => {
             className="mb-4"
           >
             <Select size="large" placeholder="Select Nationality">
-              {nationalityOptions.map((o) => (
-                <Option key={o.value} value={o.value}>
-                  {o.label}
-                </Option>
+              {COUNTRY_OPTIONS.map((o) => (
+                <Option key={o.value}>{o.label}</Option>
               ))}
             </Select>
           </Form.Item>
@@ -300,7 +271,6 @@ const GuardianInfo = ({ formData }) => {
         placeholder="e.g. +974 1234 5678"
         required
       />
-
       <PhoneField
         form={form}
         name={[p, "cell2"]}
@@ -334,28 +304,29 @@ const GuardianInfo = ({ formData }) => {
     </>
   );
 
-  /* ───────────────────── specific section UIs ─────────────────────── */
+  /* ------------- section renderers ------------- */
   const renderFatherInfo = () => (
     <>
       <Divider orientation="left" dashed>
         Father Information
       </Divider>
-
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <div className="md:w-[35%]">
-          <CustomUploadCard
-            name="fatherPhoto"
-            label="Father Photo"
-            form={form}
-            recommendedSize="300x400"
-            width="w-full"
-            height="h-40"
-            aspectRatio="aspect-square"
-          />
+          <Form.Item name={["fatherInfo", "photo"]} noStyle>
+            <CustomUploadCard
+              name={["fatherInfo", "photo"]}
+              label="Father Photo"
+              form={form}
+              recommendedSize="300x400"
+              width="w-full"
+              height="h-40"
+              aspectRatio="aspect-square"
+              enableCrop={false}
+            />
+          </Form.Item>
         </div>
         <div className="md:w-[65%]">{renderNameFields("fatherInfo")}</div>
       </div>
-
       {renderIdAndPersonalInfo("fatherInfo")}
       {renderContactInfo("fatherInfo")}
     </>
@@ -366,22 +337,23 @@ const GuardianInfo = ({ formData }) => {
       <Divider orientation="left" dashed>
         Mother Information
       </Divider>
-
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <div className="md:w-[35%]">
-          <CustomUploadCard
-            name="motherPhoto"
-            label="Mother Photo"
-            form={form}
-            recommendedSize="400x500"
-            width="w-full"
-            height="h-40"
-            aspectRatio="aspect-square"
-          />
+          <Form.Item name={["motherInfo", "photo"]} noStyle>
+            <CustomUploadCard
+              name={["motherInfo", "photo"]}
+              label="Mother Photo"
+              form={form}
+              recommendedSize="400x500"
+              width="w-full"
+              height="h-40"
+              aspectRatio="aspect-square"
+              enableCrop={false}
+            />
+          </Form.Item>
         </div>
         <div className="md:w-[65%]">{renderNameFields("motherInfo")}</div>
       </div>
-
       {renderIdAndPersonalInfo("motherInfo")}
       {renderContactInfo("motherInfo")}
     </div>
@@ -392,7 +364,6 @@ const GuardianInfo = ({ formData }) => {
       <Divider orientation="left" dashed>
         Guardian Information
       </Divider>
-
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
@@ -440,71 +411,22 @@ const GuardianInfo = ({ formData }) => {
     </div>
   );
 
-  /* ───────────────────────── navigation ───────────────────────────── */
+  /* ------------- navigation handlers ------------- */
   const gradient = "linear-gradient(90deg,#C83B62 0%,#7F35CD 100%)";
   const darkerGradient = "linear-gradient(90deg,#A02D53 0%,#6A28A4 100%)";
 
-  const prepareFormData = () => {
-    const formValues = form.getFieldsValue(true);
-    const formData = new FormData();
-console.log(formValues);
-
-    // Add all form data from all steps (from Redux store)
-    Object.entries(completeFormData).forEach(([section, data]) => {
-      if (typeof data === "object" && data !== null) {
-        formData.append(section, JSON.stringify(data));
-      } else {
-        formData.append(section, data);
-      }
-    });
-
-    // Handle file uploads
-    if (formValues.fatherPhoto?.file) {
-      formData.append("fatherPhoto", formValues.fatherPhoto.file);
-    }
-    if (formValues.motherPhoto?.file) {
-      formData.append("motherPhoto", formValues.motherPhoto.file);
-    }
-
-    return formData;
-  };
-
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
-   // try {
-      const formData = prepareFormData();
-      console.log(formData);
-      
-
-      // Dispatch the registration thunk
-      // await dispatch(
-      //   registerStudentDetails({
-      //     formData,
-      //     navigate,
-      //   })
-      // ).unwrap();
-
-    //   // Only proceed to next step if submission was successful
-    //   dispatch(nextStep());
-    // } catch (error) {
-    //   message.error("Failed to save guardian information");
-    //   console.error("Submission error:", error);
-    // } finally {
-    //   setIsSubmitting(false);
-    // }
-    setIsSubmitting(false);
-  };
-
   const handleNext = async () => {
     try {
-      // Validate current tab fields
+      // First validate all fields
       await form.validateFields();
 
-      // Update Redux store with current form data
-      const currentFormData = form.getFieldsValue(true);
-      dispatch(updateFormData({ guardian: currentFormData }));
+      // Get current form values including files
+      const formValues = form.getFieldsValue(true);
 
-      // Determine next action based on current tab
+      // Update Redux store with current data
+      dispatch(updateFormData({ guardian: formValues }));
+
+      // Handle tab navigation
       if (activeTab === "father") {
         setActiveTab("mother");
         return;
@@ -514,19 +436,18 @@ console.log(formValues);
         return;
       }
 
-      // On final tab, validate all guardian data
-      await GuardianSchema.validate(currentFormData, {
-        abortEarly: false,
-      });
+      // Final validation before submission
+      await GuardianSchema.validate(formValues, { abortEarly: false });
 
-      // Submit the form when all guardian info is complete
-      await handleSubmit();
+      // Proceed to next step
+      dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
-      const first =
+      const firstError =
         err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
-      if (first)
-        form.scrollToField(first, { behavior: "smooth", block: "center" });
+      if (firstError) {
+        form.scrollToField(firstError, { behavior: "smooth", block: "center" });
+      }
     } finally {
       smoothToTop();
     }
@@ -539,10 +460,10 @@ console.log(formValues);
     smoothToTop();
   };
 
-  /* ───────────────────────────── render ───────────────────────────── */
+  /* ------------- render ------------- */
   return (
     <div className="flex flex-col h-full">
-      {/* sticky segmented control */}
+      {/* segmented control */}
       <div className="sticky top-0 z-20 pt-1 pb-2 bg-white shadow-sm">
         <Segmented
           size="large"
@@ -629,8 +550,9 @@ console.log(formValues);
                   onClick={handleNext}
                   type="primary"
                   size="large"
-                  loading={isLoading || isSubmitting}
-                  className="!border-none !text-white font-semibold rounded-md px-6 py-2 transition-all duration-200 ease-in-out"
+                  loading={isCheckingStudent}
+                  className="!border-none !text-white font-semibold rounded-md px-6 py-2
+                             transition-all duration-200 ease-in-out"
                   style={{ backgroundImage: gradient }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.backgroundImage = darkerGradient)

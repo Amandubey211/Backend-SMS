@@ -16,8 +16,8 @@ import CompactIconSelect from "../Components/CompactIconSelect";
 import CompactPhoneInputWithWhatsApp from "../Components/CompactPhoneInputWithWhatsApp ";
 
 import {
-  NATIONALITY_OPTIONS,
   RELIGION_OPTIONS,
+  COUNTRY_OPTIONS,
 } from "../Configs/selectOptionsConfig";
 
 const ParentGuardianInfo = () => {
@@ -99,7 +99,7 @@ const ParentGuardianInfo = () => {
                 tooltip="Father's Nationality"
                 placeholder="Nationality"
                 allowCustom
-                options={NATIONALITY_OPTIONS}
+                options={COUNTRY_OPTIONS}
               />
             </Col>
             <Col xs={24} md={8}>
@@ -234,7 +234,7 @@ const ParentGuardianInfo = () => {
                 tooltip="Mother's Nationality"
                 allowCustom
                 placeholder="Nationality"
-                options={NATIONALITY_OPTIONS}
+                options={COUNTRY_OPTIONS}
               />
             </Col>
             <Col xs={24} md={8}>

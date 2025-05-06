@@ -33,6 +33,11 @@ import {
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 import { CandidateSchema } from "../Utils/validationSchemas";
 import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
+import {
+  COUNTRY_OPTIONS,
+  NATIVE_LANGUAGE_OPTIONS,
+  RELIGION_OPTIONS,
+} from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 
 const { Option } = Select;
 /* ☎️ reusable ------------------------------------------------------ */
@@ -173,13 +178,13 @@ const CandidateInfo = ({ formData }) => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="md:w-[40%]">
             <CustomUploadCard
-              name="candidatePicture"
+              name="profile"
               label="Candidate Photo"
-              form={form}
+              form={form} // Pass the form prop
               recommendedSize="300x400"
               width="w-full"
               height="h-48"
-              aspectRatio="aspect-square"
+              aspectRatio={1}
             />
           </div>
           <div className="md:w-[60%] grid gap-3">
@@ -193,7 +198,10 @@ const CandidateInfo = ({ formData }) => {
                 prefix={<UserOutlined />}
               />
             </Form.Item>
-            <Form.Item name="middleName">
+            <Form.Item
+              name="middleName"
+              rules={[{ required: true, message: "Required" }]}
+            >
               <Input
                 size="large"
                 placeholder="Middle Name"
@@ -321,15 +329,14 @@ const CandidateInfo = ({ formData }) => {
               label="Nationality"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select size="large" placeholder="Nationality">
-                {[
-                  "qatari",
-                  "egyptian",
-                  "indian",
-                  "pakistani",
-                  "bangladeshi",
-                ].map((n) => (
-                  <Option key={n}>{n}</Option>
+              <Select
+                size="large"
+                placeholder="Nationality"
+                allowClear
+                showSearch
+              >
+                {COUNTRY_OPTIONS.map((n) => (
+                  <Option key={n.value}>{n.label}</Option>
                 ))}
               </Select>
             </Form.Item>
@@ -344,15 +351,9 @@ const CandidateInfo = ({ formData }) => {
               label="Religion"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select size="large" placeholder="Religion">
-                {[
-                  "Islam",
-                  "Christianity",
-                  "Hinduism",
-                  "Buddhism",
-                  "Judaism",
-                ].map((r) => (
-                  <Option key={r}>{r}</Option>
+              <Select size="large" placeholder="Religion" allowClear showSearch>
+                {RELIGION_OPTIONS.map((r) => (
+                  <Option key={r.value}>{r.label}</Option>
                 ))}
               </Select>
             </Form.Item>
@@ -363,9 +364,14 @@ const CandidateInfo = ({ formData }) => {
               label="Native Language"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select size="large" placeholder="Native Language">
-                {["arabic", "english", "other"].map((l) => (
-                  <Option key={l}>{l}</Option>
+              <Select
+                size="large"
+                placeholder="Native Language"
+                allowClear
+                showSearch
+              >
+                {NATIVE_LANGUAGE_OPTIONS.map((nl) => (
+                  <Option key={nl.value}>{nl.label}</Option>
                 ))}
               </Select>
             </Form.Item>

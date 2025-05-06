@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Table, Input, Tag, Select, Tooltip } from "antd";
+import { Table, Input, Tag, Select, Tooltip, Modal } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { CopyOutlined, SearchOutlined } from "@ant-design/icons";
 import { cancelStudentFee, deleteStudentFees, fetchAllStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FaFileInvoice, FaHistory } from "react-icons/fa";
+import { FaFileExport, FaFileInvoice, FaHistory } from "react-icons/fa";
 import { MdCancel, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import RecentInvoiceTemplate from "../../../../Utils/FinanceTemplate/RecentInvoiceTemplate";
 import { downloadPDF } from "../../../../Utils/xl";
 import toast from "react-hot-toast";
-
+import * as XLSX from "xlsx";
 const SummaryRevenueList = () => {
   const dispatch = useDispatch();
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
@@ -23,15 +23,16 @@ const SummaryRevenueList = () => {
 
   const [searchText, setSearchText] = useState("");
   const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
-
+const [status, setStatus] = useState('');
+  const [exportModel, setExportModel] = useState(false);
   useEffect(() => {
-    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize,isCancel }));
-  }, [dispatch, currentPage, computedPageSize,isCancel]);
+    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize,isCancel,status }));
+  }, [dispatch, currentPage, computedPageSize,isCancel,status]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize,isCancel }));
+    dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize,isCancel,status }));
   };
   const [selectedIds, setSelectedIds] = useState([]);
   const columns = [
@@ -112,7 +113,7 @@ const SummaryRevenueList = () => {
       },
     },
   ];
-
+  const [fileTitle, setFileTitle] = useState('');
   // Define expandable row for lineItems
   const expandedRowRender = (record) => {
     const lineItemsColumns = [
@@ -173,6 +174,55 @@ const navigate = useNavigate();
     const handleDownloadPDF = async (pdfRef, selectedInvoice) => {
         await downloadPDF(pdfRef, selectedInvoice, "Invoice")
       }
+      const downloadexcel = () => {
+        if(!fileTitle){
+          toast.error("Please Enter File Name");
+          return
+        }
+          let fileName = `${fileTitle}.xlsx`;
+          let sheet = "sheet1"
+          let formattedData = []
+          incomes?.map((row) => {
+            row.lineItems.map((li) => {
+              formattedData.push({
+                "Student Name": `${row.studentDetails?.firstName} ${row.studentDetails?.lastName}`,
+                "Class": row.studentDetails?.className,
+                Section: row.studentDetails?.sectionName,
+                Contact: row.studentDetails?.contactNumber,
+                Email: row.studentDetails?.email,
+                Date: row.createdAt?.slice(0, 10),
+                Item: li.name,
+                "Item Details": li.itemDetails,
+                "Frequency": li.frequency,
+                "Start Date": li?.startDate?.slice(0, 10) || 'N/A',
+                "End Date": li?.endDate?.slice(0, 10) || 'N/A',
+                "Due Date": li?.dueDate?.slice(0, 10) || 'N/A',
+                "Rate": li.rate,
+                "Amount": li.amount,
+                "Quantity": li.quanity,
+                "Tax": li.tax,
+                "Discount Type": li.discountType,
+                "Discount": li.discount,
+                "Penalty": li.penalty_amount,
+                "Paid Amount": li.paid_amount,
+                "Remaining Amount": li.remaining_amount,
+                "Final Amount": li.final_amount
+              })
+            })
+          }
+          );
+      
+          // Step 3: Create a worksheet
+          const worksheet = XLSX.utils.json_to_sheet(formattedData);
+      
+          // Step 4: Create a workbook
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, sheet);
+      
+          // Step 5: Write the workbook directly to file
+          XLSX.writeFile(workbook, fileName); // Automatically triggers the file download
+      
+        }
   return (
     <Layout title="Finance | Student Fees List">
       <AdminDashLayout>
@@ -187,6 +237,16 @@ const navigate = useNavigate();
             allowClear
             style={{ width: 300, marginBottom: 16 }}
           />
+          <Select
+                className="px-1 w-[10rem] mb-4"
+                value={status}
+                onChange={(value) => setStatus(value)}
+                placeholder="Select Status"
+              >
+                <Select.Option value=''>All</Select.Option>
+                <Select.Option value='Paid'>Paid</Select.Option>
+                <Select.Option value='Unpaid'>Unpaid</Select.Option>
+              </Select>
            <Select
                 className="px-1 w-[10rem] mb-4"
                 value={isCancel}
@@ -199,6 +259,7 @@ const navigate = useNavigate();
               </div>
           <div className="flex flex-row gap-3">
             {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>dispatch(deleteStudentFees((selectedIds)))}>Delete <MdDeleteOutline /></button>}
+                <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => { setExportModel(true) }}><FaFileExport /> Export</button>
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/studentfees/add/form")}>Add New Fees</button>
           </div>
          </div>
@@ -218,22 +279,38 @@ const navigate = useNavigate();
               total: totalRecords,
               pageSize: computedPageSize,
               showSizeChanger: true, // Enable size changer
-              pageSizeOptions: ["5", "10", "20", "50"], // Define page size options
+              pageSizeOptions: ["5", "10", "20", "50","100","200","500"], // Define page size options
               size: "small",
               showTotal: () =>
                 `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
               onChange: (page, pageSize) => {
-                dispatch(fetchAllStudentFee({ page, search: searchText, limit:pageSize,isCancel }));
+                dispatch(fetchAllStudentFee({ page, search: searchText, limit:pageSize,isCancel,status }));
               },
               onShowSizeChange: (current, size) => {
                 setComputedPageSize(size); // Update local state
-                dispatch(fetchAllStudentFee({ page: 1, search: searchText, limit: size,isCancel}));
+                dispatch(fetchAllStudentFee({ page: 1, search: searchText, limit: size,isCancel,status}));
               },
             }}
             rowKey="_id"
             loading={loading}
           />
         </div>
+        <Modal
+          title="Export Data"
+          visible={exportModel}
+          onOk={() => downloadexcel()}
+          onCancel={() => setExportModel(false)}
+          okText="Export"
+          cancelText="Cancel"
+        > 
+        <div className="flex flex-row gap-2 items-center ">
+        <Input placeholder="File Name.." className="w-[18rem]" onChange={(e)=>setFileTitle(e.target.value)}/><span className="text-lg">.xlsx</span>
+        </div>
+        
+          <p>Only the data that matches the filters you have applied will be exported.</p>
+          <p>Export is limited to the current page based on the selected page limit.</p>
+
+        </Modal>
         {isInvoiceVisible && selectedInvoice && (
                       <div className="fixed inset-0 z-50 flex items-center justify-center">
                         {/* Full-screen blur background */}

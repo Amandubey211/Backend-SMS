@@ -92,7 +92,7 @@ const AccountingSection = () => {
     const groups = {};
     fees.forEach((fee) => {
       const childName = fee.childName || "Unknown Child";
-      // Always initialize the child entry if not present
+      
       if (!groups[childName]) {
         groups[childName] = 0;
       }
