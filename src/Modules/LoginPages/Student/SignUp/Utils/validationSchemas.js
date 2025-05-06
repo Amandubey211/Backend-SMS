@@ -135,8 +135,9 @@ export const ConsentSchema = yup.object({});
 
 export const stepSchemas = [
   SchoolSchema,
-  GuardianSchema,
+
   CandidateSchema,
+  GuardianSchema,
   LanguagePreferenceSchema,
   AcademicSchema,
   AddressSchema,

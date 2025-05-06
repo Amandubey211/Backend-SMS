@@ -221,6 +221,7 @@ export const registerStudentDetails = createAsyncThunk(
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
+      console.log(formData,"formDataformData")
       const endpoint = `/student/register/student?formStatus=submitted`;
 
       const fd = new FormData();
