@@ -104,6 +104,23 @@ export const AcademicSchema = yup.object({
   sourceOfFee: yup.string().required("Source of fee is required"),
 });
 
+export const LanguagePreferenceSchema = yup.object().shape({
+  secondLanguage: yup
+    .array()
+    .min(1, "Please select at least one second language")
+    .required("Required"),
+  thirdLanguage: yup
+    .array()
+    .min(1, "Please select at least one third language")
+    .required("Required"),
+  valueEducation: yup
+    .array()
+    .min(1, "Please select at least one value education")
+    .required("Required"),
+  isLeftHanded: yup.boolean().default(false),
+  medicalCondition: yup.string().nullable(),
+});
+
 export const AddressSchema = yup.object({
   residenceType: yup.string().required(),
   unitNumber: yup.string().required(),
@@ -120,6 +137,7 @@ export const stepSchemas = [
   SchoolSchema,
   GuardianSchema,
   CandidateSchema,
+  LanguagePreferenceSchema,
   AcademicSchema,
   AddressSchema,
   DocsSchema,

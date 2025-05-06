@@ -233,12 +233,15 @@ const DocumentsUpload = ({ formData }) => {
                           </Upload>
                         ) : (
                           <div className="flex items-center justify-between w-full border border-gray-300 bg-blue-50 rounded-r-[2px] px-3">
-                            <span className="flex-1 text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">
-                              {uploadedFile.name}{" "}
-                              <Tag color="blue">
+                            <div className="flex items-center max-w-full">
+                              <span className="flex-1 min-w-0 text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">
+                                {uploadedFile.name}
+                              </span>
+                              <Tag color="blue" className="ms-5">
                                 {(uploadedFile.size / 1024).toFixed(2)} KB
                               </Tag>
-                            </span>
+                            </div>
+
                             <Space>
                               <Tooltip title="Preview">
                                 <Button

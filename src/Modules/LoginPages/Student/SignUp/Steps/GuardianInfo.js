@@ -30,22 +30,15 @@ import {
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
 import { GuardianSchema } from "../Utils/validationSchemas";
+import {
+  COUNTRY_OPTIONS,
+  LANGUAGE_OPTIONS,
+  RELIGION_OPTIONS,
+} from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 
 const { Option } = Select;
 
 /* ─── static options ─── */
-const religionOptions = [
-  { label: "Islam", value: "Islam" },
-  { label: "Christianity", value: "Christianity" },
-  { label: "Hinduism", value: "Hinduism" },
-  { label: "Buddhism", value: "Buddhism" },
-  { label: "Judaism", value: "Judaism" },
-];
-const nationalityOptions = [
-  { label: "Qatari", value: "qatari" },
-  { label: "Egyptian", value: "egyptian" },
-  { label: "Indian", value: "indian" },
-];
 
 /* ─── phone + WhatsApp toggle ─── */
 const PhoneField = ({
@@ -226,7 +219,7 @@ const GuardianInfo = ({ formData }) => {
         <Col xs={24} md={12}>
           <Form.Item name={[p, "religion"]} label="Religion" className="mb-4">
             <Select size="large" placeholder="Select Religion">
-              {religionOptions.map((o) => (
+              {RELIGION_OPTIONS.map((o) => (
                 <Option key={o.value}>{o.label}</Option>
               ))}
             </Select>
@@ -239,7 +232,7 @@ const GuardianInfo = ({ formData }) => {
             className="mb-4"
           >
             <Select size="large" placeholder="Select Nationality">
-              {nationalityOptions.map((o) => (
+              {COUNTRY_OPTIONS.map((o) => (
                 <Option key={o.value}>{o.label}</Option>
               ))}
             </Select>
