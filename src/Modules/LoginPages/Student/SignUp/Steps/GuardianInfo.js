@@ -128,11 +128,14 @@ const GuardianInfo = ({ formData }) => {
 
   const [activeTab, setActiveTab] = useState("father");
 
-  /* hydrate draft */
+  /* Hydrate form with initial data */
   useEffect(() => {
     if (!formData) return;
-    console.log(formData, "formDataformData");
+
+    // Create a deep copy and handle file objects properly
     const sanitized = JSON.parse(JSON.stringify(formData));
+
+    // Convert phone numbers to strings
     [
       "fatherInfo.cell1",
       "fatherInfo.cell2",
@@ -146,12 +149,13 @@ const GuardianInfo = ({ formData }) => {
         curr = curr[parts[i]] ||= {};
       }
       const leaf = parts.pop();
-      if (curr[leaf] !== undefined && curr[leaf] !== null)
+      if (curr[leaf] !== undefined && curr[leaf] !== null) {
         curr[leaf] = curr[leaf].toString();
+      }
     });
+
     form.setFieldsValue(sanitized);
   }, [formData, form]);
-
   /* auto scroll on tab change */
   useEffect(() => {
     if (activeTab === "mother")
@@ -207,11 +211,13 @@ const GuardianInfo = ({ formData }) => {
         </Col>
         <Col xs={24} md={12}>
           <Form.Item name={[p, "idExpiry"]} label="ID Expiry" className="mb-4">
-            {/* <DatePicker
+            <DatePicker
+              disabled
               size="large"
               className="w-full"
               placeholder="ID Expiry"
-            /> */}
+              format="DD/MM/YYYY"
+            />
           </Form.Item>
         </Col>
       </Row>
@@ -306,15 +312,18 @@ const GuardianInfo = ({ formData }) => {
       </Divider>
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <div className="md:w-[35%]">
-          <CustomUploadCard
-            name="fatherPhoto"
-            label="Father Photo"
-            form={form}
-            recommendedSize="300x400"
-            width="w-full"
-            height="h-40"
-            aspectRatio="aspect-square"
-          />
+          <Form.Item name={["fatherInfo", "photo"]} noStyle>
+            <CustomUploadCard
+              name={["fatherInfo", "photo"]}
+              label="Father Photo"
+              form={form}
+              recommendedSize="300x400"
+              width="w-full"
+              height="h-40"
+              aspectRatio="aspect-square"
+              enableCrop={false}
+            />
+          </Form.Item>
         </div>
         <div className="md:w-[65%]">{renderNameFields("fatherInfo")}</div>
       </div>
@@ -330,15 +339,18 @@ const GuardianInfo = ({ formData }) => {
       </Divider>
       <div className="flex flex-col md:flex-row gap-4 mb-4">
         <div className="md:w-[35%]">
-          <CustomUploadCard
-            name="motherPhoto"
-            label="Mother Photo"
-            form={form}
-            recommendedSize="400x500"
-            width="w-full"
-            height="h-40"
-            aspectRatio="aspect-square"
-          />
+          <Form.Item name={["motherInfo", "photo"]} noStyle>
+            <CustomUploadCard
+              name={["motherInfo", "photo"]}
+              label="Mother Photo"
+              form={form}
+              recommendedSize="400x500"
+              width="w-full"
+              height="h-40"
+              aspectRatio="aspect-square"
+              enableCrop={false}
+            />
+          </Form.Item>
         </div>
         <div className="md:w-[65%]">{renderNameFields("motherInfo")}</div>
       </div>
@@ -405,10 +417,16 @@ const GuardianInfo = ({ formData }) => {
 
   const handleNext = async () => {
     try {
+      // First validate all fields
       await form.validateFields();
-      const currentFormData = form.getFieldsValue(true);
-      dispatch(updateFormData({ guardian: currentFormData }));
 
+      // Get current form values including files
+      const formValues = form.getFieldsValue(true);
+
+      // Update Redux store with current data
+      dispatch(updateFormData({ guardian: formValues }));
+
+      // Handle tab navigation
       if (activeTab === "father") {
         setActiveTab("mother");
         return;
@@ -418,15 +436,18 @@ const GuardianInfo = ({ formData }) => {
         return;
       }
 
-      await GuardianSchema.validate(currentFormData, { abortEarly: false });
-      /* final tab finished – go to next step */
+      // Final validation before submission
+      await GuardianSchema.validate(formValues, { abortEarly: false });
+
+      // Proceed to next step
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
-      const first =
+      const firstError =
         err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
-      if (first)
-        form.scrollToField(first, { behavior: "smooth", block: "center" });
+      if (firstError) {
+        form.scrollToField(firstError, { behavior: "smooth", block: "center" });
+      }
     } finally {
       smoothToTop();
     }

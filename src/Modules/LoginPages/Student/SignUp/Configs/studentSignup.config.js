@@ -15,7 +15,7 @@ export const stepMeta = [
     title: "Candidate",
     subtitle: "Student personal details",
     image:
-      "https://static.vecteezy.com/system/resources/previews/036/123/021/large_2x/account-3d-illustration-icon-png.png",
+      "https://static.vecteezy.com/system/resources/previews/036/123/004/large_2x/account-3d-illustration-icon-png.png",
     captionTitle: "About the student",
     captionText: "Tell us about the applicant",
   },
