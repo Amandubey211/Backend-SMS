@@ -126,7 +126,7 @@ export const AddressSchema = yup.object({
   unitNumber: yup.string().required(),
   buildingNumber: yup.string().required(),
   streetName: yup.string().required(),
-  zoneNumber: yup.number().typeError("Zone is required").required(),
+  // zoneNumber: yup.number().typeError("Zone is required").required(),
   city: yup.string().required(),
   transportRequired: yup.boolean(),
 });

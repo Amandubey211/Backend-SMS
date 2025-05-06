@@ -3,7 +3,7 @@ import { Modal, Button, message, Slider, Row, Col } from "antd";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { GrRotateRight, GrRotateLeft } from "react-icons/gr";
-import { PiCropLight, PiFlipHorizontalLight } from "react-icons/pi";
+import { PiCropLight, PiFlipHorizontalLight, PiEyeLight } from "react-icons/pi";
 
 const CustomUploadCard = ({
   name,
@@ -13,6 +13,7 @@ const CustomUploadCard = ({
   width = "w-full",
   height = "h-52",
   aspectRatio = 1,
+  enableCrop = true, // New prop to enable/disable crop functionality
 }) => {
   const [currentFile, setCurrentFile] = useState(null);
   const [localPreview, setLocalPreview] = useState(null);
@@ -56,11 +57,13 @@ const CustomUploadCard = ({
     e.stopPropagation();
     if (localPreview) {
       setPreviewVisible(true);
-      setCrop({
-        unit: "%",
-        width: 100,
-        aspect: aspectRatio,
-      });
+      if (enableCrop) {
+        setCrop({
+          unit: "%",
+          width: 100,
+          aspect: aspectRatio,
+        });
+      }
     }
   };
 
@@ -70,6 +73,11 @@ const CustomUploadCard = ({
   };
 
   const handleCropSave = () => {
+    if (!enableCrop) {
+      setPreviewVisible(false);
+      return;
+    }
+
     if (
       !completedCrop ||
       !completedCrop.width ||
@@ -103,13 +111,15 @@ const CustomUploadCard = ({
 
   useEffect(() => {
     if (
+      !enableCrop ||
       !completedCrop ||
       !completedCrop.width ||
       !completedCrop.height ||
       !previewCanvasRef.current ||
       !imgRef.current
-    )
+    ) {
       return;
+    }
 
     const canvas = previewCanvasRef.current;
     const image = imgRef.current;
@@ -141,7 +151,7 @@ const CustomUploadCard = ({
       completedCrop.height
     );
     ctx.restore();
-  }, [completedCrop, rotation, flipHorizontal]);
+  }, [completedCrop, rotation, flipHorizontal, enableCrop]);
 
   return (
     <>
@@ -167,7 +177,11 @@ const CustomUploadCard = ({
               className="absolute top-2 left-2 cursor-pointer"
               onClick={handlePreview}
             >
-              <PiCropLight style={{ fontSize: 24, color: "#fff" }} />
+              {enableCrop ? (
+                <PiCropLight style={{ fontSize: 24, color: "#fff" }} />
+              ) : (
+                <PiEyeLight style={{ fontSize: 24, color: "#fff" }} />
+              )}
             </div>
           </>
         ) : (
@@ -194,68 +208,110 @@ const CustomUploadCard = ({
       <Modal
         open={previewVisible}
         footer={null}
+        centered
         onCancel={() => setPreviewVisible(false)}
-        title="Edit Image"
+        title={enableCrop ? "Edit Image" : "View Image"}
         width={1000}
       >
         <Row gutter={24}>
-          <Col md={12}>
-            <h4>Crop Image</h4>
-            <ReactCrop
-              crop={crop}
-              onChange={(c) => setCrop(c)}
-              onComplete={(c) => setCompletedCrop(c)}
-              onImageLoaded={handleImageLoaded}
-              aspect={aspectRatio}
-            >
-              <img
-                ref={imgRef}
-                src={localPreview}
-                alt="Crop Source"
-                style={{
-                  maxWidth: "100%",
-                  transform: `rotate(${rotation}deg) scaleX(${
-                    flipHorizontal ? -1 : 1
-                  })`,
-                }}
-              />
-            </ReactCrop>
-
-            <div className="flex items-center justify-between mt-3">
-              <div className="flex space-x-2">
-                <Button icon={<GrRotateLeft />} onClick={() => rotateImage(-90)} />
-                <Button icon={<GrRotateRight />} onClick={() => rotateImage(90)} />
+          <Col md={enableCrop ? 12 : 24}>
+            <h4>{enableCrop ? "Crop Image" : "Image Preview"}</h4>
+            {enableCrop ? (
+              <ReactCrop
+                crop={crop}
+                onChange={(c) => setCrop(c)}
+                onComplete={(c) => setCompletedCrop(c)}
+                onImageLoaded={handleImageLoaded}
+                aspect={aspectRatio}
+              >
+                <img
+                  ref={imgRef}
+                  src={localPreview}
+                  alt="Crop Source"
+                  style={{
+                    maxWidth: "100%",
+                    transform: `rotate(${rotation}deg) scaleX(${
+                      flipHorizontal ? -1 : 1
+                    })`,
+                  }}
+                />
+              </ReactCrop>
+            ) : (
+              <div className="border p-2 rounded-md">
+                <img
+                  src={localPreview}
+                  alt="Preview"
+                  style={{
+                    maxWidth: "100%",
+                    transform: `rotate(${rotation}deg) scaleX(${
+                      flipHorizontal ? -1 : 1
+                    })`,
+                  }}
+                />
               </div>
-              <Button icon={<PiFlipHorizontalLight />} onClick={toggleFlip} />
-            </div>
+            )}
 
-            <Slider
-              min={0}
-              max={360}
-              value={rotation}
-              onChange={setRotation}
-              marks={{ 0: "0°", 90: "90°", 180: "180°", 270: "270°" }}
-              className="mt-4"
-            />
+            {enableCrop && (
+              <>
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex space-x-2">
+                    <Button
+                      icon={<GrRotateLeft />}
+                      onClick={() => rotateImage(-90)}
+                      className="text-lg font-semibold bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    >
+                      Rotate Left
+                    </Button>
+                    <Button
+                      icon={<GrRotateRight />}
+                      onClick={() => rotateImage(90)}
+                      className="text-lg font-semibold bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    >
+                      Rotate Right
+                    </Button>
+                  </div>
+                  <Button
+                    icon={<PiFlipHorizontalLight />}
+                    onClick={toggleFlip}
+                    className="text-lg font-semibold bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                  >
+                    Flip
+                  </Button>
+                </div>
+
+                <Slider
+                  min={0}
+                  max={360}
+                  value={rotation}
+                  onChange={setRotation}
+                  marks={{ 0: "0°", 90: "90°", 180: "180°", 270: "270°" }}
+                  className="mt-4"
+                />
+              </>
+            )}
           </Col>
 
-          <Col md={12}>
-            <h4>Preview</h4>
-            <div className="border p-2 rounded-md flex items-center justify-center min-h-[200px]">
-              {completedCrop ? (
-                <canvas ref={previewCanvasRef} style={{ maxWidth: "100%" }} />
-              ) : (
-                <div className="text-gray-400">Crop area will appear here</div>
-              )}
-            </div>
-            <Button
-              type="primary"
-              className="mt-4 w-full"
-              onClick={handleCropSave}
-            >
-              Save Cropped Image
-            </Button>
-          </Col>
+          {enableCrop && (
+            <Col md={12}>
+              <h4>Preview</h4>
+              <div className="border p-2 rounded-md flex items-center justify-center min-h-[200px]">
+                {completedCrop ? (
+                  <canvas ref={previewCanvasRef} style={{ maxWidth: "100%" }} />
+                ) : (
+                  <div className="text-gray-400">
+                    Crop area will appear here
+                  </div>
+                )}
+              </div>
+              <Button
+                type="primary"
+                className="mt-4 w-full bg-blue-500 text-white hover:bg-blue-600"
+                onClick={handleCropSave}
+              >
+                Save Cropped Image
+              </Button>
+            </Col>
+          )}
         </Row>
       </Modal>
     </>

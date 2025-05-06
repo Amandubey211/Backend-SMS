@@ -159,10 +159,36 @@ export const verifyStudentOtp = createAsyncThunk(
         schoolId,
         otp,
       });
-      toast.success("OTP verified");
-      return res;
+
+      if (res.success) {
+        // Only proceed if OTP is verified successfully
+        toast.success(res.message || "OTP Verified");
+
+        // // Fetch the draft or process accordingly
+        // const { payload } = await dispatch(
+        //   fetchStudentDraft({ email, schoolId })
+        // );
+
+        // if (payload?.success && payload.exists) {
+        //   dispatch(updateFormData(mapDraft(payload.data)));
+        //   message.success("Existing application found and pre‑filled.");
+        // } else {
+        //   dispatch(updateFormData({ school: { ...res.data, isVerified: true } }));
+        //   message.success("Email verified successfully.");
+        // }
+
+        // dispatch(setEmailVerified(email));
+        // saveCache({ ...res.data, isVerified: true });
+
+        return res; // Proceed to the next step or any other actions
+      } else {
+        // Handle failure case for invalid OTP
+        toast.error(res.message || "Invalid OTP");
+        throw new Error(res.message || "OTP Verification Failed");
+      }
     } catch (err) {
-      toast.error("Invalid OTP");
+      // Handle errors gracefully
+      toast.error("OTP verification failed. Please try again.");
       return handleError(err, dispatch, rejectWithValue);
     }
   }
@@ -221,7 +247,7 @@ export const registerStudentDetails = createAsyncThunk(
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
-      console.log(formData,"formDataformData")
+      console.log(formData, "formDataformData");
       const endpoint = `/student/register/student?formStatus=submitted`;
 
       const fd = new FormData();

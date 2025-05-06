@@ -180,11 +180,11 @@ const CandidateInfo = ({ formData }) => {
             <CustomUploadCard
               name="candidatePicture"
               label="Candidate Photo"
-              form={form}
+              form={form} // Pass the form prop
               recommendedSize="300x400"
               width="w-full"
               height="h-48"
-              aspectRatio="aspect-square"
+              aspectRatio={1}
             />
           </div>
           <div className="md:w-[60%] grid gap-3">
