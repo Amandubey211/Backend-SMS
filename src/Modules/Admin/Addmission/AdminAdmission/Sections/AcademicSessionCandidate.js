@@ -23,8 +23,7 @@ import { useField } from "formik";
 import LanguagePreferences from "./LanguagePreferences";
 import {
   GENDER_OPTIONS,
-  PLACE_OF_BIRTH_OPTIONS,
-  NATIONALITY_OPTIONS,
+  COUNTRY_OPTIONS,
   RELIGION_OPTIONS,
   NATIVE_LANGUAGE_OPTIONS,
   PRIMARY_CONTACT_OPTIONS,
@@ -125,7 +124,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
   const [LANGUAGE_OPTIONS, setLANGUAGE_OPTIONS] = useState([]);
   useEffect(() => {
     dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
-      const { languages = [], valueEducation = []} = res.payload?.data || {};
+      const { languages = [], valueEducation = [] } = res.payload?.data || {};
 
       if (languages?.length > 0) {
         let la = languages.map((i) => ({ label: i, value: i }));
@@ -286,7 +285,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Place of Birth"
                 placeholder="Place of Birth"
-                options={PLACE_OF_BIRTH_OPTIONS}
+                options={COUNTRY_OPTIONS}
               />
             </div>
             <div className="flex-1">
@@ -295,7 +294,7 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 icon={<GlobalOutlined />}
                 tooltip="Nationality"
                 placeholder="Nationality"
-                options={NATIONALITY_OPTIONS}
+                options={COUNTRY_OPTIONS}
                 allowCustom
                 ref={(el) =>
                   (formRefs.current["candidateInformation.nationality"] = el)

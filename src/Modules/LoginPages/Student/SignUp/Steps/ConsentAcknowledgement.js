@@ -30,7 +30,7 @@ const ConsentAcknowledgement = ({ formData }) => {
 
   /* helper: download receipt */
   const handleDownload = () => {
-    message.success("Download link is not implemented yet.");
+    message.success("The download feature will be available soon.");
   };
 
   /* handle back navigation */

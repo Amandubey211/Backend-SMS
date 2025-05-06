@@ -9,17 +9,13 @@ import {
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 import { AddressSchema } from "../Utils/validationSchemas";
 import { setYupErrorsToAnt } from "../Utils/yupAntdHelpers";
+import { COUNTRY_OPTIONS } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 
 const { Option } = Select;
 
 /* demo data – replace with API lists when available */
 const cityList = ["Doha", "Al Wakrah", "Al Khor", "Dukhan"];
-const countryList = [
-  "Qatar",
-  "Saudi Arabia",
-  "United Arab Emirates",
-  "Bahrain",
-];
+
 const stateList = ["Doha Municipality", "Al Rayyan", "Al Daayen", "Umm Salal"];
 
 const AddressInfo = ({ formData }) => {
@@ -126,13 +122,7 @@ const AddressInfo = ({ formData }) => {
               label="Zone #"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select size="large" placeholder="Select Zone">
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((z) => (
-                  <Option key={z} value={z}>
-                    Zone {z}
-                  </Option>
-                ))}
-              </Select>
+              <Input size="large" placeholder="Enter Zone Number" allowClear />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -161,11 +151,7 @@ const AddressInfo = ({ formData }) => {
               label="City"
               rules={[{ required: true, message: "Required" }]}
             >
-              <Select size="large" placeholder="City">
-                {cityList.map((c) => (
-                  <Option key={c}>{c}</Option>
-                ))}
-              </Select>
+              <Input size="large" placeholder="City" allowClear />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
@@ -179,11 +165,7 @@ const AddressInfo = ({ formData }) => {
         <Row gutter={16}>
           <Col xs={24} md={8}>
             <Form.Item name="state" label="State / Province">
-              <Select size="large" placeholder="State / Province">
-                {stateList.map((s) => (
-                  <Option key={s}>{s}</Option>
-                ))}
-              </Select>
+              <Input size="large" placeholder="State / Province" allowClear />
             </Form.Item>
           </Col>
           <Col xs={24} md={8}>
@@ -193,8 +175,8 @@ const AddressInfo = ({ formData }) => {
               rules={[{ required: true, message: "Required" }]}
             >
               <Select size="large" placeholder="Country">
-                {countryList.map((cntry) => (
-                  <Option key={cntry}>{cntry}</Option>
+                {COUNTRY_OPTIONS.map((n) => (
+                  <Option key={n.value}>{n.label}</Option>
                 ))}
               </Select>
             </Form.Item>

@@ -15,23 +15,33 @@ import { stepSchemas } from "../../../../../Modules/LoginPages/Student/SignUp/Ut
 /* 🔸  THUNKS                                                          */
 /* ------------------------------------------------------------------ */
 
-/* helper – returns first incomplete step index */
+/**
+ * Helper function to find the first incomplete step in the form
+ * @param {object} data - The form data to validate
+ * @returns {number} Index of the first incomplete step
+ */
 const firstIncompleteStep = (data) => {
   for (let i = 0; i < stepSchemas.length; i += 1) {
     if (!stepSchemas[i].isValidSync(data, { strict: false })) return i;
   }
-  return stepSchemas.length - 1; // everything valid → last step (Submit)
+  return stepSchemas.length - 1; // Everything valid → last step (Submit)
 };
-/* ––––– helpers ––––– */
+
+/* Cache helpers */
 const cacheKey = "signupStep1";
 const loadCache = () => JSON.parse(sessionStorage.getItem(cacheKey) || "{}");
-/* ---------- helper utilities ---------- */
+
+/* Contact info helpers */
 const extractPhone = (contactObj) => contactObj?.value ?? "";
 const extractIsWA = (contactObj) => !!contactObj?.isWhatsApp;
 
-/** transforms mongo‑doc → { guardian, candidate, academic, address, documents } */
+/**
+ * Transforms MongoDB document into our form sections structure
+ * @param {object} doc - The document from MongoDB
+ * @returns {object} Structured form data
+ */
 const mapDraftToSections = (doc) => {
-  /* ----- father & mother (phones split into value + flag) ----- */
+  /* Process father & mother info (phones split into value + flag) */
   const father = doc.fatherInfo || {};
   const mother = doc.motherInfo || {};
 
@@ -51,11 +61,11 @@ const mapDraftToSections = (doc) => {
     cell2IsWhatsapp: extractIsWA(mother.cell2),
   };
 
-  /* ---------- build section payloads ---------- */
+  /* Build section payloads */
   return {
-    /* STEP‑1 (school) – untouched, already in state/cache */
+    /* STEP-1 (school) – untouched, already in state/cache */
 
-    /* Guardian tab (3‑in‑1) */
+    /* Guardian tab (3-in-1) */
     guardian: {
       fatherInfo: fatherSection,
       motherInfo: motherSection,
@@ -63,7 +73,7 @@ const mapDraftToSections = (doc) => {
         guardianName: doc.guardianName ?? "",
         guardianRelationToStudent: doc.guardianRelationToStudent ?? "",
         guardianContactNumber: doc.guardianContactNumber ?? "",
-        guardianContactIsWhatsapp: false, // backend keeps plain string; adjust if you store flag
+        guardianContactIsWhatsapp: false, // backend keeps plain string
         guardianEmail: doc.guardianEmail ?? "",
       },
     },
@@ -81,11 +91,18 @@ const mapDraftToSections = (doc) => {
       email: doc.email, // verified already
     },
 
+    /* Language & Preferences tab */
+    languagePreference: {
+      secondLanguage: doc.languagePreferences?.secondLanguage ?? [],
+      thirdLanguage: doc.languagePreferences?.thirdLanguage ?? [],
+      valueEducation: doc.languagePreferences?.valueEducation ?? [],
+      isLeftHanded: doc.languagePreferences?.isLeftHanded || false,
+      medicalCondition: doc.languagePreferences?.medicalCondition || null,
+    },
+
     /* Academic tab */
     academic: {
       ...doc.academicHistory, // previousSchoolName, previousClass, etc.
-      // applyingClass: doc.applyingClass ?? "",
-      // academicYear: doc.academicYear ?? "",
       sourceOfFee: doc.academicHistory?.sourceOfFee ?? "Parent",
     },
 
@@ -116,7 +133,7 @@ const mapDraftToSections = (doc) => {
   };
 };
 
-/* ---------- OTP ---------- */
+/* ---------- OTP Operations ---------- */
 export const sendStudentOtp = createAsyncThunk(
   "studentSignup/sendOtp",
   async ({ email, schoolId }, { rejectWithValue, dispatch }) => {
@@ -151,7 +168,7 @@ export const verifyStudentOtp = createAsyncThunk(
   }
 );
 
-/* ---------- draft helpers ---------- */
+/* ---------- Draft Operations ---------- */
 export const fetchStudentDraft = createAsyncThunk(
   "studentSignup/fetchDraft",
   async ({ email }, { rejectWithValue, dispatch }) => {
@@ -198,13 +215,12 @@ export const saveStudentDraft = createAsyncThunk(
   }
 );
 
-/* ---------- final submit ---------- */
+/* ---------- Final Submission ---------- */
 export const registerStudentDetails = createAsyncThunk(
   "studentSignup/register",
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData } = getState().common.studentSignup;
-      // const role = getUserRole(getState) || "student";
       const endpoint = `/student/register/student?formStatus=submitted`;
 
       const fd = new FormData();
@@ -249,12 +265,13 @@ export const registerStudentDetails = createAsyncThunk(
       toast.success("Application submitted successfully");
       return res.data;
     } catch (err) {
-      console.log(err, "errerr");
+      console.error("Submission failed:", err);
       toast.error("Submission failed");
       return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
+
 /* ------------------------------------------------------------------ */
 /* 🔸  STATE SHAPE                                                     */
 /* ------------------------------------------------------------------ */
@@ -263,6 +280,7 @@ const baseForm = {
   school: loadCache(),
   guardian: {},
   candidate: {},
+  languagePreference: {}, // New field for language preferences
   academic: {},
   address: {},
   documents: [],
@@ -273,7 +291,7 @@ const initialState = {
   currentStep: 0,
   formData: baseForm,
 
-  /* flags */
+  /* Status flags */
   isOtpLoading: false,
   otpError: null,
   isVerifying: false,
@@ -292,25 +310,28 @@ const studentSignupSlice = createSlice({
   name: "studentSignup",
   initialState,
   reducers: {
+    // Navigation actions
     setCurrentStep: (s, a) => {
       s.currentStep = a.payload;
     },
     nextStep: (s) => {
-      if (s.currentStep < 6) s.currentStep += 1;
+      if (s.currentStep < 7) s.currentStep += 1; // Updated to account for new step
     },
     prevStep: (s) => {
       if (s.currentStep > 0) s.currentStep -= 1;
     },
+
+    // Form data actions
     updateFormData: (s, a) => {
       s.formData = { ...s.formData, ...a.payload };
     },
     resetSignup: () => initialState,
 
-    /* email verification flags */
+    // Email verification actions
     setEmailVerified: (s, a) => {
       s.isEmailVerified = true;
       s.verifiedEmail = a.payload;
-      /* also annotate formData.school.isVerified so Yup passes */
+      // Also annotate formData.school.isVerified so Yup passes
       s.formData.school = {
         ...s.formData.school,
         isVerified: true,
@@ -355,13 +376,12 @@ const studentSignupSlice = createSlice({
         s.verificationError = a.payload;
       });
 
-    /* ---------- fetch draft ---------- */
+    /* ---------- Fetch draft ---------- */
     builder.addCase(fetchStudentDraft.fulfilled, (s, a) => {
       if (a.payload?.success && a.payload.exists) {
-        console.log(a.payload.data, "sdfsdfsdfs");
         s.formData = { ...s.formData, ...mapDraftToSections(a.payload.data) };
 
-        // 🔸  use step from DB if present, fallback to firstIncompleteStep()
+        // Use step from DB if present, fallback to firstIncompleteStep()
         const stepFromDb = a.payload.data.currentStep;
         s.currentStep =
           typeof stepFromDb === "number"
@@ -370,9 +390,7 @@ const studentSignupSlice = createSlice({
       }
     });
 
-    /* ---------- save draft (no ui‑state change) ---------- */
-
-    /* ---------- final submit ---------- */
+    /* ---------- Final submit ---------- */
     builder
       .addCase(registerStudentDetails.pending, (s) => {
         s.isRegistering = true;

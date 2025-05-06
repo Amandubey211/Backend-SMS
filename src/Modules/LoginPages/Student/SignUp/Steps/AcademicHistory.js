@@ -152,8 +152,8 @@ const AcademicHistory = ({ formData }) => {
               <Select size="large" placeholder="Select Source">
                 <Option value="parent">Parent</Option>
                 <Option value="company">Company</Option>
-                <Option value="scholarship">Scholarship</Option>
-                <Option value="other">Other</Option>
+                {/* <Option value="scholarship">Scholarship</Option> */}
+                {/* <Option value="other">Other</Option> */}
               </Select>
             </Form.Item>
           </Col>
