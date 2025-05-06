@@ -139,7 +139,7 @@ const StudentDetail = () => {
                   ) : (
                     <embed
                       src={preview}
-                      type={previewType}
+                      type={'application/pdf'}
                       className="w-full h-[80vh] object-contain"
                     />
                   )

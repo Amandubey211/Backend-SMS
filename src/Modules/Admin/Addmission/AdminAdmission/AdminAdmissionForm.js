@@ -119,8 +119,9 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const [formSubmiting,setFormSubmiting] = useState(false)
 
   const handleFormSubmit = async (values, actions) => {
-    setFormSubmiting(true)
+    toast.dismiss()
     try {
+      setFormSubmiting(true)
       for (let key of Object.keys(values?.candidateInformation || {})) {
         const val = fields?.find((field) => field?.fieldName == key);
         console.log(key, val);
@@ -524,15 +525,15 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
                 type="primary"
                 size="large"
                 htmlType="submit"
-                loading={regLoading || isSubmitting ||formSubmiting}
-                disabled={regLoading || isSubmitting ||formSubmiting}
+                loading={formSubmiting}
+                disabled={formSubmiting}
                 style={{
                   background: "linear-gradient(to right, #C83B62, #7F35CD)",
                   border: "none",
                   color: "#ffffff",
                 }}
               >
-                {regLoading || isSubmitting ||formSubmiting ? 'Loading...' : 'Save & Submit'}
+                {formSubmiting ? 'Loading...' : 'Save & Submit'}
               </Button>
             </div>
           </Form>
