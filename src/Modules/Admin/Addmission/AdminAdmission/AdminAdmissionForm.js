@@ -95,324 +95,393 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
     return missing;
   }, []);
   const [fields, setFields] = useState([]);
-    const { classes, loading: classLoading } = useSelector(
-      (state) => state.admin.class
-    );
+  const { classes, loading: classLoading } = useSelector(
+    (state) => state.admin.class
+  );
   useEffect(() => {
     dispatch(fetchAdmissionOptions(schoolId)).then((res) => {
-      const {fieldOptionality} = res.payload?.data || {};
-      if(fieldOptionality?.length > 0){
+      const { fieldOptionality } = res.payload?.data || {};
+      if (fieldOptionality?.length > 0) {
         setFields(fieldOptionality)
       }
     });
   }, []);
-  const formatLabel = (text)=> {
+  const formatLabel = (text) => {
     return text
       .split('.')
       .map(part =>
         part
-          .replace(/([A-Z])/g, ' $1') 
-          .replace(/^./, str => str.toUpperCase()) 
+          .replace(/([A-Z])/g, ' $1')
+          .replace(/^./, str => str.toUpperCase())
       )
       .join(' - ');
   }
-  const handleFormSubmit = async (values, actions) => {
-      try {
-        for (let key of Object.keys(values?.candidateInformation || {})) {
-          const val = fields?.find((field) => field?.fieldName == key);
-          console.log(key,val);
-          if(!val){
-            if(!values?.candidateInformation[key]){
-              toast.error(`Candidate ${formatLabel(key)} is requireds`);
-              return;
-            }
-          }
-          if (val?.required == true) {
-            if (!values?.candidateInformation[val.fieldName]) {
-              toast.error(`Candidate ${formatLabel(val.fieldName)} is requiredd`);
+  const [formSubmiting,setFormSubmiting] = useState(false)
 
-              return;
-            }
+  const handleFormSubmit = async (values, actions) => {
+    setFormSubmiting(true)
+    try {
+      for (let key of Object.keys(values?.candidateInformation || {})) {
+        const val = fields?.find((field) => field?.fieldName == key);
+        console.log(key, val);
+        if (!val) {
+          if (!values?.candidateInformation[key]) {
+            toast.error(`Candidate ${formatLabel(key)} is requireds`);
+            return;
           }
         }
-        for (let key of Object.keys(values?.academicSession || {})) {
-          if(!values?.academicSession[key]){
-            toast.error(`In "Academic Session" Section: ${formatLabel(key)} is required`);
+        if (val?.required == true) {
+          if (!values?.candidateInformation[val.fieldName]) {
+            toast.error(`Candidate ${formatLabel(val.fieldName)} is requiredd`);
+
             return;
+          }
         }
       }
-            if (fields?.find((field) => field?.fieldName == "secondLanguage").required &  values?.languagePrefs?.second?.length < 1) {
-              toast.error(`Second Language is required`);
-              return;
-            }
-            if (fields?.find((field) => field?.fieldName == "thirdLanguage").required &  values?.languagePrefs?.third?.length < 1) {
-              toast.error(`Third Language is required`);
-              return;
-            }
-
-           //academic history
-            for (let key of Object.keys(values?.academicHistory || {})) {
-              const val = fields?.find((field) => field?.fieldName?.toString() == key?.toString());
-              if(!val){
-                if(!values?.academicHistory[key]){
-                  toast.error(`Academic History: ${formatLabel(key)} is required`);
-                  return;
-                }
-              }
-              if (val?.required === true) {
-                if (!values?.academicHistory[val.fieldName]) {
-                  toast.error(`Academic History: ${formatLabel(val.fieldName)} is required`);
-                  return;
-                }
-              }
-            }
-            //address 
-            for (let key of Object.keys(values?.addressInformation || {})) {
-              const val = fields?.find((field) => field?.fieldName?.toString() == `address.${key.toString()}`);
-              if(!val){
-                if(!values?.addressInformation[key]){
-                  toast.error(`Address Information: ${formatLabel(key)} is required`);
-                  return;
-                }
-              }
-              if (val?.required === true) {
-                if (!values?.addressInformation[val.fieldName?.split('.')[1]]) {
-                  toast.error(`Address Information: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-    
-                  return;
-                }
-              }
-            }
-            //father info
-            for (let key of Object.keys(values?.fatherInfo || {})) {
-              const val = fields?.find((field) => field?.fieldName?.toString() == `fatherInfo.${key.toString()}`);
-              if(!val){
-                if(!values?.fatherInfo[key]){
-                  toast.error(`Father Info: ${formatLabel(key)} is required`);
-                  return;
-                }
-              }
-              if (val?.required === true) {
-                if(["cell1","cell2"].includes(key)){
-                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
-                    toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-                    return;
-                  }
-                }else{
-                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
-                    toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-                    return;
-                  }
-                }
-               
-              }
-            }
-            //mother info
-            for (let key of Object.keys(values?.motherInfo|| {})) {
-              const val = fields?.find((field) => field?.fieldName?.toString() == `motherInfo.${key.toString()}`);
-              if(!val){
-                if(!values?.motherInfo[key]){
-                  toast.error(`Mother Info: ${formatLabel(key)} is required`);
-                  return;
-                }
-              }
-              if (val?.required === true) {
-                if(["cell1","cell2"].includes(key)){
-
-                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
-                    toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-      
-                    return;
-                  }
-                }else{
-                  if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
-                    toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-      
-                    return;
-                  }
-                }
-               
-              }
-            }
-
-            const showThirdLang = () => {
-                const clsLabel =
-                classes?.find((c) => c._id == values.academicSession.class)
-                    ?.label || "";
-                const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
-                return gradeNum >= 3;
-              }
-            if ( showThirdLang & fields?.find((field) => field?.fieldName == "valueEducation").required & 
-             values?.languagePrefs?.valueEd?.length < 1) {
-              toast.error(`Value Education is required`);
-              return;
-            }
-        // Validate mandatory attachments and check for any missing files
-        const missingAttachments = validateMandatoryAttachments(values);
-        if (missingAttachments.length > 0) {
-          message.error(`Please upload: ${missingAttachments.join(", ")}`);
+      for (let key of Object.keys(values?.academicSession || {})) {
+        if (!values?.academicSession[key]) {
+          toast.error(`In "Academic Session" Section: ${formatLabel(key)} is required`);
           return;
         }
-
-        const formData = new FormData();
-
-        // Add student basic information to formData
-        formData.append("firstName", values.candidateInformation.firstName);
-        formData.append("lastName", values.candidateInformation.lastName);
-        formData.append(
-          "email",
-          values.candidateInformation.email.toLowerCase()
-        );
-        formData.append("dateOfBirth", values.candidateInformation.dob);
-        formData.append(
-          "placeOfBirth",
-          values.candidateInformation.placeOfBirth
-        );
-        formData.append("gender", values.candidateInformation.gender);
-        formData.append(
-          "contactNumber",
-          values.candidateInformation.phoneNumber
-        );
-        formData.append("religion", values.candidateInformation.religion);
-        formData.append("bloodGroup", values.candidateInformation.bloodGroup);
-        formData.append(
-          "emergencyNumber",
-          values.candidateInformation.emergencyNumber
-        );
-        formData.append("Q_Id", values.candidateInformation.studentId);
-        formData.append("nationality", values.candidateInformation.nationality);
-
-        // Add academic information to formData
-        formData.append(
-          "enrollmentStatus",
-          values.academicSession.enrollmentStats
-        );
-        formData.append("applyingClass", values.academicSession.class);
-        formData.append("schoolId", schoolId);
-        formData.append("academicYear", values.academicSession.academicYear);
-
-        // Add parent/guardian information to formData
-        formData.append(
-          "fatherName",
-          `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
-        );
-        formData.append(
-          "motherName",
-          `${values.motherInfo.firstName} ${values.motherInfo.lastName}`
-        );
-        formData.append(
-          "guardianName",
-          values.guardianInformation.guardianName
-        );
-        formData.append(
-          "guardianRelationToStudent",
-          values.guardianInformation.guardianRelationToStudent
-        );
-        formData.append(
-          "guardianContactNumber",
-          values.guardianInformation.guardianContactNumber
-        );
-        formData.append(
-          "guardianEmail",
-          values.guardianInformation.guardianEmail
-        );
-
-        // Add address information to formData
-        const addressFields = [
-          "unitNumber",
-          "buildingNumber",
-          "streetNumber",
-          "streetName",
-          "zone",
-          "compoundName",
-          "city",
-          "nearestLandmark",
-          "proposedCampus",
-          "transportRequired",
-          "postalCode",
-          "state",
-          "country",
-        ];
-
-        addressFields.forEach((field) => {
-          formData.append(
-            `permanentAddress[${field}]`,
-            values.addressInformation[field] || ""
-          );
-          formData.append(
-            `residentialAddress[${field}]`,
-            values.addressInformation[field] || ""
-          );
-        });
-
-        // Add academic history information to formData
-        formData.append(
-          "previousSchoolName",
-          values.academicHistory.previousSchoolName
-        );
-        formData.append("previousClass", values.academicHistory.previousClass);
-        formData.append("curriculum", values.academicHistory.curriculum);
-        if (values.academicHistory.lastDayAtSchool) {
-          formData.append(
-            "lastDayAtSchool",
-            values.academicHistory.lastDayAtSchool
-          );
-        }
-        formData.append(
-          "sourceOfFee",
-          values.academicHistory.sourceOfFee || "Parent"
-        );
-
-        // Add language preferences to formData
-        formData.append("secondLanguage", values.languagePrefs.second || []);
-        formData.append("thirdLanguage", values.languagePrefs.third || []);
-        formData.append("valueEducation", values.languagePrefs.valueEd || []);
-        formData.append(
-          "isLeftHanded",
-          values.languagePrefs.leftHanded ? "true" : "false"
-        );
-
-        // Add medical condition information to formData
-        if (values.medicalInfo) {
-          formData.append("medicalCondition", values.medicalInfo);
-        }
-
-        // Add profile picture if available
-        if (values.profile?.file) {
-          formData.append("profile", values.profile.file);
-        }
-        const addDynamicAttachments = (bucket) => {
-          Object.values(bucket || {}).forEach((attachment) => {
-            if (attachment?.file) {
-              formData.append(attachment.fieldName, attachment.file);
-              // Include ID if needed
-              if (attachment.fieldId) {
-                formData.append(
-                  `${attachment.fieldName}_id`,
-                  attachment.fieldId
-                );
-              }
-            }
-          });
-        };
-        // Process both mandatory and optional attachments
-        addDynamicAttachments(values.attachments?.mandatory);
-        addDynamicAttachments(values.attachments?.optional);
-
-        // Handle submission of the form data to the backend
-        dispatch(registerStudentDetails({ formData, navigate }));
-
-        // if (registrationResponse?.success) {
-        //   message.success("Registration successful!");
-        // } else {
-        //   message.error(registrationResponse?.message || "Registration failed");
-        // }
-      } catch (error) {
-        message.error(error.response?.data?.message || "Registration failed");
-      } finally {
-        actions.setSubmitting(false); // Ensure form submission state is reset
       }
+      if (fields?.find((field) => field?.fieldName == "secondLanguage").required & values?.languagePrefs?.second?.length < 1) {
+        toast.error(`Second Language is required`);
+        return;
+      }
+      if (fields?.find((field) => field?.fieldName == "thirdLanguage").required & values?.languagePrefs?.third?.length < 1) {
+        toast.error(`Third Language is required`);
+        return;
+      }
+
+      //academic history
+      for (let key of Object.keys(values?.academicHistory || {})) {
+        const val = fields?.find((field) => field?.fieldName?.toString() == key?.toString());
+        if (!val) {
+          if (!values?.academicHistory[key]) {
+            toast.error(`Academic History: ${formatLabel(key)} is required`);
+            return;
+          }
+        }
+        if (val?.required === true) {
+          if (!values?.academicHistory[val.fieldName]) {
+            toast.error(`Academic History: ${formatLabel(val.fieldName)} is required`);
+            return;
+          }
+        }
+      }
+      //address 
+      for (let key of Object.keys(values?.addressInformation || {})) {
+        const val = fields?.find((field) => field?.fieldName?.toString() == `address.${key.toString()}`);
+        if (!val) {
+          if (!values?.addressInformation[key]) {
+            toast.error(`Address Information: ${formatLabel(key)} is required`);
+            return;
+          }
+        }
+        if (val?.required === true) {
+          if (!values?.addressInformation[val.fieldName?.split('.')[1]]) {
+            toast.error(`Address Information: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+
+            return;
+          }
+        }
+      }
+      //father info
+      for (let key of Object.keys(values?.fatherInfo || {})) {
+        const val = fields?.find((field) => field?.fieldName?.toString() == `fatherInfo.${key.toString()}`);
+        if (!val) {
+          if (!values?.fatherInfo[key]) {
+            toast.error(`Father Info: ${formatLabel(key)} is required`);
+            return;
+          }
+        }
+        if (val?.required === true) {
+          if (["cell1", "cell2"].includes(key)) {
+            if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
+              toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+              return;
+            }
+          } else {
+            if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
+              toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+              return;
+            }
+          }
+
+        }
+      }
+      //mother info
+      for (let key of Object.keys(values?.motherInfo || {})) {
+        const val = fields?.find((field) => field?.fieldName?.toString() == `motherInfo.${key.toString()}`);
+        if (!val) {
+          if (!values?.motherInfo[key]) {
+            toast.error(`Mother Info: ${formatLabel(key)} is required`);
+            return;
+          }
+        }
+        if (val?.required === true) {
+          if (["cell1", "cell2"].includes(key)) {
+
+            if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
+              toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+
+              return;
+            }
+          } else {
+            if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
+              toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+
+              return;
+            }
+          }
+
+        }
+      }
+
+      const showThirdLang = () => {
+        const clsLabel =
+          classes?.find((c) => c._id == values.academicSession.class)
+            ?.label || "";
+        const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
+        return gradeNum >= 3;
+      }
+      if (showThirdLang & fields?.find((field) => field?.fieldName == "valueEducation").required &
+        values?.languagePrefs?.valueEd?.length < 1) {
+        toast.error(`Value Education is required`);
+        return;
+      }
+      // Validate mandatory attachments and check for any missing files
+      const missingAttachments = validateMandatoryAttachments(values);
+      if (missingAttachments.length > 0) {
+        message.error(`Please upload: ${missingAttachments.join(", ")}`);
+        return;
+      }
+
+      const formData = new FormData();
+
+      // Add student basic information to formData
+      formData.append("firstName", values.candidateInformation.firstName);
+      formData.append("lastName", values.candidateInformation.lastName);
+      formData.append(
+        "email",
+        values.candidateInformation.email.toLowerCase()
+      );
+      formData.append("dateOfBirth", values.candidateInformation.dob);
+      formData.append(
+        "placeOfBirth",
+        values.candidateInformation.placeOfBirth
+      );
+      formData.append("gender", values.candidateInformation.gender);
+      formData.append(
+        "contactNumber",
+        values.candidateInformation.contactNumber
+      );
+      formData.append("religion", values.candidateInformation.religion);
+      formData.append("bloodGroup", values.candidateInformation.bloodGroup);
+      formData.append(
+        "emergencyNumber",
+        values.candidateInformation.emergencyNumber
+      );
+      formData.append("Q_Id", values.candidateInformation.studentId);
+      formData.append("nationality", values.candidateInformation.nationality);
+
+      // Add academic information to formData
+      formData.append(
+        "enrollmentStatus",
+        values.academicSession.enrollmentStats
+      );
+      formData.append("applyingClass", values.academicSession.class);
+      formData.append("schoolId", schoolId);
+      formData.append("academicYear", values.academicSession.academicYear);
+
+      // Add parent/guardian information to formData
+      formData.append(
+        "fatherName",
+        `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
+      );
+      formData.append(
+        "motherName",
+        `${values.motherInfo.firstName} ${values.motherInfo.lastName}`
+      );
+      formData.append(
+        "guardianName",
+        values.guardianInformation.guardianName
+      );
+      formData.append(
+        "guardianRelationToStudent",
+        values.guardianInformation.guardianRelationToStudent
+      );
+      formData.append(
+        "guardianContactNumber",
+        values.guardianInformation.guardianContactNumber
+      );
+      formData.append(
+        "guardianEmail",
+        values.guardianInformation.guardianEmail
+      );
+
+      // Add address information to formData
+      const addressFields = [
+        "unitNumber",
+        "buildingNumber",
+        "streetNumber",
+        "streetName",
+        "zone",
+        "compoundName",
+        "city",
+        "nearestLandmark",
+        "proposedCampus",
+        "transportRequired",
+        "postalCode",
+        "state",
+        "country",
+      ];
+
+      addressFields.forEach((field) => {
+        formData.append(
+          `permanentAddress[${field}]`,
+          values.addressInformation[field] || ""
+        );
+        formData.append(
+          `residentialAddress[${field}]`,
+          values.addressInformation[field] || ""
+        );
+      });
+
+      const fatherInfoFields = [
+        "idNumber",
+        "idExpiry",
+        "firstName",
+        "middleName ",
+        "lastName",
+        "religion",
+        "nationality",
+        "company",
+        "jobTitle ",
+        "cell1",
+        "cell2",
+        "workPhone",
+        "homePhone",
+        "email1",
+        "email2"
+      ];
+
+      fatherInfoFields.forEach((field) => {
+        if (field === 'cell1' || field === 'cell2') {
+          
+          formData.append(
+            `fatherInfo[${field}]`,
+            values.fatherInfo[field]?.value || ""
+          );
+        } else {
+          formData.append(
+            `fatherInfo[${field}]`,
+            values.fatherInfo[field] || ""
+          );
+        }
+      });
+      
+      const motherInfoFields = [
+        "idNumber",
+        "idExpiry",
+        "firstName",
+        "middleName ",
+        "lastName",
+        "religion",
+        "nationality",
+        "company",
+        "jobTitle ",
+        "cell1",
+        "cell2",
+        "workPhone",
+        "homePhone",
+        "email1",
+        "email2"
+      ];
+
+      motherInfoFields.forEach((field) => {
+        if (field === 'cell1' || field === 'cell2') {
+          
+          formData.append(
+            `motherInfo[${field}]`,
+            values.motherInfo[field]?.value || "" 
+          );
+        } else {
+          formData.append(
+            `motherInfo[${field}]`,
+            values.motherInfo[field] || ""
+          );
+        }
+      });
+      // Add academic history information to formData
+      formData.append(
+        "previousSchoolName",
+        values.academicHistory.previousSchoolName
+      );
+      formData.append("previousClass", values.academicHistory.previousClass);
+      formData.append("curriculum", values.academicHistory.curriculum);
+      if (values.academicHistory.lastDayAtSchool) {
+        formData.append(
+          "lastDayAtSchool",
+          values.academicHistory.lastDayAtSchool
+        );
+      }
+      formData.append(
+        "sourceOfFee",
+        values.academicHistory.sourceOfFee || "Parent"
+      );
+
+      // Add language preferences to formData
+      formData.append("secondLanguage", values.languagePrefs.second || []);
+      formData.append("thirdLanguage", values.languagePrefs.third || []);
+      formData.append("valueEducation", values.languagePrefs.valueEd || []);
+      formData.append(
+        "isLeftHanded",
+        values.languagePrefs.leftHanded ? "true" : "false"
+      );
+
+      // Add medical condition information to formData
+      if (values.medicalInfo) {
+        formData.append("medicalCondition", values.medicalInfo);
+      }
+
+      // Add profile picture if available
+      if (values.profile?.file) {
+        formData.append("profile", values.profile.file);
+      }
+      const addDynamicAttachments = (bucket) => {
+        Object.values(bucket || {}).forEach((attachment) => {
+          if (attachment?.file) {
+            formData.append(attachment.fieldName, attachment.file);
+            // Include ID if needed
+            if (attachment.fieldId) {
+              formData.append(
+                `${attachment.fieldName}_id`,
+                attachment.fieldId
+              );
+            }
+          }
+        });
+      };
+      // Process both mandatory and optional attachments
+      addDynamicAttachments(values.attachments?.mandatory);
+      addDynamicAttachments(values.attachments?.optional);
+
+      // Handle submission of the form data to the backend
+      dispatch(registerStudentDetails({ formData, navigate }));
+
+      // if (registrationResponse?.success) {
+      //   message.success("Registration successful!");
+      // } else {
+      //   message.error(registrationResponse?.message || "Registration failed");
+      // }
+    } catch (error) {
+      message.error(error.response?.data?.message || "Registration failed");
+    } finally {
+      setFormSubmiting(false)
+      actions.setSubmitting(false); // Ensure form submission state is reset
     }
+  }
 
   return (
     <div className="bg-white rounded-md p-4">
@@ -455,15 +524,15 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
                 type="primary"
                 size="large"
                 htmlType="submit"
-                loading={regLoading || isSubmitting}
-                disabled={regLoading || isSubmitting}
+                loading={regLoading || isSubmitting ||formSubmiting}
+                disabled={regLoading || isSubmitting ||formSubmiting}
                 style={{
                   background: "linear-gradient(to right, #C83B62, #7F35CD)",
                   border: "none",
                   color: "#ffffff",
                 }}
               >
-                Save & Submit
+                {regLoading || isSubmitting ||formSubmiting ? 'Loading...' : 'Save & Submit'}
               </Button>
             </div>
           </Form>

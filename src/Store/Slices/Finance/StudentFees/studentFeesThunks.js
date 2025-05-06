@@ -17,7 +17,7 @@ import { getUserRole } from "../../../../Utils/getRoles";
 export const fetchOneStudentFee = createAsyncThunk(
   "studentFees/fetchOneStudentFee",
 
-  async (studentId, { rejectWithValue, dispatch, getState }) => {
+  async (params, { rejectWithValue, dispatch, getState }) => {
 
     try {
       
@@ -25,7 +25,7 @@ export const fetchOneStudentFee = createAsyncThunk(
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/revenue/get/student/fee/${studentId}?say=${say}`
+        `/${getRole}/revenue/get/student/fee/${params.studentId}?say=${say}`,params
       );
       return response;
     } catch (error) {

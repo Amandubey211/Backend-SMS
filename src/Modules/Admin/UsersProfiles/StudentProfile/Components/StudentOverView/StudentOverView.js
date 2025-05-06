@@ -12,8 +12,6 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 const StudentOverView = ({ student }) => {
   const { t } = useTranslation("admAccounts");
   const dispatch = useDispatch();
-  console.log(student, "sdsdf");
-
   useEffect(() => {
     dispatch(fetchAttendanceData(student?.classId));
   }, [dispatch]);
