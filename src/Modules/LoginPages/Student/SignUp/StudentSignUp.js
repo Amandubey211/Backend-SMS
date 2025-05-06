@@ -27,7 +27,6 @@ import { registerStudentDetails } from "../../../../Store/Slices/Common/User/act
 import { stepSchemas } from "./Utils/validationSchemas";
 import { message } from "antd";
 import { stepMeta } from "./Configs/studentSignup.config";
-import useGetAllSchools from "../../../../Hooks/CommonHooks/useGetAllSchool";
 
 /* -------- helpers -------- */
 const stepDoneCheckers = stepSchemas.map(
@@ -41,7 +40,6 @@ const StudentSignUp = () => {
     formData,
     isRegistering: isLoading,
   } = useSelector((s) => s.common.studentSignup);
-
 
   /* auto scroll on step change */
   useEffect(() => {
