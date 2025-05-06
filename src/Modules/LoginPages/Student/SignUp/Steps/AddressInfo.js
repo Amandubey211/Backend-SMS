@@ -1,5 +1,4 @@
-// src/pages/StudentSignUp/Steps/AddressInfo.jsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Form,
   Select,
@@ -12,7 +11,12 @@ import {
   Card,
   Tabs,
 } from "antd";
-import { FaBuilding, FaHome } from "react-icons/fa";
+import {
+  FaBuilding,
+  FaHome,
+  FaMapMarkerAlt,
+  FaStreetView,
+} from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import {
   nextStep,
@@ -31,20 +35,10 @@ const AddressInfo = ({ formData }) => {
   const [form] = Form.useForm();
   const [sameAsResidential, setSameAsResidential] = useState(false);
   const [activeTab, setActiveTab] = useState("residential");
-  const formRef = useRef(null);
 
-  // Track mounted state to prevent memory leaks
-  const mountedRef = useRef(true);
-
+  /* Hydrate on mount */
   useEffect(() => {
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-
-  /* hydrate on mount */
-  useEffect(() => {
-    if (formData && mountedRef.current) {
+    if (formData) {
       form.setFieldsValue(formData);
       setSameAsResidential(
         JSON.stringify(formData?.residentialAddress) ===
@@ -54,20 +48,19 @@ const AddressInfo = ({ formData }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [formData, form]);
 
-  /* watch residence type in both addresses */
+  /* Watch residence type in both addresses */
   const residentialResidenceType =
     Form.useWatch(["residentialAddress", "residenceType"], form) || "flat";
   const permanentResidenceType =
     Form.useWatch(["permanentAddress", "residenceType"], form) || "flat";
 
-  /* keep Redux in sync */
-  const handleValuesChange = (changedValues, allValues) => {
-    if (mountedRef.current) {
-      dispatch(updateFormData({ address: allValues }));
-    }
+  /* Keep Redux in sync */
+  const handleValuesChange = () => {
+    const values = form.getFieldsValue(true);
+    dispatch(updateFormData({ address: values }));
   };
 
-  /* handle same as residential checkbox */
+  /* Handle same as residential checkbox */
   const handleSameAsResidentialChange = (checked) => {
     setSameAsResidential(checked);
     if (checked) {
@@ -78,220 +71,214 @@ const AddressInfo = ({ formData }) => {
       // Switch to permanent tab to show the copied values
       setActiveTab("permanent");
     }
+    handleValuesChange();
   };
 
-  /* nav */
+  /* Nav */
   const handleNext = async () => {
     try {
       const vals = form.getFieldsValue(true);
       await AddressSchema.validate(vals, { abortEarly: false });
+      handleValuesChange();
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
       const first =
-        err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
+        err?.errorFields?.[0]?.name || err?.inner?.[0]?.path.split(".");
       if (first) {
         // Determine which tab contains the error
         const tabForError =
           first[0] === "permanentAddress" ? "permanent" : "residential";
         setActiveTab(tabForError);
+        form.scrollToField(first, { behavior: "smooth", block: "center" });
       }
     }
   };
-
   const handleBack = () => dispatch(prevStep());
 
   /* Address form section - reusable component */
-  const AddressSection = React.memo(({ prefix, title, residenceType }) => {
-    return (
-      <Card
-        title={
-          <div className="flex items-center gap-2">
-            {prefix === "residentialAddress" ? (
-              <FaHome className="text-xl text-gray-500" />
-            ) : (
-              <FaBuilding className="text-xl text-gray-500" />
-            )}
-            <span>{title}</span>
-          </div>
-        }
-        bordered={false}
-        className="mb-6 shadow-sm"
-        headStyle={{ borderBottom: "1px solid #f0f0f0" }}
+  const AddressSection = ({ prefix, title, residenceType }) => (
+    <Card
+      title={
+        <div className="flex items-center gap-2">
+          {prefix === "residentialAddress" ? (
+            <FaHome className="text-xl text-gray-500" />
+          ) : (
+            <FaBuilding className="text-xl text-gray-500" />
+          )}
+          <span>{title}</span>
+        </div>
+      }
+      bordered={false}
+      className="mb-6 shadow-sm"
+      headStyle={{ borderBottom: "1px solid #f0f0f0" }}
+    >
+      {/* Residence type */}
+      <Form.Item
+        name={[prefix, "residenceType"]}
+        label="Residence Type"
+        rules={[{ required: true, message: "Select residence type" }]}
       >
-        {/* residence type */}
-        <Form.Item
-          name={[prefix, "residenceType"]}
-          label="Residence Type"
-          rules={[{ required: true, message: "Select residence type" }]}
-        >
-          <Radio.Group>
-            <Radio value="flat">Flat / Villa</Radio>
-            <Radio value="house">House</Radio>
-          </Radio.Group>
-        </Form.Item>
+        <Radio.Group>
+          <Radio value="flat">Flat / Villa</Radio>
+          <Radio value="house">House</Radio>
+        </Radio.Group>
+      </Form.Item>
 
-        {/* unit / building OR house / street */}
-        <Row gutter={16}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name={[prefix, "unitNumber"]}
-              label={residenceType === "flat" ? "Unit #" : "House #"}
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Input
-                size="large"
-                placeholder={
-                  residenceType === "flat" ? "Unit Number" : "House Number"
-                }
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name={[prefix, "buildingNumber"]}
-              label={residenceType === "flat" ? "Building #" : "Street #"}
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Input
-                size="large"
-                placeholder={
-                  residenceType === "flat" ? "Building Number" : "Street Number"
-                }
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* street */}
-        <Form.Item
-          name={[prefix, "streetName"]}
-          label="Street Name"
-          rules={[{ required: true, message: "Required" }]}
-        >
-          <Input size="large" placeholder="Street Name" />
-        </Form.Item>
-
-        {/* zone */}
-        <Row gutter={16}>
-          <Col xs={24} md={12}>
-            <Form.Item name={[prefix, "zoneNumber"]} label="Zone #">
-              <Input size="large" placeholder="Enter Zone Number" allowClear />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item name={[prefix, "zoneName"]} label="Zone Name">
-              <Input size="large" placeholder="Zone Name" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* compound */}
-        <Form.Item
-          name={[prefix, "compoundType"]}
-          label="Compound / Stand‑Alone"
-        >
-          <Radio.Group>
-            <Radio value="compound">Compound</Radio>
-            <Radio value="standalone">Stand‑Alone</Radio>
-          </Radio.Group>
-        </Form.Item>
-        <Form.Item name={[prefix, "compoundName"]} label="Compound Name">
-          <Input size="large" placeholder="Compound Name (if applicable)" />
-        </Form.Item>
-
-        {/* city / landmark */}
-        <Row gutter={16}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name={[prefix, "city"]}
-              label="City"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Input size="large" placeholder="City" allowClear />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              name={[prefix, "nearestLandmark"]}
-              label="Nearest Landmark"
-            >
-              <Input size="large" placeholder="Landmark" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* state / country / postal code */}
-        <Row gutter={16}>
-          <Col xs={24} md={8}>
-            <Form.Item name={[prefix, "state"]} label="State / Province">
-              <Input size="large" placeholder="State / Province" allowClear />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={8}>
-            <Form.Item
-              name={[prefix, "country"]}
-              label="Country"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Select
-                size="large"
-                placeholder="Country"
-                showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().indexOf(input.toLowerCase()) >=
-                  0
-                }
-              >
-                {COUNTRY_OPTIONS.map((n) => (
-                  <Option key={n.value}>{n.label}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={8}>
-            <Form.Item name={[prefix, "postalCode"]} label="Postal Code">
-              <Input size="large" placeholder="Postal Code" />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* proposed campus */}
-        <Form.Item
-          name={[prefix, "proposedCampus"]}
-          label="Proposed Campus (optional)"
-        >
-          <Input size="large" placeholder="Campus" />
-        </Form.Item>
-
-        {/* For residential tab only - show same as checkbox */}
-        {prefix === "residentialAddress" && (
-          <Form.Item>
-            <div className="flex justify-end">
-              <Switch
-                checked={sameAsResidential}
-                onChange={handleSameAsResidentialChange}
-                checkedChildren="Same as Residential"
-                unCheckedChildren="Different from Residential"
-              />
-            </div>
+      {/* Unit / building OR house / street */}
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={[prefix, "unitNumber"]}
+            label={residenceType === "flat" ? "Unit #" : "House #"}
+            rules={[{ required: true, message: "Required" }]}
+          >
+            <Input
+              size="large"
+              placeholder={
+                residenceType === "flat" ? "Unit Number" : "House Number"
+              }
+            />
           </Form.Item>
-        )}
-      </Card>
-    );
-  });
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={[prefix, "buildingNumber"]}
+            label={residenceType === "flat" ? "Building #" : "Street #"}
+            rules={[{ required: true, message: "Required" }]}
+          >
+            <Input
+              size="large"
+              placeholder={
+                residenceType === "flat" ? "Building Number" : "Street Number"
+              }
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {/* Street */}
+      <Form.Item
+        name={[prefix, "streetName"]}
+        label="Street Name"
+        rules={[{ required: true, message: "Required" }]}
+      >
+        <Input size="large" placeholder="Street Name" />
+      </Form.Item>
+
+      {/* Zone */}
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item name={[prefix, "zoneNumber"]} label="Zone #">
+            <Input size="large" placeholder="Enter Zone Number" allowClear />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item name={[prefix, "zoneName"]} label="Zone Name">
+            <Input size="large" placeholder="Zone Name" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {/* Compound */}
+      <Form.Item name={[prefix, "compoundType"]} label="Compound / Stand‑Alone">
+        <Radio.Group>
+          <Radio value="compound">Compound</Radio>
+          <Radio value="standalone">Stand‑Alone</Radio>
+        </Radio.Group>
+      </Form.Item>
+      <Form.Item name={[prefix, "compoundName"]} label="Compound Name">
+        <Input size="large" placeholder="Compound Name (if applicable)" />
+      </Form.Item>
+
+      {/* City / Landmark */}
+      <Row gutter={16}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={[prefix, "city"]}
+            label="City"
+            rules={[{ required: true, message: "Required" }]}
+          >
+            <Input size="large" placeholder="City" allowClear />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={[prefix, "nearestLandmark"]}
+            label="Nearest Landmark"
+          >
+            <Input size="large" placeholder="Landmark" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {/* State / Country / Postal Code */}
+      <Row gutter={16}>
+        <Col xs={24} md={8}>
+          <Form.Item name={[prefix, "state"]} label="State / Province">
+            <Input size="large" placeholder="State / Province" allowClear />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={8}>
+          <Form.Item
+            name={[prefix, "country"]}
+            label="Country"
+            rules={[{ required: true, message: "Required" }]}
+          >
+            <Select
+              size="large"
+              placeholder="Country"
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              {COUNTRY_OPTIONS.map((n) => (
+                <Option key={n.value}>{n.label}</Option>
+              ))}
+            </Select>
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={8}>
+          <Form.Item name={[prefix, "postalCode"]} label="Postal Code">
+            <Input size="large" placeholder="Postal Code" />
+          </Form.Item>
+        </Col>
+      </Row>
+
+      {/* Proposed Campus */}
+      <Form.Item
+        name={[prefix, "proposedCampus"]}
+        label="Proposed Campus (optional)"
+      >
+        <Input size="large" placeholder="Campus" />
+      </Form.Item>
+
+      {/* For residential tab only - show same as checkbox */}
+      {prefix === "residentialAddress" && (
+        <Form.Item>
+          <div className="flex justify-end">
+            <Switch
+              checked={sameAsResidential}
+              onChange={handleSameAsResidentialChange}
+              checkedChildren="Same as Residential"
+              unCheckedChildren="Different from Residential"
+            />
+          </div>
+        </Form.Item>
+      )}
+    </Card>
+  );
 
   /* UI */
   return (
     <div className="max-w-6xl mx-auto p-4">
       <Form
         form={form}
-        ref={formRef}
         layout="vertical"
         onValuesChange={handleValuesChange}
         className="space-y-6"
-        initialValues={formData}
       >
         <Tabs
           activeKey={activeTab}
@@ -360,7 +347,7 @@ const AddressInfo = ({ formData }) => {
           </p>
         </Card>
 
-        {/* nav buttons */}
+        {/* Nav buttons */}
         <Row justify="space-between" className="mt-8">
           <Button size="large" onClick={handleBack}>
             Back
@@ -379,4 +366,4 @@ const AddressInfo = ({ formData }) => {
   );
 };
 
-export default React.memo(AddressInfo);
+export default AddressInfo;

@@ -400,7 +400,7 @@ const studentSignupSlice = createSlice({
       })
       .addCase(verifyStudentOtp.rejected, (s, a) => {
         s.isVerifying = false;
-        s.verificationError = a.payload;
+        s.verificationError = true
       });
 
     /* ---------- Fetch draft ---------- */
