@@ -7,7 +7,7 @@ const useGetClassesBySchool = (schoolId) => {
   const [error, setError] = useState(null);
 
   const fetchClasses = async () => {
-    // If no schoolId is provided, clear class list
+    // Only proceed if schoolId is available
     if (!schoolId) {
       setClassList([]);
       return;
@@ -17,7 +17,6 @@ const useGetClassesBySchool = (schoolId) => {
       const response = await getData(
         `/admin/class/school?schoolId=${schoolId}`
       );
-      // Assuming the controller returns: { status: true, data: classes }
       setClassList(response.data);
     } catch (err) {
       console.error("Error fetching classes:", err);
@@ -28,8 +27,10 @@ const useGetClassesBySchool = (schoolId) => {
   };
 
   useEffect(() => {
-    fetchClasses();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Only fetch classes when schoolId is valid
+    if (schoolId) {
+      fetchClasses();
+    }
   }, [schoolId]);
 
   return { classList, fetchClasses, loading, error };

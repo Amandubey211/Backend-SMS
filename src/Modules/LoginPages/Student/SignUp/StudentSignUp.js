@@ -19,7 +19,6 @@ import {
   nextStep,
   setCurrentStep,
   resetSignup,
-  updateFormData,
   saveStudentDraft,
   fetchStudentDraft,
 } from "../../../../Store/Slices/Common/User/actions/studentSignupSlice";
@@ -75,11 +74,11 @@ const StudentSignUp = () => {
       },
       {
         ...stepMeta[1],
-        component: <GuardianInfo formData={formData.guardian} />,
+        component: <CandidateInfo formData={formData.candidate} />,
       },
       {
         ...stepMeta[2],
-        component: <CandidateInfo formData={formData.candidate} />,
+        component: <GuardianInfo formData={formData.guardian} />,
       },
       {
         ...stepMeta[3],

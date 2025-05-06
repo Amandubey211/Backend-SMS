@@ -48,9 +48,11 @@ const SchoolSelection = ({ formData }) => {
 
   /* API hooks */
   const { fetchSchools, schoolList } = useGetAllSchools();
-  const { classList, loading: classFetchLoading } = useGetClassesBySchool(
-    formData?.schoolId
-  );
+  const {
+    classList,
+    loading: classFetchLoading,
+    fetchClasses,
+  } = useGetClassesBySchool(formData?.schoolId || formData?.schoolId?.schoolId);
 
   const selectedSchool = schoolList?.find((s) => s?._id === formData?.schoolId);
   useEffect(() => {
@@ -60,11 +62,19 @@ const SchoolSelection = ({ formData }) => {
     // Only restore from cache if verified
     if (isVerified && cached.email && cached.schoolId) {
       const merged = { ...cached, ...formData };
+      console.log(merged, "sdfsdfsddd");
       form.setFieldsValue(merged);
       dispatch(updateFormData({ school: merged }));
 
       // Automatically mark as verified in form state
       form.setFieldsValue({ isVerified: true });
+    }
+  }, []);
+  console.log(formData, "formDataformData");
+  useEffect(() => {
+    if (formData?.schoolId) {
+      fetchClasses();
+    } else {
     }
   }, []);
   /* ------------------ mount ------------------ */
@@ -126,6 +136,7 @@ const SchoolSelection = ({ formData }) => {
   /* ------------------ verify OTP ------------------ */
   const handleVerifyOtp = async () => {
     const values = form.getFieldsValue(); // { email, schoolId, … }
+    console.log(values.email);
     try {
       await dispatch(
         verifyStudentOtp({
