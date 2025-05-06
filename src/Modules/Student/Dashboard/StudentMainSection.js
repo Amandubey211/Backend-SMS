@@ -29,6 +29,7 @@ import {
   MdNotifications,
   MdOutlineSchool,
 } from "react-icons/md";
+import { fetchOneStudentFee } from "../../../Store/Slices/Finance/StudentFees/studentFeesThunks.js";
 
 const StudentMainSection = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const StudentMainSection = () => {
     tasks,
     examResults: results,
   } = useSelector((state) => state.student.studentDashboard);
-  console.log(cardData,"cardDatacardData")
+
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo
   );
@@ -54,9 +55,12 @@ const StudentMainSection = () => {
   const { studentSubjectProgress } = useSelector(
     (store) => store.admin.all_students
   );
-
+  const { totalAllAmount,paidAllAmount,categories } = useSelector(
+    (state) => state.admin.studentFees
+  );
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(userDetails?.userId));
+    dispatch(fetchOneStudentFee({studentId:userDetails?.userId }))
     dispatch(fetchDashboardDetails());
     dispatch(fetchSubjects());
     dispatch(fetchTasks());
@@ -87,8 +91,8 @@ const StudentMainSection = () => {
                   url: "/student_dash",
                 },
                 {
-                  label: "Due Fees",
-                  value: 0,
+                  label: "Unpiad Fees",
+                  value:0,
                   bgColor: "bg-red-100",
                   textColor: "text-black-500",
                   pentagonColor: "bg-red-500",
@@ -179,7 +183,7 @@ const StudentMainSection = () => {
             <div className="flex w-full h-[250px] justify-between p-2 bg-white rounded-md border hover:shadow-sm mb-4">
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
-                amount={unpaidFees || 0}
+                amount={(totalAllAmount-paidAllAmount).toFixed(2) || 0}
                 buttonText="View More"
                 buttonAction={handlePayNow}
               />

@@ -48,7 +48,7 @@ const SingleStudent = () => {
       "Course Progress": <StudentCourseProgress student={student} />,
       Information: <StudentInformationMenu student={student} />,
       Parents: <ParentsProfile student={student} />,
-      Finance: <StudentFinance student={student} />,
+      Finance: <StudentFinance studentId={student?._id} />,
       Grades: <StudentGradesAccordion student={student} />,
       Attendance: <StudentAttendance student={student} />,
       "Book Issue": <BookIssue />,
