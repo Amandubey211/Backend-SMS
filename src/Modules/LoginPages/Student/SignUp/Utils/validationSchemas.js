@@ -97,10 +97,6 @@ export const AcademicSchema = yup.object({
         : schema.strip() // strip from output when not needed
   ),
 
-  lastDayAtSchool: yup
-    .date()
-    .typeError("Last day is required") // nicer message for empty picker
-    .required("Last day is required"),
   sourceOfFee: yup.string().required("Source of fee is required"),
 });
 
@@ -126,7 +122,6 @@ export const AddressSchema = yup.object({
   unitNumber: yup.string().required(),
   buildingNumber: yup.string().required(),
   streetName: yup.string().required(),
-  // zoneNumber: yup.number().typeError("Zone is required").required(),
   city: yup.string().required(),
   transportRequired: yup.boolean(),
 });

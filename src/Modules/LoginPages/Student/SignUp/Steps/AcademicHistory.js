@@ -136,15 +136,6 @@ const AcademicHistory = ({ formData }) => {
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item
-              name="lastDayAtSchool"
-              label="Last Day at School"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              {/* <DatePicker size="large" className="w-full" /> */}
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
               name="sourceOfFee"
               label="Source of Fee"
               rules={[{ required: true, message: "Required" }]}
