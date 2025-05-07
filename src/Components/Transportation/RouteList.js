@@ -420,6 +420,7 @@ const RouteList = ({ onEdit }) => {
                                     <CreateTrip
                                       vehicle={v}
                                       route={r}
+                                      shiftId={assignment.shift._id}
                                       onClose={() =>
                                         setSidebarState({ isOpen: false })
                                       }

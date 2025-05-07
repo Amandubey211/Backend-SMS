@@ -64,6 +64,8 @@ import duration from "dayjs/plugin/duration";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import MapView from "./MapView";
 import Sidebar from "../Common/Sidebar";
+import Pagination from "../Common/pagination";
+import { useTranslation } from "react-i18next";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -105,6 +107,7 @@ const stopStatusText = {
 };
 
 const ViewTripsList = () => {
+  const {t}=useTranslation();
   const [activeTab, setActiveTab] = useState("today");
   const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState([]);
@@ -116,7 +119,7 @@ const ViewTripsList = () => {
   const [selectedTripForDetails, setSelectedTripForDetails] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isGpsOn, setIsGpsOn] = useState(false);
-  const { loading, error, vehicleWiseLogs } = useSelector(
+  const { loading, error, vehicleWiseLogs=[], pagination={} } = useSelector(
     (s) => s.transportation.tripExecutionLog
   );
 
@@ -124,9 +127,39 @@ const ViewTripsList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
+const handlePageChange = (newPage) => {
+  dispatch(
+    getTripLogsByVehicle({
+      vehicleId,
+      page: newPage,
+      limit: pagination.limit,
+      type: activeTab,
+    })
+  );
+};
+
+const handleLimitChange = (newLimit) => {
+  dispatch(
+    getTripLogsByVehicle({
+      vehicleId,
+      page: 1,
+      limit: newLimit,
+      type: activeTab,
+    })
+  );
+};
+
   useEffect(() => {
-    dispatch(getTripLogsByVehicle(vehicleId));
-  }, [vehicleId, dispatch]);
+    dispatch(
+      getTripLogsByVehicle({
+        vehicleId,
+        page: pagination?.currentPage,
+        limit: pagination?.limit,
+        type: activeTab, // "today" or "history"
+      })
+    );
+  }, [vehicleId, activeTab, dispatch]);
 
   const filteredTrips = useMemo(() => {
     let trips = vehicleWiseLogs || [];
@@ -355,6 +388,13 @@ const ViewTripsList = () => {
             <div className="text-xs text-gray-500">
               {dayjs(record.tripDate).format("MMM D, YYYY")}
             </div>
+
+            {record.shiftId && (
+              <div className="text-xs text-blue-600">
+                {record.shiftId.shiftName} <br />({record.shiftId.fromTime} -{" "}
+                {record.shiftId.toTime})
+              </div>
+            )}
           </div>
         </div>
       ),
@@ -367,9 +407,7 @@ const ViewTripsList = () => {
         <div className="flex flex-col">
           <div className="flex items-center">
             <FaClock className="mr-1 text-gray-500" />
-            <span>
-              Scheduled: {formatTime(record.stopLogs[0]?.scheduledArrival)}
-            </span>
+            <span>Scheduled: {formatTime(record.createdAt)}</span>
           </div>
           {record.startedAt && (
             <div className="flex items-center mt-1">
@@ -401,40 +439,36 @@ const ViewTripsList = () => {
       render: (_, record) => (
         <Popover
           content={
-            <div className="p-2">
-              <div className="font-medium mb-2">Route Stops</div>
-              <div className="max-h-60 overflow-y-auto">
+            <div className="p-3 w-64">
+              <div className="font-semibold text-base mb-3 border-b pb-1">
+                Route Stops
+              </div>
+              <div className="max-h-60 overflow-y-auto space-y-3 pr-1">
                 {record?.stopLogs?.map((stop, i) => (
-                  <div key={i} className="mb-2 last:mb-0">
-                    <div className="flex items-center">
-                      <MdLocationOn
-                        className={`mr-2 ${
-                          stop.status === "start_point"
-                            ? "text-green-500"
-                            : stop.status === "completed"
-                            ? "text-blue-500"
-                            : stop.status === "in_progress"
-                            ? "text-yellow-500"
-                            : "text-gray-400"
-                        }`}
-                      />
-                      <div>
-                        <div className="font-medium">
-                          {stop.stopId?.stopName || "Unknown Stop"}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {formatTime(stop.scheduledArrival)} -{" "}
-                          {formatTime(stop.scheduledDeparture)}
-                        </div>
+                  <div key={i} className="flex items-start space-x-2">
+                    <MdLocationOn
+                      className={`mt-1 text-lg ${
+                        stop.status === "start_point"
+                          ? "text-green-500"
+                          : stop.status === "completed"
+                          ? "text-blue-500"
+                          : stop.status === "in_progress"
+                          ? "text-yellow-500"
+                          : "text-gray-400"
+                      }`}
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">
+                        {stop.stopId?.stopName || "Unknown Stop"}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {formatTime(stop.scheduledArrival)} -{" "}
+                        {formatTime(stop.scheduledDeparture)}
+                      </div>
+                      <div className="text-xs italic text-gray-400 capitalize">
+                        Status: {stop.status?.replaceAll("_", " ")}
                       </div>
                     </div>
-                    {i < record.stopLogs.length - 1 && (
-                      <Divider
-                        className="my-2"
-                        dashed
-                        style={{ margin: "4px 0 4px 24px" }}
-                      />
-                    )}
                   </div>
                 ))}
               </div>
@@ -443,9 +477,9 @@ const ViewTripsList = () => {
           trigger="hover"
           placement="right"
         >
-          <div className="flex items-center cursor-pointer">
+          <div className="flex items-center cursor-pointer hover:text-blue-600">
             <MdLocationOn className="mr-1 text-red-500" />
-            <span>
+            <span className="text-sm font-medium">
               {record.stopLogs.filter((s) => s.status !== "skipped").length}/
               {record.stopLogs.length} stops
             </span>
@@ -981,7 +1015,7 @@ const ViewTripsList = () => {
                     dayjs(trip.tripDate).isSame(dayjs(), "day")
                   )}
                   rowKey="_id"
-                  // pagination={{ pageSize: 5 }}
+                  pagination={false}
                   loading={loading || confirmLoading}
                   locale={{
                     emptyText: (
@@ -1023,7 +1057,7 @@ const ViewTripsList = () => {
                     (trip) => !dayjs(trip.tripDate).isSame(dayjs(), "day")
                   )}
                   rowKey="_id"
-                  // pagination={{ pageSize: 5 }}
+                  pagination={false}
                   loading={loading}
                   locale={{
                     emptyText: (
@@ -1076,6 +1110,16 @@ const ViewTripsList = () => {
           </div>
         )}
       </Modal>
+
+      <Pagination
+      page={pagination.currentPage}
+      totalPages={pagination.totalPages}
+      totalRecords={pagination.totalItems}
+      limit={pagination.limit}
+      setPage={handlePageChange}
+      setLimit={handleLimitChange}
+      t={t}
+    />
     </div>
   );
 };

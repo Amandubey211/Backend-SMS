@@ -6,7 +6,7 @@ import { createTripLog } from "../../../../../Store/Slices/Transportation/TripEx
 
 const { Option } = Select;
 
-const CreateTrip = ({ vehicle, route, onClose }) => {
+const CreateTrip = ({ vehicle, route,shiftId, onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
 
@@ -14,6 +14,7 @@ const CreateTrip = ({ vehicle, route, onClose }) => {
     const payload = {
       vehicleId: vehicle.vehicleId,
       routeId: route.routeId, // Assuming vehicle object has routeId
+      shiftId,
       tripType: values.tripType,
       tripDate: values.date.startOf("day").toISOString(), // Convert date to 00:00:00 time
       stopLogs:
