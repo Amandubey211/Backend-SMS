@@ -52,6 +52,20 @@ export const getShiftById = createAsyncThunk(
   }
 );
 
+export const getShiftByvehicleId = createAsyncThunk(
+  "shift/getShiftByVehicleId",
+  async (vehicleId, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const data = await getData(`/transport/get-shifts/vehicles/${vehicleId}`);
+      return data;
+    } catch (error) {
+      console.error("Error in getShiftByvehicleId:", error);
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
 export const updateShift = createAsyncThunk(
   "shift/updateShift",
   async ({ id, updatedData }, { rejectWithValue, dispatch }) => {
@@ -95,3 +109,4 @@ export const deleteShift = createAsyncThunk(
     }
   }
 );
+

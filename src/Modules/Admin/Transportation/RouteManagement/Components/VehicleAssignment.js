@@ -1,155 +1,186 @@
-// VehicleAssignment.jsx
 import React, { useEffect, useState } from "react";
 import {
   Select,
-  Tag,
-  Avatar,
   Button,
-  Spin,
   Card,
-  Divider,
+  Spin,
   message,
+  Avatar,
+  Tag,
+  Divider,
 } from "antd";
-import { CarOutlined } from "@ant-design/icons";
+import { CarOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllVehicles } from "../../../../../Store/Slices/Transportation/Vehicles/vehicles.action";
-import { assignVehiclesToRoute } from "../../../../../Store/Slices/Transportation/RoutesManagment/routes.action";
+import {
+  assignVehiclesToRoute,
+} from "../../../../../Store/Slices/Transportation/RoutesManagment/routes.action";
+import {
+  getShiftByvehicleId,
+} from "../../../../../Store/Slices/Transportation/Shift/shift.action";
 
 const { Option } = Select;
 
-const VehicleAssignment = ({ routeId, currentVehicles = [], onSuccess }) => {
-    console.log("Route ID:", routeId);
-  console.log("Current Vehicles:", currentVehicles);
+const VehicleAssignment = ({ routeId, onSuccess }) => {
   const dispatch = useDispatch();
-  const { vehicles, loading } = useSelector(
+  const { vehicles, loading: vehicleLoading } = useSelector(
     (state) => state.transportation.transportVehicle
   );
-  const [selectedVehicles, setSelectedVehicles] = useState(currentVehicles);
+
+  const [assignments, setAssignments] = useState([
+    { vehicleId: null, shifts: [] },
+  ]);
+
+  const [vehicleShiftMap, setVehicleShiftMap] = useState({});
   const [assignLoading, setAssignLoading] = useState(false);
 
   useEffect(() => {
     dispatch(getAllVehicles());
   }, [dispatch]);
 
-  useEffect(() => {
-    setSelectedVehicles(currentVehicles);
-  }, [currentVehicles]);
+  const handleVehicleSelect = async (index, vehicleId) => {
+    const updated = [...assignments];
+    updated[index].vehicleId = vehicleId;
+    updated[index].shifts = [];
+    setAssignments(updated);
+
+    if (!vehicleShiftMap[vehicleId]) {
+      try {
+        const result = await dispatch(getShiftByvehicleId(vehicleId)).unwrap();
+        const shiftsArray = Array.isArray(result.data) ? result.data : [];
+        setVehicleShiftMap((prev) => ({
+          ...prev,
+          [vehicleId]: shiftsArray,
+        }));
+      } catch (err) {
+        message.error("Failed to fetch shifts");
+      }
+    }
+  };
+
+  const handleShiftSelect = (index, shiftIds) => {
+    const updated = [...assignments];
+    updated[index].shifts = shiftIds;
+    setAssignments(updated);
+  };
+
+  const handleAddVehicle = () => {
+    setAssignments([...assignments, { vehicleId: null, shifts: [] }]);
+  };
 
   const handleAssignVehicles = async () => {
-    console.log("Assigning vehicles:", selectedVehicles);
-    console.log("Route ID:", routeId);
-    
-    if (!routeId) return;
+    const filteredAssignments = assignments.filter(
+      (a) => a.vehicleId && a.shifts.length
+    );
+
+    if (!routeId || !filteredAssignments.length) {
+      return message.warning("Please assign at least one vehicle with shifts");
+    }
 
     setAssignLoading(true);
     try {
       await dispatch(
         assignVehiclesToRoute({
           routeId,
-          vehicleIds: selectedVehicles,
+          vehiclesWithShifts: filteredAssignments?.map((a) => ({
+            vehicleId: a.vehicleId,
+            shiftIds: a.shifts,
+          })),
         })
       ).unwrap();
-      message.success("Vehicles assigned successfully");
+      message.success("Vehicles with shifts assigned successfully");
       onSuccess?.();
-    } catch (error) {
+    } catch (err) {
       message.error("Failed to assign vehicles");
     } finally {
       setAssignLoading(false);
     }
   };
 
-  const tagRender = (props) => {
-    const { label, value, closable, onClose } = props;
-    const vehicle = vehicles?.find((v) => v._id === value);
-
-    return (
-      <Tag
-        closable={closable}
-        onClose={onClose}
-        style={{ marginRight: 3, display: "flex", alignItems: "center" }}
-      >
-        <Avatar
-          size="small"
-          icon={<CarOutlined />}
-          style={{
-            marginRight: 4,
-            backgroundColor:
-              vehicle?.status === "active" ? "#52c41a" : "#f5222d",
-          }}
-        />
-        {label}
-      </Tag>
-    );
+  const handleRemoveVehicle = (index) => {
+    const updated = [...assignments];
+    updated.splice(index, 1);
+    setAssignments(updated);
   };
 
   return (
-    <Card title="Assign Vehicles" bordered={false}>
-      <Spin spinning={loading || assignLoading}>
-        <div className="mb-4">
-          <Select
-            mode="multiple"
-            style={{ width: "100%" }}
-            placeholder="Select vehicles"
-            value={selectedVehicles}
-            onChange={setSelectedVehicles}
-            optionLabelProp="label"
-            tagRender={tagRender}
-            filterOption={(input, option) =>
-              option.label.toLowerCase().includes(input.toLowerCase())
-            }
-          >
-            {vehicles?.map((vehicle) => (
-              <Option
-                key={vehicle._id}
-                value={vehicle._id}
-                label={`${vehicle.vehicleNumber} (${vehicle.vehicleType})`}
-              >
-                <div className="flex items-center gap-2">
-                  <Avatar
-                    size="small"
-                    icon={<CarOutlined />}
-                    style={{
-                      backgroundColor:
-                        vehicle.status === "active" ? "#52c41a" : "#f5222d",
-                    }}
-                  />
-                  <div>
-                    <div className="font-medium">
-                      {vehicle.vehicleNumber}
-                      <Tag
-                        color={
-                          vehicle.vehicleCategory === "ac" ? "blue" : "default"
-                        }
-                        className="ml-2"
-                      >
-                        {vehicle.vehicleType} ({vehicle.vehicleCategory})
-                      </Tag>
-                    </div>
-                    <div className="text-xs">
-                      Capacity: {vehicle.seatingCapacity} | Status:
-                      <Tag
-                        color={
-                          vehicle.status === "active" ? "success" : "error"
-                        }
-                        className="ml-1"
-                      >
-                        {vehicle.status}
-                      </Tag>
-                    </div>
-                  </div>
+    <Card title="Assign Vehicles with Shifts">
+      <Spin spinning={vehicleLoading || assignLoading}>
+        {assignments?.map((assignment, index) => {
+          const selectedVehicle = vehicles.find((v) => v._id === assignment.vehicleId);
+          const availableShifts = vehicleShiftMap[assignment.vehicleId] || [];
+
+          return (
+            <Card
+              key={index}
+              type="inner"
+              title={
+                <div className="flex justify-between items-center">
+                  <span>{`Vehicle ${index + 1}`}</span>
+                  {assignments.length > 1 && (
+                    <Button danger size="small" onClick={() => handleRemoveVehicle(index)}>
+                      Remove
+                    </Button>
+                  )}
                 </div>
-              </Option>
-            ))}
-          </Select>
-        </div>
+              }
+              className="mb-4"
+            >
+              <Select
+                showSearch
+                placeholder="Select Vehicle"
+                style={{ width: "100%", marginBottom: "1rem" }}
+                value={assignment.vehicleId}
+                onChange={(value) => handleVehicleSelect(index, value)}
+              >
+                {vehicles?.map((vehicle) => (
+                  <Option key={vehicle._id} value={vehicle._id}>
+                    <div className="flex items-center gap-2">
+                      <Avatar
+                        size="small"
+                        icon={<CarOutlined />}
+                        style={{
+                          backgroundColor:
+                            vehicle.status === "active" ? "#52c41a" : "#f5222d",
+                        }}
+                      />
+                      <span>
+                        {vehicle.vehicleNumber} - {vehicle.vehicleType}
+                      </span>
+                    </div>
+                  </Option>
+                ))}
+              </Select>
+
+              {assignment.vehicleId && (
+                <Select
+                  mode="multiple"
+                  placeholder="Select Shifts"
+                  style={{ width: "100%" }}
+                  value={assignment.shifts}
+                  onChange={(val) => handleShiftSelect(index, val)}
+                >
+                  {availableShifts?.map((shift) => (
+                    <Option key={shift._id} value={shift._id}>
+                      {shift.shiftName} ({shift.fromTime} - {shift.toTime})
+                    </Option>
+                  ))}
+                </Select>
+              )}
+            </Card>
+          );
+        })}
 
         <Divider />
 
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <Button icon={<PlusOutlined />} onClick={handleAddVehicle}>
+            Add Vehicle
+          </Button>
           <Button
             type="primary"
             onClick={handleAssignVehicles}
-            disabled={!selectedVehicles.length}
+            disabled={assignments.every((a) => !a.vehicleId || !a.shifts.length)}
           >
             Assign Vehicles
           </Button>

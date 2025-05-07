@@ -240,7 +240,6 @@ const RouteList = ({ onEdit }) => {
 
   /* expanded vehicles */
   const expandedRowRender = (r) => {
-    console.log(r, "sdfsdfsdfsdf");
     const isExpanded = expandedRowKeys.includes(r._id ?? r.routeId);
 
     return isExpanded ? (
@@ -296,26 +295,6 @@ const RouteList = ({ onEdit }) => {
                 dataIndex: "vehicleNumber",
                 render: (v) => <strong>{v}</strong>,
               },
-              {
-                title: "Driver",
-                dataIndex: "driverName",
-                render: (d) => (
-                  <div className="flex items-center">
-                    <UserOutlined className="mr-2" />
-                    {d || "Driver Name"}
-                  </div>
-                ),
-              },
-              {
-                title: "Helper",
-                dataIndex: "helperName",
-                render: (helperName) => (
-                  <div className="flex items-center">
-                    <UserOutlined className="mr-2" />
-                    {helperName || "Helper Name"}
-                  </div>
-                ),
-              },
               { title: "Type", dataIndex: "vehicleType" },
               {
                 title: "Capacity",
@@ -323,96 +302,152 @@ const RouteList = ({ onEdit }) => {
                 render: (c) => `${c} seats`,
               },
               {
-                title: "Students",
-                render: (_, v) => (
-                  <Badge
-                    count={v.students?.length || v?.totalStudents || 0}
-                    showZero
-                    color="#7F35CD"
-                  />
-                ),
-              },
-              {
-                title: "Staff",
-                render: (_, v) => (
-                  <Badge
-                    count={v.staffs?.length || v?.totalStaffs || 0} // Assuming the field is called 'staffs'
-                    showZero
-                    color="#1890ff" // Different color to distinguish from students
-                  />
-                ),
-              },
-              {
-                title: "Actions",
-                render: (_, v) => (
-                  <Space>
-                    <Tooltip title="Add Users">
-                      <Button
-                        size="small"
-                        icon={<UserAddOutlined />}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSidebarState({
-                            isOpen: true,
-                            title: `Add Users to ${v.vehicleNumber}`,
-                            content: (
-                              <AddUsers
-                                vehicle={v}
-                                route={r}
-                                onClose={() =>
-                                  setSidebarState({ isOpen: false })
-                                }
-                              />
-                            ),
-                          });
-                        }}
-                      >
-                        Add Users
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="Create Trip">
-                      <Button
-                        size="small"
-                        icon={<PlusCircleOutlined />}
-                        type="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSidebarState({
-                            isOpen: true,
-                            title: `Create Trip for ${v.vehicleNumber}`,
-                            content: (
-                              <CreateTrip
-                                vehicle={v}
-                                route={r}
-                                onClose={() =>
-                                  setSidebarState({ isOpen: false })
-                                }
-                              />
-                            ),
-                          });
-                        }}
-                      >
-                        Create Trip
-                      </Button>
-                    </Tooltip>
-                    <Tooltip title="View Trips">
-                      <Button
-                        size="small"
-                        icon={<UnorderedListOutlined />}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(
-                            `/transportation/route-management/view-trip/${v.vehicleId}/logs`
-                          ); // Navigate to the logs page with vehicleId
-                        }}
-                      >
-                        View Trips
-                      </Button>
-                    </Tooltip>
-                  </Space>
+                title: "Status",
+                dataIndex: "status",
+                render: (status) => (
+                  <Tag color={status === "active" ? "green" : "red"}>
+                    {status.charAt(0).toUpperCase() + status.slice(1)}
+                  </Tag>
                 ),
               },
             ]}
+            expandable={{
+              expandedRowRender: (v) => (
+                <Table
+                  size="small"
+                  pagination={false}
+                  rowKey={(record) => record.shiftId}
+                  dataSource={v.assignments || []}
+                  columns={[
+                    {
+                      title: "Shift",
+                      render: (_, assignment) => (
+                        <div>
+                          <div className="font-semibold">
+                            {assignment.shift?.shiftName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {assignment.shift?.fromTime} -{" "}
+                            {assignment.shift?.toTime}
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      title: "Driver",
+                      render: (_, assignment) => (
+                        <div className="flex items-center">
+                          <UserOutlined className="mr-2" />
+                          {assignment.driverName || "Not Assigned"}
+                        </div>
+                      ),
+                    },
+                    {
+                      title: "Helper",
+                      render: (_, assignment) => (
+                        <div className="flex items-center">
+                          <UserOutlined className="mr-2" />
+                          {assignment.helperName || "Not Assigned"}
+                        </div>
+                      ),
+                    },
+                    {
+                      title: "Students",
+                      render: (_, assignment) => (
+                        <Badge
+                          count={assignment.studentCount || 0}
+                          showZero
+                          color="#7F35CD"
+                        />
+                      ),
+                    },
+                    {
+                      title: "Staff",
+                      render: (_, assignment) => (
+                        <Badge
+                          count={assignment.staffCount || 0}
+                          showZero
+                          color="#1890ff"
+                        />
+                      ),
+                    },
+                    {
+                      title: "Actions",
+                      render: (_, assignment) => (
+                        <Space>
+                          <Tooltip title="Add Users">
+                            <Button
+                              size="small"
+                              icon={<UserAddOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSidebarState({
+                                  isOpen: true,
+                                  title: `Add Users to ${v.vehicleNumber} - ${assignment.shift?.shiftName}`,
+                                  content: (
+                                    <AddUsers
+                                      vehicle={v}
+                                      route={r}
+                                      shiftId={assignment.shift._id}
+                                      onClose={() =>
+                                        setSidebarState({ isOpen: false })
+                                      }
+                                    />
+                                  ),
+                                });
+                              }}
+                            />
+                          </Tooltip>
+
+                          <Tooltip
+                            title={
+                              assignment.driverName
+                                ? "Create Trip"
+                                : "Assign a driver first"
+                            }
+                          >
+                            <Button
+                              size="small"
+                              type="primary"
+                              icon={<PlusCircleOutlined />}
+                              disabled={!assignment.driverName} // ✅ जब ड्राइवर assigned नहीं हो, तब disable
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSidebarState({
+                                  isOpen: true,
+                                  title: `Create Trip for ${v.vehicleNumber}`,
+                                  content: (
+                                    <CreateTrip
+                                      vehicle={v}
+                                      route={r}
+                                      onClose={() =>
+                                        setSidebarState({ isOpen: false })
+                                      }
+                                    />
+                                  ),
+                                });
+                              }}
+                            />
+                          </Tooltip>
+                          <Tooltip title="View Trips">
+                            <Button
+                              size="small"
+                              icon={<UnorderedListOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(
+                                  `/transportation/route-management/view-trip/${v.vehicleId}/logs`
+                                );
+                              }}
+                            />
+                          </Tooltip>
+                        </Space>
+                      ),
+                    },
+                  ]}
+                />
+              ),
+            }}
             className="rounded-lg overflow-hidden"
           />
         )}

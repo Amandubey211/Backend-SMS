@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
-const AddUsers = ({ vehicle, route, academicYearId, onClose }) => {
+const AddUsers = ({ vehicle, route, shiftId, onClose }) => {
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [personType, setPersonType] = useState("student"); // Default is 'student'
@@ -33,7 +33,7 @@ const AddUsers = ({ vehicle, route, academicYearId, onClose }) => {
   const onFinish = (values) => {
     const payload = {
       vehicleId: vehicle.vehicleId || null,
-      shiftId: vehicle.shiftId || null,
+      shiftId: shiftId || null,
       persons: values.users?.map((id) => ({
         personId: id,
         person_type: personType,
