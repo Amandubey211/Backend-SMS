@@ -1,12 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Form, Select, Button, Avatar, Tag, Input, Modal, message } from "antd";
+import {
+  Form,
+  Select,
+  Button,
+  Avatar,
+  Tag,
+  Input,
+  Modal,
+  message,
+  Divider,
+} from "antd";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { FaSchool } from "react-icons/fa";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import useGetAllSchools from "../../../../../Hooks/CommonHooks/useGetAllSchool";
 import useGetClassesBySchool from "../../../../../Hooks/CommonHooks/useGetClassesBySchool";
-import CustomInput from "../Components/CustomInput";
 
 import {
   nextStep,
@@ -17,7 +26,7 @@ import {
   clearVerification,
   fetchStudentDraft,
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
-
+import { BsPatchCheck } from "react-icons/bs";
 const { Option } = Select;
 
 /* ---------- local helpers ---------- */
@@ -352,10 +361,13 @@ const SchoolSelection = ({ formData }) => {
               { type: "email", message: "Please enter a valid email" },
             ]}
           >
-            <CustomInput
+            {/* <CustomInput size="large" /> */}
+
+            <Input
+              size="large"
               type="email"
               placeholder="student@example.com"
-              size="large"
+              // prefix={<UserOutlined />}
             />
           </Form.Item>
 
@@ -473,10 +485,23 @@ const SchoolSelection = ({ formData }) => {
       {/* ---------------- Document Modal ---------------- */}
       <Modal
         title={
-          <div className="flex items-center space-x-2">
-            <i className="fas fa-check-circle text-green-500 text-xl"></i>
-            <span className="font-semibold text-xl text-gray-800">
-              Required Documents
+          <div className="flex items-center space-x-3">
+            <svg
+              className="w-6 h-6 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span className="font-bold text-xl text-gray-800">
+              Required Documents for{" "}
+              {selectedSchool?.nameOfSchool || "Selected School"}
             </span>
           </div>
         }
@@ -486,37 +511,50 @@ const SchoolSelection = ({ formData }) => {
           <Button
             key="close"
             onClick={() => setDocumentModalVisible(false)}
-            className="!bg-[#C83B62] !text-white"
+            className="!bg-gradient-to-r !from-[#C83B62] !to-[#7F35CD] !border-none !text-white hover:!from-[#A82E52] hover:!to-[#6C2DAF]"
+            size="large"
           >
-            Okay
+            Got it, thanks!
           </Button>,
         ]}
         centered
         maskClosable={false}
-        className="rounded-lg shadow-lg"
+        width={700}
+        className="rounded-lg shadow-xl [&_.ant-modal-body]:py-6"
       >
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Mandatory Documents */}
           <div>
-            <h3 className="font-semibold text-lg text-gray-800">
-              Mandatory Documents
-            </h3>
-            <ul className="list-disc pl-6 text-gray-600 space-y-2">
+            <Divider orientation="left" dashed className="!border-gray-200">
+              <div className="flex items-center gap-3 bg-white pr-3">
+                <BsPatchCheck className="text-green-500 text-xl" />
+                <span className="font-semibold text-gray-700">
+                  Mandatory Documents
+                </span>
+              </div>
+            </Divider>
+            <ul className="list-disc pl-6 text-gray-700 space-y-3 mt-4">
               {selectedSchool?.attachments
                 ?.filter((doc) => doc.mandatory)
                 .map((doc) => (
                   <li
                     key={doc._id}
-                    className="text-sm flex items-center space-x-2"
+                    className="text-base flex items-start space-x-3"
                   >
-                    <i className="fas fa-check-circle text-green-500 text-xs"></i>
-                    <span className="font-medium">{doc.name}</span>
+                    <span className="font-medium text-gray-800">
+                      - {doc.name}
+                    </span>
+                    {doc.description && (
+                      <span className="text-sm text-gray-500">
+                        - {doc.description}
+                      </span>
+                    )}
                   </li>
                 ))}
               {selectedSchool?.attachments?.filter((doc) => doc.mandatory)
                 .length === 0 && (
-                <li className="text-sm text-gray-400">
-                  No mandatory documents available.
+                <li className="text-sm text-gray-400 italic">
+                  No mandatory documents required.
                 </li>
               )}
             </ul>
@@ -524,36 +562,70 @@ const SchoolSelection = ({ formData }) => {
 
           {/* Optional Documents */}
           <div>
-            <h3 className="font-semibold text-lg text-gray-800">
-              Optional Documents
-            </h3>
-            <ul className="list-disc pl-6 text-gray-600 space-y-2">
+            <Divider orientation="left" dashed className="!border-gray-200">
+              <div className="flex items-center gap-3 bg-white pr-3">
+                <BsPatchCheck className="text-blue-400 text-xl" />
+                <span className="font-semibold text-gray-700">
+                  Optional Documents
+                </span>
+              </div>
+            </Divider>
+            <ul className="list-disc pl-6 text-gray-700 space-y-3 mt-4">
               {selectedSchool?.attachments
                 ?.filter((doc) => !doc.mandatory)
                 .map((doc) => (
                   <li
                     key={doc._id}
-                    className="text-sm flex items-center space-x-2"
+                    className="text-base flex items-start space-x-3"
                   >
-                    <i className="fas fa-circle text-blue-500 text-xs"></i>
-                    <span className="font-medium">{doc.name}</span>
+                    <span className="font-medium text-gray-800">
+                      - {doc.name}
+                    </span>
+                    {doc.description && (
+                      <span className="text-sm text-gray-500">
+                        - {doc.description}
+                      </span>
+                    )}
                   </li>
                 ))}
               {selectedSchool?.attachments?.filter((doc) => !doc.mandatory)
                 .length === 0 && (
-                <li className="text-sm text-gray-400">
-                  No optional documents available.
+                <li className="text-sm text-gray-400 italic">
+                  No optional documents suggested.
                 </li>
               )}
             </ul>
           </div>
 
           {/* Instruction Text */}
-          <p className="text-sm text-gray-500 mt-4">
-            Please ensure that all documents are up-to-date and accurate for
-            smooth processing. Missing mandatory documents may delay the
-            processing of your application.
-          </p>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+            <div className="flex items-start gap-3">
+              <svg
+                className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <div>
+                <p className="text-sm text-gray-700 font-medium">
+                  Please ensure all documents meet these requirements:
+                </p>
+                <ul className="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-600">
+                  <li>Clear, legible scans or photos</li>
+                  <li>File formats: PDF, JPG, or PNG</li>
+                  <li>Maximum file size: 5MB per document</li>
+                  <li>Documents must be valid and up-to-date</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </Modal>
     </>

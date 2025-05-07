@@ -11,6 +11,7 @@ import {
   Row,
   Col,
   Divider,
+  InputNumber,
 } from "antd";
 import {
   CalendarOutlined,
@@ -52,9 +53,6 @@ const PhoneField = ({
   const value = Form.useWatch(name, form);
   const isWA = Form.useWatch(whatsappName, form);
 
-  // Convert value to string and ensure it's not undefined
-  const phoneValue = value ? value.toString() : "";
-
   return (
     <Form.Item
       name={name}
@@ -75,9 +73,8 @@ const PhoneField = ({
             borderRadius: 0,
           }}
           containerStyle={{ width: "100%" }}
-          value={phoneValue}
-          onChange={(value, country, e, formattedValue) => {
-            // Update the form value directly
+          value={value || ""}
+          onChange={(value) => {
             form.setFieldValue(name, value);
           }}
         />
@@ -89,9 +86,9 @@ const PhoneField = ({
           <Tooltip title="Mark this number as WhatsApp">
             <div
               className="cursor-pointer"
-              onClick={() =>
-                form.setFieldValue(whatsappName, !isWA, false /* no trigger*/)
-              }
+              onClick={() => {
+                form.setFieldValue(whatsappName, !isWA);
+              }}
             >
               <FaWhatsapp className="text-[#075E54] text-xl" />
             </div>
@@ -117,6 +114,8 @@ const CandidateInfo = ({ formData }) => {
       passportExpiry: formData.passportExpiry
         ? dayjs(formData.passportExpiry)
         : undefined,
+      phoneNumberIsWhatsapp: formData.phoneNumberIsWhatsapp || false,
+      profile: formData.profile instanceof File ? formData.profile : undefined,
     });
   }, [formData]);
 
@@ -138,6 +137,10 @@ const CandidateInfo = ({ formData }) => {
       updateFormData({
         candidate: {
           ...raw,
+          // Preserve the File object if it exists
+          profile:
+            raw.profile instanceof File ? raw.profile : formData?.profile,
+          // Handle date conversions
           dob: raw.dob ? raw.dob.format("YYYY-MM-DD") : null,
           idExpiry: raw.idExpiry ? raw.idExpiry.format("YYYY-MM-DD") : null,
           passportExpiry: raw.passportExpiry
@@ -153,7 +156,24 @@ const CandidateInfo = ({ formData }) => {
     try {
       const vals = form.getFieldsValue(true);
       await CandidateSchema.validate(vals, { abortEarly: false });
-      handleValuesChange(); // ensure latest snapshot
+
+      // Create FormData for the file upload
+      const formData = new FormData();
+      if (vals.profile instanceof File) {
+        formData.append("profile", vals.profile);
+      }
+
+      // Add other form data
+      Object.entries(vals).forEach(([key, value]) => {
+        if (key !== "profile" && value !== null && value !== undefined) {
+          formData.append(
+            key,
+            typeof value === "object" ? JSON.stringify(value) : value
+          );
+        }
+      });
+
+      handleValuesChange(); // Update Redux state
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
@@ -180,7 +200,7 @@ const CandidateInfo = ({ formData }) => {
             <CustomUploadCard
               name="profile"
               label="Candidate Photo"
-              form={form} // Pass the form prop
+              form={form}
               recommendedSize="300x400"
               width="w-full"
               height="h-48"
@@ -382,9 +402,13 @@ const CandidateInfo = ({ formData }) => {
         <Form.Item
           name="email"
           label="Email"
-          rules={[{ type: "email", message: "Invalid email" }]}
+          rules={[{ type: "email", required: true, message: "Invalid email" }]}
         >
-          <Input size="large" prefix={<MailOutlined />} />
+          <Input
+            size="large"
+            prefix={<MailOutlined />}
+            placeholder="student@studentdiwan.com "
+          />
         </Form.Item>
 
         {/* phone / emergency */}
@@ -401,7 +425,11 @@ const CandidateInfo = ({ formData }) => {
           </Col>
           <Col xs={24} md={12}>
             <Form.Item name="emergencyNumber" label="Emergency Number">
-              <Input size="large" />
+              <InputNumber
+                size="large"
+                style={{ width: "100%" }}
+                placeholder="Enter emergency number"
+              />
             </Form.Item>
           </Col>
         </Row>

@@ -11,12 +11,7 @@ import {
   Card,
   Tabs,
 } from "antd";
-import {
-  FaBuilding,
-  FaHome,
-  FaMapMarkerAlt,
-  FaStreetView,
-} from "react-icons/fa";
+import { FaBuilding, FaHome } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import {
   nextStep,
@@ -54,12 +49,6 @@ const AddressInfo = ({ formData }) => {
   const permanentResidenceType =
     Form.useWatch(["permanentAddress", "residenceType"], form) || "flat";
 
-  /* Keep Redux in sync */
-  const handleValuesChange = () => {
-    const values = form.getFieldsValue(true);
-    dispatch(updateFormData({ address: values }));
-  };
-
   /* Handle same as residential checkbox */
   const handleSameAsResidentialChange = (checked) => {
     setSameAsResidential(checked);
@@ -68,10 +57,8 @@ const AddressInfo = ({ formData }) => {
       form.setFieldsValue({
         permanentAddress: { ...residentialValues },
       });
-      // Switch to permanent tab to show the copied values
       setActiveTab("permanent");
     }
-    handleValuesChange();
   };
 
   /* Nav */
@@ -79,7 +66,7 @@ const AddressInfo = ({ formData }) => {
     try {
       const vals = form.getFieldsValue(true);
       await AddressSchema.validate(vals, { abortEarly: false });
-      handleValuesChange();
+      dispatch(updateFormData({ address: vals }));
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
@@ -94,7 +81,11 @@ const AddressInfo = ({ formData }) => {
     }
   };
 
-  const handleBack = () => dispatch(prevStep());
+  const handleBack = () => {
+    const vals = form.getFieldsValue(true);
+    dispatch(updateFormData({ address: vals }));
+    dispatch(prevStep());
+  };
 
   /* Address form section - reusable component */
   const AddressSection = ({ prefix, title, residenceType }) => (
@@ -114,11 +105,7 @@ const AddressInfo = ({ formData }) => {
       headStyle={{ borderBottom: "1px solid #f0f0f0" }}
     >
       {/* Residence type */}
-      <Form.Item
-        name={[prefix, "residenceType"]}
-        label="Residence Type"
-        // rules={[{ required: true, message: "Select residence type" }]}
-      >
+      <Form.Item name={[prefix, "residenceType"]} label="Residence Type">
         <Radio.Group value="flat">
           <Radio value="flat">Flat / Villa</Radio>
           <Radio value="house">House</Radio>
@@ -131,7 +118,6 @@ const AddressInfo = ({ formData }) => {
           <Form.Item
             name={[prefix, "unitNumber"]}
             label={residenceType === "flat" ? "Unit #" : "House #"}
-            // rules={[{ required: true, message: "Required" }]}
           >
             <Input
               size="large"
@@ -145,7 +131,6 @@ const AddressInfo = ({ formData }) => {
           <Form.Item
             name={[prefix, "buildingNumber"]}
             label={residenceType === "flat" ? "Building #" : "Street #"}
-            // rules={[{ required: true, message: "Required" }]}
           >
             <Input
               size="large"
@@ -158,11 +143,7 @@ const AddressInfo = ({ formData }) => {
       </Row>
 
       {/* Street */}
-      <Form.Item
-        name={[prefix, "streetName"]}
-        label="Street Name"
-        // rules={[{ required: true, message: "Required" }]}
-      >
+      <Form.Item name={[prefix, "streetName"]} label="Street Name">
         <Input size="large" placeholder="Street Name" />
       </Form.Item>
 
@@ -194,11 +175,7 @@ const AddressInfo = ({ formData }) => {
       {/* City / Landmark */}
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item
-            name={[prefix, "city"]}
-            label="City"
-            // rules={[{ required: true, message: "Required" }]}
-          >
+          <Form.Item name={[prefix, "city"]} label="City">
             <Input size="large" placeholder="City" allowClear />
           </Form.Item>
         </Col>
@@ -220,11 +197,7 @@ const AddressInfo = ({ formData }) => {
           </Form.Item>
         </Col>
         <Col xs={24} md={8}>
-          <Form.Item
-            name={[prefix, "country"]}
-            label="Country"
-            // rules={[{ required: true, message: "Required" }]}
-          >
+          <Form.Item name={[prefix, "country"]} label="Country">
             <Select
               size="large"
               placeholder="Country"
@@ -271,15 +244,9 @@ const AddressInfo = ({ formData }) => {
     </Card>
   );
 
-  /* UI */
   return (
     <div className="max-w-6xl mx-auto p-4">
-      <Form
-        form={form}
-        layout="vertical"
-        onValuesChange={handleValuesChange}
-        className="space-y-6"
-      >
+      <Form form={form} layout="vertical" className="space-y-6">
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
