@@ -30,7 +30,7 @@ export const startTripLog = createAsyncThunk(
         `/transport/start-trip/${tripId}?${query}`,
         payload
       );
-      dispatch(getTripLogsByVehicle(vehicleId))
+      dispatch(getTripLogsByVehicle({vehicleId}))
       return data;
     } catch (error) {
       console.error("Error in startTripLog:", error);
@@ -45,7 +45,7 @@ export const endTripLog = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const data = await postData(`/transport/trip/${tripId}/end`);
-      dispatch(getTripLogsByVehicle(vehicleId));
+      dispatch(getTripLogsByVehicle({vehicleId}));
       return data;
     } catch (error) {
       console.error("Error in endTripLog:", error);
@@ -56,16 +56,17 @@ export const endTripLog = createAsyncThunk(
 
 export const getTripLogsByVehicle = createAsyncThunk(
   "tripExecutionLog/getByVehicle",
-  async (vehicleId, { rejectWithValue, dispatch }) => {
+  async ({ vehicleId, page = 1, limit = 10, type = "today" }, { rejectWithValue, dispatch }) => {
     try {
-      const data = await getData(`/transport/trip-logs/vehicle/${vehicleId}`);
-      return data.trips;
+      const data = await getData(`/transport/trip-logs/vehicle/${vehicleId}?page=${page}&limit=${limit}&type=${type}`);
+      return data;
     } catch (error) {
       console.error("Error in getTripLogsByVehicle:", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 
 export const getAllTripLogs = createAsyncThunk(
   "tripExecutionLog/getAll",
