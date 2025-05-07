@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { createShift, deleteShift, getAllShifts, getShiftById, toggleShiftStatus, updateShift } from "./shift.action";
+import { createShift, deleteShift, getAllShifts, getShiftById, getShiftByvehicleId, toggleShiftStatus, updateShift } from "./shift.action";
 
 
 const initialState = {
   loading: false,
   error: false,
   shifts: [],
+  vehicleShifts:[],
   selectedShift: null,
   currentPage: 1,
   totalPages: 1,
@@ -49,6 +50,21 @@ const shiftSlice = createSlice({
         state.selectedShift = action.payload?.data || null;
       })
       .addCase(getShiftById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || true;
+      })
+
+
+       // Get Shift By vehicle ID
+       .addCase(getShiftByvehicleId.pending, (state) => {
+        state.loading = true;
+        state.error = false;
+      })
+      .addCase(getShiftByvehicleId.fulfilled, (state, action) => {
+        state.loading = false;
+        state.vehicleShifts = action.payload?.data || null;
+      })
+      .addCase(getShiftByvehicleId.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || true;
       })
