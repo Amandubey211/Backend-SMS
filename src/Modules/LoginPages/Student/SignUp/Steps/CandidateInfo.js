@@ -115,7 +115,7 @@ const CandidateInfo = ({ formData }) => {
         ? dayjs(formData.passportExpiry)
         : undefined,
       phoneNumberIsWhatsapp: formData.phoneNumberIsWhatsapp || false,
-      profile: formData.profile instanceof File ? formData.profile : undefined,
+      profile: formData.profile || undefined,
     });
   }, [formData]);
 
@@ -138,8 +138,8 @@ const CandidateInfo = ({ formData }) => {
         candidate: {
           ...raw,
           // Preserve the File object if it exists
-          profile:
-            raw.profile instanceof File ? raw.profile : formData?.profile,
+
+          profile: raw.profile,
           // Handle date conversions
           dob: raw.dob ? raw.dob.format("YYYY-MM-DD") : null,
           idExpiry: raw.idExpiry ? raw.idExpiry.format("YYYY-MM-DD") : null,
@@ -173,7 +173,8 @@ const CandidateInfo = ({ formData }) => {
         }
       });
 
-      handleValuesChange(); // Update Redux state
+      await CandidateSchema.validate(vals, { abortEarly: false });
+      handleValuesChange();
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);

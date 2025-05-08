@@ -1,4 +1,3 @@
-// src/pages/StudentSignUp/Steps/GuardianInfo.jsx
 import {
   Form,
   Input,
@@ -130,42 +129,21 @@ const GuardianInfo = ({ formData }) => {
   const [activeTab, setActiveTab] = useState("father");
 
   /* Hydrate form with initial data */
-  // Update the useEffect that hydrates the form
+
   useEffect(() => {
     if (!formData) return;
-
-    // Create a deep copy and handle file objects properly
     const sanitized = JSON.parse(JSON.stringify(formData));
 
-    // Convert dates to dayjs objects
-    ["fatherInfo.idExpiry", "motherInfo.idExpiry"].forEach((path) => {
+    // Handle photos properly
+    ["fatherInfo.photo", "motherInfo.photo"].forEach((path) => {
       const parts = path.split(".");
       let curr = sanitized;
       for (let i = 0; i < parts.length - 1; i++) {
         curr = curr[parts[i]] ||= {};
       }
       const leaf = parts.pop();
-      if (curr[leaf]) {
-        curr[leaf] = dayjs(curr[leaf]);
-      }
-    });
-
-    // Convert phone numbers to strings
-    [
-      "fatherInfo.cell1",
-      "fatherInfo.cell2",
-      "motherInfo.cell1",
-      "motherInfo.cell2",
-      "guardianInformation.guardianContactNumber",
-    ].forEach((path) => {
-      const parts = path.split(".");
-      let curr = sanitized;
-      for (let i = 0; i < parts.length - 1; i++) {
-        curr = curr[parts[i]] ||= {};
-      }
-      const leaf = parts.pop();
-      if (curr[leaf] !== undefined && curr[leaf] !== null) {
-        curr[leaf] = curr[leaf].toString();
+      if (curr[leaf] && typeof curr[leaf] === "object") {
+        curr[leaf] = curr[leaf].url || curr[leaf];
       }
     });
 
@@ -184,8 +162,17 @@ const GuardianInfo = ({ formData }) => {
 
   const smoothToTop = () =>
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  const handleValuesChange = () =>
-    dispatch(updateFormData({ guardian: form.getFieldsValue(true) }));
+  const handleValuesChange = () => {
+    const raw = form.getFieldsValue(true);
+
+    // Ensure photos are always plain strings
+    ["fatherInfo.photo", "motherInfo.photo"].forEach((p) => {
+      const [parent, key] = p.split(".");
+      if (raw[parent]?.[key]?.url) raw[parent][key] = raw[parent][key].url;
+    });
+
+    dispatch(updateFormData({ guardian: raw }));
+  };
 
   /* ------------- reusable render helpers ------------- */
   const renderNameFields = (p) => (
@@ -460,10 +447,18 @@ const GuardianInfo = ({ formData }) => {
         fatherInfo: {
           ...formValues.fatherInfo,
           idExpiry: formValues.fatherInfo?.idExpiry?.format("YYYY-MM-DD"),
+          photo:
+            typeof formValues.fatherInfo?.photo === "object"
+              ? formValues.fatherInfo.photo.url
+              : formValues.fatherInfo?.photo,
         },
         motherInfo: {
           ...formValues.motherInfo,
           idExpiry: formValues.motherInfo?.idExpiry?.format("YYYY-MM-DD"),
+          photo:
+            typeof formValues.motherInfo?.photo === "object"
+              ? formValues.motherInfo.photo.url
+              : formValues.motherInfo?.photo,
         },
       };
 
