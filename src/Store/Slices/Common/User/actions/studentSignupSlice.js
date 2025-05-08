@@ -8,18 +8,8 @@ import {
 } from "../../../../../services/apiEndpoints";
 import { setShowError } from "../../Alerts/alertsSlice";
 import { handleError } from "../../Alerts/errorhandling.action";
-import { getUserRole } from "../../../../../Utils/getRoles";
 import { stepSchemas } from "../../../../../Modules/LoginPages/Student/SignUp/Utils/validationSchemas";
 
-/* ------------------------------------------------------------------ */
-/* 🔸  THUNKS                                                          */
-/* ------------------------------------------------------------------ */
-
-/**
- * Helper function to find the first incomplete step in the form
- * @param {object} data - The form data to validate
- * @returns {number} Index of the first incomplete step
- */
 const firstIncompleteStep = (data) => {
   for (let i = 0; i < stepSchemas.length; i += 1) {
     if (!stepSchemas[i].isValidSync(data, { strict: false })) return i;
@@ -27,21 +17,13 @@ const firstIncompleteStep = (data) => {
   return stepSchemas.length - 1; // Everything valid → last step (Submit)
 };
 
-/* Cache helpers */
 const cacheKey = "signupStep1";
 const loadCache = () => JSON.parse(sessionStorage.getItem(cacheKey) || "{}");
 
-/* Contact info helpers */
 const extractPhone = (contactObj) => contactObj?.value ?? "";
 const extractIsWA = (contactObj) => !!contactObj?.isWhatsApp;
 
-/**
- * Transforms MongoDB document into our form sections structure
- * @param {object} doc - The document from MongoDB
- * @returns {object} Structured form data
- */
 const mapDraftToSections = (doc) => {
-  /* Process father & mother info (phones split into value + flag) */
   const father = doc.fatherInfo || {};
   const mother = doc.motherInfo || {};
 
@@ -61,11 +43,7 @@ const mapDraftToSections = (doc) => {
     cell2IsWhatsapp: extractIsWA(mother.cell2),
   };
 
-  /* Build section payloads */
   return {
-    /* STEP-1 (school) – untouched, already in state/cache */
-
-    /* Guardian tab (3-in-1) */
     guardian: {
       fatherInfo: fatherSection,
       motherInfo: motherSection,
@@ -85,6 +63,7 @@ const mapDraftToSections = (doc) => {
       dob: doc.dateOfBirth ?? null,
       gender: doc.gender ?? "",
       contactNumber: doc.contactNumber ?? "",
+      phoneNumberIsWhatsapp: doc.contactNumberIsWhatsapp || false,
       placeOfBirth: doc.placeOfBirth ?? "",
       religion: doc.religion ?? "",
       bloodGroup: doc.bloodGroup ?? "",
@@ -161,33 +140,14 @@ export const verifyStudentOtp = createAsyncThunk(
       });
 
       if (res.success) {
-        // Only proceed if OTP is verified successfully
         toast.success(res.message || "OTP Verified");
 
-        // // Fetch the draft or process accordingly
-        // const { payload } = await dispatch(
-        //   fetchStudentDraft({ email, schoolId })
-        // );
-
-        // if (payload?.success && payload.exists) {
-        //   dispatch(updateFormData(mapDraft(payload.data)));
-        //   message.success("Existing application found and pre‑filled.");
-        // } else {
-        //   dispatch(updateFormData({ school: { ...res.data, isVerified: true } }));
-        //   message.success("Email verified successfully.");
-        // }
-
-        // dispatch(setEmailVerified(email));
-        // saveCache({ ...res.data, isVerified: true });
-
-        return res; // Proceed to the next step or any other actions
+        return res;
       } else {
-        // Handle failure case for invalid OTP
         toast.error(res.message || "Invalid OTP");
         throw new Error(res.message || "OTP Verification Failed");
       }
     } catch (err) {
-      // Handle errors gracefully
       toast.error("OTP verification failed. Please try again.");
       return handleError(err, dispatch, rejectWithValue);
     }
@@ -244,32 +204,37 @@ export const saveStudentDraft = createAsyncThunk(
 /* ---------- Final Submission ---------- */
 export const registerStudentDetails = createAsyncThunk(
   "studentSignup/register",
-  async (navigate, { getState, rejectWithValue, dispatch }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
       const { formData } = getState().common.studentSignup;
       const endpoint = `/student/register/student`;
       const email = (formData.candidate?.email || "").toLowerCase();
-      const res = await customRequest(
-        "put",
-        endpoint,
-        {
-          ...formData,
-          candidate: { ...formData.candidate, email },
-          currentStep: getState().common.studentSignup.currentStep,
-        },
-        {
-          "Content-Type": "multipart/form-data",
+
+      // Create FormData
+      const payload = new FormData();
+
+      // Append the profile image if it exists
+      if (formData.candidate?.profile instanceof File) {
+        payload.append("profile", formData.candidate.profile);
+      }
+
+      // Append other form data
+      Object.entries(formData).forEach(([section, data]) => {
+        if (section !== "profile") {
+          payload.append(section, JSON.stringify(data));
         }
-      );
+      });
+
+      const res = await customRequest("put", endpoint, payload, {
+        "Content-Type": "multipart/form-data",
+      });
 
       toast.success("Application submitted successfully");
-
-      // navigate("/studentlogin");
       return res.data;
     } catch (err) {
       console.error("Submission failed:", err);
       toast.error("Submission failed");
-      return handleError(err, dispatch, rejectWithValue);
+      return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
@@ -282,7 +247,7 @@ const baseForm = {
   school: loadCache(),
   guardian: {},
   candidate: {},
-  languagePreference: {}, // New field for language preferences
+  languagePreference: {},
   academic: {},
   address: {},
   documents: [],
@@ -298,7 +263,6 @@ const initialState = {
   otpError: null,
   isVerifying: false,
   verificationError: null,
-
   isRegistering: false,
   isEmailVerified: loadCache().isVerified || false,
   verifiedEmail: loadCache().isVerified ? loadCache().email : null,
@@ -325,7 +289,19 @@ const studentSignupSlice = createSlice({
 
     // Form data actions
     updateFormData: (s, a) => {
-      s.formData = { ...s.formData, ...a.payload };
+      s.formData = {
+        ...s.formData,
+        ...a.payload,
+        // Preserve file objects when updating form data
+        candidate: {
+          ...(s.formData.candidate || {}),
+          ...(a.payload.candidate || {}),
+          profile:
+            a.payload.candidate?.profile instanceof File
+              ? a.payload.candidate.profile
+              : s.formData.candidate?.profile,
+        },
+      };
     },
     resetSignup: () => initialState,
 

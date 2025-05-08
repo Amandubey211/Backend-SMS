@@ -1,187 +1,394 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Modal, Button, message, Slider, Row, Col } from "antd";
-import ReactCrop from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
-import { GrRotateRight, GrRotateLeft } from "react-icons/gr";
-import { PiCropLight, PiFlipHorizontalLight, PiEyeLight } from "react-icons/pi";
+// import React, { useRef, useState, useEffect, useCallback } from "react";
+// import { Modal, Button, message, Slider, Row, Col } from "antd";
+// import ReactCrop from "react-image-crop";
+// import "react-image-crop/dist/ReactCrop.css";
+// import { GrRotateRight, GrRotateLeft } from "react-icons/gr";
+// import { PiCropLight, PiFlipHorizontalLight } from "react-icons/pi";
+
+// const CustomUploadCard = ({
+//   name,
+//   label,
+//   form,
+//   recommendedSize = "300x400",
+//   width = "w-full",
+//   height = "h-48",
+//   aspectRatio = 3 / 4,
+//   enableCrop = true,
+// }) => {
+//   /* ---------------- state ---------------- */
+//   const [file, setFile] = useState(null);
+//   const [previewUrl, setPreviewUrl] = useState(null);
+//   const [previewVisible, setPreviewVisible] = useState(false);
+
+//   /* crop state */
+//   const [crop, setCrop] = useState(null);
+//   const [completedCrop, setCompletedCrop] = useState(null);
+//   const [rotation, setRotation] = useState(0);
+//   const [flipH, setFlipH] = useState(false);
+
+//   /* ---------------- refs ---------------- */
+//   const fileInputRef = useRef(null);
+//   const imgRef = useRef(null);
+//   const canvasRef = useRef(null);
+
+//   /* ---------------- helpers ---------------- */
+//   const openDialog = () => fileInputRef.current?.click();
+
+//   const handleFileChange = useCallback(
+//     (e) => {
+//       const f = e.target.files?.[0];
+//       if (!f?.type.startsWith("image/")) {
+//         message.error("Please upload a valid image");
+//         return;
+//       }
+//       const url = URL.createObjectURL(f);
+//       setFile(f);
+//       setPreviewUrl(url);
+//       form.setFieldValue(name, f);
+
+//       /* reset editor state */
+//       setRotation(0);
+//       setFlipH(false);
+//     },
+//     [form, name]
+//   );
+
+//   const clearFile = (e) => {
+//     e?.stopPropagation();
+//     if (previewUrl) URL.revokeObjectURL(previewUrl);
+//     setFile(null);
+//     setPreviewUrl(null);
+//     form.setFieldValue(name, null);
+//     if (fileInputRef.current) fileInputRef.current.value = "";
+//   };
+
+//   const openPreview = (e) => {
+//     e?.stopPropagation();
+//     if (!previewUrl) return;
+//     if (enableCrop) {
+//       setCrop({ unit: "%", width: 100, aspect: aspectRatio });
+//     }
+//     setPreviewVisible(true);
+//   };
+
+//   const saveCrop = () => {
+//     if (!completedCrop || !canvasRef.current) {
+//       return message.error("Please crop the image first");
+//     }
+//     canvasRef.current.toBlob(
+//       (blob) => {
+//         if (!blob) return message.error("Failed to crop image");
+//         const newFile = new File([blob], file?.name || "image.jpg", {
+//           type: "image/jpeg",
+//         });
+//         const newURL = URL.createObjectURL(blob);
+//         setFile(newFile);
+//         setPreviewUrl(newURL);
+//         form.setFieldValue(name, newFile);
+//         setPreviewVisible(false);
+//       },
+//       "image/jpeg",
+//       0.9
+//     );
+//   };
+
+//   /* ------------ live-preview painter ------------ */
+//   useEffect(() => {
+//     if (
+//       !enableCrop ||
+//       !imgRef.current ||
+//       !canvasRef.current ||
+//       !crop?.width ||
+//       !crop?.height
+//     )
+//       return;
+
+//     const canvas = canvasRef.current;
+//     const image = imgRef.current;
+//     const scaleX = image.naturalWidth / image.width;
+//     const scaleY = image.naturalHeight / image.height;
+//     const dpr = window.devicePixelRatio || 1;
+//     const ctx = canvas.getContext("2d");
+
+//     canvas.width = crop.width * dpr;
+//     canvas.height = crop.height * dpr;
+//     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+//     ctx.imageSmoothingQuality = "high";
+
+//     ctx.save();
+//     ctx.clearRect(0, 0, canvas.width, canvas.height);
+//     ctx.translate(canvas.width / 2, canvas.height / 2);
+//     ctx.rotate((rotation * Math.PI) / 180);
+//     if (flipH) ctx.scale(-1, 1);
+//     ctx.translate(-canvas.width / 2, -canvas.height / 2);
+//     ctx.drawImage(
+//       image,
+//       crop.x * scaleX,
+//       crop.y * scaleY,
+//       crop.width * scaleX,
+//       crop.height * scaleY,
+//       0,
+//       0,
+//       crop.width,
+//       crop.height
+//     );
+//     ctx.restore();
+//   }, [crop, rotation, flipH, enableCrop]);
+
+//   /* revoke object URLs on unmount */
+//   useEffect(
+//     () => () => previewUrl && URL.revokeObjectURL(previewUrl),
+//     [previewUrl]
+//   );
+
+//   /* ---------------- render ---------------- */
+//   return (
+//     <>
+//       {/* Upload thumbnail */}
+//       <div
+//         className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
+//         onClick={openDialog}
+//       >
+//         {file ? (
+//           <>
+//             <img
+//               src={previewUrl}
+//               alt="Preview"
+//               className="w-full h-full object-cover rounded-md"
+//               onClick={openPreview}
+//             />
+//             <button
+//               onClick={clearFile}
+//               className="absolute top-2 right-2 bg-white border border-gray-300 rounded px-2 py-0.5 text-xs hover:bg-gray-50"
+//             >
+//               Clear
+//             </button>
+//             {enableCrop && (
+//               <div
+//                 className="absolute top-2 left-2 cursor-pointer"
+//                 onClick={openPreview}
+//               >
+//                 <PiCropLight style={{ fontSize: 25, color: "#fff" }} />
+//               </div>
+//             )}
+//           </>
+//         ) : (
+//           <div className="text-center p-4">
+//             <div className="text-xl">+</div>
+//             <div>Upload Photo</div>
+//             {recommendedSize && (
+//               <div className="text-xs text-gray-400 mt-1">
+//                 (Recommended: {recommendedSize})
+//               </div>
+//             )}
+//           </div>
+//         )}
+//         <input
+//           ref={fileInputRef}
+//           type="file"
+//           accept="image/*"
+//           hidden
+//           onChange={handleFileChange}
+//         />
+//       </div>
+
+//       {/* Modal */}
+//       <Modal
+//         open={previewVisible}
+//         footer={null}
+//         centered
+//         title={enableCrop ? "Edit Image" : "Image Preview"}
+//         onCancel={() => setPreviewVisible(false)}
+//         width={enableCrop ? 1000 : 600}
+//         destroyOnClose
+//       >
+//         {enableCrop ? (
+//           /* ---------- Editor ---------- */
+//           <Row gutter={[16, 16]}>
+//             <Col xs={24} md={12}>
+//               <h4 className="text-center mb-2">Crop</h4>
+//               <ReactCrop
+//                 crop={crop}
+//                 onChange={(c) => setCrop(c)}
+//                 onComplete={(c) => setCompletedCrop(c)}
+//                 onImageLoaded={(img) => (imgRef.current = img)}
+//                 aspect={aspectRatio}
+//                 className="max-h-[50vh]"
+//               >
+//                 <img
+//                   src={previewUrl}
+//                   alt="Crop"
+//                   style={{
+//                     transform: `rotate(${rotation}deg) scaleX(${
+//                       flipH ? -1 : 1
+//                     })`,
+//                     maxWidth: "100%",
+//                     maxHeight: "50vh",
+//                   }}
+//                 />
+//               </ReactCrop>
+
+//               <div className="flex justify-between items-center my-4 px-5">
+//                 <div className="flex space-x-2">
+//                   <Button
+//                     icon={<GrRotateLeft />}
+//                     onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
+//                   />
+//                   <Button
+//                     icon={<GrRotateRight />}
+//                     onClick={() => setRotation((r) => (r + 90) % 360)}
+//                   />
+//                 </div>
+//                 <Button
+//                   icon={<PiFlipHorizontalLight />}
+//                   onClick={() => setFlipH((f) => !f)}
+//                 />
+//               </div>
+
+//               <div className="px-5">
+//                 <Slider
+//                   min={0}
+//                   max={360}
+//                   value={rotation}
+//                   onChange={setRotation}
+//                   marks={{ 0: "0°", 90: "90°", 180: "180°", 270: "270°" }}
+//                 />
+//               </div>
+//             </Col>
+
+//             <Col xs={24} md={12}>
+//               <h4 className="text-center mb-2">Preview</h4>
+//               <div className="border rounded-md p-2 flex justify-center items-center h-[30rem]">
+//                 {crop?.width ? (
+//                   <canvas
+//                     ref={canvasRef}
+//                     style={{ maxWidth: "100%", maxHeight: "100%" }}
+//                   />
+//                 ) : (
+//                   <span className="text-gray-400">
+//                     Crop area will appear here
+//                   </span>
+//                 )}
+//               </div>
+//               <Button
+//                 type="primary"
+//                 className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white mt-4"
+//                 block
+//                 onClick={saveCrop}
+//               >
+//                 Save Cropped Image
+//               </Button>
+//             </Col>
+//           </Row>
+//         ) : (
+//           /* ---------- Viewer ---------- */
+//           <img
+//             src={previewUrl}
+//             alt="Preview"
+//             className="max-h-[80vh] w-full object-contain rounded-md"
+//           />
+//         )}
+//       </Modal>
+//     </>
+//   );
+// };
+
+// export default CustomUploadCard;
+/**
+ * CustomUploadCard (simplified, view-only)
+ * – Cropping / rotation / flip code has been commented out so you can re-enable later.
+ * – Hovering the thumbnail shows an eye icon; clicking it opens a read-only modal preview.
+ */
+
+import React, { useRef, useState, useCallback, useEffect } from "react";
+import { Modal, Button, message } from "antd";
+import { FaEye } from "react-icons/fa";
+import { PiCropLight } from "react-icons/pi"; // ← kept for future use if needed
 
 const CustomUploadCard = ({
   name,
-  label,
   form,
-  recommendedSize = "500x500",
+  recommendedSize = "300x400",
   width = "w-full",
-  height = "h-52",
-  aspectRatio = 1,
-  enableCrop = true, // New prop to enable/disable crop functionality
+  height = "h-48",
 }) => {
-  const [currentFile, setCurrentFile] = useState(null);
-  const [localPreview, setLocalPreview] = useState(null);
+  /* ---------------- state ---------------- */
+  const [file, setFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
 
-  const [crop, setCrop] = useState();
-  const [completedCrop, setCompletedCrop] = useState(null);
-  const [rotation, setRotation] = useState(0);
-  const [flipHorizontal, setFlipHorizontal] = useState(false);
-
+  /* ---------------- refs ---------------- */
   const fileInputRef = useRef(null);
-  const imgRef = useRef(null);
-  const previewCanvasRef = useRef(null);
 
-  const openFileDialog = () => fileInputRef.current?.click();
+  /* ---------------- helpers ---------------- */
+  const openDialog = () => fileInputRef.current?.click();
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file?.type.startsWith("image/")) {
-      message.error("Please upload a valid image.");
-      return;
-    }
-
-    const previewUrl = URL.createObjectURL(file);
-    setCurrentFile(file);
-    setLocalPreview(previewUrl);
-    setRotation(0);
-    setFlipHorizontal(false);
-    form.setFieldsValue({ [name]: file });
-  };
+  const handleFileChange = useCallback(
+    (e) => {
+      const f = e.target.files?.[0];
+      if (!f?.type.startsWith("image/")) {
+        message.error("Please upload a valid image");
+        return;
+      }
+      const url = URL.createObjectURL(f);
+      setFile(f);
+      setPreviewUrl(url);
+      form.setFieldValue(name, f);
+    },
+    [form, name]
+  );
 
   const clearFile = (e) => {
-    e.stopPropagation();
-    setCurrentFile(null);
-    setLocalPreview(null);
-    form.setFieldsValue({ [name]: null });
+    e?.stopPropagation();
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
+    form.setFieldValue(name, null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handlePreview = (e) => {
-    e.stopPropagation();
-    if (localPreview) {
-      setPreviewVisible(true);
-      if (enableCrop) {
-        setCrop({
-          unit: "%",
-          width: 100,
-          aspect: aspectRatio,
-        });
-      }
-    }
+  const openPreview = (e) => {
+    e?.stopPropagation();
+    if (previewUrl) setPreviewVisible(true);
   };
 
-  const handleImageLoaded = (img) => {
-    imgRef.current = img;
-    return false; // suppress built-in crop auto-set
-  };
+  /* revoke object URL on unmount */
+  useEffect(
+    () => () => previewUrl && URL.revokeObjectURL(previewUrl),
+    [previewUrl]
+  );
 
-  const handleCropSave = () => {
-    if (!enableCrop) {
-      setPreviewVisible(false);
-      return;
-    }
-
-    if (
-      !completedCrop ||
-      !completedCrop.width ||
-      !completedCrop.height ||
-      !previewCanvasRef.current
-    ) {
-      message.error("Please crop the image.");
-      return;
-    }
-
-    previewCanvasRef.current.toBlob(
-      (blob) => {
-        if (!blob) {
-          message.error("Failed to crop image.");
-          return;
-        }
-
-        const fileURL = URL.createObjectURL(blob);
-        setLocalPreview(fileURL);
-        setCurrentFile(blob);
-        form.setFieldsValue({ [name]: blob });
-        setPreviewVisible(false);
-      },
-      "image/jpeg",
-      0.95
-    );
-  };
-
-  const rotateImage = (deg) => setRotation((prev) => (prev + deg) % 360);
-  const toggleFlip = () => setFlipHorizontal((prev) => !prev);
-
-  useEffect(() => {
-    if (
-      !enableCrop ||
-      !completedCrop ||
-      !completedCrop.width ||
-      !completedCrop.height ||
-      !previewCanvasRef.current ||
-      !imgRef.current
-    ) {
-      return;
-    }
-
-    const canvas = previewCanvasRef.current;
-    const image = imgRef.current;
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    const ctx = canvas.getContext("2d");
-    const pixelRatio = window.devicePixelRatio;
-
-    canvas.width = completedCrop.width * pixelRatio;
-    canvas.height = completedCrop.height * pixelRatio;
-
-    ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    ctx.imageSmoothingQuality = "high";
-
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((rotation * Math.PI) / 180);
-    if (flipHorizontal) ctx.scale(-1, 1);
-    ctx.translate(-canvas.width / 2, -canvas.height / 2);
-    ctx.drawImage(
-      image,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      completedCrop.width,
-      completedCrop.height
-    );
-    ctx.restore();
-  }, [completedCrop, rotation, flipHorizontal, enableCrop]);
-
+  /* ---------------- render ---------------- */
   return (
     <>
+      {/* Upload area / thumbnail */}
       <div
-        className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
-        onClick={openFileDialog}
+        className={`relative group flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
+        onClick={openDialog}
       >
-        {currentFile ? (
+        {file ? (
           <>
+            {/* image thumbnail */}
             <img
-              src={localPreview}
+              src={previewUrl}
               alt="Preview"
               className="w-full h-full object-cover rounded-md"
-              onClick={handlePreview}
             />
+
+            {/* clear button */}
             <button
               onClick={clearFile}
-              className="absolute top-2 right-2 bg-white border px-2 py-0.5 text-xs rounded hover:bg-gray-100"
+              className="absolute top-2 right-2 bg-white border border-gray-300 rounded px-2 py-0.5 text-xs hover:bg-gray-50"
             >
               Clear
             </button>
+
+            {/* eye overlay (only on hover) */}
             <div
-              className="absolute top-2 left-2 cursor-pointer"
-              onClick={handlePreview}
+              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition"
+              onClick={openPreview}
             >
-              {enableCrop ? (
-                <PiCropLight style={{ fontSize: 24, color: "#fff" }} />
-              ) : (
-                <PiEyeLight style={{ fontSize: 24, color: "#fff" }} />
-              )}
+              <FaEye style={{ fontSize: 32, color: "#ffffff" }} />
             </div>
           </>
         ) : (
@@ -190,130 +397,49 @@ const CustomUploadCard = ({
             <div>Upload Photo</div>
             {recommendedSize && (
               <div className="text-xs text-gray-400 mt-1">
-                (Recommended size: {recommendedSize})
+                (Recommended: {recommendedSize})
               </div>
             )}
           </div>
         )}
+
+        {/* file input */}
         <input
-          type="file"
           ref={fileInputRef}
+          type="file"
           accept="image/*"
-          name={name}
-          onChange={handleFileChange}
           hidden
+          onChange={handleFileChange}
         />
       </div>
 
+      {/* ---------------- Modal (view-only) ---------------- */}
       <Modal
         open={previewVisible}
         footer={null}
         centered
+        title="Image Preview"
         onCancel={() => setPreviewVisible(false)}
-        title={enableCrop ? "Edit Image" : "View Image"}
-        width={1000}
+        width={600}
+        destroyOnClose
       >
-        <Row gutter={24}>
-          <Col md={enableCrop ? 12 : 24}>
-            <h4>{enableCrop ? "Crop Image" : "Image Preview"}</h4>
-            {enableCrop ? (
-              <ReactCrop
-                crop={crop}
-                onChange={(c) => setCrop(c)}
-                onComplete={(c) => setCompletedCrop(c)}
-                onImageLoaded={handleImageLoaded}
-                aspect={aspectRatio}
-              >
-                <img
-                  ref={imgRef}
-                  src={localPreview}
-                  alt="Crop Source"
-                  style={{
-                    maxWidth: "100%",
-                    transform: `rotate(${rotation}deg) scaleX(${
-                      flipHorizontal ? -1 : 1
-                    })`,
-                  }}
-                />
-              </ReactCrop>
-            ) : (
-              <div className="border p-2 rounded-md">
-                <img
-                  src={localPreview}
-                  alt="Preview"
-                  style={{
-                    maxWidth: "100%",
-                    transform: `rotate(${rotation}deg) scaleX(${
-                      flipHorizontal ? -1 : 1
-                    })`,
-                  }}
-                />
-              </div>
-            )}
-
-            {enableCrop && (
-              <>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex space-x-2">
-                    <Button
-                      icon={<GrRotateLeft />}
-                      onClick={() => rotateImage(-90)}
-                      className="text-lg font-semibold bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                    >
-                      Rotate Left
-                    </Button>
-                    <Button
-                      icon={<GrRotateRight />}
-                      onClick={() => rotateImage(90)}
-                      className="text-lg font-semibold bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                    >
-                      Rotate Right
-                    </Button>
-                  </div>
-                  <Button
-                    icon={<PiFlipHorizontalLight />}
-                    onClick={toggleFlip}
-                    className="text-lg font-semibold bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                  >
-                    Flip
-                  </Button>
-                </div>
-
-                <Slider
-                  min={0}
-                  max={360}
-                  value={rotation}
-                  onChange={setRotation}
-                  marks={{ 0: "0°", 90: "90°", 180: "180°", 270: "270°" }}
-                  className="mt-4"
-                />
-              </>
-            )}
-          </Col>
-
-          {enableCrop && (
-            <Col md={12}>
-              <h4>Preview</h4>
-              <div className="border p-2 rounded-md flex items-center justify-center min-h-[200px]">
-                {completedCrop ? (
-                  <canvas ref={previewCanvasRef} style={{ maxWidth: "100%" }} />
-                ) : (
-                  <div className="text-gray-400">
-                    Crop area will appear here
-                  </div>
-                )}
-              </div>
-              <Button
-                type="primary"
-                className="mt-4 w-full bg-blue-500 text-white hover:bg-blue-600"
-                onClick={handleCropSave}
-              >
-                Save Cropped Image
-              </Button>
-            </Col>
-          )}
-        </Row>
+        <img
+          src={previewUrl}
+          alt="Preview"
+          className="max-h-[80vh] w-full object-contain rounded-md"
+        />
       </Modal>
+
+      {/* --------------------------------------------------- */}
+      {/*  NOTE: Cropping / rotation / flip implementation    */}
+      {/*  has been commented out for now. Re-enable later    */}
+      {/*  by restoring ReactCrop and related state/effects.  */}
+      {/* --------------------------------------------------- */}
+      {/*
+        import ReactCrop from "react-image-crop";
+        import "react-image-crop/dist/ReactCrop.css";
+        ...existing rotation / flip logic...
+      */}
     </>
   );
 };
