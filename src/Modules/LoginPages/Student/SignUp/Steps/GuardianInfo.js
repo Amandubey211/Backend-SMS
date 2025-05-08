@@ -38,8 +38,6 @@ import dayjs from "dayjs";
 
 const { Option } = Select;
 
-/* ─── static options ─── */
-
 /* ─── phone + WhatsApp toggle ─── */
 const PhoneField = ({
   form,
@@ -118,7 +116,10 @@ const PhoneField = ({
 const GuardianInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-
+  const [completedSections, setCompletedSections] = useState({
+    father: false,
+    mother: false,
+  });
   const { isCheckingStudent } = useSelector((s) => s.common.studentSignup);
 
   const containerRef = useRef(null);
@@ -465,20 +466,18 @@ const GuardianInfo = ({ formData }) => {
       // Update Redux store with current data
       dispatch(updateFormData({ guardian: processedValues }));
 
-      // Handle tab navigation
+      // Mark current section as complete
       if (activeTab === "father") {
+        setCompletedSections((prev) => ({ ...prev, father: true }));
         setActiveTab("mother");
         return;
       }
       if (activeTab === "mother") {
+        setCompletedSections((prev) => ({ ...prev, mother: true }));
         setActiveTab("guardian");
         return;
       }
-
-      // Final validation before submission
       await GuardianSchema.validate(processedValues, { abortEarly: false });
-
-      // Proceed to next step
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
@@ -511,6 +510,13 @@ const GuardianInfo = ({ formData }) => {
           size="large"
           value={activeTab}
           onChange={(val) => {
+            if (
+              (val === "mother" && !completedSections.father) ||
+              (val === "guardian" && !completedSections.mother)
+            ) {
+              message.warning("Please complete the current section first");
+              return;
+            }
             setActiveTab(val);
             smoothToTop();
           }}
@@ -530,6 +536,7 @@ const GuardianInfo = ({ formData }) => {
                   <LiaFemaleSolid className="mr-2" /> Mother
                 </span>
               ),
+              disabled: !completedSections.father,
             },
             {
               value: "guardian",
@@ -538,6 +545,7 @@ const GuardianInfo = ({ formData }) => {
                   <TeamOutlined className="mr-2" /> Guardian
                 </span>
               ),
+              disabled: !completedSections.mother,
             },
           ]}
           style={{ width: "100%" }}
