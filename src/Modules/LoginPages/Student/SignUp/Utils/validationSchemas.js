@@ -59,12 +59,18 @@ export const CandidateSchema = yup.object({
   firstName: yup.string().required("First name is required"),
   lastName: yup.string().required("Last name is required"),
   middleName: yup.string().required("Middle name is required"),
-
-  // dob: yup
-  //   .string()
-  //   .transform(toDate)
-  //   .typeError("Date of birth is required")
-  //   .required("Date of birth is required"),
+  profile: yup
+    .mixed()
+    .required("Candidate photo is required")
+    .test("is-file-or-url", "Invalid image", (value) => {
+      // Allow either a File object or a URL string
+      return value instanceof File || typeof value === "string";
+    }),
+  dob: yup
+    .string()
+    .transform(toDate)
+    .typeError("Date of birth is required")
+    .required("Date of birth is required"),
 
   dob: yup.date().typeError("Required").required(),
 

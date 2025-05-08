@@ -107,29 +107,42 @@ const CandidateInfo = ({ formData }) => {
   /* hydrate draft (convert dates back to dayjs) */
   useEffect(() => {
     if (!formData) return;
-    form.setFieldsValue({
-      ...formData,
+
+    const initialValues = {
+      ...formData, // Spread all existing formData properties
+      // Convert string dates to dayjs objects
       dob: formData.dob ? dayjs(formData.dob) : undefined,
       idExpiry: formData.idExpiry ? dayjs(formData.idExpiry) : undefined,
       passportExpiry: formData.passportExpiry
         ? dayjs(formData.passportExpiry)
         : undefined,
       phoneNumberIsWhatsapp: formData.phoneNumberIsWhatsapp || false,
-      profile: formData.profile instanceof File ? formData.profile : undefined,
-    });
+      profile: formData.profile || undefined,
+    };
+
+    // This is where initialValues.age gets added
+    if (formData.dob) {
+      initialValues.age = dayjs().diff(dayjs(formData.dob), "year");
+    }
+
+    form.setFieldsValue(initialValues);
   }, [formData]);
 
-  /* auto‑age calc */
   const handleDobChange = (d) => {
     form.setFieldValue("dob", d);
-    if (d) {
-      const yrs = dayjs().diff(d, "year");
-      form.setFieldValue("age", yrs);
+    if (d && d.isValid()) {
+      const today = dayjs();
+      const birthDate = dayjs(d);
+      let age = today.year() - birthDate.year();
+      const m = today.month() - birthDate.month();
+      if (m < 0 || (m === 0 && today.date() < birthDate.date())) {
+        age--;
+      }
+      form.setFieldValue("age", age);
     } else {
       form.setFieldValue("age", "");
     }
   };
-
   /* persist every keystroke */
   const handleValuesChange = () => {
     const raw = form.getFieldsValue(true);
@@ -138,8 +151,8 @@ const CandidateInfo = ({ formData }) => {
         candidate: {
           ...raw,
           // Preserve the File object if it exists
-          profile:
-            raw.profile instanceof File ? raw.profile : formData?.profile,
+
+          profile: raw.profile,
           // Handle date conversions
           dob: raw.dob ? raw.dob.format("YYYY-MM-DD") : null,
           idExpiry: raw.idExpiry ? raw.idExpiry.format("YYYY-MM-DD") : null,
@@ -150,6 +163,13 @@ const CandidateInfo = ({ formData }) => {
       })
     );
   };
+  const validateAge = (_, value) => {
+    if (value < 3) return Promise.reject("Age must be at least 3");
+    if (value > 100) return Promise.reject("Age must be less than 100");
+    return Promise.resolve();
+  };
+
+  // In your Form.Item:
 
   /* navigation */
   const goNext = async () => {
@@ -173,13 +193,28 @@ const CandidateInfo = ({ formData }) => {
         }
       });
 
-      handleValuesChange(); // Update Redux state
+      await CandidateSchema.validate(vals, { abortEarly: false });
+      handleValuesChange();
       dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
-      const first = err?.inner?.[0]?.path?.split(".");
-      if (first)
-        form.scrollToField(first, { behavior: "smooth", block: "center" });
+      const firstErrorField = err?.inner?.[0]?.path;
+
+      if (firstErrorField) {
+        // Special handling for the profile image field
+        if (firstErrorField === "profile") {
+          // Scroll to the upload card container
+          document.querySelector(".upload-card-container")?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        } else {
+          form.scrollToField(firstErrorField, {
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }
     }
   };
 
@@ -195,17 +230,28 @@ const CandidateInfo = ({ formData }) => {
         className="space-y-4"
       >
         {/* 📸 + names */}
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col md:flex-row gap-4 upload-card-container">
+          {" "}
+          {/* Added class here */}
           <div className="md:w-[40%]">
-            <CustomUploadCard
+            <Form.Item
               name="profile"
-              label="Candidate Photo"
-              form={form}
-              recommendedSize="300x400"
-              width="w-full"
-              height="h-48"
-              aspectRatio={1}
-            />
+              rules={[
+                { required: true, message: "Candidate photo is required" },
+              ]}
+              valuePropName="file" // Important for AntD Form validation
+            >
+              <CustomUploadCard
+                name="profile"
+                label="Candidate Photo"
+                form={form}
+                recommendedSize="300x400"
+                width="w-full"
+                height="h-48"
+                aspectRatio={1}
+                required
+              />
+            </Form.Item>
           </div>
           <div className="md:w-[60%] grid gap-3">
             <Form.Item
@@ -264,8 +310,12 @@ const CandidateInfo = ({ formData }) => {
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item name="age" label="Age">
-              <Input size="large" disabled readOnly />
+            <Form.Item
+              name="age"
+              label="Age"
+              rules={[{ validator: validateAge }]}
+            >
+              <Input size="large" disabled readOnly suffix="years" />
             </Form.Item>
           </Col>
         </Row>
@@ -273,12 +323,12 @@ const CandidateInfo = ({ formData }) => {
         {/* Student‑ID / expiry */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <Form.Item name="studentId" label="Student ID">
+            <Form.Item name="studentId" label="Student QID">
               <Input size="large" prefix={<IdcardOutlined />} />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item name="idExpiry" label="ID Expiry">
+            <Form.Item name="idExpiry" label="QID Expiry">
               <DatePicker
                 size="large"
                 className="w-full"

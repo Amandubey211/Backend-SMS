@@ -1,309 +1,16 @@
-// import React, { useRef, useState, useEffect, useCallback } from "react";
-// import { Modal, Button, message, Slider, Row, Col } from "antd";
-// import ReactCrop from "react-image-crop";
-// import "react-image-crop/dist/ReactCrop.css";
-// import { GrRotateRight, GrRotateLeft } from "react-icons/gr";
-// import { PiCropLight, PiFlipHorizontalLight } from "react-icons/pi";
+import React, { useState, useEffect } from "react";
+import { Modal, Button, message, Spin, Tooltip } from "antd";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 
-// const CustomUploadCard = ({
-//   name,
-//   label,
-//   form,
-//   recommendedSize = "300x400",
-//   width = "w-full",
-//   height = "h-48",
-//   aspectRatio = 3 / 4,
-//   enableCrop = true,
-// }) => {
-//   /* ---------------- state ---------------- */
-//   const [file, setFile] = useState(null);
-//   const [previewUrl, setPreviewUrl] = useState(null);
-//   const [previewVisible, setPreviewVisible] = useState(false);
+import useCloudinaryUpload from "../../../../../Hooks/CommonHooks/useCloudinaryUpload";
+import useCloudinaryDeleteByPublicId from "../../../../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
 
-//   /* crop state */
-//   const [crop, setCrop] = useState(null);
-//   const [completedCrop, setCompletedCrop] = useState(null);
-//   const [rotation, setRotation] = useState(0);
-//   const [flipH, setFlipH] = useState(false);
-
-//   /* ---------------- refs ---------------- */
-//   const fileInputRef = useRef(null);
-//   const imgRef = useRef(null);
-//   const canvasRef = useRef(null);
-
-//   /* ---------------- helpers ---------------- */
-//   const openDialog = () => fileInputRef.current?.click();
-
-//   const handleFileChange = useCallback(
-//     (e) => {
-//       const f = e.target.files?.[0];
-//       if (!f?.type.startsWith("image/")) {
-//         message.error("Please upload a valid image");
-//         return;
-//       }
-//       const url = URL.createObjectURL(f);
-//       setFile(f);
-//       setPreviewUrl(url);
-//       form.setFieldValue(name, f);
-
-//       /* reset editor state */
-//       setRotation(0);
-//       setFlipH(false);
-//     },
-//     [form, name]
-//   );
-
-//   const clearFile = (e) => {
-//     e?.stopPropagation();
-//     if (previewUrl) URL.revokeObjectURL(previewUrl);
-//     setFile(null);
-//     setPreviewUrl(null);
-//     form.setFieldValue(name, null);
-//     if (fileInputRef.current) fileInputRef.current.value = "";
-//   };
-
-//   const openPreview = (e) => {
-//     e?.stopPropagation();
-//     if (!previewUrl) return;
-//     if (enableCrop) {
-//       setCrop({ unit: "%", width: 100, aspect: aspectRatio });
-//     }
-//     setPreviewVisible(true);
-//   };
-
-//   const saveCrop = () => {
-//     if (!completedCrop || !canvasRef.current) {
-//       return message.error("Please crop the image first");
-//     }
-//     canvasRef.current.toBlob(
-//       (blob) => {
-//         if (!blob) return message.error("Failed to crop image");
-//         const newFile = new File([blob], file?.name || "image.jpg", {
-//           type: "image/jpeg",
-//         });
-//         const newURL = URL.createObjectURL(blob);
-//         setFile(newFile);
-//         setPreviewUrl(newURL);
-//         form.setFieldValue(name, newFile);
-//         setPreviewVisible(false);
-//       },
-//       "image/jpeg",
-//       0.9
-//     );
-//   };
-
-//   /* ------------ live-preview painter ------------ */
-//   useEffect(() => {
-//     if (
-//       !enableCrop ||
-//       !imgRef.current ||
-//       !canvasRef.current ||
-//       !crop?.width ||
-//       !crop?.height
-//     )
-//       return;
-
-//     const canvas = canvasRef.current;
-//     const image = imgRef.current;
-//     const scaleX = image.naturalWidth / image.width;
-//     const scaleY = image.naturalHeight / image.height;
-//     const dpr = window.devicePixelRatio || 1;
-//     const ctx = canvas.getContext("2d");
-
-//     canvas.width = crop.width * dpr;
-//     canvas.height = crop.height * dpr;
-//     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-//     ctx.imageSmoothingQuality = "high";
-
-//     ctx.save();
-//     ctx.clearRect(0, 0, canvas.width, canvas.height);
-//     ctx.translate(canvas.width / 2, canvas.height / 2);
-//     ctx.rotate((rotation * Math.PI) / 180);
-//     if (flipH) ctx.scale(-1, 1);
-//     ctx.translate(-canvas.width / 2, -canvas.height / 2);
-//     ctx.drawImage(
-//       image,
-//       crop.x * scaleX,
-//       crop.y * scaleY,
-//       crop.width * scaleX,
-//       crop.height * scaleY,
-//       0,
-//       0,
-//       crop.width,
-//       crop.height
-//     );
-//     ctx.restore();
-//   }, [crop, rotation, flipH, enableCrop]);
-
-//   /* revoke object URLs on unmount */
-//   useEffect(
-//     () => () => previewUrl && URL.revokeObjectURL(previewUrl),
-//     [previewUrl]
-//   );
-
-//   /* ---------------- render ---------------- */
-//   return (
-//     <>
-//       {/* Upload thumbnail */}
-//       <div
-//         className={`relative flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
-//         onClick={openDialog}
-//       >
-//         {file ? (
-//           <>
-//             <img
-//               src={previewUrl}
-//               alt="Preview"
-//               className="w-full h-full object-cover rounded-md"
-//               onClick={openPreview}
-//             />
-//             <button
-//               onClick={clearFile}
-//               className="absolute top-2 right-2 bg-white border border-gray-300 rounded px-2 py-0.5 text-xs hover:bg-gray-50"
-//             >
-//               Clear
-//             </button>
-//             {enableCrop && (
-//               <div
-//                 className="absolute top-2 left-2 cursor-pointer"
-//                 onClick={openPreview}
-//               >
-//                 <PiCropLight style={{ fontSize: 25, color: "#fff" }} />
-//               </div>
-//             )}
-//           </>
-//         ) : (
-//           <div className="text-center p-4">
-//             <div className="text-xl">+</div>
-//             <div>Upload Photo</div>
-//             {recommendedSize && (
-//               <div className="text-xs text-gray-400 mt-1">
-//                 (Recommended: {recommendedSize})
-//               </div>
-//             )}
-//           </div>
-//         )}
-//         <input
-//           ref={fileInputRef}
-//           type="file"
-//           accept="image/*"
-//           hidden
-//           onChange={handleFileChange}
-//         />
-//       </div>
-
-//       {/* Modal */}
-//       <Modal
-//         open={previewVisible}
-//         footer={null}
-//         centered
-//         title={enableCrop ? "Edit Image" : "Image Preview"}
-//         onCancel={() => setPreviewVisible(false)}
-//         width={enableCrop ? 1000 : 600}
-//         destroyOnClose
-//       >
-//         {enableCrop ? (
-//           /* ---------- Editor ---------- */
-//           <Row gutter={[16, 16]}>
-//             <Col xs={24} md={12}>
-//               <h4 className="text-center mb-2">Crop</h4>
-//               <ReactCrop
-//                 crop={crop}
-//                 onChange={(c) => setCrop(c)}
-//                 onComplete={(c) => setCompletedCrop(c)}
-//                 onImageLoaded={(img) => (imgRef.current = img)}
-//                 aspect={aspectRatio}
-//                 className="max-h-[50vh]"
-//               >
-//                 <img
-//                   src={previewUrl}
-//                   alt="Crop"
-//                   style={{
-//                     transform: `rotate(${rotation}deg) scaleX(${
-//                       flipH ? -1 : 1
-//                     })`,
-//                     maxWidth: "100%",
-//                     maxHeight: "50vh",
-//                   }}
-//                 />
-//               </ReactCrop>
-
-//               <div className="flex justify-between items-center my-4 px-5">
-//                 <div className="flex space-x-2">
-//                   <Button
-//                     icon={<GrRotateLeft />}
-//                     onClick={() => setRotation((r) => (r - 90 + 360) % 360)}
-//                   />
-//                   <Button
-//                     icon={<GrRotateRight />}
-//                     onClick={() => setRotation((r) => (r + 90) % 360)}
-//                   />
-//                 </div>
-//                 <Button
-//                   icon={<PiFlipHorizontalLight />}
-//                   onClick={() => setFlipH((f) => !f)}
-//                 />
-//               </div>
-
-//               <div className="px-5">
-//                 <Slider
-//                   min={0}
-//                   max={360}
-//                   value={rotation}
-//                   onChange={setRotation}
-//                   marks={{ 0: "0°", 90: "90°", 180: "180°", 270: "270°" }}
-//                 />
-//               </div>
-//             </Col>
-
-//             <Col xs={24} md={12}>
-//               <h4 className="text-center mb-2">Preview</h4>
-//               <div className="border rounded-md p-2 flex justify-center items-center h-[30rem]">
-//                 {crop?.width ? (
-//                   <canvas
-//                     ref={canvasRef}
-//                     style={{ maxWidth: "100%", maxHeight: "100%" }}
-//                   />
-//                 ) : (
-//                   <span className="text-gray-400">
-//                     Crop area will appear here
-//                   </span>
-//                 )}
-//               </div>
-//               <Button
-//                 type="primary"
-//                 className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white mt-4"
-//                 block
-//                 onClick={saveCrop}
-//               >
-//                 Save Cropped Image
-//               </Button>
-//             </Col>
-//           </Row>
-//         ) : (
-//           /* ---------- Viewer ---------- */
-//           <img
-//             src={previewUrl}
-//             alt="Preview"
-//             className="max-h-[80vh] w-full object-contain rounded-md"
-//           />
-//         )}
-//       </Modal>
-//     </>
-//   );
-// };
-
-// export default CustomUploadCard;
-/**
- * CustomUploadCard (simplified, view-only)
- * – Cropping / rotation / flip code has been commented out so you can re-enable later.
- * – Hovering the thumbnail shows an eye icon; clicking it opens a read-only modal preview.
- */
-
-import React, { useRef, useState, useCallback, useEffect } from "react";
-import { Modal, Button, message } from "antd";
-import { FaEye } from "react-icons/fa";
-import { PiCropLight } from "react-icons/pi"; // ← kept for future use if needed
+const VALID_TYPES = ["image/jpeg", "image/png", "image/gif"];
 
 const CustomUploadCard = ({
   name,
@@ -311,125 +18,249 @@ const CustomUploadCard = ({
   recommendedSize = "300x400",
   width = "w-full",
   height = "h-48",
+  required = false,
 }) => {
-  /* ---------------- state ---------------- */
-  const [file, setFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [previewVisible, setPreviewVisible] = useState(false);
+  /* -------------------- Hooks -------------------- */
+  const { uploadFile, uploading, error, resetUpload } = useCloudinaryUpload(
+    process.env.REACT_APP_CLOUDINARY_PRESET,
+    "student_profiles"
+  );
+  const { deleteMediaByPublicId } = useCloudinaryDeleteByPublicId();
 
-  /* ---------------- refs ---------------- */
-  const fileInputRef = useRef(null);
+  const [publicId, setPublicId] = useState(null);
+  const [localFile, setLocalFile] = useState(null);
+  const [localURL, setLocalURL] = useState(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [currentImage, setCurrentImage] = useState(null);
 
-  /* ---------------- helpers ---------------- */
-  const openDialog = () => fileInputRef.current?.click();
+  /* ----------- Utilities ----------- */
+  const extractPublicId = (url = "") => {
+    const parts = url.split("/");
+    const idx = parts.findIndex((p) => p === "upload");
+    return idx === -1
+      ? null
+      : parts
+          .slice(idx + 2)
+          .join("/")
+          .split(".")[0];
+  };
 
-  const handleFileChange = useCallback(
-    (e) => {
-      const f = e.target.files?.[0];
-      if (!f?.type.startsWith("image/")) {
-        message.error("Please upload a valid image");
-        return;
+  /* ----------- Initialise from form field (edit mode) ----------- */
+  useEffect(() => {
+    const existing = form.getFieldValue(name);
+    if (existing?.url) {
+      setCurrentImage(existing.url);
+      const id = extractPublicId(existing.url);
+      id && setPublicId(id);
+    }
+    resetUpload();
+  }, [form, name, resetUpload]);
+
+  /* ----------- Clean up local object URLs ----------- */
+  useEffect(() => {
+    return () => {
+      if (localURL) URL.revokeObjectURL(localURL);
+    };
+  }, [localURL]);
+
+  /* -------------------- Handlers -------------------- */
+  const handleSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!VALID_TYPES.includes(file.type)) {
+      message.error("Only JPG / PNG / GIF allowed");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      message.error("File size must be less than 5MB");
+      return;
+    }
+
+    setLocalFile(file);
+    setLocalURL(URL.createObjectURL(file));
+  };
+
+  const confirmUpload = async () => {
+    if (!localFile) return;
+    try {
+      if (publicId) await deleteMediaByPublicId(publicId);
+
+      const url = await uploadFile(localFile);
+      if (url) {
+        const id = extractPublicId(url);
+        setPublicId(id);
+        setCurrentImage(url);
+        form.setFieldValue(name, url); // This will trigger validation
+        message.success("Image uploaded ✔");
+        setLocalFile(null);
+        setLocalURL(null);
       }
-      const url = URL.createObjectURL(f);
-      setFile(f);
-      setPreviewUrl(url);
-      form.setFieldValue(name, f);
-    },
-    [form, name]
-  );
-
-  const clearFile = (e) => {
-    e?.stopPropagation();
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setFile(null);
-    setPreviewUrl(null);
-    form.setFieldValue(name, null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (err) {
+      message.error("Upload failed");
+      console.error(err);
+    }
   };
 
-  const openPreview = (e) => {
-    e?.stopPropagation();
-    if (previewUrl) setPreviewVisible(true);
+  const removeUploaded = async () => {
+    try {
+      if (publicId) await deleteMediaByPublicId(publicId);
+      setPublicId(null);
+      setCurrentImage(null);
+      form.setFieldValue(name, null); // Set to null instead of empty object
+      message.success("Image removed");
+    } catch (err) {
+      message.error("Remove failed");
+      console.error(err);
+    }
+  };
+  const cancelPending = () => {
+    setLocalFile(null);
+    setLocalURL(null);
   };
 
-  /* revoke object URL on unmount */
-  useEffect(
-    () => () => previewUrl && URL.revokeObjectURL(previewUrl),
-    [previewUrl]
+  // const removeUploaded = async () => {
+  //   try {
+  //     if (publicId) await deleteMediaByPublicId(publicId);
+  //     setPublicId(null);
+  //     setCurrentImage(null);
+  //     form.setFieldValue(name, null);
+  //     message.success("Image removed");
+  //   } catch (err) {
+  //     message.error("Remove failed");
+  //     console.error(err);
+  //   }
+  // };
+
+  /* -------------------- Render helpers -------------------- */
+  const EmptyState = () => (
+    <div className="text-center p-4">
+      <div className="text-xl">+</div>
+      <div>Upload Photo</div>
+      <div className="text-xs text-gray-500 mt-1">
+        (Recommended {recommendedSize})
+      </div>
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleSelect}
+        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+      />
+    </div>
   );
 
-  /* ---------------- render ---------------- */
-  return (
+  const PendingState = () => (
     <>
-      {/* Upload area / thumbnail */}
-      <div
-        className={`relative group flex items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer hover:border-blue-500 transition-colors ${width} ${height}`}
-        onClick={openDialog}
-      >
-        {file ? (
-          <>
-            {/* image thumbnail */}
-            <img
-              src={previewUrl}
-              alt="Preview"
-              className="w-full h-full object-cover rounded-md"
-            />
+      <img
+        src={localURL}
+        alt="preview"
+        className="w-full h-full object-cover"
+      />
+      <div className="absolute inset-0 bg-black/60 flex items-center justify-center gap-3">
+        <Tooltip title="Upload">
+          <Button
+            shape="circle"
+            type="text"
+            icon={<CheckOutlined className="text-white" />}
+            onClick={confirmUpload}
+            loading={uploading}
+          />
+        </Tooltip>
+        <Tooltip title="Cancel">
+          <Button
+            shape="circle"
+            danger
+            type="text"
+            icon={<CloseOutlined className="text-white" />}
+            onClick={cancelPending}
+            disabled={uploading}
+          />
+        </Tooltip>
+      </div>
+    </>
+  );
 
-            {/* clear button */}
-            <button
-              onClick={clearFile}
-              className="absolute top-2 right-2 bg-white border border-gray-300 rounded px-2 py-0.5 text-xs hover:bg-gray-50"
-            >
-              Clear
-            </button>
+  const UploadedState = () => (
+    <>
+      <img
+        src={currentImage}
+        alt="Uploaded"
+        className="w-full h-full object-cover"
+        onClick={() => setPreviewOpen(true)}
+      />
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center opacity-0 group-hover:opacity-100">
+        <Tooltip title="Preview">
+          <Button
+            shape="circle"
+            type="text"
+            icon={<EyeOutlined className="text-white" />}
+            onClick={() => setPreviewOpen(true)}
+          />
+        </Tooltip>
+        <Tooltip title="Remove">
+          <Button
+            shape="circle"
+            danger
+            type="text"
+            icon={<DeleteOutlined className="text-white" />}
+            onClick={removeUploaded}
+            className="ml-2"
+          />
+        </Tooltip>
+      </div>
+    </>
+  );
 
-            {/* eye overlay (only on hover) */}
-            <div
-              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition"
-              onClick={openPreview}
-            >
-              <FaEye style={{ fontSize: 32, color: "#ffffff" }} />
+  /* -------------------- Main JSX -------------------- */
+  return (
+    <div className={`${width} ${height}`}>
+      <div className="flex flex-col h-full">
+        <div
+          className={`relative group border-2 border-dashed rounded-md flex items-center justify-center flex-1
+          transition-colors overflow-hidden cursor-pointer
+          ${
+            uploading
+              ? "bg-gray-100 border-gray-300"
+              : "bg-white hover:border-blue-500"
+          }
+        `}
+        >
+          {uploading ? (
+            <div className="flex flex-col items-center p-4">
+              <Spin size="large" />
+              <span className="mt-2 text-sm text-gray-600">Uploading…</span>
             </div>
-          </>
-        ) : (
-          <div className="text-center p-4">
-            <div className="text-xl">+</div>
-            <div>Upload Photo</div>
-            {recommendedSize && (
-              <div className="text-xs text-gray-400 mt-1">
-                (Recommended: {recommendedSize})
-              </div>
-            )}
-          </div>
-        )}
+          ) : localURL ? (
+            <PendingState />
+          ) : currentImage ? (
+            <UploadedState />
+          ) : (
+            <EmptyState />
+          )}
+        </div>
 
-        {/* file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          hidden
-          onChange={handleFileChange}
-        />
+        {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
       </div>
 
-      {/* ---------------- Modal (view-only) ---------------- */}
+      {/* Full-screen preview */}
       <Modal
-        open={previewVisible}
-        footer={null}
+        open={previewOpen}
         centered
-        title="Image Preview"
-        onCancel={() => setPreviewVisible(false)}
-        width={600}
-        destroyOnClose
+        footer={null}
+        onCancel={() => setPreviewOpen(false)}
+        width="70%"
+        bodyStyle={{ padding: 0 }}
       >
-        <img
-          src={previewUrl}
-          alt="Preview"
-          className="max-h-[80vh] w-full object-contain rounded-md"
-        />
+        {currentImage && (
+          <img
+            src={currentImage}
+            alt="preview"
+            style={{ width: "100%", maxHeight: "80vh", objectFit: "contain" }}
+          />
+        )}
       </Modal>
-    </>
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-// src/pages/StudentSignUp/Steps/GuardianInfo.jsx
 import {
   Form,
   Input,
@@ -36,10 +35,10 @@ import {
   RELIGION_OPTIONS,
 } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+// import isDayjs from "dayjs/plugin/isDayjs";
 
 const { Option } = Select;
-
-/* ─── static options ─── */
 
 /* ─── phone + WhatsApp toggle ─── */
 const PhoneField = ({
@@ -119,7 +118,10 @@ const PhoneField = ({
 const GuardianInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
-
+  const [completedSections, setCompletedSections] = useState({
+    father: false,
+    mother: false,
+  });
   const { isCheckingStudent } = useSelector((s) => s.common.studentSignup);
 
   const containerRef = useRef(null);
@@ -130,14 +132,12 @@ const GuardianInfo = ({ formData }) => {
   const [activeTab, setActiveTab] = useState("father");
 
   /* Hydrate form with initial data */
-  // Update the useEffect that hydrates the form
+
   useEffect(() => {
     if (!formData) return;
-
-    // Create a deep copy and handle file objects properly
     const sanitized = JSON.parse(JSON.stringify(formData));
 
-    // Convert dates to dayjs objects
+    // Convert string dates to dayjs objects
     ["fatherInfo.idExpiry", "motherInfo.idExpiry"].forEach((path) => {
       const parts = path.split(".");
       let curr = sanitized;
@@ -147,25 +147,6 @@ const GuardianInfo = ({ formData }) => {
       const leaf = parts.pop();
       if (curr[leaf]) {
         curr[leaf] = dayjs(curr[leaf]);
-      }
-    });
-
-    // Convert phone numbers to strings
-    [
-      "fatherInfo.cell1",
-      "fatherInfo.cell2",
-      "motherInfo.cell1",
-      "motherInfo.cell2",
-      "guardianInformation.guardianContactNumber",
-    ].forEach((path) => {
-      const parts = path.split(".");
-      let curr = sanitized;
-      for (let i = 0; i < parts.length - 1; i++) {
-        curr = curr[parts[i]] ||= {};
-      }
-      const leaf = parts.pop();
-      if (curr[leaf] !== undefined && curr[leaf] !== null) {
-        curr[leaf] = curr[leaf].toString();
       }
     });
 
@@ -184,8 +165,17 @@ const GuardianInfo = ({ formData }) => {
 
   const smoothToTop = () =>
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
-  const handleValuesChange = () =>
-    dispatch(updateFormData({ guardian: form.getFieldsValue(true) }));
+  const handleValuesChange = () => {
+    const raw = form.getFieldsValue(true);
+
+    // Ensure photos are always plain strings
+    ["fatherInfo.photo", "motherInfo.photo"].forEach((p) => {
+      const [parent, key] = p.split(".");
+      if (raw[parent]?.[key]?.url) raw[parent][key] = raw[parent][key].url;
+    });
+
+    dispatch(updateFormData({ guardian: raw }));
+  };
 
   /* ------------- reusable render helpers ------------- */
   const renderNameFields = (p) => (
@@ -220,21 +210,27 @@ const GuardianInfo = ({ formData }) => {
     <>
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item name={[p, "idNumber"]} label="ID #" className="mb-4">
+          <Form.Item name={[p, "idNumber"]} label="QID" className="mb-4">
             <Input size="large" placeholder="ID Number" />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name={[p, "idExpiry"]}
-            label="ID Expiry"
+            label="QID Expiry"
             className="mb-4"
             rules={[
               {
-                validator: (_, value) =>
-                  !value || dayjs.isDayjs(value)
-                    ? Promise.resolve()
-                    : Promise.reject("Invalid date"),
+                validator: (_, value) => {
+                  // Accept empty values
+                  if (!value) return Promise.resolve();
+
+                  // Check if it's a Dayjs object and valid
+                  if (dayjs.isDayjs(value) && value.isValid()) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject("Please select a valid date");
+                },
               },
             ]}
           >
@@ -448,43 +444,31 @@ const GuardianInfo = ({ formData }) => {
 
   const handleNext = async () => {
     try {
-      // First validate all fields
       await form.validateFields();
-
-      // Get current form values including files
       const formValues = form.getFieldsValue(true);
 
-      // Convert dayjs dates to strings
       const processedValues = {
         ...formValues,
         fatherInfo: {
           ...formValues.fatherInfo,
-          idExpiry: formValues.fatherInfo?.idExpiry?.format("YYYY-MM-DD"),
+          idExpiry:
+            formValues.fatherInfo?.idExpiry?.format("YYYY-MM-DD") || null,
         },
         motherInfo: {
           ...formValues.motherInfo,
-          idExpiry: formValues.motherInfo?.idExpiry?.format("YYYY-MM-DD"),
+          idExpiry:
+            formValues.motherInfo?.idExpiry?.format("YYYY-MM-DD") || null,
         },
       };
 
-      // Update Redux store with current data
       dispatch(updateFormData({ guardian: processedValues }));
 
-      // Handle tab navigation
-      if (activeTab === "father") {
-        setActiveTab("mother");
-        return;
+      if (activeTab === "father") setActiveTab("mother");
+      else if (activeTab === "mother") setActiveTab("guardian");
+      else {
+        await GuardianSchema.validate(processedValues, { abortEarly: false });
+        dispatch(nextStep());
       }
-      if (activeTab === "mother") {
-        setActiveTab("guardian");
-        return;
-      }
-
-      // Final validation before submission
-      await GuardianSchema.validate(processedValues, { abortEarly: false });
-
-      // Proceed to next step
-      dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
       const firstError =
@@ -516,6 +500,13 @@ const GuardianInfo = ({ formData }) => {
           size="large"
           value={activeTab}
           onChange={(val) => {
+            if (
+              (val === "mother" && !completedSections.father) ||
+              (val === "guardian" && !completedSections.mother)
+            ) {
+              message.warning("Please complete the current section first");
+              return;
+            }
             setActiveTab(val);
             smoothToTop();
           }}
@@ -535,6 +526,7 @@ const GuardianInfo = ({ formData }) => {
                   <LiaFemaleSolid className="mr-2" /> Mother
                 </span>
               ),
+              disabled: !completedSections.father,
             },
             {
               value: "guardian",
@@ -543,6 +535,7 @@ const GuardianInfo = ({ formData }) => {
                   <TeamOutlined className="mr-2" /> Guardian
                 </span>
               ),
+              disabled: !completedSections.mother,
             },
           ]}
           style={{ width: "100%" }}

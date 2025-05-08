@@ -64,7 +64,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
 
   const mergedValidation = useMemo(() => {
     const s = baseAdminAdmissionSchema.concat(attachmentsSchema);
-    delete s.fields.studentPicture; //  ⬅️  force-remove
+    delete s.fields.studentPicture; 
     return s;
   }, [attachmentsSchema]);
 
@@ -124,17 +124,17 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       setFormSubmiting(true)
       for (let key of Object.keys(values?.candidateInformation || {})) {
         const val = fields?.find((field) => field?.fieldName == key);
-        console.log(key, val);
         if (!val) {
           if (!values?.candidateInformation[key]) {
             toast.error(`Candidate ${formatLabel(key)} is requireds`);
+            setFormSubmiting(false)
             return;
           }
         }
         if (val?.required == true) {
           if (!values?.candidateInformation[val.fieldName]) {
             toast.error(`Candidate ${formatLabel(val.fieldName)} is requiredd`);
-
+            setFormSubmiting(false)
             return;
           }
         }
@@ -142,15 +142,18 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       for (let key of Object.keys(values?.academicSession || {})) {
         if (!values?.academicSession[key]) {
           toast.error(`In "Academic Session" Section: ${formatLabel(key)} is required`);
+          setFormSubmiting(false)
           return;
         }
       }
       if (fields?.find((field) => field?.fieldName == "secondLanguage").required & values?.languagePrefs?.second?.length < 1) {
         toast.error(`Second Language is required`);
+        setFormSubmiting(false)
         return;
       }
       if (fields?.find((field) => field?.fieldName == "thirdLanguage").required & values?.languagePrefs?.third?.length < 1) {
         toast.error(`Third Language is required`);
+        setFormSubmiting(false)
         return;
       }
 
@@ -160,12 +163,14 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         if (!val) {
           if (!values?.academicHistory[key]) {
             toast.error(`Academic History: ${formatLabel(key)} is required`);
+            setFormSubmiting(false)
             return;
           }
         }
         if (val?.required === true) {
           if (!values?.academicHistory[val.fieldName]) {
             toast.error(`Academic History: ${formatLabel(val.fieldName)} is required`);
+            setFormSubmiting(false)
             return;
           }
         }
@@ -176,13 +181,14 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         if (!val) {
           if (!values?.addressInformation[key]) {
             toast.error(`Address Information: ${formatLabel(key)} is required`);
+            setFormSubmiting(false)
             return;
           }
         }
         if (val?.required === true) {
           if (!values?.addressInformation[val.fieldName?.split('.')[1]]) {
             toast.error(`Address Information: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-
+            setFormSubmiting(false)
             return;
           }
         }
@@ -193,6 +199,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         if (!val) {
           if (!values?.fatherInfo[key]) {
             toast.error(`Father Info: ${formatLabel(key)} is required`);
+            setFormSubmiting(false)
             return;
           }
         }
@@ -200,11 +207,13 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           if (["cell1", "cell2"].includes(key)) {
             if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
               toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+              setFormSubmiting(false)
               return;
             }
           } else {
             if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
               toast.error(`Father Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
+              setFormSubmiting(false)
               return;
             }
           }
@@ -217,6 +226,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         if (!val) {
           if (!values?.motherInfo[key]) {
             toast.error(`Mother Info: ${formatLabel(key)} is required`);
+            setFormSubmiting(false)
             return;
           }
         }
@@ -225,13 +235,13 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
 
             if (!values?.fatherInfo[val.fieldName?.split('.')[1]?.toLowerCase()]?.value) {
               toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-
+              setFormSubmiting(false)
               return;
             }
           } else {
             if (!values?.fatherInfo[val.fieldName?.split('.')[1]]) {
               toast.error(`Mother Info: ${formatLabel(val.fieldName?.split('.')[1])} is required`);
-
+              setFormSubmiting(false)
               return;
             }
           }
@@ -244,17 +254,20 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           classes?.find((c) => c._id == values.academicSession.class)
             ?.label || "";
         const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
+
         return gradeNum >= 3;
       }
       if (showThirdLang & fields?.find((field) => field?.fieldName == "valueEducation").required &
         values?.languagePrefs?.valueEd?.length < 1) {
         toast.error(`Value Education is required`);
+        setFormSubmiting(false)
         return;
       }
       // Validate mandatory attachments and check for any missing files
       const missingAttachments = validateMandatoryAttachments(values);
       if (missingAttachments.length > 0) {
         message.error(`Please upload: ${missingAttachments.join(", ")}`);
+        setFormSubmiting(false)
         return;
       }
 
@@ -469,7 +482,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       addDynamicAttachments(values.attachments?.optional);
 
       // Handle submission of the form data to the backend
-      dispatch(registerStudentDetails({ formData, navigate }));
+      dispatch(registerStudentDetails({ formData, navigate })).then(()=>{setFormSubmiting(false)}).catch(()=>{setFormSubmiting(false);});
 
       // if (registrationResponse?.success) {
       //   message.success("Registration successful!");
@@ -477,10 +490,11 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       //   message.error(registrationResponse?.message || "Registration failed");
       // }
     } catch (error) {
+      setFormSubmiting(false)
       message.error(error.response?.data?.message || "Registration failed");
     } finally {
-      setFormSubmiting(false)
-      actions.setSubmitting(false); // Ensure form submission state is reset
+      
+      actions.setSubmitting(false);
     }
   }
 

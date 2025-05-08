@@ -68,6 +68,7 @@ const mapDraftToSections = (doc) => {
       religion: doc.religion ?? "",
       bloodGroup: doc.bloodGroup ?? "",
       email: doc.email, // verified already
+      profile:doc.profile
     },
 
     /* Language & Preferences tab */
@@ -108,7 +109,7 @@ const mapDraftToSections = (doc) => {
       })),
     ],
 
-    /* Consent tab left empty – user fills it later */
+    
   };
 };
 
@@ -211,24 +212,14 @@ export const registerStudentDetails = createAsyncThunk(
       const email = (formData.candidate?.email || "").toLowerCase();
 
       // Create FormData
-      const payload = new FormData();
 
-      // Append the profile image if it exists
-      if (formData.candidate?.profile instanceof File) {
-        payload.append("profile", formData.candidate.profile);
-      }
-
-      // Append other form data
-      Object.entries(formData).forEach(([section, data]) => {
-        if (section !== "profile") {
-          payload.append(section, JSON.stringify(data));
-        }
+      const res = await putData(endpoint, {
+        ...formData,
+        candidate: {
+          ...formData.candidate,
+          email: formData.candidate.email.toLowerCase(),
+        },
       });
-
-      const res = await customRequest("put", endpoint, payload, {
-        "Content-Type": "multipart/form-data",
-      });
-
       toast.success("Application submitted successfully");
       return res.data;
     } catch (err) {
@@ -296,10 +287,6 @@ const studentSignupSlice = createSlice({
         candidate: {
           ...(s.formData.candidate || {}),
           ...(a.payload.candidate || {}),
-          profile:
-            a.payload.candidate?.profile instanceof File
-              ? a.payload.candidate.profile
-              : s.formData.candidate?.profile,
         },
       };
     },

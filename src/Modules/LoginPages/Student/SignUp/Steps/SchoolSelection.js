@@ -44,7 +44,10 @@ const SchoolSelection = ({ formData }) => {
   const [otp, setOtp] = useState("");
   const [documentModalVisible, setDocumentModalVisible] = useState(false); // Added for the document modal
   const prevRef = useRef(loadCache());
-
+  const areRequiredFieldsFilled = () => {
+    const values = form.getFieldsValue();
+    return values.schoolId && values.applyingClass && values.email;
+  };
   /* redux flags */
   const {
     isLoading: schoolFetchLoading,
@@ -412,7 +415,7 @@ const SchoolSelection = ({ formData }) => {
                 loading={isOtpLoading}
                 type="primary"
                 size="large"
-                disabled={!form.getFieldValue("email")}
+                disabled={!areRequiredFieldsFilled()}
                 className="!bg-gradient-to-r !from-[#C83B62] !to-[#7F35CD] !border-none !text-white font-semibold"
               >
                 Verify Email
