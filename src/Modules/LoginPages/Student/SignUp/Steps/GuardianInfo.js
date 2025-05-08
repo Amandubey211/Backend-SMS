@@ -253,7 +253,7 @@ const GuardianInfo = ({ formData }) => {
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item name={[p, "religion"]} label="Religion" className="mb-4">
-            <Select size="large" placeholder="Select Religion">
+            <Select size="large" placeholder="Select Religion" showSearch>
               {RELIGION_OPTIONS.map((o) => (
                 <Option key={o.value}>{o.label}</Option>
               ))}
@@ -266,7 +266,7 @@ const GuardianInfo = ({ formData }) => {
             label="Nationality"
             className="mb-4"
           >
-            <Select size="large" placeholder="Select Nationality">
+            <Select size="large" placeholder="Select Nationality" showSearch>
               {COUNTRY_OPTIONS.map((o) => (
                 <Option key={o.value}>{o.label}</Option>
               ))}
@@ -470,12 +470,36 @@ const GuardianInfo = ({ formData }) => {
       // Update Redux store with current data
       dispatch(updateFormData({ guardian: processedValues }));
 
-      // Rest of your navigation logic...
+      // Handle tab navigation
+      if (activeTab === "father") {
+        setActiveTab("mother");
+        return;
+      }
+      if (activeTab === "mother") {
+        setActiveTab("guardian");
+        return;
+      }
+
+      // Final validation before submission
+      await GuardianSchema.validate(processedValues, { abortEarly: false });
+
+      // Proceed to next step
+      dispatch(nextStep());
     } catch (err) {
-      // Error handling remains the same
+      setYupErrorsToAnt(form, err);
+      const firstError =
+        err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
+      if (firstError) {
+        form.scrollToField(firstError, {
+          behavior: "smooth",
+          block: "center",
+          scrollMode: "if-needed",
+        });
+      }
+    } finally {
+      smoothToTop();
     }
   };
-
   const handleBack = () => {
     if (activeTab === "guardian") setActiveTab("mother");
     else if (activeTab === "mother") setActiveTab("father");

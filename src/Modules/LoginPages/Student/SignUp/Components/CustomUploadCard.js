@@ -429,17 +429,6 @@ const CustomUploadCard = ({
           className="max-h-[80vh] w-full object-contain rounded-md"
         />
       </Modal>
-
-      {/* --------------------------------------------------- */}
-      {/*  NOTE: Cropping / rotation / flip implementation    */}
-      {/*  has been commented out for now. Re-enable later    */}
-      {/*  by restoring ReactCrop and related state/effects.  */}
-      {/* --------------------------------------------------- */}
-      {/*
-        import ReactCrop from "react-image-crop";
-        import "react-image-crop/dist/ReactCrop.css";
-        ...existing rotation / flip logic...
-      */}
     </>
   );
 };
