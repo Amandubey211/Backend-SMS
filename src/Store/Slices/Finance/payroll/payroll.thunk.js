@@ -17,13 +17,13 @@ import { isCancel } from "axios";
 
 export const fetchPayroll  = createAsyncThunk(
   "finance/fetchPayroll ",
-  async ({categoryId,search, page, limit,isCancel}, { rejectWithValue, dispatch, getState }) => {
+  async (params, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/expense/get/all/payroll?say=${say}`,{ categoryId,search, page, limit,isCancel}
+        `/${getRole}/expense/get/all/payroll?say=${say}`,params
       );
       return response;
     } catch (error) {
