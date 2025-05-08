@@ -68,7 +68,7 @@ const mapDraftToSections = (doc) => {
       religion: doc.religion ?? "",
       bloodGroup: doc.bloodGroup ?? "",
       email: doc.email, // verified already
-      profile:doc.profile
+      profile: doc.profile,
     },
 
     /* Language & Preferences tab */
@@ -108,8 +108,6 @@ const mapDraftToSections = (doc) => {
         mandatory: false,
       })),
     ],
-
-    
   };
 };
 
@@ -207,11 +205,14 @@ export const registerStudentDetails = createAsyncThunk(
   "studentSignup/register",
   async (_, { getState, rejectWithValue }) => {
     try {
+      const { currentStep } = getState().common.studentSignup;
+      if (currentStep !== 7) {
+        throw new Error("Registration can only be done on the final step");
+      }
+
       const { formData } = getState().common.studentSignup;
       const endpoint = `/student/register/student`;
-      const email = (formData.candidate?.email || "").toLowerCase();
-
-      // Create FormData
+      // const email = (formData.candidate?.email || "").toLowerCase();
 
       const res = await putData(endpoint, {
         ...formData,
@@ -229,7 +230,6 @@ export const registerStudentDetails = createAsyncThunk(
     }
   }
 );
-
 /* ------------------------------------------------------------------ */
 /* 🔸  STATE SHAPE                                                     */
 /* ------------------------------------------------------------------ */
