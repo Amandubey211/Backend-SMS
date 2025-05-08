@@ -18,6 +18,7 @@ const CustomUploadCard = ({
   recommendedSize = "300x400",
   width = "w-full",
   height = "h-48",
+  required = false,
 }) => {
   /* -------------------- Hooks -------------------- */
   const { uploadFile, uploading, error, resetUpload } = useCloudinaryUpload(
@@ -91,7 +92,7 @@ const CustomUploadCard = ({
         const id = extractPublicId(url);
         setPublicId(id);
         setCurrentImage(url);
-        form.setFieldValue(name, url); // Store just the URL string
+        form.setFieldValue(name, url); // This will trigger validation
         message.success("Image uploaded ✔");
         setLocalFile(null);
         setLocalURL(null);
