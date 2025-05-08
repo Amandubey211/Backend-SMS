@@ -7,13 +7,22 @@ import {
   startTripLog,
 } from "./tripExecutionLog.action";
 
-const initialState = {
-  loading: false,
-  error: null,
-  trip: null,
-  tripLogs: [],
-  vehicleWiseLogs: [],
-};
+  const initialState = {
+    loading: false,
+    error: null,
+    trip: null,
+    tripLogs: [],
+    vehicleWiseLogs: [],
+    pagination: {
+      totalItems: 0,
+      currentPage: 1,
+      totalPages: 0,
+      limit: 10,
+      type: "today",
+    },
+  };
+  
+
 
 const tripExecutionLogSlice = createSlice({
   name: "tripExecutionLog",
@@ -87,7 +96,8 @@ const tripExecutionLogSlice = createSlice({
       })
       .addCase(getTripLogsByVehicle.fulfilled, (state, action) => {
         state.loading = false;
-        state.vehicleWiseLogs = action.payload;
+        state.vehicleWiseLogs = action.payload?.data;
+        state.pagination = action.payload?.pagination;
       })
       .addCase(getTripLogsByVehicle.rejected, (state, action) => {
         state.loading = false;

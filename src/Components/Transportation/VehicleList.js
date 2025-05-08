@@ -160,7 +160,7 @@ const VehicleList = ({ handleEdit }) => {
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="all">All Types</option>
-            {vehicleTypes.map((type) => (
+            {vehicleTypes?.map((type) => (
               <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
             ))}
           </select>
@@ -250,7 +250,7 @@ const VehicleList = ({ handleEdit }) => {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredVehicles.length > 0 ? (
-                  filteredVehicles.map((vehicle, index) => (
+                  filteredVehicles?.map((vehicle, index) => (
                     <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {vehicle.vehicleNumber}

@@ -9,13 +9,13 @@ import { getUserRole } from "../../../../Utils/getRoles";
 // Fetch Unverified Students
 export const fetchUnverifiedStudents = createAsyncThunk(
   "verification/fetchUnverifiedStudents",
-  async (_, { rejectWithValue, dispatch, getState }) => {
+  async (params, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await getData(
-        `/${getRole}/get_unverified_student_details?say=${say}`
+        `/${getRole}/get_unverified_student_details?say=${say}`,params
       );
 
       if (!response.students || response.students?.length === 0) {

@@ -248,6 +248,7 @@ const SummaryRevenueList = () => {
                 <Select.Option value=''>All</Select.Option>
                 <Select.Option value='Paid'>Paid</Select.Option>
                 <Select.Option value='Unpaid'>Unpaid</Select.Option>
+                <Select.Option value='Partial'>Partial</Select.Option>
               </Select>
               <Select
                 className="px-1 w-[10rem] mb-4"

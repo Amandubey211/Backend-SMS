@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { SearchOutlined } from "@ant-design/icons";
 import Layout from "../../../../Components/Common/Layout";
 import AdminDashLayout from "../../../../Components/Admin/AdminDashLayout";
-import { FaFileInvoice } from "react-icons/fa";
+import { FaFileExport, FaFileInvoice } from "react-icons/fa";
 import { MdClose, MdDeleteOutline, MdOutlineEdit } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import VoucherTemplate from "../../../../Utils/FinanceTemplate/VoucherTemplate";
@@ -13,11 +13,15 @@ import { deleteOperationalExpenses, fetchOperationalExpenses, updateOperationalE
 import { GiTakeMyMoney } from "react-icons/gi";
 import Sidebar from "../../../../Components/Common/Sidebar";
 import EditOperationalExpenses from "./EditExpense";
-
+import toast from "react-hot-toast";
+import * as XLSX from "xlsx";
 const ExpenseList = () => {
   const dispatch = useDispatch();
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
   const [isCancel, setIsCancel] = useState(false);
+  const [status, setStatus] = useState('');
+  const [fileTitle, setFileTitle] = useState('');
+  const [exportModel, setExportModel] = useState(false);
   const { allOperationalExpense, loading, currentPage, totalRecords, totalPages } = useSelector(
     (store) => store.admin.operationalExpenses
   );
@@ -26,13 +30,13 @@ const ExpenseList = () => {
   const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
 
   useEffect(() => {
-    dispatch(fetchOperationalExpenses({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel }));
+    dispatch(fetchOperationalExpenses({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel,status }));
   }, [dispatch, currentPage, computedPageSize, isCancel]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    dispatch(fetchOperationalExpenses({ page: 1, search: value, limit: computedPageSize, isCancel }));
+    dispatch(fetchOperationalExpenses({ page: 1, search: value, limit: computedPageSize, isCancel,status }));
   };
   const [cancelModalVisible, setCancelModalVisible] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -82,7 +86,7 @@ const ExpenseList = () => {
         const capitalizedStatus = status.charAt(0).toUpperCase() + status.slice(1);
         return <Tag color={color}>{capitalizedStatus}</Tag>;
       },
-    },    
+    },
     {
       title: "Action",
       key: "action",
@@ -101,7 +105,7 @@ const ExpenseList = () => {
               </> : null
             }
             {
-              ["pending", "hold", "partial"].includes(record.status) && !record?.isCancel ? <button title="Edit" onClick={()=>{setSelectedInvoice(record);setIsModalVisible(true)}}><MdOutlineEdit size={20}  /></button> : null
+              ["pending", "hold", "partial"].includes(record.status) && !record?.isCancel ? <button title="Edit" onClick={() => { setSelectedInvoice(record); setIsModalVisible(true) }}><MdOutlineEdit size={20} /></button> : null
             }
             {
               record?.isCancel ?
@@ -172,7 +176,51 @@ const ExpenseList = () => {
   const handleDownloadPDF = async (pdfRef, selectedInvoice) => {
     await downloadPDF(pdfRef, selectedInvoice, "Voucher")
   };
+  const downloadexcel = () => {
+    if (!fileTitle) {
+      toast.error("Please Enter File Name");
+      return
+    }
+    let fileName = `${fileTitle}.xlsx`;
+    let sheet = "sheet1"
+    let formattedData = []
+    allOperationalExpense?.map((row) => {
+      row.lineItems.map((li) => {
+        formattedData.push({
+          "Entity Name": row.entityDetails?.entityName,
+          "Entity Type": row.entityDetails?.entityType,
+          Email: row.entityDetails?.email,
+          Contact: row.entityDetails?.contactNumber,
+          Date: row.createdAt?.slice(0, 10),
+          Category: li.name,
+          "Sub Category": li.subCategory || 'N/A',
+          "Sub Category": li.subCategory,
+          "Rate": li.rate,
+          "Quantity": li.quantity,
+          "Unit": li.unit,
+          "Amount": li.amount,
+          "Paid Amount": li.paidAmount,
+          "Remaining Amount": li.remainingAmount,
+          "Frequency": li.frequency,
+          "Start Date": li?.startDate?.slice(0, 10) || 'N/A',
+          "End Date": li?.endDate?.slice(0, 10) || 'N/A',
+          "Due Date": li?.dueDate?.slice(0, 10) || 'N/A',
+        })
+      })
+    }
+    );
 
+    // Step 3: Create a worksheet
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+    // Step 4: Create a workbook
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheet);
+
+    // Step 5: Write the workbook directly to file
+    XLSX.writeFile(workbook, fileName); // Automatically triggers the file download
+
+  }
   return (
     <Layout title="Finance | Expense List">
       <AdminDashLayout>
@@ -189,6 +237,18 @@ const ExpenseList = () => {
               />
               <Select
                 className="px-1 w-[10rem] mb-4"
+                value={status}
+                onChange={(value) => setStatus(value)}
+                placeholder="Select Status"
+              >
+                <Select.Option value=''>All</Select.Option>
+                <Select.Option value='paid'>Paid</Select.Option>
+                <Select.Option value='partial'>Partial</Select.Option>
+                <Select.Option value='Pending'>Pending</Select.Option>
+                <Select.Option value='Hold'>Hold</Select.Option>
+              </Select>
+              <Select
+                className="px-1 w-[10rem] mb-4"
                 value={isCancel}
                 onChange={(value) => setIsCancel(value)}
                 placeholder="Select Status"
@@ -197,13 +257,15 @@ const ExpenseList = () => {
                 <Select.Option value={true}>Canceled</Select.Option>
               </Select>
             </div>
-            
+
             <div className="flex flex-row gap-2 items-center justify-center">
-              {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg mb-4" onClick={()=>dispatch(deleteOperationalExpenses((selectedIds)))}>Delete <MdDeleteOutline /></button>}
+              {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg mb-4" onClick={() => dispatch(deleteOperationalExpenses((selectedIds)))}>Delete <MdDeleteOutline /></button>}
+              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg mb-4" onClick={() => { setExportModel(true) }}><FaFileExport /> Export</button>
               <button
                 onClick={() => navigate("/finance/add/operational-expenses")}
                 className="inline-flex  items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2 mb-4"
               >
+
                 <span className="text-gray-800 font-medium">Create Expenses</span>
                 <div className="w-12 h-10 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white">
                   <GiTakeMyMoney size={20} />
@@ -219,8 +281,8 @@ const ExpenseList = () => {
               selectedRowKeys: selectedIds,
               onChange: (selectedRowKeys) => setSelectedIds(selectedRowKeys),
               getCheckboxProps: (record) => ({
-                disabled: record.isCancel ? true:["pending", "hold"].includes(record.status) ?false:true,
-               }),
+                disabled: record.isCancel ? true : ["pending", "hold"].includes(record.status) ? false : true,
+              }),
             }}
             pagination={{
               current: currentPage,
@@ -232,11 +294,11 @@ const ExpenseList = () => {
               showTotal: () =>
                 `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
               onChange: (page, pageSize) => {
-                dispatch(fetchOperationalExpenses({ page, search: searchText, limit: pageSize, isCancel }));
+                dispatch(fetchOperationalExpenses({ page, search: searchText, limit: pageSize, isCancel,status }));
               },
               onShowSizeChange: (current, size) => {
                 setComputedPageSize(size); // Update local state
-                dispatch(fetchOperationalExpenses({ page: 1, search: searchText, limit: size, isCancel }));
+                dispatch(fetchOperationalExpenses({ page: 1, search: searchText, limit: size, isCancel,status }));
               },
             }}
             rowKey="_id"
@@ -252,6 +314,22 @@ const ExpenseList = () => {
           cancelText="Cancel"
         >
           <p>Are you sure you want to cancel the record</p>
+        </Modal>
+        <Modal
+          title="Export Data"
+          visible={exportModel}
+          onOk={() => downloadexcel()}
+          onCancel={() => setExportModel(false)}
+          okText="Export"
+          cancelText="Cancel"
+        >
+          <div className="flex flex-row gap-2 items-center ">
+            <Input placeholder="File Name.." className="w-[18rem]" onChange={(e) => setFileTitle(e.target.value)} /><span className="text-lg">.xlsx</span>
+          </div>
+
+          <p>Only the data that matches the filters you have applied will be exported.</p>
+          <p>Export is limited to the current page based on the selected page limit.</p>
+
         </Modal>
         {isInvoiceVisible && selectedInvoice && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -291,7 +369,7 @@ const ExpenseList = () => {
           </div>
         )}
         <Sidebar title="Update Expense" width="70%" isOpen={isModalVisible} onClose={() => setIsModalVisible(false)}>
-          <EditOperationalExpenses data= {selectedInvoice}/>
+          <EditOperationalExpenses data={selectedInvoice} />
         </Sidebar>
       </AdminDashLayout>
     </Layout>

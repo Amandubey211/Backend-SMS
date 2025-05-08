@@ -312,7 +312,7 @@ listenerMiddleware.startListening({
     } catch {
       /* ignore – offline etc. */
     }
-  }, 1000),
+  }, 3000),
 });
 
 // Create the store

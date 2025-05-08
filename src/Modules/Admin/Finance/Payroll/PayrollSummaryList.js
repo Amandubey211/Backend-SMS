@@ -30,7 +30,7 @@ const schoolCurrency = useSelector((store) => store.common.user.userDetails?.cur
 
   const columns = [
     {
-      title: "Voucher",
+      title: "Slip Number",
       dataIndex: "voucherNumber",
       key: "voucherNumber",
       render: (InvoiceNumber) => `${InvoiceNumber}` || "N/A",

@@ -35,6 +35,7 @@ import {
   LANGUAGE_OPTIONS,
   RELIGION_OPTIONS,
 } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
@@ -129,11 +130,25 @@ const GuardianInfo = ({ formData }) => {
   const [activeTab, setActiveTab] = useState("father");
 
   /* Hydrate form with initial data */
+  // Update the useEffect that hydrates the form
   useEffect(() => {
     if (!formData) return;
 
     // Create a deep copy and handle file objects properly
     const sanitized = JSON.parse(JSON.stringify(formData));
+
+    // Convert dates to dayjs objects
+    ["fatherInfo.idExpiry", "motherInfo.idExpiry"].forEach((path) => {
+      const parts = path.split(".");
+      let curr = sanitized;
+      for (let i = 0; i < parts.length - 1; i++) {
+        curr = curr[parts[i]] ||= {};
+      }
+      const leaf = parts.pop();
+      if (curr[leaf]) {
+        curr[leaf] = dayjs(curr[leaf]);
+      }
+    });
 
     // Convert phone numbers to strings
     [
@@ -188,15 +203,15 @@ const GuardianInfo = ({ formData }) => {
           }
         />
       </Form.Item>
+      <Form.Item name={[p, "middleName"]} className="mb-4">
+        <Input size="large" placeholder="Middle Name" />
+      </Form.Item>
       <Form.Item
         name={[p, "lastName"]}
         rules={[{ required: true, message: "Required" }]}
         className="mb-4"
       >
         <Input size="large" placeholder="Last Name" />
-      </Form.Item>
-      <Form.Item name={[p, "middleName"]} className="mb-4">
-        <Input size="large" placeholder="Middle Name" />
       </Form.Item>
     </>
   );
@@ -210,13 +225,27 @@ const GuardianInfo = ({ formData }) => {
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
-          <Form.Item name={[p, "idExpiry"]} label="ID Expiry" className="mb-4">
+          <Form.Item
+            name={[p, "idExpiry"]}
+            label="ID Expiry"
+            className="mb-4"
+            rules={[
+              {
+                validator: (_, value) =>
+                  !value || dayjs.isDayjs(value)
+                    ? Promise.resolve()
+                    : Promise.reject("Invalid date"),
+              },
+            ]}
+          >
             <DatePicker
-              disabled
               size="large"
               className="w-full"
               placeholder="ID Expiry"
               format="DD/MM/YYYY"
+              disabledDate={(current) => {
+                return current && current < dayjs().startOf("day");
+              }}
             />
           </Form.Item>
         </Col>
@@ -224,7 +253,7 @@ const GuardianInfo = ({ formData }) => {
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item name={[p, "religion"]} label="Religion" className="mb-4">
-            <Select size="large" placeholder="Select Religion">
+            <Select size="large" placeholder="Select Religion" showSearch>
               {RELIGION_OPTIONS.map((o) => (
                 <Option key={o.value}>{o.label}</Option>
               ))}
@@ -237,7 +266,7 @@ const GuardianInfo = ({ formData }) => {
             label="Nationality"
             className="mb-4"
           >
-            <Select size="large" placeholder="Select Nationality">
+            <Select size="large" placeholder="Select Nationality" showSearch>
               {COUNTRY_OPTIONS.map((o) => (
                 <Option key={o.value}>{o.label}</Option>
               ))}
@@ -284,7 +313,9 @@ const GuardianInfo = ({ formData }) => {
           <Form.Item
             name={[p, "email1"]}
             label="Email 1"
-            rules={[{ type: "email", message: "Invalid email" }]}
+            rules={[
+              { type: "email", required: true, message: "Invalid email" },
+            ]}
             className="mb-4"
           >
             <Input size="large" placeholder="primary@email.com" />
@@ -403,7 +434,7 @@ const GuardianInfo = ({ formData }) => {
       <Form.Item
         name={["guardianInformation", "guardianEmail"]}
         label="Guardian Email"
-        rules={[{ type: "email", message: "Invalid email" }]}
+        rules={[{ type: "email", required: true, message: "Invalid email" }]}
         className="mb-4"
       >
         <Input size="large" placeholder="Guardian Email" />
@@ -423,8 +454,21 @@ const GuardianInfo = ({ formData }) => {
       // Get current form values including files
       const formValues = form.getFieldsValue(true);
 
+      // Convert dayjs dates to strings
+      const processedValues = {
+        ...formValues,
+        fatherInfo: {
+          ...formValues.fatherInfo,
+          idExpiry: formValues.fatherInfo?.idExpiry?.format("YYYY-MM-DD"),
+        },
+        motherInfo: {
+          ...formValues.motherInfo,
+          idExpiry: formValues.motherInfo?.idExpiry?.format("YYYY-MM-DD"),
+        },
+      };
+
       // Update Redux store with current data
-      dispatch(updateFormData({ guardian: formValues }));
+      dispatch(updateFormData({ guardian: processedValues }));
 
       // Handle tab navigation
       if (activeTab === "father") {
@@ -437,7 +481,7 @@ const GuardianInfo = ({ formData }) => {
       }
 
       // Final validation before submission
-      await GuardianSchema.validate(formValues, { abortEarly: false });
+      await GuardianSchema.validate(processedValues, { abortEarly: false });
 
       // Proceed to next step
       dispatch(nextStep());
@@ -446,13 +490,16 @@ const GuardianInfo = ({ formData }) => {
       const firstError =
         err?.errorFields?.[0]?.name || err?.inner?.[0]?.path?.split(".");
       if (firstError) {
-        form.scrollToField(firstError, { behavior: "smooth", block: "center" });
+        form.scrollToField(firstError, {
+          behavior: "smooth",
+          block: "center",
+          scrollMode: "if-needed",
+        });
       }
     } finally {
       smoothToTop();
     }
   };
-
   const handleBack = () => {
     if (activeTab === "guardian") setActiveTab("mother");
     else if (activeTab === "mother") setActiveTab("father");

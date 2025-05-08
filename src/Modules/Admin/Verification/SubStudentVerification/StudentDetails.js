@@ -65,10 +65,60 @@ const StudentDetail = () => {
 
         <div className="bg-white p-2">
           <Details student={student} />
-
           <div className="p-2 rounded-lg mb-3">
             <h3 className="text-lg font-semibold mb-4 text-gray-800">
-              {t("Document Previews")}
+              {t("Mandatory Document Previews")}
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.keys(student?.attachments?.mandatory || {}).map((key, index) => {
+                const docUrl = student?.attachments?.mandatory[key];
+                const docLabel = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the key for label
+
+                return (
+                  <div
+                    key={key} // Use a unique identifier if available
+                    className={`${getColor(index)} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
+                  >
+                    {docUrl?.startsWith("http") && docUrl?.match(/\.(jpg|jpeg|png)$/) ? (
+                      <img
+                        src={docUrl}
+                        alt={`${t("Document")} ${docLabel}`}
+                        className="w-full h-40 object-cover mb-2 rounded-md"
+                        onError={(e) => e.target.src = "/path/to/default-image.jpg"} // Handle broken image URLs
+                      />
+                    ) : (
+                      <embed
+                        src={docUrl}
+                        type="application/pdf"
+                        className="w-full h-40 mb-2 rounded-md"
+                        alt={`${t("Document")} ${docLabel}`} // Ensure accessibility for embedded files
+                      />
+                    )}
+                    <div className="flex justify-between items-center">
+                      <p className="text-white">
+                        <span className="font-medium">
+                          {t("Document")} {index + 1}:
+                        </span>{" "}
+                        {docLabel}
+                      </p>
+                      <button
+                        title={t("Open Modal")}
+                        className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
+                        onClick={() =>
+                          handlePreviewClick(docUrl, docUrl?.startsWith("http") && docUrl?.match(/\.(jpg|jpeg|png)$/) ?"image":"pdf")
+                        }
+                      >
+                        <AiOutlineEye size={20} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <div className="p-2 rounded-lg mb-3">
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              {t("Optional Document Previews")}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.keys(student?.attachments?.optional || {}).map((key, index) => {

@@ -99,12 +99,12 @@ export const getTransportUsers = createAsyncThunk(
 /* 🔹 ASSIGN VEHICLES TO ROUTE ----------------------------------- */
 export const assignVehiclesToRoute = createAsyncThunk(
   "routes/assignVehicles",
-  async ({ routeId, vehicleIds }, { dispatch, rejectWithValue }) => {
+  async ({ routeId, vehiclesWithShifts }, { dispatch, rejectWithValue }) => {
     try {
       silent(dispatch);
-      const res = await putData(`/transport/route/assignVehicle/${routeId}`, {
-        vehicleIds,
-      });
+      const res = await putData(`/transport/route/assignVehicle/${routeId}`, 
+       { vehiclesWithShifts},
+      );
       dispatch(getRoutesBySchool()); // refresh list
       return res;
     } catch (err) {
