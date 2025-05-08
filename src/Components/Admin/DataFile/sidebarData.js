@@ -29,6 +29,8 @@ import {
   MdOutlineInventory2,
   MdDirectionsBus,
   MdAccessTime,
+  MdEmojiPeople, 
+  MdOutlineDirectionsBus 
 } from "react-icons/md";
 import { CiViewTable } from "react-icons/ci";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
@@ -108,6 +110,18 @@ const sidebarData = [
         icon: <MdLocalLibrary />,
         path: "/users/librarian",
         roles: [ROLES.ADMIN, ROLES.LIBRARIAN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_LIBRARIANS, // Added permission reference
+      },
+      {
+        title: "Helper",
+        icon: (
+          <span className="relative inline-block">
+            <MdOutlineDirectionsBus className="text-xl" />
+            <MdEmojiPeople className="absolute -right-2 -bottom-2 text-xs" />
+          </span>
+        ),
+        path: "/users/helper",
+        roles: [ROLES.ADMIN],
         //requiredPermission: PERMISSIONS.VIEW_LIBRARIANS, // Added permission reference
       },
       {
@@ -341,7 +355,7 @@ const sidebarData = [
       },
       {
         title: "Shift Management", // New tab
-        icon:<RiUserSettingsLine />, // You can choose a different icon if preferred
+        icon: <RiUserSettingsLine />, // You can choose a different icon if preferred
         path: "/transportation/shift-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },

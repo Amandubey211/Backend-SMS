@@ -9,6 +9,7 @@ import { getUserRole } from "../../../../Utils/getRoles";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
 export const fetchHelperList = createAsyncThunk(
   "transport/fetchHelperList",
@@ -76,6 +77,55 @@ export const deleteHelper = createAsyncThunk(
         `/transport/delete-helper/${id}?say=${say}`
       );
       dispatch(fetchHelperList());
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const deactiveHelper = createAsyncThunk(
+  "transport/deactiveHelper",
+  async (userData, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/transport/deactivate-helper/${userData.id}`
+      );
+
+      if (response.success) {
+        toast.success("User deactivated successfully");
+        fetchHelperList();
+      } else {
+        toast.error(response.message || "User deactivation failed");
+      }
+
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Activate User
+
+export const activeHelper = createAsyncThunk(
+  "transport/activeHelper",
+  async (userData, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      console.log(userData, "userData in activeHelper action");
+      const response = await putData(
+        `/transport/activate-helper/${userData.id}`
+      );
+
+      if (response.success) {
+        toast.success("User activated successfully");
+        fetchHelperList();
+      } else {
+        toast.error(response.message || "User activation failed");
+      }
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
