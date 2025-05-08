@@ -27,9 +27,9 @@ const TopNavigation = () => {
           }`}
           onClick={() => dispatch(setActiveTab("unverified"))}
         >
-          {t("Unverified Students")} ({unVerifiedStudents?.length})
+          {t("Unverified Students")} 
         </h1>
-
+      
         {/* Rejected Students Tab */}
         <h1
           className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
@@ -39,7 +39,17 @@ const TopNavigation = () => {
           }`}
           onClick={() => dispatch(setActiveTab("rejected"))}
         >
-          {t("Rejected Students")} ({rejectedStudents?.length})
+          {t("Rejected Students")}
+        </h1>
+        <h1
+          className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
+            activeTab === "Pending"
+              ? "text-purple-500 bg-purple-100"
+              : "text-gray-700 hover:bg-gray-100"
+          }`}
+          onClick={() => dispatch(setActiveTab("Pending"))}
+        >
+          {t("Pending Forms")}
         </h1>
       </div>
 

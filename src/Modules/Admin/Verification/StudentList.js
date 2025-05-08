@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import TopNavigation from "./TopNavigation";
 import RejectStudents from "./RejectStudents";
 import UnverifiedStudents from "./UnverifiedStudents";
+import PendingForms from "./PendingForms";
 
 const StudentList = () => {
   const { activeTab } = useSelector((state) => state.admin.verification);
@@ -15,7 +16,7 @@ const StudentList = () => {
       <TopNavigation />
 
       {/* Render based on active tab */}
-      {activeTab === "unverified" ? <UnverifiedStudents /> : <RejectStudents />}
+      {activeTab === "unverified" ? <UnverifiedStudents /> : activeTab === "Pending" ? <PendingForms />: <RejectStudents />}
     </div>
   );
 };
