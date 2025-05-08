@@ -323,12 +323,12 @@ const CandidateInfo = ({ formData }) => {
         {/* Student‑ID / expiry */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <Form.Item name="studentId" label="Student ID">
+            <Form.Item name="studentId" label="Student QID">
               <Input size="large" prefix={<IdcardOutlined />} />
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item name="idExpiry" label="ID Expiry">
+            <Form.Item name="idExpiry" label="QID Expiry">
               <DatePicker
                 size="large"
                 className="w-full"
