@@ -35,6 +35,8 @@ import {
   RELIGION_OPTIONS,
 } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 import dayjs from "dayjs";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+// import isDayjs from "dayjs/plugin/isDayjs";
 
 const { Option } = Select;
 
@@ -135,16 +137,16 @@ const GuardianInfo = ({ formData }) => {
     if (!formData) return;
     const sanitized = JSON.parse(JSON.stringify(formData));
 
-    // Handle photos properly
-    ["fatherInfo.photo", "motherInfo.photo"].forEach((path) => {
+    // Convert string dates to dayjs objects
+    ["fatherInfo.idExpiry", "motherInfo.idExpiry"].forEach((path) => {
       const parts = path.split(".");
       let curr = sanitized;
       for (let i = 0; i < parts.length - 1; i++) {
         curr = curr[parts[i]] ||= {};
       }
       const leaf = parts.pop();
-      if (curr[leaf] && typeof curr[leaf] === "object") {
-        curr[leaf] = curr[leaf].url || curr[leaf];
+      if (curr[leaf]) {
+        curr[leaf] = dayjs(curr[leaf]);
       }
     });
 
@@ -208,21 +210,27 @@ const GuardianInfo = ({ formData }) => {
     <>
       <Row gutter={16}>
         <Col xs={24} md={12}>
-          <Form.Item name={[p, "idNumber"]} label="ID #" className="mb-4">
+          <Form.Item name={[p, "idNumber"]} label="QID" className="mb-4">
             <Input size="large" placeholder="ID Number" />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name={[p, "idExpiry"]}
-            label="ID Expiry"
+            label="QID Expiry"
             className="mb-4"
             rules={[
               {
-                validator: (_, value) =>
-                  !value || dayjs.isDayjs(value)
-                    ? Promise.resolve()
-                    : Promise.reject("Invalid date"),
+                validator: (_, value) => {
+                  // Accept empty values
+                  if (!value) return Promise.resolve();
+
+                  // Check if it's a Dayjs object and valid
+                  if (dayjs.isDayjs(value) && value.isValid()) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject("Please select a valid date");
+                },
               },
             ]}
           >
@@ -436,49 +444,31 @@ const GuardianInfo = ({ formData }) => {
 
   const handleNext = async () => {
     try {
-      // First validate all fields
       await form.validateFields();
-
-      // Get current form values including files
       const formValues = form.getFieldsValue(true);
 
-      // Convert dayjs dates to strings
       const processedValues = {
         ...formValues,
         fatherInfo: {
           ...formValues.fatherInfo,
-          idExpiry: formValues.fatherInfo?.idExpiry?.format("YYYY-MM-DD"),
-          photo:
-            typeof formValues.fatherInfo?.photo === "object"
-              ? formValues.fatherInfo.photo.url
-              : formValues.fatherInfo?.photo,
+          idExpiry:
+            formValues.fatherInfo?.idExpiry?.format("YYYY-MM-DD") || null,
         },
         motherInfo: {
           ...formValues.motherInfo,
-          idExpiry: formValues.motherInfo?.idExpiry?.format("YYYY-MM-DD"),
-          photo:
-            typeof formValues.motherInfo?.photo === "object"
-              ? formValues.motherInfo.photo.url
-              : formValues.motherInfo?.photo,
+          idExpiry:
+            formValues.motherInfo?.idExpiry?.format("YYYY-MM-DD") || null,
         },
       };
 
-      // Update Redux store with current data
       dispatch(updateFormData({ guardian: processedValues }));
 
-      // Mark current section as complete
-      if (activeTab === "father") {
-        setCompletedSections((prev) => ({ ...prev, father: true }));
-        setActiveTab("mother");
-        return;
+      if (activeTab === "father") setActiveTab("mother");
+      else if (activeTab === "mother") setActiveTab("guardian");
+      else {
+        await GuardianSchema.validate(processedValues, { abortEarly: false });
+        dispatch(nextStep());
       }
-      if (activeTab === "mother") {
-        setCompletedSections((prev) => ({ ...prev, mother: true }));
-        setActiveTab("guardian");
-        return;
-      }
-      await GuardianSchema.validate(processedValues, { abortEarly: false });
-      dispatch(nextStep());
     } catch (err) {
       setYupErrorsToAnt(form, err);
       const firstError =
