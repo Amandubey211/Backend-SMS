@@ -5,12 +5,15 @@ import {
   getAllTripLogs,
   getTripLogsByVehicle,
   startTripLog,
+  toggleGPS
 } from "./tripExecutionLog.action";
 
   const initialState = {
     loading: false,
     error: null,
     trip: null,
+    isGpsOn:false,
+    currentLocation:null,
     tripLogs: [],
     vehicleWiseLogs: [],
     pagination: {
@@ -33,6 +36,12 @@ const tripExecutionLogSlice = createSlice({
       state.tripLogs = [];
       state.vehicleWiseLogs = [];
       state.error = null;
+    },
+    setIsGpsOn:(state,action)=>{
+      state.isGpsOn=action.payload;
+    },
+    setCurrentLocation:(state,action)=>{
+      state.currentLocation=action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -102,10 +111,24 @@ const tripExecutionLogSlice = createSlice({
       .addCase(getTripLogsByVehicle.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      //Toggle-Gps
+      .addCase(toggleGPS.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(toggleGPS.fulfilled, (state, action) => {
+        state.loading = false;
+        state.gpsStatus = action.payload?.trip?.isGPSOn; 
+
+      })
+      .addCase(toggleGPS.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
       });
   },
 });
 
-export const { clearTripData } = tripExecutionLogSlice.actions;
+export const { clearTripData,setIsGpsOn,setCurrentLocation } = tripExecutionLogSlice.actions;
 
 export default tripExecutionLogSlice.reducer;
