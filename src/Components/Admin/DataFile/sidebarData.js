@@ -7,6 +7,7 @@ import {
   FaBusAlt,
   FaRoute,
   FaUserTie,
+  FaUserAlt,
 } from "react-icons/fa";
 import { TbCreditCardPay, TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine, RiUserSettingsLine } from "react-icons/ri";
@@ -29,6 +30,9 @@ import {
   MdOutlineInventory2,
   MdDirectionsBus,
   MdAccessTime,
+  MdEmojiPeople,
+  MdOutlineDirectionsBus,
+  MdDirectionsCar,
 } from "react-icons/md";
 import { CiViewTable } from "react-icons/ci";
 import { RiParentFill, RiAdminFill } from "react-icons/ri";
@@ -142,6 +146,29 @@ const sidebarData = [
           ROLES.STAFF,
         ],
         //requiredPermission: PERMISSIONS.VIEW_PARENTS, // Added permission reference
+      },
+      {
+        title: "Driver",
+        icon: (
+          <span className="relative inline-block">
+            <MdDirectionsCar className="text-xl" />
+            <FaUserAlt className="absolute -right-2 -bottom-2 text-xs" />
+          </span>
+        ),
+        path: "/users/driver",
+        roles: [ROLES.ADMIN],
+      },
+      {
+        title: "Helper",
+        icon: (
+          <span className="relative inline-block">
+            <MdOutlineDirectionsBus className="text-xl" />
+            <MdEmojiPeople className="absolute -right-2 -bottom-2 text-xs" />
+          </span>
+        ),
+        path: "/users/helper",
+        roles: [ROLES.ADMIN],
+        //requiredPermission: PERMISSIONS.VIEW_LIBRARIANS, // Added permission reference
       },
     ],
   },
@@ -341,7 +368,7 @@ const sidebarData = [
       },
       {
         title: "Shift Management", // New tab
-        icon:<RiUserSettingsLine />, // You can choose a different icon if preferred
+        icon: <RiUserSettingsLine />, // You can choose a different icon if preferred
         path: "/transportation/shift-management",
         roles: [ROLES.ADMIN, ROLES.STAFF],
       },

@@ -9,6 +9,7 @@ import { getUserRole } from "../../../../Utils/getRoles";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import toast from "react-hot-toast";
 
 export const fetchDriverList = createAsyncThunk(
   "transport/fetchDriverList",
@@ -82,6 +83,54 @@ export const deleteDriver = createAsyncThunk(
         `/transport/delete-driver/${id}?say=${say}`
       );
       dispatch(fetchDriverList());
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+export const deactiveDriver = createAsyncThunk(
+  "transport/deactiveDriver",
+  async (userData, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/transport/deactivate-driver/${userData.id}`
+      );
+
+      if (response.success) {
+        toast.success("User deactivated successfully");
+        fetchDriverList();
+      } else {
+        toast.error(response.message || "User deactivation failed");
+      }
+
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Activate User
+
+export const activeDriver = createAsyncThunk(
+  "transport/activeDriver",
+  async (userData, { rejectWithValue, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const response = await putData(
+        `/transport/activate-driver/${userData.id}`
+      );
+
+      if (response.success) {
+        toast.success("User activated successfully");
+        fetchDriverList();
+      } else {
+        toast.error(response.message || "User activation failed");
+      }
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
