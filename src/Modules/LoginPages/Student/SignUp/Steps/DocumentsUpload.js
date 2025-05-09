@@ -27,6 +27,7 @@ import useGetAllSchools from "../../../../../Hooks/CommonHooks/useGetAllSchool";
 import {
   nextStep,
   prevStep,
+  saveStudentDraft,
   updateFormData,
 } from "../../../../../Store/Slices/Common/User/actions/studentSignupSlice";
 import useCloudinaryUpload from "../../../../../Hooks/CommonHooks/useCloudinaryUpload";
@@ -35,7 +36,7 @@ import useCloudinaryDeleteByPublicId from "../../../../../Hooks/CommonHooks/useC
 const DocumentsUpload = ({ formData }) => {
   const dispatch = useDispatch();
   const { schoolList, loading: schoolsLoading } = useGetAllSchools();
-  const { formData: storeFormData } = useSelector(
+  const { formData: storeFormData, currentStep } = useSelector(
     (s) => s.common.studentSignup
   );
 
@@ -205,8 +206,12 @@ const DocumentsUpload = ({ formData }) => {
           type,
         })),
       };
-
       dispatch(updateFormData({ documents: documentData }));
+      // Only save draft if not on last step
+      if (currentStep < 6) {
+        // 6 is DocumentsUpload step
+        await dispatch(saveStudentDraft()).unwrap();
+      }
       dispatch(nextStep());
     } catch (err) {
       console.error("Error submitting documents:", err);

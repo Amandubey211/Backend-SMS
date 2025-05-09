@@ -181,10 +181,7 @@ export const saveStudentDraft = createAsyncThunk(
     try {
       const { formData, currentStep } = getState().common.studentSignup;
 
-      // Don't save if we're on the consent step (step 6)
-      if (currentStep === 6) {
-        return true;
-      }
+      if (currentStep >= 6) return true;
 
       const email = (formData.candidate?.email || "").toLowerCase();
       const schoolId = formData.school?.schoolId;
