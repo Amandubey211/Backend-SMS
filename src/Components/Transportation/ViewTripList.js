@@ -14,6 +14,7 @@ import {
   FaFilter,
   FaSearch,
   FaInfoCircle,
+  FaCrosshairs,
 } from "react-icons/fa";
 import {
   MdLocationOn,
@@ -29,6 +30,7 @@ import {
   endTripLog,
   getTripLogsByVehicle,
   startTripLog,
+  toggleGPS,
 } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
 import {
   Tabs,
@@ -48,6 +50,8 @@ import {
   Progress,
   Modal,
   message,
+  Tooltip,
+  Switch,
 } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -57,6 +61,7 @@ import {
   CloseOutlined,
   CheckOutlined,
   ExclamationOutlined,
+  AimOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -66,6 +71,12 @@ import MapView from "./MapView";
 import Sidebar from "../Common/Sidebar";
 import Pagination from "../Common/pagination";
 import { useTranslation } from "react-i18next";
+import TripTracker from "./TripTracker";
+import {
+  setCurrentLocation,
+  setIsGpsOn,
+} from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLogSlice";
+import { useTripLocationSocket } from "../../Hooks/Transportation/useTripLocationSocket";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -107,7 +118,7 @@ const stopStatusText = {
 };
 
 const ViewTripsList = () => {
-  const {t}=useTranslation();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("today");
   const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState([]);
@@ -118,37 +129,174 @@ const ViewTripsList = () => {
   const [showDetailsSidebar, setShowDetailsSidebar] = useState(false);
   const [selectedTripForDetails, setSelectedTripForDetails] = useState(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [isGpsOn, setIsGpsOn] = useState(false);
-  const { loading, error, vehicleWiseLogs=[], pagination={} } = useSelector(
-    (s) => s.transportation.tripExecutionLog
-  );
+  const [isMapLoading, setIsMapLoading] = useState(true);
+  const {
+    loading,
+    error,
+    isGpsOn,
+    currentLocation,
+    vehicleWiseLogs = [],
+    pagination = {},
+  } = useSelector((s) => s.transportation.tripExecutionLog);
 
   const { vehicleId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const r1=selectedTripForDetails?.tripId
+  // useTripLocationSocket(r1, (data) => {
+  //   console.log("cl--->",data);
+  //   dispatch(setCurrentLocation({...data,tripId:r1}));
+  // });
 
 
-const handlePageChange = (newPage) => {
-  dispatch(
-    getTripLogsByVehicle({
-      vehicleId,
-      page: newPage,
-      limit: pagination.limit,
-      type: activeTab,
-    })
-  );
-};
 
-const handleLimitChange = (newLimit) => {
-  dispatch(
-    getTripLogsByVehicle({
-      vehicleId,
-      page: 1,
-      limit: newLimit,
-      type: activeTab,
-    })
-  );
-};
+  useEffect(() => {
+    let watcherId;
+
+    if (isGpsOn) {
+      if (navigator.geolocation) {
+        watcherId = navigator.geolocation.watchPosition(
+          (position) => {
+            dispatch(
+              setCurrentLocation({
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+                speed: position.coords.speed || 0, // in meters/second
+              })
+            );
+            console.log("Live location update:", position.coords);
+          },
+          (error) => {
+            console.error("Live GPS error:", error);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0,
+          }
+        );
+      }
+    } else {
+      // ✅ GPS off होने पर location clear करें
+      dispatch(setCurrentLocation(null));
+    }
+
+    // ✅ Cleanup on unmount or GPS off
+    return () => {
+      if (watcherId) {
+        navigator.geolocation.clearWatch(watcherId);
+      }
+    };
+  }, [isGpsOn]);
+
+  const fetchCurrentLocation = ({ tripId, enable }) => {
+    if (!navigator.geolocation) {
+      alert("Geolocation not supported by this browser.");
+      return;
+    }
+
+    // Always enable GPS on button click
+    if (!isGpsOn) {
+      dispatch(setIsGpsOn(true));
+      dispatch(toggleGPS({ tripId, enable: true }));
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        dispatch(
+          setCurrentLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            speed: position.coords.speed || 0, // in meters/second
+          })
+        );
+        console.log("📍 Fetched current location:", position.coords);
+      },
+      (error) => {
+        console.error("❌ Error getting location:", error);
+
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert("Permission denied. Please allow location access.");
+            break;
+          case error.POSITION_UNAVAILABLE:
+            alert("Location info is unavailable.");
+            break;
+          case error.TIMEOUT:
+            alert("Location request timed out.");
+            break;
+          default:
+            alert("An unknown error occurred.");
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  };
+
+  const handleEnableLocation = ({ tripId, enable }) => {
+    if (!enable) {
+      // GPS को disable करना है — सीधे dispatch करो
+      dispatch(setIsGpsOn(enable));
+      dispatch(toggleGPS({ tripId, enable: isGpsOn }));
+      dispatch(setCurrentLocation(null));
+      console.log("Location disabled");
+      return;
+    }
+
+    // GPS enable करना है — पहले location access करो
+    if (!navigator.geolocation) {
+      return alert("Geolocation is not supported by your browser.");
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        dispatch(setIsGpsOn(enable));
+        dispatch(toggleGPS({ tripId, enable: isGpsOn }));
+        dispatch(
+          setCurrentLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            speed: position.coords.speed || 0, // in meters/second
+          })
+        
+        );
+        console.log("Location enabled:", position.coords);
+        // 🔁 You can also start WebSocket here if needed
+      },
+      (error) => {
+        console.error("Error accessing location:", error);
+        alert("Location access denied or unavailable.");
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
+  const handlePageChange = (newPage) => {
+    dispatch(
+      getTripLogsByVehicle({
+        vehicleId,
+        page: newPage,
+        limit: pagination.limit,
+        type: activeTab,
+      })
+    );
+  };
+
+  const handleLimitChange = (newLimit) => {
+    dispatch(
+      getTripLogsByVehicle({
+        vehicleId,
+        page: 1,
+        limit: newLimit,
+        type: activeTab,
+      })
+    );
+  };
 
   useEffect(() => {
     dispatch(
@@ -668,6 +816,23 @@ const handleLimitChange = (newLimit) => {
                   </span>
                 </div>
               }
+              extra={
+                <div className="flex items-center gap-2">
+                  <AimOutlined className="text-indigo-600 text-lg" />
+                  GPS
+                  <Tooltip title={isGpsOn ? "Turn off GPS" : "Turn on GPS"}>
+                    <Switch
+                      checked={isGpsOn}
+                      onChange={(checked) =>
+                        handleEnableLocation({
+                          tripId: record._id,
+                          enable: checked,
+                        })
+                      }
+                    />
+                  </Tooltip>
+                </div>
+              }
               size="small"
               className="h-full shadow-lg border-0"
               headStyle={{ borderBottom: "1px solid #e2e8f0" }}
@@ -740,13 +905,17 @@ const handleLimitChange = (newLimit) => {
                       GPS Status
                     </div>
                     <Tag
-                      color={record.isGPSOn ? "green" : "red"}
-                      icon={
-                        record.isGPSOn ? <CheckOutlined /> : <CloseOutlined />
-                      }
+                      color={isGpsOn ? "green" : "red"}
+                      icon={isGpsOn ? <CheckOutlined /> : <CloseOutlined />}
                       className="w-full text-center font-medium shadow-sm"
+                      // onClick={() =>
+                      //   handleEnableLocation({
+                      //     tripId: record._id,
+                      //     enable: !isGpsOn,
+                      //   })
+                      // }
                     >
-                      {record.isGPSOn ? "Active" : "Inactive"}
+                      <span>{isGpsOn ? "Active" : "Inactive"}</span>
                     </Tag>
                   </div>
 
@@ -802,6 +971,10 @@ const handleLimitChange = (newLimit) => {
                     </div>
                   </div>
                 )}
+
+                <div className=" rounded overflow-hidden border">
+                  {isGpsOn && <TripTracker tripId={record._id} />}
+                </div>
               </div>
             </Card>
 
@@ -838,34 +1011,97 @@ const handleLimitChange = (newLimit) => {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
-                  <div className="text-xs font-medium text-gray-500 mb-1">
-                    Vehicle Details
-                  </div>
-                  <div className="flex items-center">
-                    <FaBus className="mr-3 text-green-500 text-lg" />
-                    <div>
-                      <div className="text-sm font-semibold text-gray-800">
-                        {record.vehicleId?.vehicleNumber || "N/A"}
-                      </div>
-                      <div className="text-xs text-gray-500">
-                        {record.vehicleId?.vehicleType || "N/A"} •{" "}
-                        {record.vehicleId?.capacity || "N/A"} seats
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
+                    {/* 🚍 Live Location Info */}
+                    <div className="text-xs font-medium text-gray-500 mb-1">
+                      Live Location of vehicle
+                    </div>
+                    <div className="flex items-center mb-2">
+                      <FaBus className="mr-3 text-green-500 text-lg" />
+                      <div>
+                        <div className="text-sm font-semibold text-gray-800">
+                          {record.vehicleId?.vehicleNumber || "N/A"}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {record.vehicleId?.vehicleType || "N/A"} •{" "}
+                          {record.vehicleId?.capacity || "N/A"} seats
+                        </div>
                       </div>
                     </div>
+
+                    {/* 📍 Coordinates */}
+                    <div className="text-xs text-gray-600">
+                      <strong>Latitude:</strong> {currentLocation?.lat || "N/A"}{" "}
+                      <br />
+                      <strong>Longitude:</strong>{" "}
+                      {currentLocation?.lng || "N/A"}
+                    </div>
+
+                    {/* 📍 Fetch Live Location Button */}
+                    <div className="flex justify-end mt-2">
+                      <button
+                        onClick={() =>
+                          fetchCurrentLocation({
+                            tripId: record._id,
+                            enable: true,
+                          })
+                        }
+                        className="flex items-center px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-medium rounded hover:bg-indigo-200 transition"
+                      >
+                        <FaCrosshairs className="mr-1" />
+                        Fetch Location
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 🗺️ Map View */}
+                  <div className="rounded-lg overflow-hidden shadow mt-3 relative">
+                    {currentLocation ? (
+                      <>
+                        {isMapLoading && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
+                            <span className="text-sm text-gray-500 animate-pulse">
+                              Loading map...
+                            </span>
+                          </div>
+                        )}
+                        <iframe
+                          width="100%"
+                          height="200"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          allowFullScreen
+                          referrerPolicy="no-referrer-when-downgrade"
+                          onLoad={() => setIsMapLoading(false)}
+                          src={`https://maps.google.com/maps?q=${currentLocation.lat},${currentLocation.lng}&z=15&output=embed`}
+                        />
+                      </>
+                    ) : (
+                      <div className="text-sm text-gray-500 p-4 text-center">
+                        Location not available or GPS is off.
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg">
-                    <div className="text-xs font-medium text-gray-500 mb-1">
-                      Speed
-                    </div>
-                    <div className="flex items-center">
-                      <MdSpeed className="mr-2 text-purple-500" />
-                      <span className="text-sm font-semibold text-gray-800">
-                        {record.DEFAULT_SPEED_KMPH || "N/A"} km/h
-                      </span>
+                  <div className="grid">
+                    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-3 rounded-lg shadow">
+                      <div className="text-xs font-medium text-gray-500 mb-1">
+                        {currentLocation?.speed
+                          ? "Live Speed"
+                          : "Default Speed"}
+                      </div>
+                      <div className="flex items-center">
+                        <MdSpeed className="mr-2 text-purple-500 text-lg" />
+                        <span className="text-sm font-semibold text-gray-800">
+                          {currentLocation?.speed
+                            ? (currentLocation.speed * 3.6).toFixed(1) // m/s to km/h
+                            : record?.DEFAULT_SPEED_KMPH || "N/A"}{" "}
+                          km/h
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -1086,7 +1322,7 @@ const handleLimitChange = (newLimit) => {
           selectedTripForDetails?.routeId?.routeName || "Trip"
         }`}
         onClose={() => setShowDetailsSidebar(false)}
-        width="80%"
+        width="90%"
       >
         {renderTripDetails()}
       </Sidebar>
@@ -1111,15 +1347,17 @@ const handleLimitChange = (newLimit) => {
         )}
       </Modal>
 
-      <Pagination
-      page={pagination.currentPage}
-      totalPages={pagination.totalPages}
-      totalRecords={pagination.totalItems}
-      limit={pagination.limit}
-      setPage={handlePageChange}
-      setLimit={handleLimitChange}
-      t={t}
-    />
+      {vehicleWiseLogs.length > 0 && (
+        <Pagination
+          page={pagination.currentPage}
+          totalPages={pagination.totalPages}
+          totalRecords={pagination.totalItems}
+          limit={pagination.limit}
+          setPage={handlePageChange}
+          setLimit={handleLimitChange}
+          t={t}
+        />
+      )}
     </div>
   );
 };

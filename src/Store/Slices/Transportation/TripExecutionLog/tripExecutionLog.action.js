@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getData, postData } from "../../../../services/apiEndpoints";
+import { getData, postData, putData } from "../../../../services/apiEndpoints";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import toast from "react-hot-toast";
@@ -76,6 +76,21 @@ export const getAllTripLogs = createAsyncThunk(
       return data;
     } catch (error) {
       console.error("Error in getAllTripLogs:", error);
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+
+export const toggleGPS= createAsyncThunk(
+  "liveTracking/gps",
+  async ({tripId,enable}, { rejectWithValue, dispatch }) => {
+    try {
+      const data = await putData(`/transport/trip/toggle-gps/location/${tripId}`,{enable});
+      dispatch(getAllTripLogs());
+      return data;
+    } catch (error) {
+      console.error("Error in toggleGPS:", error);
       return handleError(error, dispatch, rejectWithValue);
     }
   }
