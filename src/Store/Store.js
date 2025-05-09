@@ -308,7 +308,8 @@ listenerMiddleware.startListening({
     const currentStep = current.common?.studentSignup?.currentStep;
     const formDataChanged =
       current.common?.studentSignup?.formData !==
-      previous.common?.studentSignup?.formData;
+        previous.common?.studentSignup?.formData &&
+      current.common?.studentSignup?.currentStep < 6;
 
     return formDataChanged && currentStep !== 6;
   },
