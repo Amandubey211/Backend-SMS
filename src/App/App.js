@@ -59,6 +59,7 @@ import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 // RBAC (Role-Based Access Control)
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 import AllHelper from "../Modules/Admin/UsersProfiles/HelperProfile/AllHelper.js";
+import AllDriver from "../Modules/Admin/UsersProfiles/DriverProfile/AllDriver.js";
 
 // =================================================================
 // Lazy Loaded Components (Grouped by functionality)
@@ -1512,6 +1513,11 @@ function App() {
     {
       path: "/users/helper",
       element: <AllHelper />,
+      errorElement: <Error />,
+    },
+    {
+      path: "/users/driver",
+      element: <AllDriver />,
       errorElement: <Error />,
     },
     { path: "/users/staffs", element: <AllStaff />, errorElement: <Error /> },

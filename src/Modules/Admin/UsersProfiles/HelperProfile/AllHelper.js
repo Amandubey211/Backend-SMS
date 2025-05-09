@@ -1,6 +1,5 @@
 // AllLibrarian.js
 import React, { useEffect, useState } from "react";
-import { FiUserPlus } from "react-icons/fi";
 import { GoPlus } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +8,6 @@ import { useTranslation } from "react-i18next";
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import SidebarSlide from "../../../../Components/Common/SidebarSlide";
-import AddUser from "../StaffProfile/AddUser";
 import Spinner from "../../../../Components/Common/Spinner";
 import CreateRole from "../../../../Components/Common/RBAC/CreateRole";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
@@ -140,12 +138,12 @@ const AllHelper = () => {
             case "viewHelper":
                 return <ViewHelper helper={selectedHelper} />; // You may want to rename ViewHelper to ViewHelper
             case "addHelper":
-                return <AddHelper role="helper" />;
+                return <AddHelper role="staff" />;
             case "editHelper":
-                return <AddHelper role="helper" data={helperData} />;
+                return <AddHelper role="staff" data={helperData} />;
             case "createRole":
                 return (
-                    <CreateRole onClose={handleSidebarClose} department="Helper" />
+                    <CreateRole onClose={handleSidebarClose} department="staff" />
                 );
             default:
                 return <div>{t("Select an action")}</div>;
