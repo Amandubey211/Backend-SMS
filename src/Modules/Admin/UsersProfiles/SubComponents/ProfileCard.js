@@ -26,7 +26,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
   const [isNameTooltipVisible, setIsNameTooltipVisible] = useState(false);
   const [isPositionTooltipVisible, setIsPositionTooltipVisible] =
     useState(false);
-    
+
   const adminStaffRole = role === "admin" || profile?.role === role
   // Handlers for Modal
   const openModal = () => setIsModalOpen(true);
@@ -46,19 +46,29 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
     dispatch(activeUser(userData));
   };
 
+  const getContact = () =>
+    profile.contactNumber || profile.mobileNumber;
+
+  const getDisplayName = () =>
+    profile.fullName || `${profile.firstName || ""} ${profile.lastName || ""}`.trim();
+
+  const isUserActive = (profile) => {
+    // Normalize for both librarian (boolean) and helper (string) cases
+    if (typeof profile.active === "boolean") return profile.active;
+    if (typeof profile.status === "string") return profile.status.toLowerCase() === "active";
+    return false;
+  };
+
   /**
    * Truncates the full name to the specified limit,
    * showing a single "..." ONLY as a clickable element.
    * This avoids double dots in the UI.
    */
-  const getTruncatedName = (firstName, lastName, limit = 20) => {
-    const fullName = `${firstName} ${lastName}`;
-    if (fullName.length <= limit) {
-      return <span>{fullName}</span>;
-    }
+  const getTruncatedName = (name, limit = 20) => {
+    if (!name || name.length <= limit) return <span>{name}</span>;
 
     // We slice but do NOT add "..." here to avoid double dots
-    const truncated = fullName.slice(0, limit);
+    const truncated = name.slice(0, limit);
 
     return (
       <div className="relative inline-block">
@@ -67,7 +77,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
           className="text-blue-600 font-bold cursor-pointer ml-1"
           onMouseEnter={() => setIsNameTooltipVisible(true)}
           onMouseLeave={() => setIsNameTooltipVisible(false)}
-          aria-label={`Show full name: ${fullName}`}
+          aria-label={`Show full name: ${name}`}
         >
           ...
         </span>
@@ -80,7 +90,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
               className="absolute z-10 w-40 bg-white border border-gray-300 rounded-md shadow-lg p-2 mt-1 right-0"
             >
               <p className="text-sm font-medium text-gray-800">Full Name:</p>
-              <p className="mt-1 text-gray-700 text-sm">{fullName}</p>
+              <p className="mt-1 text-gray-700 text-sm">{name}</p>
             </motion.div>
           )}
         </AnimatePresence>
@@ -140,16 +150,17 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
         onClick={() => onClick(profile)}
         className="block p-6 bg-white rounded-lg hover:shadow-lg transition cursor-pointer border"
       >
-        {!profile?.active && adminStaffRole && (
-          <span className="flex my-[-.5rem] text-red-600 font-bold text-sm">
-            Deactivated
-          </span>
-        )}
+        {!isUserActive(profile)
+          && adminStaffRole && (
+            <span className="flex my-[-.5rem] text-red-600 font-bold text-sm">
+              Deactivated
+            </span>
+          )}
 
         {adminStaffRole && <div className="absolute right-0 top-0 flex flex-col px-4 py-2 gap-2 justify-start">
           {
             MYId == profile._id ? <div className="bg-purple-200 text-purple-800 px-2 rounded-md">My Profile</div> : <>
-              {profile?.active && (
+              {isUserActive(profile) && (
                 <ProtectedAction
                   requiredPermission={PERMISSIONS[`EDIT_${role.toUpperCase()}`]}
                 >
@@ -167,7 +178,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
                 </ProtectedAction>
               )}
 
-              {profile?.active ? (
+              {isUserActive(profile) ? (
 
                 <ProtectedAction requiredPermission={PERMISSIONS[`DEACTIVE_${role.toUpperCase()}`]}>
 
@@ -207,10 +218,10 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
           <img
             className="object-cover rounded-full w-[100px] h-[100px] border"
             src={profile?.profile || profileIcon}
-            alt={`${profile.firstName} ${profile.lastName}`}
+            alt={getDisplayName()}
           />
           <h3 className="text-lg font-medium">
-            {getTruncatedName(profile.firstName, profile.lastName)}
+            {getTruncatedName(getDisplayName())}
           </h3>
           {role === "admin" && (
             <p className="text-gray-500 text-sm mt-1">
@@ -220,7 +231,7 @@ const ProfileCard = ({ profile, onClick, editUser }) => {
         </div>
 
         <div className="p-4 text-center justify-center items-center border-t-2">
-          <p className="text-gray-600">Phone: {profile.mobileNumber}</p>
+          <p className="text-gray-600">Phone:  {getContact()}</p>
         </div>
       </div>
 

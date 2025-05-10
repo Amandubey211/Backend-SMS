@@ -78,6 +78,9 @@ import {
   setIsGpsOn,
 } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLogSlice";
 import { useTripLocationSocket } from "../../Hooks/Transportation/useTripLocationSocket";
+import { baseUrl } from "../../config/Common";
+import { io } from "socket.io-client";
+
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -143,11 +146,9 @@ const ViewTripsList = () => {
   const { vehicleId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const r1 = selectedTripForDetails?.tripId;
-  // useTripLocationSocket(r1, (data) => {
-  //   console.log("cl--->",data);
-  //   dispatch(setCurrentLocation({...data,tripId:r1}));
-  // });
+
+
+const socket = io.connect(baseUrl);
 
   useEffect(() => {
     let watcherId;
@@ -163,6 +164,15 @@ const ViewTripsList = () => {
                 speed: position.coords.speed || 0, // in meters/second
               })
             );
+
+            const data={
+              tripId:"681dededeccf5c4a19ba41ff",
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              speed: position.coords.speed || 0,
+            }
+
+            socket.emit("location",data)
             console.log("Live location update:", position.coords);
           },
           (error) => {
