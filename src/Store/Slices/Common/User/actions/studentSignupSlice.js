@@ -62,13 +62,17 @@ const mapDraftToSections = (doc) => {
       lastName: doc.lastName ?? "",
       dob: doc.dateOfBirth ?? null,
       gender: doc.gender ?? "",
-      contactNumber: doc.contactNumber ?? "",
+      phoneNumber: doc.phoneNumber ?? "",
       phoneNumberIsWhatsapp: doc.contactNumberIsWhatsapp || false,
       placeOfBirth: doc.placeOfBirth ?? "",
       religion: doc.religion ?? "",
       bloodGroup: doc.bloodGroup ?? "",
       email: doc.email, // verified already
       profile: doc.profile,
+      Q_Id: doc.Q_Id ?? "",
+      emergencyNumber: doc.emergencyNumber ?? "",
+      nationality: doc.nationality ?? "",
+      nativeLanguage: doc.nativeLanguage ?? "",
     },
 
     /* Language & Preferences tab */

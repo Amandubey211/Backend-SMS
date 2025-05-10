@@ -31,6 +31,7 @@ import {
   getTripLogsByVehicle,
   startTripLog,
   toggleGPS,
+  cancelTripLog,
 } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
 import {
   Tabs,
@@ -142,13 +143,11 @@ const ViewTripsList = () => {
   const { vehicleId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const r1=selectedTripForDetails?.tripId
+  const r1 = selectedTripForDetails?.tripId;
   // useTripLocationSocket(r1, (data) => {
   //   console.log("cl--->",data);
   //   dispatch(setCurrentLocation({...data,tripId:r1}));
   // });
-
-
 
   useEffect(() => {
     let watcherId;
@@ -263,7 +262,6 @@ const ViewTripsList = () => {
             lng: position.coords.longitude,
             speed: position.coords.speed || 0, // in meters/second
           })
-        
         );
         console.log("Location enabled:", position.coords);
         // 🔁 You can also start WebSocket here if needed
@@ -274,6 +272,28 @@ const ViewTripsList = () => {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     );
+  };
+  const handleCancel = (trip) => {
+    Modal.confirm({
+      title: "Confirm Cancel Trip",
+      icon: <ExclamationOutlined />,
+      content: `Are you sure you want to cancel the ${trip.tripType} trip for ${trip.routeId?.routeName}?`,
+      okText: "Cancel Trip",
+      okButtonProps: { danger: true },
+      cancelText: "Go Back",
+      onOk() {
+        setConfirmLoading(true);
+        dispatch(cancelTripLog({ tripId: trip._id, vehicleId }))
+          .then(() => {
+            message.success(`Trip ${trip._id} cancelled successfully`);
+            setConfirmLoading(false);
+          })
+          .catch((error) => {
+            message.error(`Failed to cancel trip: ${error.message}`);
+            setConfirmLoading(false);
+          });
+      },
+    });
   };
 
   const handlePageChange = (newPage) => {
