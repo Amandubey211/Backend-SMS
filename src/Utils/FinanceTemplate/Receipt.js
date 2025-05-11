@@ -1,5 +1,7 @@
 import React, { forwardRef } from "react";
-
+import { FiPhone, FiMail } from 'react-icons/fi';
+import { FaGlobe } from 'react-icons/fa';
+import { GoLocation } from 'react-icons/go';
 
 const ReceiptTemplate = forwardRef((props, ref) => {
   const { data } = props;
@@ -41,27 +43,31 @@ const ReceiptTemplate = forwardRef((props, ref) => {
     nameOfSchool = "N/A",
     currency="",
     logo="",
+    contactDetails
   } = schoolId || {};
 
   return (
     <div className="p-6 bg-gray-50 rounded-md shadow-lg max-w-3xl mx-auto" ref={ref}>
-     <div className="flex relative h-[10rem]">
-      <div className="w-[70%] h-[10rem]  bg-[#B874FF] z-40 [clip-path:polygon(0_0,100%_0,92%_18%,0_18%)] absolute top-0 left-0">
+     <div className="flex w-full flex-row  gap-10 mb-2 ">
+
+        <div className="flex flex-col gap-2 w-[70%] ">
+
+          <div className="w-[99%] h-[3rem]  bg-[#7F31AB]  relative">
+            <div class="w-10 h-40 bg-gray-50 rotate-45  absolute right-2 top-[-70%]"></div>
+          </div>
+          <div className="w-[90%] h-[1.5rem]  bg-[#8C1E60]">
+          </div>
+        </div>
+        <div>
+          <div className="w-full flex flex-row gap-4 justify-center items-center h-[5rem]">
+            {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
+            <h1 className="font-bold text-lg">{nameOfSchool}</h1>
+          </div>
+        </div>
       </div>
-      <div className="w-[70%] h-[10rem]  absolute top-9 left-0 flex flex-col gap-1">
-      {logo && <img src={logo} alt="Logo" className="w-10 h-10 rounded-full" />}
-      <h1 className="font-bold text-lg">{nameOfSchool}</h1>
-      <p className="text-sm text-gray-500">{`${city}, ${branchName}`}</p>
-      </div>
-      <div className="w-[60%] h-[16rem]  bg-gradient-to-r from-[#A535FF] to-[#C83BBA] z-20 [clip-path:polygon(0_0,100%_0%,100%_29%,26%_29%)] absolute top-0 right-0">
-      </div>
-      <div className=" z-40  text-white absolute top-4 right-4 p-2  font-bold">
+      <div className="flex w-full items-center justify-center font-bold text-3xl mt-8 mb-2">
         RECEIPT
       </div>
-      <div className="w-[44%] h-[10rem]  bg-[#B874FF] z-40 [clip-path:polygon(0_0,100%_0,100%_18%,9%_18%)] absolute top-20 right-0">
-      </div>
-      </div>
-
       <div className="text-sm text-gray-800 mb-4 flex justify-between">
         {studentId &&<div>
           <p><strong>Receipt Number:</strong> {_id?.toUpperCase()}</p>
@@ -128,12 +134,40 @@ const ReceiptTemplate = forwardRef((props, ref) => {
         </ul>
       </div>
       <div>
-     <div className="relative flex h-[8rem] w-full items-start">
-  <div className="absolute left-0 top-0 w-[50%] h-[11rem] bg-gradient-to-r from-[#A535FF] to-[#C83BBA] z-20 [clip-path:polygon(0_0,87%_0,100%_20%,0_20%)]">
-  </div>
-  <div className="absolute right-0 top-[.2rem] w-[70%] h-[10rem] pr-[20%] bg-[#B874FF] z-40 [clip-path:polygon(14%_0,100%_0,100%_20%,0_20%)]">
-  </div>
-</div>
+   <div className="bg-[#89125B] text-white p-6 relative  overflow-hidden">
+            <div class="w-40 h-40 bg-purple-500 rotate-45  absolute right-[-15%] top-[-60%]"></div>
+            <div className="w-full flex flex-row items-center justify-around">
+              
+              <div className="flex flex-col items-start gap-4">
+                {/* Phone */}
+                <div className="flex items-center gap-2">
+                  <FiPhone className="text-lg" />
+                  <span>{contactDetails?.contactNumber}</span>
+                </div>
+  
+                {/* Email */}
+                <div className="flex items-center gap-2">
+                  <FiMail className="text-lg" />
+                  <span>{contactDetails?.email}</span>
+                </div>
+              </div>
+  
+              <div className="flex flex-col items-start gap-4">
+                {/* Website */}
+                <div className="flex items-center gap-2">
+                  <FaGlobe className="text-lg" />
+                  <span>{contactDetails?.website}</span>
+                </div>
+  
+                {/* Location */}
+                <div className="flex items-center gap-2">
+                  <GoLocation className="text-lg" />
+                  <span>{address}</span>
+                </div>
+              </div>
+  
+            </div>
+          </div>
 
      </div>
     </div>

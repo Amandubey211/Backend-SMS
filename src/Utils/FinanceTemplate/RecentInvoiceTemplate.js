@@ -54,6 +54,7 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
     nameOfSchool = "N/A",
     currency = "",
     logo = "",
+    bankDetails,contactDetails
   } = schoolId || {};
 
   return (
@@ -182,17 +183,17 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
         {description && <li>{description}</li>}
         <div className="p-4 border-t border-gray-300 mt-4">
           <h2 className="text-base font-semibold mb-2">Payment Instructions</h2>
-          <p><strong>Bank Name:</strong> [Bank Name]</p>
-          <p><strong>Account Name:</strong> [School Account Name]</p>
-          <p><strong>Account Number:</strong> [Account Number]</p>
-          <p><strong>IBAN:</strong> [IBAN Number]</p>
-          <p><strong>SWIFT Code:</strong> [SWIFT Code]</p>
-          <p><strong>Payment Reference:</strong> [Invoice Number or Student ID]</p>
+          <p><strong>Bank Name:</strong> {bankDetails?.bankName}</p>
+          <p><strong>Account Name:</strong> {bankDetails?.AccountName}</p>
+          <p><strong>Account Number:</strong> {bankDetails?.AccountNumber}</p>
+          <p><strong>IBAN:</strong> {bankDetails?.IBAN}</p>
+          <p><strong>SWIFT Code:</strong> {bankDetails?.SwiftCode}</p>
+          <p><strong>Payment Reference:</strong> {InvoiceNumber}</p>
 
           <h2 className="text-base font-semibold mt-6 mb-2">Notes</h2>
           <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
             <li>Please make the payment by the due date to avoid any late payment penalties.</li>
-            <li>For any queries regarding this invoice, contact us at [Contact Information].</li>
+            <li>For any queries regarding this invoice, contact us at {contactDetails?.contactNumber}.</li>
             <li>Scholarships and discounts are subject to approval and may vary each term.</li>
           </ul>
 
@@ -210,13 +211,13 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
               {/* Phone */}
               <div className="flex items-center gap-2">
                 <FiPhone className="text-lg" />
-                <span>+974-7444-9111</span>
+                <span>{contactDetails?.contactNumber}</span>
               </div>
 
               {/* Email */}
               <div className="flex items-center gap-2">
                 <FiMail className="text-lg" />
-                <span>info@studentdiwan.com</span>
+                <span>{contactDetails?.email}</span>
               </div>
             </div>
 
@@ -224,13 +225,13 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
               {/* Website */}
               <div className="flex items-center gap-2">
                 <FaGlobe className="text-lg" />
-                <span>https://studentdiwan.com</span>
+                <span>{contactDetails?.website}</span>
               </div>
 
               {/* Location */}
               <div className="flex items-center gap-2">
                 <GoLocation className="text-lg" />
-                <span>Msheireb Downtown Doha - Qatar</span>
+                <span>{address}</span>
               </div>
             </div>
 

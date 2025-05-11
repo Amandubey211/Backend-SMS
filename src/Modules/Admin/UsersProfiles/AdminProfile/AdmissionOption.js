@@ -14,18 +14,30 @@ export default function AdmissionOption({ schoolId, onClose }) {
   const [valueEducation, setValueEducation] = useState([]);
   const [newValueEducation, setNewValueEducation] = useState(""); // For custom value education
   const dispatch = useDispatch();
+  const [bankDetails, setBankDetails] = useState({
+    bankName: "",
+    AccountName: "",
+    AccountNumber: "",
+    IBAN: "",
+    SwiftCode: "",
+  });
 
+  const [contactDetails, setContactDetails] = useState({
+    contactNumber: "",
+    email: "",
+    website: "",
+  });
   // Universal lists for value education
   const valueEducationOptions = [
-    "Moral Science", "Islamic Studies", "Christian Studies", 
+    "Moral Science", "Islamic Studies", "Christian Studies",
     "Ethics / Life Skills", "Other"
   ];
 
   // Static list of language options
   const languageOptions = [
-    "Arabic", "Hindi", "Urdu", "Malayalam", "Tamil", "French", 
-    "Bengali", "Tagalog (Filipino)", "Punjabi", "English", 
-    "Spanish", "Farsi", "Sinhala", "Turkish", "Pashto", "Russian", 
+    "Arabic", "Hindi", "Urdu", "Malayalam", "Tamil", "French",
+    "Bengali", "Tagalog (Filipino)", "Punjabi", "English",
+    "Spanish", "Farsi", "Sinhala", "Turkish", "Pashto", "Russian",
     "German", "Mandarin"
   ];
   const [fields, setFields] = useState([]);
@@ -34,13 +46,25 @@ export default function AdmissionOption({ schoolId, onClose }) {
     setThirdLanguages([]);
     setValueEducation([]);
     dispatch(fetchAdmissionOptions(schoolId)).then((res) => {
-      const { languageOptions = {}, valueEducation = [] ,fieldOptionality} = res.payload?.data || {};
+      const { languageOptions = {}, valueEducation = [], fieldOptionality, } = res.payload?.data || {};
       setSecondLanguages(prevState => [...prevState, ...languageOptions?.secondLanguages || []]);
       setThirdLanguages(prevState => [...prevState, ...languageOptions?.thirdLanguages || []]);
       setValueEducation(prevState => [...prevState, ...valueEducation]);
-      if(fieldOptionality?.length > 0){
+      if (fieldOptionality?.length > 0) {
         setFields(fieldOptionality)
-      }
+      };
+      setBankDetails(
+        res.payload?.bankDetails && Object.keys(res.payload.bankDetails).length
+          ? res.payload.bankDetails
+          : bankDetails
+      );
+
+      setContactDetails(
+        res.payload?.contactDetails && Object.keys(res.payload.contactDetails).length
+          ? res.payload.contactDetails
+          : contactDetails
+      );
+
     });
   }, [dispatch, schoolId]);
 
@@ -67,34 +91,68 @@ export default function AdmissionOption({ schoolId, onClose }) {
   const handleAddCustomThirdLanguage = () => {
     if (newThirdLanguage.trim() && !thirdLanguages.includes(newThirdLanguage)) {
       setThirdLanguages([...thirdLanguages, newThirdLanguage.trim()]);
-      setNewThirdLanguage(""); 
+      setNewThirdLanguage("");
     }
   };
 
   const handleAddCustomValueEducation = () => {
     if (newValueEducation.trim() && !valueEducation.includes(newValueEducation)) {
       setValueEducation([...valueEducation, newValueEducation.trim()]);
-      setNewValueEducation(""); 
+      setNewValueEducation("");
     }
   };
- 
-  
+  const handleBankChange = (e) => {
+    const { name, value } = e.target;
+    setBankDetails(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleContactChange = (e) => {
+    const { name, value } = e.target;
+    setContactDetails(prev => ({ ...prev, [name]: value }));
+  };
+
   const handleSubmit = () => {
     dispatch(updateAdmissionOptions({
       schoolId,
+      bankDetails,
+      contactDetails,
       admissionOptions: {
         languageOptions: {
           secondLanguages,
           thirdLanguages
         },
         valueEducation,
-        fieldOptionality:fields
+        fieldOptionality: fields,
+
       }
     })).then(() => onClose());
   };
+
   return (
     <div className="p-4">
       <Space direction="vertical" style={{ width: "100%" }}>
+        <p className="font-semibold text-gray-700">Bank Details</p>
+        {Object.keys(bankDetails).map((field) => (
+          <Input
+            key={field}
+            name={field}
+            value={bankDetails[field]}
+            onChange={handleBankChange}
+            placeholder={field.replace(/([A-Z])/g, ' $1').trim()}
+          />
+        ))}
+
+        {/* Contact Details Inputs */}
+        <p className="font-semibold text-gray-700">Contact Details</p>
+        {Object.keys(contactDetails).map((field) => (
+          <Input
+            key={field}
+            name={field}
+            value={contactDetails[field]}
+            onChange={handleContactChange}
+            placeholder={field.replace(/([A-Z])/g, ' $1').trim()}
+          />
+        ))}
         <p className="font-semibold text-gray-700">Specify Available Second Languages for Students</p>
         <Select
           mode="multiple"
@@ -161,11 +219,11 @@ export default function AdmissionOption({ schoolId, onClose }) {
           Add Custom Value Education
         </Button>
 
-<div>
-  <FieldOptionalityForm fields={fields} setFields={setFields} schoolId={schoolId} handleSubmit={handleSubmit}/>
-</div>
+        <div>
+          <FieldOptionalityForm fields={fields} setFields={setFields} schoolId={schoolId} handleSubmit={handleSubmit} />
+        </div>
         <Button className="bg-gradient-to-r from-pink-500 to-purple-500 text-white m-4 mb-10 w-full" onClick={handleSubmit}>
-          Save Options
+          Save
         </Button>
       </Space>
     </div>
