@@ -127,7 +127,7 @@ export const updateAdmissionOptions = createAsyncThunk(
       dispatch(setShowError(false));
       const response = await putData(
         `/student_diwan/update_school/${data.schoolId}`,
-        { admissionOptions: data.admissionOptions }
+       data
       );
       return response;
     } catch (error) {

@@ -81,7 +81,7 @@ const AcademicHistory = ({ formData }) => {
         className="space-y-6"
       >
         <Form.Item
-          name="previousSchool"
+          name="previousSchoolName"
           label="Previous School Name"
           rules={[{ required: true, message: "Required" }]}
         >

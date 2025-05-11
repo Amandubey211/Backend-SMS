@@ -31,7 +31,7 @@ const ExpenseList = () => {
 
   useEffect(() => {
     dispatch(fetchOperationalExpenses({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel,status }));
-  }, [dispatch, currentPage, computedPageSize, isCancel]);
+  }, [status, isCancel]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -289,7 +289,7 @@ const ExpenseList = () => {
               total: totalRecords,
               pageSize: computedPageSize,
               showSizeChanger: true,
-              pageSizeOptions: ["5", "10", "20", "50"],
+              pageSizeOptions: ["5", "10", "20", "50","100","200","500"],
               size: "small",
               showTotal: () =>
                 `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,

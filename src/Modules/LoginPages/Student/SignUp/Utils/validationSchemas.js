@@ -91,7 +91,7 @@ export const CandidateSchema = yup.object({
 });
 
 export const AcademicSchema = yup.object({
-  previousSchool: yup.string().required("Previous school is required"),
+  previousSchoolName: yup.string().required("Previous school is required"),
   previousClass: yup.string().required("Previous class is required"),
   curriculum: yup.string().required("Curriculum is required"),
 

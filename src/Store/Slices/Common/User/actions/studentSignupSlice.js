@@ -62,13 +62,17 @@ const mapDraftToSections = (doc) => {
       lastName: doc.lastName ?? "",
       dob: doc.dateOfBirth ?? null,
       gender: doc.gender ?? "",
-      contactNumber: doc.contactNumber ?? "",
+      phoneNumber: doc.phoneNumber ?? "",
       phoneNumberIsWhatsapp: doc.contactNumberIsWhatsapp || false,
       placeOfBirth: doc.placeOfBirth ?? "",
       religion: doc.religion ?? "",
       bloodGroup: doc.bloodGroup ?? "",
       email: doc.email, // verified already
-      profile:doc.profile
+      profile: doc.profile,
+      Q_Id: doc.Q_Id ?? "",
+      emergencyNumber: doc.emergencyNumber ?? "",
+      nationality: doc.nationality ?? "",
+      nativeLanguage: doc.nativeLanguage ?? "",
     },
 
     /* Language & Preferences tab */
@@ -108,8 +112,6 @@ const mapDraftToSections = (doc) => {
         mandatory: false,
       })),
     ],
-
-    
   };
 };
 
@@ -181,7 +183,10 @@ export const saveStudentDraft = createAsyncThunk(
   "studentSignup/saveDraft",
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
-      const { formData } = getState().common.studentSignup;
+      const { formData, currentStep } = getState().common.studentSignup;
+
+      if (currentStep >= 6) return true;
+
       const email = (formData.candidate?.email || "").toLowerCase();
       const schoolId = formData.school?.schoolId;
 
@@ -190,7 +195,7 @@ export const saveStudentDraft = createAsyncThunk(
       await putData("/student/register/student?formStatus=draft", {
         ...formData,
         candidate: { ...formData.candidate, email },
-        currentStep: getState().common.studentSignup.currentStep,
+        currentStep,
       });
 
       return true;
@@ -207,11 +212,14 @@ export const registerStudentDetails = createAsyncThunk(
   "studentSignup/register",
   async (_, { getState, rejectWithValue }) => {
     try {
+      const { currentStep } = getState().common.studentSignup;
+      if (currentStep !== 7) {
+        throw new Error("Registration can only be done on the final step");
+      }
+
       const { formData } = getState().common.studentSignup;
       const endpoint = `/student/register/student`;
-      const email = (formData.candidate?.email || "").toLowerCase();
-
-      // Create FormData
+      // const email = (formData.candidate?.email || "").toLowerCase();
 
       const res = await putData(endpoint, {
         ...formData,
@@ -229,7 +237,6 @@ export const registerStudentDetails = createAsyncThunk(
     }
   }
 );
-
 /* ------------------------------------------------------------------ */
 /* 🔸  STATE SHAPE                                                     */
 /* ------------------------------------------------------------------ */

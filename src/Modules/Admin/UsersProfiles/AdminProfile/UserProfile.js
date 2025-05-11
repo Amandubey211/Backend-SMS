@@ -130,9 +130,9 @@ const UserProfile = () => {
                 <button
 
                   onClick={handleSidebar}
-                  className="px-4 py-2 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+                  className="px-3 py-2 inline-flex items-center border border-transparent text-sm font-medium shadow-sm bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
                 >
-                Admission Options
+                School Configuration
                 </button>
                 
                 </div>

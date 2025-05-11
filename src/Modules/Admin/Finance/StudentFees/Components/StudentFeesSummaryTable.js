@@ -22,13 +22,9 @@ const StudentFeesSummaryTable = () => {
 
   useEffect(() => {
     dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize }));
-  }, [dispatch, currentPage, computedPageSize]);
+  }, []);
 
-  const handleSearch = (e) => {
-    const value = e.target.value;
-    setSearchText(value);
-    dispatch(fetchAllStudentFee({ page: 1, search: value, limit: computedPageSize }));
-  };
+
 
   const columns = [
     {

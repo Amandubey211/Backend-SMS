@@ -250,6 +250,7 @@ const CandidateInfo = ({ formData }) => {
                 height="h-48"
                 aspectRatio={1}
                 required
+                profilelink={formData?.profile} //could be change later for sending the public id of the image link
               />
             </Form.Item>
           </div>
@@ -323,7 +324,7 @@ const CandidateInfo = ({ formData }) => {
         {/* Student‑ID / expiry */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <Form.Item name="studentId" label="Student QID">
+            <Form.Item name="Q_Id" label="Student QID">
               <Input size="large" prefix={<IdcardOutlined />} />
             </Form.Item>
           </Col>

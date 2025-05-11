@@ -61,7 +61,7 @@ const StudentSignUp = () => {
 
   /* persist draft on step change */
   useEffect(() => {
-    if (currentStep > 0) dispatch(saveStudentDraft());
+    if (currentStep > 0 && currentStep < 6) dispatch(saveStudentDraft());
   }, [currentStep, dispatch]);
 
   /* ---------- step map ---------- */
