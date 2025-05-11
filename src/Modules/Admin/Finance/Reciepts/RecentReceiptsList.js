@@ -7,10 +7,12 @@ import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import { SearchOutlined } from "@ant-design/icons";
 import { useNavigate } from 'react-router-dom';
 import { MdCancel } from 'react-icons/md';
-
+import * as XLSX from "xlsx";
 import { downloadPDF } from '../../../../Utils/xl';
 import ReceiptTemplate from '../../../../Utils/FinanceTemplate/Receipt';
 import { TbInvoice } from 'react-icons/tb';
+import { FaFileExport } from 'react-icons/fa';
+import toast from 'react-hot-toast';
 const ReceiptsList = () => {
   const dispatch = useDispatch();
   const { receipts, loading, totalRecords, totalPages } = useSelector(state => state.admin.receipts);
@@ -20,6 +22,8 @@ const ReceiptsList = () => {
   const [pageSize, setPageSize] = useState(10); // State for page size
   const currency = useSelector((store) => store.common.user.userDetails.currency);
   const [isCancel,setIsCancel] = useState(false);
+  const [exportModel, setExportModel] = useState(false);
+   const [fileTitle, setFileTitle] = useState('');
   useEffect(() => {
     dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize,isCancel }));
   }, [dispatch, currentPage, pageSize,isCancel]);
@@ -109,6 +113,66 @@ const ReceiptsList = () => {
     dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize,search:value,isCancel }));
   };
   
+  const downloadexcel = () => {
+  if (!fileTitle) {
+    toast.error("Please Enter File Name");
+    return;
+  }
+
+  let fileName = `${fileTitle}.xlsx`;
+  let sheet = "sheet1";
+  let formattedData = [];
+
+  receipts?.forEach((row) => {
+    const {
+      _id,
+      invoiceNumber,
+      schoolId = {},
+      description,
+      penalty = 0,
+      isCancel,
+      paymentDate,
+      paidItems = [],
+      paidBy,
+      studentId,
+      entityId,
+      paymentStatus,
+      onlineTransactionId,
+      chequeDate,
+      chequeNumber,
+      paymentType
+    } = row;
+
+    // Total amount paid
+    let totalAmount = 0;
+    paidItems.forEach((item) => {
+      totalAmount += item.amountPaid || 0;
+    });
+
+    formattedData.push({
+      ReceiptID: _id?.toUpperCase(),
+      InvoiceNumber: invoiceNumber,
+        // Either Student or Entity
+      Name: studentId ? `${studentId.firstName} ${studentId.lastName}` : entityId?.entityName || "",
+      Email: studentId?.email || entityId?.email || "",
+      Contact: studentId?.contact || entityId?.contactNumber || "",
+      PaidBy: paidBy || "Self",
+      PaymentType: paymentType,
+      PaymentDate: paymentDate?.slice(0, 10),
+      PaymentStatus: paymentStatus,
+        ChequeNumber: chequeNumber || "N/A",
+      ChequeDate: chequeDate || "N/A",
+      TotalPaid: totalAmount,
+      Currency: schoolId?.currency || "",
+      Remarks: description || "",
+    });
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(formattedData);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheet);
+  XLSX.writeFile(workbook, fileName);
+};
 
   return (
     <Layout title="Finance | Reciept List">
@@ -134,7 +198,8 @@ const ReceiptsList = () => {
                 <Select.Option value={true}>Canceled</Select.Option>
               </Select>
               </div>
-          <div>
+          <div className='flex flex-row gap-2'>
+            <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => { setExportModel(true) }}><FaFileExport /> Export</button>
             <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/receipts/add-new-receipt")}>Add New Reciept</button>
           </div>
          </div>
@@ -164,6 +229,22 @@ const ReceiptsList = () => {
         <p>Are you sure you want to cancel the receipt for Reciept number: {selectedReceipt?.RecieptNumber}?</p>
       </Modal>
     </div>
+     <Modal
+              title="Export Data"
+              visible={exportModel}
+              onOk={() => downloadexcel()}
+              onCancel={() => setExportModel(false)}
+              okText="Export"
+              cancelText="Cancel"
+            > 
+            <div className="flex flex-row gap-2 items-center ">
+            <Input placeholder="File Name.." className="w-[18rem]" onChange={(e)=>setFileTitle(e.target.value)}/><span className="text-lg">.xlsx</span>
+            </div>
+            
+              <p>Only the data that matches the filters you have applied will be exported.</p>
+              <p>Export is limited to the current page based on the selected page limit.</p>
+    
+            </Modal>
     {isRecieptVisible && selectedReciept && (
                       <div className="fixed inset-0 z-50 flex items-center justify-center">
                         {/* Full-screen blur background */}

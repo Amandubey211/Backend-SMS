@@ -46,7 +46,7 @@ const PayrollList = () => {
         status
       })
     );
-  }, [dispatch, currentPage, computedPageSize,isCancel,status]);
+  }, [isCancel,status]);
 
   const handleSearch = (e) => {
     const value = e.target.value;

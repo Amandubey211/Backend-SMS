@@ -28,7 +28,7 @@ const SummaryRevenueList = () => {
 
   useEffect(() => {
     dispatch(fetchAllEntityRevenue({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status }));
-  }, [dispatch, currentPage, computedPageSize, isCancel, status]);
+  }, [isCancel, status]);
 
   const handleSearch = (e) => {
     const value = e.target.value;
