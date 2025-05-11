@@ -156,7 +156,7 @@ export const downloadPDF = async (pdfRef, selectedData, title) => {
   const imgHeight = canvasHeight * scaleFactor;
 
   const marginX = (pdfWidth - imgWidth) / 2;
-  const marginY = (pdfHeight - imgHeight) / 2;
+  const marginY = 0;
 
   // Draw the full content on a single page
   pdf.addImage(imgData, "PNG", marginX, marginY, imgWidth, imgHeight);
