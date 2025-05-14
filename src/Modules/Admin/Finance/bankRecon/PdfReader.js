@@ -10,7 +10,8 @@ import { IoIosWarning } from "react-icons/io";
 import toast from 'react-hot-toast';
 import BankReconciliationSummary from './BankReconciliationSummary';
 
-pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
+//pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const PDFSearchViewer = () => {
   const schoolCurrency = useSelector((store) => store.common.user.userDetails?.currency);
@@ -66,132 +67,61 @@ const PDFSearchViewer = () => {
   };
 
 
-  // const extractTextFromPDF = async (file) => {
-  //   const loadingTask = pdfjs.getDocument(URL.createObjectURL(file));
-  //   const pdf = await loadingTask.promise;
-  //   const textLines = [];
-
-  //   for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-  //     const page = await pdf.getPage(pageNum);
-  //     const textContent = await page.getTextContent();
-
-  //     const lineMap = new Map();
-
-  //     textContent.items.forEach((item) => {
-  //       const y = Math.floor(item.transform[5]); // Y position
-  //       const existingLine = lineMap.get(y) || [];
-  //       existingLine.push(item.str);
-  //       lineMap.set(y, existingLine);
-  //     });
-
-  //     const sortedLines = Array.from(lineMap.entries())
-  //       .sort((a, b) => b[0] - a[0])
-  //       .map(([_, words]) => words.join(' '));
-
-  //     textLines.push(...sortedLines);
-  //   }
-  //   let findTransactions = []
-  //   textLines?.map((item) => {
-
-
-  //     let firstWord = item?.split(' ');
-
-
-  //     if (firstWord?.length > 0) {
-  //       if (firstWord[0]?.split('-').length == 3 && firstWord.length > 12) {
-  //         console.log(firstWord[0]?.split('-'));
-  //         findTransactions.push(item)
-  //       }
-  //     }
-  //   })
-
-
-  //   const regex = /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g;
-  //   let result = [];
-
-  //   findTransactions?.forEach((entry, index) => {
-  //     const parts = entry.split(' ');
-  //     const date = parts[0];
-
-
-
-  //     const matches = entry.match(regex);
-  //     if (matches && matches.length >= 2) {
-  //       const amount = parseFloat(matches[matches?.length - 2].replace(',', ''));
-  //       const balance = parseFloat(matches[matches?.length - 1].replace(',', ''));
-  //       let d = entry?.split(' ');
-  //       d = d?.slice(1, d.length - 2);
-  //       result.push({
-  //         date,
-  //         description: d,
-  //         amount: Number(amount),
-  //         balance: Number(balance),
-  //       });
-  //     }
-  //   });
-  //   result = result.map((i, index) => {
-  //     return {
-  //       date: i.date,
-  //       description: i.description,
-  //       amount: i.amount,
-  //       balance: i.balance,
-  //       Type: result[index - 1]?.balance < i?.balance ? "Credit" : "Debit"
-  //     }
-  //   })
-  //   setAllPdfText(result);
-  //   return textLines;
-  // };
-
-
   const extractTextFromPDF = async (file) => {
     const loadingTask = pdfjs.getDocument(URL.createObjectURL(file));
     const pdf = await loadingTask.promise;
+    console.log(pdf);
+    
     const textLines = [];
-  
+
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
-  
+
       const lineMap = new Map();
-  
+
       textContent.items.forEach((item) => {
-        // ✅ Fix: Normalize Y position to tolerate macOS/Windows differences
-        const y = Math.round(item.transform[5]); // Changed from Math.floor
+        const y = Math.floor(item.transform[5]); // Y position
         const existingLine = lineMap.get(y) || [];
         existingLine.push(item.str);
         lineMap.set(y, existingLine);
       });
-  
+
       const sortedLines = Array.from(lineMap.entries())
         .sort((a, b) => b[0] - a[0])
         .map(([_, words]) => words.join(' '));
-  
+
       textLines.push(...sortedLines);
     }
-  
-    let findTransactions = [];
+    let findTransactions = []
     textLines?.map((item) => {
+
+
       let firstWord = item?.split(' ');
-  
+
+
       if (firstWord?.length > 0) {
-        if (firstWord[0]?.split('-').length === 3 && firstWord.length > 12) {
+        if (firstWord[0]?.split('-').length == 3 && firstWord.length > 12) {
           console.log(firstWord[0]?.split('-'));
-          findTransactions.push(item);
+          findTransactions.push(item)
         }
       }
-    });
-  
+    })
+
+
     const regex = /(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)/g;
     let result = [];
-  
+
     findTransactions?.forEach((entry, index) => {
       const parts = entry.split(' ');
       const date = parts[0];
+
+
+
       const matches = entry.match(regex);
-  
       if (matches && matches.length >= 2) {
-        const amount = parseFloat(matches[matches.length - 2].replace(',', ''));
-        const balance = parseFloat(matches[matches.length - 1].replace(',', ''));
+        const amount = parseFloat(matches[matches?.length - 2].replace(',', ''));
+        const balance = parseFloat(matches[matches?.length - 1].replace(',', ''));
         let d = entry?.split(' ');
         d = d?.slice(1, d.length - 2);
         result.push({
@@ -202,20 +132,19 @@ const PDFSearchViewer = () => {
         });
       }
     });
-  
     result = result.map((i, index) => {
       return {
         date: i.date,
         description: i.description,
         amount: i.amount,
         balance: i.balance,
-        Type: result[index - 1]?.balance < i?.balance ? "Credit" : "Debit",
-      };
-    });
-  
+        Type: result[index - 1]?.balance < i?.balance ? "Credit" : "Debit"
+      }
+    })
     setAllPdfText(result);
     return textLines;
   };
+
   
 
   const normalizeDate = (dateStr) => {
