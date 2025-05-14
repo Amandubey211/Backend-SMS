@@ -346,6 +346,11 @@ const AddOperationalExpenses = () => {
                       </Select>
                     </Form.Item>
                   </Col>
+                  <Col span={6}>
+                    <Form.Item name="onlineTransactionId" label="Online Transaction Id">
+                        <input type="text" className="w-full h-[2rem] border border-gray-300 rounded-lg p-2" style={{ width: "100%" }} value={receiptData.onlineTransactionId} onChange={(e) => handleChange("onlineTransactionId", e.target.value)} placeholder="Online Transaction Id" />
+                      </Form.Item>
+                  </Col>
 
                   <Col span={6}>
                     <Form.Item label="Payment Date" name="paymentDate" rules={[{ required: true, message: "Payment Date is required" }]}>
