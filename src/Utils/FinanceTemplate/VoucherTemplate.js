@@ -92,6 +92,7 @@ const VoucherTemplate = forwardRef((props, ref) => {
             <th className="p-2 border-4 border-white">Item Detail</th>
             <th className="p-2 border-4 border-white">Rate</th>
             <th className="p-2 border-4 border-white">Qty</th>
+            <th className="p-2 border-4 border-white">Unit</th>
             <th className="p-2 border-4 border-white">Amount</th>
             <th className="p-2 border-4 border-white">Paid Amount</th>
             <th className="p-2 border-4 border-white">Remaining Amount</th>
@@ -106,6 +107,7 @@ const VoucherTemplate = forwardRef((props, ref) => {
                ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
               <td className="p-2 border-4 border-white text-start">{item.rate?.toFixed(2)}</td>
               <td className="p-2 border-4 border-white text-start">{item.quantity || 1}</td>
+              <td className="p-2 border-4 border-white text-start">{item.unit || '-'}</td>
               <td className="p-2 border-4 border-white text-start">{item.amount?.toFixed(2)}</td>
               <td className="p-2 border-4 border-white text-start">{item.paidAmount?.toFixed(2)}</td>
               <td className="p-2 border-4 border-white text-start">{item.remainingAmount?.toFixed(2)}</td>
