@@ -19,6 +19,7 @@ const CustomUploadCard = ({
   width = "w-full",
   height = "h-48",
   required = false,
+  profilelink
 }) => {
   /* -------------------- Hooks -------------------- */
   const { uploadFile, uploading, error, resetUpload } = useCloudinaryUpload(

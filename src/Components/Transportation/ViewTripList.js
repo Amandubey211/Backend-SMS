@@ -31,6 +31,7 @@ import {
   getTripLogsByVehicle,
   startTripLog,
   toggleGPS,
+  cancelTripLog,
 } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
 import {
   Tabs,
@@ -247,6 +248,7 @@ const ViewTripsList = () => {
       }
     );
   };
+
 const handleEnableLocation = ({ tripId, enable }) => {
   if (!enable) {
     // GPS को disable करना है
