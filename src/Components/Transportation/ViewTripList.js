@@ -81,7 +81,6 @@ import { useTripLocationSocket } from "../../Hooks/Transportation/useTripLocatio
 import { baseUrl } from "../../config/Common";
 import { io } from "socket.io-client";
 
-
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 dayjs.extend(advancedFormat);
@@ -147,56 +146,55 @@ const ViewTripsList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const socket = io.connect(baseUrl);
 
-const socket = io.connect(baseUrl);
+  // useEffect(() => {
+  //   let watcherId;
 
-  useEffect(() => {
-    let watcherId;
+  //   if (isGpsOn) {
+  //     if (navigator.geolocation) {
+  //       watcherId = navigator.geolocation.watchPosition(
+  //         (position) => {
+  //           dispatch(
+  //             setCurrentLocation({
+  //               lat: position.coords.latitude,
+  //               lng: position.coords.longitude,
+  //               speed: position.coords.speed || 0, // in meters/second
+  //             })
+  //           );
 
-    if (isGpsOn) {
-      if (navigator.geolocation) {
-        watcherId = navigator.geolocation.watchPosition(
-          (position) => {
-            dispatch(
-              setCurrentLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-                speed: position.coords.speed || 0, // in meters/second
-              })
-            );
+  //           const data = {
+  //             tripId: "681dededeccf5c4a19ba41ff",
+  //             lat: position.coords.latitude,
+  //             lng: position.coords.longitude,
+  //             speed: position.coords.speed || 0,
+  //           };
 
-            const data={
-              tripId:"681dededeccf5c4a19ba41ff",
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              speed: position.coords.speed || 0,
-            }
+  //           socket.emit("location", data);
+  //           console.log("Live location update:", position.coords);
+  //         },
+  //         (error) => {
+  //           console.error("Live GPS error:", error);
+  //         },
+  //         {
+  //           enableHighAccuracy: true,
+  //           timeout: 10000,
+  //           maximumAge: 0,
+  //         }
+  //       );
+  //     }
+  //   } else {
+  //     // ✅ GPS off होने पर location clear करें
+  //     dispatch(setCurrentLocation(null));
+  //   }
 
-            socket.emit("location",data)
-            console.log("Live location update:", position.coords);
-          },
-          (error) => {
-            console.error("Live GPS error:", error);
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0,
-          }
-        );
-      }
-    } else {
-      // ✅ GPS off होने पर location clear करें
-      dispatch(setCurrentLocation(null));
-    }
-
-    // ✅ Cleanup on unmount or GPS off
-    return () => {
-      if (watcherId) {
-        navigator.geolocation.clearWatch(watcherId);
-      }
-    };
-  }, [isGpsOn]);
+  //   // ✅ Cleanup on unmount or GPS off
+  //   return () => {
+  //     if (watcherId) {
+  //       navigator.geolocation.clearWatch(watcherId);
+  //     }
+  //   };
+  // }, [isGpsOn]);
 
   const fetchCurrentLocation = ({ tripId, enable }) => {
     if (!navigator.geolocation) {
@@ -206,8 +204,12 @@ const socket = io.connect(baseUrl);
 
     // Always enable GPS on button click
     if (!isGpsOn) {
+      const currentLocation = {
+        lat: currentLocation?.lat,
+        lng: currentLocation?.lng,
+      };
       dispatch(setIsGpsOn(true));
-      dispatch(toggleGPS({ tripId, enable: true }));
+      dispatch(toggleGPS({ tripId, enable: true, currentLocation }));
     }
 
     navigator.geolocation.getCurrentPosition(
@@ -247,64 +249,53 @@ const socket = io.connect(baseUrl);
     );
   };
 
-  const handleEnableLocation = ({ tripId, enable }) => {
-    if (!enable) {
-      // GPS को disable करना है — सीधे dispatch करो
-      dispatch(setIsGpsOn(enable));
-      dispatch(toggleGPS({ tripId, enable: isGpsOn }));
-      dispatch(setCurrentLocation(null));
-      console.log("Location disabled");
-      return;
-    }
+const handleEnableLocation = ({ tripId, enable }) => {
+  if (!enable) {
+    // GPS को disable करना है
+    dispatch(setIsGpsOn(false));
+    dispatch(toggleGPS({ tripId, enable: false }));
+    dispatch(setCurrentLocation(null));
+    console.log("Location disabled");
+    return;
+  }
 
-    // GPS enable करना है — पहले location access करो
-    if (!navigator.geolocation) {
-      return alert("Geolocation is not supported by your browser.");
-    }
+  // GPS enable करना है
+  if (!navigator.geolocation) {
+    return alert("Geolocation is not supported by your browser.");
+  }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        dispatch(setIsGpsOn(enable));
-        dispatch(toggleGPS({ tripId, enable: isGpsOn }));
-        dispatch(
-          setCurrentLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            speed: position.coords.speed || 0, // in meters/second
-          })
-        );
-        console.log("Location enabled:", position.coords);
-        // 🔁 You can also start WebSocket here if needed
-      },
-      (error) => {
-        console.error("Error accessing location:", error);
-        alert("Location access denied or unavailable.");
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-    );
-  };
-  const handleCancel = (trip) => {
-    Modal.confirm({
-      title: "Confirm Cancel Trip",
-      icon: <ExclamationOutlined />,
-      content: `Are you sure you want to cancel the ${trip.tripType} trip for ${trip.routeId?.routeName}?`,
-      okText: "Cancel Trip",
-      okButtonProps: { danger: true },
-      cancelText: "Go Back",
-      onOk() {
-        setConfirmLoading(true);
-        dispatch(cancelTripLog({ tripId: trip._id, vehicleId }))
-          .then(() => {
-            message.success(`Trip ${trip._id} cancelled successfully`);
-            setConfirmLoading(false);
-          })
-          .catch((error) => {
-            message.error(`Failed to cancel trip: ${error.message}`);
-            setConfirmLoading(false);
-          });
-      },
-    });
-  };
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const currentLocation = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        speed: position.coords.speed || 0,
+      };
+
+      // पहले GPS ऑन स्टेट सेट करें और लोकेशन सेव करें
+      dispatch(setIsGpsOn(true));
+      dispatch(setCurrentLocation(currentLocation));
+
+      // फिर API कॉल करें toggleGPS को
+      dispatch(toggleGPS({
+        tripId,
+        enable: true,
+        currentLocation: {
+          lat: currentLocation.lat,
+          lng: currentLocation.lng,
+        },
+      }));
+
+      console.log("Location enabled:", currentLocation);
+      // 🔁 यहाँ WebSocket या live tracking स्टार्ट कर सकते हो
+    },
+    (error) => {
+      console.error("Error accessing location:", error);
+      alert("Location access denied or unavailable.");
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+  );
+};
 
   const handlePageChange = (newPage) => {
     dispatch(
@@ -316,7 +307,6 @@ const socket = io.connect(baseUrl);
       })
     );
   };
-
   const handleLimitChange = (newLimit) => {
     dispatch(
       getTripLogsByVehicle({
@@ -762,6 +752,10 @@ const socket = io.connect(baseUrl);
           const payload = {
             DEFAULT_SPEED_KMPH: 40,
             HALT_TIME_MINUTES: 2,
+            currentLocation: {
+              lat: currentLocation?.lat,
+              lng: currentLocation?.lng,
+            },
           };
           dispatch(
             startTripLog({
@@ -791,7 +785,7 @@ const socket = io.connect(baseUrl);
           message.success(`Trip ${trip._id} ended successfully`);
           setConfirmLoading(false);
           // In a real app, you would dispatch an action here
-          dispatch(endTripLog({ tripId: trip._id, vehicleId }));
+          dispatch(endTripLog({ tripId: trip._id, vehicleId , currentLocation:null }));
         }, 1500);
       },
     });
