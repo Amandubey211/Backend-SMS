@@ -22,7 +22,9 @@ const VoucherTemplate = forwardRef((props, ref) => {
     paymentType,
     paymentDate,
     status,
-    history
+    history,
+    userName,
+    onlineTransactionId
   } = data;
 
   let totalAmount = 0;
@@ -83,67 +85,81 @@ const VoucherTemplate = forwardRef((props, ref) => {
         </div>
       </div>
 
-      <table className="w-full text-[10px] mb-6 border border-gray-300">
+      <table className="w-full text-[10px]  border border-gray-300">
         <thead>
-          <tr className="bg-purple-300 text-left">
-            <th className="p-2 border">Item</th>
-            <th className="p-2 border">Item Detail</th>
-            <th className="p-2 border">Rate</th>
-            <th className="p-2 border">Qty</th>
-            <th className="p-2 border">Amount</th>
-            <th className="p-2 border">Paid Amount</th>
-            <th className="p-2 border">Remaining Amount</th>
+          <tr className="bg-[#7F31AB] text-left text-white">
+            <th className="p-2 border-4 border-white">Item</th>
+            <th className="p-2 border-4 border-white">Item Detail</th>
+            <th className="p-2 border-4 border-white">Rate</th>
+            <th className="p-2 border-4 border-white">Qty</th>
+            <th className="p-2 border-4 border-white">Unit</th>
+            <th className="p-2 border-4 border-white">Amount</th>
+            <th className="p-2 border-4 border-white">Paid Amount</th>
+            <th className="p-2 border-4 border-white">Remaining Amount</th>
           </tr>
         </thead>
         <tbody>
           {lineItems.map((item, index) => (
-            <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+            <tr key={item._id || index} className={index % 2 === 0 ? "bg-[#E4D9FA]" : "bg-[#E4D9FA]"}>
 
-              <td className="p-2 border">{item?.name || "N/A"}</td>
-              <td className="p-2 border">{item?.subCategory} <br /> {item.frequency != "Permanent Purchase" && `
+              <td className="p-2 border-4 border-white">{item?.name || "N/A"}</td>
+              <td className="p-2 border-4 border-white">{item?.subCategory} <br /> {item.frequency != "Permanent Purchase" && `
                ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
-              <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
-              <td className="p-2 border text-start">{item.quantity || 1}</td>
-              <td className="p-2 border text-start">{item.amount?.toFixed(2)}</td>
-              <td className="p-2 border text-start">{item.paidAmount?.toFixed(2)}</td>
-              <td className="p-2 border text-start">{item.remainingAmount?.toFixed(2)}</td>
+              <td className="p-2 border-4 border-white text-start">{item.rate?.toFixed(2)}</td>
+              <td className="p-2 border-4 border-white text-start">{item.quantity || 1}</td>
+              <td className="p-2 border-4 border-white text-start">{item.unit || '-'}</td>
+              <td className="p-2 border-4 border-white text-start">{item.amount?.toFixed(2)}</td>
+              <td className="p-2 border-4 border-white text-start">{item.paidAmount?.toFixed(2)}</td>
+              <td className="p-2 border-4 border-white text-start">{item.remainingAmount?.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <div className="flex flex-row items-center border border-gray-300 text-xs ">
-        <div className="flex flex-col items-start p-4 w-[60%]">
-          <p>Payment Details</p>
-          {/* {!["pending", "hold"].includes(status) && <div className="my-4 border-t border-gray-500">
-            <p><strong>Payment Date :</strong> {paymentDate?.slice(0, 10)}</p>
-            <p><strong>Payment Method :</strong> {paymentType}</p>
-            {chequeNumber && <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
-            {chequeDate && <p><strong>Cheque Date:</strong> {chequeDate?.slice(0, 10)}</p>}
-          </div>}
-          {history?.length > 0 && history?.map((i) => (
-            i?.oldData?.totalpaid > 0 && (
-              <div key={i._id} className="my-4 border-t border-gray-500">
-                <p><strong>Payment Date :</strong> {i?.oldData?.paymentDate?.slice(0, 10)}</p>
-                <p><strong>Payment Method :</strong> {i?.oldData?.paymentType}</p>
-                {i?.oldData?.chequeNumber && (
-                  <p><strong>Cheque Number:</strong> {i?.oldData?.chequeNumber}</p>
-                )}
-                {i?.oldData?.chequeDate && (
-                  <p><strong>Cheque Date:</strong> {i?.oldData?.chequeDate?.slice(0, 10)}</p>
-                )}
-              </div>
-            )
-          ))} */}
-
-
-        </div>
-        <div className="flex flex-col items-start p-4 w-[40%] border-l-2 border-gray-300">
-          <p><strong>Total Amount</strong> = {totalAmount?.toFixed(2)} {currency}</p>
-          <p><strong>Total Paid</strong> = {totalPaid?.toFixed(2)} {currency}</p>
-          <p><strong>Total Remaining</strong> = {(totalAmount - totalPaid).toFixed(2)} {currency}</p>
-        </div>
+      <div className="">
+        <table className="w-full table-auto bg-[#E4D9FA]">
+          <tbody>
+            <tr className="border-4 border-white text-start" >
+              <td className="p-2  text-center" colSpan={16}>Total Amount </td>
+              <td className="p-2 border-4 border-white">{totalAmount?.toFixed(2)} {currency}</td>
+            </tr>
+            <tr className="border-4 border-white text-start">
+              <td className="p-2  text-center" colSpan={16}>Total Paid</td>
+              <td className="p-2 border-4 border-white">{totalPaid?.toFixed(2)} {currency}</td>
+            </tr>
+            <tr className="border-4 border-white text-start">
+              <td className="p-2  text-center" colSpan={16}>Total Remaining</td>
+              <td className="p-2 border-4 border-white">{(totalAmount - totalPaid).toFixed(2)} {currency}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
+      <div className="flex flex-col items-start  mt-2">
+        <p>Authorization & Internal Tracking</p>
+         <p><strong>Status:</strong> {status}</p>
+        {!["pending", "hold"].includes(status) & history?.length < 1 ? <div className="">
+          <p><strong>Approved By :</strong> {userName}</p>
+          <p><strong>Transaction ID :</strong> {onlineTransactionId}</p>
+          <p><strong>Payment Date :</strong> {paymentDate?.slice(0, 10)}</p>
+          <p><strong>Payment Method :</strong> {paymentType}</p>
+          <p><strong>Amount :</strong> {totalPaid?.toFixed(2)} {currency}</p>
+          {chequeNumber && <p><strong>Cheque Number:</strong> {chequeNumber}</p>}
+          {chequeDate && <p><strong>Cheque Date:</strong> {chequeDate?.slice(0, 10)}</p>}
+        </div>: history?.filter((i)=>i.oldData.totalpaid !=0)?.map((i) => (
+            <div key={i._id} className="border-t py-2">
+          <p><strong>Approved By :</strong> {i?.oldData?.userName}</p>
+          <p><strong>Transaction ID :</strong> {i?.oldData?.onlineTransactionId || "N/A"}</p>
+              <p><strong>Payment Date :</strong> {i?.oldData?.paymentDate?.slice(0, 10)}</p>
+              <p><strong>Payment Method :</strong> {i?.oldData?.paymentType}</p>
+              <p><strong>Amount :</strong> {i?.oldData?.totalpaid} {currency}</p>
+              {i?.oldData?.chequeNumber && (
+                <p><strong>Cheque Number:</strong> {i?.oldData?.chequeNumber}</p>
+              )}
+              {i?.oldData?.chequeDate && (
+                <p><strong>Cheque Date:</strong> {i?.oldData?.chequeDate?.slice(0, 10)}</p>
+              )}
+            </div>
+        ))}
+      </div>
       <div className="text-sm text-gray-700 mt-4">
         {description && <li>Remarks / Notes: {description}</li>}
         <div className="p-4 border-t border-gray-300 mt-4">
