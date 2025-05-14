@@ -41,10 +41,10 @@ export const startTripLog = createAsyncThunk(
 
 export const endTripLog = createAsyncThunk(
   "tripExecutionLog/end",
-  async ({tripId,vehicleId}, { rejectWithValue, dispatch }) => {
+  async ({tripId,vehicleId,currentLocation}, { rejectWithValue, dispatch }) => {
     try {
       dispatch(setShowError(false));
-      const data = await postData(`/transport/trip/${tripId}/end`);
+      const data = await postData(`/transport/trip/${tripId}/end`,{currentLocation});
       dispatch(getTripLogsByVehicle({vehicleId}));
       return data;
     } catch (error) {
@@ -84,9 +84,9 @@ export const getAllTripLogs = createAsyncThunk(
 
 export const toggleGPS= createAsyncThunk(
   "liveTracking/gps",
-  async ({tripId,enable}, { rejectWithValue, dispatch }) => {
+  async ({tripId,enable,currentLocation}, { rejectWithValue, dispatch }) => {
     try {
-      const data = await putData(`/transport/trip/toggle-gps/location/${tripId}`,{enable});
+      const data = await putData(`/transport/trip/toggle-gps/location/${tripId}`,{enable,currentLocation});
       dispatch(getAllTripLogs());
       return data;
     } catch (error) {
