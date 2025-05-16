@@ -60,6 +60,7 @@ import GraduationPage from "../Modules/Admin/Graduation/GraduationPage.js";
 import ManageRolePage from "../Components/Common/RBAC/ManageRolePage.js";
 import AllHelper from "../Modules/Admin/UsersProfiles/HelperProfile/AllHelper.js";
 import AllDriver from "../Modules/Admin/UsersProfiles/DriverProfile/AllDriver.js";
+import TransportSimulator from "../Components/Common/TransportSimulator.js";
 
 // =================================================================
 // Lazy Loaded Components (Grouped by functionality)
@@ -165,9 +166,9 @@ const Stoppage = lazy(() =>
   import("../Components/Transportation/StopageList.js")
 );
 
-const Scheduling = lazy(()=>
+const Scheduling = lazy(() =>
   import("../Modules/Admin/Transportation/Scheduling.js")
-)
+);
 
 const ViewTripLogs = lazy(() =>
   import("../Modules/Admin/Transportation/ViewTripLogs.js")
@@ -509,6 +510,12 @@ function App() {
     { path: "/stafflogin", element: <StaffLogin />, errorElement: <Error /> },
     { path: "/signup", element: <StudentSignUp />, errorElement: <Error /> },
     { path: "/verify_qid", element: <QIDLogin />, errorElement: <Error /> },
+    {
+      path: "/transport/sim",
+      element: <TransportSimulator />,
+      errorElement: <Error />,
+    }, // sim
+
     {
       path: "/privacy-policy",
       element: <PrivacyPolicy />,
