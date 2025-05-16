@@ -71,7 +71,7 @@ const PDFSearchViewer = () => {
     const loadingTask = pdfjs.getDocument(URL.createObjectURL(file));
     const pdf = await loadingTask.promise;
     console.log(pdf);
-    
+
     const textLines = [];
 
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
@@ -81,30 +81,39 @@ const PDFSearchViewer = () => {
       const lineMap = new Map();
 
       textContent.items.forEach((item) => {
-        const y = Math.floor(item.transform[5]); // Y position
-        const existingLine = lineMap.get(y) || [];
-        existingLine.push(item.str);
-        lineMap.set(y, existingLine);
-      });
+        const y = item.transform[5];
+        let matchedY = null;
 
+        for (let existingY of lineMap.keys()) {
+          if (Math.abs(existingY - y) < 2) {
+            matchedY = existingY;
+            break;
+          }
+        }
+
+        if (matchedY !== null) {
+          lineMap.get(matchedY).push(item.str);
+        } else {
+          lineMap.set(y, [item.str]);
+        }
+      });
       const sortedLines = Array.from(lineMap.entries())
         .sort((a, b) => b[0] - a[0])
         .map(([_, words]) => words.join(' '));
 
       textLines.push(...sortedLines);
     }
-    let findTransactions = []
+    let findTransactions = [];
     textLines?.map((item) => {
-
-
       let firstWord = item?.split(' ');
-
-
       if (firstWord?.length > 0) {
-        if (firstWord[0]?.split('-').length == 3 && firstWord.length > 12) {
-          console.log(firstWord[0]?.split('-'));
+        if (firstWord[0]?.split('-').length == 3 &&firstWord[0]?.length > 5 && firstWord[0]?.length < 15) {
           findTransactions.push(item)
         }
+        if (firstWord[1]?.split('/').length == 3 && firstWord[0]?.length > 5 &&  firstWord[0]?.length < 15) {
+          findTransactions.push(item);
+        }
+
       }
     })
 
@@ -145,7 +154,7 @@ const PDFSearchViewer = () => {
     return textLines;
   };
 
-  
+
 
   const normalizeDate = (dateStr) => {
     if (!dateStr) return null;
@@ -261,16 +270,16 @@ const PDFSearchViewer = () => {
             {!File ? <p class="text-gray-800">
               Upload your bank statement to begin reconciliation
             </p> : null}
-            {File ?<div className="relative w-fit">
+            {File ? <div className="relative w-fit">
               <input
-              type="file"
-              accept="application/pdf"
-              onChange={handleFileChange}
-              className="opacity-0 absolute inset-0 w-full h-full z-10 cursor-pointer"
-            />
-            <div className="border rounded px-3 py-1 text-sm text-gray-500 bg-white pointer-events-none">
-              Upload New File
-            </div></div>: null}
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className="opacity-0 absolute inset-0 w-full h-full z-10 cursor-pointer"
+              />
+              <div className="border rounded px-3 py-1 text-sm text-gray-500 bg-white pointer-events-none">
+                Upload New File
+              </div></div> : null}
           </div>
           {File ? <button onClick={() => extractTextFromPDF(File)} className='flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg'>Show All</button> : null}
         </div>
