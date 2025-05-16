@@ -292,7 +292,7 @@ const GuardianInfo = ({ formData }) => {
         form={form}
         name={[p, "cell1"]}
         whatsappName={[p, "cell1IsWhatsapp"]}
-        label="Cell Phone 1"
+        label="Primary Contact:"
         placeholder="e.g. +974 1234 5678"
         required
       />
@@ -300,7 +300,7 @@ const GuardianInfo = ({ formData }) => {
         form={form}
         name={[p, "cell2"]}
         whatsappName={[p, "cell2IsWhatsapp"]}
-        label="Cell Phone 2"
+        label="Secondary Contact:"
         placeholder="e.g. +974 1234 5679"
       />
 

@@ -31,11 +31,11 @@ import { useTranslation } from "react-i18next";
 import { PERMISSIONS } from "../../../../config/permission";
 
 // Ant Design
-import { Modal, Button, Result, Typography } from "antd";
 
+import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge } from "antd";
 // Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
-
+// Framer Motion
 const colors = [
   "bg-yellow-300",
   "bg-blue-300",
@@ -46,7 +46,63 @@ const colors = [
 ];
 
 const getColor = (index) => colors[index % colors.length];
+// CSS for Shimmer Animation on Icons
+const shimmerStyles = `
+  .shimmer-icon-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+  .shimmer-icon-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      rgba(200, 200, 200, 0.2) 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(200, 200, 200, 0.2) 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+  
+`;
+// Shimmer Component for Subject Card
+const SubjectCardShimmer = () => {
+  return (
+    <div className="p-4 rounded-lg shadow-md h-64">
+      <div className="flex justify-between items-center mb-2">
+        <Skeleton.Button active size="small" style={{ width: 80 }} />
+      </div>
+      <Skeleton paragraph={{ rows: 1 }} active />
+      <div className="flex mt-[60px] justify-between items-center">
+        <Skeleton.Avatar active size="large" shape="circle" />
+        <Skeleton.Avatar active size="large" shape="square" style={{height:50,width:50}} />
+      </div>
+    </div>
+  );
+};
 
+// Shimmer Component for NavIconCard (with Circle Placeholder Instead of Icon)
+const NavIconCardShimmer = () => {
+  return (
+    <div className="p-4 rounded-lg bg-white shadow-md flex-1 w-[24%]">
+      <div className="flex flex-col justify-center items-center gap-3">
+        {/* Replace the icon with a circular skeleton placeholder */}
+        <Skeleton.Avatar active size="large" shape="circle" />
+        <div>
+          <Skeleton.Input active size="small" style={{ width: 100 }} />
+        </div>
+      </div>
+    </div>
+  );
+};
 function MainSection() {
   const { t } = useTranslation("admClass");
   const dispatch = useDispatch();
@@ -71,6 +127,7 @@ function MainSection() {
   const role = useSelector((store) => store.common.auth.role);
   const loading = useSelector((store) => store.admin.class.loading);
   const { Title, Text } = Typography;
+  const [isLoading, setIsLoading] = useState(false);
   // Semesters & selected semester
   const { semesters } = useSelector((state) => state.admin.semesters);
   const { selectedSemester } = useSelector(
@@ -104,10 +161,10 @@ function MainSection() {
   const filteredSubjects =
     classDetails && classDetails.subjects
       ? classDetails.subjects.filter((subject) =>
-          selectedTab === t("Published")
-            ? subject.isPublished
-            : !subject.isPublished
-        )
+        selectedTab === t("Published")
+          ? subject.isPublished
+          : !subject.isPublished
+      )
       : [];
 
   const publishedSubjects =
@@ -173,6 +230,8 @@ function MainSection() {
     const hasSemesters = semesters && semesters.length > 0;
     const hasValidSelection = selectedSemester && selectedSemester.id;
 
+    setIsLoading(true);
+    console.log(isLoading);
     if (!hasSemesters || !hasValidSelection) {
       setNoSemesterModalVisible(true);
       setIsSemesterSidebarOpen(true);
@@ -188,9 +247,34 @@ function MainSection() {
       title={"Subjects"}
     >
       {/* Show loading spinner if data is still being fetched */}
-      {loading ? (
-        <div className="flex justify-center items-center h-screen">
-          <Spinner />
+      <style>{shimmerStyles}</style>
+      {loading ?(
+        <div className="p-4">
+          {/* Shimmer for NavIconCards (with circle placeholder) */}
+          <div className="flex flex-wrap justify-center gap-3 mb-4">
+            {staticIconData.map((_, index) => (
+              <NavIconCardShimmer key={index} />
+            ))}
+          </div>
+          {/* Shimmer for Tabs and Subject Cards */}
+          <div className="px-5">
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex gap-2">
+
+              <Skeleton.Button active size="large" style={{width:160}} />
+              <Skeleton.Button active size="large" style={{width:130}} />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton.Button active shape="circle" size="large" />
+                <Skeleton.Button active size="large" style={{ width: 120 }} />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              { [1, 2, 3,4,5,6].map((_, index) => (
+                  <SubjectCardShimmer key={index} />
+                ))}
+            </div>
+          </div>
         </div>
       ) : (
         <>

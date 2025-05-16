@@ -25,7 +25,7 @@ const AddressInformation = () => {
       <div className="p-3">
         {/* First Row: Residence Type, Dwelling Type, Transport Required */}
         <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={24} md={8}>
+          {/* <Col xs={24} md={8}>
             <Form.Item label="Residence Type" className="mb-2">
               <Radio.Group
                 name="addressInformation.residenceType"
@@ -48,7 +48,7 @@ const AddressInformation = () => {
                 <Radio.Button value="standAlone">Stand Alone</Radio.Button>
               </Radio.Group>
             </Form.Item>
-          </Col>
+          </Col> */}
           <Col xs={24} md={8}>
             <Form.Item label="Transport Required" className="mb-2">
               <Radio.Group
@@ -65,7 +65,7 @@ const AddressInformation = () => {
 
         {/* Second Row: Unit #, Building #, Street # */}
         <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={24} md={8}>
+          {/* <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.unitNumber"
               icon={<NumberOutlined />}
@@ -73,35 +73,43 @@ const AddressInformation = () => {
               placeholder="Unit #"
               type="text"
             />
-          </Col>
+          </Col> */}
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.buildingNumber"
               icon={<BankOutlined />}
               tooltip="Enter Building #"
-              placeholder="Building #"
+              placeholder="Building No./House No."
             />
           </Col>
-          <Col xs={24} md={8}>
+          {/* <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.streetNumber"
               icon={<NumberOutlined />}
               tooltip="Enter Street #"
               placeholder="Street #"
             />
-          </Col>
-        </Row>
-
-        {/* Third Row: Street Name, Zone #, Compound Name */}
-        <Row gutter={[16, 16]} className="mb-4">
+          </Col> */}
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.streetName"
               icon={<EnvironmentOutlined />}
               tooltip="Enter Street Name"
-              placeholder="Street Name"
+              placeholder="Street Address"
             />
           </Col>
+          <Col xs={24} md={8}>
+            <CompactIconInput
+              name="addressInformation.city"
+              icon={<EnvironmentOutlined />}
+              tooltip="Enter City"
+              placeholder="City"
+            />
+          </Col>
+        </Row>
+
+        {/* Third Row: Street Name, Zone #, Compound Name */}
+        {/* <Row gutter={[16, 16]} className="mb-4">
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.zone"
@@ -118,18 +126,10 @@ const AddressInformation = () => {
               placeholder="Compound Name"
             />
           </Col>
-        </Row>
+        </Row> */}
 
         {/* Fourth Row: City, Nearest Landmark, Proposed Campus */}
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={8}>
-            <CompactIconInput
-              name="addressInformation.city"
-              icon={<EnvironmentOutlined />}
-              tooltip="Enter City"
-              placeholder="City"
-            />
-          </Col>
+        {/* <Row gutter={[16, 16]}>
           <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.nearestLandmark"
@@ -145,12 +145,18 @@ const AddressInformation = () => {
               tooltip="Enter Proposed Campus"
               placeholder="Proposed Campus"
             />
-          </Col>
-       
-        
-        </Row>
+          </Col>   
+        </Row> */}
         <Row gutter={[16, 16]}>
-        <Col xs={24} md={8}>
+          <Col xs={24} md={8}>
+            <CompactIconInput
+              name="addressInformation.postalCode"
+              icon={<BankFilled />}
+              tooltip="Enter postal Code/Zip Code"
+              placeholder="Enter postal Code/Zip Code"
+            />
+          </Col>
+          <Col xs={24} md={8}>
             <CompactIconInput
               name="addressInformation.state"
               icon={<BankFilled />}
@@ -166,16 +172,8 @@ const AddressInformation = () => {
               placeholder="country"
             />
           </Col>
-          <Col xs={24} md={8}>
-            <CompactIconInput
-              name="addressInformation.postalCode"
-              icon={<BankFilled />}
-              tooltip="Enter postal Code/Zip Code"
-              placeholder="Enter postal Code/Zip Code"
-            />
-          </Col>
-       
-        
+
+
         </Row>
       </div>
     </div>

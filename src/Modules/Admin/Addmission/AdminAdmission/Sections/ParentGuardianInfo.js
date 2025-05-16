@@ -120,14 +120,26 @@ const ParentGuardianInfo = () => {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} className="flex flex-col "> 
+             <label
+                htmlFor="fatherInfo.cell1"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                Primary Contact:
+              </label>
               <CompactPhoneInputWithWhatsApp
                 phoneName="fatherInfo.cell1"
                 whatsappName="fatherInfo.cell1IsWhatsapp"
                 tooltip="Father's Primary Contact"
               />
             </Col>
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} className="flex flex-col ">
+            <label
+                htmlFor="fatherInfo.cell2"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                Secondary Contact:
+              </label>
               <CompactPhoneInputWithWhatsApp
                 phoneName="fatherInfo.cell2"
                 whatsappName="fatherInfo.cell2IsWhatsapp"
@@ -175,30 +187,12 @@ const ParentGuardianInfo = () => {
           <Row gutter={16}>
             <Col xs={24} md={8}>
               <CompactIconInput
-                name="motherInfo.idNumber"
-                icon={<IdcardOutlined />}
-                tooltip="Mother's ID Number"
-                placeholder="Mother ID"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconDatePicker
-                name="motherInfo.idExpiry"
-                icon={<CalendarOutlined />}
-                tooltip="Mother ID Expiry"
-                placeholder="ID Expiry"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
                 name="motherInfo.firstName"
                 icon={<UserOutlined />}
                 tooltip="Mother's First Name"
                 placeholder="First Name"
               />
             </Col>
-          </Row>
-          <Row gutter={16}>
             <Col xs={24} md={8}>
               <CompactIconInput
                 name="motherInfo.middleName"
@@ -213,6 +207,24 @@ const ParentGuardianInfo = () => {
                 icon={<UserOutlined />}
                 tooltip="Mother's Last Name"
                 placeholder="Last Name"
+              />
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col xs={24} md={8}>
+              <CompactIconInput
+                name="motherInfo.idNumber"
+                icon={<IdcardOutlined />}
+                tooltip="Mother's ID Number"
+                placeholder="Mother ID"
+              />
+            </Col>
+            <Col xs={24} md={8}>
+              <CompactIconDatePicker
+                name="motherInfo.idExpiry"
+                icon={<CalendarOutlined />}
+                tooltip="Mother ID Expiry"
+                placeholder="ID Expiry"
               />
             </Col>
             <Col xs={24} md={8}>
@@ -255,14 +267,26 @@ const ParentGuardianInfo = () => {
             </Col>
           </Row>
           <Row gutter={16}>
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} className="flex flex-col ">
+            <label
+                htmlFor="motherInfo.cell1"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                Primary Contact:
+              </label>
               <CompactPhoneInputWithWhatsApp
                 phoneName="motherInfo.cell1"
                 whatsappName="motherInfo.cell1IsWhatsapp"
                 tooltip="Mother's Primary Contact"
               />
             </Col>
-            <Col xs={24} md={12}>
+            <Col xs={24} md={12} className="flex flex-col ">
+            <label
+                htmlFor="motherInfo.cell2"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                Secondary Contact:
+              </label>
               <CompactPhoneInputWithWhatsApp
                 phoneName="motherInfo.cell2"
                 whatsappName="motherInfo.cell2IsWhatsapp"

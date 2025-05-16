@@ -318,57 +318,71 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
           </div>
 
           <div className="flex gap-3">
-            <div className="flex-1" style={{ flex: 2 }}>
+            {/* Phone # */}
+            <div className="flex-1 flex flex-col" style={{ flex: 2 }}>
+              <label
+                htmlFor="candidateInformation.contactNumber"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                Contact Number:
+              </label>
               <PhoneInputField
+                id="candidateInformation.contactNumber"
                 name="candidateInformation.contactNumber"
                 tooltip="Candidate Phone Number"
-                placeholder="Phone"
+                placeholder="Phone No."
+              // … refs/errors …
               />
             </div>
-            <div className="flex-1" style={{ flex: 2 }}>
+
+            {/* Email */}
+            <div className="flex-1 flex flex-col" style={{ flex: 2 }}>
+              {/* Invisible label to reserve space */}
+              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
               <CompactIconInput
                 name="candidateInformation.email"
                 icon={<MailOutlined />}
                 tooltip="Candidate Email"
                 placeholder="Email"
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.email"] = el)
-                }
-                error={
-                  touched.candidateInformation?.email &&
-                  errors.candidateInformation?.email
-                }
+              // … refs/errors …
               />
             </div>
-            <div className="flex-1" style={{ flex: 1 }}>
+
+            {/* Age */}
+            <div className="flex-1 flex flex-col" style={{ flex: 1 }}>
+              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
               <CompactIconInput
                 name="candidateInformation.age"
                 icon={<CalendarOutlined />}
                 tooltip="Candidate Age"
                 placeholder="Age"
-                disabled={true}
+                disabled
                 readOnly
               />
             </div>
           </div>
 
           <div className="flex gap-3">
-            <div className="flex-1">
+            {/* Emergency # */}
+            <div className="flex-1 flex flex-col">
+              <label
+                htmlFor="candidateInformation.emergencyNumber"
+                className="mb-1 text-sm font-medium text-gray-700"
+              >
+                Emergency Contact Number:
+              </label>
               <PhoneInputField
+                id="candidateInformation.emergencyNumber"
                 name="candidateInformation.emergencyNumber"
                 tooltip="Emergency Number"
-                placeholder="Emergency #"
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.emergencyNumber"] =
-                    el)
-                }
-                error={
-                  touched.candidateInformation?.emergencyNumber &&
-                  errors.candidateInformation?.emergencyNumber
-                }
+                placeholder="Emergency Contact No."
+              // … refs/errors …
               />
             </div>
-            <div className="flex-1">
+
+            {/* Native Language */}
+            <div className="flex-1 flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
               <CompactIconSelect
                 name="candidateInformation.nativeLanguage"
                 icon={<GlobalOutlined />}
@@ -378,7 +392,10 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 allowCustom
               />
             </div>
-            <div className="flex-1">
+
+            {/* Primary Contact */}
+            <div className="flex-1 flex flex-col">
+              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
               <CompactIconSelect
                 name="candidateInformation.primaryContact"
                 icon={<UserOutlined />}

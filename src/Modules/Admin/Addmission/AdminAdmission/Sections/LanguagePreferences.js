@@ -19,7 +19,7 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
   const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
   const [isValueEdModalVisible, setIsValueEdModalVisible] = useState(false);
   const [newLanguage, setNewLanguage] = useState("");
-  const [newValueEd, setNewValueEd] = useState(null);
+  const [newValueEd, setNewValueEd] = useState("");
   const [modalType, setModalType] = useState("");
 
   const languageOptions = useMemo(
