@@ -1,43 +1,34 @@
-import { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
-import { baseUrl } from "../../config/Common";
+import { useEffect } from "react";
+import { useSocket } from "../../Components/Common/SocketContext";
 
-const SOCKET_URL = baseUrl;
-
-export const useTripLocationSocket = (tripId, onLocationUpdate) => {
-  const socketRef = useRef(null);
-  console.log("ttt->",tripId)
-  console.log("ooooo->",onLocationUpdate)
+/**
+ * Keeps a component subscribed to one trip room.
+ * – automatically joins when tripId is truthy
+ * – auto-cleans on unmount or when id changes
+ * – forwards every “location” payload to the callback
+ * – logs *everything* for easy debugging
+ */
+export const useTripLocationSocket = (tripId, onLocation) => {
+  const socket = useSocket();
 
   useEffect(() => {
-    // Create socket only once
-    if (!socketRef.current) {
-      socketRef.current = io(SOCKET_URL, {
-        transports: ["websocket"], // force websocket (optional)
-      });
+    if (!socket || !tripId) return;
 
-      socketRef.current.on("connect", () => {
-        console.log("📡 Connected to WebSocket", socketRef.current.id);
-      });
+    const room = `trip-${tripId}`;
+    console.debug(`[socket] joining → ${room}`);
+    socket.emit("join-trip", { room });
 
-      socketRef.current.on("disconnect", () => {
-        console.log("❌ WebSocket Disconnected");
-      });
-    }
-
-    const socket = socketRef.current;
-
-    const handleLocation = (data) => {
-
-        console.log("📍 New location:", data);
-        onLocationUpdate(data);
-      
+    const handle = (payload) => {
+      console.debug("[socket] 📦 location payload:", payload);
+      if (payload.tripId === tripId) onLocation(payload);
     };
 
-    socket.on("location", handleLocation);
+    socket.on("location", handle);
 
     return () => {
-      socket.off("location", handleLocation); // remove listener only
+      console.debug(`[socket] leaving ← ${room}`);
+      socket.emit("leave-trip", { room });
+      socket.off("location", handle);
     };
-  }, [tripId, onLocationUpdate]);
+  }, [socket, tripId, onLocation]);
 };
