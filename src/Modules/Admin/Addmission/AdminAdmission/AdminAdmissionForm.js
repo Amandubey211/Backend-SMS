@@ -46,7 +46,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
   const { loading: regLoading } = useSelector(
     (state) => state.common.auth.loading
   );
-  console.log(attachmentsMeta, "attachmentsMeta");
+  // console.log(attachmentsMeta, "attachmentsMeta");
   useEffect(() => {
     dispatch(fetchSchoolAttachmentsById());
   }, [dispatch]);
@@ -126,14 +126,14 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         const val = fields?.find((field) => field?.fieldName == key);
         if (!val) {
           if (!values?.candidateInformation[key]) {
-            toast.error(`Candidate ${formatLabel(key)} is requireds`);
+            toast.error(`Candidate ${formatLabel(key)} is required`);
             setFormSubmiting(false)
             return;
           }
         }
         if (val?.required == true) {
           if (!values?.candidateInformation[val.fieldName]) {
-            toast.error(`Candidate ${formatLabel(val.fieldName)} is requiredd`);
+            toast.error(`Candidate ${formatLabel(val.fieldName)} is required`);
             setFormSubmiting(false)
             return;
           }
@@ -336,15 +336,15 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
 
       // Add address information to formData
       const addressFields = [
-        "unitNumber",
+        // "unitNumber",
         "buildingNumber",
-        "streetNumber",
+        // "streetNumber",
         "streetName",
-        "zone",
-        "compoundName",
+        // "zone",
+        // "compoundName",
         "city",
-        "nearestLandmark",
-        "proposedCampus",
+        // "nearestLandmark",
+        // "proposedCampus",
         "transportRequired",
         "postalCode",
         "state",
@@ -480,7 +480,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       // Process both mandatory and optional attachments
       addDynamicAttachments(values.attachments?.mandatory);
       addDynamicAttachments(values.attachments?.optional);
-
+      console.log(formData, "formData");
       // Handle submission of the form data to the backend
       dispatch(registerStudentDetails({ formData, navigate })).then(()=>{setFormSubmiting(false)}).catch(()=>{setFormSubmiting(false);});
 

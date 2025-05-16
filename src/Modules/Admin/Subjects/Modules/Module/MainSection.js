@@ -8,7 +8,6 @@ import AddModule from "./Components/AddModule";
 import { RiAddFill } from "react-icons/ri";
 import MoveModule from "./Components/MoveModule";
 import AddChapter from "./Components/AddChapter";
-import Spinner from "../../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../../Components/Common/NoDataFound";
 import { fetchModules } from "../../../../../Store/Slices/Admin/Class/Module/moduleThunk";
 import { setSelectedModule } from "../../../../../Store/Slices/Admin/Class/Module/moduleSlice";
@@ -19,6 +18,68 @@ import { FaBookOpen } from "react-icons/fa";
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { PERMISSIONS } from "../../../../../config/permission";
+
+// Ant Design
+import { Skeleton } from "antd";
+
+const ChapterShimmer = () => {
+  return (
+    <div className="p-1 rounded-lg border-b mb-4">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center">
+          <Skeleton.Avatar active size={48} shape="square" className="mr-4" /> {/* Matches w-12 h-12 */}
+          <div className="flex flex-col">
+            <Skeleton.Input active style={{ width: 150, height: 16 }} className="mb-1" /> {/* Title */}
+            <Skeleton.Input active style={{ width: 100, height: 14 }} /> {/* Subtitle */}
+          </div>
+        </div>
+        <Skeleton.Button active size="small" shape="circle" style={{ width: 32, height: 32 }} /> {/* Button */}
+      </div>
+    </div>
+  );
+};
+
+const ModuleCardShimmer = () => {
+  return (
+    <div className="mb-4 border border-gray-200 rounded-lg">
+      {/* Image Placeholder */}
+      <Skeleton
+        active
+        paragraph={false}
+        title={{ style: { height: 144, margin: 0, borderRadius: "8px 8px 0 0" } }}
+      />
+      {/* Content Section */}
+      <div className="p-4">
+        <div className="flex justify-between items-center mb-2">
+          <Skeleton.Input active style={{ width: 150, height: 18 }} /> {/* Title */}
+          <div className="flex gap-2">
+            <Skeleton.Avatar active size={32} shape="circle" /> {/* Icon 1 */}
+            <Skeleton.Avatar active size={32} shape="circle" /> {/* Icon 2 */}
+          </div>
+        </div>
+        <Skeleton.Button active style={{ width: 80, height: 24 }} className="rounded-full" /> {/* Module Number */}
+      </div>
+    </div>
+  );
+};
+// Shimmer Component for NoDataFound
+const NoDataFoundShimmer = () => {
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <Skeleton.Avatar active size={48} shape="circle" className="sm:size-64" />
+      <Skeleton.Input
+        active
+        style={{ width: "70%", minWidth: 150, marginTop: 12 }}
+        className="sm:mt-16"
+      />
+      <Skeleton.Input
+        active
+        style={{ width: "90%", minWidth: 200, marginTop: 6 }}
+        className="sm:mt-8"
+      />
+    </div>
+  );
+};
 
 const MainSection = () => {
   const [expandedChapters, setExpandedChapters] = useState([]);
@@ -144,36 +205,74 @@ const MainSection = () => {
   };
 
   return (
-    <div className="flex min-h-screen h-full w-full">
-      <SubjectSideBar />
+    <div className="flex flex-col sm:flex-row min-h-screen h-full w-full">
+      {/* SubjectSideBar - Assuming it's responsive or hidden on small screens */}
+      <SubjectSideBar className="w-full sm:w-64 sm:flex-shrink-0" />
 
       <ProtectedSection
         requiredPermission={PERMISSIONS.MODULES_FOR_A_STUDENT_MODULES}
         title="Module"
+        className="flex-1"
       >
         {moduleLoading ? (
-          <Spinner />
+          <div className="flex flex-col lg:flex-row w-full min-h-screen">
+  {/* Left Column Shimmer (Chapters) */}
+  <div className="w-full lg:w-[60%] bg-white p-2 sm:p-3">
+    <div className="bg-white p-2 sm:p-3 rounded-lg">
+      <div className="flex justify-between px-2 sm:px-4 mb-3 items-center">
+        <Skeleton.Input active style={{ width: "50%", minWidth: 150 }} />
+        <Skeleton.Button active style={{ width: "30%", minWidth: 80 }} />
+      </div>
+      {/* Mimic a few chapters */}
+      <div className="space-y-2">
+        {[1, 2,3,4].map((_, index) => (
+          <ChapterShimmer key={index} />
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {/* Right Column Shimmer (Modules) */}
+  <div className="w-full lg:w-[35%] min-h-[50vh] lg:min-h-screen p-2 sm:p-3 border-t lg:border-t-0 lg:border-l">
+    <div className="bg-white p-3 sm:p-4 rounded-lg">
+      <div className="flex items-center gap-1 mb-2">
+        <Skeleton.Input active style={{ width: "40%", minWidth: 120 }} />
+        <Skeleton.Avatar active size={24} shape="circle" />
+      </div>
+      <div className="grid grid-cols-1 gap-2">
+        {[1, 2, 3].map((_, index) => (
+          <ModuleCardShimmer key={index} />
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
         ) : modulesData?.length === 0 ? (
           // If no modules, show a single NoDataFound centered both horizontally and vertically
-          <div className="flex items-center justify-center w-full min-h-screen">
-            <NoDataFound
-              title="Modules"
-              desc={t(
-                "No modules available yet! Start by adding your first module."
-              )}
-              icon={FaBookOpen}
-              iconColor="text-blue-500"
-              textColor="text-gray-600"
-            />
+          <div className="flex items-center justify-center w-full min-h-screen p-4">
+            {moduleLoading ? (
+              <NoDataFoundShimmer />
+            ) : (
+              <NoDataFound
+                title="Modules"
+                desc={t(
+                  "No modules available yet! Start by adding your first module."
+                )}
+                icon={FaBookOpen}
+                iconColor="text-blue-500"
+                textColor="text-gray-600"
+                className="text-center"
+              />
+            )}
           </div>
         ) : (
           // Otherwise, render two-column layout for modules and chapters
-          <div className="flex w-full">
+          <div className="flex flex-col lg:flex-row w-full">
             {/* Left Section: Chapters */}
-            <div className="w-[60%] bg-white p-2">
-              <div className="bg-white p-2 rounded-lg">
-                <div className="flex justify-between px-4 mb-3 items-center">
-                  <h1 className="text-lg font-semibold capitalize">
+            <div className="w-full lg:w-[60%] bg-white p-2 sm:p-3">
+              <div className="bg-white p-2 sm:p-3 rounded-lg">
+                <div className="flex justify-between px-2 sm:px-4 mb-3 items-center">
+                  <h1 className="text-base sm:text-lg font-semibold capitalize">
                     {selectedModule?.name
                       ? selectedModule.name
                       : t("Select a Module")}
@@ -184,7 +283,7 @@ const MainSection = () => {
                     >
                       <button
                         onClick={openAddChapter}
-                        className="px-4 py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200"
+                        className="px-3 sm:px-4 py-1 sm:py-2 rounded-md bg-gradient-to-r from-pink-100 to-purple-200 text-sm sm:text-base"
                       >
                         <span className="text-gradient">
                           {t("+ Add Chapter")}
@@ -195,7 +294,11 @@ const MainSection = () => {
                 </div>
 
                 {chapterLoading ? (
-                  <Spinner />
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((_, index) => (
+                      <ChapterShimmer key={index} />
+                    ))}
+                  </div>
                 ) : selectedModule?.chapters?.length > 0 ? (
                   selectedModule?.chapters?.map((chapter, index) => (
                     <Chapter
@@ -205,32 +308,42 @@ const MainSection = () => {
                       isExpanded={expandedChapters.includes(index + 1)}
                       onToggle={() => handleToggle(index + 1)}
                       onEdit={() => handleEditChapter(chapter)}
+                      className="p-3 sm:p-4"
                     />
                   ))
                 ) : (
                   // Centering NoDataFound for chapters when none exist
-                  <div className="flex items-center justify-center min-h-[200px]">
-                    <NoDataFound
-                      title={t("Chapter")}
-                      desc={t(
-                        "No chapters available in this module yet! Start by adding your first chapter."
-                      )}
-                      icon={FaBookOpen}
-                      iconColor="text-green-500"
-                      textColor="text-gray-600"
-                    />
+                  <div className="flex items-center justify-center min-h-[150px] sm:min-h-[200px] p-4">
+                    {chapterLoading ? (
+                      <NoDataFoundShimmer />
+                    ) : (
+                      <NoDataFound
+                        title={t("Chapter")}
+                        desc={t(
+                          "No chapters available in this module yet! Start by adding your first chapter."
+                        )}
+                        icon={FaBookOpen}
+                        iconColor="text-green-500"
+                        textColor="text-gray-600"
+                        className="text-center"
+                      />
+                    )}
                   </div>
                 )}
               </div>
             </div>
 
             {/* Right Section: Modules List */}
-            <div className="w-[35%] min-h-screen p-2 border-l">
-              <div className="bg-white p-4 rounded-lg">
+            <div className="w-full lg:w-[35%] min-h-[50vh] lg:min-h-screen p-2 sm:p-3 border-t lg:border-t-0 lg:border-l">
+              <div className="bg-white p-3 sm:p-4 rounded-lg">
                 <div className="flex items-center gap-1 mb-2">
-                  <h1 className="text-xl font-semibold">{t("All Modules")}</h1>
-                  <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-6 h-6">
-                    <span className="text-gradient">{modulesData?.length}</span>
+                  <h1 className="text-lg sm:text-xl font-semibold">
+                    {t("All Modules")}
+                  </h1>
+                  <p className="bg-gradient-to-r from-pink-100 flex justify-center items-center to-purple-200 font-semibold rounded-full w-5 h-5 sm:w-6 sm:h-6 mt-1.5">
+                    <span className="text-gradient text-xs sm:text-sm">
+                      {modulesData?.length}
+                    </span>
                   </p>
                 </div>
                 <div className="grid grid-cols-1 gap-2">
@@ -241,6 +354,7 @@ const MainSection = () => {
                       onSelect={() => handleModuleSelect(module)}
                       onEdit={() => handleEditModule(module)}
                       onMove={() => handleMoveModule(module)}
+                      className="p-3 sm:p-4"
                     />
                   ))}
                 </div>
@@ -254,14 +368,14 @@ const MainSection = () => {
           <ProtectedAction requiredPermission={PERMISSIONS.ADD_MODULE}>
             <button
               onClick={openAddModule}
-              className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-4 fixed rounded-full shadow-md bottom-4 right-4 transform transition-transform duration-300 hover:scale-110"
+              className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-3 sm:p-4 fixed rounded-full shadow-md bottom-3 sm:bottom-4 right-3 sm:right-4 transform transition-transform duration-300 hover:scale-110"
               aria-label={t("Add Module")}
             >
-              <RiAddFill size={24} />
+             <RiAddFill size={24} />
             </button>
           </ProtectedAction>
 
-          <span className="absolute bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-sm p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
+          <span className="absolute bottom-12 sm:bottom-14 right-1/2 transform translate-x-1/2 bg-black text-white text-xs sm:text-sm p-1 sm:p-2 rounded opacity-0 transition-opacity duration-300 hover:opacity-100 pointer-events-none">
             {t("Add Module")}
           </span>
         </div>
@@ -278,6 +392,7 @@ const MainSection = () => {
                 ? t("Add New Module")
                 : t("Edit Module")
             }
+            className="w-full sm:w-96"
           >
             {sidebarContent === "chapter" ? (
               <AddChapter onClose={handleSidebarClose} />

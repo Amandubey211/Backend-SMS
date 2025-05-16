@@ -475,6 +475,16 @@ const CandidateInfo = ({ formData }) => {
             />
           </Col>
           <Col xs={24} md={12}>
+            <PhoneField
+              form={form}
+              name="emergencyNumber"
+              whatsappName="emergencyNumberIsWhatsapp"
+              label="Emergency Number"
+              placeholder="e.g. +974 1234 5678"
+              required
+            />
+          </Col>
+          {/* <Col xs={24} md={12}>
             <Form.Item name="emergencyNumber" label="Emergency Number">
               <InputNumber
                 size="large"
@@ -482,7 +492,7 @@ const CandidateInfo = ({ formData }) => {
                 placeholder="Enter emergency number"
               />
             </Form.Item>
-          </Col>
+          </Col> */}
         </Row>
 
         <Divider className="my-2" />

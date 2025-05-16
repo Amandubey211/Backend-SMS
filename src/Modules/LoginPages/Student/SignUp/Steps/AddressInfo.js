@@ -37,7 +37,7 @@ const AddressInfo = ({ formData }) => {
       form.setFieldsValue(formData);
       setSameAsResidential(
         JSON.stringify(formData?.residentialAddress) ===
-          JSON.stringify(formData?.permanentAddress)
+        JSON.stringify(formData?.permanentAddress)
       );
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -105,16 +105,16 @@ const AddressInfo = ({ formData }) => {
       headStyle={{ borderBottom: "1px solid #f0f0f0" }}
     >
       {/* Residence type */}
-      <Form.Item name={[prefix, "residenceType"]} label="Residence Type">
+      {/* <Form.Item name={[prefix, "residenceType"]} label="Residence Type">
         <Radio.Group value="flat">
           <Radio value="flat">Flat / Villa</Radio>
           <Radio value="house">House</Radio>
         </Radio.Group>
-      </Form.Item>
+      </Form.Item> */}
 
       {/* Unit / building OR house / street */}
       <Row gutter={16}>
-        <Col xs={24} md={12}>
+        {/* <Col xs={24} md={12}>
           <Form.Item
             name={[prefix, "unitNumber"]}
             label={residenceType === "flat" ? "Unit #" : "House #"}
@@ -126,16 +126,16 @@ const AddressInfo = ({ formData }) => {
               }
             />
           </Form.Item>
-        </Col>
+        </Col> */}
         <Col xs={24} md={12}>
           <Form.Item
             name={[prefix, "buildingNumber"]}
-            label={residenceType === "flat" ? "Building #" : "Street #"}
+            label={"Building No. / House No."}
           >
             <Input
               size="large"
               placeholder={
-                residenceType === "flat" ? "Building Number" : "Street Number"
+                "Building No. / House No."
               }
             />
           </Form.Item>
@@ -143,12 +143,12 @@ const AddressInfo = ({ formData }) => {
       </Row>
 
       {/* Street */}
-      <Form.Item name={[prefix, "streetName"]} label="Street Name">
-        <Input size="large" placeholder="Street Name" />
+      <Form.Item name={[prefix, "streetName"]} label="Street Address">
+        <Input size="large" placeholder="Street Address" />
       </Form.Item>
 
       {/* Zone */}
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item name={[prefix, "zoneNumber"]} label="Zone #">
             <Input size="large" placeholder="Enter Zone Number" allowClear />
@@ -159,18 +159,18 @@ const AddressInfo = ({ formData }) => {
             <Input size="large" placeholder="Zone Name" />
           </Form.Item>
         </Col>
-      </Row>
+      </Row> */}
 
       {/* Compound */}
-      <Form.Item name={[prefix, "compoundType"]} label="Compound / Stand‑Alone">
+      {/* <Form.Item name={[prefix, "compoundType"]} label="Compound / Stand‑Alone">
         <Radio.Group>
           <Radio value="compound">Compound</Radio>
           <Radio value="standalone">Stand‑Alone</Radio>
         </Radio.Group>
-      </Form.Item>
-      <Form.Item name={[prefix, "compoundName"]} label="Compound Name">
+      </Form.Item> */}
+      {/* <Form.Item name={[prefix, "compoundName"]} label="Compound Name">
         <Input size="large" placeholder="Compound Name (if applicable)" />
-      </Form.Item>
+      </Form.Item> */}
 
       {/* City / Landmark */}
       <Row gutter={16}>
@@ -179,14 +179,14 @@ const AddressInfo = ({ formData }) => {
             <Input size="large" placeholder="City" allowClear />
           </Form.Item>
         </Col>
-        <Col xs={24} md={12}>
+        {/* <Col xs={24} md={12}>
           <Form.Item
             name={[prefix, "nearestLandmark"]}
             label="Nearest Landmark"
           >
             <Input size="large" placeholder="Landmark" />
           </Form.Item>
-        </Col>
+        </Col> */}
       </Row>
 
       {/* State / Country / Postal Code */}
@@ -221,12 +221,12 @@ const AddressInfo = ({ formData }) => {
       </Row>
 
       {/* Proposed Campus */}
-      <Form.Item
+      {/* <Form.Item
         name={[prefix, "proposedCampus"]}
         label="Proposed Campus (optional)"
       >
         <Input size="large" placeholder="Campus" />
-      </Form.Item>
+      </Form.Item> */}
 
       {/* For residential tab only - show same as checkbox */}
       {prefix === "residentialAddress" && (
