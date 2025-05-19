@@ -110,7 +110,7 @@ const PDFSearchViewer = () => {
         if (firstWord[0]?.split('-').length == 3 &&firstWord[0]?.length > 5 && firstWord[0]?.length < 15) {
           findTransactions.push(item)
         }
-        if (firstWord[1]?.split('/').length == 3 && firstWord[0]?.length > 5 &&  firstWord[0]?.length < 15) {
+        if (firstWord[1]?.split('/').length == 3 &&firstWord[0]?.length > 5 && firstWord[0]?.length < 15) {
           findTransactions.push(item);
         }
 
@@ -124,9 +124,6 @@ const PDFSearchViewer = () => {
     findTransactions?.forEach((entry, index) => {
       const parts = entry.split(' ');
       const date = parts[0];
-
-
-
       const matches = entry.match(regex);
       if (matches && matches.length >= 2) {
         const amount = parseFloat(matches[matches?.length - 2].replace(',', ''));

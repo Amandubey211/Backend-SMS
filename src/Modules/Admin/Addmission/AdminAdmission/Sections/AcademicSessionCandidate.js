@@ -149,14 +149,6 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
             recommendedSize="300x400px"
             previewTitle="Student Picture Preview"
           />
-          <div className="flex flex-col">
-            <CompactIconDatePicker
-              name="candidateInformation.dob"
-              icon={<CalendarOutlined />}
-              tooltip="Date of Birth"
-              placeholder="DOB"
-            />
-          </div>
         </div>
 
         <div className="flex-1 min-w-[60%] flex flex-col">
@@ -404,6 +396,32 @@ const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
                 options={PRIMARY_CONTACT_OPTIONS}
               />
             </div>
+          </div>
+          <div className="flex flex-row w-full gap-4">
+             <div className="flex flex-col">
+            <CompactIconDatePicker
+              name="candidateInformation.dob"
+              icon={<CalendarOutlined />}
+              tooltip="Date of Birth"
+              placeholder="DOB"
+            />
+          </div>
+          <div className="flex flex-col">
+            <CompactIconInput
+                name="candidateInformation.height"
+                icon={<IdcardOutlined />}
+                tooltip="height"
+                placeholder="Candidate Height"
+            />
+          </div>
+          <div className="flex flex-col">
+            <CompactIconInput
+               name="candidateInformation.weight"
+                icon={<IdcardOutlined />}
+                tooltip="weight"
+                placeholder="Candidate Weight"
+            />
+          </div>
           </div>
         </div>
       </div>
