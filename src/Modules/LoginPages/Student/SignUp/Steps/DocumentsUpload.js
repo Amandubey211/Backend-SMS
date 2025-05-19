@@ -106,8 +106,8 @@ const DocumentsUpload = ({ formData }) => {
         name:
           file.name.length > 30
             ? `${file.name.substring(0, 15)}...${file.name.substring(
-                file.name.length - 10
-              )}`
+              file.name.length - 10
+            )}`
             : file.name,
         size: file.size,
       },
@@ -122,12 +122,12 @@ const DocumentsUpload = ({ formData }) => {
       const fileType = isImage
         ? "image"
         : isPdf
-        ? "pdf"
-        : isWord
-        ? "word"
-        : isPpt
-        ? "ppt"
-        : "other";
+          ? "pdf"
+          : isWord
+            ? "word"
+            : isPpt
+              ? "ppt"
+              : "other";
 
       const newFile = {
         url,
@@ -306,11 +306,11 @@ const DocumentsUpload = ({ formData }) => {
                               <span className="flex-1 min-w-0 text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">
                                 {uploadedFile.documentName.length > 30
                                   ? `${uploadedFile.documentName.substring(
-                                      0,
-                                      15
-                                    )}...${uploadedFile.documentName.substring(
-                                      uploadedFile.documentName.length - 10
-                                    )}`
+                                    0,
+                                    15
+                                  )}...${uploadedFile.documentName.substring(
+                                    uploadedFile.documentName.length - 10
+                                  )}`
                                   : uploadedFile.documentName}
                               </span>
                               <Tag color="blue" className="ms-5">
@@ -407,11 +407,11 @@ const DocumentsUpload = ({ formData }) => {
                             <span className="flex-1 text-gray-800 overflow-hidden text-ellipsis whitespace-nowrap">
                               {uploadedFile.documentName.length > 30
                                 ? `${uploadedFile.documentName.substring(
-                                    0,
-                                    15
-                                  )}...${uploadedFile.documentName.substring(
-                                    uploadedFile.documentName.length - 10
-                                  )}`
+                                  0,
+                                  15
+                                )}...${uploadedFile.documentName.substring(
+                                  uploadedFile.documentName.length - 10
+                                )}`
                                 : uploadedFile.documentName}{" "}
                               <Tag color="blue">
                                 {(uploadedFile.size / 1024).toFixed(2)} KB
@@ -501,5 +501,4 @@ const DocumentsUpload = ({ formData }) => {
     </div>
   );
 };
-
 export default DocumentsUpload;

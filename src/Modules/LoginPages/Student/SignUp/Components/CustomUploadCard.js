@@ -19,7 +19,8 @@ const CustomUploadCard = ({
   width = "w-full",
   height = "h-48",
   required = false,
-  profilelink
+  profilelink,
+  onRemove,
 }) => {
   /* -------------------- Hooks -------------------- */
   const { uploadFile, uploading, error, resetUpload } = useCloudinaryUpload(
@@ -36,6 +37,7 @@ const CustomUploadCard = ({
 
   /* ----------- Utilities ----------- */
   const extractPublicId = (url = "") => {
+    if (typeof url !== "string") return null;
     const parts = url.split("/");
     const idx = parts.findIndex((p) => p === "upload");
     return idx === -1
@@ -48,14 +50,19 @@ const CustomUploadCard = ({
 
   /* ----------- Initialise from form field (edit mode) ----------- */
   useEffect(() => {
-    const existing = form.getFieldValue(name);
-    if (existing?.url) {
-      setCurrentImage(existing.url);
-      const id = extractPublicId(existing.url);
-      id && setPublicId(id);
+    // Use profilelink if provided, otherwise fall back to form field value
+    const initialImage = profilelink || form.getFieldValue(name);
+    if (initialImage) {
+      // Handle both string and object formats
+      const imageUrl = typeof initialImage === "string" ? initialImage : initialImage?.url;
+      if (imageUrl) {
+        setCurrentImage(imageUrl);
+        const id = extractPublicId(imageUrl);
+        id && setPublicId(id);
+      }
     }
     resetUpload();
-  }, [form, name, resetUpload]);
+  }, [form, name, profilelink, resetUpload]);
 
   /* ----------- Clean up local object URLs ----------- */
   useEffect(() => {
@@ -93,7 +100,7 @@ const CustomUploadCard = ({
         const id = extractPublicId(url);
         setPublicId(id);
         setCurrentImage(url);
-        form.setFieldValue(name, url); // This will trigger validation
+        form.setFieldValue(name, { url }); // Set as object to match form hydration
         message.success("Image uploaded ✔");
         setLocalFile(null);
         setLocalURL(null);
@@ -109,30 +116,19 @@ const CustomUploadCard = ({
       if (publicId) await deleteMediaByPublicId(publicId);
       setPublicId(null);
       setCurrentImage(null);
-      form.setFieldValue(name, null); // Set to null instead of empty object
+      form.setFieldValue(name, null);
       message.success("Image removed");
+      if (onRemove) onRemove(); // Call onRemove callback if provided
     } catch (err) {
       message.error("Remove failed");
       console.error(err);
     }
   };
+
   const cancelPending = () => {
     setLocalFile(null);
     setLocalURL(null);
   };
-
-  // const removeUploaded = async () => {
-  //   try {
-  //     if (publicId) await deleteMediaByPublicId(publicId);
-  //     setPublicId(null);
-  //     setCurrentImage(null);
-  //     form.setFieldValue(name, null);
-  //     message.success("Image removed");
-  //   } catch (err) {
-  //     message.error("Remove failed");
-  //     console.error(err);
-  //   }
-  // };
 
   /* -------------------- Render helpers -------------------- */
   const EmptyState = () => (
@@ -220,11 +216,10 @@ const CustomUploadCard = ({
         <div
           className={`relative group border-2 border-dashed rounded-md flex items-center justify-center flex-1
           transition-colors overflow-hidden cursor-pointer
-          ${
-            uploading
+          ${uploading
               ? "bg-gray-100 border-gray-300"
               : "bg-white hover:border-blue-500"
-          }
+            }
         `}
         >
           {uploading ? (

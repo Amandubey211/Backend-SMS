@@ -36,11 +36,11 @@ import {
 } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
 import dayjs from "dayjs";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
-// import isDayjs from "dayjs/plugin/isDayjs";
+
+dayjs.extend(isSameOrBefore);
 
 const { Option } = Select;
 
-/* ─── phone + WhatsApp toggle ─── */
 const PhoneField = ({
   form,
   name,
@@ -49,9 +49,44 @@ const PhoneField = ({
   placeholder,
   required,
 }) => {
-  const isWA = Form.useWatch(whatsappName, form) ?? false;
   const hasError = form.getFieldError(name).length > 0;
   const borderCol = hasError ? "#ff4d4f" : "#d9d9d9";
+
+  // Initialize isWA from the form value, but manage it locally thereafter
+  const [isWA, setIsWA] = useState(form.getFieldValue(whatsappName) || false);
+  const [phoneValue, setPhoneValue] = useState(form.getFieldValue(name) || "");
+
+  // Sync local state with form value for phone number
+  useEffect(() => {
+    const formValue = form.getFieldValue(name) || "";
+    const normalizedFormValue = formValue.replace(/[^+\d]/g, "");
+    setPhoneValue(normalizedFormValue);
+    // console.log(`PhoneField - ${name.join(".")} initial form value:`, normalizedFormValue);
+  }, [form, name]);
+
+  const handleWhatsappToggle = () => {
+    const newValue = !isWA;
+    setIsWA(newValue);
+    // Update the form with the new WhatsApp toggle state
+    form.setFieldsValue({
+      [whatsappName]: newValue,
+    });
+    // console.log(`PhoneField - ${name.join(".")} whatsapp toggled to:`, newValue);
+  };
+
+  const handlePhoneChange = (value) => {
+    const normalizedValue = value.replace(/[^+\d]/g, "");
+    const finalValue = normalizedValue.startsWith("+") ? normalizedValue : `+974${normalizedValue}`;
+    setPhoneValue(finalValue);
+
+    // Only update the phone number field, don't touch whatsappName
+    form.setFieldsValue({
+      [name]: finalValue,
+    });
+
+    form.validateFields([name]);
+    // console.log(`PhoneField - ${name.join(".")} onChange:`, finalValue);
+  };
 
   return (
     <Form.Item
@@ -72,17 +107,15 @@ const PhoneField = ({
         <Form.Item
           name={name}
           noStyle
-          valuePropName="value"
-          trigger="onChange"
-          rules={
-            required
-              ? [{ required: true, message: "Phone number is required" }]
-              : []
-          }
+          rules={[
+            { required: true, message: "Phone number is required" },
+          ]}
         >
           <PhoneInput
             country="qa"
             placeholder={placeholder}
+            value={phoneValue}
+            onChange={handlePhoneChange}
             inputStyle={{
               width: "100%",
               height: "100%",
@@ -91,11 +124,21 @@ const PhoneField = ({
               borderRadius: "6px 0 0 6px",
             }}
             containerStyle={{ width: "100%" }}
+            buttonStyle={{
+              border: "none",
+              borderRadius: "6px 0 0 6px",
+              background: "transparent",
+              padding: "0 10px",
+              width: "50px",
+            }}
+            enableSearch={true}
+            countryCodeEditable={false}
           />
         </Form.Item>
+
         <Tooltip title={isWA ? "WhatsApp enabled" : "Click to enable WhatsApp"}>
           <div
-            onClick={() => form.setFieldValue(whatsappName, !isWA)}
+            onClick={handleWhatsappToggle}
             className={`flex items-center justify-center w-12 cursor-pointer
                         ${isWA ? "bg-[#25D366]" : "bg-gray-100"}`}
             style={{
@@ -114,7 +157,6 @@ const PhoneField = ({
   );
 };
 
-/* ─── main component ─── */
 const GuardianInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -132,7 +174,6 @@ const GuardianInfo = ({ formData }) => {
   const [activeTab, setActiveTab] = useState("father");
 
   /* Hydrate form with initial data */
-
   useEffect(() => {
     if (!formData) return;
     const sanitized = JSON.parse(JSON.stringify(formData));
@@ -152,7 +193,8 @@ const GuardianInfo = ({ formData }) => {
 
     form.setFieldsValue(sanitized);
   }, [formData, form]);
-  /* auto scroll on tab change */
+
+  /* Auto-scroll on tab change */
   useEffect(() => {
     if (activeTab === "mother")
       motherSectionRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -165,6 +207,7 @@ const GuardianInfo = ({ formData }) => {
 
   const smoothToTop = () =>
     containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
   const handleValuesChange = () => {
     const raw = form.getFieldsValue(true);
 
@@ -177,7 +220,7 @@ const GuardianInfo = ({ formData }) => {
     dispatch(updateFormData({ guardian: raw }));
   };
 
-  /* ------------- reusable render helpers ------------- */
+  /* ------------- Reusable render helpers ------------- */
   const renderNameFields = (p) => (
     <>
       <Form.Item
@@ -330,8 +373,8 @@ const GuardianInfo = ({ formData }) => {
       </Row>
     </>
   );
-
-  /* ------------- section renderers ------------- */
+  // console.log("Photo", formData?.fatherInfo?.photo);
+  /* ------------- Section renderers ------------- */
   const renderFatherInfo = () => (
     <>
       <Divider orientation="left" dashed>
@@ -349,6 +392,7 @@ const GuardianInfo = ({ formData }) => {
               height="h-40"
               aspectRatio="aspect-square"
               enableCrop={false}
+              profileLink={formData?.fatherInfo?.photo || ""} // Pass profileLink for father
             />
           </Form.Item>
         </div>
@@ -376,6 +420,7 @@ const GuardianInfo = ({ formData }) => {
               height="h-40"
               aspectRatio="aspect-square"
               enableCrop={false}
+              profileLink={formData?.motherInfo?.photo || ""} // Pass profileLink for mother
             />
           </Form.Item>
         </div>
@@ -438,7 +483,7 @@ const GuardianInfo = ({ formData }) => {
     </div>
   );
 
-  /* ------------- navigation handlers ------------- */
+  /* ------------- Navigation handlers ------------- */
   const gradient = "linear-gradient(90deg,#C83B62 0%,#7F35CD 100%)";
   const darkerGradient = "linear-gradient(90deg,#A02D53 0%,#6A28A4 100%)";
 
@@ -484,6 +529,7 @@ const GuardianInfo = ({ formData }) => {
       smoothToTop();
     }
   };
+
   const handleBack = () => {
     if (activeTab === "guardian") setActiveTab("mother");
     else if (activeTab === "mother") setActiveTab("father");
@@ -491,10 +537,10 @@ const GuardianInfo = ({ formData }) => {
     smoothToTop();
   };
 
-  /* ------------- render ------------- */
+  /* ------------- Render ------------- */
   return (
     <div className="flex flex-col h-full">
-      {/* segmented control */}
+      {/* Segmented control */}
       <div className="sticky top-0 z-20 pt-1 pb-2 bg-white shadow-sm">
         <Segmented
           size="large"
@@ -542,7 +588,7 @@ const GuardianInfo = ({ formData }) => {
         />
       </div>
 
-      {/* form body */}
+      {/* Form body */}
       <div ref={containerRef} className="flex-1 overflow-y-auto px-4">
         <Form
           form={form}
@@ -604,8 +650,8 @@ const GuardianInfo = ({ formData }) => {
                   {activeTab === "father"
                     ? "Mother Info"
                     : activeTab === "mother"
-                    ? "Guardian Info"
-                    : "Save & Continue"}
+                      ? "Guardian Info"
+                      : "Save & Continue"}
                 </Button>
               </motion.div>
             </Col>
