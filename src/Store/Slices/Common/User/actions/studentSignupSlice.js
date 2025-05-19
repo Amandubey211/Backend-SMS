@@ -184,7 +184,7 @@ export const saveStudentDraft = createAsyncThunk(
   async (_, { getState, rejectWithValue, dispatch }) => {
     try {
       const { formData, currentStep } = getState().common.studentSignup;
-
+      console.log("Saving draft:", formData);
       if (currentStep >= 6) return true;
 
       const email = (formData.candidate?.email || "").toLowerCase();

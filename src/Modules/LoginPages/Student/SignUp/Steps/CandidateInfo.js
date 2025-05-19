@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import {
   Form,
@@ -21,9 +21,6 @@ import {
   MailOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import { FaWhatsapp } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 
 import CustomUploadCard from "../Components/CustomUploadCard";
@@ -39,9 +36,12 @@ import {
   NATIVE_LANGUAGE_OPTIONS,
   RELIGION_OPTIONS,
 } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const { Option } = Select;
-/* ☎️ reusable ------------------------------------------------------ */
+
 const PhoneField = ({
   form,
   name,
@@ -51,7 +51,21 @@ const PhoneField = ({
   required,
 }) => {
   const value = Form.useWatch(name, form);
-  const isWA = Form.useWatch(whatsappName, form);
+  const [isWA, setIsWA] = React.useState(form.getFieldValue(whatsappName) || false);
+
+  const handleWhatsappToggle = () => {
+    const currentIsWA = form.getFieldValue(whatsappName) || false;
+    const newValue = !currentIsWA;
+    // console.log('Before toggle:', { whatsappName, currentIsWA, newValue });
+
+    form.setFieldsValue({
+      [whatsappName]: newValue,
+    });
+
+    setIsWA(newValue);
+
+    // console.log('After toggle:', { whatsappName, updatedIsWA: form.getFieldValue(whatsappName) });
+  };
 
   return (
     <Form.Item
@@ -75,8 +89,17 @@ const PhoneField = ({
           containerStyle={{ width: "100%" }}
           value={value || ""}
           onChange={(value) => {
-            form.setFieldValue(name, value);
+            form.setFieldsValue({ [name]: value });
           }}
+          buttonStyle={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "0",
+            background: "transparent",
+            padding: "0 10px",
+            width: "50px",
+          }}
+          enableSearch={true}
+          countryCodeEditable={false}
         />
         <div
           className={`flex items-center border border-l-0 rounded-r px-3 ${
@@ -86,9 +109,7 @@ const PhoneField = ({
           <Tooltip title="Mark this number as WhatsApp">
             <div
               className="cursor-pointer"
-              onClick={() => {
-                form.setFieldValue(whatsappName, !isWA);
-              }}
+              onClick={handleWhatsappToggle}
             >
               <FaWhatsapp className="text-[#075E54] text-xl" />
             </div>
@@ -99,34 +120,39 @@ const PhoneField = ({
   );
 };
 
-/* 📄 main component ------------------------------------------------ */
 const CandidateInfo = ({ formData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+  const [profileImage, setProfileImage] = useState(formData?.profile || null);
 
-  /* hydrate draft (convert dates back to dayjs) */
+  // console.log("formData.profile:", formData?.profile);
+  // console.log("profileImage:", profileImage);
+
   useEffect(() => {
     if (!formData) return;
 
     const initialValues = {
-      ...formData, // Spread all existing formData properties
-      // Convert string dates to dayjs objects
+      ...formData,
       dob: formData.dob ? dayjs(formData.dob) : undefined,
       idExpiry: formData.idExpiry ? dayjs(formData.idExpiry) : undefined,
       passportExpiry: formData.passportExpiry
         ? dayjs(formData.passportExpiry)
         : undefined,
       phoneNumberIsWhatsapp: formData.phoneNumberIsWhatsapp || false,
+      emergencyNumberIsWhatsapp: formData.emergencyNumberIsWhatsapp || false,
       profile: formData.profile || undefined,
     };
 
-    // This is where initialValues.age gets added
     if (formData.dob) {
       initialValues.age = dayjs().diff(dayjs(formData.dob), "year");
     }
 
+    // Sync profileImage with formData.profile
+    setProfileImage(formData.profile || null);
+
+    // console.log("Setting initial values:", initialValues);
     form.setFieldsValue(initialValues);
-  }, [formData]);
+  }, [formData, form]);
 
   const handleDobChange = (d) => {
     form.setFieldValue("dob", d);
@@ -143,17 +169,15 @@ const CandidateInfo = ({ formData }) => {
       form.setFieldValue("age", "");
     }
   };
-  /* persist every keystroke */
+
   const handleValuesChange = () => {
     const raw = form.getFieldsValue(true);
+    setProfileImage(raw.profile || null);
     dispatch(
       updateFormData({
         candidate: {
           ...raw,
-          // Preserve the File object if it exists
-
           profile: raw.profile,
-          // Handle date conversions
           dob: raw.dob ? raw.dob.format("YYYY-MM-DD") : null,
           idExpiry: raw.idExpiry ? raw.idExpiry.format("YYYY-MM-DD") : null,
           passportExpiry: raw.passportExpiry
@@ -163,30 +187,28 @@ const CandidateInfo = ({ formData }) => {
       })
     );
   };
+
   const validateAge = (_, value) => {
     if (value < 3) return Promise.reject("Age must be at least 3");
     if (value > 100) return Promise.reject("Age must be less than 100");
     return Promise.resolve();
   };
 
-  // In your Form.Item:
-
-  /* navigation */
   const goNext = async () => {
     try {
       const vals = form.getFieldsValue(true);
       await CandidateSchema.validate(vals, { abortEarly: false });
 
-      // Create FormData for the file upload
-      const formData = new FormData();
+      const formDataToSubmit = new FormData();
       if (vals.profile instanceof File) {
-        formData.append("profile", vals.profile);
+        formDataToSubmit.append("profile", vals.profile);
+      } else if (typeof vals.profile === "string") {
+        formDataToSubmit.append("profile", vals.profile);
       }
 
-      // Add other form data
       Object.entries(vals).forEach(([key, value]) => {
         if (key !== "profile" && value !== null && value !== undefined) {
-          formData.append(
+          formDataToSubmit.append(
             key,
             typeof value === "object" ? JSON.stringify(value) : value
           );
@@ -201,9 +223,7 @@ const CandidateInfo = ({ formData }) => {
       const firstErrorField = err?.inner?.[0]?.path;
 
       if (firstErrorField) {
-        // Special handling for the profile image field
         if (firstErrorField === "profile") {
-          // Scroll to the upload card container
           document.querySelector(".upload-card-container")?.scrollIntoView({
             behavior: "smooth",
             block: "center",
@@ -220,7 +240,6 @@ const CandidateInfo = ({ formData }) => {
 
   const goBack = () => dispatch(prevStep());
 
-  /* 🖼️ UI ---------------------------------------------------------- */
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <Form
@@ -229,17 +248,14 @@ const CandidateInfo = ({ formData }) => {
         onValuesChange={handleValuesChange}
         className="space-y-4"
       >
-        {/* 📸 + names */}
         <div className="flex flex-col md:flex-row gap-4 upload-card-container">
-          {" "}
-          {/* Added class here */}
           <div className="md:w-[40%]">
             <Form.Item
               name="profile"
               rules={[
                 { required: true, message: "Candidate photo is required" },
               ]}
-              valuePropName="file" // Important for AntD Form validation
+              valuePropName="file"
             >
               <CustomUploadCard
                 name="profile"
@@ -250,7 +266,12 @@ const CandidateInfo = ({ formData }) => {
                 height="h-48"
                 aspectRatio={1}
                 required
-                profilelink={formData?.profile} //could be change later for sending the public id of the image link
+                profilelink={profileImage}
+                onRemove={() => {
+                  form.setFieldsValue({ profile: undefined });
+                  setProfileImage(null);
+                  handleValuesChange();
+                }}
               />
             </Form.Item>
           </div>
@@ -288,7 +309,6 @@ const CandidateInfo = ({ formData }) => {
           </div>
         </div>
 
-        {/* dob + age */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item
@@ -321,7 +341,6 @@ const CandidateInfo = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* Student‑ID / expiry */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item name="Q_Id" label="Student QID">
@@ -339,7 +358,6 @@ const CandidateInfo = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* Blood + gender */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item name="bloodGroup" label="Blood Group">
@@ -365,7 +383,6 @@ const CandidateInfo = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* Passport */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item name="passportNumber" label="Passport #">
@@ -383,7 +400,6 @@ const CandidateInfo = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* place / nationality */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item
@@ -414,7 +430,6 @@ const CandidateInfo = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* religion / native‑lang */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <Form.Item
@@ -449,7 +464,6 @@ const CandidateInfo = ({ formData }) => {
           </Col>
         </Row>
 
-        {/* email */}
         <Form.Item
           name="email"
           label="Email"
@@ -458,11 +472,10 @@ const CandidateInfo = ({ formData }) => {
           <Input
             size="large"
             prefix={<MailOutlined />}
-            placeholder="student@studentdiwan.com "
+            placeholder="student@studentdiwan.com"
           />
         </Form.Item>
 
-        {/* phone / emergency */}
         <Row gutter={16}>
           <Col xs={24} md={12}>
             <PhoneField
@@ -484,20 +497,10 @@ const CandidateInfo = ({ formData }) => {
               required
             />
           </Col>
-          {/* <Col xs={24} md={12}>
-            <Form.Item name="emergencyNumber" label="Emergency Number">
-              <InputNumber
-                size="large"
-                style={{ width: "100%" }}
-                placeholder="Enter emergency number"
-              />
-            </Form.Item>
-          </Col> */}
         </Row>
 
         <Divider className="my-2" />
 
-        {/* primary contact */}
         <Form.Item
           name="primaryContact"
           label="Primary Contact"
@@ -510,7 +513,6 @@ const CandidateInfo = ({ formData }) => {
           </Select>
         </Form.Item>
 
-        {/* nav buttons */}
         <Row justify="space-between" className="mt-8">
           <Button icon={<ArrowLeftOutlined />} onClick={goBack}>
             Back
