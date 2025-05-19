@@ -5,27 +5,25 @@ import {
   getAllTripLogs,
   getTripLogsByVehicle,
   startTripLog,
-  toggleGPS
+  toggleGPS,
 } from "./tripExecutionLog.action";
 
-  const initialState = {
-    loading: false,
-    error: null,
-    trip: null,
-    isGpsOn:false,
-    currentLocation:null,
-    tripLogs: [],
-    vehicleWiseLogs: [],
-    pagination: {
-      totalItems: 0,
-      currentPage: 1,
-      totalPages: 0,
-      limit: 10,
-      type: "today",
-    },
-  };
-  
-
+const initialState = {
+  loading: false,
+  error: null,
+  trip: null,
+  isGpsOn: false,
+  currentLocation: null,
+  tripLogs: [],
+  vehicleWiseLogs: [],
+  pagination: {
+    totalItems: 0,
+    currentPage: 1,
+    totalPages: 0,
+    limit: 10,
+    type: "today",
+  },
+};
 
 const tripExecutionLogSlice = createSlice({
   name: "tripExecutionLog",
@@ -37,11 +35,11 @@ const tripExecutionLogSlice = createSlice({
       state.vehicleWiseLogs = [];
       state.error = null;
     },
-    setIsGpsOn:(state,action)=>{
-      state.isGpsOn=action.payload;
+    setIsGpsOn: (state, action) => {
+      state.isGpsOn = action.payload;
     },
-    setCurrentLocation:(state,action)=>{
-      state.currentLocation=action.payload;
+    setCurrentLocation: (state, action) => {
+      state.currentLocation = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -119,8 +117,7 @@ const tripExecutionLogSlice = createSlice({
       })
       .addCase(toggleGPS.fulfilled, (state, action) => {
         state.loading = false;
-        state.gpsStatus = action.payload?.trip?.isGPSOn; 
-
+        state.gpsStatus = action.payload?.trip?.isGPSOn;
       })
       .addCase(toggleGPS.rejected, (state, action) => {
         state.loading = false;
@@ -129,6 +126,7 @@ const tripExecutionLogSlice = createSlice({
   },
 });
 
-export const { clearTripData,setIsGpsOn,setCurrentLocation } = tripExecutionLogSlice.actions;
+export const { clearTripData, setIsGpsOn, setCurrentLocation } =
+  tripExecutionLogSlice.actions;
 
 export default tripExecutionLogSlice.reducer;
