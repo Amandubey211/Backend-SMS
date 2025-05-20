@@ -22,7 +22,27 @@ import ViewHelper from "./ViewHelper";
 import { fetchHelperList } from "../../../../Store/Slices/Transportation/Helper/helper.action";
 import ProfileHelperCard from "../SubComponents/ProfileHelperCard";
 import AddHelper from "./AddHelper";
-
+import { Skeleton, Card, Row, Col } from 'antd';
+const HelperShimmer = () => {
+    return (
+        <div style={{ padding: '20px' }}>
+            <Row gutter={[16, 16]}>
+                {[...Array(5)].map((_, index) => (
+                    <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                        <Card style={{ marginBottom: '16px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Skeleton.Avatar active size={64} shape="circle" style={{ marginBottom: '16px' }} />
+                                <Skeleton.Input active size="small" style={{ width: '80%', marginBottom: '8px' }} />
+                                <Skeleton.Input active size="small" style={{ width: '60%', marginBottom: '8px' }} />
+                                <Skeleton.Input active size="small" style={{ width: '90%' }} />
+                            </div>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+        </div>
+    );
+};
 const AllHelper = () => {
     const { t } = useTranslation("admAccounts");
     const dispatch = useDispatch();
@@ -50,7 +70,7 @@ const AllHelper = () => {
     useEffect(() => {
         setSortedHelpers(helpers);
     }, [helpers]);
-
+    // console.log("helpers", helpers);
     useEffect(() => {
         let filtered = [...helpers];
 
@@ -155,7 +175,7 @@ const AllHelper = () => {
             <DashLayout>
                 {helperLoading ? (
                     <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-                        <Spinner />
+                        <HelperShimmer />
                     </div>
                 ) : (
                     <ProtectedSection

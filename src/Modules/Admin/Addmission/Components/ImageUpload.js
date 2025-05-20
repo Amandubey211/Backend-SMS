@@ -17,11 +17,9 @@ const ImageUpload = ({
   return (
     <>
       <div
-        className={`flex flex-col items-center justify-center border-2 p-1 rounded-lg relative ${
-          width ? width : "w-64"
-        } ${height ? height : "h-64"} border-dashed ${
-          error ? "border-red-500" : "border-gray-300"
-        } `}
+        className={`flex flex-col items-center justify-center border-2 p-1 rounded-lg relative ${width ? width : "w-64"
+          } ${height ? height : "h-64"} border-dashed ${error ? "border-red-500" : "border-gray-300"
+          } `}
       >
         {imagePreview ? (
           <div className="relative w-full h-full">

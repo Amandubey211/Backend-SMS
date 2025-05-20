@@ -4,6 +4,7 @@ import { GoPlus } from "react-icons/go";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Skeleton, Card, Row, Col } from 'antd';
 
 import Layout from "../../../../Components/Common/Layout";
 import DashLayout from "../../../../Components/Admin/AdminDashLayout";
@@ -22,7 +23,26 @@ import { fetchDriverList } from "../../../../Store/Slices/Transportation/Driver/
 import AddDriver from "./AddDriver";
 import ViewDriver from "./ViewDriver";
 import ProfileDriverCard from "../SubComponents/ProfileDriverCard";
-
+const DriverShimmer = () => {
+  return (
+    <div style={{ padding: '20px' }}>
+      <Row gutter={[16, 16]}>
+        {[...Array(5)].map((_, index) => (
+          <Col xs={24} sm={12} md={8} lg={6} key={index}>
+            <Card style={{ marginBottom: '16px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <Skeleton.Avatar active size={64} shape="circle" style={{ marginBottom: '16px' }} />
+                <Skeleton.Input active size="small" style={{ width: '80%', marginBottom: '8px' }} />
+                <Skeleton.Input active size="small" style={{ width: '60%', marginBottom: '8px' }} />
+                <Skeleton.Input active size="small" style={{ width: '90%' }} />
+              </div>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </div>
+  );
+};
 const AllDriver = () => {
     const { t } = useTranslation("admAccounts");
     const dispatch = useDispatch();
@@ -41,15 +61,16 @@ const AllDriver = () => {
     );
     const role = useSelector((store) => store.common.auth.role);
     const { roles: AllRoles } = useSelector((state) => state.admin.rbac);
-
+    
     useEffect(() => {
         dispatch(fetchDriverList());
         dispatch(getAllRolesThunk());
     }, [dispatch]);
-
+    
     useEffect(() => {
         setSortedDrivers(drivers);
     }, [drivers]);
+    // console.log("drivers", drivers);
 
     useEffect(() => {
         let filtered = [...drivers];
@@ -155,7 +176,7 @@ const AllDriver = () => {
             <DashLayout>
                 {driverLoading ? (
                     <div className="flex w-full h-[90vh] flex-col items-center justify-center">
-                        <Spinner />
+                       <DriverShimmer />
                     </div>
                 ) : (
                     <ProtectedSection

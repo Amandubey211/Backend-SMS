@@ -214,7 +214,7 @@ const ProfileHelperCard = ({ profile, onClick, editUser }) => {
         <div className="flex flex-col h-[80%] justify-center items-center py-3">
           <img
             className="object-cover rounded-full w-[100px] h-[100px] border"
-            src={profile?.profile || profileIcon}
+            src={profile?.photo || profileIcon}
             alt={getDisplayName()}
           />
           <h3 className="text-lg font-medium">
