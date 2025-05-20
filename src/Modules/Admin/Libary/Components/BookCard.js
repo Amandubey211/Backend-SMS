@@ -61,7 +61,7 @@ const BookCard = ({ book }) => {
           <img
             src={image}
             alt={name}
-            className="w-[65%] h-full object-cover rounded-md"
+            className="w-[65%] h-full rounded-md object-contain rounded-md"
           />
           <div className="flex flex-col p-2 space-y-1">
             {/* Conditionally render class info if available */}

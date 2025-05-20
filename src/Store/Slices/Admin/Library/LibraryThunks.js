@@ -169,13 +169,19 @@ export const issueBookThunk = createAsyncThunk(
 
       const response = await customRequest(method, url, bookIssueData);
       dispatch(fetchBookIssuesThunk());
-      toast.success(
+      if(response.success){
+toast.success(
         id
           ? "Book issue updated successfully!"
           : "Book issue created successfully!"
       );
+      }else{
+       toast.error( response.message|| "Book not issued"); 
+      }
+      
       return response?.book;
     } catch (error) {
+             toast.error( error?.response?.data?.message|| "Book not issued"); 
       return handleError(error, dispatch, rejectWithValue);
     }
   }
