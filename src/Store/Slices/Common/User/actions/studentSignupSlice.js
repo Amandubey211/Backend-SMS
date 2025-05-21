@@ -90,6 +90,7 @@ const mapDraftToSections = (doc) => {
     academic: {
       ...doc.academicHistory, // previousSchoolName, previousClass, etc.
       sourceOfFee: doc.academicHistory?.sourceOfFee ?? "Parent",
+      previousSchoolName: doc.academicHistory?.previousSchoolName ?? "",
     },
 
     /* Address tab */

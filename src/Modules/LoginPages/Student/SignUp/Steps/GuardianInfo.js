@@ -40,52 +40,57 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 dayjs.extend(isSameOrBefore);
 
 const { Option } = Select;
+/* ---- helper so nested paths aren’t clobbered ---- */
+const setNested = (form, pathArr, value) => {
+  if (!Array.isArray(pathArr)) {
+    form.setFieldsValue({ [pathArr]: value });
+    return;
+  }
+  const [parent, child] = pathArr; // 2-level deep only
+  form.setFieldsValue({
+    [parent]: { ...form.getFieldValue(parent), [child]: value },
+  });
+};
 
+/* ---- reusable phone field (fixed) ---- */
 const PhoneField = ({
   form,
-  name,
-  whatsappName,
+  name, // ➜ e.g. ['fatherInfo','cell1']
+  whatsappName, // ➜ e.g. ['fatherInfo','cell1IsWhatsapp']
   label,
   placeholder,
-  required,
+  required = false,
 }) => {
   const hasError = form.getFieldError(name).length > 0;
   const borderCol = hasError ? "#ff4d4f" : "#d9d9d9";
 
-  // Initialize isWA from the form value, but manage it locally thereafter
-  const [isWA, setIsWA] = useState(form.getFieldValue(whatsappName) || false);
-  const [phoneValue, setPhoneValue] = useState(form.getFieldValue(name) || "");
+  /* sync local ↔ form every time form resets */
+  const [value, setValue] = useState(form.getFieldValue(name) || "");
+  const [isWA, setIsWA] = useState(!!form.getFieldValue(whatsappName));
 
-  // Sync local state with form value for phone number
   useEffect(() => {
-    const formValue = form.getFieldValue(name) || "";
-    const normalizedFormValue = formValue.replace(/[^+\d]/g, "");
-    setPhoneValue(normalizedFormValue);
-    // console.log(`PhoneField - ${name.join(".")} initial form value:`, normalizedFormValue);
-  }, [form, name]);
+    setValue(form.getFieldValue(name) || "");
+    setIsWA(!!form.getFieldValue(whatsappName));
+  }, [form, name, whatsappName]);
 
-  const handleWhatsappToggle = () => {
-    const newValue = !isWA;
-    setIsWA(newValue);
-    // Update the form with the new WhatsApp toggle state
-    form.setFieldsValue({
-      [whatsappName]: newValue,
-    });
-    // console.log(`PhoneField - ${name.join(".")} whatsapp toggled to:`, newValue);
+  const normalize = (v) => {
+    const raw = v.replace(/[^+\d]/g, "");
+    return raw.startsWith("+") ? raw : `+974${raw}`; // always E.164
   };
 
-  const handlePhoneChange = (value) => {
-    const normalizedValue = value.replace(/[^+\d]/g, "");
-    const finalValue = normalizedValue.startsWith("+") ? normalizedValue : `+974${normalizedValue}`;
-    setPhoneValue(finalValue);
-
-    // Only update the phone number field, don't touch whatsappName
-    form.setFieldsValue({
-      [name]: finalValue,
-    });
-
+  /* phone number typed */
+  const handleChange = (v) => {
+    const full = normalize(v);
+    setValue(full);
+    setNested(form, name, full); // safe nested update
     form.validateFields([name]);
-    // console.log(`PhoneField - ${name.join(".")} onChange:`, finalValue);
+  };
+
+  /* toggle WhatsApp flag */
+  const toggleWA = () => {
+    const nv = !isWA;
+    setIsWA(nv);
+    setNested(form, whatsappName, nv);
   };
 
   return (
@@ -104,18 +109,19 @@ const PhoneField = ({
           height: 40,
         }}
       >
+        {/* ---- PHONE INPUT ---- */}
         <Form.Item
           name={name}
           noStyle
-          rules={[
-            { required: true, message: "Phone number is required" },
-          ]}
+          rules={[{ required, message: "Phone number is required" }]}
         >
           <PhoneInput
             country="qa"
             placeholder={placeholder}
-            value={phoneValue}
-            onChange={handlePhoneChange}
+            value={value}
+            onChange={handleChange}
+            enableSearch
+            countryCodeEditable={false}
             inputStyle={{
               width: "100%",
               height: "100%",
@@ -131,16 +137,15 @@ const PhoneField = ({
               padding: "0 10px",
               width: "50px",
             }}
-            enableSearch={true}
-            countryCodeEditable={false}
           />
         </Form.Item>
 
+        {/* ---- WHATSAPP TOGGLE ---- */}
         <Tooltip title={isWA ? "WhatsApp enabled" : "Click to enable WhatsApp"}>
           <div
-            onClick={handleWhatsappToggle}
+            onClick={toggleWA}
             className={`flex items-center justify-center w-12 cursor-pointer
-                        ${isWA ? "bg-[#25D366]" : "bg-gray-100"}`}
+                       ${isWA ? "bg-[#25D366]" : "bg-gray-100"}`}
             style={{
               borderLeft: `1px solid ${borderCol}`,
               borderRadius: "0 6px 6px 0",
@@ -392,7 +397,7 @@ const GuardianInfo = ({ formData }) => {
               height="h-40"
               aspectRatio="aspect-square"
               enableCrop={false}
-              profileLink={formData?.guardian?.fatherInfo?.photo || ""} // Pass profileLink for father
+              profilelink={formData?.fatherInfo?.photo || ""} // Pass profileLink for father
             />
           </Form.Item>
         </div>
@@ -420,7 +425,7 @@ const GuardianInfo = ({ formData }) => {
               height="h-40"
               aspectRatio="aspect-square"
               enableCrop={false}
-              profileLink={formData?.guardian?.motherInfo?.photo || ""} // Pass profileLink for mother
+              profilelink={formData?.motherInfo?.photo || ""} // Pass profileLink for mother
             />
           </Form.Item>
         </div>
@@ -491,6 +496,7 @@ const GuardianInfo = ({ formData }) => {
     try {
       await form.validateFields();
       const formValues = form.getFieldsValue(true);
+      console.log(formValues, "formValues");
 
       const processedValues = {
         ...formValues,
@@ -650,8 +656,8 @@ const GuardianInfo = ({ formData }) => {
                   {activeTab === "father"
                     ? "Mother Info"
                     : activeTab === "mother"
-                      ? "Guardian Info"
-                      : "Save & Continue"}
+                    ? "Guardian Info"
+                    : "Save & Continue"}
                 </Button>
               </motion.div>
             </Col>
