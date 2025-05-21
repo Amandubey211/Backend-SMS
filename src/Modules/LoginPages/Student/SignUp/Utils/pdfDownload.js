@@ -547,19 +547,19 @@ export const handleDownload = async (ApplicationData) => {
           "Street",
           ApplicationData?.address?.residentialAddress?.streetName || "N/A",
         ],
-        [
-          "Zone",
-          `${
-            ApplicationData?.address?.residentialAddress?.zoneName || "N/A"
-          } ` +
-            `(${
-              ApplicationData?.address?.residentialAddress?.zoneNumber || "N/A"
-            })`,
-        ],
-        [
-          "Compound",
-          ApplicationData?.address?.residentialAddress?.compoundName || "N/A",
-        ],
+        // [
+        //   "Zone",
+        //   `${
+        //     ApplicationData?.address?.residentialAddress?.zoneName || "N/A"
+        //   } ` +
+        //     `(${
+        //       ApplicationData?.address?.residentialAddress?.zoneNumber || "N/A"
+        //     })`,
+        // ],
+        // [
+        //   "Compound",
+        //   ApplicationData?.address?.residentialAddress?.compoundName || "N/A",
+        // ],
         ["City", ApplicationData?.address?.residentialAddress?.city || "N/A"],
         [
           "Country",
@@ -567,11 +567,11 @@ export const handleDownload = async (ApplicationData) => {
             ApplicationData?.address?.residentialAddress?.country || "N/A"
           ).toUpperCase(),
         ],
-        [
-          "Nearest Landmark",
-          ApplicationData?.address?.residentialAddress?.nearestLandmark ||
-            "N/A",
-        ],
+        // [
+        //   "Nearest Landmark",
+        //   ApplicationData?.address?.residentialAddress?.nearestLandmark ||
+        //     "N/A",
+        // ],
         [
           "Transport Required",
           ApplicationData?.address?.transportRequirement ? "YES" : "NO",
@@ -593,11 +593,11 @@ export const handleDownload = async (ApplicationData) => {
           "Street",
           ApplicationData?.address?.permanentAddress?.streetName || "N/A",
         ],
-        [
-          "Zone",
-          `${ApplicationData?.address?.permanentAddress?.zoneName} ` +
-            `(${ApplicationData?.address?.permanentAddress?.zoneNumber})`,
-        ],
+        // [
+        //   "Zone",
+        //   `${ApplicationData?.address?.permanentAddress?.zoneName} ` +
+        //     `(${ApplicationData?.address?.permanentAddress?.zoneNumber})`,
+        // ],
         [
           "Compound",
           ApplicationData?.address?.permanentAddress?.compoundName || "N/A",
@@ -609,10 +609,10 @@ export const handleDownload = async (ApplicationData) => {
             ApplicationData?.address?.permanentAddress?.country || "N/A"
           ).toUpperCase(),
         ],
-        [
-          "Nearest Landmark",
-          ApplicationData?.address?.permanentAddress?.nearestLandmark || "N/A",
-        ],
+        // [
+        //   "Nearest Landmark",
+        //   ApplicationData?.address?.permanentAddress?.nearestLandmark || "N/A",
+        // ],
       ],
       ...tableOpts,
       didDrawCell: (data) => {
@@ -667,7 +667,7 @@ export const handleDownload = async (ApplicationData) => {
           "Curriculum",
           (ApplicationData?.academic?.curriculum || "N/A").toUpperCase(),
         ],
-        ["Previous School", ApplicationData?.academic?.previousSchool || "N/A"],
+        ["Previous School", ApplicationData?.academic?.previousSchoolName || "N/A"],
         [
           "Source of Fee",
           (ApplicationData?.academic?.sourceOfFee || "N/A").toUpperCase(),
