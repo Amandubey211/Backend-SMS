@@ -226,9 +226,8 @@ export const RELIGION_OPTIONS = [
   { label: "Cao Dai", value: "cao_dai" },
   { label: "Tenrikyo", value: "tenrikyo" },
   { label: "Rastafarianism", value: "rastafarianism" },
-  { label: "Spiritism", value: "spiritism" }
+  { label: "Spiritism", value: "spiritism" },
 ];
-
 
 export const NATIVE_LANGUAGE_OPTIONS = [
   { label: "Abkhaz", value: "ab" },
