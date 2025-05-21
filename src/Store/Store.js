@@ -71,6 +71,7 @@ import earnignsReducer from "./Slices/Finance/Earnings/earningsSlice";
 import adminOfflineExamReducer from "./Slices/Admin/Class/OfflineExam/offlineExamSlice";
 import operationalExpensesReducer from "./Slices/Finance/operationalExpenses/operationalExpenses.slice";
 import payrollReducer from "./Slices/Finance/payroll/payroll.slice";
+import scoreCardReducer from "./Slices/Admin/scoreCard/scoreCard.slice";
 // student
 import studentDashboardReducer from "./Slices/Student/Dashboard/studentDashboardSlices";
 import studentFinanceReducer from "./Slices/Student/Finance/financeSlice";
@@ -246,6 +247,7 @@ const AdminReducer = combineReducers({
   earnings: earnignsReducer,
   studentFees: studentFeesReducer,
   offlineExam: adminOfflineExamReducer,
+  scoreCard:scoreCardReducer
 });
 
 const studentReducer = combineReducers({
