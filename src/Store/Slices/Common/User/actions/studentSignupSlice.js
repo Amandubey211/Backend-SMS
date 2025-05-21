@@ -62,7 +62,7 @@ const mapDraftToSections = (doc) => {
       lastName: doc.lastName ?? "",
       dob: doc.dateOfBirth ?? null,
       gender: doc.gender ?? "",
-      phoneNumber: doc.phoneNumber ?? "",
+      contactNumber: doc.contactNumber ?? "",
       phoneNumberIsWhatsapp: doc.contactNumberIsWhatsapp || false,
       placeOfBirth: doc.placeOfBirth ?? "",
       religion: doc.religion ?? "",
@@ -73,6 +73,8 @@ const mapDraftToSections = (doc) => {
       emergencyNumber: doc.emergencyNumber ?? "",
       nationality: doc.nationality ?? "",
       nativeLanguage: doc.nativeLanguage ?? "",
+      passportNumber: doc.passportNumber ?? "",
+      idExpiry: doc.idExpiry ?? "",
     },
 
     /* Language & Preferences tab */
@@ -163,7 +165,7 @@ export const fetchStudentDraft = createAsyncThunk(
   async ({ email }, { rejectWithValue, dispatch }) => {
     try {
       const res = await getData(`/student/register/student?email=${email}`);
-      if (res.success && res.exists) {
+      if (res?.success && res?.exists) {
         return {
           ...res,
           data: {

@@ -392,7 +392,7 @@ const GuardianInfo = ({ formData }) => {
               height="h-40"
               aspectRatio="aspect-square"
               enableCrop={false}
-              profileLink={formData?.fatherInfo?.photo || ""} // Pass profileLink for father
+              profileLink={formData?.guardian?.fatherInfo?.photo || ""} // Pass profileLink for father
             />
           </Form.Item>
         </div>
@@ -420,7 +420,7 @@ const GuardianInfo = ({ formData }) => {
               height="h-40"
               aspectRatio="aspect-square"
               enableCrop={false}
-              profileLink={formData?.motherInfo?.photo || ""} // Pass profileLink for mother
+              profileLink={formData?.guardian?.motherInfo?.photo || ""} // Pass profileLink for mother
             />
           </Form.Item>
         </div>

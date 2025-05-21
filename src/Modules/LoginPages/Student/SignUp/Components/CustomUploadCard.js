@@ -54,7 +54,8 @@ const CustomUploadCard = ({
     const initialImage = profilelink || form.getFieldValue(name);
     if (initialImage) {
       // Handle both string and object formats
-      const imageUrl = typeof initialImage === "string" ? initialImage : initialImage?.url;
+      const imageUrl =
+        typeof initialImage === "string" ? initialImage : initialImage?.url;
       if (imageUrl) {
         setCurrentImage(imageUrl);
         const id = extractPublicId(imageUrl);
@@ -100,7 +101,7 @@ const CustomUploadCard = ({
         const id = extractPublicId(url);
         setPublicId(id);
         setCurrentImage(url);
-        form.setFieldValue(name, { url }); // Set as object to match form hydration
+        form.setFieldValue(name, url); // Set as object to match form hydration
         message.success("Image uploaded ✔");
         setLocalFile(null);
         setLocalURL(null);
@@ -216,10 +217,11 @@ const CustomUploadCard = ({
         <div
           className={`relative group border-2 border-dashed rounded-md flex items-center justify-center flex-1
           transition-colors overflow-hidden cursor-pointer
-          ${uploading
+          ${
+            uploading
               ? "bg-gray-100 border-gray-300"
               : "bg-white hover:border-blue-500"
-            }
+          }
         `}
         >
           {uploading ? (

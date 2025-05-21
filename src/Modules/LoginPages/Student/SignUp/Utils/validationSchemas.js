@@ -58,7 +58,7 @@ export const GuardianSchema = yup.object().shape({
 export const CandidateSchema = yup.object({
   firstName: yup.string().required("First name is required"),
   lastName: yup.string().required("Last name is required"),
-  middleName: yup.string().required("Middle name is required"),
+  // middleName: yup.string().required("Middle name is required"),
   profile: yup
     .mixed()
     .required("Candidate photo is required")
@@ -79,15 +79,17 @@ export const CandidateSchema = yup.object({
 
   gender: yup.string().required("Gender is required"),
   placeOfBirth: yup.string().required("Place of birth is required"),
+  Q_Id: yup.string().required("Student Id is required"),
+
   nationality: yup.string().required("Nationality is required"),
   religion: yup.string().required("Religion is required"),
   nativeLanguage: yup.string().required("Native language is required"),
 
-  phoneNumber: yup.string().required("Phone number is required"),
+  contactNumber: yup.string().required("Contact number is required"),
 
   email: yup.string().email("Invalid e‑mail").required("Email is required"),
 
-  primaryContact: yup.string().required("Primary contact is required"),
+  // primaryContact: yup.string().required("Primary contact is required"),
 });
 
 export const AcademicSchema = yup.object({

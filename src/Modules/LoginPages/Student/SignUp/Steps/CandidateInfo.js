@@ -36,9 +36,9 @@ import {
   NATIVE_LANGUAGE_OPTIONS,
   RELIGION_OPTIONS,
 } from "../../../../Admin/Addmission/AdminAdmission/Configs/selectOptionsConfig";
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
-import { FaWhatsapp } from 'react-icons/fa';
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import { FaWhatsapp } from "react-icons/fa";
 
 const { Option } = Select;
 
@@ -51,7 +51,9 @@ const PhoneField = ({
   required,
 }) => {
   const value = Form.useWatch(name, form);
-  const [isWA, setIsWA] = React.useState(form.getFieldValue(whatsappName) || false);
+  const [isWA, setIsWA] = React.useState(
+    form.getFieldValue(whatsappName) || false
+  );
 
   const handleWhatsappToggle = () => {
     const currentIsWA = form.getFieldValue(whatsappName) || false;
@@ -107,10 +109,7 @@ const PhoneField = ({
           }`}
         >
           <Tooltip title="Mark this number as WhatsApp">
-            <div
-              className="cursor-pointer"
-              onClick={handleWhatsappToggle}
-            >
+            <div className="cursor-pointer" onClick={handleWhatsappToggle}>
               <FaWhatsapp className="text-[#075E54] text-xl" />
             </div>
           </Tooltip>
@@ -288,7 +287,7 @@ const CandidateInfo = ({ formData }) => {
             </Form.Item>
             <Form.Item
               name="middleName"
-              rules={[{ required: true, message: "Required" }]}
+              // rules={[{ required: true, message: "Required" }]}
             >
               <Input
                 size="large"
@@ -343,7 +342,11 @@ const CandidateInfo = ({ formData }) => {
 
         <Row gutter={16}>
           <Col xs={24} md={12}>
-            <Form.Item name="Q_Id" label="Student QID">
+            <Form.Item
+              name="Q_Id"
+              label="Student QID"
+              rules={[{ required: true, message: "Required" }]}
+            >
               <Input size="large" prefix={<IdcardOutlined />} />
             </Form.Item>
           </Col>
@@ -480,7 +483,7 @@ const CandidateInfo = ({ formData }) => {
           <Col xs={24} md={12}>
             <PhoneField
               form={form}
-              name="phoneNumber"
+              name="contactNumber"
               whatsappName="phoneNumberIsWhatsapp"
               label="Phone"
               placeholder="e.g. +974 1234 5678"
@@ -504,7 +507,7 @@ const CandidateInfo = ({ formData }) => {
         <Form.Item
           name="primaryContact"
           label="Primary Contact"
-          rules={[{ required: true, message: "Required" }]}
+          // rules={[{ required: true, message: "Required" }]}
         >
           <Select size="large" placeholder="Select">
             <Option value="father">Father</Option>
