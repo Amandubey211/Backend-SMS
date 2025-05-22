@@ -34,7 +34,7 @@ const MainSection = () => {
     currentPage,
   } = useSelector((store) => store.admin.offlineExam);
   const { allStudents } = useSelector((store) => store.admin.all_students);
-  const [page,setPage]=useState(currentPage);
+  const [page, setPage] = useState(currentPage);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [limit, setLimit] = useState(10);

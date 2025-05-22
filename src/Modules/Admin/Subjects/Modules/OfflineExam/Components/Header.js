@@ -1,7 +1,7 @@
 import React from "react";
 import { CiSearch } from "react-icons/ci";
 
-function Header({ searchQuery, loading, searchedData, handleSearch }) {
+function Header({ loading, searchedData, searchQuery, handleSearch }) {
   return (
     <div className=" pl-5 w-full">
       <div className="flex justify-between items-center mb-4 mr-2">

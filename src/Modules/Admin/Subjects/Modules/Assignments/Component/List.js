@@ -9,7 +9,7 @@ import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { Button, Popover, Empty, Skeleton } from "antd";
-import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EllipsisOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { FaEllipsisV } from "react-icons/fa";
 import { setCellModal } from "../../../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 
@@ -51,41 +51,41 @@ const List = ({
   const filteredData = data?.filter((item) =>
     item?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
+  //  console.log("filteredData", filteredData);
   return (
-    <div className="bg-white p-5 w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold text-gradient">
+    <div className="bg-white p-6 rounded-lg shadow-md w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
           {title}
-          <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {filteredData?.length}
+          <span className="ml-2 text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+            {filteredData?.length || 0}
           </span>
         </h2>
-        <div className="relative flex items-center max-w-xs w-full mr-4">
+        <div className="relative w-full sm:w-64">
           <input
             type="text"
             placeholder="Search here"
             value={searchQuery}
             onChange={handleSearchChange}
-            className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full"
+            className="w-full px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-300"
           />
-          <button className="absolute right-3">
+          <button className="absolute right-3 top-1/2 transform -translate-y-1/2">
             <CiSearch className="w-5 h-5 text-gray-500" />
           </button>
         </div>
       </div>
 
-      <ul className="border-t p-4">
+      <ul className="divide-y divide-gray-100">
         {loading ? (
           <>
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="mb-3">
+              <li key={i} className="py-4">
                 <Skeleton active avatar paragraph={{ rows: 1 }} />
-              </div>
+              </li>
             ))}
           </>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center py-10">
+          <div className="flex flex-col items-center justify-center py-12">
             <Empty
               description={
                 type === "Assignment" ? "No Assignments" : "No Quizzes"
@@ -94,58 +94,56 @@ const List = ({
           </div>
         ) : filteredData?.length > 0 ? (
           filteredData.reverse().map((item) => (
-            <div key={item._id} className="relative mb-3">
-              <div className="flex items-center gap-3 p-1 rounded-lg">
+            <li
+              key={item._id}
+              className="py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-gray-50 transition-all duration-200 rounded-lg"
+            >
+              <div className="flex items-center gap-4 w-full">
                 <NavLink
                   to={
                     type === "Assignment"
                       ? `/class/${cid}/${sid}/assignment/${item._id}/view`
                       : `/class/${cid}/${sid}/quiz/${item._id}/view`
                   }
-                  className="text-green-600 p-2 border rounded-full"
+                  className="text-green-500 p-2 border border-green-100 rounded-full hover:bg-green-50 transition-all duration-200 flex-shrink-0"
                 >
-                  {icon}
+                  {icon || <BsPatchCheckFill className="w-5 h-5" />}
                 </NavLink>
-                <div className="flex justify-between w-full px-2 items-center">
-                  <div className="flex flex-col gap-1 justify-center flex-grow">
-                    <NavLink
-                      to={
-                        type === "Assignment"
-                          ? `/class/${cid}/${sid}/assignment/${item._id}/view`
-                          : `/class/${cid}/${sid}/quiz/${item._id}/view`
-                      }
-                    >
-                      <h3 className="text-md font-semibold mb-1">
-                        {item.name || "No Title"}
-                      </h3>
-                    </NavLink>
-                    <p className="text-sm text-gray-500 capitalize truncate">
-                      {type === "Assignment" ? (
-                        <>
-                          Module: {item.moduleName || "N/A"} | Chapter:{" "}
-                          {item.chapterName || "N/A"}
-                        </>
-                      ) : (
-                        <>
-                          Total Points: {item.totalPoints} | Type:{" "}
-                          {item.quizType}
-                        </>
-                      )}
-                    </p>
-                  </div>
-                  <div onClick={() => dispatch(setCellModal({ modelName: "assignment", dataId: item._id,classId:cid }))} className="cursor-pointer">
-                    Add In Score Card
-                  </div>
-
+                <div className="flex flex-col flex-grow min-w-0">
+                  <NavLink
+                    to={
+                      type === "Assignment"
+                        ? `/class/${cid}/${sid}/assignment/${item._id}/view`
+                        : `/class/${cid}/${sid}/quiz/${item._id}/view`
+                    }
+                  >
+                    <h3 className="text-lg font-semibold text-gray-800 hover:text-indigo-600 transition-all duration-200 truncate">
+                      {item.name || "No Title"}
+                    </h3>
+                  </NavLink>
+                  <p className="text-sm text-gray-500 mt-1 truncate">
+                    {type === "Assignment" ? (
+                      <>
+                        Module: {item.moduleName || "N/A"} | Chapter:{" "}
+                        {item.chapterName || "N/A"}
+                      </>
+                    ) : (
+                      <>
+                        Total Points: {item.totalPoints} | Type: {item.quizType}
+                      </>
+                    )}
+                  </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  {item.publish ? (
-                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-8 w-8" />
-                  ) : (
-                    <MdOutlineBlock className="text-gray-600 p-1 h-8 w-8" />
-                  )}
-                  <Popover
-                    content={
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end flex-shrink-0">
+                {item.publish ? (
+                  <BsPatchCheckFill className="text-green-500 p-1 border border-green-100 rounded-full h-8 w-8 flex-shrink-0" />
+                ) : (
+                  <MdOutlineBlock className="text-gray-500 p-1 h-8 w-8 flex-shrink-0" />
+                )}
+                <Popover
+                  content={
+                    <div className="flex flex-col gap-2">
                       <ProtectedAction requiredPermission={requiredPermission}>
                         <Button
                           danger
@@ -156,23 +154,40 @@ const List = ({
                           Delete
                         </Button>
                       </ProtectedAction>
-                    }
-                    trigger="click"
-                    placement="bottomRight"
-                    overlayStyle={{ padding: "3px", minHeight: "0" }}
-                  >
-                    <Button
-                      shape="circle"
-                      type="default"
-                      icon={<FaEllipsisV />}
-                    />
-                  </Popover>
-                </div>
+                      <Button
+                        type="default"
+                        icon={<PlusOutlined />}
+                        onClick={() =>
+                          dispatch(
+                            setCellModal({
+                              modelName: type === "Assignment" ? "assignment" : "quizz",
+                              dataId: item._id,
+                              classId: cid,
+                            })
+                          )
+                        }
+                        className="border-green-500 text-green-500 hover:border-green-600 hover:text-green-600 bg-transparent rounded-md transition-all duration-200 flex items-center justify-center text-sm font-medium px-3 py-1"
+                      >
+                        Report Card
+                      </Button>
+                    </div>
+                  }
+                  trigger="click"
+                  placement="bottomRight"
+                  overlayStyle={{ padding: "3px", minHeight: "0" }}
+                >
+                  <Button
+                    shape="circle"
+                    type="default"
+                    icon={<FaEllipsisV />}
+                    className="text-gray-500 hover:text-gray-700 transition-all duration-200 flex-shrink-0"
+                  />
+                </Popover>
               </div>
-            </div>
+            </li>
           ))
         ) : (
-          <div className="flex flex-col items-center justify-center py-10">
+          <div className="flex flex-col items-center justify-center py-12">
             <Empty
               description={
                 type === "Assignment" ? "No Assignments" : "No Quizzes"
