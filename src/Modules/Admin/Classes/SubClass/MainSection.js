@@ -32,9 +32,11 @@ import { PERMISSIONS } from "../../../../config/permission";
 
 // Ant Design
 
-import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge } from "antd";
+import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge, Input } from "antd";
 // Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
+import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
+import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 // Framer Motion
 const colors = [
   "bg-yellow-300",
@@ -83,7 +85,7 @@ const SubjectCardShimmer = () => {
       <Skeleton paragraph={{ rows: 1 }} active />
       <div className="flex mt-[60px] justify-between items-center">
         <Skeleton.Avatar active size="large" shape="circle" />
-        <Skeleton.Avatar active size="large" shape="square" style={{height:50,width:50}} />
+        <Skeleton.Avatar active size="large" shape="square" style={{ height: 50, width: 50 }} />
       </div>
     </div>
   );
@@ -240,15 +242,17 @@ function MainSection() {
       navigate(`/class/${cid}/${subject._id}/module`);
     }
   };
-
+  
   return (
     <ProtectedSection
       requiredPermission={PERMISSIONS.SPECIFIC_CLASS}
       title={"Subjects"}
     >
+      
+
       {/* Show loading spinner if data is still being fetched */}
       <style>{shimmerStyles}</style>
-      {loading ?(
+      {loading ? (
         <div className="p-4">
           {/* Shimmer for NavIconCards (with circle placeholder) */}
           <div className="flex flex-wrap justify-center gap-3 mb-4">
@@ -261,8 +265,8 @@ function MainSection() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex gap-2">
 
-              <Skeleton.Button active size="large" style={{width:160}} />
-              <Skeleton.Button active size="large" style={{width:130}} />
+                <Skeleton.Button active size="large" style={{ width: 160 }} />
+                <Skeleton.Button active size="large" style={{ width: 130 }} />
               </div>
               <div className="flex gap-2">
                 <Skeleton.Button active shape="circle" size="large" />
@@ -270,9 +274,9 @@ function MainSection() {
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 mt-4">
-              { [1, 2, 3,4,5,6].map((_, index) => (
-                  <SubjectCardShimmer key={index} />
-                ))}
+              {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                <SubjectCardShimmer key={index} />
+              ))}
             </div>
           </div>
         </div>
