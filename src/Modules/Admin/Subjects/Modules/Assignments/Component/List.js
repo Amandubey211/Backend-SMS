@@ -133,7 +133,7 @@ const List = ({
                       )}
                     </p>
                   </div>
-                  <div onClick={() => dispatch(setCellModal({ modelName: "assignment", dataId: item._id }))} className="cursor-pointer">
+                  <div onClick={() => dispatch(setCellModal({ modelName: "assignment", dataId: item._id,classId:cid }))} className="cursor-pointer">
                     Add In Score Card
                   </div>
 
