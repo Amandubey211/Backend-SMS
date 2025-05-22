@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { GoPlus } from 'react-icons/go';
 import { UploadOutlined } from '@ant-design/icons';
-import { Button, Upload, message, Modal, Input, Select, Progress } from 'antd';
+import { Button, Upload, message, Modal, Input, Select, Tabs } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
-import { addScoreCard, getScoreCard, updateScoreCard, addCommonDataToScoreCard } from '../../../Store/Slices/Admin/scoreCard/scoreCard.thunk';
+import {
+  addScoreCard,
+  getScoreCard,
+  updateScoreCard,
+  addCommonDataToScoreCard,
+} from '../../../Store/Slices/Admin/scoreCard/scoreCard.thunk';
 import useCloudinaryRawUpload from '../../../Hooks/CommonHooks/useCloudinaryRawUpload';
 import { useParams } from 'react-router-dom';
 import CommonDataTable from './components/CommonDataTable';
 import toast from 'react-hot-toast';
+import CellDataTable from './components/CellDataTable';
 
 const { Option } = Select;
+const { TabPane } = Tabs;
 
 const CLOUDINARY_UPLOAD_PRESET = process.env.REACT_APP_CLOUDINARY_PRESET;
 const CLOUDINARY_FOLDER = 'ScorecardExcelfile';
@@ -27,7 +34,7 @@ const MainSection = () => {
     fieldName: [],
     separate: '',
   });
-    const [cellNumberError, setCellNumberError] = useState('');
+  const [cellNumberError, setCellNumberError] = useState('');
 
   const { uploadFile, uploading, uploadProgress, resetUpload, error: uploadError } = useCloudinaryRawUpload(
     CLOUDINARY_UPLOAD_PRESET,
@@ -37,7 +44,7 @@ const MainSection = () => {
   const validateCellNumber = (cell) => /^[A-Z]+[1-9][0-9]*$/i.test(cell);
 
   useEffect(() => {
-    dispatch(getScoreCard(cid))
+    dispatch(getScoreCard(cid));
   }, [dispatch, cid]);
 
   useEffect(() => {
@@ -87,7 +94,6 @@ const MainSection = () => {
     }
     setCellNumberError('');
 
-
     setConfirmLoading(true);
     dispatch(addCommonDataToScoreCard({ ...preparedField, classId: cid })).then((res) => {
       setConfirmLoading(false);
@@ -96,13 +102,9 @@ const MainSection = () => {
           cellNumber: '',
           fieldName: [],
           separate: '',
-        })
-        message.success('Field added successfully!');
-        dispatch(getScoreCard(cid)).then((action) => {
-          if (!action.payload?.success) {
-            message.error('Failed to fetch scorecard data.');
-          }
         });
+        message.success('Field added successfully!');
+        dispatch(getScoreCard(cid));
         setFieldModal(false);
       } else {
         message.error('Failed to add field.');
@@ -110,18 +112,19 @@ const MainSection = () => {
     });
   };
 
-  const handleOpenModal = ()=>{
-    if(scoreCardData?.excelFile){
-      setFieldModal(true)
+  const handleOpenModal = () => {
+    if (scoreCardData?.excelFile) {
+      setFieldModal(true);
+    } else {
+      toast.error('Add Report card excel file first');
     }
-    else{
-      toast.error("Add Report card excel file first");
-    }
-  }
+  };
+
+  const CellData = () => <div>Grades Component Placeholder</div>;
 
   return (
     <div className="p-4">
-      <h1 className="font-semibold">Report card Management</h1>
+      <h1 className="font-semibold">Report Card Management</h1>
       <div className="flex justify-between items-center p-2">
         <Button
           type="primary"
@@ -171,7 +174,6 @@ const MainSection = () => {
           onChange={(value) => setNewField({ ...newField, fieldName: value })}
           className="mb-2 w-full"
         >
-          {/* Field Options */}
           {[
             'firstName',
             'lastName',
@@ -180,7 +182,7 @@ const MainSection = () => {
             'placeOfBirth',
             'age',
             'nationality',
-            'nativeLanguag',
+            'nativeLanguage',
             'passportNumber',
             'bloodGroup',
             'gender',
@@ -205,7 +207,7 @@ const MainSection = () => {
           onChange={(e) => setNewField({ ...newField, cellNumber: e.target.value.toUpperCase() })}
           className="mb-2"
         />
-         {cellNumberError && <div className="text-red-500">{cellNumberError}</div>}
+        {cellNumberError && <div className="text-red-500">{cellNumberError}</div>}
         <Select
           placeholder="Separator"
           value={newField.separate}
@@ -214,7 +216,6 @@ const MainSection = () => {
           }
           className="mb-2 min-w-[40%]"
         >
-          <Option >Select Separator</Option>
           <Option value=",">,</Option>
           <Option value="-">-</Option>
           <Option value="/">/</Option>
@@ -231,8 +232,15 @@ const MainSection = () => {
         )}
       </Modal>
 
-      {/* Common Data Table */}
-      {scoreCardData && <CommonDataTable />}
+      {/* Tabs for Fields and Grades */}
+      <Tabs defaultActiveKey="1">
+        <TabPane tab="Fields" key="1">
+          {scoreCardData && <CommonDataTable />}
+        </TabPane>
+        <TabPane tab="Grades" key="2">
+          <CellDataTable />
+        </TabPane>
+      </Tabs>
     </div>
   );
 };

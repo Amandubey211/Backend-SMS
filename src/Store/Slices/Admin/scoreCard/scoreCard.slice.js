@@ -1,30 +1,36 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-import { addScoreCard,getScoreCard, updateScoreCard,addCommonDataToScoreCard, reomoveCommonDataFromScoreCard,addScoreCardCellData } from "./scoreCard.thunk";
+import {
+  addScoreCard, getScoreCard,
+  updateScoreCard, addCommonDataToScoreCard,
+  reomoveCommonDataFromScoreCard,
+  addScoreCardCellData, reomoveScoreCardCellData
+} from "./scoreCard.thunk";
 
 
 const initialState = {
-  scoreCardData:{},
+  scoreCardData: {},
   loading: false,
   error: null,
-  isModalOpen:false,
-  Modaldata:{},
+  isModalOpen: false,
+  Modaldata: {},
 };
 
 const scoreCardSlice = createSlice({
   name: "scoreCard",
   initialState,
-    reducers: {
+  reducers: {
 
     setCellModal: (state, action) => {
       state.isModalOpen = true;
       state.Modaldata = action.payload
     },
- setCellModalCancel: (state, action) => {
+    setCellModalCancel: (state, action) => {
       state.isModalOpen = false;
       state.Modaldata = {}
-    }},
-  
+    }
+  },
+
   extraReducers: (builder) => {
     builder
       // add scoreCards
@@ -41,7 +47,7 @@ const scoreCardSlice = createSlice({
         state.loading = false;
       })
 
-  // Fetch scoreCards 
+      // Fetch scoreCards 
       .addCase(getScoreCard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -54,7 +60,7 @@ const scoreCardSlice = createSlice({
         state.error = action.error.message;
         state.loading = false;
       })
-  // update scoreCards 
+      // update scoreCards 
       .addCase(updateScoreCard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -67,7 +73,7 @@ const scoreCardSlice = createSlice({
         state.error = action.error.message;
         state.loading = false;
       })
-  // Add commonData to  scoreCards 
+      // Add commonData to  scoreCards 
       .addCase(addCommonDataToScoreCard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -80,7 +86,7 @@ const scoreCardSlice = createSlice({
         state.error = action.error.message;
         state.loading = false;
       })
-  // remove commonData from  scoreCards 
+      // remove commonData from  scoreCards 
       .addCase(reomoveCommonDataFromScoreCard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -90,7 +96,7 @@ const scoreCardSlice = createSlice({
         state.loading = false;
       })
       .addCase(reomoveCommonDataFromScoreCard.rejected, (state, action) => {
-                state.error = action.error.message;
+        state.error = action.error.message;
         state.loading = false;
       })
 
@@ -101,10 +107,25 @@ const scoreCardSlice = createSlice({
         state.error = null;
       })
       .addCase(addScoreCardCellData.fulfilled, (state, action) => {
-        
+
         state.loading = false;
       })
       .addCase(addScoreCardCellData.rejected, (state, action) => {
+
+        state.error = action.error.message;
+        state.loading = false;
+      })
+
+      // Remove ScoreCard CellData 
+      .addCase(reomoveScoreCardCellData.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(reomoveScoreCardCellData.fulfilled, (state, action) => {
+
+        state.loading = false;
+      })
+      .addCase(reomoveScoreCardCellData.rejected, (state, action) => {
 
         state.error = action.error.message;
         state.loading = false;

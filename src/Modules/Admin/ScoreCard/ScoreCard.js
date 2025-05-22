@@ -8,9 +8,9 @@ import MainSection from "./MainSection.js";
 
 const Branch = () => {
   const role = useSelector((store) => store.common.auth.role);
-  useNavHeading(role, `Scorecard`);
+  useNavHeading(role, `Report Card`);
   return (
-    <Layout title={` Scorecard | Student Diwan`}>
+    <Layout title={`Report Card | Student Diwan`}>
       <DashLayout children={<MainSection/>} />
     </Layout>
   );
