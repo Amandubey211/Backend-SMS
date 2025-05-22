@@ -50,12 +50,12 @@ const OfflineExamCard = ({
         status: student.status || "present",
         studentId: student.studentId
           ? {
-              _id: student.studentId._id || null,
-              firstName: student.studentId.firstName || "",
-              lastName: student.studentId.lastName || "",
-              fullName: student.studentId.fullName || "",
-              id: student.studentId.id || null,
-            }
+            _id: student.studentId._id || null,
+            firstName: student.studentId.firstName || "",
+            lastName: student.studentId.lastName || "",
+            fullName: student.studentId.fullName || "",
+            id: student.studentId.id || null,
+          }
           : null, // Fallback if studentId is undefined
       })) || [],
   });
@@ -81,12 +81,12 @@ const OfflineExamCard = ({
             status: student.status || "present",
             studentId: student.studentId
               ? {
-                  _id: student.studentId._id || null,
-                  firstName: student.studentId.firstName || "",
-                  lastName: student.studentId.lastName || "",
-                  fullName: student.studentId.fullName || "",
-                  id: student.studentId.id || null,
-                }
+                _id: student.studentId._id || null,
+                firstName: student.studentId.firstName || "",
+                lastName: student.studentId.lastName || "",
+                fullName: student.studentId.fullName || "",
+                id: student.studentId.id || null,
+              }
               : null,
           })) || [],
       });
@@ -144,12 +144,12 @@ const OfflineExamCard = ({
           status: student.status || "present",
           studentId: student.studentId
             ? {
-                _id: student.studentId._id || null,
-                firstName: student.studentId.firstName || "",
-                lastName: student.studentId.lastName || "",
-                fullName: student.studentId.fullName || "",
-                id: student.studentId.id || null,
-              }
+              _id: student.studentId._id || null,
+              firstName: student.studentId.firstName || "",
+              lastName: student.studentId.lastName || "",
+              fullName: student.studentId.fullName || "",
+              id: student.studentId.id || null,
+            }
             : null,
         })),
       };
@@ -225,16 +225,16 @@ const OfflineExamCard = ({
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                {examDetails.isPublished ? (
-                  <Tooltip title="Published">
-                    <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7 cursor-pointer" />
-                  </Tooltip>
-                ) : (
-                  <Tooltip title="UnPublished">
-                    <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7 cursor-pointer" />
-                  </Tooltip>
-                )}
-              </div>
+                  {examDetails.isPublished ? (
+                    <Tooltip title="Published">
+                      <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7 cursor-pointer" />
+                    </Tooltip>
+                  ) : (
+                    <Tooltip title="UnPublished">
+                      <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7 cursor-pointer" />
+                    </Tooltip>
+                  )}
+                </div>
               )}
             </div>
             <div className="bg-gray-100 text-gray-600 text-sm font-semibold rounded-full px-2 py-1 capitalize">
@@ -281,6 +281,8 @@ const OfflineExamCard = ({
           handleDeleteClick={handleDeleteClick}
           isModalOpen={isModalOpen}
           setIsModalOpen={setIsModalOpen}
+          cid={cid}
+          examId={examId}
         />
       </div>
     </div>

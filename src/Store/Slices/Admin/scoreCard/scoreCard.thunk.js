@@ -33,6 +33,7 @@ export const addScoreCardCellData = createAsyncThunk(
       const role = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await putData(`/${role}/scoreCard/add/cell/${data.classId}?say=${say}`, data);
+      console.log("response", response);
       if(response.success){
         toast.success("Added Successfully");
       }else{
