@@ -37,11 +37,7 @@ const MainSection = () => {
   const validateCellNumber = (cell) => /^[A-Z]+[1-9][0-9]*$/i.test(cell);
 
   useEffect(() => {
-    dispatch(getScoreCard(cid)).then((action) => {
-      if (!action.payload?.success) {
-        message.error('Failed to fetch scorecard data.');
-      }
-    });
+    dispatch(getScoreCard(cid))
   }, [dispatch, cid]);
 
   useEffect(() => {
