@@ -185,3 +185,20 @@ export const fetchGraduates = createAsyncThunk(
     }
   }
 );
+export const fetchStudentReportCard = createAsyncThunk(
+  "student/studentReportCard",
+  async (studentId, { rejectWithValue, getState, dispatch }) => {
+    try {
+      dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
+      console.log("getRole", getRole);
+      const response = await getData(
+        `/${getRole}/scoreCard/get/student/${studentId}`
+      );
+      console.log("response", response);
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
