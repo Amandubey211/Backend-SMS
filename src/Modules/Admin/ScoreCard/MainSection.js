@@ -7,6 +7,7 @@ import { addScoreCard, getScoreCard, updateScoreCard, addCommonDataToScoreCard }
 import useCloudinaryRawUpload from '../../../Hooks/CommonHooks/useCloudinaryRawUpload';
 import { useParams } from 'react-router-dom';
 import CommonDataTable from './components/CommonDataTable';
+import toast from 'react-hot-toast';
 
 const { Option } = Select;
 
@@ -113,15 +114,24 @@ const MainSection = () => {
     });
   };
 
+  const handleOpenModal = ()=>{
+    if(scoreCardData?.excelFile){
+      setFieldModal(true)
+    }
+    else{
+      toast.error("Add Report card excel file first");
+    }
+  }
+
   return (
     <div className="p-4">
-      <h1 className="font-semibold">Scorecard Management</h1>
+      <h1 className="font-semibold">Report card Management</h1>
       <div className="flex justify-between items-center p-2">
         <Button
           type="primary"
           className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
           icon={<GoPlus />}
-          onClick={() => setFieldModal(true)}
+          onClick={handleOpenModal}
         >
           Add Field
         </Button>
