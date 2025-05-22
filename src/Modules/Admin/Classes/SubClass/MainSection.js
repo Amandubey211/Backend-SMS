@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { BiSpreadsheet } from "react-icons/bi";
 
-// Local Imports
+
+
+// Local Imports 
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
 import SubjectCard from "./SubjectCard";
@@ -35,8 +38,12 @@ import { PERMISSIONS } from "../../../../config/permission";
 import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge, Input } from "antd";
 // Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
+
+import { gt } from "../../../../Utils/translator/translation";
+
 import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
 import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
+
 // Framer Motion
 const colors = [
   "bg-yellow-300",
@@ -296,15 +303,18 @@ function MainSection() {
 
           {/* Subject Tabs (Published/Draft) + Subject List */}
           <div className="px-5">
-            <ButtonGroup
-              onAddNewSubject={handleAddNewSubject}
-              onViewSemester={handleViewSemester}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-              role={role}
-              publishedCount={publishedSubjects?.length || 0}
-              draftCount={draftSubjects?.length || 0}
-            />
+            
+              <ButtonGroup
+                onAddNewSubject={handleAddNewSubject}
+                onViewSemester={handleViewSemester}
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+                role={role}
+                cid={cid}
+                publishedCount={publishedSubjects?.length || 0}
+                draftCount={draftSubjects?.length || 0}
+              />
+           
             <div className="grid grid-cols-3 gap-4 mb-10">
               {filteredSubjects && filteredSubjects.length > 0 ? (
                 <AnimatePresence>
@@ -361,6 +371,8 @@ function MainSection() {
           onClose={() => setIsSemesterSidebarOpen(false)}
         />
       </Sidebar>
+
+
       {/* "Semester Required" Modal using Framer Motion animations */}
 
       <AnimatePresence>
