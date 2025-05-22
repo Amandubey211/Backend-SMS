@@ -7,8 +7,11 @@ import { useTranslation } from "react-i18next";
 import { AiFillFileExcel } from "react-icons/ai";
 import { Tooltip } from "antd";
 import * as XLSX from "xlsx";
-import { useSelector } from "react-redux";
+import { Button } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
 import DeleteConfirmatiomModal from "../../../../../../Components/Common/DeleteConfirmationModal";
+import { setCellModal } from "../../../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 
 function DateSection({
   isEditing,
@@ -20,8 +23,10 @@ function DateSection({
   handleDeleteClick,
   isModalOpen,
   setIsModalOpen,
+  examId, // Added to access item._id for setCellModal
+  cid,  // Added to pass classId for setCellModal
 }) {
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const formatDateForInput = (date) => {
     if (!date) return "";
     const formattedDate = new Date(date);
@@ -30,6 +35,7 @@ function DateSection({
 
   const { t } = useTranslation("admClass");
   const { allStudents } = useSelector((store) => store.admin.all_students);
+
   const handleExport = () => {
     if (
       !examDetails ||
@@ -66,118 +72,131 @@ function DateSection({
     // Download Excel file
     XLSX.writeFile(workbook, `${examDetails.examName}_Exam_Report.xlsx`);
   };
+
   return (
-    <div className="flex flex-col text-black text-xs ">
-      {/* row-1 */}
-      <div className="flex items-center justify-between h-auto">
-        <div className="flex flex-col w-full gap-1">
-          <div className="flex items-center">
-            <div className="flex items-center gap-1">
-              <IoCalendarOutline className="text-sm" />
-              <span>Start Date:</span>
+    <div className="flex flex-col text-black text-xs">
+      {/* Row-1 */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col w-full gap-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <IoCalendarOutline className="text-sm text-gray-600" />
+              <span className="font-medium text-gray-700">Start Date:</span>
               {isEditing ? (
                 <input
                   type="date"
                   name="startDate"
                   value={formatDateForInput(examDetails.startDate)}
                   onChange={handleInputChange}
-                  className="border px-2 py-1 rounded-md"
+                  className="border border-gray-200 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-full sm:w-36"
                 />
               ) : (
-                <span>{formatDate(examDetails.startDate)}</span>
+                <span className="text-gray-600">{formatDate(examDetails.startDate)}</span>
               )}
             </div>
-            <div className="flex items-center gap-1 pl-2">
-              <IoCalendarOutline className="text-sm " />
-              <span>End Date:</span>
+            <div className="flex items-center gap-1.5">
+              <IoCalendarOutline className="text-sm text-gray-600" />
+              <span className="font-medium text-gray-700">End Date:</span>
               {isEditing ? (
                 <input
                   type="date"
                   name="endDate"
                   value={formatDateForInput(examDetails.endDate)}
                   onChange={handleInputChange}
-                  className="border px-2 py-1 rounded-md"
+                  className="border border-gray-200 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-full sm:w-36"
                 />
               ) : (
-                <span>{formatDate(examDetails.endDate)}</span>
+                <span className="text-gray-600">{formatDate(examDetails.endDate)}</span>
               )}
             </div>
           </div>
           {examDetails.publishDate && !isEditing && (
-            <div className="flex items-center gap-1">
-              <IoCalendarOutline className="text-sm" />
-              <span>Published Date:</span>
-              <span>{formatDate(examDetails.publishDate)}</span>
+            <div className="flex items-center gap-1.5">
+              <IoCalendarOutline className="text-sm text-gray-600" />
+              <span className="font-medium text-gray-700">Published Date:</span>
+              <span className="text-gray-600">{formatDate(examDetails.publishDate)}</span>
             </div>
           )}
 
           {isEditing && (
-            <div className="flex items-center gap-1 w-full md:w-auto">
-              <IoCalendarOutline className="text-sm" />
-              <span>Published Date:</span>
+            <div className="flex items-center gap-1.5 w-full sm:w-auto">
+              <IoCalendarOutline className="text-sm text-gray-600" />
+              <span className="font-medium text-gray-700">Published Date:</span>
               <input
                 type="date"
                 name="publishDate"
-                value={formatDateForInput(examDetails.publishDate)} // Set to empty if no date is set
+                value={formatDateForInput(examDetails.publishDate)}
                 onChange={handleInputChange}
-                className="border px-2 py-1 rounded-md w-full md:w-36"
+                className="border border-gray-200 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-full sm:w-36"
               />
             </div>
           )}
         </div>
-        <div className="flex justify-end gap-y-2 cursor-pointer items-end h-full  gap-1">
-          <div className="flex flex-col">
-            <Tooltip title="Export">
-              <button
-                disabled={loading}
-                aria-label={t("Delete")}
-                onClick={handleExport}
-                className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-              >
-                <AiFillFileExcel className="w-5 h-5 text-red-500" />
-              </button>
-            </Tooltip>
-          </div>
+        <div className="flex justify-end gap-2 items-center">
+          <Tooltip title="Add to Score Card">
+            <Button
+              type="default"
+              icon={<PlusOutlined />}
+              onClick={() =>
+                dispatch(
+                  setCellModal({
+                    modelName: "offline",
+                    dataId: examId,
+                    classId: cid,
+                  })
+                )
+              }
+              className="border-green-500 text-green-500 hover:border-green-600 hover:text-green-600 bg-transparent rounded-md transition-all duration-200 flex items-center justify-center text-sm font-medium px-3 py-1"
+            >
+              Report Card
+            </Button>
+          </Tooltip>
+          <Tooltip title="Export to Excel">
+            <button
+              disabled={loading}
+              aria-label={t("Export")}
+              onClick={handleExport}
+              className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-all duration-200"
+            >
+              <AiFillFileExcel className="w-5 h-5 text-red-500" />
+            </button>
+          </Tooltip>
           {isEditing ? (
             <Tooltip title="Save">
               <button
                 onClick={handleUpdate}
-                className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+                className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-all duration-200"
               >
-                <TbCheck className="w-4 h-4 text-green-500" />
+                <TbCheck className="w-5 h-5 text-green-500" />
               </button>
             </Tooltip>
           ) : (
             <Tooltip title="Edit">
               <button
                 onClick={handleEditClick}
-                className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
+                className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-all duration-200"
               >
                 <TbEdit className="w-5 h-5 text-green-500" />
               </button>
             </Tooltip>
           )}
-
-          <div className="flex flex-col">
-            <Tooltip title="Delete">
-              <button
-                disabled={loading}
-                aria-label={t("Delete")}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsModalOpen(true);
-                }}
-                className="bg-white p-1 rounded-full shadow hover:bg-gray-200"
-              >
-                <RiDeleteBin6Line className="w-5 h-5 text-red-500" />
-              </button>
-            </Tooltip>
-          </div>
+          <Tooltip title="Delete">
+            <button
+              disabled={loading}
+              aria-label={t("Delete")}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsModalOpen(true);
+              }}
+              className="bg-white p-2 rounded-full shadow hover:bg-gray-100 transition-all duration-200"
+            >
+              <RiDeleteBin6Line className="w-5 h-5 text-red-500" />
+            </button>
+          </Tooltip>
           <DeleteConfirmatiomModal
             isOpen={isModalOpen}
             onClose={() => setIsModalOpen(false)}
             onConfirm={handleDeleteClick}
-
           />
         </div>
       </div>

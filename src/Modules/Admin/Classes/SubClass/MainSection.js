@@ -35,10 +35,15 @@ import { PERMISSIONS } from "../../../../config/permission";
 
 // Ant Design
 
-import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge } from "antd";
+import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge, Input } from "antd";
 // Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
+
 import { gt } from "../../../../Utils/translator/translation";
+
+import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
+import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
+
 // Framer Motion
 const colors = [
   "bg-yellow-300",
@@ -244,12 +249,14 @@ function MainSection() {
       navigate(`/class/${cid}/${subject._id}/module`);
     }
   };
-
+  
   return (
     <ProtectedSection
       requiredPermission={PERMISSIONS.SPECIFIC_CLASS}
       title={"Subjects"}
     >
+      
+
       {/* Show loading spinner if data is still being fetched */}
       <style>{shimmerStyles}</style>
       {loading ? (

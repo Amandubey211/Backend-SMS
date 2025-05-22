@@ -1,11 +1,98 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Tooltip, Modal, Button, Divider } from "antd";
+import { Tooltip, Modal, Button, Divider, Input } from "antd";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedSemester } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
+import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
+import toast from "react-hot-toast";
+const ScoreCardModal = ({ isModalOpen, dispatch, Modaldata, setCellModal, setCellModalCancel, addScoreCardCellData, scoreCardData }) => {
+  const [cellNumber, setCellNumber] = useState("");
+  const [error, setError] = useState("");
 
+  // Validate input on change
+  const validateInput = (value) => {
+    // Check if input is empty
+    if (!value) {
+      setError("Cell number is required");
+      return false;
+    }
+
+    // Allow only uppercase letters and numbers, no spaces or special characters
+    const isValid = /^[A-Z0-9]+$/.test(value);
+    if (!isValid) {
+      setError("Only uppercase letters and numbers are allowed (e.g., A1, B2)");
+      return false;
+    }
+
+    setError("");
+    return true;
+  };
+
+  // Handle input change
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setCellNumber(value);
+    validateInput(value);
+    dispatch(setCellModal({ ...Modaldata, cellNumber: value }));
+  };
+
+  // Handle form submission
+  const handleOk = () => {
+    console.log("scoreCardData", scoreCardData);
+    if (!scoreCardData?.excelFile) {
+      toast.error("Please upload report card excel file first");
+      return;
+    }
+    if (validateInput(cellNumber)) {
+      dispatch(addScoreCardCellData(Modaldata));
+    }
+
+  };
+
+  // Reset state when modal is closed
+  useEffect(() => {
+    if (!isModalOpen) {
+      setCellNumber("");
+      setError("");
+    }
+  }, [isModalOpen]);
+
+  return (
+    <Modal
+      open={isModalOpen}
+      onOk={handleOk}
+      okText="Add"
+      onCancel={() => dispatch(setCellModalCancel())}
+      okButtonProps={{
+        className: "bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-all duration-200",
+        disabled: !!error || !cellNumber, // Disable button if there's an error or input is empty
+      }}
+      cancelButtonProps={{
+        className: "border-gray-300 text-gray-600 hover:text-gray-800 hover:border-gray-400 rounded-lg transition-all duration-200",
+      }}
+      className="rounded-lg"
+    >
+      <div className="p-4">
+        <label className="block text-gray-700 text-sm font-semibold mb-3">
+          Enter the cell number where you want to display the grades in your scorecard Excel sheet
+        </label>
+        <Input
+          placeholder="e.g., A1, B2"
+          value={cellNumber}
+          onChange={handleInputChange}
+          className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 transition-all duration-200 placeholder-gray-400 ${error ? "border-red-400 focus:ring-red-400" : "border-gray-200 focus:ring-indigo-400"
+            }`}
+        />
+        {error && (
+          <p className="mt-2 text-sm text-red-500">{error}</p>
+        )}
+      </div>
+    </Modal>
+  );
+};
 const SubjectSideBar = () => {
   const { t } = useTranslation("admModule");
   const location = useLocation();
@@ -50,8 +137,8 @@ const SubjectSideBar = () => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     setSemesterModalVisible(false);
   };
-
-  return (
+  const { isModalOpen, Modaldata, scoreCardData } = useSelector((state) => state.admin.scoreCard)
+  return (<>
     <div className="flex flex-col min-h-screen h-full w-full md:w-[16%] space-y-3 p-3 border-r ">
       {/* Semester Selection Section */}
       <div>
@@ -105,11 +192,10 @@ const SubjectSideBar = () => {
             <Tooltip key={index} title={t(item.name)} placement="right">
               <NavLink
                 to={basePath}
-                className={`${
-                  isActive
-                    ? "text-purple-600 font-semibold bg-purple-100 rounded-full py-1 px-4"
-                    : "text-gray-800 px-4 py-1"
-                } hover:bg-purple-200 hover:text-purple-500 hover:rounded-full transition-colors duration-200`}
+                className={`${isActive
+                  ? "text-purple-600 font-semibold bg-purple-100 rounded-full py-1 px-4"
+                  : "text-gray-800 px-4 py-1"
+                  } hover:bg-purple-200 hover:text-purple-500 hover:rounded-full transition-colors duration-200`}
                 aria-label={t(item.name)}
               >
                 {t(item.name)}
@@ -149,11 +235,10 @@ const SubjectSideBar = () => {
                   <Button
                     key={sem._id}
                     onClick={() => handleSemesterSelect(sem)}
-                    className={`w-full text-left border rounded-md transition-colors duration-200 ${
-                      selectedSemester && selectedSemester.id === sem._id
-                        ? "bg-purple-100 border-purple-400"
-                        : "bg-white hover:bg-purple-50"
-                    }`}
+                    className={`w-full text-left border rounded-md transition-colors duration-200 ${selectedSemester && selectedSemester.id === sem._id
+                      ? "bg-purple-100 border-purple-400"
+                      : "bg-white hover:bg-purple-50"
+                      }`}
                     aria-label={`Select semester ${sem.title}`}
                   >
                     {sem.title}
@@ -167,6 +252,15 @@ const SubjectSideBar = () => {
         </motion.div>
       </Modal>
     </div>
+    <ScoreCardModal
+      isModalOpen={isModalOpen}
+      dispatch={dispatch}
+      Modaldata={Modaldata}
+      setCellModal={setCellModal}
+      setCellModalCancel={setCellModalCancel}
+      addScoreCardCellData={addScoreCardCellData}
+      scoreCardData={scoreCardData} />
+  </>
   );
 };
 
