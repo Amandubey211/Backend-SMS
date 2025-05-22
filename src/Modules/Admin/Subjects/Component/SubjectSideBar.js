@@ -6,11 +6,12 @@ import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedSemester } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
-import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
+import { addScoreCardCellData, getScoreCard } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
 import toast from "react-hot-toast";
 const ScoreCardModal = ({ isModalOpen, dispatch, Modaldata, setCellModal, setCellModalCancel, addScoreCardCellData, scoreCardData }) => {
   const [cellNumber, setCellNumber] = useState("");
   const [error, setError] = useState("");
+    
 
   // Validate input on change
   const validateInput = (value) => {
@@ -40,7 +41,8 @@ const ScoreCardModal = ({ isModalOpen, dispatch, Modaldata, setCellModal, setCel
   };
 
   // Handle form submission
-  const handleOk = () => {
+  const handleOk = async() => {
+    await dispatch(getScoreCard(Modaldata.classId))
     console.log("scoreCardData", scoreCardData);
     if (!scoreCardData?.excelFile) {
       toast.error("Please upload report card excel file first");

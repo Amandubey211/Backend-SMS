@@ -49,8 +49,7 @@ export const addScoreCardCellData = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-
-      const response = await getData(`/${role}/scoreCard/get/${data}?say=${say}`);
+      const response = await putData(`/${role}/scoreCard/add/cell/${data.classId}?say=${say}`,data);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
