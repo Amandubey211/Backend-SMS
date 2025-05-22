@@ -11,6 +11,7 @@ import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedA
 import { Button, Popover, Empty, Skeleton } from "antd";
 import { EllipsisOutlined, DeleteOutlined } from "@ant-design/icons";
 import { FaEllipsisV } from "react-icons/fa";
+import { setCellModal } from "../../../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 
 const List = ({
   data,
@@ -132,6 +133,10 @@ const List = ({
                       )}
                     </p>
                   </div>
+                  <div onClick={() => dispatch(setCellModal({ modelName: "assignment", dataId: item._id,classId:cid }))} className="cursor-pointer">
+                    Add In Score Card
+                  </div>
+
                 </div>
                 <div className="flex items-center gap-3">
                   {item.publish ? (

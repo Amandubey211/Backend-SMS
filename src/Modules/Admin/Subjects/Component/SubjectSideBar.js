@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { NavLink, useLocation, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Tooltip, Modal, Button, Divider } from "antd";
+import { Tooltip, Modal, Button, Divider, Input } from "antd";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedSemester } from "../../../../Store/Slices/Common/User/reducers/userSlice";
+import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
+import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
 
 const SubjectSideBar = () => {
   const { t } = useTranslation("admModule");
@@ -50,8 +52,8 @@ const SubjectSideBar = () => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     setSemesterModalVisible(false);
   };
-
-  return (
+   const {isModalOpen,Modaldata} = useSelector((state)=>state.admin.scoreCard)
+  return (<>
     <div className="flex flex-col min-h-screen h-full w-full md:w-[16%] space-y-3 p-3 border-r ">
       {/* Semester Selection Section */}
       <div>
@@ -167,6 +169,15 @@ const SubjectSideBar = () => {
         </motion.div>
       </Modal>
     </div>
+    <Modal
+    open={isModalOpen}
+    onOk={()=>dispatch(addScoreCardCellData(Modaldata))}
+    okText="Add"
+    onCancel={()=>dispatch(setCellModalCancel())}
+    >
+     <Input placeholder="Cell Number" className="m-4" onChange={((e)=>dispatch(setCellModal({...Modaldata,cellNumber:e.target.value})))}></Input>
+    </Modal>
+      </>
   );
 };
 

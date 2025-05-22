@@ -9,6 +9,7 @@ import { getAY } from "../../../../Utils/academivYear";
 import { getUserRole } from "../../../../Utils/getRoles";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { setShowError } from "../../Common/Alerts/alertsSlice";
+import toast from "react-hot-toast";
 
 export const addScoreCard = createAsyncThunk(
   "scoreCard/addScoreCard",
@@ -24,13 +25,19 @@ export const addScoreCard = createAsyncThunk(
     }
   }
 );
+
 export const getScoreCard = createAsyncThunk(
   "scoreCard/getScoreCard",
+
+export const addScoreCardCellData = createAsyncThunk(
+  "scoreCard/addScoreCardCellData",
+
   async (data, { rejectWithValue, getState, dispatch }) => {
     try {
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
+
       const response = await getData(`/${role}/scoreCard/get/${data}?say=${say}`);
       return response;
     } catch (error) {
@@ -74,6 +81,14 @@ export const reomoveCommonDataFromScoreCard = createAsyncThunk(
       const role = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await putData(`/${role}/scoreCard/remove/common/${data.classId}/${data.cellNumber}?say=${say}`,data);
+
+      const response = await putData(`/${role}/scoreCard/add/cell/${data.classId}?say=${say}`, data);
+      if(response.success){
+        toast.success("Added Successfully");
+      }else{
+        toast.error("Cell Number is already Used");
+      }
+
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
