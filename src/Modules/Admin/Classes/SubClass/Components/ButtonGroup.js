@@ -1,17 +1,21 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import {  NavLink } from "react-router-dom";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
+import { gt } from "../../../../../Utils/translator/translation";
 import { FiCalendar } from "react-icons/fi";
 import { Tooltip } from "antd";
+import { BiSpreadsheet } from "react-icons/bi";
 
 const ButtonGroup = ({
   onAddNewSubject,
   onViewSemester,
   selectedTab,
-  setSelectedTab,
+  setSelectedTab, 
   role,
   publishedCount, // <-- New prop
   draftCount, // <-- New prop
+  cid
 }) => {
   const { t } = useTranslation("admClass");
 
@@ -21,11 +25,10 @@ const ButtonGroup = ({
         <ProtectedAction requiredPermission={"dd"}>
           <Tooltip title={t("Published")}>
             <button
-              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${
-                selectedTab === "Published"
+              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${selectedTab === "Published"
                   ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
                   : "border border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-              }`}
+                }`}
               onClick={() => setSelectedTab("Published")}
             >
               {/* Show published subjects count in parentheses */}
@@ -37,11 +40,10 @@ const ButtonGroup = ({
         <ProtectedAction>
           <Tooltip title={t("Draft")}>
             <button
-              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${
-                selectedTab === "Draft"
+              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${selectedTab === "Draft"
                   ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
                   : "border border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-              }`}
+                }`}
               onClick={() => setSelectedTab("Draft")}
             >
               {/* Show draft subjects count in parentheses */}
@@ -74,6 +76,15 @@ const ButtonGroup = ({
             <FiCalendar className="mr-2" size={20} />
             {t("Manage Semester")}
           </button>
+        </Tooltip>
+        <Tooltip title={t("Scorecard Config")}>
+          <NavLink
+            to={`/admin/scorecard/${cid}`}
+            className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm h-[38px] flex-shrink-0 whitespace-nowrap"
+          >
+            <BiSpreadsheet className="text-lg mr-1" />
+            {t("Scorecard", gt.setting)}
+          </NavLink>
         </Tooltip>
       </div>
     </div>

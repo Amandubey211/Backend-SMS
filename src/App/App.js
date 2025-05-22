@@ -1543,7 +1543,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-          path:"/admin/scorecard",
+          path:"/admin/scorecard/:cid",
           element:(
             <ProtectRoute  
             Component={ScoreCard}

@@ -11,7 +11,6 @@ import { gt } from "../../Utils/translator/translation";
 import { setSelectedLanguage } from "../../Store/Slices/Common/Auth/reducers/authSlice";
 import { BiSolidSchool } from "react-icons/bi";
 import { FaRegMoneyBillAlt } from "react-icons/fa";
-import { BiSpreadsheet } from "react-icons/bi";
 const SettingDropdown = ({
   showSetting,
   setShowSetting,
@@ -132,20 +131,6 @@ const SettingDropdown = ({
           >
             <BiSolidSchool className="text-lg" />
             {t("Branchs", gt.setting)}
-          </NavLink>
-        )}
-
-        {role == "admin" && (
-          <NavLink
-            to={"/admin/scorecard"}
-            className={({ isActive }) =>
-              `${listItemClass} ${
-                isActive ? "text-purple-600 bg-purple-100 " : ""
-              }`
-            }
-          >
-            <BiSpreadsheet className="text-lg" />
-            {t("Scorecard", gt.setting)}
           </NavLink>
         )}
 

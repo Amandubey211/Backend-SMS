@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { BiSpreadsheet } from "react-icons/bi";
 
-// Local Imports
+
+
+// Local Imports 
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
 import SubjectCard from "./SubjectCard";
@@ -35,6 +38,7 @@ import { PERMISSIONS } from "../../../../config/permission";
 import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge } from "antd";
 // Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
+import { gt } from "../../../../Utils/translator/translation";
 // Framer Motion
 const colors = [
   "bg-yellow-300",
@@ -83,7 +87,7 @@ const SubjectCardShimmer = () => {
       <Skeleton paragraph={{ rows: 1 }} active />
       <div className="flex mt-[60px] justify-between items-center">
         <Skeleton.Avatar active size="large" shape="circle" />
-        <Skeleton.Avatar active size="large" shape="square" style={{height:50,width:50}} />
+        <Skeleton.Avatar active size="large" shape="square" style={{ height: 50, width: 50 }} />
       </div>
     </div>
   );
@@ -248,7 +252,7 @@ function MainSection() {
     >
       {/* Show loading spinner if data is still being fetched */}
       <style>{shimmerStyles}</style>
-      {loading ?(
+      {loading ? (
         <div className="p-4">
           {/* Shimmer for NavIconCards (with circle placeholder) */}
           <div className="flex flex-wrap justify-center gap-3 mb-4">
@@ -261,8 +265,8 @@ function MainSection() {
             <div className="flex justify-between items-center mb-4">
               <div className="flex gap-2">
 
-              <Skeleton.Button active size="large" style={{width:160}} />
-              <Skeleton.Button active size="large" style={{width:130}} />
+                <Skeleton.Button active size="large" style={{ width: 160 }} />
+                <Skeleton.Button active size="large" style={{ width: 130 }} />
               </div>
               <div className="flex gap-2">
                 <Skeleton.Button active shape="circle" size="large" />
@@ -270,9 +274,9 @@ function MainSection() {
               </div>
             </div>
             <div className="grid grid-cols-3 gap-4 mt-4">
-              { [1, 2, 3,4,5,6].map((_, index) => (
-                  <SubjectCardShimmer key={index} />
-                ))}
+              {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                <SubjectCardShimmer key={index} />
+              ))}
             </div>
           </div>
         </div>
@@ -292,15 +296,18 @@ function MainSection() {
 
           {/* Subject Tabs (Published/Draft) + Subject List */}
           <div className="px-5">
-            <ButtonGroup
-              onAddNewSubject={handleAddNewSubject}
-              onViewSemester={handleViewSemester}
-              selectedTab={selectedTab}
-              setSelectedTab={setSelectedTab}
-              role={role}
-              publishedCount={publishedSubjects?.length || 0}
-              draftCount={draftSubjects?.length || 0}
-            />
+            
+              <ButtonGroup
+                onAddNewSubject={handleAddNewSubject}
+                onViewSemester={handleViewSemester}
+                selectedTab={selectedTab}
+                setSelectedTab={setSelectedTab}
+                role={role}
+                cid={cid}
+                publishedCount={publishedSubjects?.length || 0}
+                draftCount={draftSubjects?.length || 0}
+              />
+           
             <div className="grid grid-cols-3 gap-4 mb-10">
               {filteredSubjects && filteredSubjects.length > 0 ? (
                 <AnimatePresence>
@@ -357,6 +364,8 @@ function MainSection() {
           onClose={() => setIsSemesterSidebarOpen(false)}
         />
       </Sidebar>
+
+
       {/* "Semester Required" Modal using Framer Motion animations */}
 
       <AnimatePresence>
