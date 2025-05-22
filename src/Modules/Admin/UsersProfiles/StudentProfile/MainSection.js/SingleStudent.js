@@ -12,6 +12,7 @@ import StudentInformationMenu from "../Components/StudentInformationMenu/Student
 import StudentCourseProgress from "../Components/StudentCourseProgress/StudentCourseProgress";
 import StudentGradesAccordion from "../Components/studentGradeMenu/StudentGradesAccordion";
 import StudentOverView from "../Components/StudentOverView/StudentOverView";
+import StudentReportCard from "../Components/StudentReportCard/StudentReportCard";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,8 +31,8 @@ const SingleStudent = () => {
     role == "librarian"
       ? "Information"
       : role == "finance"
-      ? "Information"
-      : "OverView"
+        ? "Information"
+        : "OverView"
   );
   useEffect(() => {
     dispatch(fetchAllStudents());
@@ -50,6 +51,7 @@ const SingleStudent = () => {
       Parents: <ParentsProfile student={student} />,
       Finance: <StudentFinance studentId={student?._id} />,
       Grades: <StudentGradesAccordion student={student} />,
+      "Report Card": <StudentReportCard student={student} />,
       Attendance: <StudentAttendance student={student} />,
       "Book Issue": <BookIssue />,
     };
@@ -68,30 +70,32 @@ const SingleStudent = () => {
               items={
                 role == "admin"
                   ? [
-                      "OverView",
-                      "Course Progress",
-                      "Information",
-                      "Parents",
-                      "Grades",
-                      "Finance",
-                      "Attendance",
-                      "Book Issue",
-                    ]
+                    "OverView",
+                    "Course Progress",
+                    "Information",
+                    "Parents",
+                    "Grades",
+                    "Report Card",
+                    "Finance",
+                    "Attendance",
+                    "Book Issue",
+                  ]
                   : role == "teacher"
-                  ? [
+                    ? [
                       "OverView",
                       "Course Progress",
                       "Information",
                       "Parents",
                       "Grades",
+                      "Report Card",
                       "Attendance",
                       "Book Issue",
                     ]
-                  : role == "finance"
-                  ? ["Information", "Parents", "Finance"]
-                  : role == "librarian"
-                  ? ["Information", "Parents", "Book Issue"]
-                  : []
+                    : role == "finance"
+                      ? ["Information", "Parents", "Finance"]
+                      : role == "librarian"
+                        ? ["Information", "Parents", "Book Issue"]
+                        : []
               }
             />
           </div>
