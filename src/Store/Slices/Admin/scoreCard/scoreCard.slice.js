@@ -90,6 +90,9 @@ const scoreCardSlice = createSlice({
         state.loading = false;
       })
       .addCase(reomoveCommonDataFromScoreCard.rejected, (state, action) => {
+                state.error = action.error.message;
+        state.loading = false;
+      })
 
     builder
       // Fetch scoreCards
