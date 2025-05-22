@@ -56,6 +56,20 @@ export const addScoreCardCellData = createAsyncThunk(
     }
   }
 );
+export const reomoveScoreCardCellData = createAsyncThunk(
+  "scoreCard/reomoveScoreCardCellData",
+  async (data, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const say = getAY();
+      const role = getUserRole(getState);
+      dispatch(setShowError(false));
+      const response = await putData(`/${role}/scoreCard/remove/${data.classId}/${data.cellNumber}?say=${say}`,data);
+      return response;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
 export const updateScoreCard = createAsyncThunk(
   "scoreCard/updateScoreCard",
   async (data, { rejectWithValue, getState, dispatch }) => {
@@ -92,18 +106,12 @@ export const reomoveCommonDataFromScoreCard = createAsyncThunk(
       const role = getUserRole(getState);
       dispatch(setShowError(false));
       const response = await putData(`/${role}/scoreCard/remove/common/${data.classId}/${data.cellNumber}?say=${say}`,data);
-      console.log("response", response);
-      if(response.success){
-        toast.success("Added Successfully");
-      }else{
-        toast.error("Cell Number is already Used");
-      }
-
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }
   }
 );
+
 
 
