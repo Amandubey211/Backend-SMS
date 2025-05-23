@@ -226,7 +226,7 @@ const MainSection = () => {
           </Button>
 
           {
-            scoreCardData.pdfFile &&
+            scoreCardData?.pdfFile &&
             <Button
               type="primary"
               icon={<UploadOutlined />}
@@ -300,7 +300,7 @@ const MainSection = () => {
         onCancel={() => setScoreCardViewModal(false)}
         confirmLoading={loading}
       >
-        <ScoreCardView pdfUrl={scoreCardData.pdfFile} />
+        <ScoreCardView pdfUrl={scoreCardData?.pdfFile} />
 
       </Modal>
 
