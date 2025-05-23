@@ -121,6 +121,73 @@ const MainSection = () => {
   };
 
   const CellData = () => <div>Grades Component Placeholder</div>;
+  const studentFields = [
+  { label: "Profile Image", value: "profile" },
+  { label: "First Name", value: "firstName" },
+  { label: "Last Name", value: "lastName" },
+  { label: "Email", value: "email" },
+  { label: "Date of Birth", value: "dateOfBirth" },
+  { label: "Place of Birth", value: "placeOfBirth" },
+  { label: "Passport Number", value: "passportNumber" },
+  { label: "Age", value: "age" },
+  { label: "Nationality", value: "nationality" },
+  { label: "Native Language", value: "nativeLanguage" },
+  { label: "Blood Group", value: "bloodGroup" },
+  { label: "Gender", value: "gender" },
+  { label: "Contact Number", value: "contactNumber" },
+  { label: "Religion", value: "religion" },
+
+  // Guardian Fields (Father)
+  { label: "Father First Name", value: "fatherInfo.firstName" },
+  { label: "Father Last Name", value: "fatherInfo.lastName" },
+  { label: "Father Email", value: "fatherInfo.email1" },
+  { label: "Father Contact", value: "fatherInfo.cell1.value" },
+
+  // Guardian Fields (Mother)
+  { label: "Mother First Name", value: "motherInfo.firstName" },
+  { label: "Mother Last Name", value: "motherInfo.lastName" },
+  { label: "Mother Email", value: "motherInfo.email1" },
+  { label: "Mother Contact", value: "motherInfo.cell1.value" },
+
+  // Additional Guardian Fields
+  { label: "Guardian Name", value: "guardianName" },
+  { label: "Guardian Relation", value: "guardianRelationToStudent" },
+  { label: "Guardian Contact", value: "guardianContactNumber" },
+  { label: "Guardian Email", value: "guardianEmail" },
+
+  // Address
+  { label: "Permanent Address - City", value: "permanentAddress.city" },
+  { label: "Permanent Address - Country", value: "permanentAddress.country" },
+  { label: "Residential Address - City", value: "residentialAddress.city" },
+  { label: "Residential Address - Country", value: "residentialAddress.country" },
+
+  // Academic
+  { label: "Admission Number", value: "admissionNumber" },
+  { label: "Admission Date", value: "admissionDate" },
+  { label: "Enrollment Status", value: "enrollmentStatus" },
+  { label: "Batch Start", value: "batchStart" },
+  { label: "Batch End", value: "batchEnd" },
+  { label: "Is Graduate", value: "isGraduate" },
+
+
+  // Emergency
+  { label: "Emergency Number", value: "emergencyNumber" },
+
+
+  // Language Preference
+  { label: "Second Language", value: "secondLanguage" },
+  { label: "Third Language", value: "thirdLanguage" },
+  { label: "Value Education", value: "valueEducation" },
+
+  // Preferences
+  { label: "Left Handed", value: "isLeftHanded" },
+  { label: "Medical Condition", value: "medicalCondition" },
+  { label: "Height", value: "height" },
+  { label: "Weight", value: "weight" },
+  { label: "Transport Required", value: "transportRequirement" },
+];
+
+
 
   return (
     <div className="p-4">
@@ -174,30 +241,9 @@ const MainSection = () => {
           onChange={(value) => setNewField({ ...newField, fieldName: value })}
           className="mb-2 w-full"
         >
-          {[
-            'firstName',
-            'lastName',
-            'email',
-            'dateOfBirth',
-            'placeOfBirth',
-            'age',
-            'nationality',
-            'nativeLanguage',
-            'passportNumber',
-            'bloodGroup',
-            'gender',
-            'contactNumber',
-            'religion',
-            'currentStep',
-            'fatherName',
-            'motherName',
-            'guardianName',
-            'guardianRelationToStudent',
-            'guardianContactNumber',
-            'guardianEmail',
-          ].map((field) => (
-            <Option key={field} value={field}>
-              {field}
+          {studentFields.map((field) => (
+            <Option key={field.value} value={field.value}>
+              {field.label}
             </Option>
           ))}
         </Select>
