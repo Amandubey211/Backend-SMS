@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {  NavLink } from "react-router-dom";
+import {  Navigate, NavLink, useNavigate } from "react-router-dom";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { gt } from "../../../../../Utils/translator/translation";
 import { FiCalendar } from "react-icons/fi";
@@ -18,7 +18,7 @@ const ButtonGroup = ({
   cid
 }) => {
   const { t } = useTranslation("admClass");
-
+   const naviagte = useNavigate()
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="flex space-x-4">
@@ -77,14 +77,14 @@ const ButtonGroup = ({
             {t("Manage Semester")}
           </button>
         </Tooltip>
-        <Tooltip title={t("Scorecard Config")}>
-          <NavLink
-            to={`/admin/scorecard/${cid}`}
-            className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm h-[38px] flex-shrink-0 whitespace-nowrap"
+        <Tooltip title={t("Manage Report Card ")}>
+         <button
+         onClick={()=>naviagte(`/admin/scorecard/${cid}`)}
+             className="px-4 py-3 rounded-md bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center transition-all duration-200 focus:outline-none hover:brightness-110 hover:shadow-md"
           >
             <BiSpreadsheet className="text-lg mr-1" />
-            {t("Scorecard", gt.setting)}
-          </NavLink>
+            {t("Manage Report Card", gt.setting)}
+           </button>
         </Tooltip>
       </div>
     </div>
