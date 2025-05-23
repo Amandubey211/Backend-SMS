@@ -1,43 +1,39 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useEffect, useState, useCallback, useMemo, memo } from "react";
 import {
+  Form,
   Row,
   Col,
   Button,
-  Modal,
-  Form,
-  Input,
-  Select,
   Skeleton,
   message,
+  Select,
+  Modal,
+  Input,
 } from "antd";
+
 import { PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import SingleFileUpload from "../Components/SingleFileUpload";
-import DeleteModal from "../../../../../Components/Common/DeleteModal";
 import {
   updateSchoolAttachments,
   fetchSchoolAttachmentsById,
 } from "../../../../../Store/Slices/Admin/Admission/admissionThunk";
-
-const { Option } = Select;
+import DeleteModal from "../../../../../Components/Common/DeleteModal";
 
 const GRADIENT = {
   background: "linear-gradient(to right, #C83B62, #7F35CD)",
   border: "none",
   color: "#fff",
 };
+const { Option } = Form; // not used, but kept for symmetry
 
-const makeKey = ({ name = "", _id = "" }) =>
-  `${name.trim().toLowerCase().replace(/\s+/g, "_")}_${
-    _id?.slice(-4) ?? "tmp"
-  }`;
+const makeKey = ({ name = "", _id = "" }) => name; // Just return the original name
 
 const withKey = (arr) =>
   (Array.isArray(arr) ? arr : []).map((a) => ({
     ...a,
-    key: a.key || makeKey(a),
+    key: makeKey(a), // Now uses the original name as key
   }));
-
 const group = (arr) =>
   arr.reduce(
     (acc, a) => {
@@ -47,101 +43,14 @@ const group = (arr) =>
     { mandatory: [], optional: [] }
   );
 
-const AttachmentModal = ({ open, initial, onClose, attachments }) => {
-  const [form] = Form.useForm();
-  const [saving, setSaving] = useState(false);
+const AttachmentsUpload = ({ form }) => {
   const dispatch = useDispatch();
-
-  const strip = (arr) =>
-    arr.map(({ name, mandatory }) => ({ name, mandatory }));
-
-  const onFinish = async ({ label, category }) => {
-    setSaving(true);
-    try {
-      const cur = withKey(attachments);
-      const next = cur.map((a) =>
-        initial && a.key === initial.key
-          ? { ...a, name: label, mandatory: category === "mandatory" }
-          : a
-      );
-
-      if (!initial) {
-        next.push({
-          name: label,
-          mandatory: category === "mandatory",
-          key: makeKey({ name: label }),
-        });
-      }
-
-      const res = await dispatch(
-        updateSchoolAttachments({ attachments: strip(next) })
-      );
-
-      if (res?.payload) {
-        message.success(initial ? "Attachment updated" : "Attachment added");
-        onClose();
-      } else {
-        throw new Error("Operation failed");
-      }
-    } catch (error) {
-      message.error(error.message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  useEffect(() => {
-    if (open) {
-      form.setFieldsValue({
-        label: initial?.name ?? "",
-        category: initial?.mandatory ? "mandatory" : "optional",
-      });
-    }
-  }, [open, initial, form]);
-
-  return (
-    <Modal
-      centered
-      maskStyle={{ backdropFilter: "blur(4px)" }}
-      destroyOnClose
-      open={open}
-      title={initial ? "Edit Attachment Field" : "Add Attachment Field"}
-      onCancel={onClose}
-      onOk={() => form.submit()}
-      okText={initial ? "Update" : "Save"}
-      okButtonProps={{ loading: saving, style: GRADIENT }}
-    >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item
-          name="label"
-          label="Label"
-          rules={[{ required: true, message: "Enter label" }]}
-        >
-          <Input size="large" placeholder="Vaccination Card" />
-        </Form.Item>
-        <Form.Item
-          name="category"
-          label="Category"
-          rules={[{ required: true }]}
-        >
-          <Select size="large">
-            <Option value="mandatory">Mandatory</Option>
-            <Option value="optional">Optional</Option>
-          </Select>
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
-};
-
-const AttachmentsUpload = () => {
-  const dispatch = useDispatch();
-  const { attachments: raw, loading } = useSelector(
-    (s) => s.admin.admissionAttachment
-  );
+  const raw = useSelector((s) => s.admin.admissionAttachment.attachments);
+  const loading = useSelector((s) => s.admin.admissionAttachment.loading);
 
   const [modal, setModal] = useState({ open: false, editItem: null });
   const [del, setDel] = useState({ open: false, item: null });
+  const [previewFile, setPreviewFile] = useState(null);
 
   useEffect(() => {
     dispatch(fetchSchoolAttachmentsById());
@@ -164,89 +73,185 @@ const AttachmentsUpload = () => {
       const res = await dispatch(
         updateSchoolAttachments({ attachments: strip(next) })
       );
-
-      if (res?.payload) {
-        message.success("Attachment removed");
-      } else {
-        throw new Error();
-      }
-    } catch (error) {
+      if (res.payload) message.success("Attachment removed");
+      else throw new Error();
+    } catch {
       message.error("Failed to remove attachment");
     } finally {
       setDel({ open: false, item: null });
     }
   }, [del.item, dispatch, raw, strip]);
 
-  const renderCol = useCallback(
-    (list, isMan) =>
-      list.map((a) => (
-        <Col span={24} key={a.key}>
+  const onSaveMeta = async ({ key, name, mandatory }) => {
+    try {
+      const cur = withKey(raw);
+      const next = modal.editItem
+        ? cur.map((a) =>
+            a.key === modal.editItem.key ? { ...a, name, mandatory } : a
+          )
+        : [...cur, { name, mandatory, key: makeKey({ name }) }];
+      const res = await dispatch(
+        updateSchoolAttachments({ attachments: strip(next) })
+      );
+      if (res.payload) {
+        message.success(
+          modal.editItem ? "Attachment updated" : "Attachment added"
+        );
+        setModal({ open: false, editItem: null });
+      } else throw new Error();
+    } catch (err) {
+      message.error(err.message || "Operation failed");
+    }
+  };
+
+  const renderList = (list, type) =>
+    list.map((a) => (
+      <Col span={24} key={a.key}>
+        <Form.Item name={["attachments", type, a.key]}>
           <SingleFileUpload
-            label={`${a.name}${isMan ? " *" : ""}`}
-            name={`attachments.${isMan ? "mandatory" : "optional"}.${a.name}`}
+            name={["attachments", type, a.key]}
+            label={a.name}
+            displayKey={a.displayKey}
+            type={type}
             onEdit={() => setModal({ open: true, editItem: a })}
             onDelete={() => setDel({ open: true, item: a })}
+            onPreview={(file) => setPreviewFile(file)}
           />
-        </Col>
-      )),
-    []
-  );
-
-  if (loading) {
-    return (
-      <div className="p-3">
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} active paragraph={{ rows: 1 }} className="mb-4" />
-        ))}
-      </div>
-    );
-  }
+        </Form.Item>
+      </Col>
+    ));
+  if (loading) return <Skeleton active paragraph={{ rows: 4 }} />;
 
   return (
-    <div>
-      <div className="mb-3">
-        <div className="flex items-center justify-between bg-purple-100 rounded-md py-2 px-3">
-          <h2 className="text-purple-500 m-0">Attachments</h2>
-          <Button
-            icon={<PlusOutlined />}
-            onClick={() => setModal({ open: true, editItem: null })}
-            style={GRADIENT}
-          >
-            Add Attachment
-          </Button>
-        </div>
+    <>
+      <div className="mb-3 flex items-center justify-between bg-purple-100 rounded-md py-2 px-3">
+        <h2 className="text-purple-500 m-0">Attachments</h2>
+        <Button
+          icon={<PlusOutlined />}
+          style={GRADIENT}
+          onClick={() => setModal({ open: true, editItem: null })}
+        >
+          Add Field
+        </Button>
       </div>
-
       <div className="p-3">
-        {!!mandatory.length && (
+        {mandatory.length > 0 && (
           <>
             <h3 className="text-base font-bold mb-3">Mandatory</h3>
-            <Row gutter={[0, 16]}>{renderCol(mandatory, true)}</Row>
+            <Row gutter={[0, 16]}>{renderList(mandatory, "mandatory")}</Row>
           </>
         )}
-        {!!optional.length && (
+        {optional.length > 0 && (
           <>
             <h3 className="text-base font-bold mt-4 mb-3">Optional</h3>
-            <Row gutter={[0, 16]}>{renderCol(optional, false)}</Row>
+            <Row gutter={[0, 16]}>{renderList(optional, "optional")}</Row>
           </>
         )}
       </div>
 
-      <AttachmentModal
+      <MetaModal
         open={modal.open}
         initial={modal.editItem}
         onClose={() => setModal({ open: false, editItem: null })}
-        attachments={raw}
+        onSave={onSaveMeta}
       />
-
       <DeleteModal
         isOpen={del.open}
         onClose={() => setDel({ open: false, item: null })}
         onConfirm={confirmDelete}
         title={del.item?.name}
       />
-    </div>
+      <FilePreviewModal
+        file={previewFile}
+        onClose={() => setPreviewFile(null)}
+      />
+    </>
   );
 };
 
-export default AttachmentsUpload;
+const FilePreviewModal = ({ file, onClose }) => {
+  if (!file) return null;
+
+  const isImage =
+    file.type?.startsWith("image/") ||
+    (file.url && file.url.match(/\.(jpeg|jpg|gif|png)$/i));
+
+  return (
+    <Modal
+      open={!!file}
+      onCancel={onClose}
+      footer={null}
+      width="80%"
+      style={{ top: 20 }}
+      bodyStyle={{ padding: 0, height: "80vh" }}
+    >
+      {isImage ? (
+        <img
+          src={file.url || file.preview}
+          alt="Preview"
+          style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        />
+      ) : (
+        <iframe
+          src={file.url || file.preview}
+          title="File Preview"
+          style={{ width: "100%", height: "100%", border: "none" }}
+        />
+      )}
+    </Modal>
+  );
+};
+
+const MetaModal = ({ open, initial, onClose, onSave }) => {
+  const [form] = Form.useForm();
+  useEffect(() => {
+    if (open) {
+      form.setFieldsValue({
+        name: initial?.name,
+        mandatory: initial?.mandatory ? "mandatory" : "optional",
+      });
+    }
+  }, [open, initial, form]);
+
+  const handleOk = () => {
+    form.validateFields().then(({ name, mandatory }) => {
+      onSave({ key: initial?.key, name, mandatory: mandatory === "mandatory" });
+    });
+  };
+
+  return (
+    <Modal
+      centered
+      maskStyle={{ backdropFilter: "blur(4px)" }}
+      destroyOnClose
+      open={open}
+      title={initial ? "Edit Field" : "Add Field"}
+      onCancel={onClose}
+      onOk={handleOk}
+      okText={initial ? "Update" : "Save"}
+      okButtonProps={{ style: GRADIENT }}
+    >
+      <Form form={form} layout="vertical">
+        <Form.Item
+          name="name"
+          label="Label"
+          rules={[{ required: true, message: "Enter label" }]}
+        >
+          <Input placeholder="Vaccination Card" />
+        </Form.Item>
+        <Form.Item
+          name="mandatory"
+          label="Category"
+          rules={[{ required: true }]}
+        >
+          <Select>
+            <Option value="mandatory">Mandatory</Option>
+            <Option value="optional">Optional</Option>
+          </Select>
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+
+export default memo(AttachmentsUpload);

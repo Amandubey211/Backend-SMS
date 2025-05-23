@@ -1,489 +1,486 @@
-import React, { useEffect, useMemo, memo, useState } from "react";
-import { Row, Col } from "antd";
-
-import { useFormikContext } from "formik";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Form, Row, Col, Input, DatePicker, Select } from "antd";
+import PhoneInput from "react-phone-input-2";
+import moment from "moment";
+import "react-phone-input-2/lib/style.css";
 import {
+  UserOutlined,
   IdcardOutlined,
   CalendarOutlined,
-  UserOutlined,
+  HeartOutlined,
   GlobalOutlined,
   MailOutlined,
+  ContactsOutlined,
 } from "@ant-design/icons";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import { HeartOutlined } from "@ant-design/icons";
-import CompactIconDatePicker from "../Components/CompactIconDatePicker";
-import CompactIconInput from "../Components/CompactIconInput";
-import CompactIconSelect from "../Components/CompactIconSelect";
-import ImageUploader from "../Components/ImageUploader";
+
 import { fetchAcademicYear } from "../../../../../Store/Slices/Common/AcademicYear/academicYear.action";
 import { fetchAllClasses } from "../../../../../Store/Slices/Admin/Class/actions/classThunk";
-import { useField } from "formik";
-import LanguagePreferences from "./LanguagePreferences";
 import {
   GENDER_OPTIONS,
   COUNTRY_OPTIONS,
   RELIGION_OPTIONS,
-  NATIVE_LANGUAGE_OPTIONS,
-  PRIMARY_CONTACT_OPTIONS,
-  ENROLLMENT_STATUS_OPTIONS,
   bloodGroupOptions,
+  CONTACT_TYPE_OPTIONS,
 } from "../Configs/selectOptionsConfig";
-import { fetchAdmissionOptions } from "../../../../../Store/Slices/Common/User/actions/userActions";
+import LanguagePreferences from "./LanguagePreferences";
+import CustomUploadCard from "../../../../LoginPages/Student/SignUp/Components/CustomUploadCard";
 
-const PhoneInputField = memo(({ name, icon, tooltip, placeholder }) => {
-  const [field, , helpers] = useField(name);
-  const phoneValue = field.value || "";
+const { Option } = Select;
 
-  return (
-    <div className="flex items-center w-full rounded hover:border-blue-500 transition-colors">
-      {icon && (
-        <span className="mr-2 text-gray-400" title={tooltip}>
-          {icon}
-        </span>
-      )}
-      <PhoneInput
-        country={"qa"}
-        value={phoneValue}
-        onChange={(value) => helpers.setValue(value)}
-        inputStyle={{
-          width: "100%",
-          height: "2rem",
-          border: "1px solid #d9d9d9",
-          borderRadius: "0.25rem",
-        }}
-        placeholder={placeholder}
-        required={true}
-      />
-    </div>
-  );
-});
-
-const AcademicSessionCandidate = memo(({ formRefs, errors, touched }) => {
+const AcademicSessionCandidate = ({ form }) => {
   const dispatch = useDispatch();
-  const { values, setFieldValue } = useFormikContext();
+  const academicYears = useSelector((s) => s.common.academicYear.academicYears);
+  const classes = useSelector((s) => s.admin.class.classes);
 
-  const { academicYears, loading: ayLoading } = useSelector(
-    (state) => state.common.academicYear
-  );
-  const { classes, loading: classLoading } = useSelector(
-    (state) => state.admin.class
-  );
-
+  // fetch dropdown data
   useEffect(() => {
     dispatch(fetchAcademicYear());
     dispatch(fetchAllClasses());
-  }, []);
+  }, [dispatch]);
 
-  const academicYearOptions = useMemo(
-    () =>
-      academicYears?.map((ay) => ({
-        label: ay.year,
-        value: ay._id,
-      })),
-    [academicYears]
-  );
+  // build Select options
+  const academicYearOptions = academicYears.map((ay) => (
+    <Option key={ay._id} value={ay._id}>
+      {ay.year}
+    </Option>
+  ));
+  const classOptions = classes.map((cls) => (
+    <Option key={cls._id} value={cls._id}>
+      {cls.className}
+    </Option>
+  ));
 
-  const classOptions = useMemo(
-    () =>
-      classes?.map((cls) => ({
-        label: cls.className,
-        value: cls._id,
-      })),
-    [classes]
-  );
-
-  const showThirdLang = useMemo(() => {
-    const clsLabel =
-      classOptions?.find((c) => c.value === values.academicSession.class)
-        ?.label || "";
-    const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
-    return gradeNum >= 3;
-  }, [values.academicSession.class, classOptions]);
-
+  // watch DOB to auto-calculate age
+  const dob = Form.useWatch(["candidateInformation", "dob"], form);
   useEffect(() => {
-    if (values.candidateInformation?.dob) {
-      const birthDate = new Date(values.candidateInformation.dob);
-      if (!isNaN(birthDate)) {
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const monthDiff = today.getMonth() - birthDate.getMonth();
-        if (
-          monthDiff < 0 ||
-          (monthDiff === 0 && today.getDate() < birthDate.getDate())
-        ) {
-          age--;
-        }
-        setFieldValue("candidateInformation.age", age);
+    if (dob) {
+      const birth = new Date(dob);
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const m = today.getMonth() - birth.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+        age--;
       }
+      form.setFieldsValue({
+        candidateInformation: {
+          ...form.getFieldValue("candidateInformation"),
+          age,
+        },
+      });
     }
-  }, [values.candidateInformation?.dob, setFieldValue]);
-  const { userDetails } = useSelector((store) => store.common.user);
-  const [VALUE_ED_OPTIONS, setVALUE_ED_OPTIONS] = useState([]);
-  const [LANGUAGE_OPTIONS, setLANGUAGE_OPTIONS] = useState([]);
-  useEffect(() => {
-    dispatch(fetchAdmissionOptions(userDetails?.schoolId)).then((res) => {
-      const { languages = [], valueEducation = [] } = res.payload?.data || {};
+  }, [dob, form]);
 
-      if (languages?.length > 0) {
-        let la = languages.map((i) => ({ label: i, value: i }));
-        setLANGUAGE_OPTIONS(la);
-      }
-      if (valueEducation?.length > 0) {
-        let va = valueEducation.map((i) => ({ label: i, value: i }));
-        setVALUE_ED_OPTIONS(va);
-      }
-    });
-  }, []);
+  // determine if we should show 3rd language (grade >=3)
+  const selectedClassId = form.getFieldValue(["academicSession", "class"]);
+  const clsLabel =
+    classes.find((c) => c._id === selectedClassId)?.className || "";
+  const gradeNum = parseInt(clsLabel.replace(/\D/g, ""), 10);
+  const showThirdLang = gradeNum >= 3;
+
   return (
-    <div>
+    <>
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
         Candidate Information
       </h2>
-      <div className="p-3 flex gap-2 flex-wrap">
-        <div className="w-1/4 flex flex-col gap-6">
-          <ImageUploader
-            height="h-64"
-            name="profile"
-            recommendedSize="300x400px"
-            previewTitle="Student Picture Preview"
-          />
-        </div>
+      <div className="p-3">
+        <Row gutter={16}>
+          {/* Left Column - Profile, DOB & Age */}
+          <Col xs={24} md={6}>
+            <Form.Item
+              name="profile"
+              label="Profile Picture"
+              rules={[
+                { required: true, message: "Profile picture is required" },
+              ]}
+            >
+              <CustomUploadCard
+                name="profile"
+                form={form}
+                recommendedSize="300x400"
+                width="w-full"
+                height="h-52"
+                required
+              />
+            </Form.Item>
 
-        <div className="flex-1 min-w-[60%] flex flex-col">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <CompactIconInput
-                name="candidateInformation.firstName"
-                icon={<UserOutlined />}
-                tooltip="First Name"
-                placeholder="First Name"
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.firstName"] = el)
-                }
-                error={
-                  touched.candidateInformation?.firstName &&
-                  errors.candidateInformation?.firstName
-                }
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconInput
-                name="candidateInformation.middleName"
-                icon={<UserOutlined />}
-                tooltip="Middle Name"
-                placeholder="Middle Name"
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconInput
-                name="candidateInformation.lastName"
-                icon={<UserOutlined />}
-                tooltip="Last Name"
-                placeholder="Last Name"
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.lastName"] = el)
-                }
-                error={
-                  touched.candidateInformation?.lastName &&
-                  errors.candidateInformation?.lastName
-                }
-              />
-            </div>
-          </div>
+            <Form.Item
+              name={["candidateInformation", "dob"]}
+              label="Date of Birth"
+              rules={[
+                {
+                  required: true,
+                  message: "DOB is required",
+                },
+                () => ({
+                  validator(_, value) {
+                    if (!value) {
+                      return Promise.resolve();
+                    }
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
 
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <CompactIconInput
-                name="candidateInformation.studentId"
-                icon={<IdcardOutlined />}
-                tooltip="Student ID"
-                placeholder="Student ID"
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.studentId"] = el)
-                }
-                error={
-                  touched.candidateInformation?.studentId &&
-                  errors.candidateInformation?.studentId
-                }
+                    if (selectedDate >= today) {
+                      return Promise.reject(
+                        new Error("Date of Birth must be in the past")
+                      );
+                    }
+                    return Promise.resolve();
+                  },
+                }),
+              ]}
+            >
+              <DatePicker
+                style={{ width: "100%" }}
+                suffixIcon={<CalendarOutlined />}
+                disabledDate={(current) => {
+                  // Disable dates that are today or in the future
+                  return current && current >= moment().startOf("day");
+                }}
               />
-            </div>
-            <div className="flex-1">
-              <CompactIconDatePicker
-                name="candidateInformation.idExpiry"
-                icon={<CalendarOutlined />}
-                tooltip="ID Expiry"
-                placeholder="ID Expiry"
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconSelect
-                name="candidateInformation.bloodGroup"
-                icon={<HeartOutlined />}
-                tooltip="Blood Group"
-                placeholder="Select Blood Group"
-                options={bloodGroupOptions}
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.bloodGroup"] = el)
-                }
-                error={
-                  touched.candidateInformation?.bloodGroup &&
-                  errors.candidateInformation?.bloodGroup
-                }
-              />
-            </div>
-          </div>
+            </Form.Item>
 
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <CompactIconSelect
-                name="candidateInformation.gender"
-                icon={<UserOutlined />}
-                tooltip="Gender"
-                placeholder="Gender"
-                options={GENDER_OPTIONS}
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.gender"] = el)
-                }
-                error={
-                  touched.candidateInformation?.gender &&
-                  errors.candidateInformation?.gender
-                }
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconInput
-                name="candidateInformation.passportNumber"
-                icon={<IdcardOutlined />}
-                tooltip="Passport Number"
-                placeholder="Passport#"
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconDatePicker
-                name="candidateInformation.passportExpiry"
-                icon={<CalendarOutlined />}
-                tooltip="Passport Expiry"
-                placeholder="Passport Expiry"
-              />
-            </div>
-          </div>
+            {/* Moved Age right below DOB */}
+            <Form.Item name={["candidateInformation", "age"]} label="Age">
+              <Input disabled placeholder="Age" suffix="years" />
+            </Form.Item>
+          </Col>
 
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <CompactIconSelect
-                name="candidateInformation.placeOfBirth"
-                icon={<GlobalOutlined />}
-                tooltip="Place of Birth"
-                placeholder="Place of Birth"
-                options={COUNTRY_OPTIONS}
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconSelect
-                name="candidateInformation.nationality"
-                icon={<GlobalOutlined />}
-                tooltip="Nationality"
-                placeholder="Nationality"
-                options={COUNTRY_OPTIONS}
-                allowCustom
-                ref={(el) =>
-                  (formRefs.current["candidateInformation.nationality"] = el)
-                }
-                error={
-                  touched.candidateInformation?.nationality &&
-                  errors.candidateInformation?.nationality
-                }
-              />
-            </div>
-            <div className="flex-1">
-              <CompactIconSelect
-                name="candidateInformation.religion"
-                icon={<GlobalOutlined />}
-                tooltip="Religion"
-                placeholder="Religion"
-                allowCustom
-                options={RELIGION_OPTIONS}
-              />
-            </div>
-          </div>
+          {/* Right Column - All other fields */}
+          <Col xs={24} md={18}>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "firstName"]}
+                  label="First Name"
+                  rules={[
+                    { required: true, message: "First name is required" },
+                  ]}
+                >
+                  <Input prefix={<UserOutlined />} placeholder="First Name" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "middleName"]}
+                  label="Middle Name"
+                >
+                  <Input prefix={<UserOutlined />} placeholder="Middle Name" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "lastName"]}
+                  label="Last Name"
+                  rules={[{ required: true, message: "Last name is required" }]}
+                >
+                  <Input prefix={<UserOutlined />} placeholder="Last Name" />
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <div className="flex gap-3">
-            {/* Phone # */}
-            <div className="flex-1 flex flex-col" style={{ flex: 2 }}>
-              <label
-                htmlFor="candidateInformation.contactNumber"
-                className="mb-1 text-sm font-medium text-gray-700"
-              >
-                Contact Number:
-              </label>
-              <PhoneInputField
-                id="candidateInformation.contactNumber"
-                name="candidateInformation.contactNumber"
-                tooltip="Candidate Phone Number"
-                placeholder="Phone No."
-              // … refs/errors …
-              />
-            </div>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "studentId"]}
+                  label="Student ID"
+                  rules={[
+                    { required: true, message: "Student ID is required" },
+                  ]}
+                >
+                  <Input prefix={<IdcardOutlined />} placeholder="Student ID" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "idExpiry"]}
+                  label="ID Expiry"
+                  rules={[{ required: true, message: "ID expiry is required" }]}
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    suffixIcon={<CalendarOutlined />}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "passportNumber"]}
+                  label="Passport Number"
+                >
+                  <Input
+                    prefix={<IdcardOutlined />}
+                    placeholder="Passport Number"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
 
-            {/* Email */}
-            <div className="flex-1 flex flex-col" style={{ flex: 2 }}>
-              {/* Invisible label to reserve space */}
-              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
-              <CompactIconInput
-                name="candidateInformation.email"
-                icon={<MailOutlined />}
-                tooltip="Candidate Email"
-                placeholder="Email"
-              // … refs/errors …
-              />
-            </div>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "passportExpiry"]}
+                  label="Passport Expiry"
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    suffixIcon={<CalendarOutlined />}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "placeOfBirth"]}
+                  label="Place of Birth"
+                >
+                  <Select
+                    placeholder="Place of Birth"
+                    suffixIcon={<GlobalOutlined />}
+                    showSearch
+                    optionFilterProp="children"
+                  >
+                    {COUNTRY_OPTIONS.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "nationality"]}
+                  label="Nationality"
+                  rules={[
+                    { required: true, message: "Nationality is required" },
+                  ]}
+                >
+                  <Select
+                    placeholder="Nationality"
+                    suffixIcon={<GlobalOutlined />}
+                    showSearch
+                    optionFilterProp="children"
+                  >
+                    {COUNTRY_OPTIONS.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-            {/* Age */}
-            <div className="flex-1 flex flex-col" style={{ flex: 1 }}>
-              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
-              <CompactIconInput
-                name="candidateInformation.age"
-                icon={<CalendarOutlined />}
-                tooltip="Candidate Age"
-                placeholder="Age"
-                disabled
-                readOnly
-              />
-            </div>
-          </div>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "height"]}
+                  label="Height (cm)"
+                  rules={[
+                    {
+                      pattern: /^[0-9]+$/,
+                      message: "Please enter a valid height",
+                    },
+                  ]}
+                >
+                  <Input suffix="cm" placeholder="Height" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "weight"]}
+                  label="Weight (kg)"
+                  rules={[
+                    {
+                      pattern: /^[0-9]+$/,
+                      message: "Please enter a valid weight",
+                    },
+                  ]}
+                >
+                  <Input suffix="kg" placeholder="Weight" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "bloodGroup"]}
+                  label="Blood Group"
+                  rules={[
+                    { required: true, message: "Blood group is required" },
+                  ]}
+                >
+                  <Select
+                    placeholder="Blood Group"
+                    suffixIcon={<HeartOutlined />}
+                  >
+                    {bloodGroupOptions.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-          <div className="flex gap-3">
-            {/* Emergency # */}
-            <div className="flex-1 flex flex-col">
-              <label
-                htmlFor="candidateInformation.emergencyNumber"
-                className="mb-1 text-sm font-medium text-gray-700"
-              >
-                Emergency Contact Number:
-              </label>
-              <PhoneInputField
-                id="candidateInformation.emergencyNumber"
-                name="candidateInformation.emergencyNumber"
-                tooltip="Emergency Number"
-                placeholder="Emergency Contact No."
-              // … refs/errors …
-              />
-            </div>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "gender"]}
+                  label="Gender"
+                  rules={[{ required: true, message: "Gender is required" }]}
+                >
+                  <Select placeholder="Gender" suffixIcon={<UserOutlined />}>
+                    {GENDER_OPTIONS.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "religion"]}
+                  label="Religion"
+                >
+                  <Select
+                    placeholder="Religion"
+                    suffixIcon={<GlobalOutlined />}
+                    showSearch
+                    optionFilterProp="children"
+                  >
+                    {RELIGION_OPTIONS.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "primaryContactType"]}
+                  label="Primary Contact Type"
+                  rules={[
+                    { required: true, message: "Contact type is required" },
+                  ]}
+                >
+                  <Select
+                    placeholder="Select Type"
+                    suffixIcon={<ContactsOutlined />}
+                  >
+                    {CONTACT_TYPE_OPTIONS.map((opt) => (
+                      <Option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-            {/* Native Language */}
-            <div className="flex-1 flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
-              <CompactIconSelect
-                name="candidateInformation.nativeLanguage"
-                icon={<GlobalOutlined />}
-                tooltip="Native Language"
-                placeholder="Native Language"
-                options={NATIVE_LANGUAGE_OPTIONS}
-                allowCustom
-              />
-            </div>
-
-            {/* Primary Contact */}
-            <div className="flex-1 flex flex-col">
-              <label className="mb-1 text-sm font-medium text-gray-700">&nbsp;</label>
-              <CompactIconSelect
-                name="candidateInformation.primaryContact"
-                icon={<UserOutlined />}
-                tooltip="Primary Contact"
-                placeholder="Primary Contact"
-                options={PRIMARY_CONTACT_OPTIONS}
-              />
-            </div>
-          </div>
-          <div className="flex flex-row w-full gap-4">
-             <div className="flex flex-col">
-            <CompactIconDatePicker
-              name="candidateInformation.dob"
-              icon={<CalendarOutlined />}
-              tooltip="Date of Birth"
-              placeholder="DOB"
-            />
-          </div>
-          <div className="flex flex-col">
-            <CompactIconInput
-                name="candidateInformation.height"
-                icon={<IdcardOutlined />}
-                tooltip="height"
-                placeholder="Candidate Height"
-            />
-          </div>
-          <div className="flex flex-col">
-            <CompactIconInput
-               name="candidateInformation.weight"
-                icon={<IdcardOutlined />}
-                tooltip="weight"
-                placeholder="Candidate Weight"
-            />
-          </div>
-          </div>
-        </div>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "email"]}
+                  label="Email"
+                  rules={[
+                    { type: "email", message: "Invalid email" },
+                    { required: true, message: "Email is required" },
+                  ]}
+                >
+                  <Input prefix={<MailOutlined />} placeholder="Email" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "contactNumber"]}
+                  label="Primary Contact"
+                  rules={[
+                    { required: true, message: "Contact number is required" },
+                  ]}
+                >
+                  <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                {" "}
+                <Form.Item
+                  name={["candidateInformation", "emergencyContactNumber"]}
+                  label="Emergency Contact"
+                  rules={[
+                    {
+                      required: true,
+                      message: "Emergency contact is required",
+                    },
+                  ]}
+                >
+                  <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Col>
+        </Row>
       </div>
 
-      <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
+      <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mt-6 mb-0">
         Academic Session
       </h2>
       <div className="p-3">
         <Row gutter={16}>
           <Col xs={24} md={8}>
-            <CompactIconSelect
-              name="academicSession.class"
-              icon={<IdcardOutlined />}
-              tooltip="Class"
-              placeholder="Select Class"
-              options={classOptions}
-              loading={classLoading}
-              ref={(el) => (formRefs.current["academicSession.class"] = el)}
-              error={
-                touched.academicSession?.class && errors.academicSession?.class
-              }
-            />
+            <Form.Item
+              name={["academicSession", "class"]}
+              label="Class"
+              rules={[{ required: true, message: "Please select class" }]}
+            >
+              <Select
+                placeholder="Select Class"
+                suffixIcon={<IdcardOutlined />}
+              >
+                {classOptions}
+              </Select>
+            </Form.Item>
           </Col>
           <Col xs={24} md={8}>
-            <CompactIconSelect
-              name="academicSession.academicYear"
-              icon={<CalendarOutlined />}
-              tooltip="Academic Year"
-              placeholder="Select Academic Year"
-              options={academicYearOptions}
-              loading={ayLoading}
-              ref={(el) =>
-                (formRefs.current["academicSession.academicYear"] = el)
-              }
-              error={
-                touched.academicSession?.academicYear &&
-                errors.academicSession?.academicYear
-              }
-            />
+            <Form.Item
+              name={["academicSession", "academicYear"]}
+              label="Academic Year"
+              rules={[
+                { required: true, message: "Please select academic year" },
+              ]}
+            >
+              <Select
+                placeholder="Select Year"
+                suffixIcon={<CalendarOutlined />}
+              >
+                {academicYearOptions}
+              </Select>
+            </Form.Item>
           </Col>
           <Col xs={24} md={8}>
-            <CompactIconSelect
-              name="academicSession.enrollmentStats"
-              icon={<UserOutlined />}
-              tooltip="Enrollment Status"
-              placeholder="Select Enrollment Status"
-              options={ENROLLMENT_STATUS_OPTIONS}
-              ref={(el) =>
-                (formRefs.current["academicSession.enrollmentStats"] = el)
-              }
-              error={
-                touched.academicSession?.enrollmentStats &&
-                errors.academicSession?.enrollmentStats
-              }
-            />
+            <Form.Item
+              name={["academicSession", "enrollmentStats"]}
+              label="Enrollment Status"
+              initialValue="Full Time"
+              rules={[
+                { required: true, message: "Please select enrollment status" },
+              ]}
+            >
+              <Select placeholder="Enrollment Status">
+                <Option value="Full Time">Full Time</Option>
+                <Option value="Part Time">Part Time</Option>
+              </Select>
+            </Form.Item>
           </Col>
         </Row>
       </div>
 
-      <LanguagePreferences showThirdLang={showThirdLang} formRefs={formRefs} />
-    </div>
+      {/* Language & Preferences */}
+      <LanguagePreferences showThirdLang={showThirdLang} />
+    </>
   );
-});
+};
 
 export default AcademicSessionCandidate;

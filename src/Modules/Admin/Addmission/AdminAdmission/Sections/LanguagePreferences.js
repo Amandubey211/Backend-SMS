@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useCallback, memo, useMemo } from "react";
-import { Row, Col, Select, Radio, Input, Modal, Button, message } from "antd";
-import { useFormikContext } from "formik";
+import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
+import { Form, Select, Radio, Input, Modal, Button, message } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateSchoolOption,
@@ -9,23 +8,29 @@ import {
 
 const { Option } = Select;
 
-const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
-  const { values, setFieldValue } = useFormikContext();
+const LanguagePreferences = memo(({ showThirdLang }) => {
+  const form = Form.useFormInstance();
   const dispatch = useDispatch();
-  const { admissionOptions, loading } = useSelector(
+  const { admissionOptions = {}, loading } = useSelector(
     (s) => s.admin.admissionAttachment
   );
 
-  const [isLanguageModalVisible, setIsLanguageModalVisible] = useState(false);
-  const [isValueEdModalVisible, setIsValueEdModalVisible] = useState(false);
-  const [newLanguage, setNewLanguage] = useState("");
-  const [newValueEd, setNewValueEd] = useState("");
-  const [modalType, setModalType] = useState("");
+  // watch form values
+  const second = Form.useWatch(["languagePrefs", "second"], form) || [];
+  const third = Form.useWatch(["languagePrefs", "third"], form) || [];
+  const valueEd = Form.useWatch(["languagePrefs", "valueEd"], form) || [];
+  const leftHanded = Form.useWatch(["languagePrefs", "leftHanded"], form);
+  const medicalInfo = Form.useWatch("medicalInfo", form);
 
-  const languageOptions = useMemo(
+  // modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [newItem, setNewItem] = useState("");
+
+  const languageOpts = useMemo(
     () => ({
-      secondLanguages: admissionOptions?.languageOptions?.secondLanguages || [],
-      thirdLanguages: admissionOptions?.languageOptions?.thirdLanguages || [],
+      secondLanguages: admissionOptions.languageOptions?.secondLanguages || [],
+      thirdLanguages: admissionOptions.languageOptions?.thirdLanguages || [],
     }),
     [admissionOptions]
   );
@@ -34,128 +39,66 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
     dispatch(fetchAdmissionOptionsBySchoolId());
   }, [dispatch]);
 
-  const handleAddLanguage = useCallback(async () => {
-    if (!newLanguage.trim()) {
-      message.warning("Please enter a language");
+  const saveNew = useCallback(async () => {
+    if (!newItem.trim()) {
+      message.warning("Please enter a value");
       return;
     }
-
-    const updatedOptions = JSON.parse(JSON.stringify(admissionOptions || {}));
-    updatedOptions.languageOptions = updatedOptions.languageOptions || {
-      secondLanguages: [],
-      thirdLanguages: [],
-    };
-
-    if (modalType === "second") {
-      updatedOptions.languageOptions.secondLanguages = [
-        ...(updatedOptions.languageOptions.secondLanguages || []),
-        newLanguage.trim(),
+    const updated = { ...admissionOptions };
+    if (modalType === "second" || modalType === "third") {
+      const key = modalType + "Languages";
+      updated.languageOptions = { ...updated.languageOptions };
+      updated.languageOptions[key] = [
+        ...(updated.languageOptions[key] || []),
+        newItem.trim(),
       ];
-    } else if (modalType === "third") {
-      updatedOptions.languageOptions.thirdLanguages = [
-        ...(updatedOptions.languageOptions.thirdLanguages || []),
-        newLanguage.trim(),
+    } else {
+      updated.valueEducation = [
+        ...(updated.valueEducation || []),
+        newItem.trim(),
       ];
     }
-
     try {
       await dispatch(
-        updateSchoolOption({
-          admissionOptions: updatedOptions,
-        })
+        updateSchoolOption({ admissionOptions: updated })
       ).unwrap();
-      message.success("Language added successfully");
-      setNewLanguage("");
-      setIsLanguageModalVisible(false);
-    } catch (error) {
-      message.error("Failed to add language");
+      message.success("Added successfully");
+      setNewItem("");
+      setModalVisible(false);
+    } catch {
+      message.error("Failed to update");
     }
-  }, [admissionOptions, dispatch, modalType, newLanguage]);
+  }, [admissionOptions, dispatch, modalType, newItem]);
 
-  const handleAddValueEd = useCallback(async () => {
-    if (!newValueEd.trim()) {
-      message.warning("Please enter a value education option");
-      return;
-    }
-
-    const updatedOptions = JSON.parse(JSON.stringify(admissionOptions || {}));
-    updatedOptions.valueEducation = [
-      ...(updatedOptions.valueEducation || []),
-      newValueEd.trim(),
-    ];
-
-    try {
-      await dispatch(
-        updateSchoolOption({
-          admissionOptions: updatedOptions,
-        })
-      ).unwrap();
-      message.success("Value education option added successfully");
-      setNewValueEd("");
-      setIsValueEdModalVisible(false);
-    } catch (error) {
-      message.error("Failed to add value education option");
-    }
-  }, [admissionOptions, dispatch, newValueEd]);
-
-  const handleRemoveLanguage = useCallback(
-    async (language, type) => {
-      const updatedOptions = JSON.parse(JSON.stringify(admissionOptions || {}));
-      updatedOptions.languageOptions = updatedOptions.languageOptions || {
-        secondLanguages: [],
-        thirdLanguages: [],
-      };
-
-      if (type === "second") {
-        updatedOptions.languageOptions.secondLanguages =
-          updatedOptions.languageOptions.secondLanguages.filter(
-            (lang) => lang !== language
-          );
-      } else if (type === "third") {
-        updatedOptions.languageOptions.thirdLanguages =
-          updatedOptions.languageOptions.thirdLanguages.filter(
-            (lang) => lang !== language
-          );
+  const removeItem = useCallback(
+    async (val, type) => {
+      const updated = { ...admissionOptions };
+      if (type === "second" || type === "third") {
+        const key = type + "Languages";
+        updated.languageOptions = { ...updated.languageOptions };
+        updated.languageOptions[key] = updated.languageOptions[key].filter(
+          (x) => x !== val
+        );
+      } else {
+        updated.valueEducation = updated.valueEducation.filter(
+          (x) => x !== val
+        );
       }
-
       try {
         await dispatch(
-          updateSchoolOption({
-            admissionOptions: updatedOptions,
-          })
+          updateSchoolOption({ admissionOptions: updated })
         ).unwrap();
-        message.success("Language removed successfully");
-      } catch (error) {
-        message.error("Failed to remove language");
+        message.success("Removed successfully");
+      } catch {
+        message.error("Failed to remove");
       }
     },
     [admissionOptions, dispatch]
   );
 
-  const handleRemoveValueEd = useCallback(
-    async (value) => {
-      const updatedOptions = JSON.parse(JSON.stringify(admissionOptions || {}));
-      updatedOptions.valueEducation = (
-        updatedOptions.valueEducation || []
-      ).filter((v) => v !== value);
-
-      try {
-        await dispatch(
-          updateSchoolOption({
-            admissionOptions: updatedOptions,
-          })
-        ).unwrap();
-        message.success("Value education option removed successfully");
-      } catch (error) {
-        message.error("Failed to remove value education option");
-      }
-    },
-    [admissionOptions, dispatch]
-  );
-
-  const showLanguageModal = (type) => {
+  const openModal = (type) => {
     setModalType(type);
-    setIsLanguageModalVisible(true);
+    setModalVisible(true);
   };
 
   return (
@@ -163,41 +106,48 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-0">
         Languages & Preferences
       </h2>
-
       <div className="p-3 flex flex-col gap-4">
-        <div className="flex justify-between items-end gap-2">
+        {/* Second Language */}
+        <div className="flex justify-between items-center gap-2 ">
           <div className="w-4/5">
-            <label className="font-semibold block mb-1">
-              Second language preference
-            </label>
-            <Select
-              style={{ width: "100%" }}
-              placeholder="Select Second Language"
-              value={values.languagePrefs.second}
-              mode="multiple"
-              onChange={(value) => setFieldValue("languagePrefs.second", value)}
-              loading={loading}
-              ref={(el) => (formRefs.current["languagePrefs.second"] = el)}
+            <Form.Item
+              name={["languagePrefs", "second"]}
+              label="Second language preference"
             >
-              {languageOptions.secondLanguages?.map((lang) => (
-                <Option key={lang} value={lang}>
-                  {lang}
-                </Option>
-              ))}
-            </Select>
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="Select Second Language"
+                value={second}
+                loading={loading}
+                onChange={(v) =>
+                  form.setFieldsValue({
+                    languagePrefs: {
+                      ...form.getFieldValue("languagePrefs"),
+                      second: v,
+                    },
+                  })
+                }
+              >
+                {languageOpts.secondLanguages.map((l) => (
+                  <Option key={l} value={l}>
+                    {l}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </div>
           <div className="w-1/5 flex gap-2">
             <Button
-              type="primary"
               className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
-              onClick={() => showLanguageModal("second")}
+              onClick={() => openModal("second")}
             >
               Add
             </Button>
-            {languageOptions.secondLanguages?.length > 0 && (
+            {languageOpts.secondLanguages.length > 0 && (
               <Button
                 className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
-                onClick={() => showLanguageModal("second")}
+                onClick={() => openModal("second")}
               >
                 Manage
               </Button>
@@ -205,42 +155,48 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
           </div>
         </div>
 
+        {/* Third Language */}
         {showThirdLang && (
           <div className="flex justify-between items-end gap-2">
             <div className="w-4/5">
-              <label className="font-semibold block mb-1 text-red-500">
-                Third language preference (Grade 3+)
-              </label>
-              <Select
-                style={{ width: "100%" }}
-                placeholder="Select Third Language"
-                value={values.languagePrefs.third}
-                mode="multiple"
-                onChange={(value) =>
-                  setFieldValue("languagePrefs.third", value)
-                }
-                loading={loading}
-                ref={(el) => (formRefs.current["languagePrefs.third"] = el)}
+              <Form.Item
+                name={["languagePrefs", "third"]}
+                label="Third language preference (Grade 3+)"
               >
-                {languageOptions.thirdLanguages?.map((lang) => (
-                  <Option key={lang} value={lang}>
-                    {lang}
-                  </Option>
-                ))}
-              </Select>
+                <Select
+                  mode="multiple"
+                  style={{ width: "100%" }}
+                  placeholder="Select Third Language"
+                  value={third}
+                  loading={loading}
+                  onChange={(v) =>
+                    form.setFieldsValue({
+                      languagePrefs: {
+                        ...form.getFieldValue("languagePrefs"),
+                        third: v,
+                      },
+                    })
+                  }
+                >
+                  {languageOpts.thirdLanguages.map((l) => (
+                    <Option key={l} value={l}>
+                      {l}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
             </div>
             <div className="w-1/5 flex gap-2">
               <Button
-                type="primary"
                 className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
-                onClick={() => showLanguageModal("third")}
+                onClick={() => openModal("third")}
               >
                 Add
               </Button>
-              {languageOptions.thirdLanguages?.length > 0 && (
+              {languageOpts.thirdLanguages.length > 0 && (
                 <Button
                   className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
-                  onClick={() => showLanguageModal("third")}
+                  onClick={() => openModal("third")}
                 >
                   Manage
                 </Button>
@@ -249,41 +205,47 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
           </div>
         )}
 
-        <div className="flex justify-between items-end gap-2">
+        {/* Value Education */}
+        <div className="flex justify-between items-center  gap-2">
           <div className="w-4/5">
-            <label className="font-semibold block mb-1">
-              Value education preference
-            </label>
-            <Select
-              style={{ width: "100%" }}
-              value={values.languagePrefs.valueEd}
-              mode="multiple"
-              placeholder="Select Value Education Option"
-              onChange={(value) =>
-                setFieldValue("languagePrefs.valueEd", value)
-              }
-              loading={loading}
-              ref={(el) => (formRefs.current["languagePrefs.valueEd"] = el)}
+            <Form.Item
+              name={["languagePrefs", "valueEd"]}
+              label="Value education preference"
             >
-              {admissionOptions?.valueEducation?.map((option) => (
-                <Option key={option} value={option}>
-                  {option}
-                </Option>
-              ))}
-            </Select>
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="Select Value Education"
+                value={valueEd}
+                loading={loading}
+                onChange={(v) =>
+                  form.setFieldsValue({
+                    languagePrefs: {
+                      ...form.getFieldValue("languagePrefs"),
+                      valueEd: v,
+                    },
+                  })
+                }
+              >
+                {(admissionOptions.valueEducation || []).map((opt) => (
+                  <Option key={opt} value={opt}>
+                    {opt}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </div>
           <div className="w-1/5 flex gap-2">
             <Button
-              type="primary"
               className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
-              onClick={() => setIsValueEdModalVisible(true)}
+              onClick={() => openModal("valueEd")}
             >
               Add
             </Button>
-            {admissionOptions?.valueEducation?.length > 0 && (
+            {(admissionOptions.valueEducation || []).length > 0 && (
               <Button
                 className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
-                onClick={() => setIsValueEdModalVisible(true)}
+                onClick={() => openModal("valueEd")}
               >
                 Manage
               </Button>
@@ -291,121 +253,83 @@ const LanguagePreferences = memo(({ showThirdLang, formRefs }) => {
           </div>
         </div>
 
-        <div>
-          <label className="font-semibold block mb-1">Left-handed</label>
+        {/* Left-handed */}
+        <Form.Item name={["languagePrefs", "leftHanded"]} label="Left-handed">
           <Radio.Group
             options={[
               { label: "Yes", value: true },
               { label: "No", value: false },
             ]}
             optionType="button"
-            value={values.languagePrefs.leftHanded}
+            value={leftHanded}
             onChange={(e) =>
-              setFieldValue("languagePrefs.leftHanded", e.target.value)
+              form.setFieldsValue({
+                languagePrefs: {
+                  ...form.getFieldValue("languagePrefs"),
+                  leftHanded: e.target.value,
+                },
+              })
             }
           />
-        </div>
+        </Form.Item>
 
-        <div>
-          <label className="font-semibold block mb-1">
-            Medical information (allergies / ailments)
-          </label>
+        {/* Medical Info */}
+        <Form.Item
+          name="medicalInfo"
+          label="Medical information (allergies/ailments)"
+        >
           <Input.TextArea
             rows={4}
-            value={values.medicalInfo}
-            onChange={(e) => setFieldValue("medicalInfo", e.target.value)}
+            value={medicalInfo}
+            onChange={(e) =>
+              form.setFieldsValue({ medicalInfo: e.target.value })
+            }
             placeholder="Describe any condition the school should know..."
-            ref={(el) => (formRefs.current["medicalInfo"] = el)}
           />
-        </div>
+        </Form.Item>
       </div>
 
-      {/* Language Modal */}
+      {/* Add / Manage Modal */}
       <Modal
-        title={`Add ${modalType === "second" ? "Second" : "Third"} Language`}
-        visible={isLanguageModalVisible}
-        onOk={handleAddLanguage}
+        title={
+          modalType === "valueEd"
+            ? "Add Value Education Option"
+            : `Add ${modalType === "second" ? "Second" : "Third"} Language`
+        }
+        open={modalVisible}
+        onOk={saveNew}
         onCancel={() => {
-          setIsLanguageModalVisible(false);
-          setNewLanguage("");
+          setModalVisible(false);
+          setNewItem("");
         }}
-        okText="Add Language"
+        okText="Add"
         okButtonProps={{
           className: "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white",
         }}
       >
         <Input
-          placeholder="Enter language name"
-          value={newLanguage}
-          onChange={(e) => setNewLanguage(e.target.value)}
+          placeholder="Enter name"
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
         />
-        {languageOptions[`${modalType}Languages`]?.length > 0 && (
-          <div className="mt-4">
-            <h4>Current Options:</h4>
-            <ul className="list-disc pl-5">
-              {languageOptions[`${modalType}Languages`]?.map((lang) => (
-                <li
-                  key={lang}
-                  className="flex justify-between items-center py-1"
-                >
-                  {lang}
-                  <Button
-                    type="text"
-                    danger
-                    size="small"
-                    onClick={() => handleRemoveLanguage(lang, modalType)}
-                  >
-                    Remove
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </Modal>
-
-      {/* Value Education Modal */}
-      <Modal
-        title="Add Value Education Option"
-        visible={isValueEdModalVisible}
-        onOk={handleAddValueEd}
-        onCancel={() => {
-          setIsValueEdModalVisible(false);
-          setNewValueEd("");
-        }}
-        okText="Add Option"
-        okButtonProps={{
-          className: "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white",
-        }}
-      >
-        <Input
-          placeholder="Enter value education option"
-          value={newValueEd}
-          onChange={(e) => setNewValueEd(e.target.value)}
-        />
-        {admissionOptions?.valueEducation?.length > 0 && (
-          <div className="mt-4">
-            <h4>Current Options:</h4>
-            <ul className="list-disc pl-5">
-              {admissionOptions?.valueEducation?.map((option) => (
-                <li
-                  key={option}
-                  className="flex justify-between items-center py-1"
-                >
-                  {option}
-                  <Button
-                    type="text"
-                    danger
-                    size="small"
-                    onClick={() => handleRemoveValueEd(option)}
-                  >
-                    Remove
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        <ul className="list-disc pl-5 mt-4">
+          {(modalType === "valueEd"
+            ? admissionOptions.valueEducation || []
+            : languageOpts[`${modalType}Languages`] || []
+          ).map((opt) => (
+            <li key={opt} className="flex justify-between items-center py-1">
+              {opt}
+              <Button
+                type="text"
+                danger
+                size="small"
+                onClick={() => removeItem(opt, modalType)}
+              >
+                Remove
+              </Button>
+            </li>
+          ))}
+        </ul>
       </Modal>
     </div>
   );

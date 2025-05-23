@@ -17,44 +17,54 @@ const StudentCard = memo(({ studentInfo, academicInfo, imagePreview }) => {
     firstName = "",
     lastName = "",
     studentId = "",
-    phoneNumber = "",
+    contactNumber = "",
     gender = "",
     nationality = "",
     email = "",
+    middleName = "",
   } = studentInfo;
 
-  const classList = useSelector((store) => store.admin.class.classes);
-  const selectedClass = classList.find(
-    (classItem) => classItem._id === academicInfo?.class
-  );
-  const className = selectedClass ? selectedClass.className : "";
+  const classList = useSelector((s) => s.admin.class.classes);
+  const selectedClass = classList.find((c) => c._id === academicInfo?.class);
+  const className = selectedClass?.className ?? "";
 
-  const truncateText = (text, maxLength) => {
-    return text?.length > maxLength
-      ? text.substring(0, maxLength) + "..."
-      : text;
-  };
+  const truncate = (txt, len) =>
+    txt?.length > len ? txt.slice(0, len) + "…" : txt;
 
   return (
     <motion.div
-      className="pb-3 mt-2 bg-white rounded-lg shadow-md w-60 border"
+      className="pb-4 mt-2 bg-white rounded-lg shadow-md w-60 border"
       variants={cardVariants}
       initial="hidden"
       animate="visible"
     >
-      <div className="flex flex-col">
-        <div
-          className="w-full h-32 bg-cover bg-center rounded-t-md relative flex justify-center items-center"
-          style={{ backgroundImage: `url(${CardBanner})` }}
-        >
-          <div className="absolute top-2 left-2 text-white text-sm font-semibold">
-            <Logo height="h-6" />
-          </div>
-          <div className="mt-2 bg-white rounded-full flex justify-center items-center">
+      {/* Banner */}
+      <div className="relative w-full h-32 rounded-t-md overflow-hidden">
+        <img
+          src={CardBanner}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          onError={(e) => (e.target.style.display = "none")}
+        />
+        {/* Logo */}
+        <div className="absolute top-1 p-1 left-1 bg-purple-100 rounded-lg">
+          <Logo height="h-5" variant="light" />
+        </div>
+        {/* Avatar + Ribbon */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          {/* Ribbon behind avatar */}
+          <img
+            src="https://static.vecteezy.com/system/resources/previews/018/742/429/large_2x/colorful-ribbon-vibrant-colored-wavy-tape-abstract-design-element-png.png"
+            alt=""
+            className="absolute top-20 w-32 transform -translate-y-1 pointer-events-none z-10"
+            onError={(e) => (e.target.style.display = "none")}
+          />
+          {/* Avatar on top */}
+          <div className="relative z-20 bg-white rounded-full p-1 shadow-md">
             {imagePreview ? (
               <img
-                src={imagePreview?.preview}
-                alt={firstName}
+                src={imagePreview}
+                alt={`${firstName} ${lastName}`}
                 className="rounded-full w-20 h-20 object-cover"
               />
             ) : (
@@ -62,37 +72,39 @@ const StudentCard = memo(({ studentInfo, academicInfo, imagePreview }) => {
             )}
           </div>
         </div>
+      </div>
 
-        <div className="mt-2 px-3">
-          <h2 className="text-base text-center font-semibold">
-            {firstName || t("First Name")} {lastName || t("Last Name")}
-          </h2>
-          <div className="text-xs text-gray-600 mt-1 space-y-1">
-            <p>
-              <span className="font-semibold">{t("ID")}</span>:{" "}
-              {studentId || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">{t("Class")}</span>:{" "}
-              {className || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">{t("Gender")}</span>:{" "}
-              {gender || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">{t("Nationality")}</span>:{" "}
-              {nationality || "N/A"}
-            </p>
-            <p title={email}>
-              <span className="font-semibold">{t("Email")}</span>:{" "}
-              {truncateText(email, 20) || "N/A"}
-            </p>
-            <p>
-              <span className="font-semibold">{t("Phone")}</span>:{" "}
-              {phoneNumber || "N/A"}
-            </p>
-          </div>
+      {/* Details */}
+      <div className="mt-4 px-3 text-center capitalize">
+        <h2 className="text-base font-semibold">
+          {firstName || t("First Name")} {middleName || t("Middle")}{" "}
+          {lastName || t("Last Name")}
+        </h2>
+        <div className="mt-2 text-xs text-gray-600 space-y-1 text-left">
+          <p>
+            <span className="font-semibold">{t("ID")}:</span>{" "}
+            {studentId || "N/A"}
+          </p>
+          <p>
+            <span className="font-semibold">{t("Class")}:</span>{" "}
+            {className || "N/A"}
+          </p>
+          <p>
+            <span className="font-semibold">{t("Gender")}:</span>{" "}
+            {gender || "N/A"}
+          </p>
+          <p>
+            <span className="font-semibold">{t("Nationality")}:</span>{" "}
+            {nationality || "N/A"}
+          </p>
+          <p title={email}>
+            <span className="font-semibold">{t("Email")}:</span>{" "}
+            {truncate(email, 20) || "N/A"}
+          </p>
+          <p>
+            <span className="font-semibold">{t("Phone")}:</span>{" "}
+            {contactNumber || "N/A"}
+          </p>
         </div>
       </div>
     </motion.div>
