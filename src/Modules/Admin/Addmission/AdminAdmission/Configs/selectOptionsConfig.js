@@ -228,7 +228,11 @@ export const RELIGION_OPTIONS = [
   { label: "Rastafarianism", value: "rastafarianism" },
   { label: "Spiritism", value: "spiritism" },
 ];
-
+export const CONTACT_TYPE_OPTIONS = [
+  { value: "father", label: "Father" },
+  { value: "mother", label: "Mother" },
+  { value: "guardian", label: "Guardian" },
+];
 export const NATIVE_LANGUAGE_OPTIONS = [
   { label: "Abkhaz", value: "ab" },
   { label: "Afar", value: "aa" },

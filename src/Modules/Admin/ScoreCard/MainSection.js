@@ -14,6 +14,7 @@ import { useParams } from 'react-router-dom';
 import CommonDataTable from './components/CommonDataTable';
 import toast from 'react-hot-toast';
 import CellDataTable from './components/CellDataTable';
+import ScoreCardView from './components/ScoreCardView';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -26,9 +27,10 @@ const MainSection = () => {
   const { loading, success, scoreCardData, error } = useSelector((state) => state.admin.scoreCard);
   const [file, setFile] = useState(null);
   const [fieldModal, setFieldModal] = useState(false);
+  const [scoreCardViewModal, setScoreCardViewModal] = useState(false);
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-    const [publishStatus, setPublishStatus] = React.useState("unpublish");
+  const [publishStatus, setPublishStatus] = React.useState("unpublish");
   const { cid } = useParams();
   const [newField, setNewField] = useState({
     cellNumber: '',
@@ -41,7 +43,6 @@ const MainSection = () => {
     CLOUDINARY_UPLOAD_PRESET,
     CLOUDINARY_FOLDER
   );
-
   const validateCellNumber = (cell) => /^[A-Z]+[1-9][0-9]*$/i.test(cell);
 
   useEffect(() => {
@@ -121,11 +122,79 @@ const MainSection = () => {
     }
   };
 
-    const handleChange = (value) => {
+
+  const handleChange = (value) => {
     setPublishStatus(value);
-    console.log("Selected:", value); 
+    console.log("Selected:", value);
   };
   // const CellData = () => <div>Grades Component Placeholder</div>;
+
+  const studentFields = [
+    { label: "Profile Image", value: "profile" },
+    { label: "First Name", value: "firstName" },
+    { label: "Last Name", value: "lastName" },
+    { label: "Email", value: "email" },
+    { label: "Date of Birth", value: "dateOfBirth" },
+    { label: "Place of Birth", value: "placeOfBirth" },
+    { label: "Passport Number", value: "passportNumber" },
+    { label: "Age", value: "age" },
+    { label: "Nationality", value: "nationality" },
+    { label: "Native Language", value: "nativeLanguage" },
+    { label: "Blood Group", value: "bloodGroup" },
+    { label: "Gender", value: "gender" },
+    { label: "Contact Number", value: "contactNumber" },
+    { label: "Religion", value: "religion" },
+
+    // Guardian Fields (Father)
+    { label: "Father First Name", value: "fatherInfo.firstName" },
+    { label: "Father Last Name", value: "fatherInfo.lastName" },
+    { label: "Father Email", value: "fatherInfo.email1" },
+    { label: "Father Contact", value: "fatherInfo.cell1.value" },
+
+    // Guardian Fields (Mother)
+    { label: "Mother First Name", value: "motherInfo.firstName" },
+    { label: "Mother Last Name", value: "motherInfo.lastName" },
+    { label: "Mother Email", value: "motherInfo.email1" },
+    { label: "Mother Contact", value: "motherInfo.cell1.value" },
+
+    // Additional Guardian Fields
+    { label: "Guardian Name", value: "guardianName" },
+    { label: "Guardian Relation", value: "guardianRelationToStudent" },
+    { label: "Guardian Contact", value: "guardianContactNumber" },
+    { label: "Guardian Email", value: "guardianEmail" },
+
+    // Address
+    { label: "Permanent Address - City", value: "permanentAddress.city" },
+    { label: "Permanent Address - Country", value: "permanentAddress.country" },
+    { label: "Residential Address - City", value: "residentialAddress.city" },
+    { label: "Residential Address - Country", value: "residentialAddress.country" },
+
+    // Academic
+    { label: "Admission Number", value: "admissionNumber" },
+    { label: "Admission Date", value: "admissionDate" },
+    { label: "Enrollment Status", value: "enrollmentStatus" },
+    { label: "Batch Start", value: "batchStart" },
+    { label: "Batch End", value: "batchEnd" },
+    { label: "Is Graduate", value: "isGraduate" },
+
+
+    // Emergency
+    { label: "Emergency Number", value: "emergencyNumber" },
+
+
+    // Language Preference
+    { label: "Second Language", value: "secondLanguage" },
+    { label: "Third Language", value: "thirdLanguage" },
+    { label: "Value Education", value: "valueEducation" },
+
+    // Preferences
+    { label: "Left Handed", value: "isLeftHanded" },
+    { label: "Medical Condition", value: "medicalCondition" },
+    { label: "Height", value: "height" },
+    { label: "Weight", value: "weight" },
+    { label: "Transport Required", value: "transportRequirement" },
+  ];
+
 
   return (
     <div className="p-4">
@@ -139,64 +208,79 @@ const MainSection = () => {
         >
           Add Field
         </Button>
- <div className="flex justify-center items-center gap-5">
-      <Button
-        type="primary"
-        icon={<UploadOutlined />}
-        className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
-        onClick={() => setUploadModalVisible(true)}
-      >
-        {scoreCardData ? "Update Excel File" : "Add Excel File"}
-      </Button>
+        <div className="flex justify-center items-center gap-5">
+          <Button
+            type="primary"
+            icon={<UploadOutlined />}
+            className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
+            onClick={() => setUploadModalVisible(true)}
+          >
+            {scoreCardData ? "Update Excel File" : "Add Excel File"}
+          </Button>
 
-      <Button
-        type="primary"
-        icon={<UploadOutlined />}
-        className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
-        onClick={() => setUploadModalVisible(true)}
-      >
-        View File
-      </Button>
+          {
+            scoreCardData.pdfFile &&
+            <Button
+              type="primary"
+              icon={<UploadOutlined />}
+              className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
+              onClick={() => setScoreCardViewModal(true)}
+            >
+              View File
+            </Button>
+          }
 
-      {/* Select Publish/Unpublish */}
-      <Select
-        value={publishStatus}
-        onChange={handleChange}
-        className="w-40 rounded-md"
-      >
-        <Option value="unpublish">Unpublish</Option>
-        <Option value="publish">Publish</Option>
-      </Select>
-    </div>
+          {/* Select Publish/Unpublish */}
+          <Select
+            value={publishStatus}
+            onChange={handleChange}
+            className="w-40 rounded-md"
+          >
+            <Option value="unpublish">Unpublish</Option>
+            <Option value="publish">Publish</Option>
+          </Select>
+        </div>
       </div>
 
       {/* Upload Modal */}
-   <Modal
-  title="Upload Excel File"
-  open={uploadModalVisible}
-  onOk={handleUploadOk}
-  onCancel={() => setUploadModalVisible(false)}
-  confirmLoading={loading}
->
-  {/* Description */}
-  <p className="text-gray-600 text-sm mb-4 bg-gray-100 p-3 rounded-md">
-    Please note: The <strong>first sheet</strong> of the uploaded Excel file will be used. 
-    Ensure it contains the required data in the correct format for a seamless upload process.
-  </p>
+      <Modal
+        title="Upload Excel File"
+        open={uploadModalVisible}
+        onOk={handleUploadOk}
+        onCancel={() => setUploadModalVisible(false)}
+        confirmLoading={loading}
+      >
+        {/* Description */}
+        <p className="text-gray-600 text-sm mb-4 bg-gray-100 p-3 rounded-md">
+          Please note: The <strong>first sheet</strong> of the uploaded Excel file will be used.
+          Ensure it contains the required data in the correct format for a seamless upload process.
+        </p>
 
-  {/* File Upload */}
-  <Upload
-    beforeUpload={(file) => setFile(file) && false}
-    accept=".xlsx"
-    maxCount={1}
-    showUploadList={false}
-  >
-    <Button icon={<UploadOutlined />}>Select Excel File</Button>
-  </Upload>
+        {/* File Upload */}
+        <Upload
+          beforeUpload={(file) => setFile(file) && false}
+          accept=".xlsx"
+          maxCount={1}
+          showUploadList={false}
+        >
+          <Button icon={<UploadOutlined />}>Select Excel File</Button>
+        </Upload>
 
-  {/* Display selected file */}
-  {file && <div className="mt-2 text-gray-700">Selected file: {file.name}</div>}
-</Modal>
+        {/* Display selected file */}
+        {file && <div className="mt-2 text-gray-700">Selected file: {file.name}</div>}
+      </Modal>
+
+      // scorecard view modal
+      <Modal
+        title="Upload Excel File"
+        open={scoreCardViewModal}
+        // onOk={handleUploadOk}
+        onCancel={() => setScoreCardViewModal(false)}
+        confirmLoading={loading}
+      >
+       <ScoreCardView pdfUrl={scoreCardData.pdfFile}/>
+      
+      </Modal>
 
 
       {/* Field Modal */}
@@ -215,30 +299,9 @@ const MainSection = () => {
           onChange={(value) => setNewField({ ...newField, fieldName: value })}
           className="mb-2 w-full"
         >
-          {[
-            'firstName',
-            'lastName',
-            'email',
-            'dateOfBirth',
-            'placeOfBirth',
-            'age',
-            'nationality',
-            'nativeLanguage',
-            'passportNumber',
-            'bloodGroup',
-            'gender',
-            'contactNumber',
-            'religion',
-            'currentStep',
-            'fatherName',
-            'motherName',
-            'guardianName',
-            'guardianRelationToStudent',
-            'guardianContactNumber',
-            'guardianEmail',
-          ].map((field) => (
-            <Option key={field} value={field}>
-              {field}
+          {studentFields.map((field) => (
+            <Option key={field.value} value={field.value}>
+              {field.label}
             </Option>
           ))}
         </Select>
