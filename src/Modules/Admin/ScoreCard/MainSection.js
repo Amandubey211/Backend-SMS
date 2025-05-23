@@ -30,7 +30,8 @@ const MainSection = () => {
   const [scoreCardViewModal, setScoreCardViewModal] = useState(false);
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [publishStatus, setPublishStatus] = React.useState("unpublish");
+  const [publishStatus, setPublishStatus] = useState("unpublish");
+  const [openPublishModal, setOpenPublishModal] = useState(false)
   const { cid } = useParams();
   const [newField, setNewField] = useState({
     cellNumber: '',
@@ -47,6 +48,11 @@ const MainSection = () => {
 
   useEffect(() => {
     dispatch(getScoreCard(cid));
+    if (scoreCardData.publish) {
+      setPublishStatus("publish")
+    } else {
+      setPublishStatus("unpublish")
+    }
   }, [dispatch, cid]);
 
   useEffect(() => {
@@ -122,12 +128,16 @@ const MainSection = () => {
     }
   };
 
-
   const handleChange = (value) => {
     setPublishStatus(value);
-    console.log("Selected:", value);
+    setOpenPublishModal(true)
   };
-  // const CellData = () => <div>Grades Component Placeholder</div>;
+
+  const handlePublishSubmit = async() => {
+    
+   await dispatch(updateScoreCard({ publish: publishStatus === 'publish'? true : false, scoreCardId: scoreCardData._id }))
+    setOpenPublishModal(false)
+  }
 
   const studentFields = [
     { label: "Profile Image", value: "profile" },
@@ -177,11 +187,8 @@ const MainSection = () => {
     { label: "Batch End", value: "batchEnd" },
     { label: "Is Graduate", value: "isGraduate" },
 
-
     // Emergency
     { label: "Emergency Number", value: "emergencyNumber" },
-
-
     // Language Preference
     { label: "Second Language", value: "secondLanguage" },
     { label: "Third Language", value: "thirdLanguage" },
@@ -235,10 +242,13 @@ const MainSection = () => {
             value={publishStatus}
             onChange={handleChange}
             className="w-40 rounded-md"
-          >
-            <Option value="unpublish">Unpublish</Option>
-            <Option value="publish">Publish</Option>
-          </Select>
+            options={[
+              { label: "Publish", value: "publish" },
+              { label: "Unpublish", value: "unpublish" },
+            ]}
+          />
+
+
         </div>
       </div>
 
@@ -252,7 +262,7 @@ const MainSection = () => {
       >
         {/* Description */}
         <p className="text-gray-600 text-sm mb-4 bg-gray-100 p-3 rounded-md">
-          Please note: The <strong>first sheet</strong> of the uploaded Excel file will be used.
+          Note: The <strong>first sheet</strong> of the uploaded Excel file will be used.
           Ensure it contains the required data in the correct format for a seamless upload process.
         </p>
 
@@ -270,7 +280,19 @@ const MainSection = () => {
         {file && <div className="mt-2 text-gray-700">Selected file: {file.name}</div>}
       </Modal>
 
-      // scorecard view modal
+      {/* Publish Modal */}
+      <Modal
+        title={`Confirm ${publishStatus === "publish" ? "Publish" : "Unpublish"}`}
+        open={openPublishModal}
+        onOk={handlePublishSubmit}
+        onCancel={()=>setOpenPublishModal(false)}
+        okText="Yes"
+        cancelText="No"
+      >
+        <p>Are you sure you want to {publishStatus === "publish" ? "publish" : "unpublish"} the Report Card?</p>
+      </Modal>
+
+      {/* scorecard view modal */}
       <Modal
         title="Upload Excel File"
         open={scoreCardViewModal}
@@ -278,8 +300,8 @@ const MainSection = () => {
         onCancel={() => setScoreCardViewModal(false)}
         confirmLoading={loading}
       >
-       <ScoreCardView pdfUrl={scoreCardData.pdfFile}/>
-      
+        <ScoreCardView pdfUrl={scoreCardData.pdfFile} />
+
       </Modal>
 
 
