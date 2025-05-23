@@ -15,6 +15,7 @@ import CommonDataTable from './components/CommonDataTable';
 import toast from 'react-hot-toast';
 import CellDataTable from './components/CellDataTable';
 import ScoreCardView from './components/ScoreCardView';
+import { FaEye } from "react-icons/fa";
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -229,7 +230,7 @@ const MainSection = () => {
             scoreCardData?.pdfFile &&
             <Button
               type="primary"
-              icon={<UploadOutlined />}
+              icon={<FaEye />}
               className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
               onClick={() => setScoreCardViewModal(true)}
             >
@@ -294,14 +295,13 @@ const MainSection = () => {
 
       {/* scorecard view modal */}
       <Modal
-        title="Upload Excel File"
         open={scoreCardViewModal}
-        // onOk={handleUploadOk}
         onCancel={() => setScoreCardViewModal(false)}
-        confirmLoading={loading}
+         width="80%" 
+  footer={null}
       >
         <ScoreCardView pdfUrl={scoreCardData?.pdfFile} />
-
+        
       </Modal>
 
 
