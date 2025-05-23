@@ -156,54 +156,54 @@ const LanguagePreferences = memo(({ showThirdLang }) => {
         </div>
 
         {/* Third Language */}
-        {showThirdLang && (
-          <div className="flex justify-between items-end gap-2">
-            <div className="w-4/5">
-              <Form.Item
-                name={["languagePrefs", "third"]}
-                label="Third language preference (Grade 3+)"
+        {/* {showThirdLang && ( */}
+        <div className="flex justify-between items-center gap-2">
+          <div className="w-4/5">
+            <Form.Item
+              name={["languagePrefs", "third"]}
+              label="Third language preference (Grade 3+)"
+            >
+              <Select
+                mode="multiple"
+                style={{ width: "100%" }}
+                placeholder="Select Third Language"
+                value={third}
+                loading={loading}
+                onChange={(v) =>
+                  form.setFieldsValue({
+                    languagePrefs: {
+                      ...form.getFieldValue("languagePrefs"),
+                      third: v,
+                    },
+                  })
+                }
               >
-                <Select
-                  mode="multiple"
-                  style={{ width: "100%" }}
-                  placeholder="Select Third Language"
-                  value={third}
-                  loading={loading}
-                  onChange={(v) =>
-                    form.setFieldsValue({
-                      languagePrefs: {
-                        ...form.getFieldValue("languagePrefs"),
-                        third: v,
-                      },
-                    })
-                  }
-                >
-                  {languageOpts.thirdLanguages.map((l) => (
-                    <Option key={l} value={l}>
-                      {l}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </div>
-            <div className="w-1/5 flex gap-2">
+                {languageOpts.thirdLanguages.map((l) => (
+                  <Option key={l} value={l}>
+                    {l}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+          </div>
+          <div className="w-1/5 flex gap-2">
+            <Button
+              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
+              onClick={() => openModal("third")}
+            >
+              Add
+            </Button>
+            {languageOpts.thirdLanguages.length > 0 && (
               <Button
-                className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white flex items-center gap-1 hover:opacity-90"
+                className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
                 onClick={() => openModal("third")}
               >
-                Add
+                Manage
               </Button>
-              {languageOpts.thirdLanguages.length > 0 && (
-                <Button
-                  className="border border-[#C83B62] text-[#C83B62] hover:bg-[#f9f0f5]"
-                  onClick={() => openModal("third")}
-                >
-                  Manage
-                </Button>
-              )}
-            </div>
+            )}
           </div>
-        )}
+        </div>
+        {/* )} */}
 
         {/* Value Education */}
         <div className="flex justify-between items-center  gap-2">

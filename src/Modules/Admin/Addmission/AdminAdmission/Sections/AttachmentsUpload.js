@@ -25,7 +25,7 @@ const GRADIENT = {
   border: "none",
   color: "#fff",
 };
-const { Option } = Form; // not used, but kept for symmetry
+const { Option } = Select; // not used, but kept for symmetry
 
 const makeKey = ({ name = "", _id = "" }) => name; // Just return the original name
 
@@ -204,10 +204,11 @@ const FilePreviewModal = ({ file, onClose }) => {
 
 const MetaModal = ({ open, initial, onClose, onSave }) => {
   const [form] = Form.useForm();
+
   useEffect(() => {
     if (open) {
       form.setFieldsValue({
-        name: initial?.name,
+        name: initial?.name || "",
         mandatory: initial?.mandatory ? "mandatory" : "optional",
       });
     }
@@ -215,7 +216,11 @@ const MetaModal = ({ open, initial, onClose, onSave }) => {
 
   const handleOk = () => {
     form.validateFields().then(({ name, mandatory }) => {
-      onSave({ key: initial?.key, name, mandatory: mandatory === "mandatory" });
+      onSave({
+        key: initial?.key,
+        name,
+        mandatory: mandatory === "mandatory",
+      });
     });
   };
 
@@ -242,9 +247,10 @@ const MetaModal = ({ open, initial, onClose, onSave }) => {
         <Form.Item
           name="mandatory"
           label="Category"
-          rules={[{ required: true }]}
+          rules={[{ required: true, message: "Please select a category" }]}
+          initialValue="optional" // Set default value
         >
-          <Select>
+          <Select placeholder="Select category">
             <Option value="mandatory">Mandatory</Option>
             <Option value="optional">Optional</Option>
           </Select>
