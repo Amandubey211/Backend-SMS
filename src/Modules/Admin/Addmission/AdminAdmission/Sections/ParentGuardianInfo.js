@@ -1,170 +1,179 @@
 import React from "react";
-import { Row, Col } from "antd";
+import { Form, Row, Col, Input, DatePicker, Select } from "antd";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
 import {
+  UserOutlined,
   IdcardOutlined,
   CalendarOutlined,
-  UserOutlined,
   GlobalOutlined,
-  MailOutlined,
   HomeOutlined,
+  MailOutlined,
   PhoneOutlined,
 } from "@ant-design/icons";
-import ImageUploader from "../Components/ImageUploader";
-import CompactIconInput from "../Components/CompactIconInput";
-import CompactIconDatePicker from "../Components/CompactIconDatePicker";
-import CompactIconSelect from "../Components/CompactIconSelect";
-import CompactPhoneInputWithWhatsApp from "../Components/CompactPhoneInputWithWhatsApp ";
+import CustomUploadCard from "../../../../LoginPages/Student/SignUp/Components/CustomUploadCard";
 
-import {
-  RELIGION_OPTIONS,
-  COUNTRY_OPTIONS,
-} from "../Configs/selectOptionsConfig";
+const { Option } = Select;
 
-const ParentGuardianInfo = () => {
+const ParentGuardianInfo = ({ form }) => {
   return (
-    <div>
+    <>
       {/* Father Information */}
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mb-4">
         Father Information
       </h2>
-      <Row gutter={16}>
+      <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
-          <ImageUploader
-            name="fatherInfo.fatherPhoto"
-            recommendedSize="300x400px"
-            previewTitle="Father Photo Preview"
-            height="h-64"
-          />
+          <Form.Item
+            name={["fatherInfo", "fatherPhoto"]}
+            label="Father Photo"
+            // rules={[{ required: true, message: "Father photo is required" }]}
+          >
+            <CustomUploadCard
+              name="fatherPhoto"
+              form={form}
+              recommendedSize="300x400"
+              width="w-full"
+              height="h-52"
+              // required
+            />
+          </Form.Item>
         </Col>
         <Col xs={24} md={18}>
-          <Row gutter={16}>
+          {/* Name Fields */}
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={8}>
-              <CompactIconInput
-                name="fatherInfo.firstName"
-                icon={<UserOutlined />}
-                tooltip="Father's First Name"
-                placeholder="First Name"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="fatherInfo.middleName"
-                icon={<UserOutlined />}
-                tooltip="Father's Middle Name"
-                placeholder="Middle Name"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="fatherInfo.lastName"
-                icon={<UserOutlined />}
-                tooltip="Father's Last Name"
-                placeholder="Last Name"
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="fatherInfo.idNumber"
-                icon={<IdcardOutlined />}
-                tooltip="Father's ID Number"
-                placeholder="Father ID"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconDatePicker
-                name="fatherInfo.idExpiry"
-                icon={<CalendarOutlined />}
-                tooltip="Father ID Expiry"
-                placeholder="ID Expiry"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconSelect
-                name="fatherInfo.religion"
-                icon={<GlobalOutlined />}
-                tooltip="Father's Religion"
-                placeholder="Religion"
-                allowCustom
-                options={RELIGION_OPTIONS}
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={8}>
-              <CompactIconSelect
-                name="fatherInfo.nationality"
-                icon={<GlobalOutlined />}
-                tooltip="Father's Nationality"
-                placeholder="Nationality"
-                allowCustom
-                options={COUNTRY_OPTIONS}
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="fatherInfo.company"
-                icon={<HomeOutlined />}
-                tooltip="Father's Workplace or Company"
-                placeholder="Company"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="fatherInfo.jobTitle"
-                icon={<HomeOutlined />}
-                tooltip="Father's Job Title or Position"
-                placeholder="Job Title"
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={12} className="flex flex-col "> 
-             <label
-                htmlFor="fatherInfo.cell1"
-                className="mb-1 text-sm font-medium text-gray-700"
+              <Form.Item
+                name={["fatherInfo", "firstName"]}
+                label="First Name"
+                rules={[{ required: true, message: "First name is required" }]}
               >
-                Primary Contact:
-              </label>
-              <CompactPhoneInputWithWhatsApp
-                phoneName="fatherInfo.cell1"
-                whatsappName="fatherInfo.cell1IsWhatsapp"
-                tooltip="Father's Primary Contact"
-              />
+                <Input prefix={<UserOutlined />} placeholder="First Name" />
+              </Form.Item>
             </Col>
-            <Col xs={24} md={12} className="flex flex-col ">
-            <label
-                htmlFor="fatherInfo.cell2"
-                className="mb-1 text-sm font-medium text-gray-700"
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["fatherInfo", "middleName"]}
+                label="Middle Name"
               >
-                Secondary Contact:
-              </label>
-              <CompactPhoneInputWithWhatsApp
-                phoneName="fatherInfo.cell2"
-                whatsappName="fatherInfo.cell2IsWhatsapp"
-                tooltip="Alternate Contact"
-              />
+                <Input prefix={<UserOutlined />} placeholder="Middle Name" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["fatherInfo", "lastName"]}
+                label="Last Name"
+                rules={[{ required: true, message: "Last name is required" }]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Last Name" />
+              </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16} className="mt-4">
+
+          {/* ID & Religion */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["fatherInfo", "idNumber"]}
+                label="ID Number"
+                rules={[{ required: true, message: "ID number is required" }]}
+              >
+                <Input prefix={<IdcardOutlined />} placeholder="ID Number" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["fatherInfo", "idExpiry"]}
+                label="ID Expiry"
+                rules={[{ required: true, message: "Expiry date is required" }]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  suffixIcon={<CalendarOutlined />}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item name={["fatherInfo", "religion"]} label="Religion">
+                <Select placeholder="Religion" suffixIcon={<GlobalOutlined />}>
+                  <Option value="christianity">Christianity</Option>
+                  <Option value="islam">Islam</Option>
+                  <Option value="hinduism">Hinduism</Option>
+                  <Option value="other">Other</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Nationality & Job */}
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["fatherInfo", "nationality"]}
+                label="Nationality"
+              >
+                <Select
+                  placeholder="Nationality"
+                  suffixIcon={<GlobalOutlined />}
+                >
+                  <Option value="albania">Albania</Option>
+                  <Option value="india">India</Option>
+                  <Option value="qatari">Qatar</Option>
+                  <Option value="other">Other</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item name={["fatherInfo", "company"]} label="Company">
+                <Input prefix={<HomeOutlined />} placeholder="Company" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item name={["fatherInfo", "jobTitle"]} label="Job Title">
+                <Input prefix={<HomeOutlined />} placeholder="Job Title" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {/* Contacts & Email */}
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <CompactIconInput
-                name="fatherInfo.email1"
-                icon={<MailOutlined />}
-                tooltip="Father's Primary Email"
-                placeholder="Email"
-                type="email"
-              />
+              <Form.Item
+                name={["fatherInfo", "cell1"]}
+                label="Primary Contact"
+                rules={[
+                  { required: true, message: "Primary contact is required" },
+                ]}
+              >
+                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+              </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <CompactIconInput
-                name="fatherInfo.email2"
-                icon={<MailOutlined />}
-                tooltip="Additional Email"
-                placeholder="Email 2"
-                type="email"
-              />
+              <Form.Item
+                name={["fatherInfo", "cell2"]}
+                label="Secondary Contact"
+              >
+                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name={["fatherInfo", "email1"]}
+                label="Email"
+                rules={[
+                  { type: "email", message: "Invalid email" },
+                  { required: true, message: "Email is required" },
+                ]}
+              >
+                <Input prefix={<MailOutlined />} placeholder="Email" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name={["fatherInfo", "email2"]} label="Email 2">
+                <Input prefix={<MailOutlined />} placeholder="Email 2" />
+              </Form.Item>
             </Col>
           </Row>
         </Col>
@@ -174,145 +183,155 @@ const ParentGuardianInfo = () => {
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mt-8 mb-4">
         Mother Information
       </h2>
-      <Row gutter={16}>
+      <Row gutter={[16, 16]}>
         <Col xs={24} md={6}>
-          <ImageUploader
-            name="motherInfo.motherPhoto"
-            height="h-64"
-            recommendedSize="300x400px"
-            previewTitle="Mother Photo Preview"
-          />
+          <Form.Item
+            name={["motherInfo", "motherPhoto"]}
+            label="Mother Photo"
+            // rules={[{ required: true, message: "Mother photo is required" }]}
+          >
+            <CustomUploadCard
+              name="motherPhoto"
+              form={form}
+              recommendedSize="300x400"
+              width="w-full"
+              height="h-52"
+              // required
+            />
+          </Form.Item>
         </Col>
         <Col xs={24} md={18}>
-          <Row gutter={16}>
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={8}>
-              <CompactIconInput
-                name="motherInfo.firstName"
-                icon={<UserOutlined />}
-                tooltip="Mother's First Name"
-                placeholder="First Name"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="motherInfo.middleName"
-                icon={<UserOutlined />}
-                tooltip="Mother's Middle Name"
-                placeholder="Middle Name"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="motherInfo.lastName"
-                icon={<UserOutlined />}
-                tooltip="Mother's Last Name"
-                placeholder="Last Name"
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="motherInfo.idNumber"
-                icon={<IdcardOutlined />}
-                tooltip="Mother's ID Number"
-                placeholder="Mother ID"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconDatePicker
-                name="motherInfo.idExpiry"
-                icon={<CalendarOutlined />}
-                tooltip="Mother ID Expiry"
-                placeholder="ID Expiry"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconSelect
-                name="motherInfo.religion"
-                icon={<GlobalOutlined />}
-                tooltip="Mother's Religion"
-                placeholder="Religion"
-                allowCustom
-                options={RELIGION_OPTIONS}
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={8}>
-              <CompactIconSelect
-                name="motherInfo.nationality"
-                icon={<GlobalOutlined />}
-                tooltip="Mother's Nationality"
-                allowCustom
-                placeholder="Nationality"
-                options={COUNTRY_OPTIONS}
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="motherInfo.company"
-                icon={<HomeOutlined />}
-                tooltip="Mother's Workplace or Company"
-                placeholder="Company"
-              />
-            </Col>
-            <Col xs={24} md={8}>
-              <CompactIconInput
-                name="motherInfo.jobTitle"
-                icon={<HomeOutlined />}
-                tooltip="Mother's Job Title or Position"
-                placeholder="Job Title"
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={12} className="flex flex-col ">
-            <label
-                htmlFor="motherInfo.cell1"
-                className="mb-1 text-sm font-medium text-gray-700"
+              <Form.Item
+                name={["motherInfo", "firstName"]}
+                label="First Name"
+                rules={[{ required: true, message: "First name is required" }]}
               >
-                Primary Contact:
-              </label>
-              <CompactPhoneInputWithWhatsApp
-                phoneName="motherInfo.cell1"
-                whatsappName="motherInfo.cell1IsWhatsapp"
-                tooltip="Mother's Primary Contact"
-              />
+                <Input prefix={<UserOutlined />} placeholder="First Name" />
+              </Form.Item>
             </Col>
-            <Col xs={24} md={12} className="flex flex-col ">
-            <label
-                htmlFor="motherInfo.cell2"
-                className="mb-1 text-sm font-medium text-gray-700"
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["motherInfo", "middleName"]}
+                label="Middle Name"
               >
-                Secondary Contact:
-              </label>
-              <CompactPhoneInputWithWhatsApp
-                phoneName="motherInfo.cell2"
-                whatsappName="motherInfo.cell2IsWhatsapp"
-                tooltip="Alternate Contact"
-              />
+                <Input prefix={<UserOutlined />} placeholder="Middle Name" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["motherInfo", "lastName"]}
+                label="Last Name"
+                rules={[{ required: true, message: "Last name is required" }]}
+              >
+                <Input prefix={<UserOutlined />} placeholder="Last Name" />
+              </Form.Item>
             </Col>
           </Row>
-          <Row gutter={16} className="mt-4">
+
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["motherInfo", "idNumber"]}
+                label="ID Number"
+                rules={[{ required: true, message: "ID number is required" }]}
+              >
+                <Input prefix={<IdcardOutlined />} placeholder="ID Number" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["motherInfo", "idExpiry"]}
+                label="ID Expiry"
+                rules={[{ required: true, message: "Expiry date is required" }]}
+              >
+                <DatePicker
+                  style={{ width: "100%" }}
+                  suffixIcon={<CalendarOutlined />}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item name={["motherInfo", "religion"]} label="Religion">
+                <Select placeholder="Religion" suffixIcon={<GlobalOutlined />}>
+                  <Option value="christianity">Christianity</Option>
+                  <Option value="islam">Islam</Option>
+                  <Option value="hinduism">Hinduism</Option>
+                  <Option value="other">Other</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Form.Item
+                name={["motherInfo", "nationality"]}
+                label="Nationality"
+              >
+                <Select
+                  placeholder="Nationality"
+                  suffixIcon={<GlobalOutlined />}
+                >
+                  <Option value="albania">Albania</Option>
+                  <Option value="india">India</Option>
+                  <Option value="qatari">Qatar</Option>
+                  <Option value="other">Other</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item name={["motherInfo", "company"]} label="Company">
+                <Input prefix={<HomeOutlined />} placeholder="Company" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item name={["motherInfo", "jobTitle"]} label="Job Title">
+                <Input prefix={<HomeOutlined />} placeholder="Job Title" />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <CompactIconInput
-                name="motherInfo.email1"
-                icon={<MailOutlined />}
-                tooltip="Mother's Primary Email"
-                placeholder="Email"
-                type="email"
-              />
+              <Form.Item
+                name={["motherInfo", "cell1"]}
+                label="Primary Contact"
+                rules={[
+                  { required: true, message: "Primary contact is required" },
+                ]}
+              >
+                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+              </Form.Item>
             </Col>
-            {/* <Col xs={24} md={12}>
-              <CompactIconInput
-                name="motherInfo.email2"
-                icon={<MailOutlined />}
-                tooltip="Additional Email"
-                placeholder="Email 2"
-                type="email"
-              />
-            </Col> */}
+            <Col xs={24} md={12}>
+              <Form.Item
+                name={["motherInfo", "cell2"]}
+                label="Secondary Contact"
+              >
+                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12}>
+              <Form.Item
+                name={["motherInfo", "email1"]}
+                label="Email"
+                rules={[
+                  { type: "email", message: "Invalid email" },
+                  { required: true, message: "Email is required" },
+                ]}
+              >
+                <Input prefix={<MailOutlined />} placeholder="Email" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item name={["motherInfo", "email2"]} label="Email 2">
+                <Input prefix={<MailOutlined />} placeholder="Email 2" />
+              </Form.Item>
+            </Col>
           </Row>
         </Col>
       </Row>
@@ -321,56 +340,50 @@ const ParentGuardianInfo = () => {
       <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mt-8 mb-4">
         Guardian Information
       </h2>
-      <Row gutter={16}>
-        {/* <Col xs={24} md={6}>
-          <ImageUploader
-            name="guardianPhoto"
-            height="h-64"
-            recommendedSize="300x400px"
-            previewTitle="Guardian Photo Preview"
-          />
-        </Col> */}
-        <Col xs={24} md={18}>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <CompactIconInput
-                name="guardianInformation.guardianName"
-                icon={<UserOutlined />}
-                tooltip="Guardian's Name"
-                placeholder="Guardian Name"
-              />
-            </Col>
-            <Col xs={24} md={12}>
-              <CompactIconInput
-                name="guardianInformation.guardianRelationToStudent"
-                icon={<UserOutlined />}
-                tooltip="Guardian's Relation to Student"
-                placeholder="Relation to Student"
-              />
-            </Col>
-          </Row>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <CompactIconInput
-                name="guardianInformation.guardianContactNumber"
-                icon={<PhoneOutlined />}
-                tooltip="Guardian Contact Number"
-                placeholder="Contact Number"
-              />
-            </Col>
-            <Col xs={24} md={12}>
-              <CompactIconInput
-                name="guardianInformation.guardianEmail"
-                icon={<MailOutlined />}
-                tooltip="Guardian Email"
-                placeholder="Guardian Email"
-                type="email"
-              />
-            </Col>
-          </Row>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={["guardianInformation", "guardianName"]}
+            label="Guardian Name"
+            rules={[{ required: true, message: "Guardian name is required" }]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="Guardian Name" />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={["guardianInformation", "guardianRelationToStudent"]}
+            label="Relation to Student"
+            rules={[{ required: true, message: "Relation is required" }]}
+          >
+            <Input prefix={<UserOutlined />} placeholder="Relation" />
+          </Form.Item>
         </Col>
       </Row>
-    </div>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={["guardianInformation", "guardianContactNumber"]}
+            label="Guardian Contact"
+            rules={[{ required: true, message: "Contact number is required" }]}
+          >
+            <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+          </Form.Item>
+        </Col>
+        <Col xs={24} md={12}>
+          <Form.Item
+            name={["guardianInformation", "guardianEmail"]}
+            label="Guardian Email"
+            rules={[
+              { type: "email", message: "Invalid email" },
+              { required: true, message: "Email is required" },
+            ]}
+          >
+            <Input prefix={<MailOutlined />} placeholder="Guardian Email" />
+          </Form.Item>
+        </Col>
+      </Row>
+    </>
   );
 };
 

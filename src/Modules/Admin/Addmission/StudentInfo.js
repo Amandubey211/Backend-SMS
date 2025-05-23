@@ -10,9 +10,9 @@ const StudentInfo = memo(() => {
   const [showStudentCard, setShowStudentCard] = useState(false);
   const [formData, setFormData] = useState(null);
 
-  // Use useCallback to ensure this function is memoized and doesn't cause unnecessary re-renders
+  // useCallback to avoid unnecessary re-renders
   const handleFormDataChange = useCallback((data) => {
-    console.log(data , "formData");
+    console.log(data, "formData");
     setFormData(data);
   }, []);
 
@@ -24,8 +24,8 @@ const StudentInfo = memo(() => {
             showStudentCard ? "w-3/4" : "w-full"
           }`}
         >
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-gradient">
+          <div className="flex justify-between items-center mb-1">
+            <h2 className="text-md font-semibold text-gradient">
               {t("Student Application")}
             </h2>
             <Space>
@@ -35,12 +35,12 @@ const StudentInfo = memo(() => {
                   showStudentCard ? <EyeInvisibleOutlined /> : <EyeOutlined />
                 }
               >
-                {showStudentCard ? t("Hide Preview") : t("Show Preview")}
+                {showStudentCard ? t("Hide ID Card") : t("Show ID Card")}
               </Button>
             </Space>
           </div>
 
-          {/* Pass handleFormDataChange as a prop, which updates formData on submit */}
+          {/* onFormDataChange will receive values on submit */}
           <AdminAdmissionForm onFormDataChange={handleFormDataChange} />
         </div>
 

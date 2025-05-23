@@ -16,7 +16,6 @@ const CompactIconInput = ({
 
   return (
     <Form.Item
-      // className="mb-2"
       validateStatus={hasError ? "error" : ""}
       help={hasError && meta.error}
     >
@@ -33,8 +32,8 @@ const CompactIconInput = ({
             onBlur={() => helpers.setTouched(true)}
             addonBefore={icon}
             placeholder={placeholder}
-            required={required||false}
-            
+            required={required || false}
+
             // size="large"
           />
         </Space.Compact>
