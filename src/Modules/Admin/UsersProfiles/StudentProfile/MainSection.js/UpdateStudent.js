@@ -117,73 +117,73 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
 
   
 
-  return (
-    <div className="p-4 bg-gray-50 h-full border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="flex flex-col justify-around gap-5">
-          {/* Profile and Basic Info */}
-          <div className="flex flex-row justify-between p-1 border-b border-gray-200 gap-4">
-            <div className="mt-10">
-              <ImageUpload imagePreview={imagePreview} handleImageChange={handleImageChange} handleRemoveImage={handleRemoveImage} />
-            </div>
-            <div className="flex flex-col gap-5">
-              {/* Contact Info */}
-              <div className="flex gap-5">
-                <FormInput id="contactNumber" label="Mobile Number" value={studentData.contactNumber} onChange={handleInputChange} required />
-                <FormInput id="email" label="Email" value={studentData.email} onChange={handleInputChange} required />
-              </div>
-              {/* Name Info */}
-              <div className="flex gap-5">
-                <FormInput id="firstName" label="First Name" value={studentData.firstName} onChange={handleInputChange} required />
-                <FormInput id="lastName" label="Last Name" value={studentData.lastName} onChange={handleInputChange} required />
-              </div>
-              {/* Admission Info */}
-              <div className="flex gap-5">
-                <FormInput id="admissionNumber" label="Admission Number" name="admissionNumber" value={studentData.admissionNumber} onChange={handleInputChange} required />
-                <FormInput id="Q_Id" label="QID" name="Q_Id" value={studentData.Q_Id} onChange={handleInputChange} required />
-              </div>
-              {/* Transport and DOB */}
-              <div className="flex gap-5">
-                <FormSelect id="transportRequirement" label="Transport" name="transportRequirement" value={studentData.transportRequirement} onChange={handleInputChange} options={[{ value: true, label: "Yes" }, { value: false, label: "No" }]} required />
-                <FormInput id="dateOfBirth" type="date" label="Date Of Birth" name="dateOfBirth" value={studentData.dateOfBirth} onChange={handleInputChange} required />
-              </div>
-            </div>
-          </div>
+  return (<></>
+    // <div className="p-4 bg-gray-50 h-full border rounded-lg overflow-auto" style={{ maxHeight: "90vh" }}>
+    //   <form className="space-y-4" onSubmit={handleSubmit}>
+    //     <div className="flex flex-col justify-around gap-5">
+    //       {/* Profile and Basic Info */}
+    //       <div className="flex flex-row justify-between p-1 border-b border-gray-200 gap-4">
+    //         <div className="mt-10">
+    //           <ImageUpload imagePreview={imagePreview} handleImageChange={handleImageChange} handleRemoveImage={handleRemoveImage} />
+    //         </div>
+    //         <div className="flex flex-col gap-5">
+    //           {/* Contact Info */}
+    //           <div className="flex gap-5">
+    //             <FormInput id="contactNumber" label="Mobile Number" value={studentData.contactNumber} onChange={handleInputChange} required />
+    //             <FormInput id="email" label="Email" value={studentData.email} onChange={handleInputChange} required />
+    //           </div>
+    //           {/* Name Info */}
+    //           <div className="flex gap-5">
+    //             <FormInput id="firstName" label="First Name" value={studentData.firstName} onChange={handleInputChange} required />
+    //             <FormInput id="lastName" label="Last Name" value={studentData.lastName} onChange={handleInputChange} required />
+    //           </div>
+    //           {/* Admission Info */}
+    //           <div className="flex gap-5">
+    //             <FormInput id="admissionNumber" label="Admission Number" name="admissionNumber" value={studentData.admissionNumber} onChange={handleInputChange} required />
+    //             <FormInput id="Q_Id" label="QID" name="Q_Id" value={studentData.Q_Id} onChange={handleInputChange} required />
+    //           </div>
+    //           {/* Transport and DOB */}
+    //           <div className="flex gap-5">
+    //             <FormSelect id="transportRequirement" label="Transport" name="transportRequirement" value={studentData.transportRequirement} onChange={handleInputChange} options={[{ value: true, label: "Yes" }, { value: false, label: "No" }]} required />
+    //             <FormInput id="dateOfBirth" type="date" label="Date Of Birth" name="dateOfBirth" value={studentData.dateOfBirth} onChange={handleInputChange} required />
+    //           </div>
+    //         </div>
+    //       </div>
 
-          {/* Address Inputs */}
-          {/* Permanent Address */}
-          <div>
-            <h2 className="font-medium underline">Permanent Address</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput id="street"  label="Street" value={studentData.permanentAddress.street} name="street" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
-              <FormInput id="city"  label="City" value={studentData.permanentAddress.city} name="city" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
-              <FormInput id="state"  label="State" value={studentData.permanentAddress.state} name="state" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
-              <FormInput id="postalCode"  label="Postal Code" value={studentData.permanentAddress.postalCode} name="postalCode" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
-              <FormInput id="country" label="Country" value={studentData.permanentAddress.country} name="country" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
-            </div>
-          </div>
+    //       {/* Address Inputs */}
+    //       {/* Permanent Address */}
+    //       <div>
+    //         <h2 className="font-medium underline">Permanent Address</h2>
+    //         <div className="grid grid-cols-2 gap-4">
+    //           <FormInput id="street"  label="Street" value={studentData.permanentAddress.street} name="street" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
+    //           <FormInput id="city"  label="City" value={studentData.permanentAddress.city} name="city" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
+    //           <FormInput id="state"  label="State" value={studentData.permanentAddress.state} name="state" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
+    //           <FormInput id="postalCode"  label="Postal Code" value={studentData.permanentAddress.postalCode} name="postalCode" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
+    //           <FormInput id="country" label="Country" value={studentData.permanentAddress.country} name="country" onChange={(e) => handleAddressChange(e, "permanentAddress")} />
+    //         </div>
+    //       </div>
 
-          {/* Residential Address */}
-          <div>
-            <h2 className="font-medium underline">Residential Address</h2>
-            <div className="grid grid-cols-2 gap-4">
-              <FormInput id="street"  label="Street" value={studentData.residentialAddress.street} name="street" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
-              <FormInput id="city"  label="City" value={studentData.residentialAddress.city} name="city" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
-              <FormInput id="state"  label="State" value={studentData.residentialAddress.state} name="state" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
-              <FormInput id="postalCode"  label="Postal Code" value={studentData.residentialAddress.postalCode} name="postalCode" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
-              <FormInput id="country"  label="Country" value={studentData.residentialAddress.country} name="country" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
-            </div>
-          </div>
-        </div>
+    //       {/* Residential Address */}
+    //       <div>
+    //         <h2 className="font-medium underline">Residential Address</h2>
+    //         <div className="grid grid-cols-2 gap-4">
+    //           <FormInput id="street"  label="Street" value={studentData.residentialAddress.street} name="street" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
+    //           <FormInput id="city"  label="City" value={studentData.residentialAddress.city} name="city" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
+    //           <FormInput id="state"  label="State" value={studentData.residentialAddress.state} name="state" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
+    //           <FormInput id="postalCode"  label="Postal Code" value={studentData.residentialAddress.postalCode} name="postalCode" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
+    //           <FormInput id="country"  label="Country" value={studentData.residentialAddress.country} name="country" onChange={(e) => handleAddressChange(e, "residentialAddress")} />
+    //         </div>
+    //       </div>
+    //     </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-center">
-          <button type="submit" className="bg-purple-400 text-white px-4 py-2 rounded">
-            {loading ? "Updating..." : "Update"}
-          </button>
-        </div>
-      </form>
-    </div>
+    //     {/* Submit Button */}
+    //     <div className="flex justify-center">
+    //       <button type="submit" className="bg-purple-400 text-white px-4 py-2 rounded">
+    //         {loading ? "Updating..." : "Update"}
+    //       </button>
+    //     </div>
+    //   </form>
+    // </div>
   );
 };
 

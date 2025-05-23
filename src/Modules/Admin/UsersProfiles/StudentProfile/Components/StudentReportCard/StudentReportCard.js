@@ -3,6 +3,7 @@ import { Document, Page, pdfjs } from "react-pdf";
 import { saveAs } from "file-saver";
 import { useDispatch } from "react-redux";
 import { fetchStudentReportCard } from "../../../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 // Set the worker for react-pdf (required for PDF rendering)
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
@@ -117,7 +118,10 @@ function StudentReportCard({ student }) {
 
   return (
     <div className="w-full p-6 bg-gray-50 rounded-lg shadow-md flex flex-col min-h-[calc(100vh-4rem)]">
-      {pdfUrl ? (
+      {isFetching? <div className="flex w-full h-[90vh] flex-col items-center justify-center">
+      <Spinner />
+    </div>:
+      pdfUrl ? (
         <>
           {/* Buttons Container */}
           <div className="flex justify-between items-center mb-6 w-full">
