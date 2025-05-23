@@ -113,15 +113,13 @@ const CellDataTable = () => {
     }
 
     return (
-    tableData.length < 1 ? (
-        <div>No data available</div>
-    ) : (
+   
         <Table
             columns={columns}
             dataSource={tableData}
             pagination={{ pageSize: 5 }}
         />
-    )
+    
 );
 
 };

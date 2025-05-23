@@ -28,6 +28,7 @@ const MainSection = () => {
   const [fieldModal, setFieldModal] = useState(false);
   const [uploadModalVisible, setUploadModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+    const [publishStatus, setPublishStatus] = React.useState("unpublish");
   const { cid } = useParams();
   const [newField, setNewField] = useState({
     cellNumber: '',
@@ -120,7 +121,11 @@ const MainSection = () => {
     }
   };
 
-  const CellData = () => <div>Grades Component Placeholder</div>;
+    const handleChange = (value) => {
+    setPublishStatus(value);
+    console.log("Selected:", value); 
+  };
+  // const CellData = () => <div>Grades Component Placeholder</div>;
 
   return (
     <div className="p-4">
@@ -134,29 +139,65 @@ const MainSection = () => {
         >
           Add Field
         </Button>
-        <Button
-          type="primary"
-          icon={<UploadOutlined />}
-          className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
-          onClick={() => setUploadModalVisible(true)}
-        >
-          {scoreCardData ? 'Update' : 'Upload'}
-        </Button>
+ <div className="flex justify-center items-center gap-5">
+      <Button
+        type="primary"
+        icon={<UploadOutlined />}
+        className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
+        onClick={() => setUploadModalVisible(true)}
+      >
+        {scoreCardData ? "Update Excel File" : "Add Excel File"}
+      </Button>
+
+      <Button
+        type="primary"
+        icon={<UploadOutlined />}
+        className="rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white flex items-center p-2 text-sm"
+        onClick={() => setUploadModalVisible(true)}
+      >
+        View File
+      </Button>
+
+      {/* Select Publish/Unpublish */}
+      <Select
+        value={publishStatus}
+        onChange={handleChange}
+        className="w-40 rounded-md"
+      >
+        <Option value="unpublish">Unpublish</Option>
+        <Option value="publish">Publish</Option>
+      </Select>
+    </div>
       </div>
 
       {/* Upload Modal */}
-      <Modal
-        title="Upload Excel File"
-        open={uploadModalVisible}
-        onOk={handleUploadOk}
-        onCancel={() => setUploadModalVisible(false)}
-        confirmLoading={loading}
-      >
-        <Upload beforeUpload={(file) => setFile(file) && false} accept=".xlsx" maxCount={1} showUploadList={false}>
-          <Button icon={<UploadOutlined />}>Select Excel File</Button>
-        </Upload>
-        {file && <div className="mt-2">Selected file: {file.name}</div>}
-      </Modal>
+   <Modal
+  title="Upload Excel File"
+  open={uploadModalVisible}
+  onOk={handleUploadOk}
+  onCancel={() => setUploadModalVisible(false)}
+  confirmLoading={loading}
+>
+  {/* Description */}
+  <p className="text-gray-600 text-sm mb-4 bg-gray-100 p-3 rounded-md">
+    Please note: The <strong>first sheet</strong> of the uploaded Excel file will be used. 
+    Ensure it contains the required data in the correct format for a seamless upload process.
+  </p>
+
+  {/* File Upload */}
+  <Upload
+    beforeUpload={(file) => setFile(file) && false}
+    accept=".xlsx"
+    maxCount={1}
+    showUploadList={false}
+  >
+    <Button icon={<UploadOutlined />}>Select Excel File</Button>
+  </Upload>
+
+  {/* Display selected file */}
+  {file && <div className="mt-2 text-gray-700">Selected file: {file.name}</div>}
+</Modal>
+
 
       {/* Field Modal */}
       <Modal
@@ -234,10 +275,10 @@ const MainSection = () => {
 
       {/* Tabs for Fields and Grades */}
       <Tabs defaultActiveKey="1">
-        <TabPane tab="Fields" key="1">
+        <TabPane tab="Student Info" key="1">
           {scoreCardData && <CommonDataTable />}
         </TabPane>
-        <TabPane tab="Grades" key="2">
+        <TabPane tab="Grades Info" key="2">
           <CellDataTable />
         </TabPane>
       </Tabs>
