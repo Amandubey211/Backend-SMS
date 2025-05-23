@@ -25,7 +25,7 @@ function ScoreCardView({ pdfUrl }) {
   };
 
   return (
-    <div className="w-full p-6 bg-gray-50 rounded-lg shadow-md flex flex-col min-h-[calc(100vh-4rem)]">
+    <div className="w-full p-6 bg-gray-50 rounded-lg shadow-md flex flex-col ]">
       {pdfUrl ? (
         <div className="w-full flex-1 pdf-container">
           <div
@@ -38,7 +38,7 @@ function ScoreCardView({ pdfUrl }) {
             <Document
               file={pdfUrl}
               onLoadSuccess={onDocumentLoadSuccess}
-              className="flex justify-center"
+              className="w-full flex justify-center"
             >
               {/* Render all pages */}
               {Array.from(new Array(numPages), (el, index) => (
@@ -56,7 +56,7 @@ function ScoreCardView({ pdfUrl }) {
         </div>
       ) : (
         <div className="flex items-center justify-center w-full h-full">
-          <p className="text-lg font-medium text-gray-700">No PDF URL provided.</p>
+          <p className="text-lg font-medium text-gray-700">File not avaliable</p>
         </div>
       )}
     </div>
