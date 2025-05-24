@@ -4,7 +4,6 @@ import * as Yup from "yup";
 export const initialValues = {
   candidateInformation: {
     firstName: "",
-    middleName: "",
     lastName: "",
     dob: "",
     height: "",

@@ -104,7 +104,40 @@ const AcademicSessionCandidate = ({ form }) => {
               />
             </Form.Item>
 
-            <Form.Item
+         
+
+            {/* Moved Age right below DOB */}
+            <Form.Item name={["candidateInformation", "age"]} label="Age">
+              <Input disabled placeholder="Age" suffix="years" />
+            </Form.Item>
+          </Col>
+
+          {/* Right Column - All other fields */}
+          <Col xs={24} md={18}>
+            <Row gutter={16}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "firstName"]}
+                  label="First Name"
+                  rules={[
+                    { required: true, message: "First name is required" },
+                  ]}
+                >
+                  <Input prefix={<UserOutlined />} placeholder="First Name" />
+                </Form.Item>
+              </Col>
+            
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "lastName"]}
+                  label="Last Name"
+                  rules={[{ required: true, message: "Last name is required" }]}
+                >
+                  <Input prefix={<UserOutlined />} placeholder="Last Name" />
+                </Form.Item>
+              </Col> 
+               <Col xs={24} md={8}>
+               <Form.Item
               name={["candidateInformation", "dob"]}
               label="Date of Birth"
               rules={[
@@ -140,43 +173,6 @@ const AcademicSessionCandidate = ({ form }) => {
                 }}
               />
             </Form.Item>
-
-            {/* Moved Age right below DOB */}
-            <Form.Item name={["candidateInformation", "age"]} label="Age">
-              <Input disabled placeholder="Age" suffix="years" />
-            </Form.Item>
-          </Col>
-
-          {/* Right Column - All other fields */}
-          <Col xs={24} md={18}>
-            <Row gutter={16}>
-              <Col xs={24} md={8}>
-                <Form.Item
-                  name={["candidateInformation", "firstName"]}
-                  label="First Name"
-                  rules={[
-                    { required: true, message: "First name is required" },
-                  ]}
-                >
-                  <Input prefix={<UserOutlined />} placeholder="First Name" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={8}>
-                <Form.Item
-                  name={["candidateInformation", "middleName"]}
-                  label="Middle Name"
-                >
-                  <Input prefix={<UserOutlined />} placeholder="Middle Name" />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={8}>
-                <Form.Item
-                  name={["candidateInformation", "lastName"]}
-                  label="Last Name"
-                  rules={[{ required: true, message: "Last name is required" }]}
-                >
-                  <Input prefix={<UserOutlined />} placeholder="Last Name" />
-                </Form.Item>
               </Col>
             </Row>
 
