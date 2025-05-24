@@ -101,7 +101,7 @@ const CustomUploadCard = ({
         const id = extractPublicId(url);
         setPublicId(id);
         setCurrentImage(url);
-        form.setFieldValue(name, url); // Set as object to match form hydration
+        form.setFieldValue(name, url); 
         message.success("Image uploaded ✔");
         setLocalFile(null);
         setLocalURL(null);
