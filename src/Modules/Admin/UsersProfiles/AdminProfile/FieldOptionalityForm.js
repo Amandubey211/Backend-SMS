@@ -6,7 +6,7 @@ const { Option } = Select;
 export default function FieldOptionalityForm({fields, setFields }) {
 
   const fieldNames = [
-    "placeOfBirth", "middleName","studentId","idExpiry","passportNumber","passportExpiry",
+    "placeOfBirth","studentId","idExpiry","passportNumber","passportExpiry",
  "contactNumber", "nationality","religion", "fatherInfo", 
     "motherInfo", 
     "address", "academicHistory", "valueEducation", "medicalCondition", 

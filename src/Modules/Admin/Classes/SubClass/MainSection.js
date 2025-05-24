@@ -41,8 +41,6 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { gt } from "../../../../Utils/translator/translation";
 
-import { addScoreCardCellData } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
-import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 
 // Framer Motion
 const colors = [

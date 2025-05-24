@@ -81,32 +81,231 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         return;
       }
 
-      // Prepare the data object to send
-      const payload = {
-        ...values,
-        // Ensure we only send URLs, not file objects
-        profile: values.profile?.url,
-        attachments: {
-          mandatory: Object.fromEntries(
-            Object.entries(values.attachments?.mandatory || {}).map(
-              ([key, val]) => [key, val?.url]
-            )
-          ),
-          optional: Object.fromEntries(
-            Object.entries(values.attachments?.optional || {}).map(
-              ([key, val]) => [key, val?.url]
-            )
-          ),
-        },
-        schoolId, // Add schoolId from Redux
-      };
+    
 
-      console.log("Sending payload:", payload);
+     const formData = new FormData();
+      formData.append("profile", values.profile);
+      formData.append("firstName", values.candidateInformation.firstName);
+      formData.append("lastName", values.candidateInformation.lastName);
+      formData.append(
+        "email",
+        values.candidateInformation.email.toLowerCase()
+      );
+      formData.append("dateOfBirth", values.candidateInformation.dob);
+      formData.append(
+        "placeOfBirth",
+        values.candidateInformation.placeOfBirth
+      );
+      formData.append("gender", values.candidateInformation.gender);
+      formData.append(
+        "contactNumber",
+        values.candidateInformation.contactNumber
+      );
+      formData.append("religion", values.candidateInformation.religion);
+      formData.append("bloodGroup", values.candidateInformation.bloodGroup);
+      formData.append(
+        "emergencyNumber",
+        values.candidateInformation.emergencyNumber
+      );
+      formData.append("Q_Id", values.candidateInformation.studentId);
+      formData.append("nationality", values.candidateInformation.nationality);
+
+      // Add academic information to formData
+      formData.append(
+        "enrollmentStatus",
+        values.academicSession.enrollmentStats
+      );
+      formData.append("applyingClass", values.academicSession.class);
+      formData.append("schoolId", schoolId);
+      formData.append("academicYear", values.academicSession.academicYear);
+
+      // Add parent/guardian information to formData
+      formData.append(
+        "fatherName",
+        `${values.fatherInfo.firstName} ${values.fatherInfo.lastName}`
+      );
+      formData.append(
+        "motherName",
+        `${values.motherInfo.firstName} ${values.motherInfo.lastName}`
+      );
+      formData.append(
+        "guardianName",
+        values.guardianInformation.guardianName
+      );
+      formData.append(
+        "guardianRelationToStudent",
+        values.guardianInformation.guardianRelationToStudent
+      );
+      formData.append(
+        "guardianContactNumber",
+        values.guardianInformation.guardianContactNumber
+      );
+      formData.append(
+        "guardianEmail",
+        values.guardianInformation.guardianEmail
+      );
+
+      // Add address information to formData
+      const addressFields = [
+        // "unitNumber",
+        "buildingNumber",
+        // "streetNumber",
+        "streetName",
+        // "zone",
+        // "compoundName",
+        "city",
+        // "nearestLandmark",
+        // "proposedCampus",
+        "transportRequired",
+        "postalCode",
+        "state",
+        "country",
+      ];
+
+      addressFields.forEach((field) => {
+        formData.append(
+          `permanentAddress[${field}]`,
+          values.addressInformation[field] || ""
+        );
+        formData.append(
+          `residentialAddress[${field}]`,
+          values.addressInformation[field] || ""
+        );
+      });
+
+      const fatherInfoFields = [
+        "idNumber",
+        "idExpiry",
+        "firstName",
+        "middleName ",
+        "lastName",
+        "religion",
+        "nationality",
+        "company",
+        "jobTitle ",
+        "cell1",
+        "cell2",
+        "workPhone",
+        "homePhone",
+        "email1",
+        "email2"
+      ];
+
+      fatherInfoFields.forEach((field) => {
+        if(values.fatherPhoto){
+           formData.append(
+            `fatherInfo[photo]`,
+            values.fatherPhoto || "" 
+          );
+        }
+        if (field === 'cell1' || field === 'cell2') {
+          
+          formData.append(
+            `fatherInfo[${field}]`,
+            values.fatherInfo[field]?.value || ""
+          );
+        } else {
+          formData.append(
+            `fatherInfo[${field}]`,
+            values.fatherInfo[field] || ""
+          );
+        }
+      });
+      
+      const motherInfoFields = [
+        "idNumber",
+        "idExpiry",
+        "firstName",
+        "middleName ",
+        "lastName",
+        "religion",
+        "nationality",
+        "company",
+        "jobTitle ",
+        "cell1",
+        "cell2",
+        "workPhone",
+        "homePhone",
+        "email1",
+        "email2"
+      ];
+
+      motherInfoFields.forEach((field) => {
+        if(values.motherPhoto){
+           formData.append(
+            `motherInfo[photo]`,
+            values.motherPhoto || "" 
+          );
+        }
+        if (field === 'cell1' || field === 'cell2') {
+          
+          formData.append(
+            `motherInfo[${field}]`,
+            values.motherInfo[field]?.value || "" 
+          );
+        } else {
+          formData.append(
+            `motherInfo[${field}]`,
+            values.motherInfo[field] || ""
+          );
+        }
+      });
+      // Add academic history information to formData
+      formData.append(
+        "previousSchoolName",
+        values.academicHistory.previousSchoolName
+      );
+      formData.append("previousClass", values.academicHistory.previousClass);
+      formData.append("curriculum", values.academicHistory.curriculum);
+      if (values.academicHistory.lastDayAtSchool) {
+        formData.append(
+          "lastDayAtSchool",
+          values.academicHistory.lastDayAtSchool
+        );
+      }
+      formData.append(
+        "sourceOfFee",
+        values.academicHistory.sourceOfFee || "Parent"
+      );
+
+      // Add language preferences to formData
+      formData.append("secondLanguage", values.languagePrefs.second || []);
+      formData.append("thirdLanguage", values.languagePrefs.third || []);
+      formData.append("valueEducation", values.languagePrefs.valueEd || []);
+      formData.append(
+        "isLeftHanded",
+        values.languagePrefs.leftHanded ? "true" : "false"
+      );
+
+      // Add medical condition information to formData
+      if (values.medicalInfo) {
+        formData.append("medicalCondition", values.medicalInfo);
+      }
+
+    
+      const addDynamicAttachments = (bucket) => {
+        Object.values(bucket || {}).forEach((attachment) => {
+          if (attachment?.file) {
+            formData.append(attachment.fieldName, attachment.file);
+            // Include ID if needed
+            if (attachment.fieldId) {
+              formData.append(
+                `${attachment.fieldName}_id`,
+                attachment.fieldId
+              );
+            }
+          }
+        });
+      };
+      // Process both mandatory and optional attachments
+      addDynamicAttachments(values.attachments?.mandatory);
+      addDynamicAttachments(values.attachments?.optional);
+      console.log(formData, "formData");
 
       // Dispatch the register action
       await dispatch(
         registerStudentDetails({
-          formData: payload,
+          formData: formData,
           navigate,
         })
       ).unwrap();

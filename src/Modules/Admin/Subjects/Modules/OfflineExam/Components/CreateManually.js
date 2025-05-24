@@ -149,10 +149,9 @@ const CreateManually = ({ setIsOpen, isOpen, cid, sid }) => {
         : null,
       students: tableData.map((row) => {
         const fullName = typeof row[0] === "object" ? row[0].name : row[0];
-        const [firstName, lastName = ""] = fullName.split(" ");
         const matchedStudent =
           studentsList.find(
-            (st) => st.firstName === firstName && st.lastName === lastName
+            (st) => st.firstName + " " +st.lastName === fullName
           ) || {};
 
         return {

@@ -50,10 +50,6 @@ const AnnouncementList = () => {
     setSearchTerm(event.target.value);
   };
 
-  // const handleMarkAsRead = (announcementId) => {
-  //   dispatch(markAsReadStudentAnnounce({ id: announcementId, cid, sid }));
-  // };
-  console.log("annoucement data", announcementData);
 
   return (
     <div className="w-full ps-3 ">

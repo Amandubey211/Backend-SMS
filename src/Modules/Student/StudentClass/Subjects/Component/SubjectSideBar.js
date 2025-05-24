@@ -49,15 +49,9 @@ const SubjectSideBar = () => {
     dispatch(fetchSemestersByClass(cid));
   }, [cid, dispatch]);
 
-  // Automatically select the first semester if none is selected
-  useEffect(() => {
-    if (semesters?.length > 0 && !selectedSemester?.id) {
-      handleSemesterSelect(semesters[0]);
-    }
-  }, [semesters, selectedSemester]);
 
   // Handler for selecting a semester from the modal
-  const handleSemesterSelect = (semester) => {
+  const handleSemesterSelect = (semester) => { 
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     setSemesterModalVisible(false);
   };

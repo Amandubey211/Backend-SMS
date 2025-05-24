@@ -155,6 +155,8 @@ const MainSection = () => {
     { label: "Gender", value: "gender" },
     { label: "Contact Number", value: "contactNumber" },
     { label: "Religion", value: "religion" },
+    { label: "Class", value: "class" },
+    { label: "Section", value: "section" },
 
     // Guardian Fields (Father)
     { label: "Father First Name", value: "fatherInfo.firstName" },
