@@ -7,8 +7,8 @@ const LeftHeading = ({ leftHeading, navigate }) => {
   return (
     <div className="flex-1 text-md font-semibold ps-4 capitalize">
       {subHeading ? (
-        <div className="flex items-center gap-1  ">
-          <span className="opacity-55  flex items-center text-gray-500">
+        <div className="flex items-center  gap-1  ">
+          <span className="opacity-55  flex items-center  text-gray-500">
             <button
               onClick={() => navigate(-1)}
               className="mr-1 capitalize"
@@ -22,10 +22,10 @@ const LeftHeading = ({ leftHeading, navigate }) => {
               aria-hidden="true"
             />
           </span>
-          <h1 className="text-gradient text-md font-bold">{subHeading}</h1>
+          <span className="text-gradient text-md font-bold">{subHeading}</span>
         </div>
       ) : (
-        <span className="text-gradient capitalize">{mainHeading}</span>
+        <span className="text-gradient ">{mainHeading}</span>
       )}
     </div>
   );
