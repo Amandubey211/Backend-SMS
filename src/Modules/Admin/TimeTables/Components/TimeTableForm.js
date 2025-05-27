@@ -50,20 +50,19 @@ const { Panel } = Collapse;
 const { TabPane } = Tabs;
 
 const TIMETABLE_TYPES = [
-  // { value: "weekly", label: "Weekly", icon: <CalendarOutlined /> },
   { value: "exam", label: "Exam", icon: <BookOutlined /> },
   { value: "event", label: "Event", icon: <TeamOutlined /> },
   { value: "others", label: "Others", icon: <UsergroupAddOutlined /> },
 ];
 
 const DAYS_OF_WEEK = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
+  { value: "monday", label: "Monday" },
+  { value: "tuesday", label: "Tuesday" },
+  { value: "wednesday", label: "Wednesday" },
+  { value: "thursday", label: "Thursday" },
+  { value: "friday", label: "Friday" },
+  { value: "saturday", label: "Saturday" },
+  { value: "sunday", label: "Sunday" },
 ];
 
 const TimetablePreviewModal = ({
@@ -275,6 +274,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
   const [subjectsError, setSubjectsError] = useState(null);
+  const [publishAuto, setPublishAuto] = useState(true);
   const firstInputRef = useRef(null);
 
   const classList = useSelector((state) => state.admin.class.classes);
@@ -335,8 +335,8 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
   const memoizedDayOptions = useMemo(
     () =>
       DAYS_OF_WEEK.map((day) => (
-        <Option key={day} value={day}>
-          {day}
+        <Option key={day.value} value={day.value}>
+          {day.label}
         </Option>
       )),
     []
@@ -433,7 +433,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
 
     fetchData();
   }, [editingTimetable, normalForm, dispatch, activeTab]);
-  // console.log("allSubjects", allSubjects);
+
   useEffect(() => {
     if (allSubjects && activeTab === "automatic") {
       setIsSubjectsLoading(true);
@@ -707,23 +707,22 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
 
       const timetableData = {
         classId: values.classId,
-        sectionIds: values.sectionId,
+        sectionId: values.sectionId,
         startTime: startTime.format("HH:mm"),
         endTime: currentTime.format("HH:mm"),
         days: selectedDays,
         subjectsTiming: subjectsTime,
+        publish: publishAuto ? true : false,
       };
       const response = await dispatch(createTimeTable(timetableData)).unwrap();
-      // console.log("Submitting Automatic Timetable Data:", response);
+      console.log("Automatic Timetable created:", response);
       if (response.success) {
-        // notification.success({
-        //   message: "Automatic Timetable created successfully",
-        // });
         autoForm.resetFields();
         setSubjectsData(subjectsData.map((item) => ({ ...item, minutes: 0 })));
         setSelectedSubjects({});
         setSelectedDays([]);
         setCustomItems([]);
+        setPublishAuto(true);
       }
       else {
         setErrorMessage(response.message || "Failed to create Automatic Timetable. Please try again.");
@@ -761,6 +760,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     setErrorMessage("");
     setIsSubjectsLoading(false);
     setSubjectsError(null);
+    setPublishAuto(true);
   };
 
   const handleReset = () => {
@@ -769,6 +769,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     setSelectedSubjects({});
     setSelectedDays([]);
     setCustomItems([]);
+    setPublishAuto(true);
     setHasUnsavedChanges(false);
   };
 
@@ -1205,10 +1206,20 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
               <span className="text-gray-600 font-medium">Custom Items</span>
             </Divider>
 
-            <div className="mb-4">
+            <div className="mb-4 flex items-center gap-4">
               <Button onClick={() => setCustomModalVisible(true)}>
                 Add Custom
               </Button>
+              <div>
+                <span className="mr-2">Publish Timetable:</span>
+                <Switch
+                  checkedChildren="Yes"
+                  unCheckedChildren="No"
+                  checked={publishAuto}
+                  onChange={(checked) => setPublishAuto(checked)}
+                  aria-label="Publish timetable"
+                />
+              </div>
             </div>
 
             {customItems.length > 0 && (
@@ -1220,7 +1231,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
                     <Button
                       type="text"
                       icon={<DeleteOutlined />}
-                      onClick={() => handleRemoveCustom(index)}
+                      onClick={() => handleRemoveCustom(index)}a
                       aria-label="Remove custom item"
                     />
                   </div>
