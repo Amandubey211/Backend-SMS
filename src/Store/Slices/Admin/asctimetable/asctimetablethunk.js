@@ -48,6 +48,23 @@ export const updateTimeTable = createAsyncThunk(
   }
 );
 
+// Fetch all school timeTable
+export const getSchoolTimeTable = createAsyncThunk(
+  "admin/getSchoolTimeTable",
+  async (data, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/ascTimeTable/school?say=${say}`,
+         );
+          return response; // Return the data array from the response
+    } catch (error) {
+      toast.error(error.message || "Failed to fetch class timetables");
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  })
 // New: Fetch All Timetables for School
 export const fetchAllTimeTables = createAsyncThunk(
   "admin/fetchAllTimeTables",
@@ -115,3 +132,24 @@ export const deleteTimeTable = createAsyncThunk(
     }
   }
 );
+
+// Fetch class timeTable
+export const getClassTimeTable = createAsyncThunk(
+  "admin/getClassTimeTable",
+  async (data, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
+      const { classId, sectionId } = data;
+
+      const response = await getData(
+        `/${getRole}/ascTimeTable/class?say=${say}&classId=${classId}&sectionId=${sectionId}`
+      );
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Failed to load timetable");
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+)

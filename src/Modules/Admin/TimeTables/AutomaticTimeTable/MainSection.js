@@ -14,7 +14,7 @@ const MainSection = () => {
     const dispatch = useDispatch();
     const { classes } = useSelector((state) => state?.admin?.class);
     const { sectionsList } = useSelector((state) => state?.admin?.group_section);
-    const [timetableType, setTimetableType] = useState("school");
+    const [timetableType, setTimetableType] = useState("class");
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSection, setSelectedSection] = useState(null);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -51,11 +51,11 @@ const MainSection = () => {
             <div className="flex space-x-4 items-center">
                 <label className="font-medium">Select Timetable Type:</label>
                 <Select
-                    defaultValue="school"
+                    defaultValue="class"
                     style={{ width: 200 }}
                     onChange={setTimetableType}
                 >
-                    <Option value="school">All</Option>
+                    {/* <Option value="school">All</Option> */}
                     <Option value="class">Class & Section Wise</Option>
                     <Option value="teacher">Teacher Wise</Option>
                 </Select>
@@ -115,18 +115,25 @@ const MainSection = () => {
             )}
 
             {/* Timetable Components */}
-            {timetableType === "class" && selectedClass && selectedSection && (
+            {sectionsList?.length >= 1 ? timetableType === "class" && selectedClass && selectedSection && (
                 <ClassTimeTable
                     selectedClass={selectedClass}
                     selectedSection={selectedSection}
                 />
-            )}
+            ) : timetableType === "class" && selectedClass && (
+                <ClassTimeTable
+                    selectedClass={selectedClass}
+                    selectedSection={selectedSection}
+                />
+            )
+
+            }
             {timetableType === "teacher" && selectedTeacher && (
                 <TeacherTimeTable selectedTeacher={selectedTeacher} />
             )}
-            {timetableType === "school" && (
+            {/* {timetableType === "school" && (
                 <SchoolTimeTable />
-            )}
+            )} */}
         </div>
     );
 };
