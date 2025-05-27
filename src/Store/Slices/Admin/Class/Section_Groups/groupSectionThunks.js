@@ -89,7 +89,6 @@ export const fetchSectionsNamesByClass = createAsyncThunk(
       const response = await getData(
         `/admin/all/getSectionByclass/${classId}?say=${say}`
       );
-
       if (response.status) {
         return response.data;
       } else {
