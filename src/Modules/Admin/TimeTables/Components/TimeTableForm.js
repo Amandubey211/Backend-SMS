@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useMemo,
-  useCallback,
-} from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {
   Form,
   Input,
@@ -21,6 +15,11 @@ import {
   Switch,
   Collapse,
   Tag,
+  Tabs,
+  TimePicker,
+  Space,
+  Checkbox,
+  Spin,
 } from "antd";
 import {
   BookOutlined,
@@ -30,10 +29,11 @@ import {
   ClockCircleOutlined,
   ExclamationCircleOutlined,
   EyeOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import DaySlotFields from "./DaySlotFields";
-import moment from "moment";
+import dayjs from "dayjs";
 import {
   fetchGroupsByClass,
   fetchGroupsByClassAndSection,
@@ -41,21 +41,31 @@ import {
 } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchSubjects } from "../../../../Store/Slices/Admin/Class/Subject/subjectThunks";
 import { fetchSemestersByClass } from "../../../../Store/Slices/Admin/Class/Semester/semesterThunks";
-
+import NoDataFound from "../../../../Components/Common/NoDataFound";
+import { createTimeTable } from "../../../../Store/Slices/Admin/asctimetable/asctimetablethunk";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 const { confirm } = Modal;
 const { Panel } = Collapse;
+const { TabPane } = Tabs;
 
-// Constants for timetable types
 const TIMETABLE_TYPES = [
-  { value: "weekly", label: "Weekly", icon: <CalendarOutlined /> },
+  // { value: "weekly", label: "Weekly", icon: <CalendarOutlined /> },
   { value: "exam", label: "Exam", icon: <BookOutlined /> },
   { value: "event", label: "Event", icon: <TeamOutlined /> },
   { value: "others", label: "Others", icon: <UsergroupAddOutlined /> },
 ];
 
-// Preview Component - Extracted for better organization
+const DAYS_OF_WEEK = [
+  "monday",
+  "tuesday",
+  "wednesday",
+  "thursday",
+  "friday",
+  "saturday",
+  "sunday",
+];
+
 const TimetablePreviewModal = ({
   visible,
   onCancel,
@@ -83,7 +93,7 @@ const TimetablePreviewModal = ({
       case "exam":
         return "#29ABE2";
       case "event":
-        return "#77DD77";
+        return "#77DDAA";
       case "others":
         return "#FFD700";
       default:
@@ -110,12 +120,11 @@ const TimetablePreviewModal = ({
     return subject ? subject.subjectName : "No Subject";
   };
 
-  // Format day header based on timetable type
   const formatDayHeader = (day) => {
     if (type === "weekly") {
       return day.day || "Weekly";
     }
-    return day.date ? moment(day.date).format("dddd, MMMM Do YYYY") : "No Date";
+    return day.date ? dayjs(day.date).format("dddd, MMMM Do YYYY") : "No Date";
   };
 
   return (
@@ -128,7 +137,6 @@ const TimetablePreviewModal = ({
       centered
     >
       <div className="space-y-4">
-        {/* Header Section */}
         <Card>
           <div className="flex items-start justify-between">
             <div>
@@ -139,11 +147,11 @@ const TimetablePreviewModal = ({
                 {validity?.startDate && (
                   <>
                     <span className="font-medium">From: </span>
-                    {moment(validity.startDate).format("DD MMM YYYY")}
+                    {dayjs(validity.startDate).format("DD MMM YYYY")}
                     {" to "}
                     <span className="font-medium">To: </span>
                     {validity.endDate
-                      ? moment(validity.endDate).format("DD MMM YYYY")
+                      ? dayjs(validity.endDate).format("DD MMM YYYY")
                       : "No End Date"}
                   </>
                 )}
@@ -159,7 +167,6 @@ const TimetablePreviewModal = ({
           </div>
         </Card>
 
-        {/* Class Info Section */}
         <Card>
           <Row gutter={16}>
             <Col xs={24} md={8}>
@@ -191,19 +198,18 @@ const TimetablePreviewModal = ({
               <div className="mt-1 flex flex-wrap gap-1">
                 {groupId && groupId.length > 0 ? (
                   groupId.map((group) => (
-                    <Tag key={group._id} color="cyan">
+                    <Tag key={group._id} color="green">
                       {group.groupName || "No Group Name"}
                     </Tag>
                   ))
                 ) : (
-                  <Tag color="cyan">All Groups</Tag>
+                  <Tag color="green">All Groups</Tag>
                 )}
               </div>
             </Col>
           </Row>
         </Card>
 
-        {/* Schedule Section */}
         <Card>
           <h4 className="font-medium mb-4">Schedule Details</h4>
           <Collapse accordion>
@@ -230,35 +236,13 @@ const TimetablePreviewModal = ({
                             <ClockCircleOutlined className="mr-2 text-gray-500" />
                             <span className="font-medium">
                               {slot.startTime &&
-                                moment(slot?.startTime).format("h:mm A")}{" "}
+                                dayjs(slot.startTime).format("h:mm A")}{" "}
                               -{" "}
-                              {slot?.endTime &&
-                                moment(slot?.endTime).format("h:mm A")}
+                              {slot.endTime &&
+                                dayjs(slot.endTime).format("h:mm A")}
                             </span>
                           </div>
-                          {/* <Tag color="blue" className="ml-2">
-                            {getSubjectName(slot.subjectId)}
-                          </Tag> */}
                         </div>
-                        {/* <div className="mt-2 flex flex-wrap gap-2">
-                          {slot.teacher && (
-                            <Tag color="purple">
-                              <span className="font-medium">Teacher:</span>{" "}
-                              {slot.teacher}
-                            </Tag>
-                          )}
-                          {slot.room && (
-                            <Tag color="green">
-                              <span className="font-medium">Room:</span>{" "}
-                              {slot.room}
-                            </Tag>
-                          )}
-                          {slot.description && (
-                            <div className="w-full mt-2 text-sm text-gray-600">
-                              {slot.description}
-                            </div>
-                          )}
-                        </div> */}
                       </div>
                     ))}
                   </div>
@@ -271,17 +255,28 @@ const TimetablePreviewModal = ({
   );
 };
 
-// Main Form Component
 const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
-  const [form] = Form.useForm();
+  const [normalForm] = Form.useForm();
+  const [autoForm] = Form.useForm();
   const dispatch = useDispatch();
   const [timetableType, setTimetableType] = useState(null);
   const [submitType, setSubmitType] = useState(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [previewVisible, setPreviewVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState("normal");
+  const [subjectsData, setSubjectsData] = useState([]);
+  const [selectedSubjects, setSelectedSubjects] = useState({});
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [customItems, setCustomItems] = useState([]);
+  const [customModalVisible, setCustomModalVisible] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [customMinutes, setCustomMinutes] = useState("");
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
+  const [subjectsError, setSubjectsError] = useState(null);
   const firstInputRef = useRef(null);
 
-  // Data from Redux
   const classList = useSelector((state) => state.admin.class.classes);
   const sectionList = useSelector(
     (state) => state.admin.group_section.sectionsList
@@ -297,7 +292,6 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     (state) => state.admin.timetable
   );
 
-  // Memoized options for better performance
   const memoizedClassOptions = useMemo(
     () =>
       classList?.map((cls) => (
@@ -338,7 +332,16 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     [reduxSemesters]
   );
 
-  // Date validation
+  const memoizedDayOptions = useMemo(
+    () =>
+      DAYS_OF_WEEK.map((day) => (
+        <Option key={day} value={day}>
+          {day}
+        </Option>
+      )),
+    []
+  );
+
   const validateDateRange = useCallback((_, value) => {
     if (value && value[0] && value[1] && value[0].isAfter(value[1])) {
       return Promise.reject("End date must be after start date");
@@ -346,77 +349,112 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     return Promise.resolve();
   }, []);
 
-  // Initialize form with editing data
   useEffect(() => {
-    if (editingTimetable) {
-      const {
-        validity,
-        days,
-        classId,
-        sectionId,
-        groupId,
-        semesterId,
-        showCalendar,
-      } = editingTimetable;
+    const fetchData = async () => {
+      if (editingTimetable && activeTab === "normal") {
+        try {
+          const {
+            validity,
+            days,
+            classId,
+            sectionId,
+            groupId,
+            semesterId,
+            showCalendar,
+          } = editingTimetable;
 
-      const convertedValidity =
-        validity?.startDate && validity?.endDate
-          ? [moment(validity.startDate), moment(validity.endDate)]
-          : [];
+          const convertedValidity =
+            validity?.startDate && validity?.endDate
+              ? [dayjs(validity.startDate), dayjs(validity.endDate)]
+              : [];
 
-      const convertedDays = (days || []).map((dayItem) => {
-        const newDay = { ...dayItem };
-        if (newDay.date) {
-          newDay.date = moment(newDay.date);
-        }
-        if (newDay.slots && Array.isArray(newDay.slots)) {
-          newDay.slots = newDay.slots.map((slot) => {
-            const newSlot = { ...slot };
-            if (newSlot.startTime) {
-              newSlot.startTime = moment(newSlot.startTime);
+          const convertedDays = (days || []).map((dayItem) => {
+            const newDay = { ...dayItem };
+            if (newDay.date) {
+              newDay.date = dayjs(newDay.date);
             }
-            if (newSlot.endTime) {
-              newSlot.endTime = moment(newSlot.endTime);
+            if (newDay.slots && Array.isArray(newDay.slots)) {
+              newDay.slots = newDay.slots.map((slot) => {
+                const newSlot = { ...slot };
+                if (newSlot.startTime) {
+                  newSlot.startTime = dayjs(newSlot.startTime);
+                }
+                if (newSlot.endTime) {
+                  newSlot.endTime = dayjs(newSlot.endTime);
+                }
+                if (newSlot.subjectId && typeof newSlot.subjectId === "object") {
+                  newSlot.subjectId = newSlot.subjectId._id;
+                }
+                return newSlot;
+              });
             }
-            if (newSlot.subjectId && typeof newSlot.subjectId === "object") {
-              newSlot.subjectId = newSlot.subjectId._id;
-            }
-            return newSlot;
+            return newDay;
           });
+
+          normalForm.setFieldsValue({
+            name: editingTimetable.name,
+            type: editingTimetable.type,
+            validity: convertedValidity,
+            classId: classId?._id || undefined,
+            sectionId: sectionId?.map((section) => section?._id) || [],
+            groupId: groupId?.map((group) => group?._id) || [],
+            semesterId: semesterId?._id || undefined,
+            days: convertedDays,
+            showCalendar: showCalendar !== false,
+          });
+
+          if (classId?._id) {
+            try {
+              await dispatch(fetchSubjects(classId._id)).unwrap();
+            } catch (error) {
+              setErrorMessage("Failed to fetch subjects. Please try again.");
+              setErrorModalVisible(true);
+            }
+
+            await Promise.all([
+              dispatch(fetchSectionsNamesByClass(classId._id)).unwrap().catch(() => { }),
+              dispatch(fetchGroupsByClass(classId._id)).unwrap().catch(() => { }),
+              dispatch(fetchSemestersByClass(classId._id)).unwrap().catch(() => { }),
+            ]);
+          }
+
+          setTimetableType(editingTimetable.type);
+
+          setTimeout(() => {
+            firstInputRef.current?.focus();
+          }, 100);
+        } catch (error) {
         }
-        return newDay;
-      });
-
-      form.setFieldsValue({
-        name: editingTimetable.name,
-        type: editingTimetable.type,
-        validity: convertedValidity,
-        classId: classId?._id || undefined,
-        sectionId: sectionId?.map((section) => section?._id) || [],
-        groupId: groupId?.map((group) => group?._id) || [],
-        semesterId: semesterId?._id || undefined,
-        days: convertedDays,
-        showCalendar: showCalendar !== false,
-      });
-
-      if (classId?._id) {
-        dispatch(fetchSectionsNamesByClass(classId._id));
-        dispatch(fetchGroupsByClass(classId._id));
-        dispatch(fetchSubjects(classId._id));
-        dispatch(fetchSemestersByClass(classId._id));
+      } else if (activeTab === "normal") {
+        normalForm.resetFields();
+        setTimetableType(null);
       }
+    };
 
-      setTimetableType(editingTimetable.type);
+    fetchData();
+  }, [editingTimetable, normalForm, dispatch, activeTab]);
+  // console.log("allSubjects", allSubjects);
+  useEffect(() => {
+    if (allSubjects && activeTab === "automatic") {
+      setIsSubjectsLoading(true);
+      setSubjectsError(null);
 
-      // Focus first field after a small delay
-      setTimeout(() => {
-        firstInputRef.current?.focus();
-      }, 100);
-    } else {
-      form.resetFields();
-      setTimetableType(null);
+      try {
+        const subjects = allSubjects.map((subject) => ({
+          subjectId: String(subject.subjectId),
+          subjectName: subject.subjectName,
+          minutes: 0,
+        }));
+        setSubjectsData(subjects);
+        setSelectedSubjects({});
+        setSelectedDays([]);
+        setIsSubjectsLoading(false);
+      } catch (error) {
+        setSubjectsError("Failed to process subjects data.");
+        setIsSubjectsLoading(false);
+      }
     }
-  }, [editingTimetable, form, dispatch]);
+  }, [allSubjects, activeTab]);
 
   const handleFieldsChange = () => {
     setHasUnsavedChanges(true);
@@ -424,22 +462,50 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
 
   const isEdit = !!editingTimetable;
 
-  const handleClassChange = (classId) => {
-    form.setFieldsValue({ sectionId: [], groupId: [], semesterId: undefined });
+  const handleClassChange = async (classId, formInstance) => {
+    formInstance.setFieldsValue({ sectionId: [], groupId: [], semesterId: undefined });
     if (classId) {
-      dispatch(fetchSectionsNamesByClass(classId));
-      dispatch(fetchGroupsByClass(classId));
-      dispatch(fetchSubjects(classId));
-      dispatch(fetchSemestersByClass(classId));
+      setIsSubjectsLoading(true);
+      setSubjectsError(null);
+
+      try {
+        await dispatch(fetchSubjects(classId)).unwrap();
+      } catch (error) {
+        setSubjectsError("Failed to fetch subjects. Please try again.");
+        setErrorMessage("Failed to fetch subjects. Please try again.");
+        setErrorModalVisible(true);
+      } finally {
+        setIsSubjectsLoading(false);
+      }
+
+      await Promise.all([
+        dispatch(fetchSectionsNamesByClass(classId)).unwrap().catch(() => { }),
+        dispatch(fetchGroupsByClass(classId)).unwrap().catch(() => { }),
+        dispatch(fetchSemestersByClass(classId)).unwrap().catch(() => { }),
+      ]);
+    } else {
+      setSubjectsData([]);
+      setSelectedSubjects({});
+      setSelectedDays([]);
+      setIsSubjectsLoading(false);
+      setSubjectsError(null);
     }
   };
 
-  const handleSectionChange = (sectionIds) => {
-    const classId = form.getFieldValue("classId");
-    form.setFieldsValue({ groupId: [] });
+  const handleSectionChange = async (sectionIds, formInstance) => {
+    const classId = formInstance.getFieldValue("classId");
+    formInstance.setFieldsValue({ groupId: [] });
     if (classId && sectionIds.length > 0) {
-      dispatch(fetchGroupsByClassAndSection({ classId, sectionIds }));
+      await dispatch(fetchGroupsByClassAndSection({ classId, sectionIds })).unwrap().catch(() => { });
     }
+  };
+
+  const handleSubjectSelect = (subjectId) => {
+    const idString = String(subjectId);
+    setSelectedSubjects((prev) => ({
+      ...prev,
+      [idString]: !prev[idString],
+    }));
   };
 
   const scrollToField = (fieldName) => {
@@ -451,13 +517,11 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
   };
 
   const getPreviewData = () => {
-    const values = form.getFieldsValue();
+    const values = normalForm.getFieldsValue();
     return {
       ...values,
       classId: classList?.find((cls) => cls._id === values.classId),
-      sectionId: sectionList?.filter((sec) =>
-        values.sectionId?.includes(sec._id)
-      ),
+      sectionId: sectionList?.filter((sec) => values.sectionId?.includes(sec._id)),
       groupId: groupsList?.filter((grp) => values.groupId?.includes(grp._id)),
       semesterId: reduxSemesters?.find((sem) => sem._id === values.semesterId),
       validity: {
@@ -468,21 +532,21 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     };
   };
 
-  const handleSubmit = async (publish = false) => {
+  const handleNormalSubmit = async (publish = false) => {
     try {
       setSubmitType(publish ? "publish" : "draft");
-      await form.validateFields();
+      await normalForm.validateFields();
 
-      const values = form.getFieldsValue();
-      const [startMoment, endMoment] = values.validity || [];
+      const values = normalForm.getFieldsValue();
+      const [startDayjs, endDayjs] = values.validity || [];
 
       const timetableData = {
         name: values.name,
         type: values.type,
         showCalendar: values.showCalendar !== false,
         validity: {
-          startDate: startMoment ? startMoment.toISOString() : null,
-          endDate: endMoment ? endMoment.toISOString() : null,
+          startDate: startDayjs ? startDayjs.toISOString() : null,
+          endDate: endDayjs ? endDayjs.toISOString() : null,
         },
         classId: values.classId,
         sectionId: values.sectionId || [],
@@ -507,14 +571,210 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
       if (error.errorFields && error.errorFields.length > 0) {
         const firstErrorField = error.errorFields[0].name[0];
         scrollToField(firstErrorField);
+        setErrorMessage(error.errorFields[0].errors[0]);
+        setErrorModalVisible(true);
+      } else {
+        setErrorMessage("An unexpected error occurred. Please try again.");
+        setErrorModalVisible(true);
       }
     } finally {
       setSubmitType(null);
     }
   };
 
+  const handleMinutesChange = (subjectId, value) => {
+    const idString = String(subjectId);
+    setSubjectsData((prev) =>
+      prev.map((item) =>
+        item.subjectId === idString ? { ...item, minutes: parseInt(value) || 0 } : item
+      )
+    );
+  };
+
+  const handleAddCustom = () => {
+    if (!customName || !customMinutes) {
+      setErrorMessage("Please provide both a name and duration for the custom item.");
+      setErrorModalVisible(true);
+      return;
+    }
+    const minutes = parseInt(customMinutes, 10);
+    setCustomItems([...customItems, { name: customName, minutes }]);
+    setCustomName("");
+    setCustomMinutes("");
+    setCustomModalVisible(false);
+  };
+
+  const handleRemoveCustom = (index) => {
+    setCustomItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const calculateTotalMinutes = () => {
+    const subjectMinutes = subjectsData
+      .filter((item) => selectedSubjects[item.subjectId])
+      .reduce((total, item) => total + item.minutes, 0);
+    const customMinutes = customItems.reduce((total, item) => total + item.minutes, 0);
+    return subjectMinutes + customMinutes;
+  };
+
+  const calculateAllowedMinutes = () => {
+    const values = autoForm.getFieldsValue();
+    const { startTime, endTime } = values;
+    if (!startTime || !endTime || !startTime.isValid() || !endTime.isValid()) {
+      return 0;
+    }
+    const startMinutes = startTime.hour() * 60 + startTime.minute();
+    const endMinutes = endTime.hour() * 60 + endTime.minute();
+    if (endMinutes <= startMinutes) {
+      return 0;
+    }
+    return endMinutes - startMinutes;
+  };
+
+  const handleAutoSubmit = async () => {
+    try {
+      setSubmitType("submit");
+      await autoForm.validateFields();
+
+      const selectedSubjectCount = Object.values(selectedSubjects).filter(Boolean).length;
+      if (selectedSubjectCount === 0 && customItems.length === 0) {
+        setErrorMessage("Please select at least one subject or add a custom item.");
+        setErrorModalVisible(true);
+        return;
+      }
+
+      const actualDuration = calculateTotalMinutes();
+      const allowedDuration = calculateAllowedMinutes();
+
+      if (allowedDuration === 0) {
+        setErrorMessage(
+          "Invalid start or end time. Please ensure the end time is after the start time."
+        );
+        setErrorModalVisible(true);
+        return;
+      }
+
+      if (actualDuration > allowedDuration) {
+        const startTimeFormatted = autoForm.getFieldValue("startTime").format("h:mm A");
+        const endTimeFormatted = autoForm.getFieldValue("endTime").format("h:mm A");
+        setErrorMessage(
+          `The actual duration (${actualDuration} minutes) exceeds the allowed duration (${allowedDuration} minutes) between ${startTimeFormatted} and ${endTimeFormatted}.`
+        );
+        setErrorModalVisible(true);
+        return;
+      }
+
+      if (actualDuration === 0) {
+        setErrorMessage("Please allocate at least some minutes to selected subjects or custom items.");
+        setErrorModalVisible(true);
+        return;
+      }
+
+      if (selectedDays.length === 0) {
+        setErrorMessage("Please select at least one day for the timetable.");
+        setErrorModalVisible(true);
+        return;
+      }
+
+      const values = autoForm.getFieldsValue();
+      const startTime = values.startTime;
+      let currentTime = startTime;
+
+      const subjectsTime = [];
+
+      subjectsData
+        .filter((item) => selectedSubjects[item.subjectId] && item.minutes > 0)
+        .forEach((item) => {
+          const endTime = currentTime.add(item.minutes, "minutes");
+          subjectsTime.push({
+            subjectId: item.subjectId,
+            name: item.subjectName,
+            time: item.minutes,
+            type: "subject",
+          });
+          currentTime = endTime;
+        });
+
+      customItems.forEach((item) => {
+        const endTime = currentTime.add(item.minutes, "minutes");
+        subjectsTime.push({
+          subjectId: null,
+          name: item.name,
+          time: item.minutes,
+          type: "custom",
+        });
+        currentTime = endTime;
+      });
+
+      const timetableData = {
+        classId: values.classId,
+        sectionIds: values.sectionId,
+        startTime: startTime.format("HH:mm"),
+        endTime: currentTime.format("HH:mm"),
+        days: selectedDays,
+        subjectsTiming: subjectsTime,
+      };
+      const response = await dispatch(createTimeTable(timetableData)).unwrap();
+      // console.log("Submitting Automatic Timetable Data:", response);
+      if (response.success) {
+        // notification.success({
+        //   message: "Automatic Timetable created successfully",
+        // });
+        autoForm.resetFields();
+        setSubjectsData(subjectsData.map((item) => ({ ...item, minutes: 0 })));
+        setSelectedSubjects({});
+        setSelectedDays([]);
+        setCustomItems([]);
+      }
+      else {
+        setErrorMessage(response.message || "Failed to create Automatic Timetable. Please try again.");
+        setErrorModalVisible(true);
+      }
+    } catch (error) {
+      if (error.errorFields && error.errorFields.length > 0) {
+        const firstErrorField = error.errorFields[0].name[0];
+        scrollToField(firstErrorField);
+        setErrorMessage(error.errorFields[0].errors[0]);
+        setErrorModalVisible(true);
+      } else {
+        setErrorMessage(error.message || "An unexpected error occurred. Please try again.");
+        setErrorModalVisible(true);
+      }
+    } finally {
+      setSubmitType(null);
+    }
+  };
+
+  const resetAll = () => {
+    normalForm.resetFields();
+    autoForm.resetFields();
+    setTimetableType(null);
+    setHasUnsavedChanges(false);
+    setPreviewVisible(false);
+    setSubjectsData([]);
+    setSelectedSubjects({});
+    setSelectedDays([]);
+    setCustomItems([]);
+    setCustomModalVisible(false);
+    setCustomName("");
+    setCustomMinutes("");
+    setErrorModalVisible(false);
+    setErrorMessage("");
+    setIsSubjectsLoading(false);
+    setSubjectsError(null);
+  };
+
+  const handleReset = () => {
+    autoForm.resetFields();
+    setSubjectsData(subjectsData.map((item) => ({ ...item, minutes: 0 })));
+    setSelectedSubjects({});
+    setSelectedDays([]);
+    setCustomItems([]);
+    setHasUnsavedChanges(false);
+  };
+
   const showConfirmOnClose = () => {
     if (!hasUnsavedChanges) {
+      resetAll();
       onClose();
       return;
     }
@@ -526,6 +786,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
       okText: "Leave",
       cancelText: "Stay",
       onOk() {
+        resetAll();
         onClose();
       },
     });
@@ -544,253 +805,500 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
         },
       }}
     >
-      <Form
-        layout="vertical"
-        form={form}
-        requiredMark={false}
-        onFieldsChange={handleFieldsChange}
-      >
-        {/* Preview Button */}
-        <div className="flex justify-end mb-4">
-          <Button
-            type="default"
-            icon={<EyeOutlined />}
-            onClick={() => setPreviewVisible(true)}
-            disabled={!form.getFieldValue("type")}
+      <Tabs activeKey={activeTab} onChange={setActiveTab}>
+        <TabPane tab="Normal Timetable" key="normal">
+          <Form
+            layout="vertical"
+            form={normalForm}
+            requiredMark={false}
+            onFieldsChange={handleFieldsChange}
           >
-            Preview Timetable
-          </Button>
-        </div>
-
-        {/* Basic Information Section */}
-        <Divider orientation="left" orientationMargin={0}>
-          <span className="text-gray-600 font-medium">Basic Information</span>
-        </Divider>
-
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              label="Timetable Name"
-              name="name"
-              rules={[
-                { required: true, message: "Timetable name is required" },
-              ]}
-            >
-              <Input
-                ref={firstInputRef}
-                placeholder="e.g. Midterm Exam Schedule"
-                size="large"
-                aria-label="Timetable name"
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              label="Type"
-              name="type"
-              rules={[
-                { required: true, message: "Timetable type is required" },
-              ]}
-            >
-              <Select
-                size="large"
-                placeholder="Select Type"
-                onChange={(val) => setTimetableType(val)}
-                aria-label="Timetable type"
-              >
-                {TIMETABLE_TYPES.map((type) => (
-                  <Option key={type.value} value={type.value}>
-                    {type.icon} {type.label}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              label="Validity Period"
-              name="validity"
-              rules={[
-                { required: true, message: "Please select a date range" },
-                { validator: validateDateRange },
-              ]}
-            >
-              <RangePicker
-                size="large"
-                style={{ width: "100%" }}
-                aria-label="Validity period"
-              />
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item
-              label="Show on Calendar"
-              name="showCalendar"
-              valuePropName="checked"
-            >
-              <Switch
-                checkedChildren="Yes"
-                unCheckedChildren="No"
-                defaultChecked={editingTimetable?.showCalendar ?? true}
-                aria-label="Show on calendar"
-              />
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* Class & Section Section */}
-        <Divider orientation="left" orientationMargin={0}>
-          <span className="text-gray-600 font-medium">Class & Section</span>
-        </Divider>
-
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={12}>
-            <Form.Item
-              label="Class"
-              name="classId"
-              rules={[{ required: true, message: "Class is required" }]}
-            >
-              <Select
-                size="large"
-                placeholder="Select Class"
-                allowClear
-                onChange={handleClassChange}
-                aria-label="Class selection"
-                showSearch
-                optionFilterProp="children"
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().includes(input.toLowerCase())
-                }
-              >
-                {memoizedClassOptions}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item label="Section" name="sectionId">
-              <Select
-                mode="multiple"
-                size="large"
-                placeholder="Select Sections"
-                allowClear
-                onChange={handleSectionChange}
-                aria-label="Section selection"
-              >
-                {memoizedSectionOptions}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* Group & Semester Section */}
-        <Divider orientation="left" orientationMargin={0}>
-          <span className="text-gray-600 font-medium">Group & Semester</span>
-        </Divider>
-
-        <Row gutter={[16, 16]}>
-          <Col xs={24} md={12}>
-            <Form.Item label="Group" name="groupId">
-              <Select
-                mode="multiple"
-                size="large"
-                placeholder="Select Groups"
-                allowClear
-                aria-label="Group selection"
-              >
-                {memoizedGroupOptions}
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} md={12}>
-            <Form.Item label="Semester" name="semesterId">
-              <Select
-                size="large"
-                placeholder="Select Semester"
-                allowClear
-                disabled={!form.getFieldValue("classId")}
-                aria-label="Semester selection"
-              >
-                {memoizedSemesterOptions}
-              </Select>
-            </Form.Item>
-          </Col>
-        </Row>
-
-        {/* Schedule Section */}
-        <Divider orientation="left" orientationMargin={0}>
-          <span className="text-gray-600 font-medium">Schedule</span>
-        </Divider>
-
-        <Form.Item
-          name="days"
-          rules={[
-            {
-              validator: (_, value) => {
-                if (
-                  Array.isArray(value) &&
-                  value.some((day) => day?.slots && day.slots.length > 0)
-                ) {
-                  return Promise.resolve();
-                }
-                return Promise.reject("At least one time slot is required.");
-              },
-            },
-          ]}
-        >
-          <DaySlotFields
-            form={form}
-            timetableType={timetableType}
-            allSubjects={allSubjects}
-          />
-        </Form.Item>
-
-        {/* Footer Buttons */}
-        <div className="bg-pink-50 py-2 border-t sticky -bottom-2 rounded-md z-10">
-          <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 px-6">
-            <Button
-              onClick={showConfirmOnClose}
-              className="w-full sm:w-auto"
-              disabled={isLoading}
-              aria-label="Cancel form"
-            >
-              Cancel
-            </Button>
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <div className="flex justify-end mb-4">
               <Button
                 type="default"
-                loading={submitType === "draft"}
-                onClick={() => handleSubmit(false)}
-                className="w-full sm:w-auto"
-                disabled={isLoading}
-                aria-label="Save as draft"
+                icon={<EyeOutlined />}
+                onClick={() => setPreviewVisible(true)}
+                disabled={!normalForm.getFieldValue("type")}
               >
-                Save as Draft
-              </Button>
-              <Button
-                type="primary"
-                loading={submitType === "publish"}
-                onClick={() => handleSubmit(true)}
-                className="w-full sm:w-auto"
-                disabled={isLoading}
-                aria-label="Save and publish"
-              >
-                Save & Publish
+                Preview Timetable
               </Button>
             </div>
+
+            <Divider orientation="left" orientationMargin={0}>
+              <span className="text-gray-600 font-medium">Basic Information</span>
+            </Divider>
+
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Timetable Name"
+                  name="name"
+                  rules={[{ required: true, message: "Timetable name is required" }]}
+                >
+                  <Input
+                    ref={firstInputRef}
+                    placeholder="e.g. Midterm Exam Schedule"
+                    size="large"
+                    aria-label="Timetable name"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Type"
+                  name="type"
+                  rules={[{ required: true, message: "Timetable type is required" }]}
+                >
+                  <Select
+                    size="large"
+                    placeholder="Select Type"
+                    onChange={(val) => setTimetableType(val)}
+                    aria-label="Timetable type"
+                  >
+                    {TIMETABLE_TYPES.map((type) => (
+                      <Option key={type.value} value={type.value}>
+                        {type.icon} {type.label}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Validity Period"
+                  name="validity"
+                  rules={[
+                    { required: true, message: "Please select a date range" },
+                    { validator: validateDateRange },
+                  ]}
+                >
+                  <RangePicker
+                    size="large"
+                    style={{ width: "100%" }}
+                    aria-label="Validity period"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Show on Calendar"
+                  name="showCalendar"
+                  valuePropName="checked"
+                >
+                  <Switch
+                    checkedChildren="Yes"
+                    unCheckedChildren="No"
+                    defaultChecked={editingTimetable?.showCalendar ?? true}
+                    aria-label="Show on calendar"
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider orientation="left" orientationMargin={0}>
+              <span className="text-gray-600 font-medium">Class & Section</span>
+            </Divider>
+
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Class"
+                  name="classId"
+                  rules={[{ required: true, message: "Class is required" }]}
+                >
+                  <Select
+                    size="large"
+                    placeholder="Select Class"
+                    allowClear
+                    onChange={(value) => handleClassChange(value, normalForm)}
+                    aria-label="Class selection"
+                    showSearch
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().includes(input.toLowerCase())
+                    }
+                  >
+                    {memoizedClassOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="Section" name="sectionId">
+                  <Select
+                    mode="multiple"
+                    size="large"
+                    placeholder="Select Sections"
+                    allowClear
+                    onChange={(value) => handleSectionChange(value, normalForm)}
+                    aria-label="Section selection"
+                  >
+                    {memoizedSectionOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider orientation="left" orientationMargin={0}>
+              <span className="text-gray-600 font-medium">Group & Semester</span>
+            </Divider>
+
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item label="Group" name="groupId">
+                  <Select
+                    mode="multiple"
+                    size="large"
+                    placeholder="Select Groups"
+                    allowClear
+                    aria-label="Group selection"
+                  >
+                    {memoizedGroupOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="Semester" name="semesterId">
+                  <Select
+                    size="large"
+                    placeholder="Select Semester"
+                    allowClear
+                    disabled={!normalForm.getFieldValue("classId")}
+                    aria-label="Semester selection"
+                  >
+                    {memoizedSemesterOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider orientation="left" orientationMargin={0}>
+              <span className="text-gray-600 font-medium">Schedule</span>
+            </Divider>
+
+            <Form.Item
+              name="days"
+              rules={[
+                {
+                  validator: (_, value) => {
+                    if (
+                      Array.isArray(value) &&
+                      value.some((day) => day?.slots && day.slots.length > 0)
+                    ) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject("At least one time slot is required.");
+                  },
+                },
+              ]}
+            >
+              <DaySlotFields
+                form={normalForm}
+                timetableType={timetableType}
+                allSubjects={allSubjects}
+              />
+            </Form.Item>
+
+            <div className="bg-pink-50 py-2 border-t sticky -bottom-2 rounded-md z-10">
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 px-6">
+                <Button
+                  onClick={showConfirmOnClose}
+                  className="w-full sm:w-auto"
+                  disabled={isLoading}
+                  aria-label="Cancel form"
+                >
+                  Cancel
+                </Button>
+                <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                  <Button
+                    type="default"
+                    loading={submitType === "draft"}
+                    onClick={() => handleNormalSubmit(false)}
+                    className="w-full sm:w-auto"
+                    disabled={isLoading}
+                    aria-label="Save as draft"
+                  >
+                    Save as Draft
+                  </Button>
+                  <Button
+                    type="primary"
+                    loading={submitType === "publish"}
+                    onClick={() => handleNormalSubmit(true)}
+                    className="w-full sm:w-auto"
+                    disabled={isLoading}
+                    aria-label="Save and publish"
+                  >
+                    Save & Publish
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            <TimetablePreviewModal
+              visible={previewVisible}
+              onCancel={() => setPreviewVisible(false)}
+              timetableData={getPreviewData()}
+              allSubjects={allSubjects}
+            />
+          </Form>
+        </TabPane>
+
+        <TabPane tab="Automatic Timetable" key="automatic">
+          <Form
+            layout="vertical"
+            form={autoForm}
+            requiredMark={false}
+          >
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item
+                  label="Class"
+                  name="classId"
+                  rules={[{ required: true, message: "Class is required" }]}
+                >
+                  <Select
+                    size="large"
+                    placeholder="Select Class"
+                    allowClear
+                    onChange={(value) => handleClassChange(value, autoForm)}
+                    aria-label="Class selection"
+                    showSearch
+                    optionFilterProp="children"
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().includes(input.toLowerCase())
+                    }
+                  >
+                    {memoizedClassOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="Section" name="sectionId">
+                  <Select
+                    size="large"
+                    placeholder="Select Sections"
+                    allowClear
+                    onChange={(value) => handleSectionChange(value, autoForm)}
+                    aria-label="Section selection"
+                  >
+                    {memoizedSectionOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  label="Days"
+                  name="days"
+                  rules={[{ required: true, message: "Please select at least one day" }]}
+                >
+                  <Select
+                    mode="multiple"
+                    size="large"
+                    placeholder="Select Days"
+                    allowClear
+                    onChange={(value) => setSelectedDays(value)}
+                    aria-label="Days selection"
+                  >
+                    {memoizedDayOptions}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  label="Start Time"
+                  name="startTime"
+                  rules={[{ required: true, message: "Start time is required" }]}
+                >
+                  <TimePicker
+                    size="large"
+                    format="HH:mm"
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  label="End Time"
+                  name="endTime"
+                  rules={[
+                    { required: true, message: "End time is required" },
+                    ({ getFieldValue }) => ({
+                      validator: (_, value) => {
+                        const startTime = getFieldValue("startTime");
+                        if (!startTime || !value) {
+                          return Promise.resolve();
+                        }
+                        if (value.isSameOrBefore(startTime)) {
+                          return Promise.reject("End time must be after start time");
+                        }
+                        return Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <TimePicker
+                    size="large"
+                    format="HH:mm"
+                    style={{ width: "100%" }}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            {autoForm.getFieldValue("classId") && (
+              <>
+                <Divider orientation="left" orientationMargin={0}>
+                  <span className="text-gray-600 font-medium">Subjects</span>
+                </Divider>
+
+                {isSubjectsLoading ? (
+                  <div className="flex justify-center items-center py-4">
+                    <Spin tip="Loading subjects..." />
+                  </div>
+                ) : subjectsError ? (
+                  <div className="text-center text-red-500 py-4">
+                    {subjectsError}
+                  </div>
+                ) : allSubjects.length === 0 ? (
+                  <NoDataFound />
+                ) : (
+                  <div className="space-y-4">
+                    {allSubjects.map((subject) => (
+                      <Row key={subject.subjectId} gutter={[16, 16]} align="middle">
+                        <Col span={12}>
+                          <Checkbox
+                            checked={!!selectedSubjects[String(subject.subjectId)]}
+                            onChange={() => handleSubjectSelect(subject.subjectId)}
+                          >
+                            {subject.subjectName}
+                          </Checkbox>
+                        </Col>
+                        <Col span={12}>
+                          <Input
+                            type="number"
+                            placeholder="Duration"
+                            style={{ width: "150px" }}
+                            min={0}
+                            value={
+                              subjectsData.find((item) => item.subjectId === String(subject.subjectId))?.minutes || 0
+                            }
+                            disabled={!selectedSubjects[String(subject.subjectId)]}
+                            onChange={(e) =>
+                              handleMinutesChange(subject.subjectId, e.target.value)
+                            }
+                            addonAfter="min"
+                          />
+                        </Col>
+                      </Row>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            <Divider orientation="left" orientationMargin={0}>
+              <span className="text-gray-600 font-medium">Custom Items</span>
+            </Divider>
+
+            <div className="mb-4">
+              <Button onClick={() => setCustomModalVisible(true)}>
+                Add Custom
+              </Button>
+            </div>
+
+            {customItems.length > 0 && (
+              <div className="space-y-2 mb-4">
+                {customItems.map((item, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <Tag color="orange">{item.name}</Tag>
+                    <span>{item.minutes} minutes</span>
+                    <Button
+                      type="text"
+                      icon={<DeleteOutlined />}
+                      onClick={() => handleRemoveCustom(index)}
+                      aria-label="Remove custom item"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="bg-pink-50 py-2 border-t sticky -bottom-2 rounded-md z-10 mt-4">
+              <div className="flex flex-col-reverse sm:flex-row justify-between gap-4 px-6">
+                <Button
+                  onClick={handleReset}
+                  className="w-full sm:w-auto"
+                  disabled={isLoading}
+                  aria-label="Reset form"
+                >
+                  Reset
+                </Button>
+                <Button
+                  type="primary"
+                  loading={submitType === "submit"}
+                  onClick={handleAutoSubmit}
+                  className="w-full sm:w-auto"
+                  disabled={isLoading}
+                  aria-label="Submit form"
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </Form>
+        </TabPane>
+      </Tabs>
+
+      <Modal
+        title="Error"
+        visible={errorModalVisible}
+        onOk={() => setErrorModalVisible(false)}
+        onCancel={() => setErrorModalVisible(false)}
+        okText="OK"
+      >
+        <p>{errorMessage}</p>
+      </Modal>
+
+      <Modal
+        title="Add Custom Item"
+        visible={customModalVisible}
+        onOk={handleAddCustom}
+        onCancel={() => {
+          setCustomName("");
+          setCustomMinutes("");
+          setCustomModalVisible(false);
+        }}
+        okText="Add"
+      >
+        <div className="space-y-4">
+          <div>
+            <label>Name</label>
+            <Input
+              placeholder="e.g., Lunch Timing"
+              value={customName}
+              onChange={(e) => setCustomName(e.target.value)}
+            />
+          </div>
+          <div>
+            <label>Duration</label>
+            <Input
+              type="number"
+              placeholder="Duration"
+              value={customMinutes}
+              onChange={(e) => {
+                setCustomMinutes(e.target.value);
+              }}
+              min={0}
+              addonAfter="min"
+            />
           </div>
         </div>
-
-        {/* Preview Modal */}
-        <TimetablePreviewModal
-          visible={previewVisible}
-          onCancel={() => setPreviewVisible(false)}
-          timetableData={getPreviewData()}
-          allSubjects={allSubjects}
-        />
-      </Form>
+      </Modal>
     </ConfigProvider>
   );
 };
