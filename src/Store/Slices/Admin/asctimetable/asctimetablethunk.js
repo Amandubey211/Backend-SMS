@@ -21,7 +21,6 @@ export const createTimeTable = createAsyncThunk(
         `/${getRole}/ascTimeTable/create?say=${academicYearId}`,
         timetableData
       );
-      toast.success("Timetable created successfully");
       return response;
     } catch (error) {
       toast.error(error.message || "Failed to create timetable");
@@ -41,7 +40,6 @@ export const updateTimeTable = createAsyncThunk(
         `/${getRole}/ascTimeTable/update`,
         timetableData
       );
-      toast.success("Timetable updated successfully");
       return response;
     } catch (error) {
       toast.error(error.message || "Failed to update timetable");
@@ -110,7 +108,6 @@ export const deleteTimeTable = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const response = await deleteData(`/${getRole}/ascTimeTable/${id}`);
-      toast.success("Timetable deleted successfully");
       return { id }; // Return the deleted timetable ID for state updates
     } catch (error) {
       toast.error(error.message || "Failed to delete timetable");
