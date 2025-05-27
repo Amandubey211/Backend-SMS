@@ -50,20 +50,19 @@ const { Panel } = Collapse;
 const { TabPane } = Tabs;
 
 const TIMETABLE_TYPES = [
-  // { value: "weekly", label: "Weekly", icon: <CalendarOutlined /> },
   { value: "exam", label: "Exam", icon: <BookOutlined /> },
   { value: "event", label: "Event", icon: <TeamOutlined /> },
   { value: "others", label: "Others", icon: <UsergroupAddOutlined /> },
 ];
 
 const DAYS_OF_WEEK = [
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-  "sunday",
+  { value: "monday", label: "Monday" },
+  { value: "tuesday", label: "Tuesday" },
+  { value: "wednesday", label: "Wednesday" },
+  { value: "thursday", label: "Thursday" },
+  { value: "friday", label: "Friday" },
+  { value: "saturday", label: "Saturday" },
+  { value: "sunday", label: "Sunday" },
 ];
 
 const TimetablePreviewModal = ({
@@ -255,7 +254,7 @@ const TimetablePreviewModal = ({
   );
 };
 
-const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
+const TimeTableForm = ({ editingTimetable, onSubmit, onClose, Type }) => {
   const [normalForm] = Form.useForm();
   const [autoForm] = Form.useForm();
   const dispatch = useDispatch();
@@ -270,11 +269,13 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
   const [customItems, setCustomItems] = useState([]);
   const [customModalVisible, setCustomModalVisible] = useState(false);
   const [customName, setCustomName] = useState("");
-  const [customMinutes, setCustomMinutes] = useState("");
+  const [customStartTime, setCustomStartTime] = useState(null);
+  const [customEndTime, setCustomEndTime] = useState(null);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubjectsLoading, setIsSubjectsLoading] = useState(false);
   const [subjectsError, setSubjectsError] = useState(null);
+  const [publishAuto, setPublishAuto] = useState(true);
   const firstInputRef = useRef(null);
 
   const classList = useSelector((state) => state.admin.class.classes);
@@ -335,8 +336,8 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
   const memoizedDayOptions = useMemo(
     () =>
       DAYS_OF_WEEK.map((day) => (
-        <Option key={day} value={day}>
-          {day}
+        <Option key={day.value} value={day.value}>
+          {day.label}
         </Option>
       )),
     []
@@ -351,7 +352,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (editingTimetable && activeTab === "normal") {
+      if (editingTimetable) {
         try {
           const {
             validity,
@@ -391,17 +392,31 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
             return newDay;
           });
 
-          normalForm.setFieldsValue({
-            name: editingTimetable.name,
-            type: editingTimetable.type,
-            validity: convertedValidity,
-            classId: classId?._id || undefined,
-            sectionId: sectionId?.map((section) => section?._id) || [],
-            groupId: groupId?.map((group) => group?._id) || [],
-            semesterId: semesterId?._id || undefined,
-            days: convertedDays,
-            showCalendar: showCalendar !== false,
-          });
+          if (Type === "automatic") {
+            console.log("Editing Automatic Timetable:", editingTimetable);
+            setActiveTab("automatic");
+            autoForm.setFieldsValue({
+              classId: classId,
+              sectionId: sectionId,
+              days: selectedDays,
+              startTime: dayjs(editingTimetable.startTime, "HH:mm"),
+              endTime: dayjs(editingTimetable.endTime, "HH:mm"),
+              publish: publishAuto,
+            });
+          } else {
+            setActiveTab("normal");
+            normalForm.setFieldsValue({
+              name: editingTimetable.name,
+              type: editingTimetable.type,
+              validity: convertedValidity,
+              classId: classId?._id || undefined,
+              sectionId: sectionId?.map((section) => section?._id) || [],
+              groupId: groupId?.map((group) => group?._id) || [],
+              semesterId: semesterId?._id || undefined,
+              days: convertedDays,
+              showCalendar: showCalendar !== false,
+            });
+          }
 
           if (classId?._id) {
             try {
@@ -425,15 +440,16 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
           }, 100);
         } catch (error) {
         }
-      } else if (activeTab === "normal") {
+      } else {
         normalForm.resetFields();
+        autoForm.resetFields();
         setTimetableType(null);
       }
     };
 
     fetchData();
-  }, [editingTimetable, normalForm, dispatch, activeTab]);
-  // console.log("allSubjects", allSubjects);
+  }, [editingTimetable, normalForm, autoForm, dispatch]);
+
   useEffect(() => {
     if (allSubjects && activeTab === "automatic") {
       setIsSubjectsLoading(true);
@@ -567,6 +583,9 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
           ? "Your timetable has been published"
           : "Your timetable has been saved as draft",
       });
+
+      // Reset the form after successful submission
+      resetAll();
     } catch (error) {
       if (error.errorFields && error.errorFields.length > 0) {
         const firstErrorField = error.errorFields[0].name[0];
@@ -591,16 +610,70 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     );
   };
 
+  const calculateCustomItemsTotalDuration = () => {
+    if (!customItems || customItems.length === 0) {
+      return 0;
+    }
+
+    return customItems.reduce((total, item) => {
+      if (!item.startTime || !item.endTime || !item.startTime.isValid() || !item.endTime.isValid()) {
+        return total;
+      }
+
+      const startMinutes = item.startTime.hour() * 60 + item.startTime.minute();
+      const endMinutes = item.endTime.hour() * 60 + item.endTime.minute();
+      const duration = endMinutes > startMinutes ? endMinutes - startMinutes : 0;
+      return total + duration;
+    }, 0);
+  };
   const handleAddCustom = () => {
-    if (!customName || !customMinutes) {
-      setErrorMessage("Please provide both a name and duration for the custom item.");
+    const timetableStartTime = autoForm.getFieldValue("startTime");
+    const timetableEndTime = autoForm.getFieldValue("endTime");
+
+    if (!customName) {
+      setErrorMessage("Please provide a name for the custom item.");
       setErrorModalVisible(true);
       return;
     }
-    const minutes = parseInt(customMinutes, 10);
-    setCustomItems([...customItems, { name: customName, minutes }]);
+    if (!customStartTime || !customEndTime || !customStartTime.isValid() || !customEndTime.isValid()) {
+      setErrorMessage("Please provide valid start and end times for the custom item.");
+      setErrorModalVisible(true);
+      return;
+    }
+    if (!timetableStartTime || !timetableEndTime) {
+      setErrorMessage("Please set the timetable start and end times first.");
+      setErrorModalVisible(true);
+      return;
+    }
+
+    // Validate custom times within timetable range
+    if (customStartTime.isBefore(timetableStartTime) || customStartTime.isAfter(timetableEndTime)) {
+      setErrorMessage(
+        `Custom start time must be between ${timetableStartTime.format("HH:mm")} and ${timetableEndTime.format("HH:mm")}.`
+      );
+      setErrorModalVisible(true);
+      return;
+    }
+    if (customEndTime.isBefore(timetableStartTime) || customEndTime.isAfter(timetableEndTime)) {
+      setErrorMessage(
+        `Custom end time must be between ${timetableStartTime.format("HH:mm")} and ${timetableEndTime.format("HH:mm")}.`
+      );
+      setErrorModalVisible(true);
+      return;
+    }
+    if (customEndTime.isSameOrBefore(customStartTime)) {
+      setErrorMessage("Custom end time must be after start time.");
+      setErrorModalVisible(true);
+      return;
+    }
+
+    setCustomItems([
+      ...customItems,
+      { name: customName, startTime: customStartTime, endTime: customEndTime },
+    ]);
     setCustomName("");
-    setCustomMinutes("");
+    setCustomStartTime(null);
+    setCustomEndTime(null);
     setCustomModalVisible(false);
   };
 
@@ -612,7 +685,8 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     const subjectMinutes = subjectsData
       .filter((item) => selectedSubjects[item.subjectId])
       .reduce((total, item) => total + item.minutes, 0);
-    const customMinutes = customItems.reduce((total, item) => total + item.minutes, 0);
+
+    const customMinutes = calculateCustomItemsTotalDuration();
     return subjectMinutes + customMinutes;
   };
 
@@ -636,8 +710,8 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
       await autoForm.validateFields();
 
       const selectedSubjectCount = Object.values(selectedSubjects).filter(Boolean).length;
-      if (selectedSubjectCount === 0 && customItems.length === 0) {
-        setErrorMessage("Please select at least one subject or add a custom item.");
+      if (selectedSubjectCount === 0) {
+        setErrorMessage("Please select at least one subject.");
         setErrorModalVisible(true);
         return;
       }
@@ -664,11 +738,10 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
       }
 
       if (actualDuration === 0) {
-        setErrorMessage("Please allocate at least some minutes to selected subjects or custom items.");
+        setErrorMessage("Please allocate at least some minutes to selected subjects.");
         setErrorModalVisible(true);
         return;
       }
-
       if (selectedDays.length === 0) {
         setErrorMessage("Please select at least one day for the timetable.");
         setErrorModalVisible(true);
@@ -677,55 +750,54 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
 
       const values = autoForm.getFieldsValue();
       const startTime = values.startTime;
+      const endTime = values.endTime; // Use the user-defined endTime
       let currentTime = startTime;
 
       const subjectsTime = [];
-
+      const customTime = [];
       subjectsData
         .filter((item) => selectedSubjects[item.subjectId] && item.minutes > 0)
         .forEach((item) => {
-          const endTime = currentTime.add(item.minutes, "minutes");
+          const slotEndTime = currentTime.add(item.minutes, "minutes");
           subjectsTime.push({
             subjectId: item.subjectId,
-            name: item.subjectName,
             time: item.minutes,
-            type: "subject",
           });
-          currentTime = endTime;
+          currentTime = slotEndTime;
         });
 
       customItems.forEach((item) => {
-        const endTime = currentTime.add(item.minutes, "minutes");
-        subjectsTime.push({
-          subjectId: null,
+        customTime.push({
           name: item.name,
-          time: item.minutes,
-          type: "custom",
+          startTime: item.startTime.format("HH:mm"),
+          endTime: item.endTime.format("HH:mm"),
         });
-        currentTime = endTime;
       });
 
       const timetableData = {
         classId: values.classId,
-        sectionIds: values.sectionId,
+        sectionId: values.sectionId,
         startTime: startTime.format("HH:mm"),
-        endTime: currentTime.format("HH:mm"),
+        endTime: endTime.format("HH:mm"), // Use the user-defined endTime
         days: selectedDays,
         subjectsTiming: subjectsTime,
+        customTiming: customTime,
+        publish: publishAuto ? true : false,
       };
       const response = await dispatch(createTimeTable(timetableData)).unwrap();
-      // console.log("Submitting Automatic Timetable Data:", response);
+      console.log("Automatic Timetable created:", response);
       if (response.success) {
-        // notification.success({
-        //   message: "Automatic Timetable created successfully",
-        // });
+        notification.success({
+          message: "Automatic Timetable created successfully",
+          description: "Your automatic timetable has been created successfully.",
+        });
         autoForm.resetFields();
         setSubjectsData(subjectsData.map((item) => ({ ...item, minutes: 0 })));
         setSelectedSubjects({});
         setSelectedDays([]);
         setCustomItems([]);
-      }
-      else {
+        setPublishAuto(true);
+      } else {
         setErrorMessage(response.message || "Failed to create Automatic Timetable. Please try again.");
         setErrorModalVisible(true);
       }
@@ -743,7 +815,6 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
       setSubmitType(null);
     }
   };
-
   const resetAll = () => {
     normalForm.resetFields();
     autoForm.resetFields();
@@ -756,11 +827,13 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     setCustomItems([]);
     setCustomModalVisible(false);
     setCustomName("");
-    setCustomMinutes("");
+    setCustomStartTime(null);
+    setCustomEndTime(null);
     setErrorModalVisible(false);
     setErrorMessage("");
     setIsSubjectsLoading(false);
     setSubjectsError(null);
+    setPublishAuto(true);
   };
 
   const handleReset = () => {
@@ -769,6 +842,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
     setSelectedSubjects({});
     setSelectedDays([]);
     setCustomItems([]);
+    setPublishAuto(true);
     setHasUnsavedChanges(false);
   };
 
@@ -1205,10 +1279,20 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
               <span className="text-gray-600 font-medium">Custom Items</span>
             </Divider>
 
-            <div className="mb-4">
+            <div className="mb-4 flex items-center gap-4">
               <Button onClick={() => setCustomModalVisible(true)}>
                 Add Custom
               </Button>
+              <div>
+                <span className="mr-2">Publish Timetable:</span>
+                <Switch
+                  checkedChildren="Yes"
+                  unCheckedChildren="No"
+                  checked={publishAuto}
+                  onChange={(checked) => setPublishAuto(checked)}
+                  aria-label="Publish timetable"
+                />
+              </div>
             </div>
 
             {customItems.length > 0 && (
@@ -1216,7 +1300,8 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
                 {customItems.map((item, index) => (
                   <div key={index} className="flex items-center gap-2">
                     <Tag color="orange">{item.name}</Tag>
-                    <span>{item.minutes} minutes</span>
+                    <span>{item.startTime ? item.startTime.format("HH:mm") : "N/A"}</span>
+                    <span>{item.endTime ? item.endTime.format("HH:mm") : "N/A"}</span>
                     <Button
                       type="text"
                       icon={<DeleteOutlined />}
@@ -1270,7 +1355,8 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
         onOk={handleAddCustom}
         onCancel={() => {
           setCustomName("");
-          setCustomMinutes("");
+          setCustomStartTime(null);
+          setCustomEndTime(null);
           setCustomModalVisible(false);
         }}
         okText="Add"
@@ -1285,16 +1371,115 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose }) => {
             />
           </div>
           <div>
-            <label>Duration</label>
-            <Input
-              type="number"
-              placeholder="Duration"
-              value={customMinutes}
-              onChange={(e) => {
-                setCustomMinutes(e.target.value);
+            <label>Start Time</label>
+            <TimePicker
+              size="large"
+              format="HH:mm"
+              value={customStartTime}
+              onChange={(time) => setCustomStartTime(time)}
+              style={{ width: "100%" }}
+              disabledHours={() => {
+                const startTime = autoForm.getFieldValue("startTime");
+                const endTime = autoForm.getFieldValue("endTime");
+                if (!startTime || !endTime) return [];
+
+                const startHour = startTime.hour();
+                const endHour = endTime.hour();
+                const hours = [];
+                for (let i = 0; i < 24; i++) {
+                  if (i < startHour || i > endHour) {
+                    hours.push(i);
+                  }
+                }
+                return hours;
               }}
-              min={0}
-              addonAfter="min"
+              disabledMinutes={(selectedHour) => {
+                const startTime = autoForm.getFieldValue("startTime");
+                const endTime = autoForm.getFieldValue("endTime");
+                if (!startTime || !endTime) return [];
+
+                const startHour = startTime.hour();
+                const endHour = endTime.hour();
+                const startMinute = startTime.minute();
+                const endMinute = endTime.minute();
+
+                if (selectedHour === startHour) {
+                  const minutes = [];
+                  for (let i = 0; i < startMinute; i++) {
+                    minutes.push(i);
+                  }
+                  return minutes;
+                }
+                if (selectedHour === endHour) {
+                  const minutes = [];
+                  for (let i = endMinute + 1; i < 60; i++) {
+                    minutes.push(i);
+                  }
+                  return minutes;
+                }
+                return [];
+              }}
+            />
+          </div>
+          <div>
+            <label>End Time</label>
+            <TimePicker
+              size="large"
+              format="HH:mm"
+              value={customEndTime}
+              onChange={(time) => setCustomEndTime(time)}
+              style={{ width: "100%" }}
+              disabledHours={() => {
+                const startTime = autoForm.getFieldValue("startTime");
+                const endTime = autoForm.getFieldValue("endTime");
+                if (!startTime || !endTime) return [];
+
+                const startHour = startTime.hour();
+                const endHour = endTime.hour();
+                const hours = [];
+                for (let i = 0; i < 24; i++) {
+                  if (i < startHour || i > endHour) {
+                    hours.push(i);
+                  }
+                }
+                return hours;
+              }}
+              disabledMinutes={(selectedHour) => {
+                const startTime = autoForm.getFieldValue("startTime");
+                const endTime = autoForm.getFieldValue("endTime");
+                const customStart = customStartTime;
+                if (!startTime || !endTime) return [];
+
+                const startHour = startTime.hour();
+                const endHour = endTime.hour();
+                const startMinute = startTime.minute();
+                const endMinute = endTime.minute();
+                const customStartHour = customStart ? customStart.hour() : null;
+                const customStartMinute = customStart ? customStart.minute() : null;
+
+                if (selectedHour === startHour && selectedHour === customStartHour) {
+                  const minutes = [];
+                  for (let i = 0; i <= (customStartMinute || startMinute); i++) {
+                    minutes.push(i);
+                  }
+                  return minutes;
+                }
+                if (selectedHour === endHour) {
+                  const minutes = [];
+                  for (let i = endMinute + 1; i < 60; i++) {
+                    minutes.push(i);
+                  }
+                  return minutes;
+                }
+                if (selectedHour === customStartHour && customStart) {
+                  const minutes = [];
+                  for (let i = 0; i <= customStartMinute; i++) {
+                    minutes.push(i);
+                  }
+                  return minutes;
+                }
+                return [];
+              }}
             />
           </div>
         </div>

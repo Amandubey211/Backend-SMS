@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,6 +7,8 @@ import { getClassTimeTable } from "../../../../../Store/Slices/Admin/asctimetabl
 const dummyData = {
   className: "10th Grade",
   sectionName: "A",
+  startTime: "9:00",
+  endTime: "15:00",
   timetable: [
     {
       time: "9:00 AM - 9:45 AM",
@@ -56,15 +59,14 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
 
   const getColorForTeachers = (teachers) => {
     if (teachers?.length === 0) return "bg-yellow-300";
-    if (teachers?.length > 1) return "bg-red-300"; 
-    return "bg-white"; 
+    if (teachers?.length > 1) return "bg-red-300";
+    return "bg-white";
   };
-
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">
-          {data.className} - Section {data.sectionName}
+          {data.className} - Section {data.sectionName}  (Timing {data.startTime}-{data.endTime})
         </h2>
         <div className="flex space-x-4">
           <button
@@ -128,6 +130,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         </tbody>
       </table>
     </div>
+
   );
 };
 

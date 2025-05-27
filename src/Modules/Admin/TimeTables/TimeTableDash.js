@@ -715,14 +715,14 @@ export default function TimeTableDash() {
                 <Button>Export</Button>
               </Popover>
 
-               <Button
-                  type="primary"
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
-                  onClick={() => openDrawer(null)}
-                >
-                 + Add Timetable
-                </Button>
-              
+              <Button
+                type="primary"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
+                onClick={() => openDrawer(null)}
+              >
+                + Add Timetable
+              </Button>
+
             </div>
           </div>
         </div>
@@ -773,7 +773,7 @@ export default function TimeTableDash() {
         )}
         {activeTab === "autoCalendar" && (
           <>
-          <MainSection/>
+            <MainSection />
           </>
         )}
 
@@ -939,6 +939,7 @@ export default function TimeTableDash() {
           groupsList={groupsList}
           allSubjects={allSubjects}
           reduxSemesters={reduxSemesters}
+          Type={"normal"}
         />
       </Drawer>
 
