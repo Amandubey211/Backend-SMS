@@ -6,7 +6,7 @@ import {
 import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
-import { postData, putData,getData } from "../../../../services/apiEndpoints";
+import { postData, putData, getData } from "../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../Utils/getRoles";
 
 export const createTimeTable = createAsyncThunk(
@@ -47,15 +47,39 @@ export const updateTimeTable = createAsyncThunk(
     }
   }
 );
+
+// Fetch all school timeTable
 export const getSchoolTimeTable = createAsyncThunk(
-  "timeTable/getSchoolTimeTable",
-  async ({ rejectWithValue, getState, dispatch }) => {
+  "admin/getSchoolTimeTable",
+  async (data, { rejectWithValue, getState, dispatch }) => {
     try {
-          const say = getAY();
+      const say = getAY();
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const response = await getData(
         `/${getRole}/ascTimeTable/school?say=${say}`,
+        data
+      );
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Failed to load timetable");
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Fetch class timeTable
+export const getClassTimeTable = createAsyncThunk(
+  "admin/getClassTimeTable",
+  async (data, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
+      const { classId, sectionId } = data;
+
+      const response = await getData(
+        `/${getRole}/ascTimeTable/class?say=${say}&classId=${classId}&sectionId=${sectionId}`
       );
       return response;
     } catch (error) {
