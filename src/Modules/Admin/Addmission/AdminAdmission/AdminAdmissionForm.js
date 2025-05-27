@@ -61,7 +61,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
     // profile
     if (!values.profile) missing.push("Profile Picture");
     // dynamic mandatory attachments
-    console.log(values.attachments,"values.attachmentsvalues.attachments")
+    console.log(values.attachments, "values.attachmentsvalues.attachments");
     if (values.attachments?.mandatory) {
       Object.entries(values.attachments.mandatory).forEach(([key, val]) => {
         if (!val?.url) missing.push(key);
@@ -81,21 +81,13 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         return;
       }
 
-    
-
-     const formData = new FormData();
+      const formData = new FormData();
       formData.append("profile", values.profile);
       formData.append("firstName", values.candidateInformation.firstName);
       formData.append("lastName", values.candidateInformation.lastName);
-      formData.append(
-        "email",
-        values.candidateInformation.email.toLowerCase()
-      );
+      formData.append("email", values.candidateInformation.email.toLowerCase());
       formData.append("dateOfBirth", values.candidateInformation.dob);
-      formData.append(
-        "placeOfBirth",
-        values.candidateInformation.placeOfBirth
-      );
+      formData.append("placeOfBirth", values.candidateInformation.placeOfBirth);
       formData.append("gender", values.candidateInformation.gender);
       formData.append(
         "contactNumber",
@@ -128,10 +120,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         "motherName",
         `${values.motherInfo.firstName} ${values.motherInfo.lastName}`
       );
-      formData.append(
-        "guardianName",
-        values.guardianInformation.guardianName
-      );
+      formData.append("guardianName", values.guardianInformation.guardianName);
       formData.append(
         "guardianRelationToStudent",
         values.guardianInformation.guardianRelationToStudent
@@ -188,18 +177,14 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         "workPhone",
         "homePhone",
         "email1",
-        "email2"
+        "email2",
       ];
 
       fatherInfoFields.forEach((field) => {
-        if(values.fatherPhoto){
-           formData.append(
-            `fatherInfo[photo]`,
-            values.fatherPhoto || "" 
-          );
+        if (values.fatherPhoto) {
+          formData.append(`fatherInfo[photo]`, values.fatherPhoto || "");
         }
-        if (field === 'cell1' || field === 'cell2') {
-          
+        if (field === "cell1" || field === "cell2") {
           formData.append(
             `fatherInfo[${field}]`,
             values.fatherInfo[field]?.value || ""
@@ -211,7 +196,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           );
         }
       });
-      
+
       const motherInfoFields = [
         "idNumber",
         "idExpiry",
@@ -227,21 +212,17 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         "workPhone",
         "homePhone",
         "email1",
-        "email2"
+        "email2",
       ];
 
       motherInfoFields.forEach((field) => {
-        if(values.motherPhoto){
-           formData.append(
-            `motherInfo[photo]`,
-            values.motherPhoto || "" 
-          );
+        if (values.motherPhoto) {
+          formData.append(`motherInfo[photo]`, values.motherPhoto || "");
         }
-        if (field === 'cell1' || field === 'cell2') {
-          
+        if (field === "cell1" || field === "cell2") {
           formData.append(
             `motherInfo[${field}]`,
-            values.motherInfo[field]?.value || "" 
+            values.motherInfo[field]?.value || ""
           );
         } else {
           formData.append(
@@ -282,17 +263,13 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         formData.append("medicalCondition", values.medicalInfo);
       }
 
-    
       const addDynamicAttachments = (bucket) => {
         Object.values(bucket || {}).forEach((attachment) => {
           if (attachment?.file) {
             formData.append(attachment.fieldName, attachment.file);
             // Include ID if needed
             if (attachment.fieldId) {
-              formData.append(
-                `${attachment.fieldName}_id`,
-                attachment.fieldId
-              );
+              formData.append(`${attachment.fieldName}_id`, attachment.fieldId);
             }
           }
         });

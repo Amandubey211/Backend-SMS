@@ -119,7 +119,7 @@ export const registerStudentDetails = createAsyncThunk(
   async ({ formData, navigate }, { rejectWithValue, dispatch, getState }) => {
     try {
       console.log("Sending student data:", formData);
-      
+
       // Get the user role; default to 'student' if not authenticated
       const role = getUserRole(getState) || "student";
       const endpoint = `/${role}/student_register`;
