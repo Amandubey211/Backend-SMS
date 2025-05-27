@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {getSchoolTimeTable,getClassTimeTable} from './asctimetablethunk'
+import {getSchoolTimeTable,getClassTimeTable,fetchTimeTablesForTeacher} from './asctimetablethunk'
 
 
 const initialState = {
   ascTimeTableData: [],
   ascClassTimeTableData:{},
+  ascTeacherTimeTable:{},
   loading: false,
   error: null,
   isModalOpen: false,
@@ -54,6 +55,21 @@ const ascTimeTableSlice = createSlice({
         state.loading = false;
       })
       .addCase(getClassTimeTable.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loading = false;
+      })
+
+    builder
+      // Fetch timeTables 
+      .addCase(fetchTimeTablesForTeacher.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTimeTablesForTeacher.fulfilled, (state, action) => {
+        state.ascClassTimeTableData = action.payload?.data;
+        state.loading = false;
+      })
+      .addCase(fetchTimeTablesForTeacher.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       })
