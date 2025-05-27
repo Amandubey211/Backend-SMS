@@ -63,6 +63,7 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semeste
 
 // Utils
 import ExportFunctions from "../../../Utils/timetableUtils";
+import MainSection from "./AutomaticTimeTable/MainSection";
 
 export default function TimeTableDash() {
   const dispatch = useDispatch();
@@ -490,18 +491,18 @@ export default function TimeTableDash() {
 
     const sections = record.sectionId?.length
       ? record.sectionId.map((sec) => (
-          <Tag key={sec._id} color="purple" style={{ marginBottom: 4 }}>
-            {sec.sectionName}
-          </Tag>
-        ))
+        <Tag key={sec._id} color="purple" style={{ marginBottom: 4 }}>
+          {sec.sectionName}
+        </Tag>
+      ))
       : [<Tag key="no-sections">No Sections</Tag>];
 
     const groups = record.groupId?.length
       ? record.groupId.map((g) => (
-          <Tag key={g._id} color="cyan" style={{ marginBottom: 4 }}>
-            {g.groupName}
-          </Tag>
-        ))
+        <Tag key={g._id} color="cyan" style={{ marginBottom: 4 }}>
+          {g.groupName}
+        </Tag>
+      ))
       : [<Tag key="no-groups">No Groups</Tag>];
 
     const popContent = (
@@ -646,20 +647,20 @@ export default function TimeTableDash() {
         key === "class"
           ? classList.find((c) => c._id === value)?.className
           : key === "sections"
-          ? sectionList
+            ? sectionList
               .filter((s) => value.includes(s._id))
               .map((s) => s.sectionName)
               .join(", ")
-          : key === "groups"
-          ? groupsList
-              .filter((g) => value.includes(g._id))
-              .map((g) => g.groupName)
-              .join(", ")
-          : key === "subject"
-          ? allSubjects.find((s) => s._id === value)?.subjectName
-          : key === "semester"
-          ? reduxSemesters.find((s) => s._id === value)?.title
-          : value,
+            : key === "groups"
+              ? groupsList
+                .filter((g) => value.includes(g._id))
+                .map((g) => g.groupName)
+                .join(", ")
+              : key === "subject"
+                ? allSubjects.find((s) => s._id === value)?.subjectName
+                : key === "semester"
+                  ? reduxSemesters.find((s) => s._id === value)?.title
+                  : value,
     }));
 
   // --------------------------
@@ -669,9 +670,8 @@ export default function TimeTableDash() {
     <div className="w-full min-h-screen flex">
       {/* Main Content */}
       <div
-        className={`flex-1 p-4 transition-all ${
-          sidebarCollapsed ? "mr-0" : "mr-72"
-        }`}
+        className={`flex-1 p-4 transition-all ${sidebarCollapsed ? "mr-0" : "mr-72"
+          }`}
       >
         {/* Header & Top Controls */}
         <div className="flex flex-col gap-4 ">
@@ -681,6 +681,7 @@ export default function TimeTableDash() {
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
                 <Tabs.TabPane key="list" tab={<span>List View</span>} />
                 <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} />
+                <Tabs.TabPane key="autoCalendar" tab="Automatic Calendar" />
               </Tabs>
             </div>
 
@@ -714,13 +715,14 @@ export default function TimeTableDash() {
                 <Button>Export</Button>
               </Popover>
 
-              <Button
-                type="primary"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
-                onClick={() => openDrawer(null)}
-              >
-                + Add Timetable
-              </Button>
+               <Button
+                  type="primary"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
+                  onClick={() => openDrawer(null)}
+                >
+                 + Add Timetable
+                </Button>
+              
             </div>
           </div>
         </div>
@@ -740,7 +742,7 @@ export default function TimeTableDash() {
           clearAllFilters={clearAllFilters}
         />
 
-        {/* Conditionally Render List / Calendar */}
+        {/* Conditionally Render List /Automatic / Calendar */}
         {activeTab === "list" && (
           <>
             {loadingFetch ? (
@@ -767,6 +769,11 @@ export default function TimeTableDash() {
                 loading={loadingFetch}
               />
             )}
+          </>
+        )}
+        {activeTab === "autoCalendar" && (
+          <>
+          <MainSection/>
           </>
         )}
 
