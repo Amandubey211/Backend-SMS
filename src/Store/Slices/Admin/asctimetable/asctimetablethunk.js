@@ -6,7 +6,7 @@ import {
 import { setShowError, setErrorMsg } from "../../Common/Alerts/alertsSlice";
 import toast from "react-hot-toast";
 import { getAY } from "../../../../Utils/academivYear";
-import { postData, putData } from "../../../../services/apiEndpoints";
+import { postData, putData,getData } from "../../../../services/apiEndpoints";
 import { getUserRole } from "../../../../Utils/getRoles";
 
 export const createTimeTable = createAsyncThunk(
@@ -43,6 +43,23 @@ export const updateTimeTable = createAsyncThunk(
       return response;
     } catch (error) {
       toast.error(error.message || "Failed to update timetable");
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+export const getSchoolTimeTable = createAsyncThunk(
+  "timeTable/getSchoolTimeTable",
+  async ({ rejectWithValue, getState, dispatch }) => {
+    try {
+          const say = getAY();
+      dispatch(setShowError(false));
+      const getRole = getUserRole(getState);
+      const response = await getData(
+        `/${getRole}/ascTimeTable/school?say=${say}`,
+      );
+      return response;
+    } catch (error) {
+      toast.error(error.message || "Failed to load timetable");
       return handleError(error, dispatch, rejectWithValue);
     }
   }
