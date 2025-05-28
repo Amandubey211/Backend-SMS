@@ -388,6 +388,29 @@ const CandidateInfo = ({ formData }) => {
 
         <Row gutter={16}>
           <Col xs={24} md={12}>
+            <Form.Item name="height" label="Height (cm)">
+              <InputNumber
+                size="large"
+                className="w-full"
+                min={50}
+                max={250}
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item name="weight" label="Weight (kg)">
+              <InputNumber
+                size="large"
+                className="w-full"
+                min={5}
+                max={200}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
             <Form.Item name="passportNumber" label="Passport #">
               <Input size="large" prefix={<IdcardOutlined />} />
             </Form.Item>
@@ -504,7 +527,7 @@ const CandidateInfo = ({ formData }) => {
 
         <Divider className="my-2" />
 
-        <Form.Item
+        {/* <Form.Item
           name="primaryContact"
           label="Primary Contact"
           // rules={[{ required: true, message: "Required" }]}
@@ -514,7 +537,7 @@ const CandidateInfo = ({ formData }) => {
             <Option value="mother">Mother</Option>
             <Option value="guardian">Guardian</Option>
           </Select>
-        </Form.Item>
+        </Form.Item> */}
 
         <Row justify="space-between" className="mt-8">
           <Button icon={<ArrowLeftOutlined />} onClick={goBack}>
