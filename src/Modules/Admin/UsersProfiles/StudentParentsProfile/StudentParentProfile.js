@@ -84,7 +84,10 @@ const StudentParentProfile = () => {
               <Spinner />
             </div>
           ) : (
-            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_PARENT} title={"Parents"}>
+            <ProtectedSection
+              requiredPermission={PERMISSIONS.VIEW_PARENT}
+              title={"Parents"}
+            >
               <div className="min-h-screen p-4">
                 <h2 className="text-xl font-semibold mb-4">
                   {t("All Parents")}{" "}
@@ -101,13 +104,13 @@ const StudentParentProfile = () => {
                       onChange={handleFilterChange}
                       options={uniqueFilterOptions(allParents, "class")}
                     />
-                    <FormField
+                    {/* <FormField
                       id="section"
                       label={t("Section")}
                       value={filters.section}
                       onChange={handleFilterChange}
                       options={uniqueFilterOptions(allParents, "section")}
-                    />
+                    /> */}
                   </div>
                 </div>
                 <div className="overflow-x-auto bg-white shadow rounded-lg">
@@ -244,9 +247,7 @@ const StudentParentProfile = () => {
                   onClose={handleSidebarClose}
                   title={t("Children Count", { count: selectedChild?.length })}
                 >
-
                   <ChildProfile children={selectedChild} />
-
                 </Sidebar>
                 <Sidebar
                   isOpen={isUpdateSidebarOpen}

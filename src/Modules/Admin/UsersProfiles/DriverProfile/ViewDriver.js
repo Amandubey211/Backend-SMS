@@ -56,4 +56,3 @@ const InfoItem = ({ icon, label, value }) => (
 );
 
 export default ViewDriver;
-
