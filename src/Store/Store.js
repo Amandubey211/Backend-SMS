@@ -305,24 +305,24 @@ const transportReducer = combineReducers({
 
 /* any change to studentSignup.formData triggers a debounced save */
 /* any change to studentSignup.formData triggers a debounced save, except when on step 6 */
-listenerMiddleware.startListening({
-  predicate: (action, current, previous) => {
-    const currentStep = current.common?.studentSignup?.currentStep;
-    const formDataChanged =
-      current.common?.studentSignup?.formData !==
-        previous.common?.studentSignup?.formData &&
-      current.common?.studentSignup?.currentStep < 6;
+// listenerMiddleware.startListening({
+//   predicate: (action, current, previous) => {
+//     const currentStep = current.common?.studentSignup?.currentStep;
+//     const formDataChanged =
+//       current.common?.studentSignup?.formData !==
+//         previous.common?.studentSignup?.formData &&
+//       current.common?.studentSignup?.currentStep < 6;
 
-    return formDataChanged && currentStep !== 6;
-  },
-  effect: debounce(async (_action, api) => {
-    try {
-      await api.dispatch(saveStudentDraft()).unwrap();
-    } catch {
-      /* ignore – offline etc. */
-    }
-  }, 3000),
-});
+//     return formDataChanged && currentStep !== 6;
+//   },
+//   effect: debounce(async (_action, api) => {
+//     try {
+//       await api.dispatch(saveStudentDraft()).unwrap();
+//     } catch {
+//       /* ignore – offline etc. */
+//     }
+//   }, 3000),
+// });
 
 // Create the store
 const store = configureStore({
