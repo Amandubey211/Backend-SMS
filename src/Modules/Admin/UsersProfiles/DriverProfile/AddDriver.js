@@ -62,6 +62,7 @@ const AddDriver = ({ role, data }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [pdfUrl, setPdfUrl] = useState(null);
+    const [isPhotoUploading, setIsPhotoUploading] = useState(false);
 
     const initialDriverData = {
         fullName: "",
@@ -86,7 +87,6 @@ const AddDriver = ({ role, data }) => {
     };
 
     const [teacherData, setTeacherData] = useState(() => {
-        // Only use localStorage for new driver forms, not when editing
         if (!data) {
             const savedData = localStorage.getItem('driverFormData');
             return savedData ? JSON.parse(savedData) : initialDriverData;
@@ -99,21 +99,22 @@ const AddDriver = ({ role, data }) => {
     const [allRoleItems, setAllRoleItems] = useState([]);
     const [filteredRoleItems, setFilteredRoleItems] = useState([]);
 
-    // Simulate a form object for CustomUploadCard
     const [formValues, setFormValues] = useState({ photo: null });
     const form = {
         getFieldValue: (name) => formValues[name],
         setFieldValue: (name, value) => {
+            setIsPhotoUploading(true);
             setFormValues((prev) => ({ ...prev, [name]: value }));
             setTeacherData((prev) => ({
                 ...prev,
-                photo: value ? value.url : null,
+                photo: typeof value === 'string' ? value : (value?.url || null), // Handle both string and object
             }));
+            // Wait for the upload to complete (based on CustomUploadCard's upload completion)
+            setTimeout(() => setIsPhotoUploading(false), 1000);
         },
     };
 
     useEffect(() => {
-        // Only save to localStorage when adding a new driver, not when editing
         if (!data) {
             localStorage.setItem('driverFormData', JSON.stringify(teacherData));
         }
@@ -137,7 +138,6 @@ const AddDriver = ({ role, data }) => {
 
     useEffect(() => {
         if (data) {
-            // When editing a driver, explicitly set the photo to null if not present in data
             const photoUrl = data.photo || null;
             setTeacherData({
                 fullName: data.fullName || "",
@@ -177,7 +177,6 @@ const AddDriver = ({ role, data }) => {
             setSelectedRoles(initialSelectedRoles);
             const permissions = data.permission || [];
             setSelectedRolePermissions([...new Set(permissions)]);
-            // Clear localStorage when editing to avoid stale data
             localStorage.removeItem('driverFormData');
         } else {
             resetForm();
@@ -253,11 +252,9 @@ const AddDriver = ({ role, data }) => {
                 setPdfUrl(teacherData.teacherCV);
                 setIsModalVisible(true);
             } else {
-                // console.error("teacherCV is neither a File nor a string URL:", teacherData.teacherCV);
                 toast.error("Cannot preview the PDF file.");
             }
         } else {
-            // console.error("No teacherCV found in teacherData:", teacherData);
             toast.error("No PDF file available to preview.");
         }
     };
@@ -336,8 +333,16 @@ const AddDriver = ({ role, data }) => {
         const {
             fullName, joiningDate, dateOfBirth, religion, gender, address,
             contactNumber, email, national_Id, licenseNumber, licenseExpiryDate,
-            driverBadgeNumber, bloodGroup, photo
+            driverBadgeNumber, bloodGroup,
         } = teacherData;
+
+        // Validate photo, handling both string and object formats
+        const photoValue = form.getFieldValue('photo');
+        const photoUrl = typeof photoValue === 'string' ? photoValue : photoValue?.url;
+        if (!photoUrl) {
+            toast.error("Driver photo is required.");
+            return false;
+        }
 
         if (!fullName.trim()) {
             toast.error("Full Name is required.");
@@ -475,16 +480,16 @@ const AddDriver = ({ role, data }) => {
             }
         }
 
-        if (!photo) {
-            toast.error("Driver photo is required.");
-            return false;
-        }
-
         return true;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isPhotoUploading) {
+            toast.error("Please wait for the photo to finish uploading.");
+            return;
+        }
+
         setIsSubmitting(true);
         if (!validateForm()) {
             setIsSubmitting(false);
@@ -540,7 +545,6 @@ const AddDriver = ({ role, data }) => {
                     toast.error(addResult?.error || "Failed to add driver.");
                 }
             } catch (err) {
-                // console.error("Error adding driver:", err);
                 toast.error(err?.message || "An error occurred while adding the driver.");
             } finally {
                 setIsSubmitting(false);
@@ -876,16 +880,16 @@ const AddDriver = ({ role, data }) => {
                 >
                     <motion.button
                         type="submit"
-                        disabled={isSubmitting}
-                        whileHover={!loading ? { scale: 1.05 } : {}}
-                        whileTap={!loading ? { scale: 0.95 } : {}}
-                        className={`${loading
+                        disabled={isSubmitting || isPhotoUploading}
+                        whileHover={!(loading || isPhotoUploading) ? { scale: 1.05 } : {}}
+                        whileTap={!(loading || isPhotoUploading) ? { scale: 0.95 } : {}}
+                        className={`${loading || isPhotoUploading
                             ? "bg-gray-400 cursor-not-allowed"
                             : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                             } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
                         aria-label={data ? "Update Driver" : "Add New Driver"}
                     >
-                        {isSubmitting ? (
+                        {isSubmitting || isPhotoUploading ? (
                             <FiLoader className="animate-spin w-6 h-6" />
                         ) : (
                             data ? "Update Driver" : "Add New Driver"
