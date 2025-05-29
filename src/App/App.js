@@ -463,9 +463,7 @@ const AccountingSection = lazy(() =>
 const RoleSelector = lazy(() =>
   import("../Components/Common/RBAC/RoleSelector.js")
 );
-const ScoreCard = lazy(()=>
-  import("../Modules/Admin/ScoreCard/ScoreCard.js")
-)
+const ScoreCard = lazy(() => import("../Modules/Admin/ScoreCard/ScoreCard.js"));
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
@@ -1543,13 +1541,8 @@ function App() {
       errorElement: <Error />,
     },
     {
-          path:"/admin/scorecard/:cid",
-          element:(
-            <ProtectRoute  
-            Component={ScoreCard}
-            allowedRoles={["admin"]}
-            />
-          )
+      path: "/admin/scorecard/:cid",
+      element: <ProtectRoute Component={ScoreCard} allowedRoles={["admin"]} />,
     },
     // Student------------------------------------------------------------------------------
     {
