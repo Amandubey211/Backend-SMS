@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +8,7 @@ const dummyData = {
   sectionName: "A",
   startTime: "9:00",
   endTime: "15:00",
+  days: ["Monday", "Tuesday", "Wednesday"],
   timetable: [
     {
       time: "9:00 AM - 9:45 AM",
@@ -62,12 +62,30 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
     if (teachers?.length > 1) return "bg-red-300";
     return "bg-white";
   };
+
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">
-          {data.className} - Section {data.sectionName}  (Timing {data.startTime}-{data.endTime})
-        </h2>
+          <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-700">
+            {data.className} - Section {data.sectionName}
+          </h2>
+          <p className="text-gray-600">
+            Timings: <span className="font-medium">{data.startTime}</span> to{" "}
+            <span className="font-medium">{data.endTime}</span>
+          </p>
+          <p className="text-gray-500 mt-2">
+            Applicable for:{" "}
+            {data.days.map((day, index) => (
+              <span
+                key={index}
+                className="inline-block bg-blue-100 text-blue-600 rounded px-2 py-1 text-sm mr-2"
+              >
+                {day}
+              </span>
+            ))}
+          </p>
+        </div>
         <div className="flex space-x-4">
           <button
             className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -86,7 +104,6 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
 
       <div className="mb-4">
         <div className="flex space-x-4">
-
           <div className="flex items-center">
             <div className="w-4 h-4 bg-red-300 mr-2"></div>
             Multiple Teachers Assigned
@@ -101,10 +118,10 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
       <table className="w-full border border-gray-300 shadow-md">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border px-4 py-2">Subject</th>
+            <th className="border px-4 py-2">Time</th>
             {data.timetable.map((item, index) => (
               <th key={index} className="border px-4 py-2">
-                {item.time}
+                {item.subject}
               </th>
             ))}
           </tr>
@@ -112,7 +129,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         <tbody>
           {data.timetable.map((item, index) => (
             <tr key={index}>
-              <td className="border px-4 py-2">{item.subject}</td>
+              <td className="border px-4 py-2">{item.time}</td>
               {data.timetable.map((timeItem, timeIndex) => (
                 <td
                   key={timeIndex}
@@ -130,7 +147,6 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         </tbody>
       </table>
     </div>
-
   );
 };
 

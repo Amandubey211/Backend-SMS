@@ -25,15 +25,15 @@ export const addScoreCard = createAsyncThunk(
     }
   }
 );
-  
+
 export const getScoreCard = createAsyncThunk(
   "scoreCard/getScoreCard",
-    async (data, { rejectWithValue, getState, dispatch }) => {
+  async (data, { rejectWithValue, getState, dispatch }) => {
     try {
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await getData(`/${role}/scoreCard/get/${data}?say=${say}`);
+      const response = await getData(`/${role}/scoreCard/get/${data.cid}?say=${say}`,data);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -49,7 +49,7 @@ export const addScoreCardCellData = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(`/${role}/scoreCard/add/cell/${data.classId}?say=${say}`,data);
+      const response = await putData(`/${role}/scoreCard/add/cell/${data.classId}?say=${say}`, data);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -63,7 +63,7 @@ export const reomoveScoreCardCellData = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(`/${role}/scoreCard/remove/${data.classId}/${data.cellNumber}?say=${say}`,data);
+      const response = await putData(`/${role}/scoreCard/remove/${data.classId}/${data.cellNumber}?say=${say}`, data);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -77,7 +77,7 @@ export const updateScoreCard = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(`/${role}/scoreCard/update/${data.scoreCardId}?say=${say}`,data);
+      const response = await putData(`/${role}/scoreCard/update/${data.scoreCardId}?say=${say}`, data);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -91,7 +91,7 @@ export const addCommonDataToScoreCard = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(`/${role}/scoreCard/add/common/cell/${data.classId}?say=${say}`,data);
+      const response = await putData(`/${role}/scoreCard/add/common/cell/${data.classId}?say=${say}`, data);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -105,7 +105,10 @@ export const reomoveCommonDataFromScoreCard = createAsyncThunk(
       const say = getAY();
       const role = getUserRole(getState);
       dispatch(setShowError(false));
-      const response = await putData(`/${role}/scoreCard/remove/common/${data.classId}/${data.cellNumber}?say=${say}`,data);
+      const response = await putData(
+        `/${role}/scoreCard/remove/common/${data.classId}/${data.cellNumber}?sectionId=${data.sectionId}&say=${say}`,
+        data
+      );
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
