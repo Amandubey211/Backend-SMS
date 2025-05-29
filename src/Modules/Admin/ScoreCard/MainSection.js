@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import CellDataTable from './components/CellDataTable';
 import ScoreCardView from './components/ScoreCardView';
 import { FaEye } from "react-icons/fa";
+import { fetchSectionsByClass } from '../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks';
 
 const { Option } = Select;
 const { TabPane } = Tabs;
@@ -26,6 +27,8 @@ const CLOUDINARY_FOLDER = 'ScorecardExcelfile';
 const MainSection = () => {
   const dispatch = useDispatch();
   const { loading, success, scoreCardData, error } = useSelector((state) => state.admin.scoreCard);
+  const { sectionsList } = useSelector((state) => state?.admin?.group_section);
+  const [selectedSection, setSelectedSection] = useState(null);
   const [file, setFile] = useState(null);
   const [fieldModal, setFieldModal] = useState(false);
   const [scoreCardViewModal, setScoreCardViewModal] = useState(false);
@@ -40,7 +43,6 @@ const MainSection = () => {
     separate: '',
   });
   const [cellNumberError, setCellNumberError] = useState('');
-
   const { uploadFile, uploading, uploadProgress, resetUpload, error: uploadError } = useCloudinaryRawUpload(
     CLOUDINARY_UPLOAD_PRESET,
     CLOUDINARY_FOLDER
@@ -48,19 +50,31 @@ const MainSection = () => {
   const validateCellNumber = (cell) => /^[A-Z]+[1-9][0-9]*$/i.test(cell);
 
   useEffect(() => {
-    dispatch(getScoreCard(cid));
-    if (scoreCardData.publish) {
+    dispatch(fetchSectionsByClass(cid));
+    dispatch(getScoreCard({cid,sectionId:selectedSection}));
+    if (scoreCardData?.publish) {
       setPublishStatus("publish")
     } else {
       setPublishStatus("unpublish")
     }
-  }, [dispatch, cid]);
+  }, [dispatch, cid,selectedSection]);
+
+  useEffect(() => {
+    if (sectionsList?.length > 0 && !selectedSection) {
+      setSelectedSection(sectionsList[0]._id);
+    }
+  }, [sectionsList, selectedSection]);
+
 
   useEffect(() => {
     if (error) {
       message.error('Failed to fetch scorecard data.');
     }
   }, [error]);
+
+  const sortedSections = sectionsList?.slice().sort((a, b) => {
+    return a.sectionName.localeCompare(b.sectionName);
+  });
 
   const handleUploadOk = async () => {
     if (!file) {
@@ -76,8 +90,7 @@ const MainSection = () => {
 
     const action = scoreCardData
       ? updateScoreCard({ excelFile: result, scoreCardId: scoreCardData._id })
-      : addScoreCard({ excelFile: result, classId: cid });
-
+      : addScoreCard({ excelFile: result, classId: cid, sectionId: selectedSection });
     dispatch(action).then((res) => {
       if (res.meta.requestStatus === 'fulfilled') {
         message.success('Operation successful!');
@@ -104,7 +117,7 @@ const MainSection = () => {
     setCellNumberError('');
 
     setConfirmLoading(true);
-    dispatch(addCommonDataToScoreCard({ ...preparedField, classId: cid })).then((res) => {
+    dispatch(addCommonDataToScoreCard({ ...preparedField, classId: cid, sectionId: selectedSection })).then((res) => {
       setConfirmLoading(false);
       if (res.meta.requestStatus === 'fulfilled') {
         setNewField({
@@ -113,7 +126,7 @@ const MainSection = () => {
           separate: '',
         });
         message.success('Field added successfully!');
-        dispatch(getScoreCard(cid));
+        dispatch(getScoreCard({cid,sectionId: selectedSection }));
         setFieldModal(false);
       } else {
         message.error('Failed to add field.');
@@ -134,9 +147,9 @@ const MainSection = () => {
     setOpenPublishModal(true)
   };
 
-  const handlePublishSubmit = async() => {
-    
-   await dispatch(updateScoreCard({ publish: publishStatus === 'publish'? true : false, scoreCardId: scoreCardData._id }))
+  const handlePublishSubmit = async () => {
+
+    await dispatch(updateScoreCard({ publish: publishStatus === 'publish' ? true : false, scoreCardId: scoreCardData._id }))
     setOpenPublishModal(false)
   }
 
@@ -209,6 +222,28 @@ const MainSection = () => {
   return (
     <div className="p-4">
       <h1 className="font-semibold">Report Card Management</h1>
+      <div>
+        {
+          sectionsList?.length >= 1 &&
+          <>
+            <label className="font-medium">Select Section:</label>
+            <Select
+              style={{ width: 150 }}
+              onChange={setSelectedSection}
+              placeholder="Select Section"
+              value={selectedSection}
+              disabled={!sectionsList?.length}
+            >
+              {sortedSections?.map((sec, index) => (
+                <Option key={sec._id || `section-${index}`} value={sec._id}>
+                  {sec.sectionName}
+                </Option>
+              ))}
+            </Select>
+          </>
+        }
+
+      </div>
       <div className="flex justify-between items-center p-2">
         <Button
           type="primary"
@@ -241,15 +276,17 @@ const MainSection = () => {
           }
 
           {/* Select Publish/Unpublish */}
-          <Select
-            value={publishStatus}
-            onChange={handleChange}
-            className="w-40 rounded-md"
-            options={[
-              { label: "Publish", value: "publish" },
-              { label: "Unpublish", value: "unpublish" },
-            ]}
-          />
+          {
+            scoreCardData && <Select
+              value={publishStatus}
+              onChange={handleChange}
+              className="w-40 rounded-md"
+              options={[
+                { label: "Publish", value: "publish" },
+                { label: "Unpublish", value: "unpublish" },
+              ]}
+            />
+          }
 
 
         </div>
@@ -288,7 +325,7 @@ const MainSection = () => {
         title={`Confirm ${publishStatus === "publish" ? "Publish" : "Unpublish"}`}
         open={openPublishModal}
         onOk={handlePublishSubmit}
-        onCancel={()=>setOpenPublishModal(false)}
+        onCancel={() => setOpenPublishModal(false)}
         okText="Yes"
         cancelText="No"
       >
@@ -299,11 +336,11 @@ const MainSection = () => {
       <Modal
         open={scoreCardViewModal}
         onCancel={() => setScoreCardViewModal(false)}
-         width="80%" 
-  footer={null}
+        width="80%"
+        footer={null}
       >
         <ScoreCardView pdfUrl={scoreCardData?.pdfFile} />
-        
+
       </Modal>
 
 
@@ -363,10 +400,10 @@ const MainSection = () => {
       {/* Tabs for Fields and Grades */}
       <Tabs defaultActiveKey="1">
         <TabPane tab="Student Info" key="1">
-          {scoreCardData && <CommonDataTable />}
+          {<CommonDataTable scoreCardData={scoreCardData} />}
         </TabPane>
         <TabPane tab="Grades Info" key="2">
-          <CellDataTable />
+          <CellDataTable scoreCardData={scoreCardData} />
         </TabPane>
       </Tabs>
     </div>
