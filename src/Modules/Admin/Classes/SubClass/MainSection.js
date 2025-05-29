@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
-import { BiSpreadsheet } from "react-icons/bi";
 
-
-
-// Local Imports 
+// Local Imports
 import NavIconCard from "./Components/NavIconCard";
 import ButtonGroup from "./Components/ButtonGroup";
 import SubjectCard from "./SubjectCard";
@@ -13,7 +10,6 @@ import Sidebar from "../../../../Components/Common/Sidebar";
 import AddNewSubject from "./AddNewSubject";
 import SemesterManager from "../Semesters/SemesterManager";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
-import Spinner from "../../../../Components/Common/Spinner";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 // Actions & Thunks
@@ -35,12 +31,20 @@ import { PERMISSIONS } from "../../../../config/permission";
 
 // Ant Design
 
-import { Card, Skeleton, Button, Modal, Typography, Tabs, Badge, Input } from "antd";
+import {
+  Card,
+  Skeleton,
+  Button,
+  Modal,
+  Typography,
+  Tabs,
+  Badge,
+  Input,
+} from "antd";
 // Framer Motion
 import { AnimatePresence, motion } from "framer-motion";
 
 import { gt } from "../../../../Utils/translator/translation";
-
 
 // Framer Motion
 const colors = [
@@ -90,7 +94,12 @@ const SubjectCardShimmer = () => {
       <Skeleton paragraph={{ rows: 1 }} active />
       <div className="flex mt-[60px] justify-between items-center">
         <Skeleton.Avatar active size="large" shape="circle" />
-        <Skeleton.Avatar active size="large" shape="square" style={{ height: 50, width: 50 }} />
+        <Skeleton.Avatar
+          active
+          size="large"
+          shape="square"
+          style={{ height: 50, width: 50 }}
+        />
       </div>
     </div>
   );
@@ -168,10 +177,10 @@ function MainSection() {
   const filteredSubjects =
     classDetails && classDetails.subjects
       ? classDetails.subjects.filter((subject) =>
-        selectedTab === t("Published")
-          ? subject.isPublished
-          : !subject.isPublished
-      )
+          selectedTab === t("Published")
+            ? subject.isPublished
+            : !subject.isPublished
+        )
       : [];
 
   const publishedSubjects =
@@ -247,14 +256,12 @@ function MainSection() {
       navigate(`/class/${cid}/${subject._id}/module`);
     }
   };
-  
+
   return (
     <ProtectedSection
       requiredPermission={PERMISSIONS.SPECIFIC_CLASS}
       title={"Subjects"}
     >
-      
-
       {/* Show loading spinner if data is still being fetched */}
       <style>{shimmerStyles}</style>
       {loading ? (
@@ -269,7 +276,6 @@ function MainSection() {
           <div className="px-5">
             <div className="flex justify-between items-center mb-4">
               <div className="flex gap-2">
-
                 <Skeleton.Button active size="large" style={{ width: 160 }} />
                 <Skeleton.Button active size="large" style={{ width: 130 }} />
               </div>
@@ -301,18 +307,17 @@ function MainSection() {
 
           {/* Subject Tabs (Published/Draft) + Subject List */}
           <div className="px-5">
-            
-              <ButtonGroup
-                onAddNewSubject={handleAddNewSubject}
-                onViewSemester={handleViewSemester}
-                selectedTab={selectedTab}
-                setSelectedTab={setSelectedTab}
-                role={role}
-                cid={cid}
-                publishedCount={publishedSubjects?.length || 0}
-                draftCount={draftSubjects?.length || 0}
-              />
-           
+            <ButtonGroup
+              onAddNewSubject={handleAddNewSubject}
+              onViewSemester={handleViewSemester}
+              selectedTab={selectedTab}
+              setSelectedTab={setSelectedTab}
+              role={role}
+              cid={cid}
+              publishedCount={publishedSubjects?.length || 0}
+              draftCount={draftSubjects?.length || 0}
+            />
+
             <div className="grid grid-cols-3 gap-4 mb-10">
               {filteredSubjects && filteredSubjects.length > 0 ? (
                 <AnimatePresence>
@@ -369,7 +374,6 @@ function MainSection() {
           onClose={() => setIsSemesterSidebarOpen(false)}
         />
       </Sidebar>
-
 
       {/* "Semester Required" Modal using Framer Motion animations */}
 
