@@ -1,72 +1,108 @@
 // src/Modules/Admin/Verification/TopNavigation.js
-
 import React from "react";
+import { useSelector, useDispatch, shallowEqual } from "react-redux";
+import { Tabs, Input } from "antd";
 import { CiSearch } from "react-icons/ci";
-import { useSelector, useDispatch } from "react-redux";
+import {
+  UserOutlined, // Unverified
+  CloseCircleOutlined, // Rejected
+  ClockCircleOutlined, // Pending (draft)
+} from "@ant-design/icons";
 import {
   setActiveTab,
   setSearchQuery,
 } from "../../../Store/Slices/Admin/Verification/VerificationSlice";
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from "react-i18next";
+
+const { TabPane } = Tabs;
+
+/** ----------  utility: return counts per status  ---------- */
+const getCounts = (students = []) => {
+  let unverified = 0,
+    rejected = 0;
+
+  students.forEach((s) => {
+    // fallback to '' if field missing
+    const status = s.verificationStatus ?? "";
+    if (status === "rejected") rejected += 1;
+    else unverified += 1; // includes empty / 'unverified'
+  });
+
+  return { unverified, rejected };
+};
 
 const TopNavigation = () => {
   const dispatch = useDispatch();
-  const { t } = useTranslation('admVerification');
-  const { unVerifiedStudents, rejectedStudents, activeTab, searchQuery } =
-    useSelector((state) => state.admin.verification);
+  const { t } = useTranslation("admVerification");
+
+  const { activeTab, searchQuery, unVerifiedStudents, loadingUnverified } =
+    useSelector(
+      (s) => ({
+        activeTab: s.admin.verification.activeTab,
+        searchQuery: s.admin.verification.searchQuery,
+        unVerifiedStudents: s.admin.verification.unVerifiedStudents,
+        loadingUnverified: s.admin.verification.loadingUnverified,
+      }),
+      shallowEqual
+    );
+
+  /* ------------ derive counts once ------------ */
+  const { unverified, rejected, pending } = getCounts(unVerifiedStudents);
+
+  /** Build label: icon + text + (count) *only* for the active tab */
+  const buildLabel = (key, icon, text, count) => (
+    <span className="flex items-center gap-1">
+      {icon}
+      <span>{text}</span>
+      {activeTab === key && !loadingUnverified && <span>({count})</span>}
+    </span>
+  );
+
+  const extraContent = (
+    <Input
+      allowClear
+      prefix={<CiSearch />}
+      placeholder={t("Search By Email")}
+      value={searchQuery}
+      onChange={(e) => dispatch(setSearchQuery(e.target.value))}
+      className="w-64"
+    />
+  );
 
   return (
-    <div className="flex justify-between items-center mb-6">
-      <div className="flex gap-2 items-center">
-        {/* Unverified Students Tab */}
-        <h1
-          className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
-            activeTab === "unverified"
-              ? "text-purple-500 bg-purple-100"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={() => dispatch(setActiveTab("unverified"))}
-        >
-          {t("Unverified Students")} 
-        </h1>
-      
-        {/* Rejected Students Tab */}
-        <h1
-          className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
-            activeTab === "rejected"
-              ? "text-purple-500 bg-purple-100"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={() => dispatch(setActiveTab("rejected"))}
-        >
-          {t("Rejected Students")}
-        </h1>
-        <h1
-          className={`text-xl font-semibold p-1 border rounded-2xl px-4 cursor-pointer transition-all duration-300 ${
-            activeTab === "Pending"
-              ? "text-purple-500 bg-purple-100"
-              : "text-gray-700 hover:bg-gray-100"
-          }`}
-          onClick={() => dispatch(setActiveTab("Pending"))}
-        >
-          {t("Pending Forms")}
-        </h1>
-      </div>
-
-      {/* Search input */}
-      <div className="relative flex items-center max-w-xs w-full mr-4">
-        <input
-          type="text"
-          placeholder={t("Search By Email")}
-          value={searchQuery}
-          onChange={(e) => dispatch(setSearchQuery(e.target.value))}
-          className="px-4 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-purple-300 w-full transition-all duration-300"
-        />
-        <button className="absolute right-3">
-          <CiSearch className="w-5 h-5 text-gray-500" />
-        </button>
-      </div>
-    </div>
+    <Tabs
+      activeKey={activeTab}
+      onChange={(k) => dispatch(setActiveTab(k))}
+      tabBarExtraContent={extraContent}
+    >
+      <TabPane
+        key="unverified"
+        tab={buildLabel(
+          "unverified",
+          <UserOutlined />,
+          t("Unverified Students"),
+          unverified
+        )}
+      />
+      <TabPane
+        key="rejected"
+        tab={buildLabel(
+          "rejected",
+          <CloseCircleOutlined />,
+          t("Rejected Students"),
+          rejected
+        )}
+      />
+      <TabPane
+        key="Pending"
+        tab={buildLabel(
+          "Pending",
+          <ClockCircleOutlined />,
+          t("Pending Forms"),
+          unverified
+        )}
+      />
+    </Tabs>
   );
 };
 
