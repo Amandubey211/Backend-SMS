@@ -27,13 +27,26 @@ const ChapterShimmer = () => {
     <div className="p-1 rounded-lg border-b mb-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center">
-          <Skeleton.Avatar active size={48} shape="square" className="mr-4" /> {/* Matches w-12 h-12 */}
+          <Skeleton.Avatar active size={48} shape="square" className="mr-4" />{" "}
+          {/* Matches w-12 h-12 */}
           <div className="flex flex-col">
-            <Skeleton.Input active style={{ width: 150, height: 16 }} className="mb-1" /> {/* Title */}
-            <Skeleton.Input active style={{ width: 100, height: 14 }} /> {/* Subtitle */}
+            <Skeleton.Input
+              active
+              style={{ width: 150, height: 16 }}
+              className="mb-1"
+            />{" "}
+            {/* Title */}
+            <Skeleton.Input active style={{ width: 100, height: 14 }} />{" "}
+            {/* Subtitle */}
           </div>
         </div>
-        <Skeleton.Button active size="small" shape="circle" style={{ width: 32, height: 32 }} /> {/* Button */}
+        <Skeleton.Button
+          active
+          size="small"
+          shape="circle"
+          style={{ width: 32, height: 32 }}
+        />{" "}
+        {/* Button */}
       </div>
     </div>
   );
@@ -46,18 +59,26 @@ const ModuleCardShimmer = () => {
       <Skeleton
         active
         paragraph={false}
-        title={{ style: { height: 144, margin: 0, borderRadius: "8px 8px 0 0" } }}
+        title={{
+          style: { height: 144, margin: 0, borderRadius: "8px 8px 0 0" },
+        }}
       />
       {/* Content Section */}
       <div className="p-4">
         <div className="flex justify-between items-center mb-2">
-          <Skeleton.Input active style={{ width: 150, height: 18 }} /> {/* Title */}
+          <Skeleton.Input active style={{ width: 150, height: 18 }} />{" "}
+          {/* Title */}
           <div className="flex gap-2">
             <Skeleton.Avatar active size={32} shape="circle" /> {/* Icon 1 */}
             <Skeleton.Avatar active size={32} shape="circle" /> {/* Icon 2 */}
           </div>
         </div>
-        <Skeleton.Button active style={{ width: 80, height: 24 }} className="rounded-full" /> {/* Module Number */}
+        <Skeleton.Button
+          active
+          style={{ width: 80, height: 24 }}
+          className="rounded-full"
+        />{" "}
+        {/* Module Number */}
       </div>
     </div>
   );
@@ -216,37 +237,46 @@ const MainSection = () => {
       >
         {moduleLoading ? (
           <div className="flex flex-col lg:flex-row w-full min-h-screen">
-  {/* Left Column Shimmer (Chapters) */}
-  <div className="w-full lg:w-[60%] bg-white p-2 sm:p-3">
-    <div className="bg-white p-2 sm:p-3 rounded-lg">
-      <div className="flex justify-between px-2 sm:px-4 mb-3 items-center">
-        <Skeleton.Input active style={{ width: "50%", minWidth: 150 }} />
-        <Skeleton.Button active style={{ width: "30%", minWidth: 80 }} />
-      </div>
-      {/* Mimic a few chapters */}
-      <div className="space-y-2">
-        {[1, 2,3,4].map((_, index) => (
-          <ChapterShimmer key={index} />
-        ))}
-      </div>
-    </div>
-  </div>
+            {/* Left Column Shimmer (Chapters) */}
+            <div className="w-full lg:w-[60%] bg-white p-2 sm:p-3">
+              <div className="bg-white p-2 sm:p-3 rounded-lg">
+                <div className="flex justify-between px-2 sm:px-4 mb-3 items-center">
+                  <Skeleton.Input
+                    active
+                    style={{ width: "50%", minWidth: 150 }}
+                  />
+                  <Skeleton.Button
+                    active
+                    style={{ width: "30%", minWidth: 80 }}
+                  />
+                </div>
+                {/* Mimic a few chapters */}
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map((_, index) => (
+                    <ChapterShimmer key={index} />
+                  ))}
+                </div>
+              </div>
+            </div>
 
-  {/* Right Column Shimmer (Modules) */}
-  <div className="w-full lg:w-[35%] min-h-[50vh] lg:min-h-screen p-2 sm:p-3 border-t lg:border-t-0 lg:border-l">
-    <div className="bg-white p-3 sm:p-4 rounded-lg">
-      <div className="flex items-center gap-1 mb-2">
-        <Skeleton.Input active style={{ width: "40%", minWidth: 120 }} />
-        <Skeleton.Avatar active size={24} shape="circle" />
-      </div>
-      <div className="grid grid-cols-1 gap-2">
-        {[1, 2, 3].map((_, index) => (
-          <ModuleCardShimmer key={index} />
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
+            {/* Right Column Shimmer (Modules) */}
+            <div className="w-full lg:w-[35%] min-h-[50vh] lg:min-h-screen p-2 sm:p-3 border-t lg:border-t-0 lg:border-l">
+              <div className="bg-white p-3 sm:p-4 rounded-lg">
+                <div className="flex items-center gap-1 mb-2">
+                  <Skeleton.Input
+                    active
+                    style={{ width: "40%", minWidth: 120 }}
+                  />
+                  <Skeleton.Avatar active size={24} shape="circle" />
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {[1, 2, 3].map((_, index) => (
+                    <ModuleCardShimmer key={index} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         ) : modulesData?.length === 0 ? (
           // If no modules, show a single NoDataFound centered both horizontally and vertically
           <div className="flex items-center justify-center w-full min-h-screen p-4">
@@ -371,7 +401,7 @@ const MainSection = () => {
               className="bg-gradient-to-r from-purple-400 to-pink-400 text-white p-3 sm:p-4 fixed rounded-full shadow-md bottom-3 sm:bottom-4 right-3 sm:right-4 transform transition-transform duration-300 hover:scale-110"
               aria-label={t("Add Module")}
             >
-             <RiAddFill size={24} />
+              <RiAddFill size={24} />
             </button>
           </ProtectedAction>
 

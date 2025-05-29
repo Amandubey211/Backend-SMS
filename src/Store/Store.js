@@ -121,6 +121,16 @@ import transportDriverReducer from "../Store/Slices/Transportation/Driver/driver
 import vehicleUserAssignmentReducer from "../Store/Slices/Transportation/VehiclePersonAssignment/vehiclePersonAssignmentSlice";
 import transportHelperReducer from "../Store/Slices/Transportation/Helper/helperSlice";
 import tripExecutionLogReducer from "../Store/Slices/Transportation/TripExecutionLog/tripExecutionLogSlice";
+import { fetchModules } from "./Slices/Admin/Class/Module/moduleThunk";
+import { fetchFilteredAssignments } from "./Slices/Admin/Class/Assignment/assignmentThunks";
+import { fetchFilteredQuizzesThunk } from "./Slices/Admin/Class/Quiz/quizThunks";
+import { fetchAllOfflineExam } from "./Slices/Admin/Class/OfflineExam/oflineExam.action";
+import { fetchClassDiscussions } from "./Slices/Admin/Class/Discussion/discussionThunks";
+import { fetchAllPages } from "./Slices/Admin/Class/Page/pageThunk";
+import { fetchSubjectGrades } from "./Slices/Admin/Class/grades/grades.action";
+import { fetchAnnouncements } from "./Slices/Admin/Class/Announcement/announcementThunk";
+import { fetchSyllabus } from "./Slices/Admin/Class/Syllabus/syllabusThunk";
+import { fetchRubricsBySubjectId } from "./Slices/Admin/Class/Rubric/rubricThunks";
 // Persist configuration for the Auth slice
 
 const authPersistConfig = {
@@ -138,14 +148,62 @@ const authPersistConfig = {
 };
 const listenerMiddleware = createListenerMiddleware();
 
+/**
++ * 🔄 Semester-change listener
++ * Fires whenever `setSelectedSemester` succeeds.
++ * ▸  Re-dispatches only the thunks that truly depend on the semester.
++ * ▸  Skips work if the user clicks the same semester again.
++ * ▸  Optionally persists the choice (redux-persist already has it,
++ *    this is just for external access or quick reads before rehydration).
++ */
 listenerMiddleware.startListening({
   matcher: isAnyOf(setSelectedSemester),
-  effect: async (action, listenerApi) => {
-    // Wait 500ms to allow state persistence to complete
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    window.location.reload();
+  effect: async (action, api) => {
+    const { id: semesterId } = action.payload || {};
+    if (!semesterId) return; // guard
+
+    // ── 1. Get classId (cid) & subjectId (sid)  ────────────────
+    const state = api.getState();
+
+    // • preferred: grab them from Redux if you already store them
+    const cid =
+      state.common.user.classInfo.selectedClassId ||
+      state.admin.class.classDetails?._id; // fallback
+
+    const sid = state.common.user.subjectInfo?.selectedSubjectId || null;
+
+    // • fallback #2: parse them from the current URL
+    //   This covers deep-links or pages that haven't stored ids yet.
+    if (!cid || !sid) {
+      const parts = window.location.pathname.split("/");
+      // expected: /class/:cid/:sid/module  (5 segments)
+      if (parts[1] === "class") {
+        cid = cid || parts[2];
+        sid = sid || (parts.length > 4 ? parts[3] : null);
+      }
+    }
+
+    // if we still don't have what we need, bail out gracefully
+    if (!cid) return;
+
+    if (sid) {
+      api.dispatch(fetchModules({ cid, sid }));
+      api.dispatch(fetchFilteredAssignments({ sid }));
+      api.dispatch(fetchFilteredQuizzesThunk({ sid }));
+      api.dispatch(fetchAllOfflineExam({ classId: cid, subjectId: sid }));
+      api.dispatch(fetchClassDiscussions({ cid, sid }));
+      api.dispatch(fetchAllPages({ cid }));
+      api.dispatch(fetchSubjectGrades({ classId: cid, subjectId: sid }));
+      api.dispatch(fetchAnnouncements({ cid, sid }));
+      api.dispatch(fetchSyllabus({ classId: cid, subjectId: sid }));
+      api.dispatch(fetchSyllabus({ classId: cid, subjectId: sid }));
+      api.dispatch(fetchRubricsBySubjectId(sid));
+    }
+
+    localStorage.setItem("activeSemesterId", semesterId);
   },
 });
+
 // Persist configuration for the User slice
 const userPersistConfig = {
   key: "user",
@@ -248,8 +306,8 @@ const AdminReducer = combineReducers({
   earnings: earnignsReducer,
   studentFees: studentFeesReducer,
   offlineExam: adminOfflineExamReducer,
-  scoreCard:scoreCardReducer,
-  ascTimeTable:ascTimeTableReducer
+  scoreCard: scoreCardReducer,
+  ascTimeTable: ascTimeTableReducer,
 });
 
 const studentReducer = combineReducers({
