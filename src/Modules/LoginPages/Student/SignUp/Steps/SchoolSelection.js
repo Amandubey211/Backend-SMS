@@ -155,15 +155,22 @@ const SchoolSelection = ({ formData }) => {
       }
 
       // Dispatch OTP action
-      await dispatch(
+      const result = await dispatch(
         sendStudentOtp({
           email: values.email,
           schoolId: values.schoolId,
         })
-      ).unwrap();
+      );
 
-      // Show OTP modal only if successful
-      setOtpModalVisible(true);
+      // Check if the OTP was successfully sent
+      if (result.payload?.success) {
+        // Show OTP modal only if successful
+        setOtpModalVisible(true);
+        message.success("OTP sent successfully!");
+      } else {
+        // Show error message from backend
+        message.error(result.payload?.message || "Failed to send OTP");
+      }
     } catch (error) {
       // Handle validation errors
       if (error.errorFields) {
@@ -172,6 +179,7 @@ const SchoolSelection = ({ formData }) => {
         });
       } else {
         console.error("OTP sending failed:", error);
+        message.error(error.message || "An error occurred while sending OTP");
       }
     }
   };

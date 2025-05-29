@@ -162,7 +162,8 @@ const ConsentAcknowledgement = ({ formData }) => {
 
       {/* Success confirmation modal */}
       <Modal
-        open={openModal}
+        // open={openModal}
+        open={true}
         footer={null}
         centered
         onCancel={() => {
@@ -170,34 +171,76 @@ const ConsentAcknowledgement = ({ formData }) => {
           sessionStorage.removeItem("signupStep1");
           dispatch(resetSignup());
         }}
-        width={500}
+        width={600}
         closeIcon={<span className="text-gray-500 hover:text-gray-700">×</span>}
+        className="[&_.ant-modal-body]:pt-8"
       >
         <Result
-          icon={<CheckCircleFilled style={{ color: "#52c41a" }} />}
-          title="Application Submitted!"
-          subTitle="Thank you. Your application has been received. You may download a copy for your records."
+          icon={<CheckCircleFilled className="!text-[#52c41a] text-6xl" />}
+          title={
+            <span className="text-2xl font-bold text-gray-800">
+              Application Submitted Successfully!
+            </span>
+          }
+          subTitle={
+            <div className="space-y-4 text-center">
+              <p className="text-gray-600 text-lg">
+                Thank you for completing the registration process.
+              </p>
+
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 max-w-md mx-auto">
+                <p className="text-gray-700 mb-2">
+                  <span className="font-semibold">Next Steps:</span>
+                </p>
+                <ul className="list-disc pl-5 space-y-1 text-gray-600 text-left">
+                  <li>
+                    <span className="font-medium">
+                      Please allow 4-5 business days
+                    </span>{" "}
+                    to receive your login credentials via email
+                  </li>
+                  <li>
+                    Check your spam folder if you don't see the email in your
+                    inbox
+                  </li>
+                </ul>
+              </div>
+
+              <p className="text-gray-500">
+                For any inquiries, please contact your respective school
+                administration.
+              </p>
+            </div>
+          }
           extra={[
-            <Button
-              key="download"
-              type="primary"
-              icon={<DownloadOutlined />}
-              onClick={handlePdfDownload}
-              loading={pdfLoading}
-            >
-              {pdfLoading ? "Generating..." : "Download Copy"}
-            </Button>,
-            <Button
-              key="done"
-              onClick={() => {
-                setOpenModal(false);
-                navigate("/studentlogin");
-                sessionStorage.removeItem("signupStep1");
-                dispatch(resetSignup());
-              }}
-            >
-              Done
-            </Button>,
+            <div key="buttons" className="flex gap-4 justify-center">
+              <Button
+                key="download"
+                type="primary"
+                icon={<DownloadOutlined />}
+                onClick={handlePdfDownload}
+                loading={pdfLoading}
+                className="!bg-gradient-to-r !from-[#C83B62] !to-[#7F35CD] !border-none"
+                size="large"
+              >
+                {pdfLoading ? "Generating..." : "Download Application Copy"}
+              </Button>
+              ,
+              <Button
+                key="done"
+                onClick={() => {
+                  setOpenModal(false);
+                  navigate("/studentlogin");
+                  sessionStorage.removeItem("signupStep1");
+                  dispatch(resetSignup());
+                }}
+                size="large"
+                className="border-gray-300"
+              >
+                Return to Login
+              </Button>
+              ,
+            </div>,
           ]}
         />
       </Modal>

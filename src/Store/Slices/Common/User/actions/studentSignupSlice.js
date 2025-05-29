@@ -125,6 +125,7 @@ export const sendStudentOtp = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const res = await postData("/student/send_otp", { email, schoolId });
+      console.log(res,"resres")
       toast.success("OTP sent");
       return res;
     } catch (err) {
