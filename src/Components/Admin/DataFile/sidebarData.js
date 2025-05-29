@@ -21,6 +21,7 @@ import { GrUserWorker } from "react-icons/gr";
 import { SiReadthedocs } from "react-icons/si";
 import { VscSaveAll } from "react-icons/vsc";
 import { FaRegCalendarTimes } from "react-icons/fa";
+import { MdHealthAndSafety } from "react-icons/md";
 
 import {
   MdLocalLibrary,
@@ -416,6 +417,13 @@ const sidebarData = [
       // },
     ],
   },
+  // New Addition Health Module
+  {
+    title: "Health",
+    icon: <MdHealthAndSafety style={{ fontSize: "1.1rem" }} />,
+    roles: [ROLES.ADMIN, ROLES.STAFF],
+    path: "/health",
+  }
 ];
 
 export default sidebarData;
