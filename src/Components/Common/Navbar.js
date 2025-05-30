@@ -26,9 +26,7 @@ const Navbar = () => {
   );
   const role = useSelector((store) => store.common.auth.role);
   const dispatch = useDispatch();
-const { FinancialYears } = useSelector(
-    (store) => store.common.financialYear
-  );
+  const { FinancialYears } = useSelector((store) => store.common.financialYear);
   const selectAcademicYear = useSelector((store) => {
     const say = getAY();
     return store.common.academicYear.academicYears?.find(
@@ -39,8 +37,8 @@ const { FinancialYears } = useSelector(
     if (!selectAcademicYear) {
       dispatch(fetchAcademicYear());
     }
-    if(FinancialYears?.length < 1){
-        dispatch(fetchFinancialYear());
+    if (FinancialYears?.length < 1) {
+      dispatch(fetchFinancialYear());
     }
   }, []);
 
