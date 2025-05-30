@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-// import Layout from "../../../../Components/Common/Layout";
-// import DashLayout from "../../../../Components/Admin/AdminDashLayout";
 import StudentProfile from "./StudentProfileCard";
 import NavigationMenu from "./NavigationMenu.js";
 import BookIssue from "../Components/BookIssueMenu/BookIssue";
@@ -17,8 +15,7 @@ import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllStudents } from "../../../../../Store/Slices/Admin/Users/Students/student.action.js";
-import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection.js";
-import { PERMISSIONS } from "../../../../../config/permission.js";
+import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading .js";
 
 const SingleStudent = () => {
   const { cid } = useParams();
@@ -31,17 +28,14 @@ const SingleStudent = () => {
     role == "librarian"
       ? "Information"
       : role == "finance"
-        ? "Information"
-        : "OverView"
+      ? "Information"
+      : "OverView"
   );
   useEffect(() => {
     dispatch(fetchAllStudents());
   }, [dispatch]);
   const student = allStudents?.find((s) => s?._id === cid);
-
-  // if (!loading && !student) {
-  //   return <div className="text-center my-10">Student not found</div>;
-  // }
+  useNavHeading("Student", student?.firstName + " " + student?.lastName);
 
   const renderContent = () => {
     const menuComponents = {
@@ -70,18 +64,18 @@ const SingleStudent = () => {
               items={
                 role == "admin"
                   ? [
-                    "OverView",
-                    "Course Progress",
-                    "Information",
-                    "Parents",
-                    "Grades",
-                    "Report Card",
-                    "Finance",
-                    "Attendance",
-                    "Book Issue",
-                  ]
+                      "OverView",
+                      "Course Progress",
+                      "Information",
+                      "Parents",
+                      "Grades",
+                      "Report Card",
+                      "Finance",
+                      "Attendance",
+                      "Book Issue",
+                    ]
                   : role == "teacher"
-                    ? [
+                  ? [
                       "OverView",
                       "Course Progress",
                       "Information",
@@ -91,11 +85,11 @@ const SingleStudent = () => {
                       "Attendance",
                       "Book Issue",
                     ]
-                    : role == "finance"
-                      ? ["Information", "Parents", "Finance"]
-                      : role == "librarian"
-                        ? ["Information", "Parents", "Book Issue"]
-                        : []
+                  : role == "finance"
+                  ? ["Information", "Parents", "Finance"]
+                  : role == "librarian"
+                  ? ["Information", "Parents", "Book Issue"]
+                  : []
               }
             />
           </div>
