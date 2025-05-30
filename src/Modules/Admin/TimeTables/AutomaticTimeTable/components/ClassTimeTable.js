@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { Drawer, Button, message } from 'antd';
 import { useDispatch } from 'react-redux';
-import { updateTimeTable, deleteTimeTable, fetchTimeTablesForClass } from '../../../../../Store/Slices/Admin/asctimetable/asctimetablethunk'; // Adjust the import path as needed
-import TimeTableForm from '../../Components/TimeTableForm'; // Adjust the import path as needed
+import { updateTimeTable, deleteTimeTable, getClassTimeTable } from '../../../../../Store/Slices/Admin/asctimetable/asctimetablethunk'; // Adjust the import path as needed
+import TimeTableForm from '../../Components/TimeTableForm'; 
+
+
 const dummyData = {
   className: "10th Grade",
   sectionName: "A",
@@ -69,8 +71,7 @@ const dData = {
   "type": "automatic",
 }
 const ClassTimeTable = ({ selectedClass, selectedSection }) => {
-  // console.log('Selected Class:', selectedClass);
-  // console.log('Selected Class:', selectedSection);
+
   const dispatch = useDispatch();
   const [data, setData] = useState(dummyData); // Initialize with dummy data
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -78,9 +79,17 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
   const handleEdit = (record) => {
     setEditingTimetable(dData);
     console.log('Editing record:', dData);
-    setData(dummyData);
     setIsDrawerOpen(true);
   };
+   useEffect(() => {
+    dispatch(
+      getClassTimeTable({
+        classId: selectedClass,
+        sectionId: selectedSection,
+      })
+    );
+  }, [dispatch, selectedClass, selectedSection]);
+
 
   const handleDelete = (record) => {
     dispatch(deleteTimeTable({ id: record.id }))
@@ -114,19 +123,40 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
     setEditingTimetable(null);
   };
 
+   const getColorForTeachers = (teachers) => {
+    if (teachers?.length === 0) return "bg-yellow-300";
+    return "bg-white";
+  };
+
+
+
   return (
-    // <>
-    // Class 
-    // </>
-    <div className="p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">
-          {data.className} - Section {data.sectionName}
-        </h2>
+ <div className="p-4">
+          <div className="flex justify-between items-center mb-6">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-700">
+            {data.className} - Section {data.sectionName}
+          </h2>
+          <p className="text-gray-600">
+            Timings: <span className="font-medium">{data.startTime}</span> to{" "}
+            <span className="font-medium">{data.endTime}</span>
+          </p>
+          <p className="text-gray-500 mt-2">
+            Applicable for:{" "}
+            {data?.days?.map((day, index) => (
+              <span
+                key={index}
+                className="inline-block bg-blue-100 text-blue-600 rounded px-2 py-1 text-sm mr-2"
+              >
+                {day}
+              </span>
+            ))}
+          </p>
+        </div>
         <div className="flex space-x-4">
           <button
             className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            onClick={() => handleEdit(data)}
+           onClick={() => handleEdit(data)}
           >
             <FaEdit className="mr-2" /> Edit
           </button>
@@ -138,25 +168,49 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
           </button>
         </div>
       </div>
+
+      <div className="mb-4">
+        <div className="flex space-x-4">
+
+          <div className="flex items-center">
+            <div className="w-4 h-4 bg-yellow-300 mr-2"></div>
+            No Teacher Assigned
+          </div>
+        </div>
+      </div>
+
       <table className="w-full border border-gray-300 shadow-md">
         <thead>
           <tr className="bg-gray-100">
-            <th className="border px-4 py-2">Timing</th>
-            <th className="border px-4 py-2">Subject</th>
-            <th className="border px-4 py-2">Teacher</th>
+            <th className="border px-4 py-2">Time</th>
+            {data?.timetable?.map((item, index) => (
+              <th key={index} className="border px-4 py-2">
+                {item.subject}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {data.timetable.map((item, index) => (
-            <tr key={index} className="hover:bg-gray-50">
+            <tr key={index}>
               <td className="border px-4 py-2">{item.time}</td>
-              <td className="border px-4 py-2">{item.subject}</td>
-              <td className="border px-4 py-2">{item.teacher}</td>
+              {data.timetable.map((timeItem, timeIndex) => (
+                <td
+                  key={timeIndex}
+                  className={`border px-4 py-2 text-center ${getColorForTeachers(
+                    timeItem.teachers
+                  )}`}
+                >
+                  {timeItem.teachers.length > 0
+                    ? timeItem.teachers.join(", ")
+                    : "-"}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>
       </table>
-      <Drawer
+       <Drawer
         title="Edit Timetable"
         width={720}
         onClose={onClose}
@@ -178,6 +232,67 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         />
       </Drawer>
     </div>
+
+    // <div className="p-4">
+    //   <div className="flex justify-between items-center mb-4">
+    //     <h2 className="text-xl font-bold">
+    //       {data.className} - Section {data.sectionName}
+    //     </h2>
+    //     <div className="flex space-x-4">
+    //       <button
+    //         className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    //         onClick={() => handleEdit(data)}
+    //       >
+    //         <FaEdit className="mr-2" /> Edit
+    //       </button>
+    //       <button
+    //         className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+    //         onClick={() => handleDelete(data)}
+    //       >
+    //         <FaTrashAlt className="mr-2" /> Delete
+    //       </button>
+    //     </div>
+    //   </div>
+    //   <table className="w-full border border-gray-300 shadow-md">
+    //     <thead>
+    //       <tr className="bg-gray-100">
+    //         <th className="border px-4 py-2">Timing</th>
+    //         <th className="border px-4 py-2">Subject</th>
+    //         <th className="border px-4 py-2">Teacher</th>
+    //       </tr>
+    //     </thead>
+    //     <tbody>
+    //       {data.timetable.map((item, index) => (
+    //         <tr key={index} className="hover:bg-gray-50">
+    //           <td className="border px-4 py-2">{item.time}</td>
+    //           <td className="border px-4 py-2">{item.subject}</td>
+    //           <td className="border px-4 py-2">{item.teacher}</td>
+    //         </tr>
+    //       ))}
+    //     </tbody>
+    //   </table>
+    //   <Drawer
+    //     title="Edit Timetable"
+    //     width={720}
+    //     onClose={onClose}
+    //     visible={isDrawerOpen}
+    //     bodyStyle={{ paddingBottom: 80 }}
+    //     footer={
+    //       <div style={{ textAlign: 'right' }}>
+    //         <Button onClick={onClose} style={{ marginRight: 8 }}>
+    //           Cancel
+    //         </Button>
+    //       </div>
+    //     }
+    //   >
+    //     <TimeTableForm
+    //       editingTimetable={editingTimetable}
+    //       onSubmit={handleSave}
+    //       onClose={onClose}
+    //       Type={"automatic"}
+    //     />
+    //   </Drawer>
+    // </div>
   );
 };
 

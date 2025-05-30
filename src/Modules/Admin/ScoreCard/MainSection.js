@@ -221,12 +221,12 @@ const MainSection = () => {
 
   return (
     <div className="p-4">
-      <h1 className="font-semibold">Report Card Management</h1>
-      <div>
+     
+      <div className='flex justify-between items-center my-6'>
+         <h1 className="font-semibold">Report Card Management</h1>
         {
           sectionsList?.length >= 1 &&
           <>
-            <label className="font-medium">Select Section:</label>
             <Select
               style={{ width: 150 }}
               onChange={setSelectedSection}
