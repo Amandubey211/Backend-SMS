@@ -9,7 +9,11 @@ import DeleteModal from "../../../../../../Components/Common/DeleteModal";
 import { deleteQuizThunk } from "../../../../../../Store/Slices/Admin/Class/Quiz/quizThunks";
 import ProtectedAction from "../../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { Button, Popover, Empty, Skeleton } from "antd";
-import { EllipsisOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  EllipsisOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import { FaEllipsisV } from "react-icons/fa";
 import { setCellModal } from "../../../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 
@@ -53,13 +57,10 @@ const List = ({
   );
   //  console.log("filteredData", filteredData);
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-indigo-500 to-pink-500 bg-clip-text text-transparent">
-          {title}
-          <span className="ml-2 text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-            {filteredData?.length || 0}
-          </span>
+    <div className="bg-white p-4 rounded-lg  w-full">
+      <div className="flex flex-col sm:flex-row justify-between items-center sm:items-center pb-4 gap-4 border-b">
+        <h2 className="text-xl font-bold text-gradient">
+          {title} ({filteredData?.length || 0})
         </h2>
         <div className="relative w-full sm:w-64">
           <input
@@ -96,7 +97,7 @@ const List = ({
           filteredData.reverse().map((item) => (
             <li
               key={item._id}
-              className="py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-gray-50 transition-all duration-200 rounded-lg"
+              className="p-2 flex flex-col sm:flex-row items-start sm:items-center gap-4 hover:bg-gray-50 transition-all duration-200 rounded-lg"
             >
               <div className="flex items-center gap-4 w-full">
                 <NavLink
@@ -160,7 +161,8 @@ const List = ({
                         onClick={() =>
                           dispatch(
                             setCellModal({
-                              modelName: type === "Assignment" ? "assignment" : "quizz",
+                              modelName:
+                                type === "Assignment" ? "assignment" : "quizz",
                               dataId: item._id,
                               classId: cid,
                             })

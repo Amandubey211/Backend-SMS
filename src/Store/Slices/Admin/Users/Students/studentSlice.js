@@ -134,7 +134,7 @@ const allStudentSlice = createSlice({
       })
       .addCase(fetchStudentFinance.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || [];
       })
       .addCase(fetchStudentSubjectProgress.pending, (state) => {
         state.loading = true;
@@ -142,11 +142,11 @@ const allStudentSlice = createSlice({
       })
       .addCase(fetchStudentSubjectProgress.fulfilled, (state, action) => {
         state.loading = false;
-        state.studentSubjectProgress = action.payload;
+        state.studentSubjectProgress = action.payload || [];
       })
       .addCase(fetchStudentSubjectProgress.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || [];
       })
       .addCase(fetchAttendanceData.pending, (state) => {
         state.loading = true;
