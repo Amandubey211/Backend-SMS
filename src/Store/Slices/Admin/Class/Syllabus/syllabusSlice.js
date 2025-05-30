@@ -51,7 +51,7 @@ const syllabusSlice = createSlice({
         state.loading.fetch = false;
         state.syllabi = action.payload;
         // Auto-select first syllabus if none selected
-        if (!state.selectedSyllabus && action.payload.length > 0) {
+        if (!state.selectedSyllabus && action.payload?.length > 0) {
           state.selectedSyllabus = action.payload[0];
         }
       })
