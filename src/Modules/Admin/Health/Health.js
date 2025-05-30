@@ -84,7 +84,10 @@ const Health = () => {
         setStudentData(student);
         setIsHealthModalOpen(true);
     };
-     console.log("All Students:", allStudents);
+
+    const toggleCardExpansion = (id) => {
+        setExpandedCard(expandedCard === id ? null : id);
+    };
     return (
         <Layout title={t("Health Management")}>
             <DashLayout>
@@ -93,200 +96,203 @@ const Health = () => {
                         <StudentsFilter onFilterChange={handleFilterChange} filters={filters} />
                     </div>
 
-                    <h2 className="text-xl font-semibold mb-4">Student Health Profile Card</h2>
+                    <div className="w-full">
+                        <h2 className="text-xl font-semibold mb-4 text-left">Student Health Profile Card</h2>
 
-                    <div className="flex flex-col sm:flex-row justify-between mb-6 gap-4 px-4">
-                        <div
-                            className="bg-gradient-to-r from-[#EDE7F6] to-[#eac6e8] text-[#673AB7] rounded-lg p-4 sm:p-6 flex-1 sm:mx-2 shadow-sm min-w-[200px] flex"
-                        >
-                            <FaHeartbeat className="text-2xl mr-2 text-green-600" />
-                            <div>
-                                <p className="font-semibold text-sm sm:text-base text-black">LOW RISK FLAG</p>
-                                <p className="text-xl sm:text-2xl">{lowRiskCount} Students</p>
+                        <div className="mb-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div
+                                    className="bg-gradient-to-r from-[#EDE7F6] to-[#eac6e8] text-[#673AB7] rounded-lg p-4 sm:p-6 shadow-sm flex"
+                                >
+                                    <FaHeartbeat className="text-2xl mr-2 text-green-600" />
+                                    <div>
+                                        <p className="font-semibold text-sm sm:text-base text-black">LOW RISK FLAG</p>
+                                        <p className="text-xl sm:text-2xl">{lowRiskCount} Students</p>
+                                    </div>
+                                </div>
+                                <div
+                                    className="bg-gradient-to-r from-[#EDE7F6] to-[#eac6e8] text-[#673AB7] rounded-lg p-4 sm:p-6 shadow-sm flex"
+                                >
+                                    <FaHeartbeat className="text-2xl mr-2 text-orange-600" />
+                                    <div>
+                                        <p className="font-semibold text-sm sm:text-base text-black">MEDIUM RISK FLAG</p>
+                                        <p className="text-xl sm:text-2xl">{mediumRiskCount} Students</p>
+                                    </div>
+                                </div>
+                                <div
+                                    className="bg-gradient-to-r from-[#EDE7F6] to-[#eac6e8] text-[#673AB7] rounded-lg p-4 sm:p-6 shadow-sm flex"
+                                >
+                                    <FaHeartbeat className="text-2xl mr-2 text-red-600" />
+                                    <div>
+                                        <p className="font-semibold text-sm sm:text-base text-black">HIGH RISK FLAG</p>
+                                        <p className="text-xl sm:text-2xl">{highRiskCount} Students</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div
-                            className="bg-gradient-to-r from-[#EDE7F6] to-[#eac6e8] text-[#673AB7] rounded-lg p-4 sm:p-6 flex-1 sm:mx-2 shadow-sm min-w-[200px] flex"
-                        >
-                            <FaHeartbeat className="text-2xl mr-2 text-orange-600" />
-                            <div>
-                                <p className="font-semibold text-sm sm:text-base text-black">MEDIUM RISK FLAG</p>
-                                <p className="text-xl sm:text-2xl">{mediumRiskCount} Students</p>
+
+                        {loading ? (
+                            <div className="flex w-full h-[80vh] flex-col items-center justify-center">
+                                <Spinner />
                             </div>
-                        </div>
-                        <div
-                            className="bg-gradient-to-r from-[#EDE7F6] to-[#eac6e8] text-[#673AB7] rounded-lg p-4 sm:p-6 flex-1 sm:mx-2 shadow-sm min-w-[200px] flex"
-                        >
-                            <FaHeartbeat className="text-2xl mr-2 text-red-600" />
-                            <div>
-                                <p className="font-semibold text-sm sm:text-base text-black">HIGH RISK FLAG</p>
-                                <p className="text-xl sm:text-2xl">{highRiskCount} Students</p>
-                            </div>
-                        </div>
-                    </div>
-                    {loading ? (
-                        <div className="flex w-full h-[80vh] flex-col items-center justify-center">
-                            <Spinner />
-                        </div>
-                    ) : (
-                        <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENT} title={"All Students"}>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 p-0 sm:p-6">
-                                {filteredStudents?.length > 0 ? (
-                                    filteredStudents?.map((student) => (
-                                        <div
-                                            key={student?._id}
-                                            className={`p-4 sm:p-6 rounded-lg shadow-md border relative bg-white ${expandedCard === student._id
+                        ) : (
+                            <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENT} title={"All Students"}>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                    {filteredStudents?.length > 0 ? (
+                                        filteredStudents?.map((student) => (
+                                            <div
+                                                key={student?._id}
+                                                className={`rounded-lg shadow-md border bg-white self-start ${expandedCard === student._id
                                                     ? "border-[#673AB7] border-2"
                                                     : "border-gray-200"
-                                                }`}
-                                        >
-                                            <div className="absolute top-2 right-2 flex items-center space-x-2">
-                                                {expandedCard === student._id ? (
-                                                    <FaChevronUp
-                                                        className="text-gray-500 text-sm sm:text-base cursor-pointer"
-                                                        onClick={() => setExpandedCard(null)}
-                                                    />
-                                                ) : (
-                                                    <FaChevronDown
-                                                        className="text-gray-500 text-sm sm:text-base cursor-pointer"
-                                                        onClick={() => setExpandedCard(student._id)}
-                                                    />
-                                                )}
-                                            </div>
-                                            <NavLink to={`/users/students/${student?._id}`}>
-                                                <div className="flex items-start mb-4">
-                                                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-300 flex-shrink-0">
-                                                        <img
-                                                            src={student?.profile}
-                                                            alt="Student"
-                                                            className="w-full h-full object-cover"
-                                                        />
+                                                    }`}
+                                            >
+                                                <div className="p-4 sm:p-6 flex flex-col">
+                                                    <div className="flex justify-end mb-2">
+                                                        {expandedCard === student._id ? (
+                                                            <FaChevronUp
+                                                                className="text-gray-500 text-sm sm:text-base cursor-pointer"
+                                                                onClick={() => toggleCardExpansion(student._id)}
+                                                            />
+                                                        ) : (
+                                                            <FaChevronDown
+                                                                className="text-gray-500 text-sm sm:text-base cursor-pointer"
+                                                                onClick={() => toggleCardExpansion(student._id)}
+                                                            />
+                                                        )}
                                                     </div>
-                                                    <div className="ml-4 flex flex-col">
-                                                        <div className="flex items-center">
-                                                            <h2 className="text-lg font-semibold text-gray-800 mr-2">
-                                                                {student?.firstName} {student?.lastName}
-                                                            </h2>
-                                                            <span
-                                                                className={`px-2 py-0.5 mb-2 rounded-full text-xs font-semibold ${student.healthRisk === "Low"
+                                                    <div className="flex items-start mb-4">
+                                                        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-300 flex-shrink-0">
+                                                            <img
+                                                                src={student?.profile}
+                                                                alt="Student"
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                        <div className="ml-4 flex flex-col">
+                                                            <div className="flex items-center">
+                                                                <h2 className="text-lg font-semibold text-gray-800 mr-2">
+                                                                    {student?.firstName} {student?.lastName}
+                                                                </h2>
+                                                                <span
+                                                                    className={`px-2 py-0.5 mb-2 rounded-full text-xs font-semibold ${student.healthRisk === "Low"
                                                                         ? "bg-[#4CAF50] text-white"
                                                                         : student.healthRisk === "Medium"
                                                                             ? "bg-[#FF9800] text-white"
                                                                             : "bg-[#F44336] text-white"
-                                                                    }`}
-                                                            >
-                                                                {student.healthRisk}
-                                                            </span>
-                                                        </div>
-                                                        <p className="text-sm text-gray-600 mt-1">
-                                                            Age: {student?.age} | Class: {student?.className} ({student?.sectionName}) | Blood: {student?.bloodGroup}
-                                                        </p>
-                                                        <div className="text-sm text-gray-700 mt-2">
-                                                            <p>
-                                                                {expandedCard === student._id
-                                                                    ? student?.medicalCondition || "No medical conditions reported"
-                                                                    : truncateText(student?.medicalCondition, 50)}
+                                                                        }`}
+                                                                >
+                                                                    {student.healthRisk}
+                                                                </span>
+                                                            </div>
+                                                            <p className="text-sm text-gray-600 mt-1">
+                                                                Age: {student?.age} | Class: {student?.className} ({student?.sectionName}) | Blood: {student?.bloodGroup}
                                                             </p>
+                                                            <div className="text-sm text-gray-700 mt-2">
+                                                                <p>
+                                                                    {expandedCard === student._id
+                                                                        ? student?.medicalCondition || "No medical conditions reported"
+                                                                        : truncateText(student?.medicalCondition, 50)}
+                                                                </p>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    {expandedCard === student._id && (
+                                                        <div className="mt-2">
+                                                            <h3 className="text-md font-semibold text-gray-800 mb-1">Medical History</h3>
+                                                            <p className="text-sm text-gray-700 mb-2">
+                                                                {student?.medicalCondition || "No medical conditions reported"}
+                                                            </p>
+                                                            <h3 className="text-md font-semibold text-gray-800 mb-1">Emergency Contacts</h3>
+                                                            <div className="flex flex-col gap-2 mb-2">
+                                                                <div className="p-3 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-1 border-black">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Name:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.firstName} {student?.lastName}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Ph. Number:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.emergencyNumber || "Not provided"}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="p-3 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-1 border-black">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Name:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.fatherName}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Relation:</span>
+                                                                        <span className="text-sm text-gray-600">Father</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Ph. Number:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.fatherInfo?.cell1 || "1234567890"}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="p-3 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-1 border-black">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Name:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.guardianName || "Guardian Name"}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Relation:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.guardianRelationToStudent || "Not provided"}
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-black text-sm">Ph. Number:</span>
+                                                                        <span className="text-sm text-gray-600">
+                                                                            {student?.guardianContactNumber || "Not provided"}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                            <div className="flex justify-end">
+                                                                <button
+                                                                    onClick={() => handleEditClick(student)}
+                                                                    className="px-4 py-1 bg-[#673AB7] text-white rounded-lg text-sm hover:bg-[#5e35b1]"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </NavLink>
-                                            {expandedCard === student._id && (
-                                                <div className="mt-4">
-                                                    <h3 className="text-md font-semibold text-gray-800 mb-2">Medical History</h3>
-                                                    <p className="text-sm text-gray-700 mb-4">
-                                                        {student?.medicalCondition || "No medical conditions reported"}
-                                                    </p>
-                                                    <h3 className="text-md font-semibold text-gray-800 mb-2">Emergency Contacts</h3>
-                                                    <div className="flex flex-col gap-4 mb-4">
-                                                        {/* Father Card */}
-                                                        <div className="p-4 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-2 border-black">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Name:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.fatherName}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Relation:</span>
-                                                                <span className="text-sm text-gray-600">Father</span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Ph. Number:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.fatherInfo?.cell1 || "1234567890"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        {/* Guardian Card */}
-                                                        <div className="p-4 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-2 border-black">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Name:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.guardianName || "Guardian Name"}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Relation:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.guardianRelationToStudent || "Not provided"}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Ph. Number:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.guardianContactNumber || "Not provided"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                        {/* Student Card */}
-                                                        <div className="p-4 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-2 border-black">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Name:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.firstName} {student?.lastName}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-black">Ph. Number:</span>
-                                                                <span className="text-sm text-gray-600">
-                                                                    {student?.emergencyNumber || "Not provided"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex justify-end">
-                                                        <button
-                                                            onClick={() => handleEditClick(student)}
-                                                            className="px-4 py-2 bg-[#673AB7] text-white rounded-lg text-sm hover:bg-[#5e35b1]"
-                                                        >
-                                                            Edit
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            )}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-lg sm:text-2xl col-span-2">
+                                            <NoDataFound />
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-lg sm:text-2xl">
-                                        <NoDataFound />
-                                    </div>
-                                )}
-                            </div>
-                        </ProtectedSection>
-                    )}
-                    <Sidebar
-                        isOpen={isHealthModalOpen}
-                        onClose={handleModalClose}
-                        title={t("Update Student Information")}
-                        width="60%"
-                    >
-                        <EditHealthModal
+                                    )}
+                                </div>
+                            </ProtectedSection>
+                        )}
+                        <Sidebar
                             isOpen={isHealthModalOpen}
                             onClose={handleModalClose}
-                            studentData={studentData}
-                        />
-                    </Sidebar>
+                            title={t("Update Student Information")}
+                            width="60%"
+                        >
+                            <EditHealthModal
+                                isOpen={isHealthModalOpen}
+                                onClose={handleModalClose}
+                                studentData={studentData}
+                            />
+                        </Sidebar>
+                    </div>
                 </div>
             </DashLayout>
         </Layout>

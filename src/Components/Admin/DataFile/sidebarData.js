@@ -420,7 +420,7 @@ const sidebarData = [
   // New Addition Health Module
   {
     title: "Health",
-    icon: <MdHealthAndSafety style={{ fontSize: "1.1rem" }} />,
+    icon: <MdHealthAndSafety style={{ fontSize: "1.3rem" }} />,
     roles: [ROLES.ADMIN, ROLES.STAFF],
     path: "/health",
   }
