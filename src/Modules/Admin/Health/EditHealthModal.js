@@ -71,12 +71,6 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                 classId: studentData?.classId || "",
                 sectionId: studentData?.sectionId || "",
                 bloodGroup: studentData?.bloodGroup || "",
-                permanentAddress: {
-                    city: studentData.permanentAddress?.city || "",
-                    state: studentData.permanentAddress?.state || "",
-                    postalCode: studentData.permanentAddress?.postalCode || "",
-                    country: studentData.permanentAddress?.country || "",
-                },
                 residentialAddress: {
                     city: studentData.residentialAddress?.city || "",
                     state: studentData.residentialAddress?.state || "",
@@ -136,7 +130,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
         const data = new FormData();
 
         Object.keys(values).forEach((key) => {
-            if (key === "emergencyContacts" || key === "permanentAddress" || key === "residentialAddress") {
+            if (key === "emergencyContacts" || key === "residentialAddress") {
                 data.append(key, JSON.stringify(values[key]));
             } else if (key === "profile" && values[key]) {
                 data.append(key, values[key]);
@@ -144,7 +138,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                 data.append(key, values[key] || "");
             }
         });
-
+        console.log("Form Data:", data);
         await dispatch(updateStudents(data));
         setLoading(false);
         onClose();
@@ -196,29 +190,26 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                         <Input size="large" placeholder="Last Name" disabled />
                                     </Form.Item>
                                 </Col>
+                                <Col xs={24} md={12}>
+                                    <Form.Item label="Mobile Number" name="contactNumber">
+                                        <Input size="large" placeholder="Mobile Number" disabled />
+                                    </Form.Item>
+                                </Col>
+                                <Col xs={24} md={12}>
+                                    <Form.Item label="Email" name="email">
+                                        <Input size="large" placeholder="Email" disabled />
+                                    </Form.Item>
+                                </Col>
                             </Row>
                         </Col>
                     </Row>
 
                     <Row gutter={[16, 16]}>
                         <Col xs={24} md={8}>
-                            <Form.Item label="Mobile Number" name="contactNumber">
-                                <Input size="large" placeholder="Mobile Number" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="Email" name="email">
-                                <Input size="large" placeholder="Email" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
                             <Form.Item label="Date of Birth" name="dateOfBirth">
                                 <Input type="date" size="large" disabled />
                             </Form.Item>
                         </Col>
-                    </Row>
-
-                    <Row gutter={[16, 16]}>
                         <Col xs={24} md={8}>
                             <Form.Item label="Admission Number" name="admissionNumber">
                                 <Input size="large" placeholder="Admission Number" disabled />
@@ -229,6 +220,9 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                 <Input size="large" placeholder="QID" disabled />
                             </Form.Item>
                         </Col>
+                    </Row>
+
+                    <Row gutter={[16, 16]}>
                         <Col xs={24} md={8}>
                             <Form.Item label="Transport Requirement" name="transportRequirement">
                                 <Select size="large" placeholder="Select Transport Requirement" disabled>
@@ -237,10 +231,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                    </Row>
-
-                    <Row gutter={[16, 16]}>
-                        <Col xs={24} md={12}>
+                        <Col xs={24} md={8}>
                             <Form.Item label="Applying Class" name="classId">
                                 <Select
                                     size="large"
@@ -260,7 +251,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                 </Select>
                             </Form.Item>
                         </Col>
-                        <Col xs={24} md={12}>
+                        <Col xs={24} md={8}>
                             <Form.Item label="Section Name" name="sectionId">
                                 <Select
                                     size="large"
@@ -273,80 +264,6 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                 >
                                     {memoizedSectionOptions}
                                 </Select>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Row gutter={[16, 16]}>
-                        <Col xs={24} md={8}>
-                            <Form.Item
-                                label="Blood Group"
-                                name="bloodGroup"
-                                rules={[{ required: true, message: "Blood group is required" }]}
-                            >
-                                <Select size="large" placeholder="Select Blood Group">
-                                    <Option value="A+">A+</Option>
-                                    <Option value="A-">A-</Option>
-                                    <Option value="B+">B+</Option>
-                                    <Option value="B-">B-</Option>
-                                    <Option value="AB+">AB+</Option>
-                                    <Option value="AB-">AB-</Option>
-                                    <Option value="O+">O+</Option>
-                                    <Option value="O-">O-</Option>
-                                </Select>
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Divider orientation="left" orientationMargin={0}>
-                        <span className="text-gray-600 font-medium">Permanent Address</span>
-                    </Divider>
-                    <Row gutter={[16, 16]}>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="City" name={["permanentAddress", "city"]}>
-                                <Input size="large" placeholder="City" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="State" name={["permanentAddress", "state"]}>
-                                <Input size="large" placeholder="State" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="Postal Code" name={["permanentAddress", "postalCode"]}>
-                                <Input size="large" placeholder="Postal Code" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="Country" name={["permanentAddress", "country"]}>
-                                <Input size="large" placeholder="Country" disabled />
-                            </Form.Item>
-                        </Col>
-                    </Row>
-
-                    <Divider orientation="left" orientationMargin={0}>
-                        <span className="text-gray-600 font-medium">Residential Address</span>
-                    </Divider>
-                    <Row gutter={[16, 16]}>
-
-                        <Col xs={24} md={8}>
-                            <Form.Item label="City" name={["residentialAddress", "city"]}>
-                                <Input size="large" placeholder="City" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="State" name={["residentialAddress", "state"]}>
-                                <Input size="large" placeholder="State" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="Postal Code" name={["residentialAddress", "postalCode"]}>
-                                <Input size="large" placeholder="Postal Code" disabled />
-                            </Form.Item>
-                        </Col>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="Country" name={["residentialAddress", "country"]}>
-                                <Input size="large" placeholder="Country" disabled />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -386,6 +303,24 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                 <Input size="large" placeholder="Enter weight in kg" type="number" />
                             </Form.Item>
                         </Col>
+                        <Col xs={24} md={8}>
+                            <Form.Item
+                                label="Blood Group"
+                                name="bloodGroup"
+                                rules={[{ required: true, message: "Blood group is required" }]}
+                            >
+                                <Select size="large" placeholder="Select Blood Group">
+                                    <Option value="A+">A+</Option>
+                                    <Option value="A-">A-</Option>
+                                    <Option value="B+">B+</Option>
+                                    <Option value="B-">B-</Option>
+                                    <Option value="AB+">AB+</Option>
+                                    <Option value="AB-">AB-</Option>
+                                    <Option value="O+">O+</Option>
+                                    <Option value="O-">O-</Option>
+                                </Select>
+                            </Form.Item>
+                        </Col>
                         <Col xs={24}>
                             <Form.Item label="Medical Condition" name="medicalCondition">
                                 <TextArea
@@ -412,13 +347,17 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                                         index === 0
                                                             ? "Father Name"
                                                             : index === 1
-                                                                ? "Guardian Name"
-                                                                : "Student Name"
+                                                            ? "Guardian Name"
+                                                            : "Student Name"
                                                     }
                                                     name={[name, "name"]}
                                                     rules={[{ required: true, message: "Name is required" }]}
                                                 >
-                                                    <Input size="large" placeholder="Enter name" />
+                                                    <Input
+                                                        size="large"
+                                                        placeholder="Enter name"
+                                                        disabled={index !== 2}
+                                                    />
                                                 </Form.Item>
                                             </Col>
                                             {index !== 2 && (
@@ -429,18 +368,32 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                                         name={[name, "relation"]}
                                                         rules={[{ required: true, message: "Relation is required" }]}
                                                     >
-                                                        <Input size="large" placeholder="Enter relation" />
+                                                        <Input
+                                                            size="large"
+                                                            placeholder="Enter relation"
+                                                            disabled
+                                                        />
                                                     </Form.Item>
                                                 </Col>
                                             )}
                                             <Col xs={24} md={index === 2 ? 10 : 7}>
                                                 <Form.Item
                                                     {...restField}
-                                                    label="Contact Number"
+                                                    label={
+                                                        index === 2 ? "Emergency Number" : "Contact Number"
+                                                    }
                                                     name={[name, "contactNumber"]}
                                                     rules={[{ required: true, message: "Contact number is required" }]}
                                                 >
-                                                    <Input size="large" placeholder="Enter contact number" />
+                                                    <Input
+                                                        size="large"
+                                                        placeholder={
+                                                            index === 2
+                                                                ? "Enter emergency number"
+                                                                : "Enter contact number"
+                                                        }
+                                                        disabled={index !== 2}
+                                                    />
                                                 </Form.Item>
                                             </Col>
                                         </Row>
@@ -449,6 +402,32 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                             </>
                         )}
                     </Form.List>
+
+                    <Divider orientation="left" orientationMargin={0}>
+                        <span className="text-gray-600 font-medium">Residential Address</span>
+                    </Divider>
+                    <Row gutter={[16, 16]}>
+                        <Col xs={24} md={8}>
+                            <Form.Item label="City" name={["residentialAddress", "city"]}>
+                                <Input size="large" placeholder="City" disabled />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} md={8}>
+                            <Form.Item label="State" name={["residentialAddress", "state"]}>
+                                <Input size="large" placeholder="State" disabled />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} md={8}>
+                            <Form.Item label="Postal Code" name={["residentialAddress", "postalCode"]}>
+                                <Input size="large" placeholder="Postal Code" disabled />
+                            </Form.Item>
+                        </Col>
+                        <Col xs={24} md={8}>
+                            <Form.Item label="Country" name={["residentialAddress", "country"]}>
+                                <Input size="large" placeholder="Country" disabled />
+                            </Form.Item>
+                        </Col>
+                    </Row>
 
                     <div className="bg-pink-50 py-2 border-t sticky -bottom-2 rounded-md z-10 mt-4">
                         <div className="flex flex-col-reverse sm:flex-row justify-end gap-4 px-6">

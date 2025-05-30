@@ -48,7 +48,7 @@ export default function StudentsFilter({ filters, onFilterChange }) {
 
   return (
     <div>
-      <div className="flex items-end gap-4 py-4 bg-white w-full justify-start">
+      <div className="flex md:flex-row flex-col md:items-end items-center gap-4 py-4 bg-white w-full justify-start">
         {/* Search Box */}
         <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">
