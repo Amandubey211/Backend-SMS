@@ -463,6 +463,10 @@ const AccountingSection = lazy(() =>
 const RoleSelector = lazy(() =>
   import("../Components/Common/RBAC/RoleSelector.js")
 );
+
+// Health
+const Health = lazy(() => import("../Modules/Admin/Health/Health.js"));
+
 const ScoreCard = lazy(() => import("../Modules/Admin/ScoreCard/ScoreCard.js"));
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
@@ -1543,6 +1547,7 @@ function App() {
     {
       path: "/admin/scorecard/:cid",
       element: <ProtectRoute Component={ScoreCard} allowedRoles={["admin"]} />,
+
     },
     // Student------------------------------------------------------------------------------
     {
@@ -1864,6 +1869,16 @@ function App() {
       path: "/childgrade/:studentId",
       element: (
         <ProtectRoute Component={ChildGrade} allowedRoles={["parent"]} />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/health",
+      element: (
+        <ProtectRoute
+          Component={Health}
+          allowedRoles={["admin", "teacher", "staff"]}
+        />
       ),
       errorElement: <Error />,
     },

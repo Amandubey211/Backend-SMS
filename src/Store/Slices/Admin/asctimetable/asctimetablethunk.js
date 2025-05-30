@@ -32,12 +32,12 @@ export const createTimeTable = createAsyncThunk(
 // Existing: Update Timetable
 export const updateTimeTable = createAsyncThunk(
   "admin/updateTimeTable",
-  async ({ timetableData }, { rejectWithValue, getState, dispatch }) => {
+  async ({ id,timetableData }, { rejectWithValue, getState, dispatch }) => {
     try {
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const response = await putData(
-        `/${getRole}/ascTimeTable/update`,
+        `/${getRole}/ascTimeTable/update/${id}`,
         timetableData
       );
       return response;

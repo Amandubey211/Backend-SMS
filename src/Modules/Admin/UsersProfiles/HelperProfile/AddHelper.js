@@ -62,6 +62,7 @@ const AddHelper = ({ role, data }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [pdfUrl, setPdfUrl] = useState(null);
+    const [isPhotoUploading, setIsPhotoUploading] = useState(false); // Track photo upload status
 
     const initialTeacherData = {
         fullName: "",
@@ -94,12 +95,15 @@ const AddHelper = ({ role, data }) => {
     const form = {
         getFieldValue: (name) => formValues[name],
         setFieldValue: (name, value) => {
+            setIsPhotoUploading(true); // Indicate photo upload is in progress
             setFormValues((prev) => ({ ...prev, [name]: value }));
-            // Update teacherData.photo when the form value changes
+            // Update teacherData.photo, handling both string and object formats
             setTeacherData((prev) => ({
                 ...prev,
-                photo: value ? value.url : null,
+                photo: typeof value === 'string' ? value : (value?.url || null),
             }));
+            // Wait for the upload to complete (placeholder)
+            setTimeout(() => setIsPhotoUploading(false), 1000);
         },
     };
 
@@ -190,11 +194,13 @@ const AddHelper = ({ role, data }) => {
             [name]: value,
         }));
     };
+
     const handleRemoveImage = () => {
         // Clear the photo in teacherData
         setTeacherData((prev) => ({ ...prev, photo: null }));
         // Clear the photo in formValues to ensure CustomUploadCard updates
         setFormValues((prev) => ({ ...prev, photo: null }));
+        toast.success("Image removed successfully!");
     };
 
     const handleCVBeforeUpload = (file) => {
@@ -224,11 +230,9 @@ const AddHelper = ({ role, data }) => {
                 setPdfUrl(teacherData.teacherCV);
                 setIsModalVisible(true);
             } else {
-                // console.error("teacherCV is neither a File nor a string URL:", teacherData.teacherCV);
                 toast.error("Cannot preview the PDF file.");
             }
         } else {
-            // console.error("No teacherCV found in teacherData:", teacherData);
             toast.error("No PDF file available to preview.");
         }
     };
@@ -316,8 +320,16 @@ const AddHelper = ({ role, data }) => {
     const validateForm = () => {
         const {
             fullName, joiningDate, dateOfBirth, religion, gender, address,
-            contactNumber, email, national_Id, helperBadgeNumber, bloodGroup, photo
+            contactNumber, email, national_Id, helperBadgeNumber, bloodGroup,
         } = teacherData;
+
+        // Validate photo, handling both string and object formats
+        const photoValue = form.getFieldValue('photo');
+        const photoUrl = typeof photoValue === 'string' ? photoValue : photoValue?.url;
+        if (!photoUrl) {
+            toast.error("Helper photo is required.");
+            return false;
+        }
 
         if (!fullName.trim()) {
             toast.error("Full Name is required.");
@@ -433,16 +445,16 @@ const AddHelper = ({ role, data }) => {
             return false;
         }
 
-        if (!photo) {
-            toast.error("Helper photo is required.");
-            return false;
-        }
-
         return true;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (isPhotoUploading) {
+            toast.error("Please wait for the photo to finish uploading.");
+            return;
+        }
+
         setIsSubmitting(true);
         if (!validateForm()) {
             setIsSubmitting(false);
@@ -489,7 +501,6 @@ const AddHelper = ({ role, data }) => {
                     toast.error("Failed to add Helper.");
                 }
             } catch (err) {
-                // console.error("Error adding Helper:", err);
                 toast.error("An error occurred while adding the Helper.");
             } finally {
                 setIsSubmitting(false);
@@ -801,16 +812,16 @@ const AddHelper = ({ role, data }) => {
                     {data ? (
                         <motion.button
                             type="submit"
-                            disabled={loading}
-                            whileHover={!loading ? { scale: 1.05 } : {}}
-                            whileTap={!loading ? { scale: 0.95 } : {}}
-                            className={`${loading
+                            disabled={loading || isSubmitting || isPhotoUploading}
+                            whileHover={!(loading || isPhotoUploading) ? { scale: 1.05 } : {}}
+                            whileTap={!(loading || isPhotoUploading) ? { scale: 0.95 } : {}}
+                            className={`${loading || isPhotoUploading
                                 ? "bg-gray-400 cursor-not-allowed"
                                 : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                                 } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
                             aria-label="Update Helper"
                         >
-                            {loading ? (
+                            {loading || isPhotoUploading ? (
                                 <FiLoader className="animate-spin w-6 h-6" />
                             ) : (
                                 "Update Helper"
@@ -819,16 +830,16 @@ const AddHelper = ({ role, data }) => {
                     ) : (
                         <motion.button
                             type="submit"
-                            disabled={isSubmitting}
-                            whileHover={!loading ? { scale: 1.05 } : {}}
-                            whileTap={!loading ? { scale: 0.95 } : {}}
-                            className={`${loading
+                            disabled={isSubmitting || isPhotoUploading}
+                            whileHover={!(loading || isPhotoUploading) ? { scale: 1.05 } : {}}
+                            whileTap={!(loading || isPhotoUploading) ? { scale: 0.95 } : {}}
+                            className={`${loading || isPhotoUploading
                                 ? "bg-gray-400 cursor-not-allowed"
                                 : "bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600"
                                 } text-white text-lg py-3 px-8 rounded-md flex items-center justify-center transition-transform duration-200`}
                             aria-label="Add New Helper"
                         >
-                            {isSubmitting ? (
+                            {isSubmitting || isPhotoUploading ? (
                                 <FiLoader className="animate-spin w-6 h-6" />
                             ) : (
                                 "Add New Helper"
