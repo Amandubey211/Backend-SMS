@@ -15,7 +15,15 @@ import toast from "react-hot-toast";
 export const fetchAllOfflineExam = createAsyncThunk(
   "subject/offline_get_exam",
   async (
-    { classId, subjectId, query = "", page = 1, limit = 10, startDate = null, endDate = null },
+    {
+      classId,
+      subjectId,
+      query = "",
+      page = 1,
+      limit = 10,
+      startDate = null,
+      endDate = null,
+    },
     { rejectWithValue, dispatch, getState }
   ) => {
     try {
@@ -24,9 +32,10 @@ export const fetchAllOfflineExam = createAsyncThunk(
       const semesterId = getState().common.user.classInfo.selectedSemester.id;
       dispatch(setShowError(false));
 
-      const isValidStartDate = startDate && !isNaN(new Date(startDate).getTime());
+      const isValidStartDate =
+        startDate && !isNaN(new Date(startDate).getTime());
       const isValidEndDate = endDate && !isNaN(new Date(endDate).getTime());
-      
+
       let queryParams = `${getRole}/offlineExam/class/${classId}/subject/${subjectId}?say=${say}&search=${query}&semesterId=${semesterId}&page=${page}&limit=${limit}`;
 
       if (isValidStartDate) {

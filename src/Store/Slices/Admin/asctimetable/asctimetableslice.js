@@ -1,16 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {getSchoolTimeTable} from './asctimetablethunk'
+import {getSchoolTimeTable,getClassTimeTable,fetchTimeTablesForTeacher} from './asctimetablethunk'
 
 
 const initialState = {
-  timeTableData: {},
+  ascTimeTableData: [],
+  ascClassTimeTableData:{},
+  ascTeacherTimeTable:{},
   loading: false,
   error: null,
   isModalOpen: false,
   Modaldata: {},
 };
 
-const timeTableSlice = createSlice({
+const ascTimeTableSlice = createSlice({
   name: "timeTable",
   initialState,
   reducers: {
@@ -27,16 +29,47 @@ const timeTableSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      // Fetch timeTables 
+      // Fetch school  timeTables 
       .addCase(getSchoolTimeTable.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getSchoolTimeTable.fulfilled, (state, action) => {
-        state.timeTableData = action.payload?.data;
+        state.ascTimeTableData = action.payload?.data;
         state.loading = false;
       })
       .addCase(getSchoolTimeTable.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loading = false;
+      })
+
+
+    builder
+      // Fetch timeTables 
+      .addCase(getClassTimeTable.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getClassTimeTable.fulfilled, (state, action) => {
+        state.ascClassTimeTableData = action.payload?.data;
+        state.loading = false;
+      })
+      .addCase(getClassTimeTable.rejected, (state, action) => {
+        state.error = action.error.message;
+        state.loading = false;
+      })
+
+    builder
+      // Fetch timeTables 
+      .addCase(fetchTimeTablesForTeacher.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchTimeTablesForTeacher.fulfilled, (state, action) => {
+        state.ascClassTimeTableData = action.payload?.data;
+        state.loading = false;
+      })
+      .addCase(fetchTimeTablesForTeacher.rejected, (state, action) => {
         state.error = action.error.message;
         state.loading = false;
       })
@@ -46,6 +79,6 @@ const timeTableSlice = createSlice({
 export const {
   setCellModal,
   setCellModalCancel
-} = timeTableSlice.actions;
+} = ascTimeTableSlice.actions;
 
-export default timeTableSlice.reducer;
+export default ascTimeTableSlice.reducer;

@@ -16,7 +16,13 @@ const StudentList = () => {
       <TopNavigation />
 
       {/* Render based on active tab */}
-      {activeTab === "unverified" ? <UnverifiedStudents /> : activeTab === "Pending" ? <PendingForms />: <RejectStudents />}
+      {activeTab === "unverified" ? (
+        <UnverifiedStudents />
+      ) : activeTab === "Pending" ? (
+        <PendingForms />
+      ) : (
+        <RejectStudents />
+      )}
     </div>
   );
 };

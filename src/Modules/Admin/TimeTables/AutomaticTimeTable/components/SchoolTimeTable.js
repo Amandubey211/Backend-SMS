@@ -1,45 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CiEdit } from "react-icons/ci";
 import { MdDeleteOutline } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { getSchoolTimeTable } from "../../../../../Store/Slices/Admin/asctimetable/asctimetablethunk";
 
 
 const SchoolTimeTable = () => {
-  // Dummy data for classes, sections, and their schedules
+  const dispatch = useDispatch();
+    const { loading, success, timeTableData, error } = useSelector((state) => state.admin.ascTimeTable);
   const schoolName = "Bright Future Academy";
-  const timetableData = [
-    {
-      className: "Class 1",
-      sections: [
-        {
-          name: "A",
-          schedule: {
-            "9:00 AM - 9:45 AM": { subject: "Math", teacher: "Mr. Smith" },
-            "9:45 AM - 10:30 AM": { subject: "English", teacher: "Ms. Johnson" },
-          },
-        },
-        {
-          name: "B",
-          schedule: {
-            "9:00 AM - 9:45 AM": { subject: "Science", teacher: "Mr. Brown" },
-            "9:45 AM - 10:30 AM": { subject: "History", teacher: "Mrs. Davis" },
-          },
-        },
-      ],
-    },
-    {
-      className: "Class 2",
-      sections: [
-        {
-          name: "A",
-          schedule: {
-            "10:00 AM - 10:45 AM": { subject: "Geography", teacher: "Mr. Lee" },
-            "10:45 AM - 11:30 AM": { subject: "Computer Science", teacher: "Ms. Taylor" },
-          },
-        },
-      ],
-    },
-  ];
 
+    useEffect(() => {
+    dispatch(getSchoolTimeTable({})) 
+  }, [dispatch]);
+  // const timetableData = [
+  //   {
+  //     className: "Class 1",
+  //     sections: [
+  //       {
+  //         name: "A",
+  //         schedule: {
+  //           "9:00 AM - 9:45 AM": { subject: "Math", teacher: "Mr. Smith" },
+  //           "9:45 AM - 10:30 AM": { subject: "English", teacher: "Ms. Johnson" },
+  //         },
+  //       },
+  //       {
+  //         name: "B",
+  //         schedule: {
+  //           "9:00 AM - 9:45 AM": { subject: "Science", teacher: "Mr. Brown" },
+  //           "9:45 AM - 10:30 AM": { subject: "History", teacher: "Mrs. Davis" },
+  //         },
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     className: "Class 2",
+  //     sections: [
+  //       {
+  //         name: "A",
+  //         schedule: {
+  //           "10:00 AM - 10:45 AM": { subject: "Geography", teacher: "Mr. Lee" },
+  //           "10:45 AM - 11:30 AM": { subject: "Computer Science", teacher: "Ms. Taylor" },
+  //         },
+  //       },
+  //     ],
+  //   },
+  // ];
   const allTimings = [
     "9:00 AM - 9:45 AM",
     "9:45 AM - 10:30 AM",
@@ -66,7 +72,7 @@ const SchoolTimeTable = () => {
           </tr>
         </thead>
         <tbody>
-          {timetableData.map((classData, classIndex) =>
+          {timeTableData.length <=1 && timeTableData.map((classData, classIndex) =>
             classData.sections.map((section, sectionIndex) => (
               <tr key={`${classIndex}-${sectionIndex}`} className="hover:bg-gray-50">
                 {/* Class Name with merged rows */}
