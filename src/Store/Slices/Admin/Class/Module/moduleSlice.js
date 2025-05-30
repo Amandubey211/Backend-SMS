@@ -35,8 +35,17 @@ const moduleSlice = createSlice({
       })
       .addCase(fetchModules.fulfilled, (state, action) => {
         state.moduleLoading = false;
-        // console.log("I am checking subject------>", action.payload);
         state.modules = action.payload || [];
+        if (state.modules.length > 0) {
+          const [first] = state?.modules;
+          state.selectedModule = {
+            moduleId: first?._id,
+            name: first?.moduleName,
+            chapters: first?.chapters,
+          };
+        } else {
+          state.selectedModule = null;
+        }
       })
       .addCase(fetchModules.rejected, (state, action) => {
         state.moduleLoading = false;

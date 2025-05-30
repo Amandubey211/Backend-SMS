@@ -10,6 +10,7 @@ import debounce from "lodash-es/debounce";
 // common
 import authReducer from "./Slices/Common/Auth/reducers/authSlice"; // Importing the auth slice reducer
 import userReducer, {
+  setSelectedModule,
   setSelectedSemester,
 } from "./Slices/Common/User/reducers/userSlice"; // Importing the user slice reducer
 import alertReducer from "./Slices/Common/Alerts/alertsSlice";
@@ -171,7 +172,6 @@ listenerMiddleware.startListening({
       state.admin.class.classDetails?._id; // fallback
 
     const sid = state.common.user.subjectInfo?.selectedSubjectId || null;
-
     // • fallback #2: parse them from the current URL
     //   This covers deep-links or pages that haven't stored ids yet.
     if (!cid || !sid) {

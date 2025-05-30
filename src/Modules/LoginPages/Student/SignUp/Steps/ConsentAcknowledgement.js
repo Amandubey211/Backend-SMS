@@ -163,7 +163,6 @@ const ConsentAcknowledgement = ({ formData }) => {
       {/* Success confirmation modal */}
       <Modal
         open={openModal}
-        // open={true}
         footer={null}
         centered
         onCancel={() => {
