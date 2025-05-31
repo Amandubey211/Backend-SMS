@@ -70,7 +70,7 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     <div className="p-4">
       
       <p className="text-lg font">
-        {teacher.fullName +`'s TimeTable` || "N/A"}
+        {teacher?.fullName ? teacher?.fullName +`'s TimeTable` || "N/A" : ''}
       </p>
       <Table
         columns={columns}
@@ -81,7 +81,6 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
         scroll={{ x: "max-content" }}
         className="mt-4"
       />
-      {error && <p className="text-red-500 mt-2">Error: {error}</p>}
     </div>
   );
 };
