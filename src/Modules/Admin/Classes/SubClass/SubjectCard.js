@@ -240,7 +240,7 @@ function SubjectCard({
         <div className="flex items-center mt-12">
           <CiUser className="w-12 h-12 bg-transparent text-white" />
           <div className="ml-3 capitalize z-10">
-            <p className="text-white font-semibold">
+            <p className="text-white text-sm font-semibold">
               {t("No Instructor Assigned")}
             </p>
           </div>
