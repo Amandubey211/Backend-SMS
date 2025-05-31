@@ -30,7 +30,7 @@ const StudentProfileCard = ({ student }) => {
       />
 
       <span className="font-bold capitalize">
-        {student?.firstName ?? t("N/A")}
+        {student?.firstName + " " + student?.lastName}
       </span>
 
       <div className="flex gap-4 text-sm font-medium text-gray-500">

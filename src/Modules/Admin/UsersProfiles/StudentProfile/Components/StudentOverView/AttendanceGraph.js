@@ -10,6 +10,8 @@ const AttendanceGraph = () => {
   const attendanceData = useSelector(
     (store) => store.admin.all_students.attendanceData
   );
+
+  console.log(attendanceData, "attendanceDataattendanceData");
   const dispatch = useDispatch();
 
   const [chartData, setChartData] = useState({
