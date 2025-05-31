@@ -204,58 +204,30 @@ const Health = () => {
                                                                 {student?.medicalCondition || "No medical conditions reported"}
                                                             </p>
                                                             <h3 className="text-md font-semibold text-gray-800 mb-1">Emergency Contacts</h3>
-                                                            <div className="flex flex-col gap-2 mb-2">
-                                                                <div className="p-3 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-1 border-black">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Name:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.firstName} {student?.lastName}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Ph. Number:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.emergencyNumber || "Not provided"}
-                                                                        </span>
-                                                                    </div>
+                                                            <div className="flex flex-col gap-2 mb-2 p-3 border rounded-lg shadow-sm bg-zinc-100 border-black">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-black text-sm">Emergency Contact:</span>
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {student?.emergencyNumber || "Not provided"}
+                                                                    </span>
                                                                 </div>
-                                                                <div className="p-3 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-1 border-black">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Name:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.fatherName}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Relation:</span>
-                                                                        <span className="text-sm text-gray-600">Father</span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Ph. Number:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.fatherInfo?.cell1 || "1234567890"}
-                                                                        </span>
-                                                                    </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-black text-sm">Guardian Name:</span>
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {student?.guardianName || "Guardian Name"}
+                                                                    </span>
                                                                 </div>
-                                                                <div className="p-3 border rounded-lg shadow-sm bg-zinc-100 flex flex-col gap-1 border-black">
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Name:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.guardianName || "Guardian Name"}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Relation:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.guardianRelationToStudent || "Not provided"}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <span className="text-black text-sm">Ph. Number:</span>
-                                                                        <span className="text-sm text-gray-600">
-                                                                            {student?.guardianContactNumber || "Not provided"}
-                                                                        </span>
-                                                                    </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-black text-sm">Relation:</span>
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {student?.guardianRelationToStudent || "Not provided"}
+                                                                    </span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-black text-sm">Guardian Contact:</span>
+                                                                    <span className="text-sm text-gray-600">
+                                                                        {student?.guardianContactNumber || student?.fatherInfo?.cell1}
+                                                                    </span>
                                                                 </div>
 
                                                             </div>

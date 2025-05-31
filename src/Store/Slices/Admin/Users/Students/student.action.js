@@ -43,13 +43,6 @@ export const updateStudents = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         }
       );
-      if(response?.success){
-
-        toast.success(response?.message);
-      }
-      else{
-        toast.error(response?.message || "Failed to update student information");
-      }
       dispatch(fetchAllStudents());
       return response;
     } catch (error) {

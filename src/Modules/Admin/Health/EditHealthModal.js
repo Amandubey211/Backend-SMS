@@ -1,12 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllClasses } from "../../../Store/Slices/Admin/Class/actions/classThunk";
-import { fetchSectionsNamesByClass } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { updateStudents } from "../../../Store/Slices/Admin/Users/Students/student.action";
-import { Form, Select, Input, Button, Row, Col, Divider } from "antd";
+import { Form, Input, Button, Row, Col, Divider, Select } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 import TextArea from "antd/es/input/TextArea";
-
+import toast from "react-hot-toast";
 const { Option } = Select;
 
 const EditHealthModal = ({ isOpen, onClose, studentData }) => {
@@ -14,47 +12,8 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
     const [form] = Form.useForm();
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
-
-    const classes = useSelector((state) => state.admin.class?.classes || []);
-    const sections = useSelector((state) => state.admin.group_section?.sectionsList || []);
-
-    const classesLoading = useSelector((state) => state.class?.loading || false);
-    const sectionsLoading = useSelector((state) => state.group?.loading || false);
-
-    const memoizedClassOptions = useMemo(
-        () =>
-            classes?.map((cls) => (
-                <Option key={cls._id} value={cls._id}>
-                    {cls.className || cls.name}
-                </Option>
-            )),
-        [classes]
-    );
-
-    const memoizedSectionOptions = useMemo(
-        () =>
-            sections?.map((sec) => (
-                <Option key={sec._id} value={sec._id}>
-                    {sec.sectionName || sec.name}
-                </Option>
-            )),
-        [sections]
-    );
-
     useEffect(() => {
-        if (isOpen) {
-            dispatch(fetchAllClasses());
-        }
-    }, [isOpen, dispatch]);
-
-    useEffect(() => {
-        const classId = form.getFieldValue("classId");
-        if (classId) {
-            dispatch(fetchSectionsNamesByClass(classId));
-        }
-    }, [form.getFieldValue("classId"), dispatch]);
-
-    useEffect(() => {
+        console.log(studentData, "studentData in EditHealthModal");
         if (studentData) {
             setImagePreview(studentData.profile || null);
             form.setFieldsValue({
@@ -63,15 +22,15 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                 lastName: studentData.lastName || "",
                 contactNumber: studentData.contactNumber || "",
                 email: studentData.email || "",
-                profile: studentData.profile || null,
                 dateOfBirth: studentData.dateOfBirth ? studentData.dateOfBirth.slice(0, 10) : "",
                 admissionNumber: studentData.admissionNumber || "",
                 Q_Id: studentData.Q_Id || "",
-                transportRequirement: studentData.transportRequirement || "",
-                classId: studentData?.classId || "",
-                sectionId: studentData?.sectionId || "",
+                transportRequirement: studentData.transportRequirement || false,
+                className: studentData?.className || "",
+                sectionName: studentData?.sectionName || "",
                 bloodGroup: studentData?.bloodGroup || "",
                 residentialAddress: {
+                    street: studentData.residentialAddress?.street || "",
                     city: studentData.residentialAddress?.city || "",
                     state: studentData.residentialAddress?.state || "",
                     postalCode: studentData.residentialAddress?.postalCode || "",
@@ -84,64 +43,52 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                 weight: studentData?.weight || "",
                 emergencyContacts: [
                     {
+                        contactNumber: studentData?.emergencyNumber || "",
+                    },
+                    {
                         name: studentData?.fatherName || "",
                         relation: "Father",
-                        contactNumber: studentData?.fatherInfo?.cell1 || "",
+                        contactNumber: studentData?.fatherInfo?.cell1.value || "",
                     },
                     {
                         name: studentData?.guardianName || "",
                         relation: studentData?.guardianRelationToStudent || "",
                         contactNumber: studentData?.guardianContactNumber || "",
                     },
-                    {
-                        name: studentData?.firstName && studentData?.lastName
-                            ? `${studentData.firstName} ${studentData.lastName}`
-                            : "",
-                        contactNumber: studentData?.emergencyNumber || "",
-                    },
                 ],
             });
         }
     }, [studentData, form]);
 
-    const handleClassChange = (value) => {
-        const selectedClass = classes.find((cls) => cls._id === value);
-        form.setFieldsValue({
-            classId: value,
-            className: selectedClass?.name || "",
-            sectionId: "",
-            sectionName: "",
-        });
-        if (value) {
-            dispatch(fetchSectionsNamesByClass(value));
-        }
-    };
-
-    const handleSectionChange = (value) => {
-        const selectedSection = sections.find((sec) => sec._id === value);
-        form.setFieldsValue({
-            sectionId: value,
-            sectionName: selectedSection?.name || "",
-        });
-    };
-
     const onFinish = async (values) => {
         setLoading(true);
-        const data = new FormData();
+        const formData = new FormData();
 
-        Object.keys(values).forEach((key) => {
-            if (key === "emergencyContacts" || key === "residentialAddress") {
-                data.append(key, JSON.stringify(values[key]));
-            } else if (key === "profile" && values[key]) {
-                data.append(key, values[key]);
+        // Explicitly append the student ID
+        if (studentData?._id) {
+            formData.append("id", studentData._id);
+        }
+        formData.append("medicalCondition", values?.medicalCondition || "");
+        formData.append("healthRisk", values.healthRisk || "Low");
+        formData.append("height", values.height || "");
+        formData.append("weight", values.weight || "");
+        formData.append("bloodGroup", values.bloodGroup || "");
+        for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        try {
+            const response = await dispatch(updateStudents({ data: formData })).unwrap();
+            if (response.success) {
+                toast.success("Student information updated successfully");
             } else {
-                data.append(key, values[key] || "");
+                toast.error(response.message || "Failed to update student information");
             }
-        });
-        console.log("Form Data:", data);
-        await dispatch(updateStudents(data));
-        setLoading(false);
-        onClose();
+        } catch (error) {
+            toast.error(error.message || "Failed to update student information");
+        } finally {
+            setLoading(false);
+            onClose();
+        }
     };
 
     if (!isOpen) return null;
@@ -173,7 +120,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                         src={imagePreview}
                                         alt="Profile"
                                         style={{ width: '100%', height: 'auto' }}
-                                        className="rounded-md"
+                                        className="rounded-md mb-4"
                                     />
                                 )}
                             </Form.Item>
@@ -232,38 +179,13 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                             </Form.Item>
                         </Col>
                         <Col xs={24} md={8}>
-                            <Form.Item label="Applying Class" name="classId">
-                                <Select
-                                    size="large"
-                                    placeholder="Select Class"
-                                    allowClear
-                                    onChange={handleClassChange}
-                                    aria-label="Class selection"
-                                    showSearch
-                                    optionFilterProp="children"
-                                    filterOption={(input, option) =>
-                                        option.children.toLowerCase().includes(input.toLowerCase())
-                                    }
-                                    loading={classesLoading}
-                                    disabled
-                                >
-                                    {memoizedClassOptions}
-                                </Select>
+                            <Form.Item label="Class" name="className">
+                                <Input size="large" placeholder="Class" disabled />
                             </Form.Item>
                         </Col>
                         <Col xs={24} md={8}>
-                            <Form.Item label="Section Name" name="sectionId">
-                                <Select
-                                    size="large"
-                                    placeholder="Select Section"
-                                    allowClear
-                                    onChange={handleSectionChange}
-                                    aria-label="Section selection"
-                                    disabled
-                                    loading={sectionsLoading}
-                                >
-                                    {memoizedSectionOptions}
-                                </Select>
+                            <Form.Item label="Section Name" name="sectionName">
+                                <Input size="large" placeholder="Section Name" disabled />
                             </Form.Item>
                         </Col>
                     </Row>
@@ -340,33 +262,31 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                 {fields.map(({ key, name, ...restField }, index) => (
                                     <div key={key} className="mb-4">
                                         <Row gutter={[16, 16]} align="middle">
-                                            <Col xs={24} md={index === 2 ? 10 : 7}>
+                                            <Col xs={24} md={7}>
                                                 <Form.Item
                                                     {...restField}
                                                     label={
                                                         index === 0
-                                                            ? "Father Name"
+                                                            ? "Emergency Contact"
                                                             : index === 1
-                                                            ? "Guardian Name"
-                                                            : "Student Name"
+                                                                ? "Father Name"
+                                                                : "Guardian Name"
                                                     }
-                                                    name={[name, "name"]}
-                                                    rules={[{ required: true, message: "Name is required" }]}
+                                                    name={[name, index === 0 ? "contactNumber" : "name"]}
                                                 >
                                                     <Input
                                                         size="large"
-                                                        placeholder="Enter name"
-                                                        disabled={index !== 2}
+                                                        placeholder={index === 0 ? "Enter emergency number" : "Enter name"}
+                                                        disabled
                                                     />
                                                 </Form.Item>
                                             </Col>
-                                            {index !== 2 && (
+                                            {index > 0 && (
                                                 <Col xs={24} md={7}>
                                                     <Form.Item
                                                         {...restField}
                                                         label="Relation to Student"
                                                         name={[name, "relation"]}
-                                                        rules={[{ required: true, message: "Relation is required" }]}
                                                     >
                                                         <Input
                                                             size="large"
@@ -376,26 +296,21 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                                                     </Form.Item>
                                                 </Col>
                                             )}
-                                            <Col xs={24} md={index === 2 ? 10 : 7}>
-                                                <Form.Item
-                                                    {...restField}
-                                                    label={
-                                                        index === 2 ? "Emergency Number" : "Contact Number"
-                                                    }
-                                                    name={[name, "contactNumber"]}
-                                                    rules={[{ required: true, message: "Contact number is required" }]}
-                                                >
-                                                    <Input
-                                                        size="large"
-                                                        placeholder={
-                                                            index === 2
-                                                                ? "Enter emergency number"
-                                                                : "Enter contact number"
-                                                        }
-                                                        disabled={index !== 2}
-                                                    />
-                                                </Form.Item>
-                                            </Col>
+                                            {index > 0 && (
+                                                <Col xs={24} md={7}>
+                                                    <Form.Item
+                                                        {...restField}
+                                                        label="Contact Number"
+                                                        name={[name, "contactNumber"]}
+                                                    >
+                                                        <Input
+                                                            size="large"
+                                                            placeholder="Enter contact number"
+                                                            disabled
+                                                        />
+                                                    </Form.Item>
+                                                </Col>
+                                            )}
                                         </Row>
                                     </div>
                                 ))}
@@ -407,6 +322,11 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                         <span className="text-gray-600 font-medium">Residential Address</span>
                     </Divider>
                     <Row gutter={[16, 16]}>
+                        <Col xs={24} md={8}>
+                            <Form.Item label="Street" name={["residentialAddress", "street"]}>
+                                <Input size="large" placeholder="Street" disabled />
+                            </Form.Item>
+                        </Col>
                         <Col xs={24} md={8}>
                             <Form.Item label="City" name={["residentialAddress", "city"]}>
                                 <Input size="large" placeholder="City" disabled />
