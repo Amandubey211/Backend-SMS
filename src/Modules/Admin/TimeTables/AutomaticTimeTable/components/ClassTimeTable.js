@@ -1,87 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import { Drawer, Button, message } from 'antd';
-import { useDispatch } from 'react-redux';
+import { Drawer, Button, message, Switch } from 'antd';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateTimeTable, deleteTimeTable, getClassTimeTable } from '../../../../../Store/Slices/Admin/asctimetable/asctimetablethunk'; // Adjust the import path as needed
-import TimeTableForm from '../../Components/TimeTableForm'; 
+import TimeTableForm from '../../Components/TimeTableForm';
 
-
-const dummyData = {
-  className: "10th Grade",
-  sectionName: "A",
-  startTime: "9:00",
-  endTime: "15:00",
-  timetable: [
-    {
-      time: "9:00 AM - 9:45 AM",
-      subject: "Mathematics",
-      teachers: ["Mr. Smith"],
-    },
-    {
-      time: "9:45 AM - 10:30 AM",
-      subject: "Science",
-      teachers: ["Mrs. Johnson", "Dr. Blake"],
-    },
-    {
-      time: "10:30 AM - 11:15 AM",
-      subject: "History",
-      teachers: [],
-    },
-    {
-      time: "11:15 AM - 12:00 PM",
-      subject: "English",
-      teachers: ["Mr. Brown"],
-    },
-  ],
-};
-const dData = {
-  "_id": "6835ad29d5e5f466fa052e0e",
-  "schoolId": "67b425757192bddd9b23b95b",
-  "classId": "67bd8ee76d5947448d0a939d",
-  "publish": true,
-  "sectionId": "67bd8f096d5947448d0a93fd",
-  "startTime": "10:00",
-  "endTime": "14:00",
-  "days": [
-    "monday",
-    "tuesday",
-    "wednesday"
-  ],
-  "subjectsTiming": [
-    {
-      "subjectId": "68270b3f311bf5bebdaf0e02",
-      "time": 45,
-      "_id": "6835ad29d5e5f466fa052e0f"
-    },
-    {
-      "subjectId": "68270b70311bf5bebdaf0ea7",
-      "time": 45,
-      "_id": "6835ad29d5e5f466fa052e10"
-    }
-  ],
-  "customTiming": [
-    {
-      "name": "Lunch ",
-      "startTime": "11:00",
-      "endTime": "11:30",
-      "_id": "6835ad29d5e5f466fa052e11"
-    }
-  ],
-  "academicYear": "67b4270c7192bddd9b23b97c",
-  "type": "automatic",
-}
 const ClassTimeTable = ({ selectedClass, selectedSection }) => {
-
   const dispatch = useDispatch();
-  const [data, setData] = useState(dummyData); // Initialize with dummy data
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
-  const handleEdit = (record) => {
-    setEditingTimetable(dData);
-    console.log('Editing record:', dData);
-    setIsDrawerOpen(true);
-  };
-   useEffect(() => {
+  const [isPublished, setIsPublished] = useState(false);
+
+  const { ascClassTimeTableData, loading, error } = useSelector(
+    (state) => state.admin.ascTimeTable
+  );
+
+  useEffect(() => {
     dispatch(
       getClassTimeTable({
         classId: selectedClass,
@@ -90,13 +24,16 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
     );
   }, [dispatch, selectedClass, selectedSection]);
 
+  const handleEdit = (record) => {
+    setEditingTimetable(record);
+    setIsDrawerOpen(true);
+  };
 
   const handleDelete = (record) => {
-    dispatch(deleteTimeTable({ id: record.id }))
+    dispatch(deleteTimeTable({ id: record._id }))
       .unwrap()
       .then(() => {
         message.success('Timetable deleted successfully');
-        setData(data.filter(item => item.id !== record.id));
       })
       .catch((error) => {
         message.error('Failed to delete timetable');
@@ -109,7 +46,6 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
       .unwrap()
       .then(() => {
         message.success('Timetable updated successfully');
-        setData(data.map(item => item.id === values.id ? values : item));
         setIsDrawerOpen(false);
       })
       .catch((error) => {
@@ -118,31 +54,48 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
       });
   };
 
+  const handleTogglePublish = () => {
+    const newPublishStatus = !isPublished;
+    setIsPublished(newPublishStatus);
+
+    // Dispatch the publish/unpublish action
+    dispatch(
+      updateTimeTable({
+        timetableData: { ...ascClassTimeTableData, isPublished: newPublishStatus },
+      })
+    )
+      .unwrap()
+      .then(() => {
+        message.success(`Timetable ${newPublishStatus ? 'published' : 'unpublished'} successfully`);
+      })
+      .catch((error) => {
+        message.error('Failed to update publish status');
+        console.error('Failed to update publish status:', error);
+      });
+  };
+
   const onClose = () => {
     setIsDrawerOpen(false);
     setEditingTimetable(null);
   };
 
-   const getColorForTeachers = (teachers) => {
-    if (teachers?.length === 0) return "bg-yellow-300";
-    return "bg-white";
+  const getColorForTeachers = (teachers) => {
+    if (!teachers || teachers.length === 0) return 'bg-yellow-300';
+    return 'bg-white';
   };
 
-
+  const data = ascClassTimeTableData || {};
 
   return (
- <div className="p-4">
-          <div className="flex justify-between items-center mb-6">
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-700">
-            {data.className} - Section {data.sectionName}
-          </h2>
           <p className="text-gray-600">
-            Timings: <span className="font-medium">{data.startTime}</span> to{" "}
-            <span className="font-medium">{data.endTime}</span>
+            Timings: <span className="font-medium">{data.startTime || 'N/A'}</span> to{' '}
+            <span className="font-medium">{data.endTime || 'N/A'}</span>
           </p>
           <p className="text-gray-500 mt-2">
-            Applicable for:{" "}
+            Applicable for:{' '}
             {data?.days?.map((day, index) => (
               <span
                 key={index}
@@ -154,12 +107,16 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
           </p>
         </div>
         <div className="flex space-x-4">
-          <button
-            className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-           onClick={() => handleEdit(data)}
-          >
-            <FaEdit className="mr-2" /> Edit
-          </button>
+          <div className="flex items-center space-x-4">
+            <span className="text-gray-700 font-medium">Publish:</span>
+            <Switch
+              checked={isPublished}
+              onChange={handleTogglePublish}
+              checkedChildren="On"
+              unCheckedChildren="Off"
+            />
+          </div>
+
           <button
             className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
             onClick={() => handleDelete(data)}
@@ -169,52 +126,34 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         </div>
       </div>
 
-      <div className="mb-4">
-        <div className="flex space-x-4">
-
-          <div className="flex items-center">
-            <div className="w-4 h-4 bg-yellow-300 mr-2"></div>
-            No Teacher Assigned
-          </div>
-        </div>
-      </div>
-
       <table className="w-full border border-gray-300 shadow-md">
         <thead>
           <tr className="bg-gray-100">
             <th className="border px-4 py-2">Time</th>
-            {data?.timetable?.map((item, index) => (
-              <th key={index} className="border px-4 py-2">
-                {item.subject}
-              </th>
-            ))}
+            <th className="border px-4 py-2">Subject</th>
+            <th className="border px-4 py-2">Teacher</th>
           </tr>
         </thead>
         <tbody>
-          {data.timetable.map((item, index) => (
+          {data?.generatedTimeTabel?.map((item, index) => (
             <tr key={index}>
-              <td className="border px-4 py-2">{item.time}</td>
-              {data.timetable.map((timeItem, timeIndex) => (
-                <td
-                  key={timeIndex}
-                  className={`border px-4 py-2 text-center ${getColorForTeachers(
-                    timeItem.teachers
-                  )}`}
-                >
-                  {timeItem.teachers.length > 0
-                    ? timeItem.teachers.join(", ")
-                    : "-"}
-                </td>
-              ))}
+              <td className="border px-4 py-2">{item?.timing?.startTime || 'N/A'} - {item?.timing?.endTime || 'N/A'}</td>
+              <td className="border px-4 py-2 text-center">{item?.subjectName || 'N/A'}</td>
+              <td
+                className={`border px-4 py-2 text-center ${getColorForTeachers(item?.teacherName)}`}
+              >
+                {item?.teacherName || 'N/A'}
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-       <Drawer
+
+      <Drawer
         title="Edit Timetable"
         width={720}
         onClose={onClose}
-        visible={isDrawerOpen}
+        open={isDrawerOpen}
         bodyStyle={{ paddingBottom: 80 }}
         footer={
           <div style={{ textAlign: 'right' }}>
@@ -228,71 +167,10 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
           editingTimetable={editingTimetable}
           onSubmit={handleSave}
           onClose={onClose}
-          Type={"automatic"}
+          Type={data.type || 'automatic'}
         />
       </Drawer>
     </div>
-
-    // <div className="p-4">
-    //   <div className="flex justify-between items-center mb-4">
-    //     <h2 className="text-xl font-bold">
-    //       {data.className} - Section {data.sectionName}
-    //     </h2>
-    //     <div className="flex space-x-4">
-    //       <button
-    //         className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-    //         onClick={() => handleEdit(data)}
-    //       >
-    //         <FaEdit className="mr-2" /> Edit
-    //       </button>
-    //       <button
-    //         className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-    //         onClick={() => handleDelete(data)}
-    //       >
-    //         <FaTrashAlt className="mr-2" /> Delete
-    //       </button>
-    //     </div>
-    //   </div>
-    //   <table className="w-full border border-gray-300 shadow-md">
-    //     <thead>
-    //       <tr className="bg-gray-100">
-    //         <th className="border px-4 py-2">Timing</th>
-    //         <th className="border px-4 py-2">Subject</th>
-    //         <th className="border px-4 py-2">Teacher</th>
-    //       </tr>
-    //     </thead>
-    //     <tbody>
-    //       {data.timetable.map((item, index) => (
-    //         <tr key={index} className="hover:bg-gray-50">
-    //           <td className="border px-4 py-2">{item.time}</td>
-    //           <td className="border px-4 py-2">{item.subject}</td>
-    //           <td className="border px-4 py-2">{item.teacher}</td>
-    //         </tr>
-    //       ))}
-    //     </tbody>
-    //   </table>
-    //   <Drawer
-    //     title="Edit Timetable"
-    //     width={720}
-    //     onClose={onClose}
-    //     visible={isDrawerOpen}
-    //     bodyStyle={{ paddingBottom: 80 }}
-    //     footer={
-    //       <div style={{ textAlign: 'right' }}>
-    //         <Button onClick={onClose} style={{ marginRight: 8 }}>
-    //           Cancel
-    //         </Button>
-    //       </div>
-    //     }
-    //   >
-    //     <TimeTableForm
-    //       editingTimetable={editingTimetable}
-    //       onSubmit={handleSave}
-    //       onClose={onClose}
-    //       Type={"automatic"}
-    //     />
-    //   </Drawer>
-    // </div>
   );
 };
 

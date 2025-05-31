@@ -103,7 +103,7 @@ const MainSection = () => {
                         style={{ width: 200 }}
                         onChange={setSelectedTeacher}
                         placeholder="Select Teacher"
-                        value={selectedTeacher} // Bind the selected value
+                        value={selectedTeacher} 
                     >
                         {teachersList?.map((teacher) => (
                             <Option key={teacher.id} value={teacher.id}>

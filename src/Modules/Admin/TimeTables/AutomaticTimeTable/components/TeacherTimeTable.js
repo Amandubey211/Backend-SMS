@@ -9,39 +9,6 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     (state) => state?.admin?.ascTimeTable
   );
 
-  // Dummy data for demonstration
-  const mockAscTeacherTimeTable = {
-    schoolId: "67b425757192bddd9b23b95b",
-    teacherId: "64c3a123e456ddefa8912345",
-    subjectsTiming: [
-      {
-        subjectId: "64d6cba4a12345c8e6789a01",
-        subjectName: "Mathematics",
-        class: "10th",
-        section: "A",
-        timing: { startTime: "9:00 AM", endTime: "10:00 AM" },
-      },
-      {
-        subjectId: "64d6cba4a12345c8e6789a02",
-        subjectName: "Physics",
-        class: "11th",
-        section: "B",
-        timing: { startTime: "10:15 AM", endTime: "11:15 AM" },
-      },
-      {
-        subjectId: "64d6cba4a12345c8e6789a03",
-        subjectName: "Chemistry",
-        class: "12th",
-        section: "A",
-        timing: { startTime: "11:30 AM", endTime: "12:30 PM" },
-      },
-    ],
-    academicYear: "64d6cba4a12345c8e6789a04",
-  };
-
-  // Use fetched data or mock data
-  const timetable = mockAscTeacherTimeTable;
-
   useEffect(() => {
     dispatch(
       fetchTimeTablesForTeacher({
@@ -50,21 +17,31 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     );
   }, [dispatch, selectedTeacher]);
 
-  // Prepare data for Ant Design Table
+  // Extract data from API response
+  const timetable = ascTeacherTimeTable || {};
+  const teacher = timetable.teacherId || {};
+  const subjectsTiming = timetable.subjectsTiming || [];
+
   const timings = Array.from(
-    new Set(timetable?.subjectsTiming.map((item) => item.timing.startTime + " - " + item.timing.endTime))
+    new Set(
+      subjectsTiming.map(
+        (item) => `${item.timing.startTime} - ${item.timing.endTime}`
+      )
+    )
   );
 
   const classesSections = Array.from(
-    new Set(timetable?.subjectsTiming.map((item) => `${item.class} ${item.section}`))
+    new Set(
+      subjectsTiming.map((item) => `${item.class} ${item.section}`)
+    )
   );
 
-  const dataSource = timings.map((time) => {
+  const dataSource = timings?.map((time) => {
     const row = { key: time, timing: time };
 
     classesSections.forEach((clsSection) => {
       const [className, sectionName] = clsSection.split(" ");
-      const subject = timetable.subjectsTiming.find(
+      const subject = subjectsTiming.find(
         (item) =>
           `${item.class} ${item.section}` === clsSection &&
           `${item.timing.startTime} - ${item.timing.endTime}` === time
@@ -91,8 +68,10 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold">Teacher Timetable</h1>
-      <p className="text-lg">Teacher ID: {selectedTeacher}</p>
+      
+      <p className="text-lg font">
+        {teacher.fullName +`'s TimeTable` || "N/A"}
+      </p>
       <Table
         columns={columns}
         dataSource={dataSource}

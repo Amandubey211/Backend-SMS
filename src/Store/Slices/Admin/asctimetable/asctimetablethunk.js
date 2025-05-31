@@ -142,7 +142,6 @@ export const getClassTimeTable = createAsyncThunk(
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
       const { classId, sectionId } = data;
-
       const response = await getData(
         `/${getRole}/ascTimeTable/class?say=${say}&classId=${classId}&sectionId=${sectionId}`
       );
