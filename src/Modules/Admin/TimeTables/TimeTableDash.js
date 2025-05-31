@@ -681,7 +681,7 @@ export default function TimeTableDash() {
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
                 <Tabs.TabPane key="list" tab={<span>List View</span>} />
                 <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} />
-                <Tabs.TabPane key="autoCalendar" tab="Automatic Calendar" />
+                <Tabs.TabPane key="autoCalendar" tab="ASC TimeTable" />
               </Tabs>
             </div>
 

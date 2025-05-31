@@ -66,7 +66,7 @@ const ascTimeTableSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchTimeTablesForTeacher.fulfilled, (state, action) => {
-        state.ascClassTimeTableData = action.payload?.data;
+        state.ascTeacherTimeTable = action.payload?.data;
         state.loading = false;
       })
       .addCase(fetchTimeTablesForTeacher.rejected, (state, action) => {
