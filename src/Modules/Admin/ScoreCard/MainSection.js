@@ -163,6 +163,7 @@ const MainSection = () => {
     { label: "Passport Number", value: "passportNumber" },
     { label: "Age", value: "age" },
     { label: "Nationality", value: "nationality" },
+    { label: "Q Id", value: "Q_Id" },
     { label: "Native Language", value: "nativeLanguage" },
     { label: "Blood Group", value: "bloodGroup" },
     { label: "Gender", value: "gender" },

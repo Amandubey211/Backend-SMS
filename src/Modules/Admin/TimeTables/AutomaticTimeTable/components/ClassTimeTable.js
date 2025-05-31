@@ -86,8 +86,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
 
   const data = ascClassTimeTableData || {};
 
-  return (
-    <div className="p-4">
+  return (<> {data?.startTime ?<div className="p-4">
       <div className="flex justify-between items-center mb-6">
         <div>
           <p className="text-gray-600">
@@ -137,12 +136,12 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         <tbody>
           {data?.generatedTimeTabel?.map((item, index) => (
             <tr key={index}>
-              <td className="border px-4 py-2">{item?.timing?.startTime || 'N/A'} - {item?.timing?.endTime || 'N/A'}</td>
-              <td className="border px-4 py-2 text-center">{item?.subjectName || 'N/A'}</td>
+              <td className="border px-4 py-2">{item?.timing?.startTime || ''} - {item?.timing?.endTime || ''}</td>
+              <td className="border px-4 py-2 text-center">{item?.subjectName || '-'}</td>
               <td
                 className={`border px-4 py-2 text-center ${getColorForTeachers(item?.teacherName)}`}
               >
-                {item?.teacherName || 'N/A'}
+                {item?.teacherName || 'Not Assigned'}
               </td>
             </tr>
           ))}
@@ -170,7 +169,14 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
           Type={data.type || 'automatic'}
         />
       </Drawer>
-    </div>
+    </div>:<div className="flex items-center justify-center w-full h-full">
+      <div className="p-8 rounded-lg flex flex-col items-center">
+        <span className="text-6xl mb-4">📜</span>
+        <p className="text-lg font-medium text-gray-700">TimeTable Not Available</p>
+      </div>
+    </div>}
+  </>
+   
   );
 };
 
