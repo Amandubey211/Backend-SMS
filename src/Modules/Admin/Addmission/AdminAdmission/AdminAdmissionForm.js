@@ -44,6 +44,7 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       academicSession: { enrollmentStats: "Full Time" },
       languagePrefs: { second: [], third: [], valueEd: [], leftHanded: false },
       medicalInfo: "",
+      healthRisk: "Low", // Added default value for healthRisk
       addressInformation: { transportRequired: true },
       fatherInfo: {},
       motherInfo: {},
@@ -262,7 +263,8 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       if (values.medicalInfo) {
         formData.append("medicalCondition", values.medicalInfo);
       }
-
+      // Add health risk to formData
+      formData.append("healthRisk", values.healthRisk);
       const addDynamicAttachments = (bucket) => {
         Object.values(bucket || {}).forEach((attachment) => {
           if (attachment?.file) {
@@ -286,8 +288,6 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           navigate,
         })
       ).unwrap();
-
-      toast.success("Registration successful");
     } catch (err) {
       console.error("Registration error:", err);
       message.error(

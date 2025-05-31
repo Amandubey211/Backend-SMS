@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, memo } from "react";
-import { Form, Select, Radio, Input, Modal, Button, message } from "antd";
+import { Form, Select, Radio, Input, Modal, Button, message, Row, Col } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateSchoolOption,
@@ -21,6 +21,7 @@ const LanguagePreferences = memo(({ showThirdLang }) => {
   const valueEd = Form.useWatch(["languagePrefs", "valueEd"], form) || [];
   const leftHanded = Form.useWatch(["languagePrefs", "leftHanded"], form);
   const medicalInfo = Form.useWatch("medicalInfo", form);
+  const healthRisk = Form.useWatch("healthRisk", form); // Added healthRisk to Form.useWatch
 
   // modal state
   const [modalVisible, setModalVisible] = useState(false);
@@ -108,7 +109,7 @@ const LanguagePreferences = memo(({ showThirdLang }) => {
       </h2>
       <div className="p-3 flex flex-col gap-4">
         {/* Second Language */}
-        <div className="flex justify-between items-center gap-2 ">
+        <div className="flex justify-between items-center gap-2">
           <div className="w-4/5">
             <Form.Item
               name={["languagePrefs", "second"]}
@@ -156,7 +157,6 @@ const LanguagePreferences = memo(({ showThirdLang }) => {
         </div>
 
         {/* Third Language */}
-        {/* {showThirdLang && ( */}
         <div className="flex justify-between items-center gap-2">
           <div className="w-4/5">
             <Form.Item
@@ -203,10 +203,9 @@ const LanguagePreferences = memo(({ showThirdLang }) => {
             )}
           </div>
         </div>
-        {/* )} */}
 
         {/* Value Education */}
-        <div className="flex justify-between items-center  gap-2">
+        <div className="flex justify-between items-center gap-2">
           <div className="w-4/5">
             <Form.Item
               name={["languagePrefs", "valueEd"]}
@@ -253,25 +252,42 @@ const LanguagePreferences = memo(({ showThirdLang }) => {
           </div>
         </div>
 
-        {/* Left-handed */}
-        <Form.Item name={["languagePrefs", "leftHanded"]} label="Left-handed">
-          <Radio.Group
-            options={[
-              { label: "Yes", value: true },
-              { label: "No", value: false },
-            ]}
-            optionType="button"
-            value={leftHanded}
-            onChange={(e) =>
-              form.setFieldsValue({
-                languagePrefs: {
-                  ...form.getFieldValue("languagePrefs"),
-                  leftHanded: e.target.value,
-                },
-              })
-            }
-          />
-        </Form.Item>
+        {/* Left-handed and Health Risk */}
+        <Row gutter={[16, 16]} className="flex justify-between">
+          <Col xs={24} md={8}>
+            <Form.Item name={["languagePrefs", "leftHanded"]} label="Left-handed">
+              <Radio.Group
+                options={[
+                  { label: "Yes", value: true },
+                  { label: "No", value: false },
+                ]}
+                optionType="button"
+                value={leftHanded}
+                onChange={(e) =>
+                  form.setFieldsValue({
+                    languagePrefs: {
+                      ...form.getFieldValue("languagePrefs"),
+                      leftHanded: e.target.value,
+                    },
+                  })
+                }
+              />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={8}>
+            <Form.Item
+              label="Health Risk"
+              name="healthRisk"
+              rules={[{ required: true, message: "Health risk is required" }]}
+            >
+              <Select size="large" placeholder="Select Health Risk">
+                <Option value="Low">Low</Option>
+                <Option value="Medium">Medium</Option>
+                <Option value="High">High</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
 
         {/* Medical Info */}
         <Form.Item
