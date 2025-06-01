@@ -42,13 +42,16 @@ const ScoreCardModal = ({ isModalOpen, dispatch, Modaldata, setCellModal, setCel
 
   // Handle form submission
   const handleOk = async() => {
-    await dispatch(getScoreCard(Modaldata.classId))
-    if (!scoreCardData?.excelFile) {
-      toast.error("Please upload report card excel file first");
-      return;
-    }
     if (validateInput(cellNumber)) {
-    await  dispatch(addScoreCardCellData(Modaldata));
+    let res=    await  dispatch(addScoreCardCellData(Modaldata))
+
+    let result = res?.payload;
+    if(result?.success){
+      toast.success("Added Successfully")
+    }else{
+      toast.error(result?.message || "Something Is Wrong")
+    }
+
      dispatch(setCellModalCancel());
 
     }
