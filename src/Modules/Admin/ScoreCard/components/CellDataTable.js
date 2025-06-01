@@ -26,14 +26,17 @@ const CellDataTable = ({ scoreCardData }) => {
     }, [scoreCardData])
 
     // Handle delete
-    const handleDelete = (cellNumber) => {
+    const handleDelete = (cellNumber,sectionId) => {
         if (!cellNumber) {
             return message.error("Failed to remove field.");
         }
+        console.log(sectionId);
+        
         dispatch(
             reomoveScoreCardCellData({
                 cellNumber,
                 classId: scoreCardData.classId,
+                sectionId
             })
         ).then((action) => {
             if (action.meta.requestStatus === "fulfilled") {
@@ -76,7 +79,7 @@ const CellDataTable = ({ scoreCardData }) => {
             render: (_, record) => (
                 <Popconfirm
                     title="Are you sure to delete this row?"
-                    onConfirm={() => handleDelete(record.cellNumber)}
+                    onConfirm={() => handleDelete(record.cellNumber,scoreCardData?.sectionId)}
                     okText="Yes"
                     cancelText="No"
                 >
