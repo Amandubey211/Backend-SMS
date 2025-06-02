@@ -1,18 +1,25 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { FaChild } from "react-icons/fa";
 import { RiSignalWifiErrorFill } from "react-icons/ri";
 import { useTranslation } from "react-i18next";
+import { Button, Upload, message, Modal, Input, Select, Tabs } from 'antd';
 import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.action";
 import { ChildCardSkeleton } from "../Skeletons";
 import { setSelectedChild } from "../../../Store/Slices/Parent/Children/childrenSlice";
 import { ChildCard } from "../../../Components/Parents/Children/ChildCard";
+import Sidebar from "../../../Components/Common/Sidebar";
+import ChildHealth from "../../../Components/Parents/Children/ChildHealth";
+import StudentReportCard from "../../Admin/UsersProfiles/StudentProfile/Components/StudentReportCard/StudentReportCard";
 
 // ChildCard component defined in the same file
 
 const MyChildren = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation("prtChildrens");
+  const [openHealthSideBar, setOpenHealthSideBar] = useState(false);
+  const [openReportCardModal, setOpenReportCardModal] = useState(false);
+  const [selectedChild, setSelectedChildState] = useState(null);
 
   // Select necessary state slices directly (without memoization)
   const {
@@ -23,7 +30,7 @@ const MyChildren = () => {
   const userId = useSelector((state) => state.common.user.userDetails.userId);
 
   // Fetch children on mount
-  console.log(children,"children")
+  // console.log(children,"children")
   useEffect(() => {
     if (userId) {
       dispatch(fetchChildren(userId));
@@ -37,6 +44,25 @@ const MyChildren = () => {
     },
     [dispatch]
   );
+  const handleOpenHealthSidebar = (child) => {
+    setSelectedChildState(child);
+    setOpenHealthSideBar(true);
+  };
+
+  const handleCloseHealthSidebar = () => {
+    setOpenHealthSideBar(false);
+    setSelectedChildState(null);
+  };
+  const handleOpenReportCardModal = (child) => {
+    setSelectedChildState(child);
+    setOpenReportCardModal(true);
+  };
+
+  const handleCloseReportCardModal = () => {
+    setOpenReportCardModal(false);
+    setSelectedChildState(null);
+  };
+
 
   const renderErrorMessage = () => {
     const isNetworkError = error?.toLowerCase().includes("network error");
@@ -98,7 +124,11 @@ const MyChildren = () => {
                 onClick={() => handleChildSelect(child)}
                 className="cursor-pointer transform transition duration-300 hover:scale-105 hover:shadow-lg"
               >
-                <ChildCard student={child} />
+                <ChildCard
+                  student={child}
+                  onOpenHealthSidebar={() => handleOpenHealthSidebar(child)}
+                  handleOpenReportCardModal={() => handleOpenReportCardModal(child)}
+                />
               </div>
             ))}
           </div>
@@ -107,7 +137,34 @@ const MyChildren = () => {
     );
   };
 
-  return <>{renderContent()}</>;
+  return (
+    <>
+      {renderContent()}
+
+      {/* Sidebar for Health */}
+      {selectedChild && (
+        <Sidebar
+          isOpen={openHealthSideBar}
+          onClose={handleCloseHealthSidebar}
+          title={"Child Health Information"}
+          width="60%"
+        >
+          <ChildHealth student={selectedChild} />
+        </Sidebar>
+      )}
+      {selectedChild && (
+        <Modal
+          open={openReportCardModal}
+          onCancel={handleCloseReportCardModal}
+          width="80%"
+          footer={null}
+        >
+          <StudentReportCard student={selectedChild} />
+        </Modal>
+      )}
+
+    </>
+  );
 };
 
 export default MyChildren;
