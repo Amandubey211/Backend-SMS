@@ -51,7 +51,9 @@ function StudentReportCard({ student }) {
     setIsFetching(true);
     setLoading(true);
     try {
-      const response = await dispatch(fetchStudentReportCard(student._id));
+      
+      const response = await dispatch(fetchStudentReportCard(student._id || student.id));
+      console.log(response)
       if (response.error) {
         throw new Error(response.payload || "Failed to fetch report card");
       }
@@ -66,7 +68,9 @@ function StudentReportCard({ student }) {
 
   // Fetch the PDF on component mount or when student ID changes
   useEffect(() => {
-    if (student?._id) {
+console.log(student)
+console.log("first")
+    if (student?._id || student?.id) {
       fetchPdf();
     } else {
       setPdfUrl(null);
