@@ -240,7 +240,7 @@ const StudentSignUp = () => {
               {steps[currentStep].title}
             </h1>
             <p className="text-gray-500 mb-4">{steps[currentStep].subtitle}</p>
-            {steps[currentStep].component}
+            {steps[1].component}
           </div>
         </motion.div>
 

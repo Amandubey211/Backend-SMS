@@ -16,18 +16,6 @@ const selectSections = createSelector(
   (sectionsList) => sectionsList
 );
 
-/**
- * SectionSelect component
- *
- * @param {Array}  sectionValue - array of selected Section IDs
- * @param {Array}  groupValue   - array of selected Group IDs
- * @param {string} assignTo     - "Section" or "Group"
- * @param {func}   handleChange - function to handle changes in the form
- * @param {object} formErrors   - validation errors, if any
- * @param {bool}   multiSelect  - controls single vs multiple selection
- * @param {string} fieldSection - field name to update for sections (e.g. "sectionId" or "sectionIds")
- * @param {string} fieldGroup   - field name to update for groups (e.g. "groupId" or "groupIds")
- */
 const SectionSelect = ({
   sectionValue = [],
   groupValue = [],
@@ -67,7 +55,8 @@ const SectionSelect = ({
           <div className="custom-ant-select">
             <Select
               mode={selectMode}
-              style={{ width: "100%", height: "2.6rem" }}
+              size="large"
+              style={{ width: "100%" }}
               className="mb-3"
               placeholder="Select Sections"
               value={sectionValue}

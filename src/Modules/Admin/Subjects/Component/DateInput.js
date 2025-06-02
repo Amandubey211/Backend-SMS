@@ -1,10 +1,20 @@
-// DateInput.jsx
 import React, { forwardRef } from "react";
-import { format } from "date-fns";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
 
+/**
+ * Ant Design DatePicker wrapped to keep the signature:
+ * handleChange({ target: { name, value } })
+ */
 const DateInput = forwardRef(
   ({ label, name, value, handleChange, error, fieldId, disabled }, ref) => {
-    const formattedValue = value ? format(new Date(value), "yyyy-MM-dd") : "";
+    const dayValue = value ? dayjs(value) : null;
+
+    const onPick = (dateObj) => {
+      const iso = dateObj ? dateObj.toISOString() : "";
+      handleChange({ target: { name, value: iso } });
+    };
+
     return (
       <div className="mb-4">
         <label
@@ -13,19 +23,16 @@ const DateInput = forwardRef(
         >
           {label}
         </label>
-        <input
+        <DatePicker
+          size="large"
           id={fieldId}
-          type="date"
-          name={name}
-          value={formattedValue}
-          onChange={handleChange}
           ref={ref}
           disabled={disabled}
-          className={`w-full p-3 border rounded-md shadow-sm focus:outline-none ${
-            error
-              ? "border-red-500 focus:ring-red-500"
-              : "border-gray-300 focus:ring-blue-500"
-          }`}
+          className="w-full"
+          value={dayValue}
+          onChange={onPick}
+          status={error ? "error" : ""}
+          format="YYYY-MM-DD"
         />
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       </div>
