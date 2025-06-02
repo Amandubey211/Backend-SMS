@@ -109,6 +109,8 @@ const initialFormState = {
   // New fields:
   resultsPublished: false,
   resultsPublishDate: "",
+  startTime: "", // 'HH:mm'
+  endTime: "", // 'HH:mm'
 };
 
 const MainSection = ({ setIsEditing, isEditing }) => {

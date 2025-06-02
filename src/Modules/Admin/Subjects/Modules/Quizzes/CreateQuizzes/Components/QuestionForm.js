@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { InputNumber, Select } from "antd";
 import EditorComponent from "../../../../Component/AdminEditor";
 import AnswerSection from "./AnswerSection";
 import AddQuestionButton from "./AddQuestionButton";
 import { useTranslation } from "react-i18next";
+
+const { Option } = Select;
 
 const QuestionForm = ({
   question,
@@ -22,12 +25,13 @@ const QuestionForm = ({
 }) => {
   const { t } = useTranslation("admModule");
   const [answerError, setAnswerError] = useState("");
+  const [questionSeconds, setQuestionSeconds] = useState(""); // optional
 
-  // Validate correct answer selection before adding/updating question
+  /* add/update question with basic validation */
   const handleAddQuestion = () => {
     if (
-      (questionType === "multiple choice" || questionType === "true/false") &&
-      !answers.some((ans) => ans.isCorrect)
+      ["multiple choice", "true/false"].includes(questionType) &&
+      !answers.some((a) => a.isCorrect)
     ) {
       setAnswerError(t("Please select the correct answer."));
       return;
@@ -38,47 +42,70 @@ const QuestionForm = ({
 
   return (
     <div className="h-full pb-16 overflow-y-scroll">
-      {/*  Question Points & Question Type  */}
-      <div className="flex justify-between items-center px-5 pt-3 space-x-4">
-        <div className="flex-1">
+      {/* Points • Seconds • Type */}
+      <div className="flex flex-wrap gap-4 px-5 pt-3">
+        {/* Points */}
+        <div className="flex-1 min-w-[120px]">
           <label className="block text-sm font-medium text-gray-700">
             {t("This Question Point")}
           </label>
-          <input
-            type="number"
-            value={questionPoint}
-            onChange={(e) => setQuestionPoint(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+          <InputNumber
+            size="large"
+            id="questionPoint"
+            className="mt-1 w-full"
+            min={0}
+            value={Number(questionPoint)}
+            onChange={(val) => setQuestionPoint(val)}
           />
         </div>
-        <div className="flex-1">
+
+        {/* Seconds (optional) */}
+        <div className="flex-1 min-w-[120px]">
+          <label className="block text-sm font-medium text-gray-700">
+            {t("Seconds (optional)")}
+          </label>
+          <InputNumber
+            id="questionSeconds"
+            className="mt-1 w-full"
+            size="large"
+            min={0}
+            value={questionSeconds}
+            onChange={(val) => setQuestionSeconds(val)}
+            placeholder="30"
+          />
+        </div>
+
+        {/* Question Type */}
+        <div className="flex-1 min-w-[140px]">
           <label className="block text-sm font-medium text-gray-700">
             {t("Question Type")}
           </label>
-          <select
+          <Select
+            id="questionType"
+            className="mt-1 w-full"
+            size="large"
             value={questionType}
-            onChange={(e) => setQuestionType(e.target.value)}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+            onChange={setQuestionType}
           >
-            <option value="multiple choice">{t("Multiple Choice")}</option>
-            <option value="true/false">{t("True/False")}</option>
-            <option value="text">{t("Text")}</option>
-          </select>
+            <Option value="multiple choice">{t("Multiple Choice")}</Option>
+            <Option value="true/false">{t("True/False")}</Option>
+            <Option value="text">{t("Text")}</Option>
+          </Select>
         </div>
       </div>
 
-      {/*  Question Editor  */}
+      {/* Editor */}
       <h2 className="text-gradient text-xl font-semibold px-5 pt-3">
         {t("Write Question")}
       </h2>
       <EditorComponent
-        isCreateQuestion={true}
-        hideInput={true}
+        isCreateQuestion
+        hideInput
         editorContent={question}
         onEditorChange={handleQuestionChange}
       />
 
-      {/*  Different answer sections based on questionType  */}
+      {/* Answer sections */}
       {questionType === "multiple choice" && (
         <AnswerSection
           answers={answers}
@@ -96,48 +123,30 @@ const QuestionForm = ({
         <div className="p-6 bg-white space-y-6">
           <h2 className="text-xl font-semibold">{t("Answer Section")}</h2>
           <div className="grid grid-cols-2 gap-4">
-            <div className="flex items-center space-x-2 border p-1 ps-3 rounded-md">
+            {["True", "False"].map((val, idx) => (
               <div
-                className={`flex items-center justify-center h-6 w-6 rounded ${
-                  answers[0]?.isCorrect ? "bg-green-500" : "bg-gray-200"
-                } text-white cursor-pointer`}
-                onClick={() =>
-                  setAnswers([
-                    { text: t("True"), isCorrect: true },
-                    { text: t("False"), isCorrect: false },
-                  ])
-                }
+                key={val}
+                className="flex items-center space-x-2 border p-1 ps-3 rounded-md"
               >
-                {answers[0]?.isCorrect && <span>{/* icon */}</span>}
+                <div
+                  className={`flex items-center justify-center h-6 w-6 rounded ${
+                    answers[idx]?.isCorrect ? "bg-green-500" : "bg-gray-200"
+                  } text-white cursor-pointer`}
+                  onClick={() =>
+                    setAnswers([
+                      { text: t("True"), isCorrect: idx === 0 },
+                      { text: t("False"), isCorrect: idx === 1 },
+                    ])
+                  }
+                />
+                <input
+                  type="text"
+                  value={t(val)}
+                  readOnly
+                  className="w-full p-2 border-none focus:ring-0"
+                />
               </div>
-              <input
-                type="text"
-                value={t("True")}
-                readOnly
-                className="w-full p-2 border-none focus:ring-0"
-              />
-            </div>
-            <div className="flex items-center space-x-2 border p-1 ps-3 rounded-md">
-              <div
-                className={`flex items-center justify-center h-6 w-6 rounded ${
-                  answers[1]?.isCorrect ? "bg-green-500" : "bg-gray-200"
-                } text-white cursor-pointer`}
-                onClick={() =>
-                  setAnswers([
-                    { text: t("True"), isCorrect: false },
-                    { text: t("False"), isCorrect: true },
-                  ])
-                }
-              >
-                {answers[1]?.isCorrect && <span>{/* icon */}</span>}
-              </div>
-              <input
-                type="text"
-                value={t("False")}
-                readOnly
-                className="w-full p-2 border-none focus:ring-0"
-              />
-            </div>
+            ))}
           </div>
           {answerError && (
             <p className="text-red-500 text-sm mt-2">{answerError}</p>
