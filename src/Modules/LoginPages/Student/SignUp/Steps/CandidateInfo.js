@@ -124,9 +124,6 @@ const CandidateInfo = ({ formData }) => {
   const [form] = Form.useForm();
   const [profileImage, setProfileImage] = useState(formData?.profile || null);
 
-  // console.log("formData.profile:", formData?.profile);
-  // console.log("profileImage:", profileImage);
-
   useEffect(() => {
     if (!formData) return;
 
@@ -285,7 +282,7 @@ const CandidateInfo = ({ formData }) => {
                 prefix={<UserOutlined />}
               />
             </Form.Item>
-            <Form.Item
+            {/* <Form.Item
               name="middleName"
               // rules={[{ required: true, message: "Required" }]}
             >
@@ -294,7 +291,7 @@ const CandidateInfo = ({ formData }) => {
                 placeholder="Middle Name"
                 prefix={<UserOutlined />}
               />
-            </Form.Item>
+            </Form.Item> */}{" "}
             <Form.Item
               name="lastName"
               rules={[{ required: true, message: "Required" }]}
@@ -304,6 +301,17 @@ const CandidateInfo = ({ formData }) => {
                 placeholder="Last Name"
                 prefix={<UserOutlined />}
               />
+            </Form.Item>
+            <Form.Item
+              name="gender"
+              // label="Gender"
+              rules={[{ required: true, message: "Required" }]}
+            >
+              <Select size="large" placeholder="Gender">
+                <Option value="male">Male</Option>
+                <Option value="female">Female</Option>
+                <Option value="other">Other</Option>
+              </Select>
             </Form.Item>
           </div>
         </div>
@@ -372,15 +380,11 @@ const CandidateInfo = ({ formData }) => {
             </Form.Item>
           </Col>
           <Col xs={24} md={12}>
-            <Form.Item
-              name="gender"
-              label="Gender"
-              rules={[{ required: true, message: "Required" }]}
-            >
-              <Select size="large" placeholder="Gender">
-                <Option value="male">Male</Option>
-                <Option value="female">Female</Option>
-                <Option value="other">Other</Option>
+            <Form.Item name="healthRisk" label="Health Risk">
+              <Select size="large" placeholder="Low, Medium, High">
+                {["Low", "Medium", "High"].map((risk) => (
+                  <Option key={risk}>{risk}</Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
@@ -392,6 +396,7 @@ const CandidateInfo = ({ formData }) => {
               <InputNumber
                 size="large"
                 className="w-full"
+                placeholder="eg 155"
                 min={50}
                 max={250}
               />
@@ -402,6 +407,7 @@ const CandidateInfo = ({ formData }) => {
               <InputNumber
                 size="large"
                 className="w-full"
+                placeholder="eg 55"
                 min={5}
                 max={200}
               />

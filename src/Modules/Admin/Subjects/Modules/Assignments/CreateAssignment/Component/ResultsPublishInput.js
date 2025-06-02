@@ -33,7 +33,7 @@ const ResultsPublishInput = ({
               })
             }
           />
-          <span className="ml-2">Publish Results Immediately</span>
+          <span className="ml-2 ">Publish Results Immediately</span>
         </label>
       </div>
       <div className="mt-2">

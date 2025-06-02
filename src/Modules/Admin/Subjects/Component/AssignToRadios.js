@@ -1,55 +1,40 @@
-import React from "react";
+// components/AssignToRadios.jsx  (plain JS)  ── or ──  .tsx if you prefer TypeScript
+import React, { memo, useCallback } from "react";
+import { Radio } from "antd";
 
-const AssignToRadios = ({ assignTo, handleChange, title, isAssignToLabel }) => (
-  <fieldset className="mb-4">
-    <legend className="text-lg font-semibold text-gray-700 mb-2">
-      {title || "Assign To"}
-    </legend>
-    <div className="flex items-center gap-2 justify-evenly">
-      <div className="flex items-center mr-4 text-md">
-        <input
-          type="radio"
-          id="everyone"
-          name={isAssignToLabel ? "assignTo" : "postTo"}
-          value="Everyone"
-          checked={assignTo === "Everyone"}
-          onChange={handleChange}
-          className="mr-2 focus:ring-blue-500"
-        />
-        <label htmlFor="everyone" className="text-sm font-medium text-gray-700">
-          Everyone
-        </label>
-      </div>
-      <div className="flex items-center mr-4">
-        <input
-          type="radio"
-          id="section"
-          name={isAssignToLabel ? "assignTo" : "postTo"}
-          value="Section"
-          checked={assignTo === "Section"}
-          onChange={handleChange}
-          className="mr-2 focus:ring-blue-500"
-        />
-        <label htmlFor="section" className="text-sm font-medium text-gray-700">
-          Section
-        </label>
-      </div>
-      <div className="flex items-center">
-        <input
-          type="radio"
-          id="group"
-          name={isAssignToLabel ? "assignTo" : "postTo"}
-          value="Group"
-          checked={assignTo === "Group"}
-          onChange={handleChange}
-          className="mr-2 focus:ring-blue-500"
-        />
-        <label htmlFor="group" className="text-sm font-medium text-gray-700">
-          Group
-        </label>
-      </div>
+const AssignToRadios = ({
+  assignTo,
+  handleChange,
+  title = "Assign To",
+  isAssignToLabel = true,
+}) => {
+  const fieldName = isAssignToLabel ? "assignTo" : "postTo";
+
+  // Memoized to avoid re-renders when parent changes unrelated state
+  const onRadioChange = useCallback((e) => handleChange(e), [handleChange]);
+
+  return (
+    <div className="mb-4">
+      <p className="mb-2 text-lg font-semibold text-gray-700">{title}</p>
+
+      <Radio.Group
+        name={fieldName}
+        value={assignTo}
+        onChange={onRadioChange}
+        optionType="button"
+        buttonStyle="solid"
+        className="flex justify-evenly"
+      >
+        <Radio.Button value="Everyone">Everyone</Radio.Button>
+        <Radio.Button value="Section">Section</Radio.Button>
+
+        {/* 
+        // Uncomment when you’re ready to target groups
+        <Radio.Button value="Group">Group</Radio.Button> 
+        */}
+      </Radio.Group>
     </div>
-  </fieldset>
-);
+  );
+};
 
-export default AssignToRadios;
+export default memo(AssignToRadios);

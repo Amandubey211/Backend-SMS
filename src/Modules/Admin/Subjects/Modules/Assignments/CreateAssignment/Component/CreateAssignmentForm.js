@@ -138,7 +138,7 @@ const CreateAssignmentForm = ({
       </div>
 
       {/* Chapter Selection */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <label className="block text-gray-700" htmlFor="chapterId">
           Chapter
         </label>
@@ -157,7 +157,7 @@ const CreateAssignmentForm = ({
             </option>
           ))}
         </select>
-      </div>
+      </div> */}
 
       {/* Grade Option */}
       <GradeOption
