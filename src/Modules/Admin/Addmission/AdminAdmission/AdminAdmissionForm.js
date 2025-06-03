@@ -95,6 +95,9 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         values.candidateInformation.contactNumber
       );
       formData.append("religion", values.candidateInformation.religion);
+      formData.append("nativeLanguage", values.candidateInformation.nativeLanguage);
+      formData.append("passportNumber", values.candidateInformation.passportNumber);
+      formData.append("idExpiry", values.candidateInformation.idExpiry);
       formData.append("bloodGroup", values.candidateInformation.bloodGroup);
       formData.append(
         "emergencyNumber",
@@ -167,12 +170,12 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         "idNumber",
         "idExpiry",
         "firstName",
-        "middleName ",
+        "middleName",
         "lastName",
         "religion",
         "nationality",
         "company",
-        "jobTitle ",
+        "jobTitle",
         "cell1",
         "cell2",
         "workPhone",
@@ -186,10 +189,8 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           formData.append(`fatherInfo[photo]`, values.fatherPhoto || "");
         }
         if (field === "cell1" || field === "cell2") {
-          formData.append(
-            `fatherInfo[${field}]`,
-            values.fatherInfo[field]?.value || ""
-          );
+          const phoneValue = values.fatherInfo[field] || "";
+          formData.append(`fatherInfo[${field}][value]`, phoneValue);
         } else {
           formData.append(
             `fatherInfo[${field}]`,
@@ -202,12 +203,12 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         "idNumber",
         "idExpiry",
         "firstName",
-        "middleName ",
+        "middleName",
         "lastName",
         "religion",
         "nationality",
         "company",
-        "jobTitle ",
+        "jobTitle",
         "cell1",
         "cell2",
         "workPhone",
@@ -221,10 +222,8 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
           formData.append(`motherInfo[photo]`, values.motherPhoto || "");
         }
         if (field === "cell1" || field === "cell2") {
-          formData.append(
-            `motherInfo[${field}]`,
-            values.motherInfo[field]?.value || ""
-          );
+          const phoneValue = values.motherInfo[field] || "";
+          formData.append(`motherInfo[${field}][value]`, phoneValue);
         } else {
           formData.append(
             `motherInfo[${field}]`,
@@ -279,7 +278,6 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       // Process both mandatory and optional attachments
       addDynamicAttachments(values.attachments?.mandatory);
       addDynamicAttachments(values.attachments?.optional);
-      console.log(formData, "formData");
 
       // Dispatch the register action
       await dispatch(

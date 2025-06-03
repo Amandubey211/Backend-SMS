@@ -131,6 +131,7 @@ export const registerStudentDetails = createAsyncThunk(
         navigate("/verify_students");
         return response;
       } else {
+        toast.error(response?.msg || "Failed to save student details.");
         return rejectWithValue(
           response?.msg || "Failed to save student details."
         );

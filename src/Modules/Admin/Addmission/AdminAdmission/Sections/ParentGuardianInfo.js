@@ -27,7 +27,7 @@ const ParentGuardianInfo = ({ form }) => {
           <Form.Item
             name={["fatherInfo", "fatherPhoto"]}
             label="Father Photo"
-            // rules={[{ required: true, message: "Father photo is required" }]}
+          // rules={[{ required: true, message: "Father photo is required" }]}
           >
             <CustomUploadCard
               name="fatherPhoto"
@@ -35,7 +35,7 @@ const ParentGuardianInfo = ({ form }) => {
               recommendedSize="300x400"
               width="w-full"
               height="h-52"
-              // required
+            // required
             />
           </Form.Item>
         </Col>
@@ -145,7 +145,15 @@ const ParentGuardianInfo = ({ form }) => {
                   { required: true, message: "Primary contact is required" },
                 ]}
               >
-                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+                <PhoneInput
+                  country="qa"
+                  inputStyle={{ width: "100%" }}
+                  onChange={(value) =>
+                    form.setFieldsValue({
+                      fatherInfo: { cell1: value },
+                    })
+                  }
+                />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
@@ -153,7 +161,15 @@ const ParentGuardianInfo = ({ form }) => {
                 name={["fatherInfo", "cell2"]}
                 label="Secondary Contact"
               >
-                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+                <PhoneInput
+                  country="qa"
+                  inputStyle={{ width: "100%" }}
+                  onChange={(value) =>
+                    form.setFieldsValue({
+                      fatherInfo: { cell2: value },
+                    })
+                  }
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -188,7 +204,7 @@ const ParentGuardianInfo = ({ form }) => {
           <Form.Item
             name={["motherInfo", "motherPhoto"]}
             label="Mother Photo"
-            // rules={[{ required: true, message: "Mother photo is required" }]}
+          // rules={[{ required: true, message: "Mother photo is required" }]}
           >
             <CustomUploadCard
               name="motherPhoto"
@@ -196,7 +212,7 @@ const ParentGuardianInfo = ({ form }) => {
               recommendedSize="300x400"
               width="w-full"
               height="h-52"
-              // required
+            // required
             />
           </Form.Item>
         </Col>
@@ -302,7 +318,15 @@ const ParentGuardianInfo = ({ form }) => {
                   { required: true, message: "Primary contact is required" },
                 ]}
               >
-                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+                <PhoneInput
+                  country="qa"
+                  inputStyle={{ width: "100%" }}
+                  onChange={(value) =>
+                    form.setFieldsValue({
+                      motherInfo: { cell1: value },
+                    })
+                  }
+                />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
@@ -310,7 +334,15 @@ const ParentGuardianInfo = ({ form }) => {
                 name={["motherInfo", "cell2"]}
                 label="Secondary Contact"
               >
-                <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
+                <PhoneInput
+                  country="qa"
+                  inputStyle={{ width: "100%" }}
+                  onChange={(value) =>
+                    form.setFieldsValue({
+                      motherInfo: { cell2: value },
+                    })
+                  }
+                />
               </Form.Item>
             </Col>
           </Row>

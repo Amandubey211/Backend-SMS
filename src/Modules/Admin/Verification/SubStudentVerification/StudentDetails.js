@@ -45,7 +45,7 @@ const StudentDetail = () => {
       console.error("Invalid URL:", url);
     }
   };
-
+  console.log("Student Details:", student);
   if (!student) {
     return <p className="text-center text-red-500">{t("Student not found")}</p>;
   }

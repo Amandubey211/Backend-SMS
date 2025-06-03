@@ -22,6 +22,7 @@ import {
   RELIGION_OPTIONS,
   bloodGroupOptions,
   CONTACT_TYPE_OPTIONS,
+  NATIVE_LANGUAGE_OPTIONS
 } from "../Configs/selectOptionsConfig";
 import LanguagePreferences from "./LanguagePreferences";
 import CustomUploadCard from "../../../../LoginPages/Student/SignUp/Components/CustomUploadCard";
@@ -104,7 +105,7 @@ const AcademicSessionCandidate = ({ form }) => {
               />
             </Form.Item>
 
-         
+
 
             {/* Moved Age right below DOB */}
             <Form.Item name={["candidateInformation", "age"]} label="Age">
@@ -126,7 +127,7 @@ const AcademicSessionCandidate = ({ form }) => {
                   <Input prefix={<UserOutlined />} placeholder="First Name" />
                 </Form.Item>
               </Col>
-            
+
               <Col xs={24} md={8}>
                 <Form.Item
                   name={["candidateInformation", "lastName"]}
@@ -135,44 +136,44 @@ const AcademicSessionCandidate = ({ form }) => {
                 >
                   <Input prefix={<UserOutlined />} placeholder="Last Name" />
                 </Form.Item>
-              </Col> 
-               <Col xs={24} md={8}>
-               <Form.Item
-              name={["candidateInformation", "dob"]}
-              label="Date of Birth"
-              rules={[
-                {
-                  required: true,
-                  message: "DOB is required",
-                },
-                () => ({
-                  validator(_, value) {
-                    if (!value) {
-                      return Promise.resolve();
-                    }
-                    const selectedDate = new Date(value);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item
+                  name={["candidateInformation", "dob"]}
+                  label="Date of Birth"
+                  rules={[
+                    {
+                      required: true,
+                      message: "DOB is required",
+                    },
+                    () => ({
+                      validator(_, value) {
+                        if (!value) {
+                          return Promise.resolve();
+                        }
+                        const selectedDate = new Date(value);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0); // Reset time part for accurate comparison
 
-                    if (selectedDate >= today) {
-                      return Promise.reject(
-                        new Error("Date of Birth must be in the past")
-                      );
-                    }
-                    return Promise.resolve();
-                  },
-                }),
-              ]}
-            >
-              <DatePicker
-                style={{ width: "100%" }}
-                suffixIcon={<CalendarOutlined />}
-                disabledDate={(current) => {
-                  // Disable dates that are today or in the future
-                  return current && current >= moment().startOf("day");
-                }}
-              />
-            </Form.Item>
+                        if (selectedDate >= today) {
+                          return Promise.reject(
+                            new Error("Date of Birth must be in the past")
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    }),
+                  ]}
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    suffixIcon={<CalendarOutlined />}
+                    disabledDate={(current) => {
+                      // Disable dates that are today or in the future
+                      return current && current >= moment().startOf("day");
+                    }}
+                  />
+                </Form.Item>
               </Col>
             </Row>
 
@@ -356,18 +357,18 @@ const AcademicSessionCandidate = ({ form }) => {
               </Col>
               <Col xs={24} md={8}>
                 <Form.Item
-                  name={["candidateInformation", "primaryContactType"]}
-                  label="Primary Contact Type"
+                  name={["candidateInformation", "nativeLanguage"]}
+                  label="Select Native Language"
                   rules={[
-                    { required: true, message: "Contact type is required" },
+                    { required: true, message: "Native Language is required" },
                   ]}
                 >
                   <Select
                     placeholder="Select Type"
-                    suffixIcon={<ContactsOutlined />}
+                    suffixIcon={<GlobalOutlined />}
                   >
-                    {CONTACT_TYPE_OPTIONS.map((opt) => (
-                      <Option key={opt.value} value={opt.value}>
+                    {NATIVE_LANGUAGE_OPTIONS.map((opt) => (
+                      <Option key={opt.value} value={opt.label}>
                         {opt.label}
                       </Option>
                     ))}
@@ -403,7 +404,7 @@ const AcademicSessionCandidate = ({ form }) => {
               <Col xs={24} md={8}>
                 {" "}
                 <Form.Item
-                  name={["candidateInformation", "emergencyContactNumber"]}
+                  name={["candidateInformation", "emergencyNumber"]}
                   label="Emergency Contact"
                   rules={[
                     {
