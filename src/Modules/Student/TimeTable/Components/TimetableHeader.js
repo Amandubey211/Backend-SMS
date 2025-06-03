@@ -99,14 +99,18 @@ const TimetableContainer = () => {
   const t = (text) => text;
 
   // Fetch timetable data for the logged-in student on component mount
-  useEffect(async() => {
-    if (!userDetails?.userId) {
-      message.error("User ID not found");
-      return;
+  useEffect(() => {
+    const fetchTimetable = async () => {
+
+      if (!userDetails?.userId) {
+        message.error("User ID not found");
+        return;
+      }
+      // console.log("Fetching student timetable for user ID:", userDetails.userId);
+      const response = await dispatch(fetchStudentTimetable())
+      console.log("Timetable fetch response:", response);
     }
-    // console.log("Fetching student timetable for user ID:", userDetails.userId);
-    const response = await dispatch(fetchStudentTimetable())
-    console.log("Timetable fetch response:", response);
+    fetchTimetable();
   }, [dispatch, userDetails]);
 
   // Export Handler Setup
