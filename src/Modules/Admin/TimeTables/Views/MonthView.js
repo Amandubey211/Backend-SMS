@@ -105,8 +105,8 @@ export default function MonthView({
 
 function getColorByType(type) {
   switch (type) {
-    case "weekly":
-      return "#FF99CC";
+    // case "weekly":
+    //   return "#FF99CC";
     case "exam":
       return "#29ABE2";
     case "event":

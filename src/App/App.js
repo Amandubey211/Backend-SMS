@@ -468,6 +468,8 @@ const RoleSelector = lazy(() =>
 const Health = lazy(() => import("../Modules/Admin/Health/Health.js"));
 
 const ScoreCard = lazy(() => import("../Modules/Admin/ScoreCard/ScoreCard.js"));
+// Report Card
+const ReportCard = lazy(() => import("../Modules/Student/Dashboard/DashBoardComponents/ReportCard/SRCLayout.js"));
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
@@ -1882,6 +1884,17 @@ function App() {
       ),
       errorElement: <Error />,
     },
+    // Added Report Card Feature for students
+    {
+      path: '/student_reportcard',
+      element: (
+        <ProtectRoute
+          Component={ReportCard}
+          allowedRoles={["student"]}
+        />
+      ),
+      errorElement: <Error />,
+    }
   ]);
 
   return (

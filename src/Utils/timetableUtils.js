@@ -21,8 +21,8 @@ class ExportFunctions {
   }
   getColorByType(type) {
     switch (type) {
-      case "weekly":
-        return "#FF99CC"; // from TIMETABLE_TYPES
+      // case "weekly":
+      //   return "#FF99CC"; // from TIMETABLE_TYPES
       case "exam":
         return "#29ABE2";
       case "event":
@@ -36,8 +36,8 @@ class ExportFunctions {
 
   getLightColorByType(type) {
     switch (type) {
-      case "weekly":
-        return "rgba(255,153,204,0.2)";
+      // case "weekly":
+      //   return "rgba(255,153,204,0.2)";
       case "exam":
         return "rgba(41,171,226,0.2)";
       case "event":
@@ -51,16 +51,18 @@ class ExportFunctions {
 
   getChartData() {
     return {
-      labels: ["Weekly", "Exam", "Event", "Others"],
+      // labels: ["Weekly", "Exam", "Event", "Others"],
+      labels: ["Exam", "Event", "Others"],
       datasets: [
         {
           data: [
-            this.filteredTimetables.filter((t) => t?.type === "weekly").length,
+            // this.filteredTimetables.filter((t) => t?.type === "weekly").length,
             this.filteredTimetables.filter((t) => t?.type === "exam").length,
             this.filteredTimetables.filter((t) => t?.type === "event").length,
             this.filteredTimetables.filter((t) => t?.type === "others").length,
           ],
-          backgroundColor: ["#FF99CC", "#29ABE2", "#77DD77", "#FFD700"],
+          // backgroundColor: ["#FF99CC", "#29ABE2", "#77DD77", "#FFD700"],
+          backgroundColor: ["#29ABE2", "#77DD77", "#FFD700"],
           borderColor: "#fff",
           borderWidth: 2,
           hoverOffset: 20,
@@ -344,7 +346,7 @@ class ExportFunctions {
                 (d) =>
                   (d.date &&
                     this.format(new Date(d.date), "yyyy-MM-dd") ===
-                      dayString) ||
+                    dayString) ||
                   (tt.type === "weekly" &&
                     d.day === this.format(this.selectedDate, "EEEE") &&
                     this.isWithinValidity(tt, this.selectedDate))
@@ -488,45 +490,41 @@ class ExportFunctions {
           </thead>
           <tbody>
             ${this.filteredTimetables
-              .flatMap((timetable) =>
-                timetable.days.flatMap(
-                  (day) =>
-                    day.slots?.map(
-                      (slot) => `
+          .flatMap((timetable) =>
+            timetable.days.flatMap(
+              (day) =>
+                day.slots?.map(
+                  (slot) => `
                     <tr style="background-color: ${this.getLightColorByType(
-                      timetable.type
-                    )}; color: ${this.getColorByType(timetable.type)}">
-                      <td>${
-                        day.date
-                          ? this.format(new Date(day.date), "dd MMM")
-                          : "Weekly"
-                      }</td>
-                      <td>${
-                        day.day ||
-                        (day.date
-                          ? this.format(new Date(day.date), "EEE")
-                          : "Weekly")
-                      }</td>
+                    timetable.type
+                  )}; color: ${this.getColorByType(timetable.type)}">
+                      <td>${day.date
+                      ? this.format(new Date(day.date), "dd MMM")
+                      : "Weekly"
+                    }</td>
+                      <td>${day.day ||
+                    (day.date
+                      ? this.format(new Date(day.date), "EEE")
+                      : "Weekly")
+                    }</td>
                       <td><span class="type-indicator" style="background-color: ${this.getColorByType(
-                        timetable.type
-                      )}"></span>${
-                        timetable.type.charAt(0).toUpperCase() +
-                        timetable.type.slice(1)
-                      }</td>
+                      timetable.type
+                    )}"></span>${timetable.type.charAt(0).toUpperCase() +
+                    timetable.type.slice(1)
+                    }</td>
                       <td>${timetable.name || "N/A"}</td>
                       <td>${this.dayjs(slot.startTime).format(
-                        "hh:mm A"
-                      )} - ${this.dayjs(slot.endTime).format("hh:mm A")}</td>
-                      <td>${
-                        slot.subjectId?.name || slot.eventName || "N/A"
-                      }</td>
+                      "hh:mm A"
+                    )} - ${this.dayjs(slot.endTime).format("hh:mm A")}</td>
+                      <td>${slot.subjectId?.name || slot.eventName || "N/A"
+                    }</td>
                       <td>${slot.teacherId?.name || "N/A"}</td>
                     </tr>
                   `
-                    ) || []
-                )
-              )
-              .join("")}
+                ) || []
+            )
+          )
+          .join("")}
           </tbody>
         </table>
       `;
@@ -557,82 +555,78 @@ class ExportFunctions {
           </thead>
           <tbody>
             ${daysInWeek
-              .flatMap((day) => {
-                const dayString = this.format(day, "yyyy-MM-dd");
-                return this.filteredTimetables.flatMap((tt) => {
-                  if (tt.type === "weekly") {
-                    if (!this.isWithinValidity(tt, day)) return [];
-                    return (
-                      tt.days
-                        ?.filter((d) => d.day === this.format(day, "EEEE"))
-                        .flatMap((d) =>
-                          d.slots?.map(
-                            (slot) => `
+          .flatMap((day) => {
+            const dayString = this.format(day, "yyyy-MM-dd");
+            return this.filteredTimetables.flatMap((tt) => {
+              if (tt.type === "weekly") {
+                if (!this.isWithinValidity(tt, day)) return [];
+                return (
+                  tt.days
+                    ?.filter((d) => d.day === this.format(day, "EEEE"))
+                    .flatMap((d) =>
+                      d.slots?.map(
+                        (slot) => `
                           <tr style="background-color: ${this.getLightColorByType(
-                            tt.type
-                          )}; color: ${this.getColorByType(tt.type)}">
+                          tt.type
+                        )}; color: ${this.getColorByType(tt.type)}">
                             <td>${this.format(day, "EEE")}</td>
                             <td>${this.format(day, "dd MMM")}</td>
                             <td>${this.dayjs(slot.startTime).format(
-                              "hh:mm A"
-                            )} - ${this.dayjs(slot.endTime).format(
-                              "hh:mm A"
-                            )}</td>
+                          "hh:mm A"
+                        )} - ${this.dayjs(slot.endTime).format(
+                          "hh:mm A"
+                        )}</td>
                             <td><span class="type-indicator" style="background-color: ${this.getColorByType(
-                              tt.type
-                            )}"></span>${
-                              tt.type.charAt(0).toUpperCase() + tt.type.slice(1)
-                            }</td>
+                          tt.type
+                        )}"></span>${tt.type.charAt(0).toUpperCase() + tt.type.slice(1)
+                          }</td>
                             <td>${tt.name || "N/A"}</td>
-                            <td>${
-                              slot.subjectId?.name || slot.eventName || "N/A"
-                            }</td>
+                            <td>${slot.subjectId?.name || slot.eventName || "N/A"
+                          }</td>
                             <td>${slot.teacherId?.name || "N/A"}</td>
                           </tr>
                         `
-                          )
-                        ) || []
-                    );
-                  }
-                  return (
-                    tt.days
-                      ?.filter(
-                        (d) =>
-                          d.date &&
-                          this.format(new Date(d.date), "yyyy-MM-dd") ===
-                            dayString
                       )
-                      .flatMap((d) =>
-                        d.slots?.map(
-                          (slot) => `
+                    ) || []
+                );
+              }
+              return (
+                tt.days
+                  ?.filter(
+                    (d) =>
+                      d.date &&
+                      this.format(new Date(d.date), "yyyy-MM-dd") ===
+                      dayString
+                  )
+                  .flatMap((d) =>
+                    d.slots?.map(
+                      (slot) => `
                         <tr style="background-color: ${this.getLightColorByType(
-                          tt.type
-                        )}; color: ${this.getColorByType(tt.type)}">
+                        tt.type
+                      )}; color: ${this.getColorByType(tt.type)}">
                           <td>${this.format(day, "EEE")}</td>
                           <td>${this.format(day, "dd MMM")}</td>
                           <td>${this.dayjs(slot.startTime).format(
-                            "hh:mm A"
-                          )} - ${this.dayjs(slot.endTime).format(
-                            "hh:mm A"
-                          )}</td>
+                        "hh:mm A"
+                      )} - ${this.dayjs(slot.endTime).format(
+                        "hh:mm A"
+                      )}</td>
                           <td><span class="type-indicator" style="background-color: ${this.getColorByType(
-                            tt.type
-                          )}"></span>${
-                            tt.type.charAt(0).toUpperCase() + tt.type.slice(1)
-                          }</td>
+                        tt.type
+                      )}"></span>${tt.type.charAt(0).toUpperCase() + tt.type.slice(1)
+                        }</td>
                           <td>${tt.name || "N/A"}</td>
-                          <td>${
-                            slot.subjectId?.name || slot.eventName || "N/A"
-                          }</td>
+                          <td>${slot.subjectId?.name || slot.eventName || "N/A"
+                        }</td>
                           <td>${slot.teacherId?.name || "N/A"}</td>
                         </tr>
                       `
-                        )
-                      ) || []
-                  );
-                });
-              })
-              .join("")}
+                    )
+                  ) || []
+              );
+            });
+          })
+          .join("")}
           </tbody>
         </table>
       `;
@@ -652,55 +646,53 @@ class ExportFunctions {
           </thead>
           <tbody>
             ${this.filteredTimetables
-              .flatMap((tt) => {
-                const filteredDays =
-                  tt.days?.filter(
-                    (d) =>
-                      (d.date &&
-                        this.format(new Date(d.date), "yyyy-MM-dd") ===
-                          dayString) ||
-                      (tt.type === "weekly" &&
-                        d.day === this.format(this.selectedDate, "EEEE") &&
-                        this.isWithinValidity(tt, this.selectedDate))
-                  ) || [];
+          .flatMap((tt) => {
+            const filteredDays =
+              tt.days?.filter(
+                (d) =>
+                  (d.date &&
+                    this.format(new Date(d.date), "yyyy-MM-dd") ===
+                    dayString) ||
+                  (tt.type === "weekly" &&
+                    d.day === this.format(this.selectedDate, "EEEE") &&
+                    this.isWithinValidity(tt, this.selectedDate))
+              ) || [];
 
-                return filteredDays.flatMap(
-                  (d) =>
-                    d.slots?.map(
-                      (slot) => `
+            return filteredDays.flatMap(
+              (d) =>
+                d.slots?.map(
+                  (slot) => `
                       <tr style="background-color: ${this.getLightColorByType(
-                        tt.type
-                      )}; color: ${this.getColorByType(tt.type)}">
+                    tt.type
+                  )}; color: ${this.getColorByType(tt.type)}">
                         <td>${this.dayjs(slot.startTime).format(
-                          "hh:mm A"
-                        )} - ${this.dayjs(slot.endTime).format("hh:mm A")}</td>
+                    "hh:mm A"
+                  )} - ${this.dayjs(slot.endTime).format("hh:mm A")}</td>
                         <td><span class="type-indicator" style="background-color: ${this.getColorByType(
-                          tt.type
-                        )}"></span>${
-                        tt.type.charAt(0).toUpperCase() + tt.type.slice(1)
-                      }</td>
+                    tt.type
+                  )}"></span>${tt.type.charAt(0).toUpperCase() + tt.type.slice(1)
+                    }</td>
                         <td>${tt.name || "N/A"}</td>
-                        <td>${
-                          slot.subjectId?.name || slot.eventName || "N/A"
-                        }</td>
+                        <td>${slot.subjectId?.name || slot.eventName || "N/A"
+                    }</td>
                         <td>${slot.teacherId?.name || "N/A"}</td>
                       </tr>
                     `
-                    ) || []
-                );
-              })
-              .sort((a, b) => {
-                const aTime =
-                  a.match(
-                    /<td>(\d{2}:\d{2} [AP]M) - \d{2}:\d{2} [AP]M<\/td>/
-                  )?.[1] || "";
-                const bTime =
-                  b.match(
-                    /<td>(\d{2}:\d{2} [AP]M) - \d{2}:\d{2} [AP]M<\/td>/
-                  )?.[1] || "";
-                return aTime.localeCompare(bTime);
-              })
-              .join("")}
+                ) || []
+            );
+          })
+          .sort((a, b) => {
+            const aTime =
+              a.match(
+                /<td>(\d{2}:\d{2} [AP]M) - \d{2}:\d{2} [AP]M<\/td>/
+              )?.[1] || "";
+            const bTime =
+              b.match(
+                /<td>(\d{2}:\d{2} [AP]M) - \d{2}:\d{2} [AP]M<\/td>/
+              )?.[1] || "";
+            return aTime.localeCompare(bTime);
+          })
+          .join("")}
           </tbody>
         </table>
       `;
@@ -802,9 +794,9 @@ class ExportFunctions {
             <h1>${title}</h1>
             <p>${subtitle}</p>
             <p>Generated on: ${this.format(
-              new Date(),
-              "MMM dd, yyyy hh:mm a"
-            )}</p>
+      new Date(),
+      "MMM dd, yyyy hh:mm a"
+    )}</p>
           </div>
           
           ${content}
@@ -839,10 +831,10 @@ function hexToRgb(hex) {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? [
-        parseInt(result[1], 16),
-        parseInt(result[2], 16),
-        parseInt(result[3], 16),
-      ]
+      parseInt(result[1], 16),
+      parseInt(result[2], 16),
+      parseInt(result[3], 16),
+    ]
     : [0, 0, 0];
 }
 

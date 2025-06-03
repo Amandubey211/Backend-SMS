@@ -18,15 +18,12 @@ import TimetableHeader from "./Components/TimetableHeader";
 import TimetableViews from "./Components/TimetableViews";
 import StatsSidebar from "./Components/StatsSidebar";
 import TimetableDetailsDrawer from "./Components/TimetableDetailsDrawer";
-import { Select } from 'antd';
 
 // Constants and Utilities
 import ExportFunctions from "../../../Utils/timetableUtils";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import { TIMETABLE_TYPES } from "./Components/constants";
-import ClassTimeTable from "../../Admin/TimeTables/AutomaticTimeTable/components/ClassTimeTable";
-import AscTimeTableView from "./Components/AscTimeTableView";
-const { Option } = Select;
+
 const StudentTimetablePage = () => {
   const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
@@ -43,7 +40,6 @@ const StudentTimetablePage = () => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
   const [detailsTimetable, setDetailsTimetable] = useState(null);
   const [selectedChildId, setSelectedChildId] = useState(null);
-  const [selectedTimeTable, setSelectedTimeTable] = useState("classTimeTable")
 
   // Redux selectors for data
   const { children = [], loading: loadingChildren } = useSelector(
@@ -112,43 +108,14 @@ const StudentTimetablePage = () => {
     return { classId: null, sectionId: null };
   };
 
-  const { classId, sectionId } = getFilterInfo();
 
-  /**
-   * Filters timetables based on selected filters
-   * @type {Array}
-   */
-  const filteredTimetables = useMemo(() => {
-    let result = timetables || [];
 
-    // Filter by type if selected
-    if (filterType) result = result?.filter((tt) => tt.type === filterType);
-
-    // Filter by class
-    if (classId) {
-      result = result.filter((tt) => tt.classId?._id === classId);
-    }
-
-    // Filter by section if available
-    if (sectionId) {
-      result = result.filter((tt) => {
-        if (!tt.sectionId || tt.sectionId.length === 0) return true;
-        return tt.sectionId.some((section) =>
-          typeof section === "object"
-            ? section._id === sectionId
-            : section === sectionId
-        );
-      });
-    }
-
-    return result;
-  }, [timetables, filterType, classId, sectionId]);
 
   // Initialize export utilities
   const exportFunctions = new ExportFunctions({
     viewMode,
     selectedDate,
-    filteredTimetables,
+    timetables,
     format,
     dayjs,
     isWithinValidity: (timetable, date) => {
@@ -181,6 +148,7 @@ const StudentTimetablePage = () => {
   // Get the appropriate dashboard layout based on role
   const DashboardLayout =
     role === "student" ? StudentDashLayout : ParentDashLayout;
+
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashboardLayout>
@@ -200,22 +168,6 @@ const StudentTimetablePage = () => {
               />
             )}
 
-            <div className="my-6 flex justify-end">
-              <Select
-                style={{ width: 150 }}
-                onChange={setSelectedTimeTable}
-                placeholder="Select Section"
-                value={selectedTimeTable}
-              >
-                <Option value="classTimeTable">
-                  Class TimeTable
-                </Option>
-                <Option value="others">
-                  Others
-                </Option>
-              </Select>
-            </div>
-
             {/* Header and Controls */}
             <TimetableHeader
               sidebarCollapsed={sidebarCollapsed}
@@ -229,23 +181,17 @@ const StudentTimetablePage = () => {
             />
 
             {/* Timetable Views */}
-            {
-              selectedTimeTable === 'classTimeTable' ?
-                <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
-                <TimetableViews
-                  loadingFetch={loadingFetch}
-                  loadingChildren={loadingChildren}
-                  role={role}
-                  viewMode={viewMode}
-                  selectedDate={selectedDate}
-                  filteredTimetables={filteredTimetables}
-                  onEventClick={onEventClick}
-                  setSelectedDate={setSelectedDate}
-                  t={t}
-                />
-
-            }
-
+            {/* <TimetableViews
+              loadingFetch={loadingFetch}
+              loadingChildren={loadingChildren}
+              role={role}
+              viewMode={viewMode}
+              selectedDate={selectedDate}
+              filteredTimetables={filteredTimetables}
+              onEventClick={onEventClick}
+              setSelectedDate={setSelectedDate}
+              t={t}
+            /> */}
           </div>
 
           {/* Stats Sidebar */}
@@ -254,7 +200,7 @@ const StudentTimetablePage = () => {
               loadingFetch={loadingFetch}
               loadingChildren={loadingChildren}
               role={role}
-              filteredTimetables={filteredTimetables}
+              filteredTimetables={timetables}
               TIMETABLE_TYPES={TIMETABLE_TYPES}
               filterType={filterType}
               setFilterType={setFilterType}

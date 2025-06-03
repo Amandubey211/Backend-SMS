@@ -93,7 +93,7 @@ export default function TimeTableDash() {
   // --------------------------
   // Local States
   // --------------------------
-  const [activeTab, setActiveTab] = useState("list");
+  const [activeTab, setActiveTab] = useState("autoCalendar");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -469,8 +469,8 @@ export default function TimeTableDash() {
   // --------------------------
   function getTypeTag(type) {
     switch (type) {
-      case "weekly":
-        return <Tag color="pink">Weekly</Tag>;
+      // case "weekly":
+      //   return <Tag color="pink">Weekly</Tag>;
       case "exam":
         return <Tag color="blue">Exams</Tag>;
       case "event":
@@ -625,7 +625,7 @@ export default function TimeTableDash() {
       ),
     },
   ];
-
+  //  console.log("TimeTable", timetables);
   // When loading, show skeleton with matching columns
   const skeletonColumns = listColumns.map((col) => ({
     ...col,
@@ -679,9 +679,9 @@ export default function TimeTableDash() {
             {/* Tabs */}
             <div className="flex items-center gap-2 flex-wrap">
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
-                <Tabs.TabPane key="list" tab={<span>List View</span>} />
-                <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} />
                 <Tabs.TabPane key="autoCalendar" tab="ASC TimeTable" />
+                <Tabs.TabPane key="list" tab={<span>Other TimeTables</span>} />
+                <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} />
               </Tabs>
             </div>
 

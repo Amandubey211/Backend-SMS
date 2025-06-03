@@ -8,13 +8,13 @@ import {
 
 // Configuration for timetable types
 const TIMETABLE_TYPES = [
-  {
-    type: "weekly",
-    label: "Weekly",
-    icon: <CalendarOutlined />,
-    color: "#FF99CC",
-    bgColor: "rgba(255,153,204,0.2)",
-  },
+  // {
+  //   type: "weekly",
+  //   label: "Weekly",
+  //   icon: <CalendarOutlined />,
+  //   color: "#FF99CC",
+  //   bgColor: "rgba(255,153,204,0.2)",
+  // },
   {
     type: "exam",
     label: "Exams",
@@ -50,9 +50,8 @@ export default function StatsSection({ counts, onTypeClick, activeType }) {
           return (
             <Card
               key={stat.type}
-              className={`cursor-pointer transition-all ${
-                isActive ? "ring-2 ring-offset-4" : ""
-              }`}
+              className={`cursor-pointer transition-all ${isActive ? "ring-2 ring-offset-4" : ""
+                }`}
               style={{
                 borderLeft: `4px solid ${stat.color}`,
                 transform: isActive ? "scale(1.02)" : "scale(1)",

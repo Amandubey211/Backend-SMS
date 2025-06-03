@@ -3,7 +3,8 @@ import { TbDashboard } from "react-icons/tb";
 import { RiGraduationCapLine } from "react-icons/ri";
 import { HiOutlineCalculator } from "react-icons/hi2";
 import { MdLocalLibrary, MdOutlineNotificationsActive } from "react-icons/md";
-import { FaClipboardList, FaBook } from "react-icons/fa";
+// import { FaClipboardList, FaBook } from "react-icons/fa";
+import { TbReportAnalytics } from "react-icons/tb";
 import { LiaClipboardListSolid } from "react-icons/lia";
 import { FcAdvertising } from "react-icons/fc";
 import { ImTable2 } from "react-icons/im";
@@ -50,6 +51,11 @@ const sidebarData = [
       },
     ],
   },
+  {
+    title:"My Report Card",
+    icon: <TbReportAnalytics />,
+    path: "/student_reportcard",
+  }
 ];
 
 export default sidebarData;
