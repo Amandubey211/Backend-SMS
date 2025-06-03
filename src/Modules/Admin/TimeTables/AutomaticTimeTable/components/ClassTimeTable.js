@@ -84,9 +84,13 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
     return 'bg-white';
   };
 
-  const data = ascClassTimeTableData || {};
+  const AllData = ascClassTimeTableData || [];
 
-  return (<> {data?.startTime ?<div className="p-4">
+  return (
+  <> 
+  {AllData?.length >= 1 ?
+  AllData.map((data)=>(
+      <div className="p-4">
       <div className="flex justify-between items-center mb-6">
         <div>
           <p className="text-gray-600">
@@ -169,7 +173,9 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
           Type={data.type || 'automatic'}
         />
       </Drawer>
-    </div>:<div className="flex items-center justify-center w-full h-full">
+    </div>
+  ))
+:<div className="flex items-center justify-center w-full h-full">
       <div className="p-8 rounded-lg flex flex-col items-center">
         <span className="text-6xl mb-4">📜</span>
         <p className="text-lg font-medium text-gray-700">TimeTable Not Available</p>
