@@ -107,7 +107,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                         {it?.subjectName || '-'}
                       </td>
                       <td
-                        className={border px-4 py-2 text-center ${getColorForTeachers(it?.teacherName)}}
+                        className={`border px-4 py-2 text-center ${getColorForTeachers(it?.teacherName)}`}
                       >
                         {it?.teacherName || 'Not Assigned'}
                       </td>
