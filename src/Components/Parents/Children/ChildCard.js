@@ -21,6 +21,7 @@ export const ChildCard = ({ student, onOpenHealthSidebar,handleOpenReportCardMod
     profile = profileIcon,
     classId
   } = student || {};
+  console.log(student)
 
   return (
     <>

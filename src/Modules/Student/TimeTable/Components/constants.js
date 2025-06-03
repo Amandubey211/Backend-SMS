@@ -8,13 +8,13 @@ import {
  * Constants for timetable types and their configurations
  */
 export const TIMETABLE_TYPES = [
-  {
-    type: "weekly",
-    label: "Weekly",
-    color: "#FF99CC",
-    bgColor: "rgba(255,153,204,0.2)",
-    icon: <CalendarOutlined className="text-lg" />,
-  },
+  // {
+  //   type: "weekly",
+  //   label: "Weekly",
+  //   color: "#FF99CC",
+  //   bgColor: "rgba(255,153,204,0.2)",
+  //   icon: <CalendarOutlined className="text-lg" />,
+  // },
   {
     type: "exam",
     label: "Exams",

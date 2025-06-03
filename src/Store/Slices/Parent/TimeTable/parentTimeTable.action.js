@@ -19,3 +19,17 @@ export const fetchParentTimetable = createAsyncThunk(
     }
   }
 );
+export const fetchAscTimetable = createAsyncThunk(
+  "parentTimetable/fetchAscTimetable",
+  async (data, { rejectWithValue, getState, dispatch }) => {
+    try {
+      const say = getAY();
+      dispatch(setShowError(false));
+      const response = await getData(`/parent/api/asctimetable?say=${say}`,data);
+      // console.log('API Response:', response);  // Log the response to verify structure
+      return response ; 
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);

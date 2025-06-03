@@ -146,6 +146,7 @@ const TimeTableMainSection = () => {
       /> */}
 
       {/* Display the filtered list of timetables */}
+
       <StudentTimeTableList
         timetables={filteredTimetables}
         loading={loadingFetch || classLoading}

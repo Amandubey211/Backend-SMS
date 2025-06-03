@@ -18,12 +18,15 @@ import TimetableHeader from "./Components/TimetableHeader";
 import TimetableViews from "./Components/TimetableViews";
 import StatsSidebar from "./Components/StatsSidebar";
 import TimetableDetailsDrawer from "./Components/TimetableDetailsDrawer";
+import { Select } from 'antd';
 
 // Constants and Utilities
 import ExportFunctions from "../../../Utils/timetableUtils";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import { TIMETABLE_TYPES } from "./Components/constants";
-
+import ClassTimeTable from "../../Admin/TimeTables/AutomaticTimeTable/components/ClassTimeTable";
+import AscTimeTableView from "./Components/AscTimeTableView";
+const { Option } = Select;
 const StudentTimetablePage = () => {
   const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
@@ -40,6 +43,7 @@ const StudentTimetablePage = () => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
   const [detailsTimetable, setDetailsTimetable] = useState(null);
   const [selectedChildId, setSelectedChildId] = useState(null);
+  const [selectedTimeTable, setSelectedTimeTable] = useState("classTimeTable")
 
   // Redux selectors for data
   const { children = [], loading: loadingChildren } = useSelector(
@@ -57,8 +61,8 @@ const StudentTimetablePage = () => {
     role === "student"
       ? studentTimetableData
       : role === "parent"
-      ? parentTimetableData
-      : { timetables: [], loading: false };
+        ? parentTimetableData
+        : { timetables: [], loading: false };
 
   // Set navigation heading
   useNavHeading(role, t("TimeTable"));
@@ -177,16 +181,14 @@ const StudentTimetablePage = () => {
   // Get the appropriate dashboard layout based on role
   const DashboardLayout =
     role === "student" ? StudentDashLayout : ParentDashLayout;
-
   return (
     <Layout title="TimeTable | Student Diwan">
       <DashboardLayout>
         <div className="w-full min-h-screen flex">
           {/* Main Content */}
           <div
-            className={`flex-1 p-4 transition-all ${
-              sidebarCollapsed ? "mr-0" : "mr-72"
-            }`}
+            className={`flex-1 p-4 transition-all ${sidebarCollapsed ? "mr-0" : "mr-72"
+              }`}
           >
             {/* Children selector for parent role */}
             {role === "parent" && (
@@ -197,6 +199,22 @@ const StudentTimetablePage = () => {
                 t={t}
               />
             )}
+
+            <div className="my-6 flex justify-end">
+              <Select
+                style={{ width: 150 }}
+                onChange={setSelectedTimeTable}
+                placeholder="Select Section"
+                value={selectedTimeTable}
+              >
+                <Option value="classTimeTable">
+                  Class TimeTable
+                </Option>
+                <Option value="others">
+                  Others
+                </Option>
+              </Select>
+            </div>
 
             {/* Header and Controls */}
             <TimetableHeader
@@ -211,17 +229,23 @@ const StudentTimetablePage = () => {
             />
 
             {/* Timetable Views */}
-            <TimetableViews
-              loadingFetch={loadingFetch}
-              loadingChildren={loadingChildren}
-              role={role}
-              viewMode={viewMode}
-              selectedDate={selectedDate}
-              filteredTimetables={filteredTimetables}
-              onEventClick={onEventClick}
-              setSelectedDate={setSelectedDate}
-              t={t}
-            />
+            {
+              selectedTimeTable === 'classTimeTable' ?
+                <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
+                <TimetableViews
+                  loadingFetch={loadingFetch}
+                  loadingChildren={loadingChildren}
+                  role={role}
+                  viewMode={viewMode}
+                  selectedDate={selectedDate}
+                  filteredTimetables={filteredTimetables}
+                  onEventClick={onEventClick}
+                  setSelectedDate={setSelectedDate}
+                  t={t}
+                />
+
+            }
+
           </div>
 
           {/* Stats Sidebar */}
