@@ -23,6 +23,9 @@ import TimetableDetailsDrawer from "./Components/TimetableDetailsDrawer";
 import ExportFunctions from "../../../Utils/timetableUtils";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import { TIMETABLE_TYPES } from "./Components/constants";
+import { Select } from 'antd';
+import AscTimeTableView from "./Components/AscTimeTableView";
+const { Option } = Select;
 
 const StudentTimetablePage = () => {
   const { t } = useTranslation("admTimeTable");
@@ -40,6 +43,7 @@ const StudentTimetablePage = () => {
   const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
   const [detailsTimetable, setDetailsTimetable] = useState(null);
   const [selectedChildId, setSelectedChildId] = useState(null);
+  const [selectedTimeTable, setSelectedTimeTable] = useState("classTimeTable")
 
   // Redux selectors for data
   const { children = [], loading: loadingChildren } = useSelector(
@@ -108,8 +112,33 @@ const StudentTimetablePage = () => {
     return { classId: null, sectionId: null };
   };
 
+  const { classId, sectionId } = getFilterInfo();
 
+  const filteredTimetables = useMemo(() => {
+    let result = timetables || [];
 
+    // Filter by type if selected
+    if (filterType) result = result?.filter((tt) => tt.type === filterType);
+
+    // Filter by class
+    if (classId) {
+      result = result.filter((tt) => tt.classId?._id === classId);
+    }
+
+    // Filter by section if available
+    if (sectionId) {
+      result = result.filter((tt) => {
+        if (!tt.sectionId || tt.sectionId.length === 0) return true;
+        return tt.sectionId.some((section) =>
+          typeof section === "object"
+            ? section._id === sectionId
+            : section === sectionId
+        );
+      });
+    }
+
+    return result;
+  }, [timetables, filterType, classId, sectionId]);
 
   // Initialize export utilities
   const exportFunctions = new ExportFunctions({
@@ -169,29 +198,54 @@ const StudentTimetablePage = () => {
             )}
 
             {/* Header and Controls */}
-            <TimetableHeader
-              sidebarCollapsed={sidebarCollapsed}
-              setSidebarCollapsed={setSidebarCollapsed}
-              viewMode={viewMode}
-              setViewMode={setViewMode}
-              exportFunctions={exportFunctions}
-              selectedDate={selectedDate}
-              setSelectedDate={setSelectedDate}
-              t={t}
-            />
+            {
+              role === "student" && <TimetableHeader
+                sidebarCollapsed={sidebarCollapsed}
+                setSidebarCollapsed={setSidebarCollapsed}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+                exportFunctions={exportFunctions}
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                t={t}
+              />
+            }
+            {
+              role === "parent" && <div className="my-6 flex justify-end">
+                <Select
+                  style={{ width: 150 }}
+                  onChange={setSelectedTimeTable}
+                  placeholder="Select Section"
+                  value={selectedTimeTable}
+                >
+                  <Option value="classTimeTable">
+                    Class TimeTable
+                  </Option>
+                  <Option value="others">
+                    Others
+                  </Option>
+                </Select>
+              </div>
+            }
 
             {/* Timetable Views */}
-            {/* <TimetableViews
-              loadingFetch={loadingFetch}
-              loadingChildren={loadingChildren}
-              role={role}
-              viewMode={viewMode}
-              selectedDate={selectedDate}
-              filteredTimetables={filteredTimetables}
-              onEventClick={onEventClick}
-              setSelectedDate={setSelectedDate}
-              t={t}
-            /> */}
+            {
+              selectedTimeTable === 'classTimeTable' ?
+                <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
+                <TimetableViews
+                  loadingFetch={loadingFetch}
+                  loadingChildren={loadingChildren}
+                  role={role}
+                  viewMode={viewMode}
+                  selectedDate={selectedDate}
+                  filteredTimetables={filteredTimetables}
+                  onEventClick={onEventClick}
+                  setSelectedDate={setSelectedDate}
+                  t={t}
+                />
+            }
+
+
           </div>
 
           {/* Stats Sidebar */}

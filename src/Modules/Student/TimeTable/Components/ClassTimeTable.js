@@ -112,6 +112,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                         {it?.teacherName || 'Not Assigned'}
                       </td>
                     </tr>
+                  
                   ))
                 ) : (
                   <tr>
