@@ -92,9 +92,8 @@ const StatsSidebar = ({
             return (
               <Card
                 key={stat.type}
-                className={`cursor-pointer transition-all ${
-                  filterType === stat.type ? "ring-2 ring-offset-4" : ""
-                }`}
+                className={`cursor-pointer transition-all ${filterType === stat.type ? "ring-2 ring-offset-4" : ""
+                  }`}
                 style={{
                   borderLeft: `4px solid ${stat.color}`,
                   transform:
@@ -158,8 +157,8 @@ const StatsSidebar = ({
             {role === "student"
               ? t("Your Schedule Info")
               : selectedChildId
-              ? t("Child's Schedule Info")
-              : t("Schedule Info")}
+                ? t("Child's Schedule Info")
+                : t("Schedule Info")}
           </h4>
           <div className="space-y-2">
             {role === "student" ? (

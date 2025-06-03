@@ -57,8 +57,8 @@ const StudentTimetablePage = () => {
     role === "student"
       ? studentTimetableData
       : role === "parent"
-      ? parentTimetableData
-      : { timetables: [], loading: false };
+        ? parentTimetableData
+        : { timetables: [], loading: false };
 
   // Set navigation heading
   useNavHeading(role, t("TimeTable"));
@@ -108,43 +108,14 @@ const StudentTimetablePage = () => {
     return { classId: null, sectionId: null };
   };
 
-  const { classId, sectionId } = getFilterInfo();
 
-  /**
-   * Filters timetables based on selected filters
-   * @type {Array}
-   */
-  const filteredTimetables = useMemo(() => {
-    let result = timetables || [];
 
-    // Filter by type if selected
-    if (filterType) result = result?.filter((tt) => tt.type === filterType);
-
-    // Filter by class
-    if (classId) {
-      result = result.filter((tt) => tt.classId?._id === classId);
-    }
-
-    // Filter by section if available
-    if (sectionId) {
-      result = result.filter((tt) => {
-        if (!tt.sectionId || tt.sectionId.length === 0) return true;
-        return tt.sectionId.some((section) =>
-          typeof section === "object"
-            ? section._id === sectionId
-            : section === sectionId
-        );
-      });
-    }
-
-    return result;
-  }, [timetables, filterType, classId, sectionId]);
 
   // Initialize export utilities
   const exportFunctions = new ExportFunctions({
     viewMode,
     selectedDate,
-    filteredTimetables,
+    timetables,
     format,
     dayjs,
     isWithinValidity: (timetable, date) => {
@@ -184,9 +155,8 @@ const StudentTimetablePage = () => {
         <div className="w-full min-h-screen flex">
           {/* Main Content */}
           <div
-            className={`flex-1 p-4 transition-all ${
-              sidebarCollapsed ? "mr-0" : "mr-72"
-            }`}
+            className={`flex-1 p-4 transition-all ${sidebarCollapsed ? "mr-0" : "mr-72"
+              }`}
           >
             {/* Children selector for parent role */}
             {role === "parent" && (
@@ -211,7 +181,7 @@ const StudentTimetablePage = () => {
             />
 
             {/* Timetable Views */}
-            <TimetableViews
+            {/* <TimetableViews
               loadingFetch={loadingFetch}
               loadingChildren={loadingChildren}
               role={role}
@@ -221,7 +191,7 @@ const StudentTimetablePage = () => {
               onEventClick={onEventClick}
               setSelectedDate={setSelectedDate}
               t={t}
-            />
+            /> */}
           </div>
 
           {/* Stats Sidebar */}
@@ -230,7 +200,7 @@ const StudentTimetablePage = () => {
               loadingFetch={loadingFetch}
               loadingChildren={loadingChildren}
               role={role}
-              filteredTimetables={filteredTimetables}
+              filteredTimetables={timetables}
               TIMETABLE_TYPES={TIMETABLE_TYPES}
               filterType={filterType}
               setFilterType={setFilterType}
