@@ -355,8 +355,8 @@ function darkenColor(color, percent) {
 
 function getColorByType(type) {
   switch (type) {
-    case "weekly":
-      return "rgba(255, 153, 204, 0.8)";
+    // case "weekly":
+    //   return "rgba(255, 153, 204, 0.8)";
     case "exam":
       return "rgba(41, 171, 226, 0.8)";
     case "event":

@@ -78,7 +78,7 @@ export const SearchComponent = ({
           onChange={(value) => handleFilterChange({ type: value })}
           dropdownMatchSelectWidth={false}
         >
-          <Option value="weekly">Weekly</Option>
+          {/* <Option value="weekly">Weekly</Option> */}
           <Option value="exam">Exam</Option>
           <Option value="event">Event</Option>
           <Option value="others">Others</Option>
