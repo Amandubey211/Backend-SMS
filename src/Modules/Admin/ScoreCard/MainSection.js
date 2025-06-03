@@ -171,6 +171,7 @@ const MainSection = () => {
     { label: "Religion", value: "religion" },
     { label: "Class", value: "class" },
     { label: "Section", value: "section" },
+    { label: "Total Present Days", value: "attendance" },
 
     // Guardian Fields (Father)
     { label: "Father First Name", value: "fatherInfo.firstName" },
