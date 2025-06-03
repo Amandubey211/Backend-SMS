@@ -163,7 +163,7 @@ const StudentGradeModalFilterHeader = ({
           </div>
 
           {/* Chapter */}
-          <div className="flex flex-col flex-grow relative">
+          {/* <div className="flex flex-col flex-grow relative">
             <label className="text-sm font-medium text-gray-700">Chapter</label>
             <div className="relative mt-1">
               <Select
@@ -190,7 +190,7 @@ const StudentGradeModalFilterHeader = ({
                 )}
               </Select>
             </div>
-          </div>
+          </div> */}
 
           {/* Status */}
           <div className="flex flex-col flex-grow relative">
