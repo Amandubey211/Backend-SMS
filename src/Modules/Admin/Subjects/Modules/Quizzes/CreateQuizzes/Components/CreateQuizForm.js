@@ -125,7 +125,6 @@ const CreateQuizForm = ({
       </div>
 
       {/* ── GROUP 1 • Basics ───────────────── */}
-      <Divider orientation="left">{t("Basics")}</Divider>
       <LabeledSelect
         label={
           <>
@@ -153,31 +152,7 @@ const CreateQuizForm = ({
         fieldId="timeLimit"
       />
 
-      {/* ── GROUP 2 • Attempts ───────────────── */}
-      {!isTimed && (
-        <>
-          <Divider orientation="left">{t("Attempts")}</Divider>
-          <AllowedAttemptsSelect
-            allowedAttempts={allowedAttempts}
-            handleChange={handleChange}
-            error={formErrors.allowedAttempts}
-          />
-          {allowedAttempts && (
-            <LabeledInput
-              label={t("Number of Attempts")}
-              name="allowNumberOfAttempts"
-              type="number"
-              value={allowNumberOfAttempts || ""}
-              onChange={handleChange}
-              error={formErrors.allowNumberOfAttempts}
-              fieldId="allowNumberOfAttempts"
-            />
-          )}
-        </>
-      )}
-
       {/* ── GROUP 3 • Audience ──────────────── */}
-      <Divider orientation="left">{t("Audience")}</Divider>
       <AssignToRadios
         assignTo={assignTo}
         handleChange={handleChange}
@@ -201,7 +176,6 @@ const CreateQuizForm = ({
       />
 
       {/* ── GROUP 4 • Module ────────────────── */}
-      <Divider orientation="left">{t("Module")}</Divider>
       <LabeledSelect
         label={t("Module")}
         name="moduleId"
@@ -216,7 +190,6 @@ const CreateQuizForm = ({
       />
 
       {/* ── GROUP 5 • Scheduling ────────────── */}
-      <Divider orientation="left">{t("Scheduling")}</Divider>
       <Space direction="vertical" size="middle" className="w-full">
         <DateInput
           label={
@@ -270,8 +243,29 @@ const CreateQuizForm = ({
         />
       </Space>
 
+      {/* ── GROUP 2 • Attempts ───────────────── */}
+      {!isTimed && (
+        <>
+          <AllowedAttemptsSelect
+            allowedAttempts={allowedAttempts}
+            handleChange={handleChange}
+            error={formErrors.allowedAttempts}
+          />
+          {allowedAttempts && (
+            <LabeledInput
+              label={t("Number of Attempts")}
+              name="allowNumberOfAttempts"
+              type="number"
+              value={allowNumberOfAttempts || ""}
+              onChange={handleChange}
+              error={formErrors.allowNumberOfAttempts}
+              fieldId="allowNumberOfAttempts"
+            />
+          )}
+        </>
+      )}
+
       {/* ── GROUP 6 • Results ───────────────── */}
-      <Divider orientation="left">{t("Results Publication")}</Divider>
       <ResultsPublishInput
         resultsPublished={resultsPublished}
         resultsPublishDate={resultsPublishDate}

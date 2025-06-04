@@ -89,7 +89,7 @@ const QuestionDetailCard = ({ hideTime }) => {
 
   return (
     <div
-      className="flex flex-col gap-7 py-1 pb-6 px-4 bg-white "
+      className="flex flex-col gap-2 py-1 px-3 bg-white "
       aria-label="Question Detail Card"
     >
       <div className="mb-auto">
@@ -121,14 +121,14 @@ const QuestionDetailCard = ({ hideTime }) => {
           <div className="flex justify-center items-center">
             <button
               onClick={() => setShowTime(!showTime)}
-              className="mt-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-3 rounded-md shadow-sm hover:bg-opacity-90"
+              className="mt-2  bg-gradient-to-r from-pink-500 to-purple-500 text-white py-1 px-3 rounded-md shadow-sm hover:bg-opacity-90"
             >
               {showTime ? "Hide Time" : "Show Time"}
             </button>
           </div>
           {/* Time Progress Bars */}
           {showTime && (
-            <div className="flex justify-around mt-6">
+            <div className="flex justify-around mt-3">
               {/* Circular Progress for Hours */}
               <div style={{ width: 70, height: 70 }}>
                 <CircularProgressbar

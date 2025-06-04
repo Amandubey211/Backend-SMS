@@ -4,7 +4,7 @@ const AssignmentDetail = React.memo(({ label, value, extra }) => {
   const displayValue = value ?? "Unlimited";
 
   return (
-    <div className="mt-4">
+    <div>
       <p className="text-sm text-gray-600">{label}</p>
       <div className="flex items-center">
         <p className="text-md font-semibold text-gray-900">{displayValue}</p>
