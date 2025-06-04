@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Table, Empty } from "antd";
+import { Table, Empty, Spin, Badge } from "antd";
 import { fetchTimeTablesForTeacher } from "../../../../../Store/Slices/Admin/asctimetable/asctimetablethunk";
 
 const TeacherTimeTable = ({ selectedTeacher }) => {
@@ -19,67 +19,66 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     }
   }, [dispatch, selectedTeacher]);
 
-  // Flatten all subjectsTiming from all timetable entries
   const allSubjectsTiming = ascTeacherTimeTable
     ? Array.isArray(ascTeacherTimeTable)
-      ? ascTeacherTimeTable.flatMap(timetable => 
-          Array.isArray(timetable?.subjectsTiming) 
-            ? timetable.subjectsTiming 
+      ? ascTeacherTimeTable.flatMap((timetable) =>
+          Array.isArray(timetable?.subjectsTiming)
+            ? timetable.subjectsTiming
             : []
         )
       : Array.isArray(ascTeacherTimeTable?.subjectsTiming)
-        ? ascTeacherTimeTable.subjectsTiming
-        : []
+      ? ascTeacherTimeTable.subjectsTiming
+      : []
     : [];
 
-  // Extract unique class-section combinations
   const uniqueClassesSections = Array.from(
     new Set(
       allSubjectsTiming
-        .filter(item => item?.class && item?.section)
-        .map(item => `${item.class}::${item.section}`)
+        .filter((item) => item?.class && item?.section)
+        .map((item) => `${item.class}::${item.section}`)
     )
   );
 
-  // Extract unique days from all entries
   const uniqueDays = Array.from(
     new Set(
       allSubjectsTiming
-        .flatMap(item => item?.days || [])
-        .filter(day => day && typeof day === 'string')
+        .flatMap((item) => item?.days || [])
+        .filter((day) => day && typeof day === "string")
     )
-  ).sort(); // Sort days for consistent order
+  ).sort();
 
-  // Create dataSource for the table
   const dataSource = uniqueClassesSections.map((clsSection) => {
     const [className, sectionName] = clsSection.split("::");
     const row = { key: clsSection, classSection: `${className} ${sectionName}` };
 
     uniqueDays.forEach((day) => {
-      // Find all subjects for this class-section on this day
       const daySubjects = allSubjectsTiming
         .filter(
-          item =>
+          (item) =>
             item?.class === className &&
             item?.section === sectionName &&
             item?.days?.includes(day)
-        );
+        )
+        .sort((a, b) => {
+          const timeA = a.timing?.startTime || "00:00";
+          const timeB = b.timing?.startTime || "00:00";
+          return timeA.localeCompare(timeB);
+        });
 
-      // Sort subjects by start time
-      daySubjects.sort((a, b) => {
-        const timeA = a.timing?.startTime || "00:00";
-        const timeB = b.timing?.startTime || "00:00";
-        return timeA.localeCompare(timeB);
-      });
-
-      // Format subjects with their time slots
       row[day] = daySubjects.length > 0
         ? daySubjects.map((subject, idx) => (
-            <div key={idx} className="flex flex-col justify-center items-center">
-              <span>{subject.subjectName || 'No Subject'}</span> 
-              <span>(
-              {subject.timing?.startTime || '??'}-{subject.timing?.endTime || '??'}
-              )</span>
+            <div
+              key={idx}
+              className="flex flex-col items-center bg-gradient-to-r from-purple-100 to-pink-100 border border-purple-300 rounded-md p-2 my-1 shadow-sm"
+            >
+              <Badge
+                count={subject.subjectName || "No Subject"}
+                style={{ backgroundColor: "#673ab7",borderRadius:'6px' }}
+              />
+              <span className="text-sm text-gray-600 mt-1">
+                {subject.timing?.startTime || "??"} -{" "}
+                {subject.timing?.endTime || "??"}
+              </span>
             </div>
           ))
         : "-";
@@ -88,35 +87,41 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     return row;
   });
 
-  // Define columns
   const columns = [
     {
       title: "Class & Section",
       dataIndex: "classSection",
       key: "classSection",
       fixed: "left",
-      width: 150,
+      width: 180,
+      render: (text) => (
+        <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold text-center py-2 px-3 rounded-md shadow">
+          {text}
+        </div>
+      ),
     },
     ...uniqueDays.map((day) => ({
-      title: day.charAt(0).toUpperCase() + day.slice(1),
+      title: (
+        <div className="flex items-center justify-center bg-gradient-to-r from-purple-400 to-pink-400 text-white py-2 px-3 rounded-md">
+          {day.charAt(0).toUpperCase() + day.slice(1)}
+        </div>
+      ),
       dataIndex: day,
       key: day,
-      render: (content) => content, // Render JSX content directly
+      render: (content) => <div className="space-y-2">{content}</div>,
     })),
   ];
 
-  const teacherName = allSubjectsTiming[0]?.teacherId?.fullName 
-    || ascTeacherTimeTable?.teacherId?.fullName 
-    || "Teacher";
+  const teacherName =
+    allSubjectsTiming[0]?.teacherId?.fullName ||
+    ascTeacherTimeTable?.teacherId?.fullName ||
+    "Teacher";
 
   return (
-    <div className="p-4">
-      <p className="text-lg font-bold mb-4">
-        {teacherName}'s TimeTable
-      </p>
+    <div className="p-6 bg-gradient-to-br from-purple-100 to-pink-100 rounded-md shadow-lg">
       {loading ? (
         <div className="flex justify-center items-center h-64">
-          <p>Loading timetable...</p>
+          <Spin size="large" />
         </div>
       ) : dataSource.length === 0 ? (
         <div className="flex items-center justify-center w-full h-64">
@@ -124,20 +129,25 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
             image={Empty.PRESENTED_IMAGE_SIMPLE}
             description={
               <span className="text-gray-600">
-                No timetable available for selected teacher
+                No timetable available 
               </span>
             }
           />
         </div>
       ) : (
-        <Table
-          columns={columns}
-          dataSource={dataSource}
-          bordered
-          pagination={false}
-          scroll={{ x: "max-content" }}
-          className="mt-2 shadow-sm"
-        />
+        <>
+          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center py-3 rounded-t-md">
+            <h1 className="text-2xl font-semibold">{teacherName}'s Timetable</h1>
+          </div>
+          <Table
+            columns={columns}
+            dataSource={dataSource}
+            bordered
+            pagination={false}
+            scroll={{ x: "max-content" }}
+            className="mt-4 bg-white rounded-b-md shadow-md"
+          />
+        </>
       )}
     </div>
   );

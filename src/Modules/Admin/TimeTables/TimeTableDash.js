@@ -64,6 +64,7 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semeste
 // Utils
 import ExportFunctions from "../../../Utils/timetableUtils";
 import MainSection from "./AutomaticTimeTable/MainSection";
+import TeacherTimeTable from "./AutomaticTimeTable/components/TeacherTimeTable";
 
 export default function TimeTableDash() {
   const dispatch = useDispatch();
@@ -89,7 +90,8 @@ export default function TimeTableDash() {
   const { semesters: reduxSemesters } = useSelector(
     (state) => state.admin.semesters
   );
-
+    const role = useSelector((store) => store.common.auth.role);
+ const { userDetails } = useSelector((store) => store.common.user);
   // --------------------------
   // Local States
   // --------------------------
@@ -681,7 +683,7 @@ export default function TimeTableDash() {
               <Tabs activeKey={activeTab} onChange={setActiveTab}>
                 <Tabs.TabPane key="autoCalendar" tab="ASC TimeTable" />
                 <Tabs.TabPane key="list" tab={<span>Other TimeTables</span>} />
-                <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} />
+                {/* <Tabs.TabPane key="calendar" tab={<span>Calendar View</span>} /> */}
               </Tabs>
             </div>
 
@@ -773,7 +775,10 @@ export default function TimeTableDash() {
         )}
         {activeTab === "autoCalendar" && (
           <>
-            <MainSection />
+          {
+            role === 'teacher' ? <TeacherTimeTable selectedTeacher={userDetails.userId} /> :<MainSection />
+          }
+            
           </>
         )}
 
