@@ -119,18 +119,20 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                 </div>
               </div>
               <div className="flex space-x-4">
-                <Tag
-                  color={isPublished ? 'green' : 'red'}
-                  className="py-1 px-3 rounded-md text-sm"
-                >
-                  {isPublished ? 'Published' : 'Unpublished'}
-                </Tag>
-                <Switch
-                  checked={isPublished}
-                  onChange={handleTogglePublish}
-                  checkedChildren="On"
-                  unCheckedChildren="Off"
-                />
+                <div className='flex justify-center items-center '>
+                  <Tag
+                    color={isPublished ? 'green' : 'red'}
+                    className="py-1 px-3 rounded-md text-sm"
+                  >
+                    {isPublished ? 'Published' : 'Unpublished'}
+                  </Tag>
+                  <Switch
+                    checked={isPublished}
+                    onChange={handleTogglePublish}
+                    checkedChildren="On"
+                    unCheckedChildren="Off"
+                  />
+                </div>
                 <Button
                   icon={<FaTrashAlt />}
                   type="primary"

@@ -173,7 +173,6 @@ const StudentTimetablePage = () => {
   const clearAllFilters = () => {
     setFilterType(null);
   };
-
   // Get the appropriate dashboard layout based on role
   const DashboardLayout =
     role === "student" ? StudentDashLayout : ParentDashLayout;
@@ -230,7 +229,8 @@ const StudentTimetablePage = () => {
 
             {/* Timetable Views */}
             {
-              selectedTimeTable === 'classTimeTable' ?
+                  role === 'parent' && (
+                         selectedTimeTable === 'classTimeTable' ?
                 <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
                 <TimetableViews
                   loadingFetch={loadingFetch}
@@ -243,6 +243,7 @@ const StudentTimetablePage = () => {
                   setSelectedDate={setSelectedDate}
                   t={t}
                 />
+                  )
             }
 
 
