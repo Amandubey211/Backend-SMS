@@ -104,9 +104,8 @@ const PhoneField = ({
           countryCodeEditable={false}
         />
         <div
-          className={`flex items-center border border-l-0 rounded-r px-3 ${
-            isWA ? "bg-[#dcf8c6]" : "bg-white"
-          }`}
+          className={`flex items-center border border-l-0 rounded-r px-3 ${isWA ? "bg-[#dcf8c6]" : "bg-white"
+            }`}
         >
           <Tooltip title="Mark this number as WhatsApp">
             <div className="cursor-pointer" onClick={handleWhatsappToggle}>
@@ -489,7 +488,7 @@ const CandidateInfo = ({ formData }) => {
                 showSearch
               >
                 {NATIVE_LANGUAGE_OPTIONS.map((nl) => (
-                  <Option key={nl.value}>{nl.label}</Option>
+                  <Option key={nl.value} value={nl.label}>{nl.label}</Option>
                 ))}
               </Select>
             </Form.Item>

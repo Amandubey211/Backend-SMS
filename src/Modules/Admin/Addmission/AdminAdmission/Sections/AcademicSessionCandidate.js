@@ -366,6 +366,8 @@ const AcademicSessionCandidate = ({ form }) => {
                   <Select
                     placeholder="Select Type"
                     suffixIcon={<GlobalOutlined />}
+                    allowClear
+                    showSearch
                   >
                     {NATIVE_LANGUAGE_OPTIONS.map((opt) => (
                       <Option key={opt.value} value={opt.label}>
