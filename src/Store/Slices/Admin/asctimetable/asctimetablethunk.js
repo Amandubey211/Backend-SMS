@@ -106,8 +106,9 @@ export const fetchTimeTablesForTeacher = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
+      console.log(getRole)
       const response = await getData(
-        `/${getRole}/ascTimeTable/teacher/${teacherId}`
+        `/admin/ascTimeTable/teacher/${teacherId}`
       );
       return response; // Return the data array from the response
     } catch (error) {
@@ -141,6 +142,7 @@ export const getClassTimeTable = createAsyncThunk(
       const say = getAY();
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
+      console.log(getRole)
       const { classId, sectionId } = data;
       const response = await getData(
         `/${getRole}/ascTimeTable/class?say=${say}&classId=${classId}&sectionId=${sectionId}`
