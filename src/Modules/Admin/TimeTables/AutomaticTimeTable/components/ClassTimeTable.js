@@ -4,6 +4,7 @@ import { Drawer, Button, message, Switch, Modal, Tag } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateTimeTable, deleteTimeTable, getClassTimeTable } from '../../../../../Store/Slices/Admin/asctimetable/asctimetablethunk'; // Adjust the import path as needed
 import TimeTableForm from '../../Components/TimeTableForm';
+import { setRole } from '../../../../../Store/Slices/Common/Auth/reducers/authSlice';
 
 const ClassTimeTable = ({ selectedClass, selectedSection }) => {
   const dispatch = useDispatch();
@@ -12,6 +13,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
   const [isPublished, setIsPublished] = useState(false);
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
+  const [reloadTable,setReloadTable]= useState(false);
 
   const { ascClassTimeTableData, loading } = useSelector(
     (state) => state.admin.ascTimeTable
@@ -24,7 +26,8 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         sectionId: selectedSection,
       })
     );
-  }, [dispatch, selectedClass, selectedSection]);
+    setReloadTable(false)
+  }, [dispatch, selectedClass, selectedSection,reloadTable]);
 
   const handleEdit = (record) => {
     setEditingTimetable(record);
@@ -42,6 +45,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
       .then(() => {
         message.success('Timetable deleted successfully');
         setDeleteModalVisible(false);
+        setReloadTable(true)
       })
       .catch((error) => {
         message.error('Failed to delete timetable');
@@ -133,14 +137,12 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                     unCheckedChildren="Off"
                   />
                 </div>
-                <Button
-                  icon={<FaTrashAlt />}
-                  type="primary"
-                  danger
+                <button
+                  className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                   onClick={() => handleDeleteConfirmation(data)}
                 >
-                  Delete
-                </Button>
+                  <FaTrashAlt className="mr-2" /> Delete
+                </button>
               </div>
             </div>
 
@@ -167,11 +169,22 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                 ))}
               </tbody>
             </table>
+           <Modal
+              title="Confirm Deletion"
+              visible={deleteModalVisible}
+              onOk={handleDelete}
+              onCancel={() => setDeleteModalVisible(false)}
+              okText="Delete"
+              cancelText="Cancel"
+              okButtonProps={{ danger: true }}
+            >
+              <p>Are you sure you want to delete this timetable?</p>
+            </Modal>
           </div>
         ))
       ) : (
         <div className="flex items-center justify-center w-full h-full">
-          <div className="w-full p-8 bg-white rounded-lg shadow-md flex flex-col items-center">
+          <div className="w-full h-full p-8 bg-white rounded-lg shadow-md flex flex-col items-center">
             <span className="text-6xl mb-4">📜</span>
             <p className="text-lg font-medium text-gray-700">Timetable Not Available</p>
           </div>
