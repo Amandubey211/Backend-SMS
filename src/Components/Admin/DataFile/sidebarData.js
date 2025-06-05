@@ -347,6 +347,13 @@ const sidebarData = [
         roles: [ROLES.ADMIN, ROLES.FINANCE],
         //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
       },
+      {
+        title: "Penalties",
+        path: "/finance/penalties",
+        icon: <FaRegCalendarTimes style={{ fontSize: "1.1rem" }} />,
+        roles: [ROLES.ADMIN, ROLES.FINANCE],
+        //requiredPermission: PERMISSIONS.VIEW_PENALTIES,
+      },
     ],
   },
   // Transportation Module - New Addition
