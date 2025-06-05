@@ -29,7 +29,7 @@ const Health = () => {
 
     const handleModalClose = () => setIsHealthModalOpen(false);
 
-    useNavHeading("User", "Health");
+    useNavHeading("Admin", "Health");
     useEffect(() => {
         dispatch(fetchAllStudents());
         dispatch(fetchAllClasses());

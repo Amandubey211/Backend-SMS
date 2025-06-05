@@ -470,6 +470,8 @@ const Health = lazy(() => import("../Modules/Admin/Health/Health.js"));
 const ScoreCard = lazy(() => import("../Modules/Admin/ScoreCard/ScoreCard.js"));
 // Report Card
 const ReportCard = lazy(() => import("../Modules/Student/Dashboard/DashBoardComponents/ReportCard/SRCLayout.js"));
+// Penalties
+const Penalties = lazy(() => import("../Modules/Admin/Finance/Penalties/MainSection.js"));
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
@@ -645,6 +647,16 @@ function App() {
       element: (
         <ProtectRoute
           Component={Entities}
+          allowedRoles={["admin", "finance"]}
+        />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/finance/penalties",
+      element: (
+        <ProtectRoute
+          Component={Penalties}
           allowedRoles={["admin", "finance"]}
         />
       ),
