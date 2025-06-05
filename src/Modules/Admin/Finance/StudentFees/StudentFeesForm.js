@@ -13,12 +13,13 @@ import { BsInfoCircle } from "react-icons/bs";
 import dayjs from "dayjs";
 import ConfigurationCreateModel from "../Configuration/ConfigurationCreateModel.js";
 import { setStudentId } from "../../../../Store/Slices/Common/User/reducers/userSlice.js";
+import { getAllPenalties } from "../../../../Store/Slices/Finance/Penalty/Penaltythunk.js";
 const { Option } = Select;
 
 const StudentFeeForm = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.admin.financialCategory.categories);
-
+  const [penalties, setpanelties] = useState([])
   const [form] = Form.useForm();
   const [studentIds, setStudentIds] = useState([]);
 
@@ -40,6 +41,7 @@ const StudentFeeForm = () => {
       startDate: null,
       endDate: null,
       dueDate: null,
+      penaltyId: ""
     },
   ]);
   const location = useLocation();
@@ -51,8 +53,8 @@ const StudentFeeForm = () => {
           ...i,
           dueDate: null,
           startDate: null,
-          endDate: null
-
+          endDate: null,
+          penaltyId: "",
         }
       });
       setLineItems(lIt);
@@ -63,6 +65,16 @@ const StudentFeeForm = () => {
       });
     }
     dispatch(fetchCategory({ categoryType: "revenue", search: "", page: 1, limit: 10000 }));
+    const fetchPenalties = async () => {
+      const response = await dispatch(getAllPenalties({ search: "", page: 1, limit: 1000, isActive: undefined }));
+      if (response?.payload?.success) {
+        setpanelties(response?.payload?.data || []);
+      }
+      else {
+        toast.error(response?.payload?.message || "Failed to fetch penalties");
+      }
+    }
+    fetchPenalties();
   }, [dispatch]);
   const [description, setDescription] = useState('');
 
@@ -93,12 +105,13 @@ const StudentFeeForm = () => {
 
     const updatedItems = [...lineItems];
     updatedItems[index] = { ...updatedItems[index], categoryId, categoryName: category.categoryName, items: fetchedItems, itemId: "", itemDetails: "", rate: 0, };
-    console.log(updatedItems);
-    let updatedItemsfix = updatedItems.map((i) => ({ ...i, 
-      startDate:  i?.startDate?.length > 0 ? dayjs(i?.startDate?.slice(0, 10)) : null,
-      enfDate: i?.endDate?.length >0 ? dayjs(i?.endDate?.slice(0, 10)) : null,
-      dueDate:  i?.dueDate?.length >0 ? dayjs(i?.dueDate?.slice(0, 10)) : null,
-     }))
+    // console.log(updatedItems);
+    let updatedItemsfix = updatedItems.map((i) => ({
+      ...i,
+      startDate: i?.startDate?.length > 0 ? dayjs(i?.startDate?.slice(0, 10)) : null,
+      enfDate: i?.endDate?.length > 0 ? dayjs(i?.endDate?.slice(0, 10)) : null,
+      dueDate: i?.dueDate?.length > 0 ? dayjs(i?.dueDate?.slice(0, 10)) : null,
+    }))
     setLineItems(updatedItemsfix);
     form.setFieldsValue({
       lineItems: updatedItemsfix
@@ -165,6 +178,7 @@ const StudentFeeForm = () => {
         startDate: null,
         endDate: null,
         dueDate: null,
+        penaltyId: ""
       },
     ]);
   };
@@ -350,6 +364,22 @@ const StudentFeeForm = () => {
                   } />
                 </Form.Item>
               </Col>
+              {
+                item.dueDate && (
+                  <Col span={6}>
+                    <Form.Item name={["lineItems", index, "penaltyId"]} label="Name">
+                      <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "penaltyId", value)} placeholder="Select Penalty">
+                        {
+                          penalties.map((penalty) => (
+                            <Option key={penalty._id} value={penalty._id}>
+                              {penalty.name}</Option>
+                          ))
+                        }
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                )
+              }
               <Col span={6}>
                 <Form.Item name={["lineItems", index, "finalAmount"]} label="Sub Amount">
 
