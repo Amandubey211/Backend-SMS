@@ -421,6 +421,7 @@ import {
 } from "@ant-design/icons";
 import DayView from "../Views/DayView";
 import WeekView from "../Views/WeekView";
+import { useSelector } from "react-redux";
 
 // Main TimetableDetailsDrawer component
 const TimetableDetailsDrawer = ({
@@ -433,7 +434,7 @@ const TimetableDetailsDrawer = ({
   // Always call hooks unconditionally at the top level
   const [viewMode, setViewMode] = useState("details");
   const [selectedDate, setSelectedDate] = useState(new Date());
-
+const role = useSelector((store) => store.common.auth.role);
   useEffect(() => {
     if (timetable?.validity?.startDate) {
       const startDate = new Date(timetable.validity.startDate);
@@ -829,7 +830,8 @@ const TimetableDetailsDrawer = ({
         </div>
 
         {/* Sticky Footer for Edit and Delete */}
-        <div className="sticky bottom-0 bg-white py-4 border-t">
+      {
+        role === 'admin' &&   <div className="sticky bottom-0 bg-white py-4 border-t">
           <div className="flex justify-end gap-2">
             <Button
               type="default"
@@ -848,6 +850,7 @@ const TimetableDetailsDrawer = ({
             </Button>
           </div>
         </div>
+      }
       </div>
     </Drawer>
   );

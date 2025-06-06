@@ -86,7 +86,7 @@ const StatsSidebar = ({
         {/* Timetable Type Stats */}
         <div className="space-y-2 mb-4">
           {TIMETABLE_TYPES.map((stat) => {
-            const count = filteredTimetables.filter(
+            const count = (filteredTimetables && filteredTimetables.length > 0) && filteredTimetables?.filter(
               (t) => t.type === stat.type
             ).length;
             return (
@@ -137,7 +137,7 @@ const StatsSidebar = ({
           <h4 className="font-semibold mb-2 text-center">
             {t("Timetable Types")}
           </h4>
-          {filteredTimetables.length > 0 ? (
+          {filteredTimetables && filteredTimetables.length > 0 ? (
             <Doughnut
               data={exportFunctions.getChartData()}
               options={exportFunctions.getChartOptions()}
@@ -149,6 +149,7 @@ const StatsSidebar = ({
               </p>
             </div>
           )}
+
         </div>
 
         {/* User Info */}

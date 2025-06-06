@@ -2,7 +2,14 @@ import { createSlice } from "@reduxjs/toolkit";
 import { fetchStudentTimetable } from "./studentTimeTable.action";
 
 const initialState = {
-  timetables: [],
+   timetables: [],
+  pagination: {
+    total: 0,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
+  },
+  counts: {},
   loading: false,
   error: null,
 };
@@ -19,7 +26,18 @@ const studentTimeTableSlice = createSlice({
       })
       .addCase(fetchStudentTimetable.fulfilled, (state, action) => {
         state.loading = false;
-        state.timetables = action.payload;
+             const {
+          data = [],
+          pagination = {},
+          counts = {},
+        } = action.payload || {};
+        state.timetables = data;
+        state.counts = counts;
+
+        // If pagination is present, store it
+        if (pagination.total !== undefined) {
+          state.pagination = pagination;
+        }
       })
       .addCase(fetchStudentTimetable.rejected, (state, action) => {
         state.loading = false;

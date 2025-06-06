@@ -776,7 +776,7 @@ export default function TimeTableDash() {
         {activeTab === "autoCalendar" && (
           <>
           {
-            role === 'teacher' ? <TeacherTimeTable selectedTeacher={userDetails.userId} /> :<MainSection />
+            role === 'teacher' && <TeacherTimeTable selectedTeacher={userDetails.userId} /> 
           }
             
           </>

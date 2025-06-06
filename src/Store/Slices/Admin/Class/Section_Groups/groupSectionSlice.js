@@ -13,12 +13,14 @@ import {
   removeStudentFromGroup,
   fetchGroupsByClassAndSection,
   fetchSectionsNamesByClass,
+  fetchGroupsByStudent
 } from "./groupSectionThunks";
 
 const initialState = {
   sectionsList: [], // List of all sections
   groupsList: [], // List of all groups
   unassignedStudentsList: [], // List of unassigned students
+  studentGroup: {},
   // Separate loading flags:
   groupsLoading: false,
   sectionsLoading: false,
@@ -100,6 +102,19 @@ const groupSectionSlice = createSlice({
         state.groupsList = action.payload;
       })
       .addCase(fetchGroupsByClassAndSection.rejected, (state, action) => {
+        state.groupsLoading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(fetchGroupsByStudent.pending, (state) => {
+        state.groupsLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchGroupsByStudent.fulfilled, (state, action) => {
+        state.groupsLoading = false;
+        state.studentGroup = action.payload;
+      })
+      .addCase(fetchGroupsByStudent.rejected, (state, action) => {
         state.groupsLoading = false;
         state.error = action.payload;
       })
