@@ -55,6 +55,28 @@ export const fetchGroupsByClassAndSection = createAsyncThunk(
   }
 );
 
+  // fetch by student Id
+export const fetchGroupsByStudent = createAsyncThunk(
+  "group/fetchGroupsByStudent",
+  async ({studentId}, { getState, rejectWithValue, dispatch }) => {
+    try {
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+      const say = getAY();
+      const response = await getData(
+        `/${getRole}/group/student/${studentId}?say=${say}`
+      );
+      if (response?.status) {
+        return response.data;
+      } else {
+        return rejectWithValue(response);
+      }
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
 // Fetch Sections by Class
 export const fetchSectionsByClass = createAsyncThunk(
   "group/fetchSectionsByClass",

@@ -14,6 +14,7 @@ const MainSection = () => {
     const dispatch = useDispatch();
     const { classes } = useSelector((state) => state?.admin?.class);
     const { sectionsList } = useSelector((state) => state?.admin?.group_section);
+      const role = useSelector((store) => store.common.auth.role);
     const [timetableType, setTimetableType] = useState("class");
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSection, setSelectedSection] = useState(null);

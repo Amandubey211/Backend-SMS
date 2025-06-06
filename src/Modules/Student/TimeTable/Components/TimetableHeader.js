@@ -1,20 +1,31 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Radio, Button, Popover, Tabs, message } from "antd";
+import { Radio, Button, Drawer, Modal, Skeleton, Divider, Popover, Tabs, Table, Space, Tag, message, Tooltip, } from "antd";
 import {
   AiOutlineFilter,
   AiOutlineFilePdf,
   AiOutlinePrinter,
 } from "react-icons/ai";
+import {
+  CloseOutlined,
+  EyeOutlined,
+  EditOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+import { BsPatchCheckFill } from "react-icons/bs";
+import { MdOutlineBlock } from "react-icons/md";
 import { format, isWithinInterval, parseISO } from "date-fns";
 import NavigationControls from "../../../Admin/TimeTables/Components/NavigationControls";
 import MainSection from "./MainSection";
 import { fetchStudentTimetable } from "../../../../Store/Slices/Student/TimeTable/studentTimeTable.action";
 import ExportFunctions from "../../../../Utils/timetableUtils";
+import TimetableDetailsDrawer from "../../../Admin/TimeTables/Components/TimetableDetailsDrawer";
+import StatsSection from "../../../Admin/TimeTables/Components/StatsSection";
 import DayView from "../../../Admin/TimeTables/Views/DayView";
 import WeekView from "../../../Admin/TimeTables/Views/WeekView";
 import MonthView from "../../../Admin/TimeTables/Views/MonthView";
 import { AnimatePresence } from "framer-motion";
+import { Doughnut } from "react-chartjs-2";
 
 // Header component for timetable with view controls and export options
 const TimetableHeader = ({
@@ -80,23 +91,70 @@ const TimetableHeader = ({
 };
 
 // Parent component to manage timetable display
-const TimetableContainer = () => {
+const TimetableContainer = ({ timetables, counts, loadingFetch, pagination, sidebarCollapsed, setSidebarCollapsed }) => {
   const dispatch = useDispatch();
   const { userDetails } = useSelector((state) => state?.common?.user);
   // console.log("User Details:", userDetails);
   const studentTimetableData = useSelector(
     (state) => state.student?.studentTimetable
   );
-  const { timetables = [], loading: loadingFetch } = studentTimetableData || {};
+  // const { timetables = [], loading: loadingFetch } = studentTimetableData || {};
 
   // Local States
   const [activeTab, setActiveTab] = useState("classTimetable");
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [detailsDrawerVisible, setDetailsDrawerVisible] = useState(false);
+  const [detailsTimetable, setDetailsTimetable] = useState(null);
   const [viewMode, setViewMode] = useState("month");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  // const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [paginationConfig, setPaginationConfig] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+
+  const [filters, setFilters] = useState({
+    class: null,
+    sections: [],
+    groups: [],
+    subject: null,
+    semester: null,
+    status: null,
+    type: null,
+  });
 
   // Translation function (mocked for simplicity)
   const t = (text) => text;
+
+  const applyFilters = useCallback(
+    (newFilters) => {
+      setFilters(newFilters);
+      setPaginationConfig((prev) => ({ ...prev, current: 1 }));
+    },
+  );
+
+  const handleFilterChange = useCallback(
+    (newFilters) => {
+      applyFilters({ ...filters, ...newFilters });
+    },
+    [applyFilters, filters]
+  );
+
+  const clearAllFilters = useCallback(() => {
+    const newFilters = {
+      class: null,
+      sections: [],
+      groups: [],
+      subject: null,
+      semester: null,
+      status: null,
+      type: null,
+    };
+    setFilters(newFilters);
+    // setSearchTerm("");
+    setPaginationConfig((prev) => ({ ...prev, current: 1 }));
+    // fetchTimetables({ ...newFilters, search: undefined, page: 1 });
+  }, []);
 
   // Fetch timetable data for the logged-in student on component mount
   useEffect(() => {
@@ -140,8 +198,205 @@ const TimetableContainer = () => {
 
   // Handle event click (placeholder for viewing timetable details)
   const onEventClick = (timetable) => {
-    console.log("Event clicked:", timetable);
+    setDetailsTimetable(timetable);
+    setDetailsDrawerVisible(true);
   };
+  
+  const handleTableChange = (pagination, filterObj, sorter) => {
+    setPaginationConfig((prev) => ({
+      ...prev,
+      current: pagination.current,
+      pageSize: pagination.pageSize,
+    }));
+  };
+
+  function getTypeTag(type) {
+    switch (type) {
+      // case "weekly":
+      //   return <Tag color="pink">Weekly</Tag>;
+      case "exam":
+        return <Tag color="blue">Exams</Tag>;
+      case "event":
+        return <Tag color="green">Events</Tag>;
+      case "others":
+        return <Tag color="yellow">Others</Tag>;
+      default:
+        return <Tag>Unknown</Tag>;
+    }
+  }
+
+  const filteredTimetables = useMemo(() => {
+    let result = [...timetables];
+
+    // If in calendar view, only show those with showCalendar = true
+    if (activeTab === "calendar") {
+      result = result.filter((t) => t.showCalendar === true);
+    }
+    // Additionally filter by type if selected via StatsSection
+    if (filters.type) {
+      result = result.filter((t) => t.type === filters.type);
+    }
+
+    return result;
+  }, [timetables, activeTab, filters.type]);
+
+  const handleTypeFilter = useCallback(
+    (type) => {
+      const newFilters = {
+        ...filters,
+        type: filters.type === type ? null : type, // toggle
+      };
+      applyFilters(newFilters);
+    },
+    [applyFilters, filters]
+  );
+
+  // --------------------------
+  // Drawers & Modals
+  // --------------------------
+
+
+  const closeDetailsDrawer = () => {
+    setDetailsDrawerVisible(false);
+    setDetailsTimetable(null);
+  };
+
+
+  function renderClassSemester(record) {
+    const className =
+      record.classId?.className || record.classId?.name || "No Class";
+    const semesterTitle = record.semesterId?.title
+      ? ` - ${record.semesterId.title}`
+      : "";
+
+    const sections = record.sectionId?.length
+      ? record.sectionId.map((sec) => (
+        <Tag key={sec._id} color="purple" style={{ marginBottom: 4 }}>
+          {sec.sectionName}
+        </Tag>
+      ))
+      : [<Tag key="no-sections">No Sections</Tag>];
+
+    const groups = record.groupId?.length
+      ? record.groupId.map((g) => (
+        <Tag key={g._id} color="cyan" style={{ marginBottom: 4 }}>
+          {g.groupName}
+        </Tag>
+      ))
+      : [<Tag key="no-groups">No Groups</Tag>];
+
+    const popContent = (
+      <div style={{ minWidth: "150px" }}>
+        <div className="mb-2">
+          <strong>Sections:</strong>
+          <div className="mt-1 flex flex-wrap gap-1">{sections}</div>
+        </div>
+        <div>
+          <strong>Groups:</strong>
+          <div className="mt-1 flex flex-wrap gap-1">{groups}</div>
+        </div>
+      </div>
+    );
+
+    return (
+      <Popover content={popContent} placement="topLeft">
+        <span className="cursor-pointer hover:underline">
+          {className}
+          {semesterTitle}
+        </span>
+      </Popover>
+    );
+  }
+
+  function renderNameWithStatus(text, record) {
+    const isActive = record.status === "active";
+    return (
+      <div className="flex items-center gap-2 w-full">
+        <Tooltip title={isActive ? "Published" : "Unpublished"}>
+          {isActive ? (
+            <BsPatchCheckFill className="text-green-600 p-1 border rounded-full h-7 w-7" />
+          ) : (
+            <MdOutlineBlock className="text-gray-600 p-1 h-7 w-7" />
+          )}
+        </Tooltip>
+        <div className="font-semibold truncate max-w-[150px] overflow-hidden whitespace-nowrap text-ellipsis">
+          {text}
+        </div>
+      </div>
+    );
+  }
+  // Table Columns
+  const listColumns = [
+    {
+      title: "Status / Timetable Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text, record) =>
+        renderNameWithStatus(text || record.title || "Untitled", record),
+    },
+    {
+      title: "On Calendar",
+      dataIndex: "showCalendar",
+      key: "showCalendar",
+      render: (show) => (
+        <Tag color={show ? "green" : "orange"}>
+          {show ? "Visible" : "Hidden"}
+        </Tag>
+      ),
+    },
+    {
+      title: "Class / Semester",
+      key: "classSemester",
+      render: (_, record) => renderClassSemester(record),
+    },
+    {
+      title: "Type",
+      dataIndex: "type",
+      key: "type",
+      render: (type) => getTypeTag(type),
+    },
+    {
+      title: "Date Range",
+      key: "dateRange",
+      render: (_, record) => {
+        let start = "N/A";
+        let end = "N/A";
+        if (record?.validity?.startDate) {
+          const parsedStart = new Date(record.validity.startDate);
+          if (!isNaN(parsedStart)) {
+            start = format(parsedStart, "dd-MM-yyyy");
+          }
+        }
+        if (record?.validity?.endDate) {
+          const parsedEnd = new Date(record.validity.endDate);
+          if (!isNaN(parsedEnd)) {
+            end = format(parsedEnd, "dd-MM-yyyy");
+          }
+        }
+        return `${start} - ${end}`;
+      },
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => (
+        <Space>
+          <Tooltip title="View">
+            <Button
+              icon={<EyeOutlined />}
+              onClick={() => onEventClick(record)}
+            />
+          </Tooltip>
+        </Space>
+      ),
+    },
+  ];
+  //  console.log("TimeTable", timetables);
+  // When loading, show skeleton with matching columns
+  const skeletonColumns = listColumns.map((col) => ({
+    ...col,
+    render: () => <Skeleton active paragraph={{ rows: 1 }} title={false} />,
+  }));
 
   // Render
   return (
@@ -158,50 +413,40 @@ const TimetableContainer = () => {
         {activeTab === "classTimetable" && <MainSection />}
         {activeTab === "otherTimetable" && (
           <>
-            <div className="flex items-center justify-between mb-4">
-              <NavigationControls
-                selectedDate={selectedDate}
-                viewMode={viewMode}
-                setSelectedDate={setSelectedDate}
+            {loadingFetch ? (
+              <Table
+                dataSource={[...Array(5)].map((_, i) => ({ _id: i }))}
+                columns={skeletonColumns}
+                pagination={false}
+                rowKey="_id"
               />
-              <Radio.Group
-                value={viewMode}
-                onChange={(e) => setViewMode(e.target.value)}
-                buttonStyle="solid"
-              >
-                <Radio.Button value="day">{t("Day")}</Radio.Button>
-                <Radio.Button value="week">{t("Week")}</Radio.Button>
-                <Radio.Button value="month">{t("Month")}</Radio.Button>
-              </Radio.Group>
-            </div>
-            <AnimatePresence mode="wait">
-              {viewMode === "day" && (
-                <DayView
-                  selectedDate={selectedDate}
-                  filteredTimetables={timetables} // Use raw timetables
-                  onEventClick={onEventClick}
-                />
-              )}
-              {viewMode === "week" && (
-                <WeekView
-                  selectedDate={selectedDate}
-                  filteredTimetables={timetables} // Use raw timetables
-                  onEventClick={onEventClick}
-                  onDateChange={setSelectedDate}
-                />
-              )}
-              {viewMode === "month" && (
-                <MonthView
-                  selectedDate={selectedDate}
-                  filteredTimetables={timetables} // Use raw timetables
-                  onEventClick={onEventClick}
-                  setSelectedDate={setSelectedDate}
-                />
-              )}
-            </AnimatePresence>
+            ) : (
+              <Table
+                dataSource={timetables}
+                columns={listColumns}
+                rowKey="_id"
+                pagination={{
+                  current: paginationConfig.current,
+                  pageSize: paginationConfig.pageSize,
+                  total: pagination.total || 0,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total) => `Total ${total} items`,
+                }}
+                onChange={handleTableChange}
+                loading={loadingFetch}
+              />
+            )}
           </>
+
         )}
       </div>
+      <TimetableDetailsDrawer
+        visible={detailsDrawerVisible}
+        onClose={closeDetailsDrawer}
+        timetable={detailsTimetable}
+
+      />
     </div>
   );
 };

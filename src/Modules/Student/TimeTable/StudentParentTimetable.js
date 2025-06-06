@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchStudentTimetable } from "../../../Store/Slices/Student/TimeTable/studentTimeTable.action";
@@ -25,15 +25,13 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 import { TIMETABLE_TYPES } from "./Components/constants";
 import { Select } from 'antd';
 import AscTimeTableView from "./Components/AscTimeTableView";
+import { fetchGroupsByClassAndSection, fetchGroupsByStudent } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
+import { fetchTimetableList } from "../../../Store/Slices/Admin/TimeTable/timetable.action";
 const { Option } = Select;
 
 const StudentTimetablePage = () => {
   const { t } = useTranslation("admTimeTable");
   const dispatch = useDispatch();
-
-  // Get user role and details from Redux store
-  const role = useSelector((store) => store.common.auth.role);
-  const { userDetails } = useSelector((store) => store.common.user);
 
   // State management
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -44,37 +42,63 @@ const StudentTimetablePage = () => {
   const [detailsTimetable, setDetailsTimetable] = useState(null);
   const [selectedChildId, setSelectedChildId] = useState(null);
   const [selectedTimeTable, setSelectedTimeTable] = useState("classTimeTable")
+  const [paginationConfig, setPaginationConfig] = useState({
+    current: 1,
+    pageSize: 10,
+  });
+  const [filters, setFilters] = useState({
+    class: null,
+    sections: [],
+    groups: [],
+    subject: null,
+    semester: null,
+    status: null,
+    type: null,
+  });
 
+  // Get user role and details from Redux store
+  const role = useSelector((store) => store.common.auth.role);
+  const { userDetails } = useSelector((store) => store.common.user);
   // Redux selectors for data
   const { children = [], loading: loadingChildren } = useSelector(
     (state) => state.Parent.children
   );
-  const studentTimetableData = useSelector(
+  const {
+    timetables = [],
+    counts,
+    loadingFetch,
+    pagination = {}, // We'll store total, page, limit in here
+  } = useSelector(
     (state) => state.student?.studentTimetable
   );
   const parentTimetableData = useSelector(
     (state) => state.Parent?.parentTimetable.timetables
   );
-
-  // Combined timetable data based on role
-  const { timetables = [], loading: loadingFetch } =
-    role === "student"
-      ? studentTimetableData
-      : role === "parent"
-        ? parentTimetableData
-        : { timetables: [], loading: false };
+  const studentGroup = useSelector(
+    (state) => state.admin.group_section.groupsList
+  )
 
   // Set navigation heading
   useNavHeading(role, t("TimeTable"));
 
-  // Fetch initial data based on role
   useEffect(() => {
-    if (role === "student") {
-      dispatch(fetchStudentTimetable());
-    } else if (role === "parent") {
-      dispatch(fetchChildren(userDetails.userId));
+    if (role === 'student') {
+      dispatch(
+        fetchGroupsByStudent({
+          studentId: userDetails.userId,
+        })
+      );
+    } else if (role === 'teacher') {
+      dispatch(
+        fetchGroupsByStudent({
+          studentId: selectedChildId,
+        })
+      );
     }
-  }, [dispatch, role, userDetails.userId]);
+
+  }, [dispatch, userDetails.userId]);
+  // Fetch initial data based on role
+
 
   // Set default child for parent role
   useEffect(() => {
@@ -114,37 +138,67 @@ const StudentTimetablePage = () => {
 
   const { classId, sectionId } = getFilterInfo();
 
-  const filteredTimetables = useMemo(() => {
-    let result = timetables || [];
+    const fetchTimetables = useCallback(
+    (params = {}) => {
+      const queryParams = {
+        page: paginationConfig.current,
+        limit: paginationConfig.pageSize,
+      };
+      if (role === 'student') {
+        queryParams.classId = userDetails?.classId
+          queryParams.sectionId = userDetails?.sectionId
+      }
+      else if (role === 'teacher') {
+        queryParams.classId = classId
+          queryParams.sectionId = sectionId 
+      }
+      if (studentGroup) {
+        queryParams.groupId = studentGroup?.id || studentGroup._id
+      }
 
-    // Filter by type if selected
-    if (filterType) result = result?.filter((tt) => tt.type === filterType);
+      dispatch(fetchStudentTimetable(queryParams))
+        .unwrap()
+        .then((res) => {
+          // If the server returns pagination, update our local state
+          if (res.pagination) {
+            setPaginationConfig((prev) => ({
+              ...prev,
+              current: res.pagination.page,
+              pageSize: res.pagination.limit,
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error("Fetch Timetables Error:", error);
+        });
+    },
+    [dispatch, filters, paginationConfig]
+  );
+  useEffect(() => {
+    fetchTimetables()
+  }, [dispatch, role, userDetails?.userId, classId, sectionId, studentGroup]);
+ 
 
-    // Filter by class
-    if (classId) {
-      result = result.filter((tt) => tt.classId?._id === classId);
-    }
-
-    // Filter by section if available
-    if (sectionId) {
-      result = result.filter((tt) => {
-        if (!tt.sectionId || tt.sectionId.length === 0) return true;
-        return tt.sectionId.some((section) =>
-          typeof section === "object"
-            ? section._id === sectionId
-            : section === sectionId
-        );
-      });
-    }
-
-    return result;
-  }, [timetables, filterType, classId, sectionId]);
-
+    const filteredTimetables = useMemo(() => {
+      let result = [...timetables];
+  
+      // If in calendar view, only show those with showCalendar = true
+      // if (activeTab === "calendar") {
+      //   result = result.filter((t) => t.showCalendar === true);
+      // }
+      
+      // Additionally filter by type if selected via StatsSection
+      if (filters.type) {
+        result = result.filter((t) => t.type === filters.type);
+      }
+  
+      return result;
+    }, [timetables,  filters.type]);
   // Initialize export utilities
   const exportFunctions = new ExportFunctions({
     viewMode,
     selectedDate,
-    timetables,
+    filteredTimetables,
     format,
     dayjs,
     isWithinValidity: (timetable, date) => {
@@ -206,6 +260,10 @@ const StudentTimetablePage = () => {
                 exportFunctions={exportFunctions}
                 selectedDate={selectedDate}
                 setSelectedDate={setSelectedDate}
+                timetables={filteredTimetables}
+                counts={counts}
+                pagination={pagination}
+                loadingFetch={loadingFetch}
                 t={t}
               />
             }
@@ -229,21 +287,22 @@ const StudentTimetablePage = () => {
 
             {/* Timetable Views */}
             {
-                  role === 'parent' && (
-                         selectedTimeTable === 'classTimeTable' ?
-                <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
-                <TimetableViews
-                  loadingFetch={loadingFetch}
-                  loadingChildren={loadingChildren}
-                  role={role}
-                  viewMode={viewMode}
-                  selectedDate={selectedDate}
-                  filteredTimetables={filteredTimetables}
-                  onEventClick={onEventClick}
-                  setSelectedDate={setSelectedDate}
-                  t={t}
-                />
-                  )
+              role === 'parent' && (
+                selectedTimeTable === 'classTimeTable' ?
+                  <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
+                  <TimetableViews
+                    loadingFetch={loadingFetch}
+                    loadingChildren={loadingChildren}
+                    role={role}
+                    viewMode={viewMode}
+                    selectedDate={selectedDate}
+                    timetables={filteredTimetables}
+                    pagination={pagination}
+                    onEventClick={onEventClick}
+                    setSelectedDate={setSelectedDate}
+                    t={t}
+                  />
+              )
             }
 
 
@@ -255,7 +314,7 @@ const StudentTimetablePage = () => {
               loadingFetch={loadingFetch}
               loadingChildren={loadingChildren}
               role={role}
-              filteredTimetables={timetables}
+              filteredTimetables={filteredTimetables}
               TIMETABLE_TYPES={TIMETABLE_TYPES}
               filterType={filterType}
               setFilterType={setFilterType}
@@ -264,6 +323,7 @@ const StudentTimetablePage = () => {
               userDetails={userDetails}
               children={children}
               selectedChildId={selectedChildId}
+              sidebarCollapsed={sidebarCollapsed}
               t={t}
             />
           )}

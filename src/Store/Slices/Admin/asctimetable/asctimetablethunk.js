@@ -106,7 +106,6 @@ export const fetchTimeTablesForTeacher = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const getRole = getUserRole(getState);
-      console.log(getRole)
       const response = await getData(
         `/admin/ascTimeTable/teacher/${teacherId}`
       );
