@@ -14,13 +14,14 @@ const Tabs = ({
   handleSidebarOpen,
 }) => {
   const handleTabClick = (tab) => {
+    if (tab === "questions" && !hasQuizId) return; // ignore clicks
     setActiveTab(tab);
     onTabChange(tab);
   };
 
   const { quizzDetail } = useSelector((store) => store.admin.quizzes);
   const { name, availableFrom, publish } = quizzDetail || {};
-
+  const hasQuizId = !!quizzDetail?._id; // <─ NEW
   // Determine the display date: format if present, else use a placeholder "DD-MM-YY"
   const displayDate = availableFrom
     ? new Date(availableFrom).toLocaleDateString()
@@ -78,27 +79,28 @@ const Tabs = ({
               Quiz Instructions
             </span>
           </button>
-
-          <button
-            onClick={() => handleTabClick("questions")}
-            className={`flex-grow ${
-              activeTab === "questions"
-                ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
-                : "border border-gray-300 text-gray-800"
-            } rounded-md py-2 px-4 text-center transition`}
-          >
-            <span
-              className={`${
-                activeTab === "questions" ? "text-gradient" : "text-black"
-              }`}
+          {hasQuizId && (
+            <button
+              onClick={() => handleTabClick("questions")}
+              className={`flex-grow ${
+                activeTab === "questions"
+                  ? "bg-gradient-to-r from-pink-100 to-purple-100 hover:from-pink-200 hover:to-purple-200"
+                  : "border border-gray-300 text-gray-800"
+              } rounded-md py-2 px-4 text-center transition`}
             >
-              Quiz Questions
-            </span>
-          </button>
+              <span
+                className={`${
+                  activeTab === "questions" ? "text-gradient" : "text-black"
+                }`}
+              >
+                Quiz Questions
+              </span>
+            </button>
+          )}
         </div>
 
         {/* Add Question Button (Protected) */}
-        {activeTab === "questions" && createPage && (
+        {activeTab === "questions" && createPage && hasQuizId && (
           <ProtectedAction
             requiredPermission={PERMISSIONS.ADD_QUESTION_TO_QUIZ}
           >

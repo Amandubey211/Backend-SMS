@@ -336,6 +336,13 @@ const StudentQuizzList = lazy(() =>
 const StudentQuizzesView = lazy(() =>
   import("../Modules/Student/StudentClass/Subjects/Modules/Quizzes/Quizzes.js")
 );
+
+const StudentTakeQuiz = lazy(() =>
+  import(
+    "../Modules/Student/StudentClass/Subjects/Modules/Quizzes/TakeQuiz/StudentTakeQuiz.js"
+  )
+);
+
 const StudentDiscussion = lazy(() =>
   import(
     "../Modules/Student/StudentClass/Subjects/Modules/Discussion/Discussion.js"
@@ -1561,7 +1568,6 @@ function App() {
     {
       path: "/admin/scorecard/:cid",
       element: <ProtectRoute Component={ScoreCard} allowedRoles={["admin"]} />,
-
     },
     // Student------------------------------------------------------------------------------
     {
@@ -1679,6 +1685,13 @@ function App() {
           Component={StudentQuizzesView}
           allowedRoles={["student"]}
         />
+      ),
+      errorElement: <Error />,
+    },
+    {
+      path: "/student_class/:cid/:sid/:qid/take_quiz",
+      element: (
+        <ProtectRoute Component={StudentTakeQuiz} allowedRoles={["student"]} />
       ),
       errorElement: <Error />,
     },

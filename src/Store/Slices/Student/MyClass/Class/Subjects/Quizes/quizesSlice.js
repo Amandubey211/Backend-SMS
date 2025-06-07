@@ -47,8 +47,9 @@ const stdQuizSlice = createSlice({
     setActiveTab: (state, action) => {
       state.activeTab = action.payload;
     },
-    setSelectedOptions: (state, action) => {
-      state.selectedOptions = action.payload;
+    setSelectedOption: (state, action) => {
+      const { index, value } = action.payload;
+      state.selectedOptions[index] = value;
     },
     setCurrentQuestionIndex: (state, action) => {
       state.currentQuestionIndex = action.payload;
@@ -181,6 +182,7 @@ export const {
   setQuizResults,
   setAttemptHistory,
   setTimeLeft,
+  setSelectedOption,
   setTotalTime,
 } = stdQuizSlice.actions;
 

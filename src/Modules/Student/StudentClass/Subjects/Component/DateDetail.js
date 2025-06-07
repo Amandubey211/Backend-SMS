@@ -1,16 +1,14 @@
-import React from "react";
 import { FaRegCalendarAlt } from "react-icons/fa";
 import { format } from "date-fns";
 
 const DateDetail = ({ label, value, labelAbove = false }) => {
-  // Check if value is a valid date
   const isValidDate = value && !isNaN(new Date(value).getTime());
   const formattedDate = isValidDate
     ? format(new Date(value), "dd/MM/yyyy")
     : "N/A";
 
   return (
-    <div className="mt-2 w-full">
+    <div className="mt-1 w-full">
       {labelAbove ? (
         <>
           <p className="text-sm text-gray-600 ">{label}</p>
