@@ -125,7 +125,7 @@ export default function TimeTableDash() {
     current: 1,
     pageSize: 10,
   });
-console.log(userDetails)
+  console.log(userDetails)
   // --------------------------
   // Export Handler Setup
   // --------------------------
@@ -196,11 +196,11 @@ console.log(userDetails)
   // 1) Fetch initial data
   useEffect(() => {
     dispatch(fetchAllClasses());
-   if(role === 'teacher'){
-     fetchTimetables();
-   }else{
-    fetchTeacherTimetables()
-   }
+    if (role === 'teacher') {
+      fetchTimetables();
+    } else {
+      fetchTeacherTimetables()
+    }
     // eslint-disable-next-line
   }, []);
 
@@ -767,14 +767,16 @@ console.log(userDetails)
               >
                 <Button>Export</Button>
               </Popover>
+              {
+                role === 'teacher' && activeTab === 'autoCalendar' ? null : <Button
+                  type="primary"
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
+                  onClick={() => openDrawer(null)}
+                >
+                  + Add Timetable
+                </Button>
+              }
 
-              <Button
-                type="primary"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
-                onClick={() => openDrawer(null)}
-              >
-                + Add Timetable
-              </Button>
 
             </div>
           </div>
@@ -826,7 +828,7 @@ console.log(userDetails)
         )}
         {activeTab === "autoCalendar" && (
           <>
-            { 
+            {
               role === 'teacher' ? <TeacherTimeTable selectedTeacher={userDetails.userId} /> : <MainSection />
             }
 
