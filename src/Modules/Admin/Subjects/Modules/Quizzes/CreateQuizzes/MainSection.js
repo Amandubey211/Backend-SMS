@@ -143,6 +143,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   const [wrongAnswerComment, setWrongAnswerComment] = useState("");
   const [questionPoint, setQuestionPoint] = useState(1);
   const [questionType, setQuestionType] = useState("multiple choice");
+  const [questionSeconds, setQuestionSeconds] = useState(0); // New state for question seconds
 
   // Sidebar for Add/Edit question
   const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -167,6 +168,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       setAnswers([]);
       setRightAnswerComment("");
       setWrongAnswerComment("");
+      setQuestionSeconds(0); // Reset seconds when creating new quiz
     }
   }, [location.state, dispatch, quizIdFromRedux, setIsEditing]);
 
@@ -288,6 +290,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     setWrongAnswerComment("");
     setQuestionPoint(1);
     setQuestionType("multiple choice"); // Default to multiple choice
+    setQuestionSeconds(0); // Reset seconds when adding new question
 
     // Set 4 blank answers so the child renders them immediately
     setAnswers([
@@ -313,6 +316,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       correctAnswer: correctOption ? correctOption.text : "",
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
+      seconds: Number(questionSeconds) || 0, // Include seconds in payload
     };
 
     try {
@@ -336,6 +340,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     questionType,
     rightAnswerComment,
     wrongAnswerComment,
+    questionSeconds, // Include in dependencies
   ]);
 
   // ---------------------------------------------
@@ -351,6 +356,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       correctAnswer: correctOption ? correctOption.text : "",
       correctAnswerComment: rightAnswerComment,
       inCorrectAnswerComment: wrongAnswerComment,
+      seconds: Number(questionSeconds) || 0, // Include seconds in payload
     };
 
     try {
@@ -379,6 +385,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
     rightAnswerComment,
     wrongAnswerComment,
     editingQuestionId,
+    questionSeconds, // Include in dependencies
   ]);
 
   // ---------------------------------------------
@@ -405,6 +412,7 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
         setQuestionPoint(questionToEdit.questionPoint);
         setQuestionType(questionToEdit.type || "multiple choice");
+        setQuestionSeconds(questionToEdit.seconds || 0); // Set seconds when editing
         setSidebarOpen(true);
       }
     },
@@ -571,6 +579,8 @@ const MainSection = ({ setIsEditing, isEditing }) => {
             questionType={questionType}
             rightAnswerComment={rightAnswerComment}
             wrongAnswerComment={wrongAnswerComment}
+            questionSeconds={questionSeconds}
+            setQuestionSeconds={setQuestionSeconds}
             handleQuestionChange={handleQuestionChange}
             handleAnswerChange={handleAnswerChange}
             setAnswers={setAnswers}
