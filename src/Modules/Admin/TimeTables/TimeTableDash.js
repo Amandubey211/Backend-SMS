@@ -63,8 +63,8 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Admin/Class/Semeste
 
 // Utils
 import ExportFunctions from "../../../Utils/timetableUtils";
-import MainSection from "./AutomaticTimeTable/MainSection";
 import TeacherTimeTable from "./AutomaticTimeTable/components/TeacherTimeTable";
+import MainSection from './AutomaticTimeTable/MainSection'
 
 export default function TimeTableDash() {
   const dispatch = useDispatch();
@@ -90,8 +90,8 @@ export default function TimeTableDash() {
   const { semesters: reduxSemesters } = useSelector(
     (state) => state.admin.semesters
   );
-    const role = useSelector((store) => store.common.auth.role);
- const { userDetails } = useSelector((store) => store.common.user);
+  const role = useSelector((store) => store.common.auth.role);
+  const { userDetails } = useSelector((store) => store.common.user);
   // --------------------------
   // Local States
   // --------------------------
@@ -125,7 +125,7 @@ export default function TimeTableDash() {
     current: 1,
     pageSize: 10,
   });
-
+console.log(userDetails)
   // --------------------------
   // Export Handler Setup
   // --------------------------
@@ -196,20 +196,71 @@ export default function TimeTableDash() {
   // 1) Fetch initial data
   useEffect(() => {
     dispatch(fetchAllClasses());
-    fetchTimetables();
+   if(role === 'teacher'){
+     fetchTimetables();
+   }else{
+    fetchTeacherTimetables()
+   }
     // eslint-disable-next-line
   }, []);
 
   // 2) Reusable function to fetch from the server
   const fetchTimetables = useCallback(
     (params = {}) => {
+
       const queryParams = {
         page: paginationConfig.current,
         limit: paginationConfig.pageSize,
         ...filters,
         ...params,
       };
+      // if (studentGroup) {
+      //   queryParams.groupId = studentGroup?.id || studentGroup._id
+      // }
+      // Only include search if not empty
+      if (searchTerm.trim()) {
+        queryParams.search = searchTerm;
+      } else {
+        delete queryParams.search;
+      }
 
+      if (activeTab === "calendar") {
+        queryParams.showCalendar = true;
+      }
+
+      dispatch(fetchTimetableList(queryParams))
+        .unwrap()
+        .then((res) => {
+          // If the server returns pagination, update our local state
+          if (res.pagination) {
+            setPaginationConfig((prev) => ({
+              ...prev,
+              current: res.pagination.page,
+              pageSize: res.pagination.limit,
+            }));
+          }
+        })
+        .catch((error) => {
+          console.error("Fetch Timetables Error:", error);
+        });
+    },
+    [dispatch, filters, searchTerm, activeTab, paginationConfig]
+  );
+  const fetchTeacherTimetables = useCallback(
+    (params = {}) => {
+
+      const queryParams = {
+        page: paginationConfig.current,
+        limit: paginationConfig.pageSize,
+      };
+
+      if (role === 'teacher') {
+        queryParams.class = userDetails?.classIds
+        queryParams.sections = userDetails?.sectionId
+      }
+      // if (studentGroup) {
+      //   queryParams.groupId = studentGroup?.id || studentGroup._id
+      // }
       // Only include search if not empty
       if (searchTerm.trim()) {
         queryParams.search = searchTerm;
@@ -775,10 +826,10 @@ export default function TimeTableDash() {
         )}
         {activeTab === "autoCalendar" && (
           <>
-          {
-            role === 'teacher' && <TeacherTimeTable selectedTeacher={userDetails.userId} /> 
-          }
-            
+            { 
+              role === 'teacher' ? <TeacherTimeTable selectedTeacher={userDetails.userId} /> : <MainSection />
+            }
+
           </>
         )}
 

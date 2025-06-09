@@ -7,6 +7,10 @@ import { fetchChildren } from "../../../Store/Slices/Parent/Children/children.ac
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import { format } from "date-fns";
+import { Button, } from "antd";
+import {
+  AiOutlineFilter,
+} from "react-icons/ai";
 // Layout Components
 import Layout from "../../../Components/Common/Layout";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
@@ -82,6 +86,7 @@ const StudentTimetablePage = () => {
   useNavHeading(role, t("TimeTable"));
 
   useEffect(() => {
+    dispatch(fetchChildren())
     if (role === 'student') {
       dispatch(
         fetchGroupsByStudent({
@@ -106,13 +111,12 @@ const StudentTimetablePage = () => {
       setSelectedChildId(children[0].id);
     }
   }, [children, role, selectedChildId]);
-
   // Fetch timetable for selected child
   useEffect(() => {
     if (role === "parent" && selectedChildId) {
       dispatch(fetchParentTimetable(selectedChildId));
     }
-  }, [dispatch, role, selectedChildId]);
+  }, [dispatch, role,]);
 
   /**
    * Gets filter information (class and section) based on role
@@ -138,7 +142,7 @@ const StudentTimetablePage = () => {
 
   const { classId, sectionId } = getFilterInfo();
 
-    const fetchTimetables = useCallback(
+  const fetchTimetables = useCallback(
     (params = {}) => {
       const queryParams = {
         page: paginationConfig.current,
@@ -146,54 +150,56 @@ const StudentTimetablePage = () => {
       };
       if (role === 'student') {
         queryParams.classId = userDetails?.classId
-          queryParams.sectionId = userDetails?.sectionId
+        queryParams.sectionId = userDetails?.sectionId
       }
-      else if (role === 'teacher') {
+      else if (role === 'parent') {
         queryParams.classId = classId
-          queryParams.sectionId = sectionId 
+        queryParams.sectionId = sectionId
       }
       if (studentGroup) {
         queryParams.groupId = studentGroup?.id || studentGroup._id
       }
 
-      dispatch(fetchStudentTimetable(queryParams))
-        .unwrap()
-        .then((res) => {
-          // If the server returns pagination, update our local state
-          if (res.pagination) {
-            setPaginationConfig((prev) => ({
-              ...prev,
-              current: res.pagination.page,
-              pageSize: res.pagination.limit,
-            }));
-          }
-        })
-        .catch((error) => {
-          console.error("Fetch Timetables Error:", error);
-        });
+      if (queryParams.classId) {
+        dispatch(fetchStudentTimetable(queryParams))
+          .unwrap()
+          .then((res) => {
+            // If the server returns pagination, update our local state
+            if (res.pagination) {
+              setPaginationConfig((prev) => ({
+                ...prev,
+                current: res.pagination.page,
+                pageSize: res.pagination.limit,
+              }));
+            }
+          })
+          .catch((error) => {
+            console.error("Fetch Timetables Error:", error);
+          });
+      }
     },
-    [dispatch, filters, paginationConfig]
+    [dispatch, filters, paginationConfig, selectedChildId]
   );
   useEffect(() => {
     fetchTimetables()
   }, [dispatch, role, userDetails?.userId, classId, sectionId, studentGroup]);
- 
 
-    const filteredTimetables = useMemo(() => {
-      let result = [...timetables];
-  
-      // If in calendar view, only show those with showCalendar = true
-      // if (activeTab === "calendar") {
-      //   result = result.filter((t) => t.showCalendar === true);
-      // }
-      
-      // Additionally filter by type if selected via StatsSection
-      if (filters.type) {
-        result = result.filter((t) => t.type === filters.type);
-      }
-  
-      return result;
-    }, [timetables,  filters.type]);
+
+  const filteredTimetables = useMemo(() => {
+    let result = [...timetables];
+
+    // If in calendar view, only show those with showCalendar = true
+    // if (activeTab === "calendar") {
+    //   result = result.filter((t) => t.showCalendar === true);
+    // }
+
+    // Additionally filter by type if selected via StatsSection
+    if (filters.type) {
+      result = result.filter((t) => t.type === filters.type);
+    }
+
+    return result;
+  }, [timetables, filters.type]);
   // Initialize export utilities
   const exportFunctions = new ExportFunctions({
     viewMode,
@@ -235,6 +241,7 @@ const StudentTimetablePage = () => {
     <Layout title="TimeTable | Student Diwan">
       <DashboardLayout>
         <div className="w-full min-h-screen flex">
+
           {/* Main Content */}
           <div
             className={`flex-1 p-4 transition-all ${sidebarCollapsed ? "mr-0" : "mr-72"
@@ -268,7 +275,7 @@ const StudentTimetablePage = () => {
               />
             }
             {
-              role === "parent" && <div className="my-6 flex justify-end">
+              role === "parent" && <div className="my-6 flex justify-end gap-4">
                 <Select
                   style={{ width: 150 }}
                   onChange={setSelectedTimeTable}
@@ -282,6 +289,15 @@ const StudentTimetablePage = () => {
                     Others
                   </Option>
                 </Select>
+                <div>
+                  <Button
+                    type="default"
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    icon={<AiOutlineFilter />}
+                  >
+                    {sidebarCollapsed ? t("Show Stats") : t("Hide Stats")}
+                  </Button>
+                </div>
               </div>
             }
 
