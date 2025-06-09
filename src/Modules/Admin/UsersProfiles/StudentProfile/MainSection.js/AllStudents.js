@@ -22,6 +22,7 @@ import { PERMISSIONS } from "../../../../../config/permission";
 import { motion } from "framer-motion";
 import { FiUsers } from "react-icons/fi";
 import { BsFilterSquare } from "react-icons/bs";
+import { FaEdit,FaPencilAlt } from "react-icons/fa";
 
 const AllStudents = () => {
   const { t } = useTranslation("admAccounts");
@@ -182,6 +183,18 @@ const AllStudents = () => {
                         >
                           <CgArrowsExchange className="text-gray-700 text-lg" />
                         </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setStudentData(student);
+                            setIsUpdateSidebarOpen(true);
+                          }}
+                          className="p-2 bg-white/90 backdrop-blur-sm rounded-full shadow-md hover:bg-white transition-all duration-200"
+                          aria-label="Change class"
+                        >
+                          <FaPencilAlt className="text-gray-700 text-lg" />
+                        </button>
                       </div>
                     )}
 
@@ -283,7 +296,7 @@ const AllStudents = () => {
           isOpen={isUpdateSidebarOpen}
           onClose={handleSidebarClose}
           title={t("Edit Student")}
-          width="55%"
+          width="80%"
         >
           {studentData && (
             <UpdateStudent

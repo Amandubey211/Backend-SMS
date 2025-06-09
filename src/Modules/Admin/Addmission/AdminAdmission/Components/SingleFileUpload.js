@@ -55,9 +55,9 @@ const SingleFileUpload = memo(
       return idx === -1
         ? null
         : parts
-            .slice(idx + 2)
-            .join("/")
-            .split(".")[0];
+          .slice(idx + 2)
+          .join("/")
+          .split(".")[0];
     }, []);
 
     useEffect(() => {

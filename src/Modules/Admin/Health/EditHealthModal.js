@@ -13,7 +13,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
     useEffect(() => {
-        console.log(studentData, "studentData in EditHealthModal");
+        // console.log(studentData, "studentData in EditHealthModal");
         if (studentData) {
             setImagePreview(studentData.profile || null);
             form.setFieldsValue({
