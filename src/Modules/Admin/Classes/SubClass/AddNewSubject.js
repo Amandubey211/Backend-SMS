@@ -93,8 +93,8 @@ const AddNewSubject = ({ onClose, subject }) => {
       }
       setSubjectTitle(subject?.name || "");
       if (subject?.isOptional && subject?.studentIds) {
-        const preloadedStudentIds = subject.studentIds.map((student) =>
-          student._id ? student._id : student
+        const preloadedStudentIds = subject?.studentIds?.map((student) =>
+          student?._id ? student?._id : student
         );
         setSelectedStudentIds(preloadedStudentIds);
       }

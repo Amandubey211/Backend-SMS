@@ -1,3 +1,4 @@
+// src/Modules/Student/StudentClass/Subjects/Quizzes/Components/QuestionForm.jsx
 import React, { useState } from "react";
 import { InputNumber, Select } from "antd";
 import EditorComponent from "../../../../Component/AdminEditor";
@@ -8,12 +9,15 @@ import { useTranslation } from "react-i18next";
 const { Option } = Select;
 
 const QuestionForm = ({
+  /* ──────────────────── props from MainSection ──────────────────── */
   question,
   answers,
   questionPoint,
   questionType,
   rightAnswerComment,
   wrongAnswerComment,
+  questionSeconds, //  NEW → controlled seconds value
+  setQuestionSeconds, //  NEW → setter from parent
   handleQuestionChange,
   handleAnswerChange,
   setAnswers,
@@ -25,9 +29,8 @@ const QuestionForm = ({
 }) => {
   const { t } = useTranslation("admModule");
   const [answerError, setAnswerError] = useState("");
-  const [questionSeconds, setQuestionSeconds] = useState(""); // optional
 
-  /* add/update question with basic validation */
+  /* ─────────────────── validation & submit ─────────────────── */
   const handleAddQuestion = () => {
     if (
       ["multiple choice", "true/false"].includes(questionType) &&
@@ -40,6 +43,7 @@ const QuestionForm = ({
     addNewQuestion();
   };
 
+  /* ────────────────────────── UI ────────────────────────── */
   return (
     <div className="h-full pb-16 overflow-y-scroll">
       {/* Points • Seconds • Type */}

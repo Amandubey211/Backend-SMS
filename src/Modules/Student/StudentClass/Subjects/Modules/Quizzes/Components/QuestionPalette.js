@@ -1,20 +1,12 @@
+/* QuestionPalette.jsx */
 import React, { useState } from "react";
 import { Avatar, Tooltip, Button, Modal } from "antd";
 import { InfoCircleOutlined, StarFilled } from "@ant-design/icons";
-import { Scrollbars } from "react-custom-scrollbars-2";
 
-/* Brand gradient colours */
 const GRAD_FROM = "#C83B62";
 const GRAD_TO = "#7F35CD";
 
-/* Status-to-color map
-   ▸ answered         → green (easy to recognise ✅)
-   ▸ not-answered     → red (alert)
-   ▸ review           → purple (brand)
-   ▸ answered-review  → darker green
-   ▸ current          → amber
-   ▸ idle             → light-grey
-*/
+/* dot colours ------------------------------------ */
 const dot = {
   idle: "#d1d5db",
   current: "#f59e0b",
@@ -30,14 +22,16 @@ export default function QuestionPalette({
   selectedOptions,
   itemDetails,
   instruction,
+  lockNav,
+  highContrast,
 }) {
   const [instrVisible, setInstrVisible] = useState(false);
 
-  /* Determine palette state for each question index */
+  /* status helper */
   const status = (i) => {
     const s = selectedOptions[i];
     const marked = s?.flag === "review";
-    const answered = !!s?.value || typeof s === "string";
+    const answered = typeof s === "string" ? true : !!s?.value;
 
     if (marked && answered) return "answered-review";
     if (marked) return "review";
@@ -47,101 +41,116 @@ export default function QuestionPalette({
     return "idle";
   };
 
+  /* text colour based on bg */
+  const txt = (bg) => (bg === "#d1d5db" || bg === "#ffffff" ? "#000" : "#fff");
+
   return (
     <div className="h-full flex flex-col">
-      <h3 className="font-semibold text-lg p-6 pb-3">All Questions</h3>
+      <div className="p-6 pb-3 flex justify-between items-center">
+        <h3
+          className={`font-semibold text-md ${
+            highContrast ? "text-white" : ""
+          }`}
+        >
+          All Questions
+        </h3>
+      </div>
 
-      {/* Scrollable palette grid */}
-      <Scrollbars autoHide>
-        <div className="px-6 pb-6">
-          <div
-            className="grid gap-2"
-            style={{ gridTemplateColumns: "repeat(5, 1fr)" }}
-          >
-            {itemDetails.questions.map((_, i) => {
-              const s = status(i);
-              return (
-                <Tooltip key={i} title={`Q${i + 1}`}>
-                  <Avatar
-                    size={36}
-                    style={{
-                      background: dot[s],
-                      cursor: "pointer",
-                      color: "#fff",
-                      border:
-                        s === "current" ? `2px solid ${GRAD_TO}` : undefined,
-                    }}
-                    className="transition hover:scale-105"
-                    onClick={() => setCurrent(i)}
-                  >
-                    {i + 1}
-                    {(s === "review" || s === "answered-review") && (
-                      <StarFilled
-                        style={{
-                          fontSize: 7,
-                          color: "#fff",
-                          position: "absolute",
-                          right: -4,
-                          bottom: -4,
-                        }}
-                      />
-                    )}
-                  </Avatar>
-                </Tooltip>
-              );
-            })}
-          </div>
-
-          {/* Legend */}
-          <div className="mt-8 space-y-2 text-xs leading-4">
-            <Legend c={dot.idle} t="Not visited" />
-            <Legend c={dot["not-answered"]} t="Not answered" />
-            <Legend c={dot.answered} t="Answered" />
-            <Legend c={dot.review} t="Marked for review" />
-            <Legend c={dot["answered-review"]} t="Answered + Marked" />
-            <Legend c={dot.current} t="Current question" />
-          </div>
+      <div className="px-6 pb-6">
+        <div
+          className="grid gap-2"
+          style={{ gridTemplateColumns: "repeat(5,1fr)" }}
+        >
+          {itemDetails.questions.map((_, i) => {
+            const s = status(i);
+            const bg = dot[s];
+            return (
+              <Tooltip key={i} title={`Q${i + 1}`}>
+                <Avatar
+                  size={36}
+                  style={{
+                    background: bg,
+                    color: txt(bg),
+                    cursor: lockNav ? "not-allowed" : "pointer",
+                    border:
+                      s === "current"
+                        ? `2px solid ${GRAD_TO}`
+                        : s === "review"
+                        ? `2px solid transparent`
+                        : undefined,
+                    boxShadow:
+                      s === "review" ? `0 0 0 2px ${GRAD_TO}` : undefined,
+                    opacity: lockNav ? 0.5 : 1,
+                  }}
+                  className="transition hover:scale-105"
+                  onClick={() => !lockNav && setCurrent(i)}
+                >
+                  {i + 1}
+                  {(s === "review" || s === "answered-review") && (
+                    <StarFilled
+                      style={{
+                        fontSize: 7,
+                        color: "#fff",
+                        position: "absolute",
+                        right: -4,
+                        bottom: -4,
+                      }}
+                    />
+                  )}
+                </Avatar>
+              </Tooltip>
+            );
+          })}
         </div>
-      </Scrollbars>
 
-      {/* “Show Instructions” button at bottom */}
+        {/* legend */}
+        <div
+          className={`mt-8 space-y-2 text-xs leading-4 ${
+            highContrast ? "text-white" : ""
+          }`}
+        >
+          {Object.entries({
+            idle: "Not visited",
+            "not-answered": "Not answered",
+            answered: "Answered",
+            review: "Marked for review",
+            "answered-review": "Answered + Marked",
+            current: "Current question",
+          }).map(([k, v]) => (
+            <p key={k} className="flex items-center gap-2">
+              <span
+                className="inline-block w-3 h-3 rounded-full"
+                style={{ background: dot[k] }}
+              />
+              {v}
+            </p>
+          ))}
+        </div>
+      </div>
+
       <div className="mt-auto p-6">
         <Button
           type="link"
           icon={<InfoCircleOutlined />}
           onClick={() => setInstrVisible(true)}
+          style={{ color: GRAD_FROM }}
         >
           Show Instructions
         </Button>
       </div>
 
-      {/* Modal for instructions (renders provided HTML) */}
       <Modal
         title="Quiz Instructions"
-        visible={instrVisible}
+        open={instrVisible}
+        footer={null}
         onCancel={() => setInstrVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setInstrVisible(false)}>
-            Close
-          </Button>,
-        ]}
         bodyStyle={{ maxHeight: "60vh", overflowY: "auto" }}
       >
         <div
-          className="prose max-w-none"
+          className={`prose max-w-none ${highContrast ? "prose-invert" : ""}`}
           dangerouslySetInnerHTML={{ __html: instruction }}
         />
       </Modal>
     </div>
   );
 }
-
-const Legend = ({ c, t }) => (
-  <p className="flex items-center gap-2">
-    <span
-      className="inline-block w-3 h-3 rounded-full"
-      style={{ background: c }}
-    />
-    {t}
-  </p>
-);
