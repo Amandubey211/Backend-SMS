@@ -1,4 +1,3 @@
-/* QuestionPalette.jsx */
 import React, { useState } from "react";
 import { Avatar, Tooltip, Button, Modal } from "antd";
 import { InfoCircleOutlined, StarFilled } from "@ant-design/icons";
@@ -27,11 +26,19 @@ export default function QuestionPalette({
 }) {
   const [instrVisible, setInstrVisible] = useState(false);
 
-  /* status helper */
+  /* status helper - fixed to handle both string and object formats */
   const status = (i) => {
     const s = selectedOptions[i];
+
+    // Handle string format (legacy)
+    if (typeof s === "string") {
+      if (i === current) return "current";
+      return s ? "answered" : "idle";
+    }
+
+    // Handle object format
     const marked = s?.flag === "review";
-    const answered = typeof s === "string" ? true : !!s?.value;
+    const answered = !!s?.value;
 
     if (marked && answered) return "answered-review";
     if (marked) return "review";

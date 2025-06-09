@@ -1,14 +1,16 @@
+/* CalculatorDrawer.jsx */
 import React, { useState, useCallback } from "react";
 import { Button, Input, message, Drawer, Switch } from "antd";
 import { CalculatorOutlined, CloseOutlined } from "@ant-design/icons";
 
-const CalculatorDrawer = ({ open, onClose }) => {
+const CalculatorDrawer = ({ open, onClose, highContrast }) => {
   const [input, setInput] = useState("");
   const [history, setHistory] = useState([]);
   const [isScientific, setIsScientific] = useState(false);
   const OPERATORS = ["+", "-", "*", "/", "%"];
   const isOperator = (ch) => OPERATORS.includes(ch);
   const lastChar = (str) => str.trim().slice(-1);
+
   /* Key layouts */
   const basicButtons = [
     ["C", "⌫", "%", "/"],
@@ -23,6 +25,43 @@ const CalculatorDrawer = ({ open, onClose }) => {
     ["π", "e", "^", "log"],
     ["(", ")", "!", "ln"],
   ];
+
+  /* Button styles based on high contrast */
+  const getButtonStyle = (type) => {
+    const baseStyle = "flex-1 h-12 rounded-md text-xl font-medium border";
+
+    if (highContrast) {
+      switch (type) {
+        case "number":
+          return `${baseStyle} bg-[#505055] text-white border-[#555] hover:bg-[#606065]`;
+        case "operator":
+          return `${baseStyle} bg-[#3A3A7A] text-white border-[#444] hover:bg-[#4A4A8A]`;
+        case "function":
+          return `${baseStyle} bg-[#7A3A3A] text-white border-[#744] hover:bg-[#8A4A4A]`;
+        case "equals":
+          return `${baseStyle} bg-[#3A7A3A] text-white border-[#474] hover:bg-[#4A8A4A]`;
+        case "scientific":
+          return `${baseStyle} bg-[#5A3A7A] text-white border-[#646] hover:bg-[#6A4A8A]`;
+        default:
+          return `${baseStyle} bg-[#404045] text-white border-[#555]`;
+      }
+    } else {
+      switch (type) {
+        case "number":
+          return `${baseStyle} bg-gray-100 hover:bg-gray-200 text-gray-800 border-gray-200`;
+        case "operator":
+          return `${baseStyle} bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-200`;
+        case "function":
+          return `${baseStyle} bg-orange-100 hover:bg-orange-200 text-orange-800 border-orange-200`;
+        case "equals":
+          return `${baseStyle} bg-green-500 hover:bg-green-600 text-white border-green-500`;
+        case "scientific":
+          return `${baseStyle} bg-purple-100 hover:bg-purple-200 text-purple-800 border-purple-200`;
+        default:
+          return `${baseStyle} bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200`;
+      }
+    }
+  };
 
   /* ────────────────────────────────
      Button Click Handler
@@ -126,9 +165,15 @@ const CalculatorDrawer = ({ open, onClose }) => {
       width={380}
       onClose={onClose}
       open={open}
-      bodyStyle={{ padding: 16 }}
+      bodyStyle={{
+        padding: 16,
+        background: highContrast ? "#404045" : "#fff",
+      }}
       title={
-        <div className="flex items-center justify-between">
+        <div
+          className="flex items-center justify-between"
+          style={{ color: highContrast ? "#fff" : undefined }}
+        >
           <span className="flex items-center gap-2">
             <CalculatorOutlined />
             Advanced Calculator
@@ -141,6 +186,11 @@ const CalculatorDrawer = ({ open, onClose }) => {
           />
         </div>
       }
+      headerStyle={{
+        background: highContrast ? "#404045" : "#fff",
+        borderBottom: highContrast ? "1px solid #555" : "1px solid #eee",
+        color: highContrast ? "#fff" : undefined,
+      }}
     >
       {/* Display */}
       <Input.TextArea
@@ -149,33 +199,52 @@ const CalculatorDrawer = ({ open, onClose }) => {
         readOnly
         style={{
           resize: "none",
-          background: "#f0f0f0",
-          border: "1px solid #d9d9d9",
+          background: highContrast ? "#505055" : "#f0f0f0",
+          border: highContrast ? "1px solid #555" : "1px solid #d9d9d9",
           borderRadius: 8,
           padding: 12,
           fontSize: 24,
           fontFamily: "monospace",
           textAlign: "right",
           marginBottom: 16,
+          color: highContrast ? "#fff" : undefined,
         }}
       />
 
       {/* History */}
       {history.length > 0 && (
-        <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-xs text-gray-500 font-medium">History:</span>
-            <Button type="text" size="small" onClick={clearHistory}>
+        <div
+          className="mb-4 p-3 rounded-lg border"
+          style={{
+            background: highContrast ? "#505055" : "#f0f0f0",
+            borderColor: highContrast ? "#555" : "#d9d9d9",
+          }}
+        >
+          <div
+            className="flex justify-between items-center mb-2"
+            style={{ color: highContrast ? "#ddd" : "#666" }}
+          >
+            <span className="text-xs font-medium">History:</span>
+            <Button
+              type="text"
+              size="small"
+              onClick={clearHistory}
+              style={{ color: highContrast ? "#ddd" : undefined }}
+            >
               Clear All
             </Button>
           </div>
           {history.map((item, idx) => (
             <div
-              className="flex justify-between items-center py-1 hover:bg-gray-100 rounded px-1"
+              className="flex justify-between items-center py-1 rounded px-1"
+              style={{
+                background: highContrast ? "#606065" : "#f8f8f8",
+                color: highContrast ? "#fff" : "#666",
+              }}
               key={idx}
             >
               <div
-                className="text-sm font-mono text-gray-600 truncate flex-1 cursor-pointer"
+                className="text-sm font-mono truncate flex-1 cursor-pointer"
                 onClick={() => setInput(item.split("=")[0].trim())}
               >
                 {item}
@@ -188,6 +257,7 @@ const CalculatorDrawer = ({ open, onClose }) => {
                   e.stopPropagation();
                   removeHistoryItem(idx);
                 }}
+                style={{ color: highContrast ? "#ddd" : undefined }}
               />
             </div>
           ))}
@@ -203,12 +273,7 @@ const CalculatorDrawer = ({ open, onClose }) => {
                 <button
                   key={btn}
                   onClick={() => handleButtonClick(btn)}
-                  className={`flex-1 h-12 rounded-md text-lg font-medium border
-                    ${
-                      btn
-                        ? "bg-purple-100 text-purple-800 hover:bg-purple-200 border-purple-200"
-                        : "invisible"
-                    }`}
+                  className={getButtonStyle("scientific")}
                 >
                   {btn}
                 </button>
@@ -223,22 +288,18 @@ const CalculatorDrawer = ({ open, onClose }) => {
               const isFunc = ["C", "⌫", "="].includes(btn);
               const isOp = isOperator(btn);
 
+              let type = "";
+              if (isNumber) type = "number";
+              else if (isOp) type = "operator";
+              else if (isFunc) {
+                type = btn === "=" ? "equals" : "function";
+              }
+
               return (
                 <button
                   key={btn || `empty-${r}`}
                   onClick={() => btn && handleButtonClick(btn)}
-                  className={`flex-1 h-12 rounded-md text-xl font-medium border border-gray-200
-                    ${!btn ? "invisible" : ""}
-                    ${isNumber && "bg-gray-100 hover:bg-gray-200 text-gray-800"}
-                    ${isOp && "bg-blue-100 hover:bg-blue-200 text-blue-800"}
-                    ${
-                      isFunc &&
-                      (btn === "C"
-                        ? "bg-red-100 hover:bg-red-200 text-red-800"
-                        : btn === "="
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-orange-100 hover:bg-orange-200 text-orange-800")
-                    }`}
+                  className={getButtonStyle(type)}
                 >
                   {btn === "*" ? "×" : btn === "/" ? "÷" : btn}
                 </button>
