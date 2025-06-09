@@ -1,3 +1,4 @@
+/* src/Modules/Student/StudentClass/Subjects/Quizzes/StudentTakeQuiz.jsx */
 import React, {
   useEffect,
   useRef,
@@ -96,6 +97,7 @@ const RectTimer = ({ left, total }) => {
     </div>
   );
 };
+
 const QuestionTimer = ({
   timeLeft = 0,
   totalTime = 1,
@@ -212,9 +214,96 @@ export default function StudentTakeQuiz() {
   const [showCalc, setShowCalc] = useState(false);
   const [highContrast, setHighContrast] = useState(false);
   const [warningShown, setWarningShown] = useState(false);
+  const [violationCount, setViolationCount] = useState(0);
+  const [isQuizEnded, setIsQuizEnded] = useState(false);
 
   const mainTimerRef = useRef(null);
   const qTimerRef = useRef(null);
+  const fullscreenAttemptRef = useRef(0);
+
+  /* Security: Prevent copy/paste and context menu */
+  useEffect(() => {
+    const handleCopy = (e) => {
+      e.preventDefault();
+      message.warning("Copying is disabled during the quiz");
+      return false;
+    };
+
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      return false;
+    };
+
+    document.addEventListener("copy", handleCopy);
+    document.addEventListener("cut", handleCopy);
+    document.addEventListener("contextmenu", handleContextMenu);
+
+    return () => {
+      document.removeEventListener("copy", handleCopy);
+      document.removeEventListener("cut", handleCopy);
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
+  }, []);
+
+  /* Security: Detect tab/window changes */
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        const newCount = violationCount + 1;
+        setViolationCount(newCount);
+
+        if (newCount >= 4) {
+          // count for tab violation
+          handleSubmit();
+          message.error("Quiz submitted due to multiple tab changes");
+        } else {
+          message.warning(
+            `Warning ${newCount}/4: Don't switch tabs during the quiz`
+          );
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [violationCount]);
+
+  /* Fullscreen enforcement */
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      try {
+        if (!document.fullscreenElement && fullscreenAttemptRef.current < 3) {
+          await document.documentElement.requestFullscreen();
+          setIsFull(true);
+          fullscreenAttemptRef.current = 0;
+        }
+      } catch (err) {
+        fullscreenAttemptRef.current += 1;
+        if (fullscreenAttemptRef.current < 3) {
+          setTimeout(enterFullscreen, 1000);
+        } else {
+          message.error("Please enable fullscreen to continue with the quiz");
+        }
+      }
+    };
+
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement && !isQuizEnded) {
+        message.warning("Please return to fullscreen mode");
+        enterFullscreen();
+      }
+    };
+
+    // Initial fullscreen entry
+    enterFullscreen();
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, [isQuizEnded]);
 
   /* Show warning notification when time is low */
   useEffect(() => {
@@ -330,6 +419,7 @@ export default function StudentTakeQuiz() {
   const handleSubmit = useCallback(async () => {
     clearInterval(mainTimerRef.current);
     clearInterval(qTimerRef.current);
+    setIsQuizEnded(true);
 
     const payload = questions.map((q, i) => ({
       questionId: q._id,
@@ -349,6 +439,12 @@ export default function StudentTakeQuiz() {
 
     dispatch(setAttemptHistory([...attemptHistory, res.newAttempt]));
     dispatch(setQuizResults(res));
+
+    // Exit fullscreen after submission
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    }
+
     navigate(`/student_class/${cid}/${sid}/quizzes/${quizId}/view`);
   }, [
     questions,
@@ -365,12 +461,13 @@ export default function StudentTakeQuiz() {
 
   /* fullscreen toggle */
   const toggleFull = async () => {
-    if (!document.fullscreenElement) {
-      await document.documentElement.requestFullscreen();
-      setIsFull(true);
-    } else {
-      await document.exitFullscreen();
-      setIsFull(false);
+    if (!document.fullscreenElement && !isQuizEnded) {
+      try {
+        await document.documentElement.requestFullscreen();
+        setIsFull(true);
+      } catch (err) {
+        message.error("Fullscreen is required to continue the quiz");
+      }
     }
   };
 
@@ -498,6 +595,7 @@ export default function StudentTakeQuiz() {
     <Layout
       className={highContrast ? "bg-[#404045] text-white" : ""}
       style={{ height: "100vh" }}
+      onContextMenu={(e) => e.preventDefault()}
     >
       {contextHolder}
       {/* NAVBAR */}
@@ -626,10 +724,14 @@ export default function StudentTakeQuiz() {
 
               {/* question text */}
               <div
-                className={`prose max-w-none mb-8 ${
+                className={`prose max-w-none mb-8 select-none ${
                   highContrast ? "text-white" : "text-black"
                 }`}
                 dangerouslySetInnerHTML={{ __html: q.questionText }}
+                onCopy={(e) => {
+                  e.preventDefault();
+                  message.warning("Copying is disabled during the quiz");
+                }}
               />
 
               {/* answer area */}
@@ -665,6 +767,12 @@ export default function StudentTakeQuiz() {
                           !isLocked && e.key === "Enter" && pickOption(o.text)
                         }
                         className={`relative border rounded-lg p-3 pl-12 select-none transition ${wrapper} ${lockStyle}`}
+                        onCopy={(e) => {
+                          e.preventDefault();
+                          message.warning(
+                            "Copying is disabled during the quiz"
+                          );
+                        }}
                       >
                         <span
                           className={`absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full text-sm font-semibold ${bubble}`}
@@ -700,6 +808,10 @@ export default function StudentTakeQuiz() {
                   maxLength={500}
                   showCount
                   className="resize-none mb-12"
+                  onCopy={(e) => {
+                    e.preventDefault();
+                    message.warning("Copying is disabled during the quiz");
+                  }}
                 />
               )}
 
@@ -785,6 +897,7 @@ export default function StudentTakeQuiz() {
         title="Submit Quiz?"
         open={confirmSubmit}
         onOk={handleSubmit}
+        centered
         onCancel={() => setSubmit(false)}
         styles={modalStyles}
         okButtonProps={{
@@ -801,6 +914,7 @@ export default function StudentTakeQuiz() {
         title="Time's up!"
         open={timesUp}
         footer={null}
+        centered
         onCancel={() => setTimesUp(false)}
         styles={modalStyles}
       >
@@ -821,6 +935,7 @@ export default function StudentTakeQuiz() {
       <Modal
         title="Go back and end quiz?"
         open={confirmBack}
+        centered
         okText="Yes, submit & exit"
         cancelText="Stay"
         styles={modalStyles}
