@@ -102,7 +102,7 @@ const CustomUploadCard = ({
         setPublicId(id);
         setCurrentImage(url);
         form.setFieldValue(name, url); 
-        message.success("Image uploaded ✔");
+        // message.success("Image uploaded ✔");
         setLocalFile(null);
         setLocalURL(null);
       }
