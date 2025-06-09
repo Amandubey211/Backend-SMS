@@ -23,7 +23,7 @@ export const fetchTimetableList = createAsyncThunk(
 
       dispatch(setShowError(false));
 
-      const response = await getData(`/${role}/timetable?say=${say}`, filters);
+      const response = await getData(`/student/timetable?say=${say}`, filters);
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
