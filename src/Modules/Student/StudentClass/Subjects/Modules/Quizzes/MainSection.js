@@ -1,7 +1,8 @@
+/* src/Modules/Student/StudentClass/Subjects/Quizzes/MainSection.jsx */
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Alert, Steps, Button } from "antd";
+import { Card, Alert, Steps, Button, message } from "antd"; // ⬅️ added `message`
 import { motion } from "framer-motion";
 
 import SubjectSideBar from "../../Component/SubjectSideBar";
@@ -15,9 +16,7 @@ import { fetchAllAttemptHistory } from "../../../../../../Store/Slices/Student/M
 
 const { Step } = Steps;
 
-/* ------------------------------------------------------------------ */
-/*                              sub-component                         */
-/* ------------------------------------------------------------------ */
+/* ---------------------------- sub-component ----------------------------- */
 const QuizInstructions = ({ acknowledged, onAcknowledge, onTakeQuiz }) => (
   <Card title="Before Starting" bordered={false}>
     <Alert
@@ -57,9 +56,7 @@ const QuizInstructions = ({ acknowledged, onAcknowledge, onTakeQuiz }) => (
   </Card>
 );
 
-/* ------------------------------------------------------------------ */
-/*                               MAIN                                 */
-/* ------------------------------------------------------------------ */
+/* --------------------------------- MAIN --------------------------------- */
 export default function MainSection() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -82,9 +79,14 @@ export default function MainSection() {
     dispatch(fetchAllAttemptHistory({ quizId }));
   }, [dispatch, quizId]);
 
-  /* handlers */
-  const goToTakeQuiz = () =>
+  /* handler */
+  const goToTakeQuiz = () => {
+    if (!hasRemainingAttempts()) {
+      message.warning("You have no remaining attempts for this quiz.");
+      return;
+    }
     navigate(`/student_class/${cid}/${sid}/${quizId}/take_quiz`);
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -140,8 +142,6 @@ export default function MainSection() {
 
           {activeTab === "questions" && (
             <div className="space-y-6">
-              {/* <QuizResultSummary /> */}
-              {/* shows basic details; hide timer here */}
               <QuestionDetailCard hideTime />
             </div>
           )}

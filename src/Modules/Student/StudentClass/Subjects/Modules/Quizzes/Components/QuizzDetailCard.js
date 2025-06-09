@@ -1,21 +1,32 @@
-import React from "react";
+/* src/Modules/Student/StudentClass/Subjects/Quizzes/Components/QuizzDetailCard.jsx */
+import React, { useMemo } from "react";
 import DateDetail from "../../../Component/DateDetail";
 import AssignmentDetail from "../../../Component/AssignmentDetail";
 import { useSelector } from "react-redux";
 
-// Utility function to convert minutes to hours and minutes
-const formatTimeLimit = (minutes) => {
-  const hrs = Math.floor(minutes / 60); // Calculate hours
-  const mins = minutes % 60; // Remaining minutes
-  return `${hrs > 0 ? `${hrs} hr` : ""} ${
-    mins > 0 ? `${mins} Minute` : ""
-  }`.trim();
+/* convert minutes ➡ `xh ym` */
+const formatTimeLimit = (minutes = 0) => {
+  const hrs = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return `${hrs ? `${hrs} hr` : ""} ${mins ? `${mins} min` : ""}`.trim();
 };
 
 const QuizzDetailCard = () => {
-  const { itemDetails: quiz } = useSelector(
-    (store) => store?.student?.studentQuiz
+  /* pull quiz meta + attempt history from store */
+  const { itemDetails: quiz, attemptHistory } = useSelector(
+    (s) => s.student.studentQuiz
   );
+
+  /* compute remaining attempts once per render */
+  const remainingAttempts = useMemo(() => {
+    if (quiz?.allowNumberOfAttempts === null) return "Unlimited";
+    return Math.max(
+      (quiz?.allowNumberOfAttempts || 0) - (attemptHistory?.length || 0),
+      0
+    );
+  }, [quiz?.allowNumberOfAttempts, attemptHistory]);
+
+  /* build the detail rows */
   const quizDetails = [
     { label: "Due Date", value: quiz?.dueDate, type: "date" },
     { label: "Quiz Type", value: quiz?.quizType, type: "quizz" },
@@ -23,19 +34,25 @@ const QuizzDetailCard = () => {
       label: "Quiz Points",
       value: quiz?.totalPoints,
       type: "quizz",
-      extra: "Point",
+      extra: "Pts",
     },
     {
-      label: "Allow Attempts",
-      value: quiz?.allowNumberOfAttempts,
+      label: "Allowed Attempts",
+      value: quiz?.allowNumberOfAttempts ?? "Unlimited",
       type: "quizz",
-      extra: "Time",
+      extra: "Times",
+    },
+    {
+      label: "Remaining Attempts",
+      value: remainingAttempts,
+      type: "quizz",
+      extra: "Left",
     },
     {
       label: "Questions",
       value: quiz?.questions?.length,
       type: "quizz",
-      extra: "Question",
+      extra: "Qs",
     },
     {
       label: "Time Limit",
@@ -45,27 +62,19 @@ const QuizzDetailCard = () => {
   ];
 
   return (
-    <div className="px-4   ">
-      {quizDetails?.map((detail, index) => {
-        if (detail.type === "quizz") {
-          return (
-            <AssignmentDetail
-              key={index}
-              label={detail?.label}
-              extra={detail?.extra}
-              value={detail?.value}
-            />
-          );
-        } else if (detail?.type === "date") {
-          return (
-            <DateDetail
-              key={index}
-              label={detail?.label}
-              value={detail?.value}
-            />
-          );
-        }
-      })}
+    <div className="px-4">
+      {quizDetails.map((d, i) =>
+        d.type === "date" ? (
+          <DateDetail key={i} label={d.label} value={d.value} />
+        ) : (
+          <AssignmentDetail
+            key={i}
+            label={d.label}
+            value={d.value}
+            extra={d.extra}
+          />
+        )
+      )}
     </div>
   );
 };
