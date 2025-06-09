@@ -303,6 +303,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose, Type }) => {
   const { loadingCreate, loadingUpdate } = useSelector(
     (state) => state.admin.timetable
   );
+  const role = useSelector((store) => store.common.auth.role);
 
   const memoizedClassOptions = useMemo(
     () =>
@@ -1223,7 +1224,7 @@ const TimeTableForm = ({ editingTimetable, onSubmit, onClose, Type }) => {
           </TabPane>
         )}
 
-        {showAutomaticTab && (
+        {showAutomaticTab && role === 'admin' && (
           <TabPane tab="Automatic Timetable" key="automatic">
             <Form layout="vertical" form={autoForm} requiredMark={false}>
               <Row gutter={[16, 16]}>

@@ -831,7 +831,7 @@ const role = useSelector((store) => store.common.auth.role);
 
         {/* Sticky Footer for Edit and Delete */}
       {
-        role === 'admin' &&   <div className="sticky bottom-0 bg-white py-4 border-t">
+        (role === 'admin' || role === 'teacher') &&   <div className="sticky bottom-0 bg-white py-4 border-t">
           <div className="flex justify-end gap-2">
             <Button
               type="default"
