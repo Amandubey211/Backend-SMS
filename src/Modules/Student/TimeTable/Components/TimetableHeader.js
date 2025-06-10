@@ -64,13 +64,16 @@ const TimetableHeader = ({
             <Tabs.TabPane key="otherTimetable" tab="Other TimeTable" />
           </Tabs>
           <div className="flex items-center gap-2">
-            <Button
-              type="default"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              icon={<AiOutlineFilter />}
-            >
-              {sidebarCollapsed ? t("Show Stats") : t("Hide Stats")}
-            </Button>
+            {
+              activeTab === "otherTimetable" && <Button
+                type="default"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                icon={<AiOutlineFilter />}
+              >
+                {sidebarCollapsed ? t("Show Stats") : t("Hide Stats")}
+              </Button>
+            }
+
 
             {/* {activeTab === "otherTimetable" && (
               <div className="flex items-center gap-2">
@@ -201,7 +204,7 @@ const TimetableContainer = ({ timetables, counts, loadingFetch, pagination, side
     setDetailsTimetable(timetable);
     setDetailsDrawerVisible(true);
   };
-  
+
   const handleTableChange = (pagination, filterObj, sorter) => {
     setPaginationConfig((prev) => ({
       ...prev,
