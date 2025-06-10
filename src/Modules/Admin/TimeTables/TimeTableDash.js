@@ -125,7 +125,6 @@ export default function TimeTableDash() {
     current: 1,
     pageSize: 10,
   });
-  console.log(userDetails)
   // --------------------------
   // Export Handler Setup
   // --------------------------
@@ -752,21 +751,27 @@ export default function TimeTableDash() {
                 </Radio.Group>
               )}
 
-              <Button
-                type="default"
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                icon={<AiOutlineFilter />}
-              >
-                {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
-              </Button>
+              {
+                activeTab === 'list' && <Button
+                  type="default"
+                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                  icon={<AiOutlineFilter />}
+                >
+                  {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
+                </Button>
+              }
 
-              <Popover
-                content={exportContent}
-                trigger="click"
-                placement="bottomRight"
-              >
-                <Button>Export</Button>
-              </Popover>
+              {
+                activeTab === 'list' && <Popover
+                  content={exportContent}
+                  trigger="click"
+                  placement="bottomRight"
+                >
+                  <Button>Export</Button>
+                </Popover>
+              }
+
+
               {
                 role === 'teacher' && activeTab === 'autoCalendar' ? null : <Button
                   type="primary"
@@ -783,19 +788,22 @@ export default function TimeTableDash() {
         </div>
 
         {/* Filters & Search */}
-        <SearchComponent
-          searchTerm={searchTerm}
-          handleSearchChange={handleSearchChange}
-          handleClearSearch={() => {
-            setSearchTerm(""); // Clear the search term state
-            fetchTimetables({ search: undefined, page: 1 }); // Fetch without search query
-          }}
-          filters={filters}
-          handleFilterChange={handleFilterChange}
-          setShowFilterDrawer={setShowFilterDrawer}
-          filterTags={filterTags}
-          clearAllFilters={clearAllFilters}
-        />
+        {
+          activeTab === "list" && <SearchComponent
+            searchTerm={searchTerm}
+            handleSearchChange={handleSearchChange}
+            handleClearSearch={() => {
+              setSearchTerm(""); // Clear the search term state
+              fetchTimetables({ search: undefined, page: 1 }); // Fetch without search query
+            }}
+            filters={filters}
+            handleFilterChange={handleFilterChange}
+            setShowFilterDrawer={setShowFilterDrawer}
+            filterTags={filterTags}
+            clearAllFilters={clearAllFilters}
+          />
+        }
+
 
         {/* Conditionally Render List /Automatic / Calendar */}
         {activeTab === "list" && (

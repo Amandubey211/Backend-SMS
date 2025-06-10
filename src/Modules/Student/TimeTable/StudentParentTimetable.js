@@ -290,13 +290,16 @@ const StudentTimetablePage = () => {
                   </Option>
                 </Select>
                 <div>
-                  <Button
-                    type="default"
-                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                    icon={<AiOutlineFilter />}
-                  >
-                    {sidebarCollapsed ? t("Show Stats") : t("Hide Stats")}
-                  </Button>
+                  {
+                    selectedTimeTable === 'others' && <Button
+                      type="default"
+                      onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                      icon={<AiOutlineFilter />}
+                    >
+                      {sidebarCollapsed ? t("Show Stats") : t("Hide Stats")}
+                    </Button>
+                  }
+
                 </div>
               </div>
             }
