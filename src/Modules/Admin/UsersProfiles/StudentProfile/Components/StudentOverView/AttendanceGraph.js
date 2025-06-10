@@ -4,19 +4,20 @@ import { Chart, registerables } from "chart.js";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { fetchAttendanceData } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+
 Chart.register(...registerables);
+
 const AttendanceGraph = () => {
   const { cid } = useParams();
   const attendanceData = useSelector(
     (store) => store.admin.all_students.attendanceData
   );
 
-  console.log(attendanceData, "attendanceDataattendanceData");
   const dispatch = useDispatch();
 
   const [chartData, setChartData] = useState({
     labels: [
-      "months",
+      "Months",
       "Jan",
       "Feb",
       "Mar",
@@ -33,7 +34,7 @@ const AttendanceGraph = () => {
     datasets: [
       {
         label: "Present",
-        data: Array(13).fill(0),
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         borderColor: "rgba(75, 192, 192, 1)",
         backgroundColor: "rgba(75, 192, 192, 0.2)",
         tension: 0.4,
@@ -41,7 +42,7 @@ const AttendanceGraph = () => {
       },
       {
         label: "Absent",
-        data: Array(13).fill(0),
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         borderColor: "rgba(255, 99, 132, 1)",
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         tension: 0.4,
@@ -49,7 +50,7 @@ const AttendanceGraph = () => {
       },
       {
         label: "Leave",
-        data: Array(13).fill(0),
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         borderColor: "rgba(153, 102, 255, 1)",
         backgroundColor: "rgba(153, 102, 255, 0.2)",
         tension: 0.4,
@@ -64,8 +65,6 @@ const AttendanceGraph = () => {
 
   useEffect(() => {
     if (attendanceData) {
-      const updatedData = { ...chartData };
-
       const months = [
         "January",
         "February",
@@ -80,6 +79,9 @@ const AttendanceGraph = () => {
         "November",
         "December",
       ];
+
+      const updatedData = { ...chartData };
+
       months.forEach((month, index) => {
         updatedData.datasets[0].data[index + 1] =
           attendanceData[month]?.presentCount || 0;
@@ -98,7 +100,7 @@ const AttendanceGraph = () => {
       tooltip: {
         callbacks: {
           label: function (context) {
-            return `${context.dataset.label}: ${context.raw.toLocaleString()}`;
+            return `${context.dataset.label}: ${context.raw}`;
           },
         },
       },
@@ -113,7 +115,13 @@ const AttendanceGraph = () => {
     },
   };
 
-  return <Line data={chartData} options={options} />;
+  return(
+
+    <div className="w-full h-full flex justify-center items-center">
+
+    <Line data={chartData} options={options} />
+  </div>
+  )
 };
 
 export default AttendanceGraph;

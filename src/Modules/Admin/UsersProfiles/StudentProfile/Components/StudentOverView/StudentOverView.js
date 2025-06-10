@@ -27,22 +27,22 @@ const StudentOverView = ({ student }) => {
             <AllSubjects student={student} />
           </div>
         </ProtectedSection>
-        <div className="mt-4 w-full h-96 justify-center items-center flex self-center border-t-2 flex-col">
-          <h1 className="mb-4 font-bold">{t("Attendance")}</h1>
+        <div className="mt-4 w-full h-96 flex flex-col justify-center items-center border-t-2">
+          <h1 className="mb-4 mt-4 font-bold">{t("Attendance")}</h1>
           <ProtectedSection
             requiredPermission={PERMISSIONS.GET_YEARLY_ATTENDEC}
-            title={"Attendence Graph"}
+            title={"Attendance Graph"}
           >
-            <div className=" flex w-full h-[95%]  justify-center items-center ">
+            <div className="w-full h-[95%] flex justify-center items-center">
               <AttendanceGraph />
             </div>
           </ProtectedSection>
         </div>
         <div className="flex justify-between w-[100%] border-t-2">
-          <p className="px-4 w-[50%] font-bold text-gray-500">
+          <p className="w-[25%] font-bold text-gray-500 text-center mt-4">
             {t("Student Grade")}
           </p>
-          <p className="flex-1 text-left font-bold text-gray-500 px-10">
+          <p className="font-bold text-gray-500 mt-4 mr-64">
             {t("Task")}
           </p>
         </div>

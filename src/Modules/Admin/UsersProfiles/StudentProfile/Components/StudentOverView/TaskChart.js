@@ -13,21 +13,21 @@ import { useParams } from 'react-router-dom';
 Chart.register(ArcElement, Tooltip, Legend);
 
 const TaskChart = () => {
-    const {cid} = useParams()
-    const {completedTask,inCompletedTask} = useSelector((store) => store.admin.all_students);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(fetchStudentTask({id:cid}))
-  }, [dispatch])
+    const { cid } = useParams()
+    const { completedTask, inCompletedTask } = useSelector((store) => store.admin.all_students);
+    const dispatch = useDispatch();
+    useEffect(() => {
+        dispatch(fetchStudentTask({ id: cid }))
+    }, [dispatch])
 
     const data = {
         datasets: [
             {
-               
-                data: [completedTask,inCompletedTask],
+
+                data: [completedTask, inCompletedTask],
                 backgroundColor: [
-                    'pink', 
-                    'orange'  
+                    'pink',
+                    'orange'
                 ],
                 borderColor: [
                     'rgba(255, 99, 132, 1)',
@@ -36,7 +36,7 @@ const TaskChart = () => {
                 borderWidth: 1,
                 cutout: '70%'
             },
-            
+
         ]
     };
 
@@ -48,7 +48,7 @@ const TaskChart = () => {
             },
             tooltip: {
                 callbacks: {
-                    label: function(tooltipItem) {
+                    label: function (tooltipItem) {
                         return `${tooltipItem.label}: ${tooltipItem.raw}%`;
                     }
                 }
@@ -60,13 +60,13 @@ const TaskChart = () => {
     return (
         <>
             <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[15rem] ">
-              <div className='flex flex-row gap-10 mb-4'>
-              <p className='text-gray-500'>Completed <spna className='text-pink-600 font-bold'>{completedTask}%</spna></p>
-              <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{inCompletedTask}%</spna></p>
-              </div>
-              <Doughnut data={data} options={options} />
+                <Doughnut data={data} options={options} />
+                <div className='flex w-full justify-center gap-10 mt-5'>
+                    <p className='text-gray-500'>Completed <spna className='text-pink-600 font-bold'>{completedTask}%</spna></p>
+                    <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{inCompletedTask}%</spna></p>
+                </div>
             </div>
-</>
+        </>
     );
 };
 
