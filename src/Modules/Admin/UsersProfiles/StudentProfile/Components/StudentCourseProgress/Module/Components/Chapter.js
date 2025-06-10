@@ -1,5 +1,6 @@
 import React from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { AiOutlineFileSearch } from "react-icons/ai";
 import ChapterItem from "./ChapterItem";
 
 const Chapter = ({
@@ -8,7 +9,7 @@ const Chapter = ({
   imageUrl,
   assignments = [],
   quizzes = [],
-  attachments=[],
+  attachments = [],
   isExpanded,
   onToggle,
   id
@@ -25,7 +26,7 @@ const Chapter = ({
     })),
     ...attachments?.map((a) => ({
       ...a,
-      type:a?.type,
+      type: a?.type,
     })),
   ];
 
@@ -65,7 +66,7 @@ const Chapter = ({
               <ChapterItem
                 key={index}
                 type={item?.type}
-                title={item?.title ||item?.name || "Untitled"}
+                title={item?.title || item?.name || "Untitled"}
                 url={item?.url || null}
                 id={item?._id}
                 submitted={item?.submitted}
@@ -73,6 +74,7 @@ const Chapter = ({
             ))
           ) : (
             <p className="py-2 bg-gray-50 italic text-gray-500 text-center">
+              <AiOutlineFileSearch className="text-[5rem] text-gray-500" />
               No data found
             </p>
           )}

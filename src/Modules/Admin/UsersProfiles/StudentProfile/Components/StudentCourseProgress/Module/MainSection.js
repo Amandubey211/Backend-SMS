@@ -7,6 +7,7 @@ import { GoAlertFill } from "react-icons/go";
 import { fetchCourseProgress } from "../../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { FaCheckCircle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { AiOutlineFileSearch } from "react-icons/ai";
 
 const MainSection = () => {
   const { t } = useTranslation('admAccounts');
@@ -64,7 +65,7 @@ const MainSection = () => {
           ) : (
             <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
               <div className="flex items-center justify-center flex-col text-2xl">
-                <GoAlertFill className="text-[5rem] text-gray-500" />
+                <AiOutlineFileSearch className="text-[5rem] text-gray-500" />
                 {t("No Chapter Found")}
               </div>
             </div>
@@ -88,11 +89,10 @@ const MainSection = () => {
                 className={`cursor-pointer`}
               >
                 <div
-                  className={`relative mb-4 border-gradient bg-white rounded-lg shadow-md ${
-                    seletedModuleId === module.moduleId
+                  className={`relative mb-4 border-gradient bg-white rounded-lg shadow-md ${seletedModuleId === module.moduleId
                       ? "border border-pink-500 rounded-lg"
                       : null
-                  }`}
+                    }`}
                 >
                   <img
                     src={module?.thumbnail}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import SubjectCard from './allSubjects/SubjectCard'
+import { AiOutlineFileSearch, AiOutlineEye } from "react-icons/ai";
 import { FiLoader } from 'react-icons/fi'
 import { GoAlertFill } from 'react-icons/go'
 import { motion } from "framer-motion";
@@ -61,7 +62,7 @@ const StudentCourseProgress = ({ student }) => {
                       <SubjectCard subject={subject} i={index} />
                     </div>
                   )) : <div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
-                    <GoAlertFill className="text-[3rem]" />
+                    <AiOutlineFileSearch className="text-[3rem]" />
                     No  Module Found
                   </div>
                 }

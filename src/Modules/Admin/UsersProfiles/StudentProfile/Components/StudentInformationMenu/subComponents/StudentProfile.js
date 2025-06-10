@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { GoAlertFill } from "react-icons/go";
+import { AiOutlineFileSearch, AiOutlineEye } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { AiOutlineEye } from "react-icons/ai";
 import { fetchStudentDocument } from "../../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { useTranslation } from "react-i18next";
 
@@ -90,11 +89,11 @@ const StudentProfile = ({ student }) => {
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             {t("Document Previews")}
           </h3>
-          <div className="flex md:flex-row md:flex-wrap flex-col gap-5 w-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
             {documents?.map((doc, index) => (
               <div
                 key={index}
-                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)] xl:w-[calc(25%-1rem)] min-w-[15rem] max-w-[20rem]`}
+                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 w-full`}
               >
                 {doc?.documentType?.startsWith("image/") ? (
                   <img
@@ -132,7 +131,7 @@ const StudentProfile = ({ student }) => {
         </div>
       ) : (
         <div className="flex items-center justify-center flex-col text-2xl h-full text-gray-500">
-          <GoAlertFill className="text-[5rem]" />
+          <AiOutlineFileSearch className="text-[5rem]" />
           {t("No Data Found")}
         </div>
       )}
