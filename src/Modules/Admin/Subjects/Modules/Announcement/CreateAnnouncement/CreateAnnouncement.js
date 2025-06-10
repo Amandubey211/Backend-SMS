@@ -26,6 +26,7 @@ const CreateAnnouncement = () => {
   const [editorContent, setEditorContent] = useState("");
   const [file, setFile] = useState(null);
 
+
   // Keep sectionId/groupId as arrays in state
   const [formState, setFormState] = useState({
     postTo: "",
@@ -79,6 +80,7 @@ const CreateAnnouncement = () => {
     setEditorContent(content);
   }, []);
 
+
   const handleFileChange = useCallback((e) => {
     setFile(e.target.files[0]);
   }, []);
@@ -88,6 +90,7 @@ const CreateAnnouncement = () => {
     setFormState((prev) => ({ ...prev, [name]: value }));
     setFormErrors((prev) => ({ ...prev, [name]: undefined }));
   }, []);
+
 
   /**
    * Validate fields & build a payload object.
@@ -113,6 +116,10 @@ const CreateAnnouncement = () => {
     if (formState.postTo === "Group" && formState.groupId.length === 0) {
       errors.groupId = "Please select at least one Group";
     }
+    if (!formState.postTo) {
+      errors.postTo = "Please select an option for 'Post To'.";
+    }
+
 
     setFormErrors(errors);
     if (Object.keys(errors).length > 0) {
