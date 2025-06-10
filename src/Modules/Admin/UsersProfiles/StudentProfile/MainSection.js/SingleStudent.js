@@ -93,7 +93,7 @@ const SingleStudent = () => {
               }
             />
           </div>
-          <div className="flex w-[75%] border border-l-1 border-l-gray-200">
+          <div className="flex w-[75%]">
             <div className="w-full">{renderContent()}</div>
           </div>
         </div>
