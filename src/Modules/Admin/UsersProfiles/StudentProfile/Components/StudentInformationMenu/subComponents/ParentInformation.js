@@ -34,8 +34,8 @@ const ParentInformation = ({ parents }) => {
       <InformationItem
         icon={MdOutlineLocationOn}
         title={t("Address")}
-        value={`${parents?.permanentAddress?.country || '-'}, ${parents?.permanentAddress?.city || ''
-          }, ${parents?.permanentAddress?.street || ''}`}
+        value={`${parents?.permanentAddress?.streetName}, ${parents?.permanentAddress?.country || '-'}, ${parents?.permanentAddress?.city || ''
+          }`}
       />
     </div>
   );

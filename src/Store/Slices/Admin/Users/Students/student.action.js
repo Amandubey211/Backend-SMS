@@ -100,7 +100,7 @@ export const fetchStudentDocument = createAsyncThunk(
       const response = await getData(
         `/${getRole}/documents/student/${id}?say=${say}`
       );
-      return response?.documents?.documents;
+      return response.documents;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
     }

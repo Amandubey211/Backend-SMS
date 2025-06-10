@@ -12,7 +12,40 @@ const StudentProfile = ({ student }) => {
 
   useEffect(() => {
     dispatch(fetchStudentDocument(student._id));
-  }, [dispatch]);
+  }, [dispatch, student._id]);
+
+  // Transform the studentDocument data into the required array format
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    if (studentDocument) {
+      const transformedDocuments = [];
+
+      // Process mandatory documents
+      if (studentDocument.mandatory) {
+        Object.entries(studentDocument.mandatory).forEach(([label, url]) => {
+          transformedDocuments.push({
+            documentLabel: label,
+            documentUrl: url,
+            documentType: url.endsWith('.pdf') ? 'application/pdf' : 'image/png',
+          });
+        });
+      }
+
+      // Process optional documents
+      if (studentDocument.optional) {
+        Object.entries(studentDocument.optional).forEach(([label, url]) => {
+          transformedDocuments.push({
+            documentLabel: label,
+            documentUrl: url,
+            documentType: url.endsWith('.pdf') ? 'application/pdf' : 'image/png',
+          });
+        });
+      }
+
+      setDocuments(transformedDocuments);
+    }
+  }, [studentDocument]);
 
   const [preview, setPreview] = useState(null);
   const [previewType, setPreviewType] = useState(null);
@@ -48,20 +81,20 @@ const StudentProfile = ({ student }) => {
   const getColor = (index) => colors[index % colors?.length];
 
   return (
-    <div className="bg-white h-full px-7 py-2">
+    <div className="bg-white h-full px-4 sm:px-7 py-2">
       <h2 className="text-base font-semibold text-gray-600 mb-3">
         {t("Educational Documents")}
       </h2>
-      {studentDocument?.length > 0 ? (
-        <div className="w-[30rem] p-2 rounded-lg mb-3">
+      {documents?.length > 0 ? (
+        <div className="w-full p-2 rounded-lg mb-3">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             {t("Document Previews")}
           </h3>
-          <div className="flex w-full">
-            {studentDocument?.map((doc, index) => (
+          <div className="flex md:flex-row md:flex-wrap flex-col gap-5 w-full">
+            {documents?.map((doc, index) => (
               <div
                 key={index}
-                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 w-[15rem] ml-2`}
+                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 w-full sm:w-[calc(50%-1rem)] lg:w-[calc(33.33%-1rem)] xl:w-[calc(25%-1rem)] min-w-[15rem] max-w-[20rem]`}
               >
                 {doc?.documentType?.startsWith("image/") ? (
                   <img
@@ -77,7 +110,7 @@ const StudentProfile = ({ student }) => {
                   />
                 )}
                 <div className="flex justify-between items-center">
-                  <p className="text-white">
+                  <p className="text-white truncate">
                     <span className="font-medium">
                       {t("Document")} {index + 1}:
                     </span>{" "}
@@ -85,7 +118,7 @@ const StudentProfile = ({ student }) => {
                   </p>
                   <button
                     title={t("Open Modal")}
-                    className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
+                    className="p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 flex-shrink-0"
                     onClick={() =>
                       handlePreviewClick(doc?.documentUrl, doc?.documentType)
                     }

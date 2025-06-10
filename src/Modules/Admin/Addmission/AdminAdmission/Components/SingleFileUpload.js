@@ -244,9 +244,9 @@ const SingleFileUpload = memo(
           </div>
         ) : fileObj?.url ? (
           <div className="flex items-center justify-between flex-1 px-3 bg-blue-50">
-            <Tooltip title={fileObj.file?.name || fileObj.url.split("/").pop()}>
+            <Tooltip title={fileObj.fieldName || fileObj.url.split("/").pop()}>
               <span className="truncate">
-                {fileObj.file?.name || fileObj.url.split("/").pop()}
+                {fileObj.fieldName || fileObj.url.split("/").pop()}
               </span>
             </Tooltip>
             <Space>
