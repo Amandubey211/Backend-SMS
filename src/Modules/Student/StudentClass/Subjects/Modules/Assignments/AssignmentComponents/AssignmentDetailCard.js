@@ -97,7 +97,7 @@ const AssignmentDetailCard = ({ isSubmitted }) => {
         extra={typeof allowNumberOfAttempts === "number" ? t("Times") : ""}
       />
       <AssignmentDetail label={t("Due Date")} value={dueDate} />
-      <AssignmentDetail label={t("Submitted By")} value={submittingBy} />
+      <AssignmentDetail label={t("Assigned To")} value={submittingBy} />
     </div>
   );
 };
