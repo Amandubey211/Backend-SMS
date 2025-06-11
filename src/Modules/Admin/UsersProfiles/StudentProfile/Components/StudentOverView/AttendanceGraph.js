@@ -7,8 +7,7 @@ import { fetchAttendanceData } from "../../../../../../Store/Slices/Admin/Users/
 
 Chart.register(...registerables);
 
-const AttendanceGraph = () => {
-  const { cid } = useParams();
+const AttendanceGraph = ({ cid }) => {
   const attendanceData = useSelector(
     (store) => store.admin.all_students.attendanceData
   );
@@ -61,7 +60,7 @@ const AttendanceGraph = () => {
 
   useEffect(() => {
     dispatch(fetchAttendanceData(cid));
-  }, [dispatch, cid]);
+  }, [dispatch,cid]);
 
   useEffect(() => {
     if (attendanceData) {
@@ -115,12 +114,12 @@ const AttendanceGraph = () => {
     },
   };
 
-  return(
+  return (
 
     <div className="w-full h-full flex justify-center items-center">
 
-    <Line data={chartData} options={options} />
-  </div>
+      <Line data={chartData} options={options} />
+    </div>
   )
 };
 

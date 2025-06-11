@@ -7,7 +7,7 @@ const ParentInformation = ({ parents }) => {
   const { t } = useTranslation('admAccounts');
 
   return (
-    <div className="w-[40%] border-r border-gray-300 p-2">
+    <div className="w-[50%] border-r border-gray-300 p-2">
       <h2 className="text-base font-semibold text-gray-600">
         {t("Parents Information")}
       </h2>

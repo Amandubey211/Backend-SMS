@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { FaHeartbeat, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaHeartbeat } from "react-icons/fa";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,10 +24,12 @@ const Health = () => {
     const { role } = useSelector((store) => store.common.auth);
     const dispatch = useDispatch();
     const [isHealthModalOpen, setIsHealthModalOpen] = useState(false);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [studentData, setStudentData] = useState(null);
-    const [expandedCard, setExpandedCard] = useState(null);
+    const [selectedStudent, setSelectedStudent] = useState(null);
 
     const handleModalClose = () => setIsHealthModalOpen(false);
+    const handleDetailsModalClose = () => setIsDetailsModalOpen(false);
 
     useNavHeading("Admin", "Health");
     useEffect(() => {
@@ -85,9 +87,11 @@ const Health = () => {
         setIsHealthModalOpen(true);
     };
 
-    const toggleCardExpansion = (id) => {
-        setExpandedCard(expandedCard === id ? null : id);
+    const handleViewDetails = (student) => {
+        setSelectedStudent(student);
+        setIsDetailsModalOpen(true);
     };
+
     return (
         <Layout title={t("Health Management")}>
             <DashLayout>
@@ -137,30 +141,14 @@ const Health = () => {
                             </div>
                         ) : (
                             <ProtectedSection requiredPermission={PERMISSIONS.VIEW_STUDENT} title={"All Students"}>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                                <div className="flex flex-wrap -mx-2">
                                     {filteredStudents?.length > 0 ? (
                                         filteredStudents?.map((student) => (
                                             <div
                                                 key={student?._id}
-                                                className={`rounded-lg shadow-md border bg-white self-start ${expandedCard === student._id
-                                                    ? "border-[#673AB7] border-2"
-                                                    : "border-gray-200"
-                                                    }`}
+                                                className="w-full sm:w-1/2 px-2 mb-4 sm:mb-6 border border-gray-200 rounded-lg shadow-md bg-white"
                                             >
                                                 <div className="p-4 sm:p-6 flex flex-col">
-                                                    <div className="flex justify-end mb-2">
-                                                        {expandedCard === student._id ? (
-                                                            <FaChevronUp
-                                                                className="text-gray-500 text-sm sm:text-base cursor-pointer"
-                                                                onClick={() => toggleCardExpansion(student._id)}
-                                                            />
-                                                        ) : (
-                                                            <FaChevronDown
-                                                                className="text-gray-500 text-sm sm:text-base cursor-pointer"
-                                                                onClick={() => toggleCardExpansion(student._id)}
-                                                            />
-                                                        )}
-                                                    </div>
                                                     <div className="flex items-start mb-4">
                                                         <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-300 flex-shrink-0">
                                                             <img
@@ -169,7 +157,7 @@ const Health = () => {
                                                                 className="w-full h-full object-cover"
                                                             />
                                                         </div>
-                                                        <div className="ml-4 flex flex-col">
+                                                        <div className="ml-4 flex flex-col flex-grow">
                                                             <div className="flex items-center">
                                                                 <h2 className="text-lg font-semibold text-gray-800 mr-2">
                                                                     {student?.firstName} {student?.lastName}
@@ -189,63 +177,29 @@ const Health = () => {
                                                                 Age: {student?.age} | Class: {student?.className} ({student?.sectionName}) | Blood: {student?.bloodGroup}
                                                             </p>
                                                             <div className="text-sm text-gray-700 mt-2">
-                                                                <p>
-                                                                    {expandedCard === student._id
-                                                                        ? student?.medicalCondition || "No medical conditions reported"
-                                                                        : truncateText(student?.medicalCondition, 50)}
-                                                                </p>
+                                                                <p>{truncateText(student?.medicalCondition, 50)}</p>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {expandedCard === student._id && (
-                                                        <div className="mt-2">
-                                                            <h3 className="text-md font-semibold text-gray-800 mb-1">Medical History</h3>
-                                                            <p className="text-sm text-gray-700 mb-2">
-                                                                {student?.medicalCondition || "No medical conditions reported"}
-                                                            </p>
-                                                            <h3 className="text-md font-semibold text-gray-800 mb-1">Emergency Contacts</h3>
-                                                            <div className="flex flex-col gap-2 mb-2 p-3 border rounded-lg shadow-sm bg-zinc-100 border-black">
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-black text-sm">Emergency Contact:</span>
-                                                                    <span className="text-sm text-gray-600">
-                                                                        {student?.emergencyNumber || "Not provided"}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-black text-sm">Guardian Name:</span>
-                                                                    <span className="text-sm text-gray-600">
-                                                                        {student?.guardianName || "Guardian Name"}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-black text-sm">Relation:</span>
-                                                                    <span className="text-sm text-gray-600">
-                                                                        {student?.guardianRelationToStudent || "Not provided"}
-                                                                    </span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                    <span className="text-black text-sm">Guardian Contact:</span>
-                                                                    <span className="text-sm text-gray-600">
-                                                                        {student?.guardianContactNumber || student?.fatherInfo?.cell1}
-                                                                    </span>
-                                                                </div>
-
-                                                            </div>
-                                                            <div className="flex justify-end">
-                                                                <button
-                                                                    onClick={() => handleEditClick(student)}
-                                                                    className="px-4 py-1 bg-[#673AB7] text-white rounded-lg text-sm hover:bg-[#5e35b1]"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                    <div className="flex justify-end gap-2">
+                                                        <button
+                                                            onClick={() => handleViewDetails(student)}
+                                                            className="px-4 py-1 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600"
+                                                        >
+                                                            View Details
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleEditClick(student)}
+                                                            className="px-4 py-1 bg-[#673AB7] text-white rounded-lg text-sm hover:bg-[#5e35b1]"
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-lg sm:text-2xl col-span-2">
+                                        <div className="flex w-full text-gray-500 h-[90vh] items-center justify-center flex-col text-lg sm:text-2xl">
                                             <NoDataFound />
                                         </div>
                                     )}
@@ -263,6 +217,54 @@ const Health = () => {
                                 onClose={handleModalClose}
                                 studentData={studentData}
                             />
+                        </Sidebar>
+                        <Sidebar
+                            isOpen={isDetailsModalOpen}
+                            onClose={handleDetailsModalClose}
+                            title={t("Student Health Details")}
+                            width="60%"
+                        >
+                            {selectedStudent && (
+                                <div className="p-4">
+                                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                                        {selectedStudent.firstName} {selectedStudent.lastName}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Age: {selectedStudent.age} | Class: {selectedStudent.className} ({selectedStudent.sectionName}) | Blood: {selectedStudent.bloodGroup} | Height: {selectedStudent?.height || "N/A"} cm  | Weight: {selectedStudent?.weight || "N/A"} kg
+                                    </p>
+                                    <h3 className="text-md font-semibold text-gray-800 mb-1">Medical History</h3>
+                                    <p className="text-sm text-gray-700 mb-4">
+                                        {selectedStudent.medicalCondition || "No medical conditions reported"}
+                                    </p>
+                                    <h3 className="text-md font-semibold text-gray-800 mb-1">Emergency Contacts</h3>
+                                    <div className="flex flex-col gap-2 mb-4 p-3 border rounded-lg shadow-sm bg-zinc-100 border-black">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-black text-sm">Emergency Contact:</span>
+                                            <span className="text-sm text-gray-600">
+                                                {selectedStudent.emergencyNumber || "Not provided"}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-black text-sm">Guardian Name:</span>
+                                            <span className="text-sm text-gray-600">
+                                                {selectedStudent.guardianName || "Guardian Name"}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-black text-sm">Relation:</span>
+                                            <span className="text-sm text-gray-600">
+                                                {selectedStudent.guardianRelationToStudent || "Not provided"}
+                                            </span>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-black text-sm">Guardian Contact:</span>
+                                            <span className="text-sm text-gray-600">
+                                                {selectedStudent.guardianContactNumber || selectedStudent.fatherInfo?.cell1}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </Sidebar>
                     </div>
                 </div>

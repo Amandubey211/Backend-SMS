@@ -13,18 +13,18 @@ const ParentProfileBlock = ({ title, imageSrc, name, details }) => {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Image and Name Section (Right) */}
         {title !== 'Guardian Details' && (
-          <div className="p-3 flex flex-col justify-center items-center gap-2 lg:w-[200px] flex-shrink-0">
+          <div className="p-3 flex flex-col justify-center items-center gap-2 lg:w-[100px] flex-shrink-0">
             <img
               src={imageSrc}
               alt={`${title} Image`}
-              className="rounded-full w-[100px] h-[100px] object-cover"
+              className="rounded-full w-[50px] h-[50px] object-cover"
             />
             <span className="font-semibold text-center">{name}</span>
 
           </div>
         )}
         {/* Details Section (Left) */}
-        <div className="flex-1 p-3">
+        <div className="flex-1">
           <div className="flex flex-wrap gap-3">
             {details?.map((detail) => (
               <div key={detail.type} className="flex-1 min-w-[150px] max-w-[180px]">

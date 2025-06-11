@@ -12,8 +12,8 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
     const [form] = Form.useForm();
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
+
     useEffect(() => {
-        // console.log(studentData, "studentData in EditHealthModal");
         if (studentData) {
             setImagePreview(studentData.profile || null);
             form.setFieldsValue({
@@ -64,7 +64,6 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
         setLoading(true);
         const formData = new FormData();
 
-        // Explicitly append the student ID
         if (studentData?._id) {
             formData.append("id", studentData._id);
         }
@@ -95,7 +94,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-screen h-screen">
+            <div className="bg-white rounded-lg p-6 w-screen h-screen overflow-y-auto">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-semibold">Update Student Information</h2>
                     <Button
@@ -112,15 +111,14 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                     onFinish={onFinish}
                     requiredMark={false}
                 >
-                    <Row gutter={[16, 16]}>
-                        <Col xs={24} md={8}>
-                            <Form.Item label="Profile Image">
+                    <Row gutter={[16, 16]} align="top">
+                        <Col xs={24} md={8} className="flex flex-col">
+                            <Form.Item label="Profile Image" className="mb-0 flex-shrink-0 w-full">
                                 {imagePreview && (
                                     <img
                                         src={imagePreview}
                                         alt="Profile"
-                                        style={{ width: '100%', height: 'auto' }}
-                                        className="rounded-md mb-4"
+                                        className="rounded-md w-full h-[200px] object-fit"
                                     />
                                 )}
                             </Form.Item>
