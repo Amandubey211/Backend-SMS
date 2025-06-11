@@ -36,11 +36,13 @@ function StudentList({ onSelectStudent, students, selectedStudentId }) {
         </div>
       </div>
       <div className="flex gap-4 items-center mb-4">
-        <h2 className="text-md font-semibold">{t("All Students")}</h2>{" "}
+        <h2 className="text-md font-semibold">
+          {t("All Students ")} ({students?.length})
+        </h2>{" "}
         {/* Translated heading */}
-        <span className="text-sm bg-purple-100 text-purple-600 rounded-full px-2 py-1">
+        {/* <span className="text-sm bg-purple-100 text-purple-600 rounded-full px-2 py-1">
           {students?.length}
-        </span>
+        </span> */}
       </div>
       {!filteredStudents?.length && <NoDataFound title={t("Students")} />}{" "}
       {/* Translated title */}
@@ -48,7 +50,7 @@ function StudentList({ onSelectStudent, students, selectedStudentId }) {
         {filteredStudents?.map((student) => (
           <div
             key={student._id}
-            className={`flex items-center p-2 cursor-pointer rounded-full ${
+            className={`flex items-center ps-2  pt-1 cursor-pointer rounded-full ${
               student._id === selectedStudentId
                 ? "bg-gradient-to-r from-purple-100 to-pink-100"
                 : ""
@@ -63,7 +65,7 @@ function StudentList({ onSelectStudent, students, selectedStudentId }) {
               }
             }}
           >
-            <div className="w-8 h-8 rounded-full mr-3 flex items-center justify-center bg-gray-200">
+            <div className="w-10 h-10 rounded-full mr-3  flex items-center justify-center bg-gray-200">
               {student.profile ? (
                 <img
                   src={student.profile}
@@ -78,7 +80,7 @@ function StudentList({ onSelectStudent, students, selectedStudentId }) {
               <h3
                 className={`text-sm font-medium capitalize ${
                   student._id === selectedStudentId
-                    ? "text-purple-600"
+                    ? "text-gradient"
                     : "text-gray-900"
                 } truncate`}
                 style={{
@@ -89,9 +91,8 @@ function StudentList({ onSelectStudent, students, selectedStudentId }) {
               >
                 {student.fullName}
               </h3>
-              <p className="text-sm text-green-500">
+              <p className="text-xs text-green-500">
                 {student?.presentSectionId?.sectionName || t("N/A")}{" "}
-                {/* Translated "N/A" */}
               </p>
             </div>
           </div>
