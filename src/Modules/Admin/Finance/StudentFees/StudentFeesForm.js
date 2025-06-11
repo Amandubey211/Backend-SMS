@@ -367,7 +367,7 @@ const StudentFeeForm = () => {
               {
                 item.dueDate && (
                   <Col span={6}>
-                    <Form.Item name={["lineItems", index, "penaltyId"]} label="Name">
+                    <Form.Item name={["lineItems", index, "penaltyId"]} label="Select Penalty">
                       <Select style={{ width: "100%" }} onChange={(value) => handleInputChange(index, "penaltyId", value)} placeholder="Select Penalty">
                         {
                           penalties.map((penalty) => (
