@@ -1,5 +1,3 @@
-// CalendarHeader.jsx
-
 import React from "react";
 import { Calendar, Select } from "antd";
 import { FaCheckCircle, FaTimesCircle, FaMinusCircle } from "react-icons/fa";
@@ -22,14 +20,13 @@ const getStatusIcon = (status) => {
   }
 };
 
-const CalendarHeader = ({ attendanceData, onPanelChange, value, yearList }) => {
+const CalendarHeader = ({ attendanceData, onMonthChange, onYearChange, value, yearList, selectedMonth, selectedYear }) => {
   const { t } = useTranslation();
 
-  const dateCellRender = (value) => {
-    const dateStr = value.format("YYYY-MM-DD");
+  const dateCellRender = (date) => {
+    const dateStr = date.format("YYYY-MM-DD");
     const status = attendanceData[dateStr];
     if (!status) return null;
-
     return (
       <div className="flex flex-col items-center">
         <div className="bg-white border border-gray-300 rounded-full p-2 flex items-center">
@@ -41,18 +38,21 @@ const CalendarHeader = ({ attendanceData, onPanelChange, value, yearList }) => {
   };
 
   const headerRender = ({ value, onChange }) => {
-    const currentYear = value.year();
-    const currentMonth = value.month();
+    const currentYear = selectedYear;
+    const currentMonth = selectedMonth;
 
-    // Month change
+    // Month change (do not affect year)
     const handleMonthChange = (newMonth) => {
-      onChange(value.clone().month(newMonth));
+      onMonthChange(newMonth);
+      const newDate = moment(`${currentYear}-${newMonth + 1}-01`, "YYYY-MM-DD");
+      onChange(newDate);
     };
 
     // Year change
     const handleYearChange = (newYear) => {
-      // Only let user pick from the yearList
-      onChange(value.clone().year(newYear));
+      onYearChange(newYear);
+      const newDate = moment(`${newYear}-${currentMonth + 1}-01`, "YYYY-MM-DD");
+      onChange(newDate);
     };
 
     return (
@@ -90,7 +90,6 @@ const CalendarHeader = ({ attendanceData, onPanelChange, value, yearList }) => {
     <Calendar
       value={value}
       dateCellRender={dateCellRender}
-      onPanelChange={onPanelChange}
       headerRender={headerRender}
     />
   );
