@@ -1,72 +1,92 @@
-
-
-
-//--------------------------------
-
-import React, { useEffect, useState } from 'react';
-import { Doughnut } from 'react-chartjs-2';
-import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
-import { GoAlertFill } from 'react-icons/go';
+import React, { useEffect } from 'react';
+import { Pie } from 'react-chartjs-2';
+import 'chart.js/auto';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchStudentTask } from '../../../../../../Store/Slices/Admin/Users/Students/student.action';
 import { useParams } from 'react-router-dom';
-Chart.register(ArcElement, Tooltip, Legend);
 
 const TaskChart = () => {
-    const { cid } = useParams()
+    const { cid } = useParams();
     const { completedTask, inCompletedTask } = useSelector((store) => store.admin.all_students);
     const dispatch = useDispatch();
+
     useEffect(() => {
-        dispatch(fetchStudentTask({ id: cid }))
-    }, [dispatch])
+        dispatch(fetchStudentTask({ id: cid }));
+    }, [dispatch, cid]);
+
+    // Define labels and data
+    const labels = ['Completed', 'Remaining'];
+    const dataValues = [completedTask, inCompletedTask];
+
+    // Define colors
+    const colors = ['#FF6384', '#FFCE56']; // Pink for completed, yellow for remaining
+
+    // Check if all data values are 0
+    const allZero = dataValues.every((value) => value === 0);
 
     const data = {
+        labels: labels,
         datasets: [
             {
-
-                data: [completedTask, inCompletedTask],
-                backgroundColor: [
-                    'pink',
-                    'orange'
-                ],
-                borderColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(200, 200, 200, 1)'
-                ],
-                borderWidth: 1,
-                cutout: '70%'
+                data: dataValues,
+                backgroundColor: allZero
+                    ? Array(dataValues.length).fill('gray')
+                    : colors,
+                hoverBackgroundColor: allZero
+                    ? Array(dataValues.length).fill('gray')
+                    : colors,
+                borderWidth: 5,
+                borderRadius: 10,
+                borderColor: '#ffffff',
+                cutout: '70%',
             },
+        ],
+    };
 
-        ]
+    const emptyData = {
+        labels: ['No Progress'],
+        datasets: [
+            {
+                data: [100],
+                backgroundColor: '#4BC0C0',
+                hoverBackgroundColor: '#4BC0C0',
+                borderWidth: 5,
+                borderRadius: 10,
+                borderColor: '#ffffff',
+                cutout: '70%',
+            },
+        ],
     };
 
     const options = {
         responsive: true,
+        maintainAspectRatio: false, // Allow the chart to resize freely
         plugins: {
             legend: {
-                display: false
+                display: true,
+                position: 'bottom',
+                labels: {
+                    boxWidth: 20,
+                    padding: 20,
+                    usePointStyle: true,
+                },
             },
             tooltip: {
                 callbacks: {
                     label: function (tooltipItem) {
                         return `${tooltipItem.label}: ${tooltipItem.raw}%`;
-                    }
-                }
-            }
+                    },
+                },
+            },
         },
-        maintainAspectRatio: false
     };
 
     return (
-        <>
-            <div className=" flex-1 p-5 flex flex-col justify-start items-start h-[15rem] ">
-                <Doughnut data={data} options={options} />
-                <div className='flex w-full justify-center gap-10 mt-5'>
-                    <p className='text-gray-500'>Completed <spna className='text-pink-600 font-bold'>{completedTask}%</spna></p>
-                    <p className='text-gray-500'>Remaining <spna className='text-yellow-700 font-bold'>{inCompletedTask}%</spna></p>
-                </div>
+        <div className="w-full h-[18rem] flex flex-col justify-start items-center">
+            <div className="relative w-full h-[14rem]">
+                <Pie data={allZero ? emptyData : data} options={allZero ? {} : options} />
             </div>
-        </>
+        </div>
     );
 };
 

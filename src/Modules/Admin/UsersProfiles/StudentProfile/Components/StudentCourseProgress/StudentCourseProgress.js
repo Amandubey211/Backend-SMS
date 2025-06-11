@@ -26,7 +26,6 @@ const StudentCourseProgress = ({ student }) => {
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
-  // console.log("Selected Sem", selectedSemester)
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -37,7 +36,7 @@ const StudentCourseProgress = ({ student }) => {
         )
       }
     });
-  }, []);
+  }, [selectedSemester]);
   const fetchModules = (subjectId) => {
     dispatch(
       fetchCourseProgress({ studentId: cid, subjectId: subjectId, semesterId: selectedSemester.id })

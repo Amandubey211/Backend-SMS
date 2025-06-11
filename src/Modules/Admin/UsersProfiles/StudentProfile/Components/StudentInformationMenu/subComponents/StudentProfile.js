@@ -85,15 +85,15 @@ const StudentProfile = ({ student }) => {
         {t("Educational Documents")}
       </h2>
       {documents?.length > 0 ? (
-        <div className="w-full p-2 rounded-lg mb-3">
+        <div className="w-full p-1 rounded-lg mb-3">
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             {t("Document Previews")}
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+          <div className="flex md:flex-row md:flex-wrap flex-col gap-y-4 gap-x-14 w-auto">
             {documents?.map((doc, index) => (
               <div
                 key={index}
-                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 w-full`}
+                className={`${getColor(index)} p-4 border rounded-lg shadow-md transform transition-transform hover:scale-105 md:w-[195px] w-full min-h-[16rem]`}
               >
                 {doc?.documentType?.startsWith("image/") ? (
                   <img

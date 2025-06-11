@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import SubjectsSlider from "./SubjectsSlider";
 import { useDispatch, useSelector } from "react-redux";
 import { GoAlertFill } from "react-icons/go";
+import { AiOutlineFileSearch, AiOutlineEye } from "react-icons/ai";
 import { fetchStudentSubjectProgress } from "../../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import Spinner from "../../../../../../../Components/Common/Spinner";
 import { useTranslation } from "react-i18next";
@@ -15,7 +16,7 @@ const AllSubjects = ({ student }) => {
 
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(student?._id));
-  }, []);
+  }, [student?._id]);
 
   return loading ? (
     <div className="flex w-full h-[80vh] flex-col items-center justify-center">
@@ -36,7 +37,7 @@ const AllSubjects = ({ student }) => {
         <SubjectsSlider subjects={studentSubjectProgress} />
       ) : (
         <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-2xl">
-          <GoAlertFill className="text-[5rem]" />
+          <AiOutlineFileSearch className="text-[5rem]" />
           {t("No Subject Found")}
         </div>
       )}
