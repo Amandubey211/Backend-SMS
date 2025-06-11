@@ -28,7 +28,7 @@ const MainSection = () => {
 
   const { loading, error, assignmentDetails, quizDetails, students } =
     useSelector((state) => state.admin.speedgrades);
-
+  console.log(assignmentDetails, quizDetails, "details");
   // Fetch students based on type
   useEffect(() => {
     if (type === "Assignment") {
@@ -78,106 +78,94 @@ const MainSection = () => {
   };
 
   return (
-     <ProtectedSection
-            title="Speed Grades"
-            requiredPermission={PERMISSIONS.ASSIGN_SPEED_GRADES}
-          >
-    <div className="flex h-screen">
-      {/* Student List Section */}
-      <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
-        {loading ? (
-          <>
-            {/* Shimmer Loaders for Student List */}
-            {[...Array(5)].map((_, index) => (
-              <ShimmerLoader
-                key={index}
-                width="100%"
-                height="40px"
-                className="mb-4"
-              />
-            ))}
-          </>
-        ) : students && students.length > 0 ? (
-          <StudentList
-            onSelectStudent={handleStudentSelection}
-            students={students}
-            selectedStudentId={selectedStudent?._id} // Pass selectedStudentId as prop
-          />
-        ) : (
-          <div className="flex flex-col items-center justify-center text-gray-500 mt-10">
-            <FaUserCircle className="text-6xl mb-4" />
-            <p className="text-lg font-semibold">
-              {t("No students present in this exam")}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Middle Section */}
-      <div className="w-1/2 p-4 border-r border-gray-200 flex flex-col">
-        {students && students.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-gray-500 h-full">
-            <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-400" />
-            <p className="text-2xl font-semibold">
-              {t("No students to display")}
-            </p>
-          </div>
-        ) : !selectedStudent ? (
-          <div className="flex flex-col items-center justify-center text-gray-400 h-full">
-            <FaUserCircle className="text-9xl mb-4" />
-            <p className="text-xl font-semibold">
-              {t("Select a student to view details")}
-            </p>
-          </div>
-        ) : loadingStatus ? (
-          <div className="w-full p-4">
-            {/* Shimmer Loaders for Assignment Details */}
-            <ShimmerLoader width="80%" height="30px" className="mb-6" />
-            <ShimmerLoader width="100%" height="200px" className="mb-4" />
-            <ShimmerLoader width="60%" height="20px" />
-          </div>
-        ) : error || !details ? (
-          <div className="flex-grow flex flex-col items-center justify-center text-gray-500">
-            <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-400" />
-            {/* <Trans
-              i18nKey="noSubmissionForStudent"
-              components={{ strong: <strong /> }}
-              
-            > */}
-
-            <div>
-              No submission found for{" "}
-              <span className="text-lg font-semibold capitalize">
-                {getFullName(selectedStudent)}
-              </span>
+    <ProtectedSection
+      title="Speed Grades"
+      requiredPermission={PERMISSIONS.ASSIGN_SPEED_GRADES}
+    >
+      <div className="flex h-screen">
+        {/* Student List Section */}
+        <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
+          {loading ? (
+            <>
+              {/* Shimmer Loaders for Student List */}
+              {[...Array(5)].map((_, index) => (
+                <ShimmerLoader
+                  key={index}
+                  width="100%"
+                  height="40px"
+                  className="mb-4"
+                />
+              ))}
+            </>
+          ) : students && students.length > 0 ? (
+            <StudentList
+              onSelectStudent={handleStudentSelection}
+              students={students}
+              selectedStudentId={selectedStudent?._id} // Pass selectedStudentId as prop
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center text-gray-500 mt-10">
+              <FaUserCircle className="text-6xl mb-4" />
+              <p className="text-lg font-semibold">
+                {t("No students present in this exam")}
+              </p>
             </div>
+          )}
+        </div>
 
-            {/* </Trans> */}
-            {/* <p className="text-sm text-gray-400 mt-2 text-center">
-              {t(
-                "Please verify if the student has submitted the assignment or contact support for assistance."
-              )}
-            </p> */}
-          </div>
-        ) : (
-          <AssignmentDetails
-            student={selectedStudent}
+        {/* Middle Section */}
+        <div className="w-1/2 p-2  flex flex-col">
+          {students && students.length === 0 ? (
+            <div className="flex flex-col items-center justify-center text-gray-500 h-full">
+              <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-400" />
+              <p className="text-2xl font-semibold">
+                {t("No students to display")}
+              </p>
+            </div>
+          ) : !selectedStudent ? (
+            <div className="flex flex-col items-center justify-center text-gray-400 h-full">
+              <FaUserCircle className="text-9xl mb-4" />
+              <p className="text-xl font-semibold">
+                {t("Select a student to view details")}
+              </p>
+            </div>
+          ) : loadingStatus ? (
+            <div className="w-full p-4">
+              {/* Shimmer Loaders for Assignment Details */}
+              <ShimmerLoader width="80%" height="30px" className="mb-6" />
+              <ShimmerLoader width="100%" height="200px" className="mb-4" />
+              <ShimmerLoader width="60%" height="20px" />
+            </div>
+          ) : error || !details ? (
+            <div className="flex-grow flex flex-col items-center justify-center text-gray-500">
+              <MdOutlineAssignmentLate className="text-6xl mb-4 text-gray-400" />
+
+              <div>
+                No submission found for{" "}
+                <span className="text-lg font-semibold capitalize">
+                  {getFullName(selectedStudent)}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <AssignmentDetails
+              student={selectedStudent}
+              details={details}
+              type={type}
+              onTotalGradeUpdate={handleTotalGradeUpdate}
+            />
+          )}
+        </div>
+
+        {/* Right Section */}
+        <div className="w-1/4 flex flex-col">
+          <SubmissionDetails
             details={details}
-            type={type}
-            onTotalGradeUpdate={handleTotalGradeUpdate}
+            student={selectedStudent}
+            initialGrade={totalGrade}
           />
-        )}
+        </div>
       </div>
-
-      {/* Right Section */}
-      <div className="w-1/4 flex flex-col">
-        <SubmissionDetails
-          details={details}
-          student={selectedStudent}
-          initialGrade={totalGrade}
-        />
-      </div>
-    </div>
     </ProtectedSection>
   );
 };

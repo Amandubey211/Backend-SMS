@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 
 const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
   const [totalTextGrade, setTotalTextGrade] = useState(0);
-  const { t } = useTranslation("admModule"); // Adding the translation function with namespace 'assignmentDetails'
+  const { t } = useTranslation("admModule");
 
   useEffect(() => {
     if (!student || !details) return;
@@ -17,7 +17,7 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
         const answer = details.answers.find(
           (ans) => ans.questionId === question._id
         );
-        if (question.type !== "text" && answer && answer.isCorrect) {
+        if (answer && answer.isCorrect) {
           return total + question.questionPoint;
         }
         return total;
@@ -35,17 +35,17 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
   };
 
   if (!student || !details) {
-    return null; // Return null if no student or details are selected
+    return null;
   }
 
   const { content, assignmentId, grade, score, quizId } = details;
   const { name, points, dueDate, questions, totalPoints } =
     assignmentId || quizId || {};
 
-  const quizType = quizId?.quizType; // Safely accessing quizType
+  const quizType = quizId?.quizType;
 
   return (
-    <div className="bg-white">
+    <div className="bg-white border-x border-gray-200 p-3">
       <div className="flex justify-between items-center mb-4 border-b pb-2">
         <div>
           <h2 className="text-xl font-medium mb-1 capitalize flex items-center">
@@ -89,14 +89,28 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
               const answer = details.answers.find(
                 (ans) => ans.questionId === question._id
               );
+              const selectedOption = answer
+                ? question.options.find(
+                    (opt) => opt._id === answer.selectedOption
+                  )
+                : null;
+
               return (
-                <SpeedGradeQuizAnswerCard
-                  key={index}
-                  question={question}
-                  questionIndex={index}
-                  selectedOption={answer ? answer.selectedOption : ""}
-                  onUpdateTextQuestionGrade={handleUpdateTextQuestionGrade}
-                />
+                <div key={index} className="border-b pb-4">
+                  <div className="flex items-start">
+                    <span className="font-medium mr-2"> Q {index + 1}.</span>
+                    <div className="flex-1">
+                      <SpeedGradeQuizAnswerCard
+                        question={question}
+                        questionIndex={index}
+                        selectedOption={answer ? answer.selectedOption : ""}
+                        onUpdateTextQuestionGrade={
+                          handleUpdateTextQuestionGrade
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
               );
             })
           ) : (

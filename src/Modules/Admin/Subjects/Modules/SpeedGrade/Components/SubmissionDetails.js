@@ -59,6 +59,44 @@ const SubmissionDetails = ({ details = {}, student, initialGrade }) => {
     setStatus(details?.status || t("Missing"));
   }, [details, initialGrade, t]);
 
+  const CorrectAnswersSummary = () => {
+    if (!details || !student || type !== "Quiz") return null;
+
+    const { questions = [] } = details.quizId || {};
+    const totalQuestions = questions.length;
+
+    if (totalQuestions === 0) return null;
+
+    const correctAnswers = questions.reduce((count, question) => {
+      const answer = details.answers?.find(
+        (ans) => ans.questionId === question._id
+      );
+      return count + (answer?.isCorrect ? 1 : 0);
+    }, 0);
+
+    const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+
+    return (
+      <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-100">
+        <h4 className="font-medium text-blue-800 mb-2">{t("Quiz Summary")}</h4>
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div>
+            <p className="text-sm text-gray-600">{t("Questions")}</p>
+            <p className="font-bold">{totalQuestions}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">{t("Correct")}</p>
+            <p className="font-bold text-green-600">{correctAnswers}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-600">{t("Score %")}</p>
+            <p className="font-bold">{percentage}%</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const handleGradeChange = (e) => {
     const inputGrade = e.target.value;
 
@@ -67,11 +105,13 @@ const SubmissionDetails = ({ details = {}, student, initialGrade }) => {
     } else {
       const parsedGrade = parseFloat(inputGrade);
 
-      if (!isNaN(parsedGrade) && parsedGrade <= maxPoints) {
-        setGrade(parsedGrade);
-      } else if (parsedGrade > maxPoints) {
-        toast.error(t("Grade cannot exceed {{maxPoints}}", { maxPoints }));
-        setGrade(maxPoints);
+      if (!isNaN(parsedGrade)) {
+        if (parsedGrade <= maxPoints) {
+          setGrade(parsedGrade);
+        } else {
+          toast.error(t("Grade cannot exceed {{maxPoints}}", { maxPoints }));
+          setGrade(maxPoints);
+        }
       }
     }
   };
@@ -204,6 +244,9 @@ const SubmissionDetails = ({ details = {}, student, initialGrade }) => {
             {daysLabel}
           </span>
         </div>
+
+        {/* Add the Correct Answers Summary here */}
+        <CorrectAnswersSummary />
 
         <div className="space-y-4 px-3">
           <div className="flex items-center space-x-2">
