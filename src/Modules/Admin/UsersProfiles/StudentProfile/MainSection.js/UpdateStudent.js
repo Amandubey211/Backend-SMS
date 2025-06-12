@@ -18,17 +18,75 @@ import PhoneInput from "react-phone-input-2";
 import 'react-phone-input-2/lib/style.css';
 import toast from "react-hot-toast";
 import SingleFileUpload from "../../../Addmission/AdminAdmission/Components/SingleFileUpload";
-
+import EditorComponent from '../../../Subjects/Component/AdminEditor';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const { Option } = Select;
 const { TextArea } = Input;
 
+const isHTML = (str) => {
+  if (!str || typeof str !== "string") return false;
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+  return htmlRegex.test(str);
+};
+
+// Function to clean editor content for display (only applied to HTML content)
+const cleanEditorContent = (content) => {
+  // Parse the content as HTML
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, "text/html");
+
+  // Remove uploaded-image-wrapper and keep only the img tag
+  const imageWrappers = doc.querySelectorAll(".uploaded-image-wrapper");
+  imageWrappers.forEach((wrapper) => {
+    const img = wrapper.querySelector("img");
+    if (img) {
+      wrapper.parentNode.replaceChild(img, wrapper);
+    }
+  });
+
+  // Remove uploaded-file-wrapper and keep only the link
+  const fileWrappers = doc.querySelectorAll(".uploaded-file-wrapper");
+  fileWrappers.forEach((wrapper) => {
+    const link = wrapper.querySelector("a");
+    if (link) {
+      wrapper.parentNode.replaceChild(link, wrapper);
+    }
+  });
+
+  // Get the cleaned HTML
+  const cleanedContent = doc.body.innerHTML;
+
+  // Check if the cleaned content is effectively empty
+  const cleanedPlainText = doc.body.textContent.trim();
+  if (!cleanedPlainText) {
+    return "No Medical Conditions Reported";
+  }
+
+  return cleanedContent;
+};
+
+// Helper function to determine how to render medicalCondition
+const renderMedicalCondition = (medicalCondition) => {
+  // Handle null, undefined, or empty string
+  if (!medicalCondition || medicalCondition.trim() === "") {
+    return "No Medical Conditions Reported";
+  }
+
+  // Check if the content is HTML
+  if (isHTML(medicalCondition)) {
+    const cleanedContent = cleanEditorContent(medicalCondition);
+    return cleanedContent;
+  }
+
+  // If it's plain text, wrap it in a <p> tag for consistent display in the editor
+  return `<p>${medicalCondition}</p>`;
+};
+
 const ImageUploadCard = ({ name, recommendedSize, width, height, required, form, onChange, initialValue }) => {
   const [image, setImage] = useState(initialValue || null);
   const [preview, setPreview] = useState(initialValue || null);
-
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -117,6 +175,7 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [fatherPhoto, setFatherPhoto] = useState(null);
   const [motherPhoto, setMotherPhoto] = useState(null);
+  const [medicalConditionContent, setMedicalConditionContent] = useState("");
 
   const calculateAge = (dob) => {
     if (!dob || !dayjs.isDayjs(dob) || !dob.isValid()) return "";
@@ -255,6 +314,10 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
       }
 
       const dateOfBirth = data.dateOfBirth ? dayjs(data.dateOfBirth) : null;
+      let medicalCondition = data.medicalCondition || "";
+      // Process medicalCondition for display
+      const processedMedicalCondition = renderMedicalCondition(medicalCondition);
+      setMedicalConditionContent(processedMedicalCondition)
       const updatedStudentData = {
         id: data._id || "",
         profile: data.profile || null,
@@ -399,14 +462,13 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
         },
       };
 
-      // Update the form value to ensure it reflects the new file
       form.setFieldsValue({
         attachments: {
           ...form.getFieldValue('attachments'),
           [type]: {
             ...form.getFieldValue(['attachments', type]),
             [key]: file ? {
-              file: file, // Store the File object directly
+              file: file,
               preview: URL.createObjectURL(file),
               url: null,
               fieldName: key,
@@ -447,7 +509,6 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
       },
     };
 
-    // Get the attachments directly from the form to ensure we have the latest state
     const formAttachments = form.getFieldValue('attachments') || { mandatory: {}, optional: {} };
 
     const addDynamicAttachments = (type) => {
@@ -455,16 +516,12 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
       Object.entries(attachments).forEach(([key, attachment]) => {
         if (attachment) {
           if (attachment.file) {
-            // Newly uploaded file
             formData.append(`attachments[${type}][${key}]`, attachment.file);
           } else if (attachment.url) {
-            // Pre-existing URL
             formData.append(`attachments[${type}][${key}]`, attachment.url);
           } else {
-            // No file or URL
             formData.append(`attachments[${type}][${key}]`, 'null');
           }
-          // Include fieldId if it exists
           if (attachment.fieldId) {
             formData.append(`attachments[${type}][${key}_id]`, attachment.fieldId);
           }
@@ -510,7 +567,7 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
             if (motherPhoto) {
               if (motherPhoto instanceof File) {
                 formData.append(`motherInfo[photo]`, motherPhoto);
-              } else if (typeof motherPhoto === 'string' && motherPhoto.startsWith('http')) {
+              } else if (typeof motherPhoto === 'string' && fatherPhoto.startsWith('http')) {
                 formData.append(`motherInfo[photo]`, motherPhoto);
               }
             } else {
@@ -526,7 +583,6 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
           }
         });
       } else if (key === "attachments") {
-        console.log("mandatory", formAttachments.mandatory);
         addDynamicAttachments("mandatory");
         addDynamicAttachments("optional");
       } else if (key === "permanentAddress" || key === "residentialAddress") {
@@ -646,19 +702,6 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
       return Promise.resolve();
     }
     return Promise.reject(new Error("Please select a valid date!"));
-  };
-
-  const validatePhoto = (rule, value) => {
-    if (!value) {
-      return Promise.reject(new Error(rule.message));
-    }
-    if (value instanceof File) {
-      return Promise.resolve();
-    }
-    if (typeof value === 'string' && value.startsWith('http')) {
-      return Promise.resolve();
-    }
-    return Promise.reject(new Error(rule.message));
   };
 
   const handleAddressToggle = (checked) => {
@@ -992,9 +1035,15 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
           </Row>
           <Row gutter={16}>
             <Col span={24}>
-              <div>
-                <label style={{ display: "block", marginBottom: "8px" }}>Medical Information (allergies/ailments)</label>
-                <TextArea rows={4} value={data?.medicalCondition || ""} disabled />
+              <div className="jodit-editor-wrapper" style={{ zIndex: 1000 }}>
+                <EditorComponent
+                  assignmentLabel="Medical Condition"
+                  hideInput={true}
+                  editorContent={medicalConditionContent}
+                  inputPlaceHolder="Enter medical condition details"
+                  isCreateQuestion={false}
+                  readOnly={true}
+                />
               </div>
             </Col>
           </Row>

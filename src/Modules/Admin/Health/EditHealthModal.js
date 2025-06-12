@@ -1,21 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateStudents } from "../../../Store/Slices/Admin/Users/Students/student.action";
 import { Form, Input, Button, Row, Col, Divider, Select } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
-import TextArea from "antd/es/input/TextArea";
+import EditorComponent from "../Subjects/Component/AdminEditor"; // Adjust the import path as needed
 import toast from "react-hot-toast";
+
 const { Option } = Select;
+
+// Utility function to detect if a string contains HTML tags
+const isHTML = (str) => {
+    if (!str || typeof str !== "string") return false;
+    // Simple regex to check for HTML tags (e.g., <p>, <div>, etc.)
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+    return htmlRegex.test(str);
+};
 
 const EditHealthModal = ({ isOpen, onClose, studentData }) => {
     const dispatch = useDispatch();
     const [form] = Form.useForm();
     const [imagePreview, setImagePreview] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [medicalConditionContent, setMedicalConditionContent] = useState("");
 
     useEffect(() => {
         if (studentData) {
             setImagePreview(studentData.profile || null);
+            let medicalCondition = studentData.medicalCondition || "";
+            if (medicalCondition && !isHTML(medicalCondition)) {
+                medicalCondition = `<p>${medicalCondition}</p>`;
+            }
+            setMedicalConditionContent(medicalCondition);
+
             form.setFieldsValue({
                 id: studentData._id,
                 firstName: studentData.firstName || "",
@@ -37,7 +53,7 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                     country: studentData.residentialAddress?.country || "",
                 },
                 active: true,
-                medicalCondition: studentData?.medicalCondition || "",
+                medicalCondition: medicalCondition,
                 healthRisk: studentData?.healthRisk || "Low",
                 height: studentData?.height || "",
                 weight: studentData?.weight || "",
@@ -67,18 +83,17 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
         if (studentData?._id) {
             formData.append("id", studentData._id);
         }
-        formData.append("medicalCondition", values?.medicalCondition || "");
+        formData.append("medicalCondition", medicalConditionContent || "");
         formData.append("healthRisk", values.healthRisk || "Low");
         formData.append("height", values.height || "");
         formData.append("weight", values.weight || "");
         formData.append("bloodGroup", values.bloodGroup || "");
-        for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
+
         try {
             const response = await dispatch(updateStudents({ data: formData })).unwrap();
             if (response.success) {
                 toast.success("Student information updated successfully");
+                setMedicalConditionContent("");
             } else {
                 toast.error(response.message || "Failed to update student information");
             }
@@ -89,8 +104,6 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
             onClose();
         }
     };
-
-    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -104,7 +117,6 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                         aria-label="Close modal"
                     />
                 </div>
-
                 <Form
                     form={form}
                     layout="vertical"
@@ -242,11 +254,24 @@ const EditHealthModal = ({ isOpen, onClose, studentData }) => {
                             </Form.Item>
                         </Col>
                         <Col xs={24}>
-                            <Form.Item label="Medical Condition" name="medicalCondition">
-                                <TextArea
-                                    rows={4}
-                                    placeholder="Enter medical condition details"
-                                />
+                            <Form.Item
+                                label="Medical Condition"
+                                name="medicalCondition"
+                                rules={[{ required: false }]}
+                            >
+                                <div className="jodit-editor-wrapper" style={{ zIndex: 1000 }}>
+                                    <EditorComponent
+                                        assignmentLabel="Medical Condition"
+                                        hideInput={true}
+                                        editorContent={medicalConditionContent}
+                                        onEditorChange={(content) => {
+                                            setMedicalConditionContent(content);
+                                            form.setFieldsValue({ medicalCondition: content });
+                                        }}
+                                        inputPlaceHolder="Enter medical condition details"
+                                        isCreateQuestion={false}
+                                    />
+                                </div>
                             </Form.Item>
                         </Col>
                     </Row>

@@ -1,12 +1,17 @@
-// Sidebar.jsx
 import React, { useEffect, useRef, useCallback } from "react";
 import { RxCross2 } from "react-icons/rx";
 
-const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
+const Sidebar = ({ 
+  isOpen, 
+  title, 
+  onClose, 
+  children, 
+  width = "35%", 
+  ignoreClickOutsideSelectors = [] // New prop for custom ignore rules
+}) => {
   const sidebarRef = useRef(null);
-  const closeButtonRef = useRef(null); // Reference to the close button
+  const closeButtonRef = useRef(null);
 
-  // Focus trap logic to keep focus within the sidebar when open
   const trapFocus = useCallback((event) => {
     if (event.key === "Tab" && sidebarRef.current) {
       const focusableElements = sidebarRef.current.querySelectorAll(
@@ -19,13 +24,11 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
       if (event.shiftKey) {
-        // Shift + Tab: cycle to the last element if at the beginning
         if (document.activeElement === firstElement) {
           event.preventDefault();
           lastElement.focus();
         }
       } else {
-        // Tab: cycle to the first element if at the end
         if (document.activeElement === lastElement) {
           event.preventDefault();
           firstElement.focus();
@@ -36,17 +39,24 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Ignore clicks on Ant Design components rendered in portals.
-      if (
-        event.target.closest(".ant-picker-dropdown") ||
-        event.target.closest(".ant-select-dropdown") || // Added condition for the Select dropdown
-        event.target.closest(".ant-modal") ||
-        event.target.closest(".ant-modal-mask") ||
-        document.querySelector(".ant-confirm, .ant-modal-confirm")
-      ) {
+      // Ignore clicks on Ant Design components, modals, or custom selectors
+      const defaultIgnoreSelectors = [
+        ".ant-picker-dropdown",
+        ".ant-select-dropdown",
+        ".ant-modal",
+        ".ant-modal-mask",
+      ];
+      const allIgnoreSelectors = [...defaultIgnoreSelectors, ...ignoreClickOutsideSelectors];
+      
+      // Check if the click target matches any ignore selector
+      const shouldIgnore = allIgnoreSelectors.some(selector => 
+        event.target.closest(selector)
+      ) || document.querySelector(".ant-confirm, .ant-modal-confirm");
+
+      if (shouldIgnore) {
         return;
       }
-      // If the click target is outside the sidebar, close the sidebar.
+
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
         onClose();
       }
@@ -63,7 +73,7 @@ const Sidebar = ({ isOpen, title, onClose, children, width = "35%" }) => {
       document.removeEventListener("mousedown", handleClickOutside);
       document.removeEventListener("keydown", trapFocus);
     };
-  }, [isOpen, onClose, trapFocus]);
+  }, [isOpen, onClose, trapFocus, ignoreClickOutsideSelectors]);
 
   return (
     <div
