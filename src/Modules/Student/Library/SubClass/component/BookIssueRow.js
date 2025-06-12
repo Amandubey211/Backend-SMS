@@ -8,15 +8,13 @@ const formatDate = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YY") : "N/A";
 
 const BookIssueRow = memo(({ item }) => {
-  const {
-    bookName = "N/A",
-    bookAuthor = "N/A",
-    bookImage = "",
-    bookCategories = [],
-    issueDate,
-    returnDate,
-    status = "N/A",
-  } = item;
+  const bookName = item?.bookId?.name || "N/A"
+  const bookAuthor = item?.bookId?.author || "N/A"
+  const bookImage = item?.bookId?.image || null
+  const bookCategories = item?.bookId?.categories || []
+  const issueDate = item?.issueDate || "N/A"
+  const returnDate = item?.returnDate || "N/A"
+  const status = item?.status || "N/A"
 
   // Memoized category strings
   const categoryNames = useMemo(
@@ -33,8 +31,8 @@ const BookIssueRow = memo(({ item }) => {
     return s === "returned"
       ? "bg-green-100 text-green-800"
       : s === "pending"
-      ? "bg-yellow-100 text-yellow-800"
-      : "bg-blue-100 text-blue-800";
+        ? "bg-yellow-100 text-yellow-800"
+        : "bg-blue-100 text-blue-800";
   }, [status]);
 
   return (

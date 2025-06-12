@@ -89,7 +89,7 @@ const StudentProfile = ({ student }) => {
           <h3 className="text-lg font-semibold mb-4 text-gray-800">
             {t("Document Previews")}
           </h3>
-          <div className="flex md:flex-row md:flex-wrap flex-col gap-y-4 gap-x-14 w-auto">
+          <div className="flex md:flex-row md:flex-wrap flex-col gap-2 w-auto">
             {documents?.map((doc, index) => (
               <div
                 key={index}
