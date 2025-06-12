@@ -265,6 +265,11 @@ const AdminNotice = () => {
             isOpen={isSidebarOpen}
             onClose={handleSidebarClose}
             title={editMode ? t("Edit Notice") : t("Add Notice")}
+            ignoreClickOutsideSelectors={[
+              ".jodit-ui-list__box",
+              ".jodit-popup",
+              ".jodit-toolbar-button",
+            ]}
             width="70%"
           >
             <AddNotice isEditing={editMode} onClose={handleSidebarClose} />

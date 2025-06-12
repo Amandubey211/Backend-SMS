@@ -22,7 +22,7 @@ import { PERMISSIONS } from "../../../../../config/permission";
 import { motion } from "framer-motion";
 import { FiUsers } from "react-icons/fi";
 import { BsFilterSquare } from "react-icons/bs";
-import { FaEdit,FaPencilAlt } from "react-icons/fa";
+import { FaEdit, FaPencilAlt } from "react-icons/fa";
 
 const AllStudents = () => {
   const { t } = useTranslation("admAccounts");
@@ -296,6 +296,11 @@ const AllStudents = () => {
           isOpen={isUpdateSidebarOpen}
           onClose={handleSidebarClose}
           title={t("Edit Student")}
+          ignoreClickOutsideSelectors={[
+            ".jodit-ui-list__box",
+            ".jodit-popup",
+            ".jodit-toolbar-button",
+          ]}
           width="80%"
         >
           {studentData && (
