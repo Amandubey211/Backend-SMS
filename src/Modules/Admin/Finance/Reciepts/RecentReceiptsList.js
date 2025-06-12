@@ -213,9 +213,9 @@ const ReceiptsList = () => {
                 placeholder="Select Status"
               >
                 <Select.Option value=''>All</Select.Option>
-                <Select.Option value='Paid'>Paid</Select.Option>
-                <Select.Option value='Partial'>Partial</Select.Option>
-                <Select.Option value='Unpaid'>Unpaid</Select.Option>
+                <Select.Option value='paid'>Paid</Select.Option>
+                <Select.Option value='partial'>Partial</Select.Option>
+                <Select.Option value='unpaid'>Unpaid</Select.Option>
               </Select>
             </div>
             <div className='flex flex-row gap-2'>

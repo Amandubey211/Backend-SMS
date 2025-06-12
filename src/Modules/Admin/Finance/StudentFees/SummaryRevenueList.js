@@ -24,7 +24,6 @@ const SummaryRevenueList = () => {
   );
   const classList = useSelector((state) => state.admin.class.classes);
   const sectionsList = useSelector((state) => state.admin.group_section.sectionsList);
-  const { studentsList } = useSelector((state) => state.admin.students);
 
   const [searchText, setSearchText] = useState("");
   const [computedPageSize, setComputedPageSize] = useState(10); // Default page size
@@ -47,7 +46,7 @@ const SummaryRevenueList = () => {
 
   useEffect(() => {
     dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status, selectedClass, selectedSection }));
-  }, [isCancel, status, selectedClass, selectedSection]);
+  }, [isCancel, status, selectedClass, selectedSection,searchText]);
 
   const handleCancelReceipt = (receipt) => {
     setSelectedReceipt(receipt);
