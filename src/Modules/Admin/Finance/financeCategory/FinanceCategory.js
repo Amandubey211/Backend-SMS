@@ -39,12 +39,12 @@ const FinanceCategory = () => {
   useNavHeading(role, `Categories`);
 
   useEffect(() => {
-     dispatch(fetchDayBook({  search: searchText, page: currentPage, limit: pageSize }));
+    dispatch(fetchDayBook({ search: searchText, page: currentPage, limit: pageSize }));
     dispatch(fetchCategory({ categoryType, search: searchText, page: currentPage, limit: pageSize }));
   }, [dispatch, categoryType, searchText, currentPage, pageSize]);
   useEffect(() => {
-      dispatch(fetchAllIcons({ type: "Category" }));
-    }, [dispatch]);
+    dispatch(fetchAllIcons({ type: "Category" }));
+  }, [dispatch]);
 
   const columns = [
     {
@@ -59,9 +59,10 @@ const FinanceCategory = () => {
       title: "Category For",
       dataIndex: "categoryType",
       key: "categoryType",
-      render: (value) =>{ 
+      render: (value) => {
         const capitalizedStatus = value?.charAt(0)?.toUpperCase() + value?.slice(1);
-       return <span className="text-md">{capitalizedStatus}</span>},
+        return <span className="text-md">{capitalizedStatus}</span>
+      },
       ellipsis: true,
       width: 60,
     },
@@ -69,15 +70,15 @@ const FinanceCategory = () => {
       title: "Description",
       dataIndex: "description",
       key: "description",
-      render: (value) => <span className="text-sm">{value?.slice(0,60) || "-"}</span>,
+      render: (value) => <span className="text-sm">{value?.slice(0, 60) || "-"}</span>,
       ellipsis: true,
       width: 230,
     },
     {
       title: "Action",
-      render: (_, record) =>   <div className="flex flex-row gap-4">
-      <span className="text-xs text-blue-600 cursor-pointer"  onClick={() => { setSelectCategory(record); setIsModalVisible(true) }} title="Edit"><MdEdit size={20}/></span>
-      <span className="text-xs text-blue-600 cursor-pointer"  onClick={() => { setSelectCategory({mode:"view",...record}); setIsModalVisible(true) }}title="View"><MdRemoveRedEye size={20}/></span>
+      render: (_, record) => <div className="flex flex-row gap-4">
+        <span className="text-xs text-blue-600 cursor-pointer" onClick={() => { setSelectCategory(record); setIsModalVisible(true) }} title="Edit"><MdEdit size={20} /></span>
+        <span className="text-xs text-blue-600 cursor-pointer" onClick={() => { setSelectCategory({ mode: "view", ...record }); setIsModalVisible(true) }} title="View"><MdRemoveRedEye size={20} /></span>
       </div>,
       width: 30,
     },
@@ -92,28 +93,28 @@ const FinanceCategory = () => {
             { title: "Total Revenue Categories", value: totalRevenue, icon: <TbCategory2 /> },
             { title: "Total Expense Categories", value: total - totalRevenue, icon: <TbCategoryMinus /> }].map((item, index) => (
               <div
-        className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
-        style={{
-          background:
-            "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
-          borderColor: "#DABDFF",
-        }}
-      >
-        {/* Title and Icon */}
-        <div className="flex items-center gap-2 mb-4">
-          <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
-            {item?.icon}
-          </div>
-          <h3 className="text-sm font-medium text-gray-800 truncate">{item?.title}</h3>
-        </div>
-  
-        {/* Value and Trend */}
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
-            {item?.value}
-          </h2>
-        </div>
-      </div>
+                className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
+                style={{
+                  background:
+                    "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
+                  borderColor: "#DABDFF",
+                }}
+              >
+                {/* Title and Icon */}
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
+                    {item?.icon}
+                  </div>
+                  <h3 className="text-sm font-medium text-gray-800 truncate">{item?.title}</h3>
+                </div>
+
+                {/* Value and Trend */}
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
+                    {item?.value}
+                  </h2>
+                </div>
+              </div>
             ))}
           </div>
 
@@ -141,8 +142,8 @@ const FinanceCategory = () => {
               </Select>
 
             </div>
-<div className="w-[15rem]">
-<button
+            <div className="w-[15rem]">
+              <button
                 onClick={() => { setSelectCategory(null); setIsModalVisible(true) }}
                 className="inline-flex items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2 "
               >
@@ -151,7 +152,7 @@ const FinanceCategory = () => {
                   <FaPlusCircle size={16} />
                 </div>
               </button>
-</div>
+            </div>
 
           </div>
 

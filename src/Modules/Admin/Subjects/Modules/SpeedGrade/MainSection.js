@@ -84,7 +84,7 @@ const MainSection = () => {
     >
       <div className="flex h-screen">
         {/* Student List Section */}
-        <div className="w-1/4 p-4 border-r border-gray-200 flex flex-col">
+        <div className="w-1/4 p-4 border-gray-200 flex flex-col">
           {loading ? (
             <>
               {/* Shimmer Loaders for Student List */}
