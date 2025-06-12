@@ -32,6 +32,8 @@ const SummaryRevenueList = () => {
   const [exportModel, setExportModel] = useState(false);
   const [selectedClass, setSelectedClass] = useState(null);
   const [selectedSection, setSelectedSection] = useState(null);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
 
   useEffect(() => {
     dispatch(fetchAllClasses());
@@ -44,8 +46,19 @@ const SummaryRevenueList = () => {
   }, [dispatch, selectedClass]);
 
   useEffect(() => {
-    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status,selectedClass,selectedSection }));
-  }, [isCancel, status,selectedClass,selectedSection]);
+    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status, selectedClass, selectedSection }));
+  }, [isCancel, status, selectedClass, selectedSection]);
+
+  const handleCancelReceipt = (receipt) => {
+    setSelectedReceipt(receipt);
+    setCancelModalVisible(true);
+  };
+
+  const handleConfirmCancel = () => {
+    dispatch(cancelStudentFee(selectedReceipt));
+    setCancelModalVisible(false);
+    setSelectedReceipt(null);
+  };
 
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -120,11 +133,29 @@ const SummaryRevenueList = () => {
             }}><FaFileInvoice size={20} /></button>
             {
               record?.history?.length > 0 && record?.paymentStatus == "Unpaid" && !record?.isCancel ?
-                <button title="Cancel" onClick={() => dispatch(cancelStudentFee(record))}><MdCancel size={20} /> </button> : ''
+                <button
+                  title="Cancel"
+                  onClick={() => handleCancelReceipt(record)}
+                // onClick={() => dispatch(cancelStudentFee(record))}
+                >
+                  <MdCancel size={20} />
+                </button> : ''
             }
             {
               record?.isCancel ?
-                <Tag color='red'>Canceled</Tag> : null}
+                <Tag color='red'>Canceled</Tag> : null
+            }
+
+            <Modal
+              title="Cancel Receipt"
+              visible={cancelModalVisible}
+              onOk={handleConfirmCancel}
+              onCancel={() => setCancelModalVisible(false)}
+              okText="Confirm"
+              cancelText="Cancel"
+            >
+              <p>Are you sure you want to cancel the receipt for Reciept number: {selectedReceipt?.RecieptNumber}?</p>
+            </Modal>
 
           </div>
         );

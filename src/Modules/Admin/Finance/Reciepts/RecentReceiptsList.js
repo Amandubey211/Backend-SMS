@@ -13,6 +13,7 @@ import ReceiptTemplate from '../../../../Utils/FinanceTemplate/Receipt';
 import { TbInvoice } from 'react-icons/tb';
 import { FaFileExport } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+
 const ReceiptsList = () => {
   const dispatch = useDispatch();
   const { receipts, loading, totalRecords, totalPages } = useSelector(state => state.admin.receipts);
@@ -24,10 +25,12 @@ const ReceiptsList = () => {
   const [isCancel, setIsCancel] = useState(false);
   const [exportModel, setExportModel] = useState(false);
   const [fileTitle, setFileTitle] = useState('');
-   const [status, setStatus] = useState('');
+  const [status, setStatus] = useState('');
+  const [searchText, setSearchText] = useState("")
+
   useEffect(() => {
-    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize, isCancel,status }));
-  }, [dispatch, currentPage, pageSize, isCancel,status]);
+    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize, isCancel, status, search: searchText }));
+  }, [dispatch, currentPage, pageSize, isCancel, status, searchText]);
 
   const handleCancelReceipt = (receipt) => {
     setSelectedReceipt(receipt);
@@ -46,7 +49,7 @@ const ReceiptsList = () => {
   };
   const [isRecieptVisible, setRecieptVisible] = useState(false);
   const [selectedReciept, setSelectedReciept] = useState(null);
- 
+
   const popupRef = useRef(null);
   const pdfRef = useRef(null);
   const handleDownloadPDF = async (pdfRef, selectedReciept) => {
@@ -78,7 +81,11 @@ const ReceiptsList = () => {
       title: 'Payment Status',
       dataIndex: 'paymentStatus',
       render: (status) => {
-        const color = status == "paid" ? "green" : "yellow";
+        let color = 'yellow';
+        if (status === 'paid') color = 'green';
+        else if (status === 'partial') color = 'orange';
+        else if (status === 'unpaid') color = 'red';
+
         const capitalizedStatus = status?.charAt(0)?.toUpperCase() + status.slice(1);
         return <Tag color={color}>{capitalizedStatus}</Tag>;
       },
@@ -108,11 +115,11 @@ const ReceiptsList = () => {
     },
   ];
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState("")
+
   const handleSearch = (e) => {
     const value = e.target.value;
     setSearchText(value);
-    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize, search: value, isCancel,status }));
+    dispatch(fetchAllReceipts({ page: currentPage, limit: pageSize, search: value, isCancel, status }));
   };
 
   const downloadexcel = () => {
