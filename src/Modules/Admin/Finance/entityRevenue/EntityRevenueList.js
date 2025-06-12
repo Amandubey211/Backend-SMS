@@ -18,6 +18,8 @@ const SummaryRevenueList = () => {
   const [isCancel, setIsCancel] = useState(false);
   const [status, setStatus] = useState('');
   const [exportModel, setExportModel] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState(null);
+  const [cancelModalVisible, setCancelModalVisible] = useState(false);
   // Get data from Redux
   const { allEntityRevenue: incomes, loading, totalRecords, totalPages, currentPage } = useSelector(
     (state) => state.admin.entityRevenue
@@ -29,6 +31,17 @@ const SummaryRevenueList = () => {
   useEffect(() => {
     dispatch(fetchAllEntityRevenue({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status }));
   }, [isCancel, status]);
+
+  const handleCancelReceipt = (receipt) => {
+    setSelectedReceipt(receipt);
+    setCancelModalVisible(true);
+  };
+
+  const handleConfirmCancel = () => {
+    dispatch(cancelEntityRevenue(selectedReceipt));
+    setCancelModalVisible(false);
+    setSelectedReceipt(null);
+  };
 
   const handleSearch = (e) => {
     const value = e.target.value;
@@ -106,7 +119,13 @@ const SummaryRevenueList = () => {
             <button title="Invoice" onClick={() => handelselectinvoice(record)}><FaFileInvoice size={20} /></button>
             {
               record?.history?.length > 0 && record?.paymentStatus == "Unpaid" && !record?.isCancel ?
-                <button title="Cancel" onClick={() => dispatch(cancelEntityRevenue(record))}><MdCancel size={20} /> </button> : ''
+                <button
+                  title="Cancel"
+                  onClick={() => handleCancelReceipt(record)}
+                // onClick={() => dispatch(cancelEntityRevenue(record))}
+                >
+                  <MdCancel size={20} />
+                </button> : ''
             }
             {
               record?.isCancel ?
@@ -179,10 +198,10 @@ const SummaryRevenueList = () => {
     await downloadPDF(pdfRef, selectedInvoice, "Invoice")
   };
   const downloadexcel = () => {
-  if(!fileTitle){
-    toast.error("Please Enter File Name");
-    return
-  }
+    if (!fileTitle) {
+      toast.error("Please Enter File Name");
+      return
+    }
     let fileName = `${fileTitle}.xlsx`;
     let sheet = "sheet1"
     let formattedData = []
@@ -282,7 +301,7 @@ const SummaryRevenueList = () => {
               total: totalRecords,
               pageSize: computedPageSize,
               showSizeChanger: true,
-              pageSizeOptions: ["5", "10", "20", "50", "100","200", "500"],
+              pageSizeOptions: ["5", "10", "20", "50", "100", "200", "500"],
               size: "small",
               showTotal: () =>
                 `Page ${currentPage} of ${totalPages} | Total ${totalRecords} records`,
@@ -305,14 +324,24 @@ const SummaryRevenueList = () => {
           onCancel={() => setExportModel(false)}
           okText="Export"
           cancelText="Cancel"
-        > 
-        <div className="flex flex-row gap-2 items-center ">
-        <Input placeholder="File Name.." className="w-[18rem]" onChange={(e)=>setFileTitle(e.target.value)}/><span className="text-lg">.xlsx</span>
-        </div>
-        
+        >
+          <div className="flex flex-row gap-2 items-center ">
+            <Input placeholder="File Name.." className="w-[18rem]" onChange={(e) => setFileTitle(e.target.value)} /><span className="text-lg">.xlsx</span>
+          </div>
+
           <p>Only the data that matches the filters you have applied will be exported.</p>
           <p>Export is limited to the current page based on the selected page limit.</p>
 
+        </Modal>
+        <Modal
+          title="Cancel Receipt"
+          visible={cancelModalVisible}
+          onOk={handleConfirmCancel}
+          onCancel={() => setCancelModalVisible(false)}
+          okText="Confirm"
+          cancelText="Cancel"
+        >
+          <p>Are you sure you want to cancel the receipt for Reciept number: {selectedReceipt?.RecieptNumber}?</p>
         </Modal>
         {isInvoiceVisible && selectedInvoice && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">

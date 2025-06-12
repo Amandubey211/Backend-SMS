@@ -53,7 +53,8 @@ const CreateReceipt = () => {
       lineItemId,
       amountPaid: value,
       discount,
-      penalty
+      penalty,
+      updatedRemainingAmount:totalRemaining
     };
 
     // Check if the lineItemId exists in the paidItems array
@@ -201,9 +202,9 @@ const CreateReceipt = () => {
                     </div>}
                     {invoiceData?.entityId && <div>
                       <p><strong>Bill To:</strong></p>
-                      <p><strong>Name:</strong> {invoiceData?.entityId?.name} </p>
+                      <p><strong>Name:</strong> {invoiceData?.entityId?.entityName} </p>
                       <p><strong>Email:</strong> {invoiceData?.entityId?.email}</p>
-                      <p><strong>Contact:</strong> {invoiceData?.entityId?.Contact}</p>
+                      <p><strong>Contact:</strong> {invoiceData?.entityId?.contactNumber}</p>
                     </div>}
                     <div>
                       <p><strong>Invoice No:</strong> {invoiceData?.InvoiceNumber || ""}</p>
@@ -249,15 +250,18 @@ const CreateReceipt = () => {
                             />
                           </td>
                           <td className="p-2 border text-start">
-                            <input
-                              type="number"
-                              min="0"
-                              className="w-full border border-gray-300 rounded-md p-1"
-                              value={editableDiscounts[item._id] || 0}
-                              onChange={(e) => handleDiscountChange(item._id, e.target.value)}
-                            />
-                            {item.discountType === "percentage" && "%"}
+                            <div className="flex items-center gap-1">
+                              <input
+                                type="number"
+                                min="0"
+                                className="w-full border border-gray-300 rounded-md p-1"
+                                value={editableDiscounts[item._id] || 0}
+                                onChange={(e) => handleDiscountChange(item._id, e.target.value)}
+                              />
+                              {item.discountType === "percentage" && <span>%</span>}
+                            </div>
                           </td>
+
                           <td className="p-2 border text-start">{item.final_amount?.toFixed(2) || 0}</td>
                           <td className="p-2 border text-start">{item.paid_amount?.toFixed(2) || 0}</td>
                           <td className="p-2 border text-start">{item.remaining_amount?.toFixed(2) || 0}</td>
