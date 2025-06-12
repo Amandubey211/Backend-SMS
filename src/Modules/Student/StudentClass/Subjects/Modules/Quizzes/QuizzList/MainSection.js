@@ -13,14 +13,16 @@ const QuizMainSection = () => {
   const { cid, sid } = useParams();
   const { loading, error, quizData } = useSelector((store) => store?.student?.studentQuiz);
   const dispatch = useDispatch();
-
+const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
 
   const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
 
 
   useEffect(() => {
     dispatch(stdGetQuiz({cid, sid, moduleId:filters?.moduleId, chapterId:filters?.chapterId}))
-  }, [dispatch,cid,sid,stdGetQuiz,filters])
+  }, [dispatch,cid,sid,stdGetQuiz,filters,selectedSemester])
 
 
   return (

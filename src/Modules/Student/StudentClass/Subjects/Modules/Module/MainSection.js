@@ -23,13 +23,16 @@ const MainSection = () => {
     subjectName,
     expandedChapters,
   } = useSelector((store) => store?.student?.studentModule);
+  const { selectedSemester } = useSelector(
+      (state) => state.common.user.classInfo
+    );
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
   const { showError } = useSelector((store) => store?.common?.alertMsg);
 
   useEffect(() => {
     dispatch(stdModule({ cid, sid }));
-  }, [dispatch]);
+  }, [dispatch,selectedSemester]);
 
   // Select the first module when modules are fetched
   useEffect(() => {
@@ -52,6 +55,7 @@ const MainSection = () => {
         })
       );
     }
+    // console.log("Module",selectedModule)
   }, [dispatch, modulesData]);
 
   const toggleChapter = (chapterId) => {
