@@ -115,7 +115,7 @@ const SummaryRevenueList = () => {
       dataIndex: "paymentStatus",
       key: "paymentStatus",
       render: (status) => {
-        const color = status === "paid" ? "green" : status === "Unpaid" ? "red" : "yellow";
+        const color = status === "Paid" ? "green" : status === "Unpaid" ? "red" : "yellow";
         return <Tag color={color}>{status}</Tag>;
       },
     },
