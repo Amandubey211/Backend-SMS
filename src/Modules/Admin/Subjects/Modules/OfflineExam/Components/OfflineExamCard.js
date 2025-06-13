@@ -56,7 +56,7 @@ const OfflineExamCard = ({
             fullName: student.studentId.fullName || "",
             id: student.studentId.id || null,
           }
-          : null, // Fallback if studentId is undefined
+          : null,
       })) || [],
   });
 
@@ -91,7 +91,7 @@ const OfflineExamCard = ({
           })) || [],
       });
     }
-  }, [offlineExamData, examId]); // <- Dependency fix here
+  }, [offlineExamData, examId]);
 
   const handleDeleteClick = async () => {
     try {
@@ -115,8 +115,6 @@ const OfflineExamCard = ({
         [name]: checked,
       });
     } else {
-      console.log("value", value);
-
       setExamDetails({
         ...examDetails,
         [name]: value,
@@ -170,7 +168,7 @@ const OfflineExamCard = ({
 
   return (
     <div className="ps-1 rounded-md bg-green-500 h-auto m-4 hover:shadow-lg">
-      <div className="border rounded-md px-5 py-5 shadow-sm relative h-auto  bg-white">
+      <div className="border rounded-md px-5 py-5 shadow-sm relative h-auto bg-white">
         <div
           className="cursor-pointer"
           onClick={() => {
@@ -189,23 +187,22 @@ const OfflineExamCard = ({
             }
           }}
         >
-          <div className="flex w-full h-auto justify-between items-end ">
-            <div className="flex w-[70%] h-auto items-end gap-x-2">
+          <div className="flex flex-col sm:flex-row w-full h-auto justify-between items-start sm:items-center gap-2">
+            <div className="flex w-full sm:w-auto items-center gap-x-2">
               {isEditing ? (
                 <input
                   type="text"
                   name="examName"
                   value={examDetails.examName}
                   onChange={handleInputChange}
-                  className="border px-2 py-1 rounded-md w-full"
+                  className="border px-2 py-1 rounded-md w-full sm:w-48"
                 />
               ) : (
-                <h1 className="font-bold text-lg pr-2 truncate capitalize">
+                <span className="font-bold text-lg pr-2 truncate capitalize">
                   {examDetails.examName}
-                </h1>
+                </span>
               )}
-
-              {/* Published Icon (Move to the right of examType) */}
+              {/* Published Icon aligned with exam name */}
               {isEditing ? (
                 <div className="flex items-center gap-2">
                   <label
@@ -220,7 +217,7 @@ const OfflineExamCard = ({
                     checked={examDetails.isPublished}
                     onChange={handleInputChange}
                     name="isPublished"
-                    className="h-4 w-4 accent-green-500 cursor-pointer"
+                    className="h-3 w-3 accent-green-500 cursor-pointer"
                   />
                 </div>
               ) : (
@@ -237,11 +234,11 @@ const OfflineExamCard = ({
                 </div>
               )}
             </div>
-            <div className="bg-gray-100 text-gray-600 text-sm font-semibold rounded-full px-2 py-1 capitalize">
+            <div className="bg-gray-100 text-gray-600 text-sm font-semibold rounded-full px-2 py-1 capitalize shrink-0">
               {examType}
             </div>
           </div>
-          <div>
+          <div className="mt-2">
             <span className="font-medium text-gray-600 text-sm">
               Max score:{" "}
             </span>
@@ -259,18 +256,14 @@ const OfflineExamCard = ({
               </span>
             )}
           </div>
-
           <div>
             <span className="font-medium text-gray-600 text-sm">
               Semester:{" "}
             </span>
-
-            <span className=" text-gray-600 text-sm">{semester}</span>
+            <span className="text-gray-600 text-sm">{semester}</span>
           </div>
         </div>
         <ul className="border-t px-8 mt-2 mb-1"></ul>
-
-        {/* Dates Section */}
         <DateSection
           isEditing={isEditing}
           examDetails={examDetails}

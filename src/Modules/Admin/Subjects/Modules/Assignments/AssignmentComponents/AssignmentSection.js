@@ -10,7 +10,6 @@ const AssignmentSection = () => {
   const { assignmentDetails, loading, error } = useSelector(
     (store) => store.admin.assignments
   );
-  console.log(assignmentDetails);
   if (loading) return <Spinner />;
   if (error || !assignmentDetails) return <NoDataFound />;
 

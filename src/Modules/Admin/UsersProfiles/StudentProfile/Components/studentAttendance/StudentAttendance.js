@@ -12,7 +12,7 @@ import { PERMISSIONS } from "../../../../../../config/permission";
 const StudentAttendance = ({ student }) => {
   const { t } = useTranslation("admAccounts");
   // Set initial date to May 2025 to match the data
-  const [selectedMonth, setSelectedMonth] = useState(5); // May (0-11, so 4)
+  const [selectedMonth, setSelectedMonth] = useState(moment().month()); // May (0-11, so 4)
   const [selectedYear, setSelectedYear] = useState(moment().year()); // Current year (2025)
 
   const { StudentAttendance, StudentAttendanceSummary, loading } = useSelector(
@@ -44,8 +44,6 @@ const StudentAttendance = ({ student }) => {
     }
   }, [dispatch, selectedMonth, selectedYear, student]);
 
-  // Create a moment object for the Calendar component to use
-  const calendarValue = moment(`${selectedYear}-${selectedMonth + 1}-01`, "YYYY-M-DD");
 
   return loading ? (
     <div className="flex w-full h-[90vh] flex-col items-center justify-center">

@@ -16,7 +16,7 @@ const AssignmentMainSection = () => {
   );
 
   const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
-const { selectedSemester } = useSelector(
+  const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
   // Fetch assignments based on selected filters
@@ -26,7 +26,7 @@ const { selectedSemester } = useSelector(
     dispatch(
       stdGetFilteredAssignment({ cid, subjectId: sid, moduleId, chapterId })
     );
-  }, [filters, sid, dispatch,selectedSemester]);
+  }, [filters, sid, dispatch, selectedSemester]);
 
   useEffect(() => {
     refetchAssignments();
@@ -34,7 +34,7 @@ const { selectedSemester } = useSelector(
 
   const getItemName = (item) => item.title;
   const getItemDetails = (item) =>
-    `Module: ${item.module} | Chapter: ${item.chapter}`;
+    `Module: ${item.module}`;
   const navLinkPath = (cid, sid, item) =>
     `/student_class/${cid}/${sid}/assignments/${item.assignmentId}/view`;
 

@@ -498,9 +498,8 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       <div className="w-full flex">
         {/*  Main content area  */}
         <div
-          className={`${
-            activeTab === "instructions" ? "w-[70%]" : "w-full"
-          } border-x`}
+          className={`${activeTab === "instructions" ? "w-[70%]" : "w-full"
+            } border-x`}
         >
           <Tabs
             createPage={true}
@@ -563,6 +562,11 @@ const MainSection = ({ setIsEditing, isEditing }) => {
         isOpen={isSidebarOpen}
         onClose={() => setSidebarOpen(false)}
         title={editingQuestionId ? "Edit Question" : "Add new Question"}
+        ignoreClickOutsideSelectors={[
+          ".jodit-ui-list__box",
+          ".jodit-popup",
+          ".jodit-toolbar-button",
+        ]}
         width="95%"
       >
         <ProtectedSection
