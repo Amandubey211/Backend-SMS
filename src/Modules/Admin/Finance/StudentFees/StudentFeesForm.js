@@ -41,7 +41,7 @@ const StudentFeeForm = () => {
       startDate: null,
       endDate: null,
       dueDate: null,
-      penaltyId: ""
+      penaltyId: null
     },
   ]);
   const location = useLocation();
@@ -54,7 +54,7 @@ const StudentFeeForm = () => {
           dueDate: null,
           startDate: null,
           endDate: null,
-          penaltyId: "",
+          penaltyId: null,
         }
       });
       setLineItems(lIt);
@@ -178,7 +178,7 @@ const StudentFeeForm = () => {
         startDate: null,
         endDate: null,
         dueDate: null,
-        penaltyId: ""
+        penaltyId: null
       },
     ]);
   };

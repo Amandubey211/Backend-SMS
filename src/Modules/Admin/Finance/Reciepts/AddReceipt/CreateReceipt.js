@@ -1,5 +1,3 @@
-// src/Modules/Admin/Finance/Receipts/AddReceipt/CreateReceipt.js
-
 import React, { useEffect, useRef, useState } from "react";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import { Col, Row, Tabs } from "antd";
@@ -54,7 +52,7 @@ const CreateReceipt = () => {
       amountPaid: value,
       discount,
       penalty,
-      updatedRemainingAmount:totalRemaining
+      updatedRemainingAmount: totalRemaining
     };
 
     // Check if the lineItemId exists in the paidItems array
@@ -90,12 +88,73 @@ const CreateReceipt = () => {
     })
   }
 
+  const calculateLineItemValues = (item) => {
+    const baseAmount = item.rate * item.quantity;
+    let discountAmount = 0;
+
+    // Handle percentage discount
+    if (item.discountType === "percentage") {
+      discountAmount = baseAmount * (editableDiscounts[item._id] || 0) / 100;
+    }
+    // Handle fixed discount
+    else {
+      discountAmount = parseFloat(editableDiscounts[item._id] || 0);
+    }
+
+    const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
+    const taxableAmount = baseAmount - discountAmount;
+    const taxAmount = taxableAmount * (item.tax || 0) / 100;
+    const finalAmount = taxableAmount + taxAmount + penaltyAmount;
+
+    return {
+      baseAmount,
+      discountAmount,
+      penaltyAmount,
+      taxAmount,
+      finalAmount,
+      remaining: finalAmount - (item.paid_amount || 0)
+    };
+  };
+
+
+  // Calculate totals using the new line item calculations
+  useEffect(() => {
+    if (!invoiceData?.lineItems) return;
+
+    let amount = 0;
+    let paid = 0;
+    let tax = 0;
+    let discount = 0;
+    let penalty = 0;
+    let final = 0;
+
+    invoiceData.lineItems.forEach((item) => {
+      const values = calculateLineItemValues(item);
+      amount += values.baseAmount;
+      paid += item.paid_amount || 0;
+      tax += values.taxAmount;
+      discount += values.discountAmount;
+      penalty += values.penaltyAmount;
+      final += values.finalAmount;
+    });
+
+    setTotalAmount(amount);
+    setTotalPaid(paid);
+    setTotalTax(tax);
+    setTotalDiscount(discount);
+    setTotalPenalty(penalty);
+    setFinalAmount(final);
+    setTotalRemaining(final - paid);
+  }, [invoiceData, editableDiscounts, editablePenalties]);
+
+  // FIX: Initialize discounts with invoice values instead of 0
   useEffect(() => {
     if (invoiceData?.lineItems) {
       const initialDiscounts = {};
       const initialPenalties = {};
 
       invoiceData.lineItems.forEach(item => {
+        // Use invoice's discount value instead of 0
         initialDiscounts[item._id] = item.discount || 0;
         initialPenalties[item._id] = item.penalty_amount || 0;
       });
@@ -120,33 +179,6 @@ const CreateReceipt = () => {
     }));
   };
 
-
-  useEffect(() => {
-    if (!invoiceData?.lineItems) return;
-
-    let amount = 0;
-    let paid = 0;
-    let tax = 0;
-
-    invoiceData.lineItems.forEach((item) => {
-      amount += item.final_amount || 0;
-      paid += item.paid_amount || 0;
-      tax += ((item.rate * item.quantity) / 100) * item.tax || 0;
-    });
-
-    // Calculate using editable values
-    const discount = Object.values(editableDiscounts).reduce((sum, val) => sum + parseFloat(val || 0), 0);
-    const penalty = Object.values(editablePenalties).reduce((sum, val) => sum + parseFloat(val || 0), 0);
-
-    setTotalAmount(amount);
-    setTotalPaid(paid);
-    setTotalTax(tax);
-    setTotalDiscount(discount);
-    setTotalPenalty(penalty);
-    setFinalAmount(amount + tax + penalty - discount);
-    setTotalRemaining(amount + tax + penalty - discount - paid);
-  }, [invoiceData, editableDiscounts, editablePenalties]);
-
   const handleChange = (field, value) => {
     setReceiptData({
       ...receiptData,
@@ -162,12 +194,11 @@ const CreateReceipt = () => {
     }
   }
 
-
-
   const { activeYear } = useSelector((store) => store.common.financialYear);
   const minDate = dayjs(activeYear?.startDate?.slice(0, 10));
   const maxDate = dayjs(activeYear?.endDate?.slice(0, 10));
   const navigate = useNavigate()
+
   return (
     <Layout title="Finance | Create Reciept">
       <DashLayout>
@@ -189,7 +220,6 @@ const CreateReceipt = () => {
                   <div>
                     <div className="w-full text-center text-white font-bold py-2" style={{ backgroundColor: "#C83B62", fontSize: "18px" }}>
                       INVOICE {invoiceData?.isCancel && "CANCELLED"}
-
                     </div>
                   </div>
 
@@ -233,47 +263,48 @@ const CreateReceipt = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {invoiceData?.lineItems.map((item, index) => (
-                        <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                          <td className="p-2 border">{item.name || "N/A"}</td>
-                          <td className="p-2 border">{item.itemDetails} <br /> {item.frequency !== "Permanent Purchase" && ` ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
-                          <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
-                          <td className="p-2 border text-start">{item.quantity || 1}</td>
-                          <td className="p-2 border text-start">{item.tax?.toFixed(2)}</td>
-                          <td className="p-2 border text-start">
-                            <input
-                              type="number"
-                              min="0"
-                              className="w-full border border-gray-300 rounded-md p-1"
-                              value={editablePenalties[item._id] || 0}
-                              onChange={(e) => handlePenaltyChange(item._id, e.target.value)}
-                            />
-                          </td>
-                          <td className="p-2 border text-start">
-                            <div className="flex items-center gap-1">
+                      {invoiceData?.lineItems.map((item, index) => {
+                        const values = calculateLineItemValues(item);
+                        return (
+                          <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                            <td className="p-2 border">{item.name || "N/A"}</td>
+                            <td className="p-2 border">{item.itemDetails} <br /> {item.frequency !== "Permanent Purchase" && ` ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
+                            <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{item.quantity || 1}</td>
+                            <td className="p-2 border text-start">{values.taxAmount.toFixed(2)}</td>
+                            <td className="p-2 border text-start">
                               <input
                                 type="number"
                                 min="0"
                                 className="w-full border border-gray-300 rounded-md p-1"
-                                value={editableDiscounts[item._id] || 0}
-                                onChange={(e) => handleDiscountChange(item._id, e.target.value)}
+                                value={editablePenalties[item._id] || 0}
+                                onChange={(e) => handlePenaltyChange(item._id, e.target.value)}
                               />
-                              {item.discountType === "percentage" && <span>%</span>}
-                            </div>
-                          </td>
-
-                          <td className="p-2 border text-start">{item.final_amount?.toFixed(2) || 0}</td>
-                          <td className="p-2 border text-start">{item.paid_amount?.toFixed(2) || 0}</td>
-                          <td className="p-2 border text-start">{item.remaining_amount?.toFixed(2) || 0}</td>
-                          <td className="p-2 border text-start">{item?.dueDate?.slice(0, 10) || " "}</td>
-                          <td className="pl-1 border text-start">
-                            <input type="Number" className="w-[7rem] border border-gray-300 rounded-md p-2"
-                              onChange={(e) => handlePayNowAmountChange(e, item._id)}
-                              placeholder="Enter Amount" />
-                          </td>
-                        </tr>
-
-                      ))}
+                            </td>
+                            <td className="p-2 border text-start">
+                              <div className="flex items-center gap-1">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  className="w-full border border-gray-300 rounded-md p-1"
+                                  value={editableDiscounts[item._id] || 0}
+                                  onChange={(e) => handleDiscountChange(item._id, e.target.value)}
+                                />
+                                {item.discountType === "percentage" && <span>%</span>}
+                              </div>
+                            </td>
+                            <td className="p-2 border text-start">{values.finalAmount.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{item.paid_amount?.toFixed(2) || 0}</td>
+                            <td className="p-2 border text-start">{values.remaining.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{item?.dueDate?.slice(0, 10) || " "}</td>
+                            <td className="pl-1 border text-start">
+                              <input type="Number" className="w-[7rem] border border-gray-300 rounded-md p-2"
+                                onChange={(e) => handlePayNowAmountChange(e, item._id)}
+                                placeholder="Enter Amount" />
+                            </td>
+                          </tr>
+                        )
+                      })}
                     </tbody>
                   </table>
                   <div className="flex flex-row items-center border border-gray-300 text-xs ">

@@ -8,8 +8,6 @@ import EntityRevenueForm from "./EntityRevenueForm.js";
 
 export default function AddEntityRevenue() {
 
-  
-   
   useNavHeading("Finance", "Entity Revenue");
   return (
     <Layout title="Finance | Add New Invoice">

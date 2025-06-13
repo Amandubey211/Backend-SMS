@@ -219,8 +219,17 @@ const ReceiptsList = () => {
               </Select>
             </div>
             <div className='flex flex-row gap-2'>
-              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => { setExportModel(true) }}><FaFileExport /> Export</button>
-              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={() => navigate("/finance/receipts/add-new-receipt")}>Add New Reciept</button>
+              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg"
+               onClick={() => { setExportModel(true) }}
+                >
+                <FaFileExport />
+               Export
+              </button>
+              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg"
+               onClick={() => navigate("/finance/receipts/add-new-receipt") }
+                >
+                Add New Reciept
+              </button>
             </div>
           </div>
           <Table
