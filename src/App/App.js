@@ -1274,7 +1274,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/start-reconciliation",
+      path: "/finance/bank-reconciliation/start-reconciliation",
       element: (
         <ProtectRoute
           Component={StartReconciliation}
@@ -1311,7 +1311,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/add/payroll",
+      path: "/finance/payroll/add",
       element: (
         <ProtectRoute
           Component={AddPayRollDash}
@@ -1341,7 +1341,7 @@ function App() {
       errorElement: <Error />,
     },
     {
-      path: "/finance/add/operational-expenses",
+      path: "/finance/operational-expenses/add",
       element: (
         <ProtectRoute
           Component={AddOperationalExpenses}

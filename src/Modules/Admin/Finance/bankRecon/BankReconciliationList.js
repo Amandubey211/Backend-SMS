@@ -108,7 +108,7 @@ export default function BankReconciliationList() {
               </Select> */}
               </div>
           <div>
-            <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/start-reconciliation")}>Start Reconciliation</button>
+            <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-1 rounded-lg shadow-lg" onClick={()=>navigate("/finance/bank-reconciliation/start-reconciliation")}>Start Reconciliation</button>
           </div>
          </div>
       <Table
