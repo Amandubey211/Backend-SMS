@@ -282,7 +282,7 @@ const SummaryRevenueList = () => {
             <div className="flex flex-row items-center gap-4 pb-2">
               {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => dispatch(deleteEntityRevenue((selectedIds)))}>Delete <MdDeleteOutline /></button>}
               <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => { setExportModel(true) }}><FaFileExport /> Export</button>
-              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => navigate("/finance/entity/add/revenue")}>Add New Invoice</button>
+              <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg" onClick={() => navigate("/finance/entity/revenue/add")}>Add New Invoice</button>
             </div>
           </div>
           <Table
