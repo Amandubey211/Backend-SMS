@@ -22,12 +22,14 @@ const AnnouncementList = () => {
     (store) => store?.student?.studentAnnounce
   );
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   const { cid, sid } = useParams();
 
   useEffect(() => {
     dispatch(fetchStudentAnnounce({ cid, sid }));
-  }, [cid, dispatch, sid]);
+  }, [cid, dispatch, sid, selectedSemester]);
 
   const filteredAnnouncements = announcementData?.filter((card) => {
     const titleMatch = card.title
@@ -121,7 +123,7 @@ const AnnouncementList = () => {
               date={new Date(card.createdAt).toLocaleDateString()}
               id={card._id}
               isRead={card.isRead}
-              // onClick={() => handleMarkAsRead(card._id)}
+            // onClick={() => handleMarkAsRead(card._id)}
             />
           ))}
         </div>

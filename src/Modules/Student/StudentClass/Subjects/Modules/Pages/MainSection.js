@@ -18,12 +18,14 @@ const MainSection = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const dispatch = useDispatch();
   const {showError}=useSelector((store)=>store?.common?.alertMsg);
-
+const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   const { cid } = useParams();
   useEffect(() => {
     dispatch(stdPages({ classId: cid }))
     // fetchAllPages();
-  }, [dispatch]);
+  }, [dispatch,selectedSemester]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);

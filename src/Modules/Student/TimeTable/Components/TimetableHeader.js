@@ -169,7 +169,6 @@ const TimetableContainer = ({ timetables, counts, loadingFetch, pagination, side
       }
       // console.log("Fetching student timetable for user ID:", userDetails.userId);
       const response = await dispatch(fetchStudentTimetable())
-      console.log("Timetable fetch response:", response);
     }
     fetchTimetable();
   }, [dispatch, userDetails]);
