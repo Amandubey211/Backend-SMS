@@ -12,6 +12,7 @@ import { Form, Input, Button, Select, DatePicker } from "antd";
 import Layout from "../../../../../Components/Common/Layout";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { fetchAllEntityRevenue } from "../../../../../Store/Slices/Finance/EntityRevenue/EntityRevenue.thunk";
 const CreateReceipt = () => {
 
   const dispatch = useDispatch()
@@ -89,6 +90,7 @@ const CreateReceipt = () => {
   }
 
   const calculateLineItemValues = (item) => {
+    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
     const baseAmount = item.rate * item.quantity;
     let discountAmount = 0;
 
@@ -104,7 +106,7 @@ const CreateReceipt = () => {
     const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
     const taxableAmount = baseAmount - discountAmount;
     const taxAmount = taxableAmount * (item.tax || 0) / 100;
-    const finalAmount = taxableAmount + taxAmount + penaltyAmount;
+    const finalAmount = roundToTwo(taxableAmount + taxAmount + penaltyAmount);
 
     return {
       baseAmount,
@@ -329,7 +331,16 @@ const CreateReceipt = () => {
                 </div>
                 <Form
                   layout="vertical"
-                  onFinish={() => { dispatch(createReceipt({ ...receiptData, invoiceNumber: searchInvoiceNumber })).then(navigate("/finance/receipts/receipt-list")) }}
+                  onFinish={() => {
+                     dispatch(createReceipt({ ...receiptData, invoiceNumber: searchInvoiceNumber
+
+                      }
+                    )).then(()=>{
+                      fetchAllEntityRevenue()
+                      navigate("/finance/receipts/receipt-list")}
+                    )}
+                    
+                    }
                   initialValues={receiptData}
                   className="mt-4"
                 >

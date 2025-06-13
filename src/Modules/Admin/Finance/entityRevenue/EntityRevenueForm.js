@@ -42,7 +42,7 @@ const EntityRevenueForm = () => {
       startDate: null,
       endDate: null,
       dueDate: null,
-      penaltyId: "",
+      penaltyId: null,
     },
   ]);
   const [entitiesIds, setEntitiesIds] = useState([]);
@@ -58,7 +58,7 @@ const EntityRevenueForm = () => {
         dueDate: "",
         startDate: "",
         endDate: "",
-        penaltyId: "",
+        penaltyId: null,
       }));
       setLineItems(lIt);
       setEntitiesIds(location?.state?.configData?.entitiesIds);
@@ -122,7 +122,7 @@ const EntityRevenueForm = () => {
 
     // If dueDate is cleared, also clear penaltyId
     if (field === "dueDate" && !value) {
-      updatedItems[index].penaltyId = "";
+      updatedItems[index].penaltyId = null;
       form.setFieldsValue({
         lineItems: updatedItems,
       });
@@ -130,7 +130,7 @@ const EntityRevenueForm = () => {
 
     // If penaltyId is cleared, set it to an empty string
     if (field === "penaltyId" && !value) {
-      updatedItems[index].penaltyId = "";
+      updatedItems[index].penaltyId = null;
     }
 
     const rate = updatedItems[index].rate || 0;
@@ -174,7 +174,7 @@ const EntityRevenueForm = () => {
         startDate: null,
         endDate: null,
         dueDate: null,
-        penaltyId: "",
+        penaltyId: null,
       },
     ]);
   };
