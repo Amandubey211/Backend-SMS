@@ -1224,7 +1224,7 @@ function App() {
     },
 
     {
-      path: "/finance/entity/add/revenue",
+      path: "/finance/entity/revenue/add",
       element: (
         <ProtectRoute
           Component={AddEntityRevenue}
