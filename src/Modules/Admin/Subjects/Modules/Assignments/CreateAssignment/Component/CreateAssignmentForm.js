@@ -1,5 +1,3 @@
-// CreateAssignmentForm.jsx
-
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import PointsInput from "./PointsInput";
@@ -32,15 +30,13 @@ const CreateAssignmentForm = ({
   moduleId,
   chapterId,
   groupIds,
-  resultsPublished, // New prop
-  resultsPublishDate, // New prop
-  // Refs for validation
+  resultsPublished,
+  resultsPublishDate,
   moduleRef,
   pointsRef,
   submissionTypeRef,
   availableFromRef,
   dueDateRef,
-  // Error messages:
   moduleError,
   pointsError,
   submissionTypeError,
@@ -112,11 +108,10 @@ const CreateAssignmentForm = ({
           name="moduleId"
           value={moduleId || ""}
           onChange={handleModuleChange}
-          className={`mt-1 block w-full border pl-3 pr-10 py-3 text-base sm:text-sm rounded-md focus:outline-none ${
-            moduleError
+          className={`mt-1 block w-full border pl-3 pr-10 py-3 text-base sm:text-sm rounded-md focus:outline-none ${moduleError
               ? "border-red-500 focus:ring-red-500"
               : "border-gray-300 focus:ring-blue-500"
-          }`}
+            }`}
         >
           <option value="">Select</option>
           {moduleList?.map((mod) => (
@@ -136,28 +131,6 @@ const CreateAssignmentForm = ({
           </motion.p>
         )}
       </div>
-
-      {/* Chapter Selection */}
-      {/* <div className="mb-4">
-        <label className="block text-gray-700" htmlFor="chapterId">
-          Chapter
-        </label>
-        <select
-          id="chapterId"
-          name="chapterId"
-          className="mt-1 block w-full pl-3 pr-10 py-3 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-          value={chapterId || ""}
-          onChange={handleChapterChange}
-          disabled={!moduleId}
-        >
-          <option value="">Select</option>
-          {chapters?.map((chapter) => (
-            <option key={chapter._id} value={chapter._id}>
-              {chapter.name}
-            </option>
-          ))}
-        </select>
-      </div> */}
 
       {/* Grade Option */}
       <GradeOption
@@ -189,7 +162,7 @@ const CreateAssignmentForm = ({
 
       {/* Assign To Radios */}
       <AssignToRadios
-        isAssignToLabel
+        isAssignToLabel={false} // Changed to false to ensure fieldName is "assignTo"
         assignTo={assignTo}
         handleChange={handleChange}
       />
@@ -226,7 +199,7 @@ const CreateAssignmentForm = ({
         error={dueDateError}
       />
 
-      {/* New Results Publish Fields */}
+      {/* Results Publish Fields */}
       <ResultsPublishInput
         resultsPublished={resultsPublished}
         resultsPublishDate={resultsPublishDate}

@@ -116,7 +116,7 @@ const SubjectCard = ({
           <CircularProgressbar
             value={percentage}
             text={`${percentage}%`}
-            strokeWidth={15} // Make the progress bar thicker
+            strokeWidth={11} // Make the progress bar thicker
             styles={buildStyles({
               rotation: 0,
               strokeLinecap: "round",

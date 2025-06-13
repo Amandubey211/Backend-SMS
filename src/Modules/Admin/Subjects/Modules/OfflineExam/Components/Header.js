@@ -1,14 +1,14 @@
 import React from "react";
 import { CiSearch } from "react-icons/ci";
 
-function Header({ loading, searchedData, searchQuery, handleSearch }) {
+function Header({ loading, data, searchQuery, handleSearch }) {
   return (
     <div className=" pl-5 w-full">
       <div className="flex justify-between items-center mb-4 mr-2">
         <h2 className="text-xl font-semibold text-gradient">
           Offline Exams
           <span className="border rounded-full text-sm p-1 px-2 ml-1 text-gray-500">
-            {loading ? 0 : searchedData?.length}
+            {loading ? 0 : data?.length}
           </span>
         </h2>
         <div className="relative flex items-center max-w-xs w-full mr-4">

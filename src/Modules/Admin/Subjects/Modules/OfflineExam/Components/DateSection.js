@@ -23,14 +23,14 @@ function DateSection({
   handleDeleteClick,
   isModalOpen,
   setIsModalOpen,
-  examId, // Added to access item._id for setCellModal
-  cid,  // Added to pass classId for setCellModal
+  examId,
+  cid,
 }) {
   const dispatch = useDispatch();
   const formatDateForInput = (date) => {
     if (!date) return "";
     const formattedDate = new Date(date);
-    return formattedDate.toISOString().split("T")[0]; // Returns "YYYY-MM-DD"
+    return formattedDate.toISOString().split("T")[0];
   };
 
   const { t } = useTranslation("admClass");
@@ -46,7 +46,6 @@ function DateSection({
       return;
     }
 
-    // Prepare student data for export
     const exportData = examDetails.students.map((student) => {
       const matchedStudent = allStudents.find(
         (s) => s._id === student.studentId._id
@@ -62,24 +61,18 @@ function DateSection({
       };
     });
 
-    console.log("Exporting Data:", exportData);
-
-    // Convert data to Excel format
     const worksheet = XLSX.utils.json_to_sheet(exportData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Exam Data");
-
-    // Download Excel file
     XLSX.writeFile(workbook, `${examDetails.examName}_Exam_Report.xlsx`);
   };
 
   return (
-    <div className="flex flex-col text-black text-xs">
-      {/* Row-1 */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div className="flex flex-col text-black text-xs w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex flex-col w-full gap-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-            <div className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-1.5 min-w-[180px]">
               <IoCalendarOutline className="text-sm text-gray-600" />
               <span className="font-medium text-gray-700">Start Date:</span>
               {isEditing ? (
@@ -88,13 +81,15 @@ function DateSection({
                   name="startDate"
                   value={formatDateForInput(examDetails.startDate)}
                   onChange={handleInputChange}
-                  className="border border-gray-200 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-full sm:w-36"
+                  className="border border-gray-200 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-28"
                 />
               ) : (
-                <span className="text-gray-600">{formatDate(examDetails.startDate)}</span>
+                <span className="text-gray-600">
+                  {formatDate(examDetails.startDate)}
+                </span>
               )}
             </div>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 min-w-[180px]">
               <IoCalendarOutline className="text-sm text-gray-600" />
               <span className="font-medium text-gray-700">End Date:</span>
               {isEditing ? (
@@ -103,36 +98,36 @@ function DateSection({
                   name="endDate"
                   value={formatDateForInput(examDetails.endDate)}
                   onChange={handleInputChange}
-                  className="border border-gray-200 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-full sm:w-36"
+                  className="border border-gray-200 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-28"
                 />
               ) : (
-                <span className="text-gray-600">{formatDate(examDetails.endDate)}</span>
+                <span className="text-gray-600">
+                  {formatDate(examDetails.endDate)}
+                </span>
               )}
             </div>
           </div>
-          {examDetails.publishDate && !isEditing && (
-            <div className="flex items-center gap-1.5">
+          {(examDetails.publishDate || isEditing) && (
+            <div className="flex items-center gap-1.5 min-w-[180px]">
               <IoCalendarOutline className="text-sm text-gray-600" />
               <span className="font-medium text-gray-700">Published Date:</span>
-              <span className="text-gray-600">{formatDate(examDetails.publishDate)}</span>
-            </div>
-          )}
-
-          {isEditing && (
-            <div className="flex items-center gap-1.5 w-full sm:w-auto">
-              <IoCalendarOutline className="text-sm text-gray-600" />
-              <span className="font-medium text-gray-700">Published Date:</span>
-              <input
-                type="date"
-                name="publishDate"
-                value={formatDateForInput(examDetails.publishDate)}
-                onChange={handleInputChange}
-                className="border border-gray-200 px-3 py-1.5 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-full sm:w-36"
-              />
+              {isEditing ? (
+                <input
+                  type="date"
+                  name="publishDate"
+                  value={formatDateForInput(examDetails.publishDate)}
+                  onChange={handleInputChange}
+                  className="border border-gray-200 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all duration-200 w-28"
+                />
+              ) : (
+                <span className="text-gray-600">
+                  {formatDate(examDetails.publishDate)}
+                </span>
+              )}
             </div>
           )}
         </div>
-        <div className="flex justify-end gap-2 items-center">
+        <div className="flex justify-end gap-2 items-center flex-wrap">
           <Tooltip title="Add to Score Card">
             <Button
               type="default"

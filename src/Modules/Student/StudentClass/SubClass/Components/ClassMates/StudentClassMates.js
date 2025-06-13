@@ -57,16 +57,16 @@ const StudentClassMates = () => {
       <DashLayout>
         <div className="p-4">
           <div className="flex items-center mb-4 gap-3">
-            <h2 className="text-xl text-gray-600 font-semibold">
+            <span className="text-xl text-gray-600 font-semibold">
               My Classmates
-            </h2>
+            </span>
             <div
-              className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300"
+              className="flex items-center justify-center h-[30px] w-[30px] bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full border border-gray-300 "
               aria-label={`Number of classmates: ${classmateData?.length || 0}`}
             >
-              <p className="text-lg font-semibold text-purple-500">
+              <span className="text-lg font-semibold text-purple-500">
                 {classmateData?.length || 0}
-              </p>
+              </span>
             </div>
           </div>
 

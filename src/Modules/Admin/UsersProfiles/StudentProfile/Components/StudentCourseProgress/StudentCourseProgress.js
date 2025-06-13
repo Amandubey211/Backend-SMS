@@ -52,22 +52,8 @@ const StudentCourseProgress = ({ student }) => {
         <Spinner />
       </div> :
         <div className='py-2 max-w-[68vw]'>
-          <div className='flex justify-between pb-2'>
-            <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS} title={"Subjects Progress"}>
-              <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
-                {studentSubjectProgress?.length > 0 ?
-                  studentSubjectProgress?.map((subject, index) => (
-                    <div key={index} className='min-w-max' onClick={() => fetchModules(subject.subjectId)}>
-                      <SubjectCard subject={subject} i={index} />
-                    </div>
-                  )) : <div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
-                    <AiOutlineFileSearch className="text-[3rem]" />
-                    No  Module Found
-                  </div>
-                }
-              </div>
-            </ProtectedSection>
-            <div className="flex flex-col w-full md:w-[16%] space-y-3 p-3 border-r ">
+          <div className='flex flex-col justify-between pb-2'>
+            <div className="flex flex-col w-full md:w-[16%] space-y-3 p-3 ml-3">
               {/* Semester Selection Section */}
               <div>
                 <Button
@@ -93,6 +79,23 @@ const StudentCourseProgress = ({ student }) => {
               </div>
 
             </div>
+            <div>
+              <ProtectedSection requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS} title={"Subjects Progress"}>
+                <div className='flex flex-row gap-2 p-4  overflow-x-auto max-w-full '>
+                  {studentSubjectProgress?.length > 0 ?
+                    studentSubjectProgress?.map((subject, index) => (
+                      <div key={index} className='min-w-max' onClick={() => fetchModules(subject.subjectId)}>
+                        <SubjectCard subject={subject} i={index} />
+                      </div>
+                    )) : <div className="flex w-full h-full text-gray-500  items-center justify-center flex-col text-xl">
+                      <AiOutlineFileSearch className="text-[3rem]" />
+                      No  Module Found
+                    </div>
+                  }
+                </div>
+              </ProtectedSection>
+            </div>
+
           </div>
           <div className='border-t-2'>
             <ProtectedSection requiredPermission={PERMISSIONS.GET_PROGRESS_OF_SUBJECT} title={"Subjects"}>

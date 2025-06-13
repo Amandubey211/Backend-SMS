@@ -125,8 +125,7 @@ const List = ({
                   <p className="text-sm text-gray-500 mt-1 truncate">
                     {type === "Assignment" ? (
                       <>
-                        Module: {item.moduleName || "N/A"} | Chapter:{" "}
-                        {item.chapterName || "N/A"}
+                        Module: {item.moduleName || "N/A"}
                       </>
                     ) : (
                       <>
