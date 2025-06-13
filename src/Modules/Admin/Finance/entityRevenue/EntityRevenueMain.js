@@ -24,7 +24,7 @@ const EntityRevenueMain = () => {
   
       <div className="flex flex-col md:flex-row justify-end items-start md:items-center gap-4 md:gap-0 ">
         <button
-          onClick={() => navigate("/finance/entity/add/revenue")}
+          onClick={() => navigate("/finance/entity/revenue/add")}
           className="inline-flex  items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2"
         >
           <span className="text-gray-800 font-medium">Add New Invoice</span>
