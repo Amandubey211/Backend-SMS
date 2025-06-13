@@ -16,7 +16,9 @@ const MainSection = () => {
   const { userDetails, classInfo } = useSelector((store) => store.common.user);
   const dispatch = useDispatch();
   const { showError } = useSelector((store) => store?.common?.alertMsg);
-
+const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   const handleDismiss = () => {
     dispatch(setShowError(false));
   }
@@ -35,7 +37,7 @@ const MainSection = () => {
     getStudentGrades();
     // console.log(userDetails, classInfo);
 
-  }, [dispatch])
+  }, [dispatch,selectedSemester])
 
   let content;
   if (loading) {

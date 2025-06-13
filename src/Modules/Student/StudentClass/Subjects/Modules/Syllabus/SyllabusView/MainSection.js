@@ -19,11 +19,13 @@ const MainSection = () => {
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
   const {showError}=useSelector((store)=>store?.common?.alertMsg);
-
+const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   // console.log("use param in syllabus:===>",cid,sid)
   useEffect(() => {
     dispatch(stdSyllabus({ classId: cid, subjectId: sid }));
-  }, [dispatch,cid,sid]);
+  }, [dispatch,cid,sid,selectedSemester]);
 
   const handleDismiss = () => {
     dispatch(setShowError(false));

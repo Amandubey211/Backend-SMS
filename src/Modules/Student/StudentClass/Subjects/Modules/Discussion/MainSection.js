@@ -17,7 +17,9 @@ const MainSection = () => {
   const { discussionData, loading, error } = useSelector((store) => store?.student?.studentDiscussion)
   const dispatch = useDispatch();
   const {showError}=useSelector((store)=>store?.common?.alertMsg);
-
+const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState("all");
 
@@ -25,7 +27,7 @@ const MainSection = () => {
 
   useEffect(() => {
     dispatch(fetchStudentDiscussion({cid,sid}))
-  }, [dispatch]);
+  }, [dispatch,selectedSemester]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);

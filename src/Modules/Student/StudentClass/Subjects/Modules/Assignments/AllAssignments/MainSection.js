@@ -16,7 +16,9 @@ const AssignmentMainSection = () => {
   );
 
   const [filters, setFilters] = useState({ moduleId: "", chapterId: "" });
-
+const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   // Fetch assignments based on selected filters
   const refetchAssignments = useCallback(() => {
     const { moduleId, chapterId } = filters;
@@ -24,7 +26,7 @@ const AssignmentMainSection = () => {
     dispatch(
       stdGetFilteredAssignment({ cid, subjectId: sid, moduleId, chapterId })
     );
-  }, [filters, sid, dispatch]);
+  }, [filters, sid, dispatch,selectedSemester]);
 
   useEffect(() => {
     refetchAssignments();

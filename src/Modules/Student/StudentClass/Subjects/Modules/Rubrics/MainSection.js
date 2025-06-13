@@ -18,6 +18,7 @@ import NoDataFound from "../../../../../../Components/Common/NoDataFound";
 import { useTranslation } from "react-i18next";
 import { FaClipboardList } from "react-icons/fa";
 import RubricModal from "./Components/RubricModal";
+import Spinner from "../../../../../../Components/Common/Spinner";
 
 const MainSection = () => {
   const { t } = useTranslation("admModule");
@@ -27,8 +28,6 @@ const MainSection = () => {
   // Fix: Corrected state selection
   const studentRubricState =
     useSelector((state) => state.student.studentRubric) || {};
-
-  console.log("Student Rubric State:", studentRubricState); // Debugging line
 
   const {
     RubricData = [],
@@ -40,12 +39,14 @@ const MainSection = () => {
     totalPoints,
     rubricLoading,
   } = studentRubricState;
-
+  const { selectedSemester } = useSelector(
+    (state) => state.common.user.classInfo
+  );
   useEffect(() => {
     if (sid) {
       dispatch(stdRubric({ subjectId: sid }));
     }
-  }, [sid, dispatch]);
+  }, [sid, dispatch, selectedSemester]);
 
   const handleViewRubric = (rubric) => {
     dispatch(resetRubricState());
@@ -65,36 +66,41 @@ const MainSection = () => {
     <div className="w-full h-full flex">
       <SubjectSideBar />
       <div className="w-full p-3 border-l">
-        {RubricData?.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            {RubricData?.map((rubric) => (
-              <RubricCard
-                key={rubric?._id}
-                rubric={rubric}
-                onView={() => handleViewRubric(rubric)}
-              />
-            ))}
-          </div>
-        ) : (
-          <NoDataFound
-            title={t("Rubrics")}
-            desc={"Click 'Add New Rubric' to define your evaluation criteria."}
-            icon={FaClipboardList}
-            iconColor="text-blue-500"
-            textColor="text-gray-700"
-            bgColor="bg-gray-100"
-          />
-        )}
-        {isModalOpen && (
-          <RubricModal
-            isOpen={isModalOpen}
-            rubric={studentRubricState.selectedRubric}
-            onClose={() =>
-              dispatch(setRubricField({ field: "isModalOpen", value: false }))
-            }
-            loading={rubricLoading}
-          />
-        )}
+        {
+          loading ? <Spinner /> :
+            <>
+              {RubricData?.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                  {RubricData?.map((rubric) => (
+                    <RubricCard
+                      key={rubric?._id}
+                      rubric={rubric}
+                      onView={() => handleViewRubric(rubric)}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <NoDataFound
+                  title={t("Rubrics")}
+                  desc={"Click 'Add New Rubric' to define your evaluation criteria."}
+                  icon={FaClipboardList}
+                  iconColor="text-blue-500"
+                  textColor="text-gray-700"
+                  bgColor="bg-gray-100"
+                />
+              )}
+              {isModalOpen && (
+                <RubricModal
+                  isOpen={isModalOpen}
+                  rubric={studentRubricState.selectedRubric}
+                  onClose={() =>
+                    dispatch(setRubricField({ field: "isModalOpen", value: false }))
+                  }
+                  loading={rubricLoading}
+                />
+              )}
+            </>
+        }
       </div>
     </div>
   );
