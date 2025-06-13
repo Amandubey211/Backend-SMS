@@ -132,6 +132,7 @@ const StudentFeeForm = () => {
   };
 
   const handleInputChange = (index, field, value) => {
+    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
     const updatedItems = [...lineItems];
     updatedItems[index][field] = field.includes('Date') && value ? value?.format('YYYY-MM-DD') : value;
 
@@ -146,10 +147,10 @@ const StudentFeeForm = () => {
     let subtotal = rate * quantity;
     let taxAmount = (subtotal * tax) / 100;
 
-    let finalAmount = subtotal + penalty + taxAmount;
+    let finalAmount = roundToTwo(subtotal + penalty + taxAmount);
 
     if (discountType === "percentage") {
-      finalAmount -= (finalAmount * discount) / 100;
+      finalAmount -= roundToTwo((finalAmount * discount) / 100);
     } else {
       finalAmount -= discount;
     }

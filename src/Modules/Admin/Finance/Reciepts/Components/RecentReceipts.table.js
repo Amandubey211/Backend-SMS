@@ -27,7 +27,7 @@ import Receipt from "../../../../../Utils/FinanceTemplate/Receipt";
 const RecentReceipts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-const currency = useSelector((store) => store.common.user.userDetails.currency);
+  const currency = useSelector((store) => store.common.user.userDetails.currency);
   const { receipts = [], loading, error, pagination = {} } = useSelector(
     (state) => state.admin.receipts || {}
   );
@@ -49,15 +49,15 @@ const currency = useSelector((store) => store.common.user.userDetails.currency);
 
   useEffect(() => {
 
-   dispatch(fetchAllReceipts({ page: 1, limit:5,isCancel:false }));
- 
+    dispatch(fetchAllReceipts({ page: 1, limit: 5, isCancel: false }));
+
   }, [dispatch]);
 
-  
 
-  
 
-  
+
+
+
 
   const handleDownloadPDF = async () => {
     if (!selectedReceipt) return;
@@ -87,54 +87,53 @@ const currency = useSelector((store) => store.common.user.userDetails.currency);
     }
   };
 
-  
+
 
 
   const columns = [
-      {
-        title: 'Reciept Number',
-        dataIndex: '_id',
-        render: (text) => text?.toUpperCase(),
+    {
+      title: 'Reciept Number',
+      dataIndex: '_id',
+      render: (text) => text?.toUpperCase(),
+    },
+    {
+      title: 'Invoice Number',
+      dataIndex: 'invoiceNumber',
+      render: (text) => text,
+    },
+
+    {
+      title: `Total Amount ${currency}`,
+      render: (_, record) => {
+        let total = 0;
+        record.paidItems.map((i) => {
+          total += i.amountPaid
+        })
+        return total
       },
-      {
-        title: 'Invoice Number',
-        dataIndex: 'invoiceNumber',
-        render: (text) => text,
+    },
+    {
+      title: 'Payment Status',
+      dataIndex: 'paymentStatus',
+      render: (status) => {
+        const color = status === "paid" ? "green" : status === "Unpaid" ? "red" : "yellow";
+        return <Tag color={color}>{status}</Tag>;
       },
-     
-      {
-        title: `Total Amount ${currency}`,
-        render: (_,record) => {
-          let total = 0;
-          record.paidItems.map((i)=>{
-           total += i.amountPaid
-          })
-          return total
-        },
+    },
+    {
+      title: 'Payment Method',
+      dataIndex: 'paymentType',
+      render: (value) => {
+        const capitalizedStatus = value.charAt(0).toUpperCase() + value.slice(1);
+        return <p>{capitalizedStatus}</p>;
       },
-     {
-           title: 'Payment Status',
-           dataIndex: 'paymentStatus',
-           render: (status) => {
-             const color = status == "paid" ? "green" : "yellow";
-             const capitalizedStatus = status?.charAt(0)?.toUpperCase() + status.slice(1);
-             return <Tag color={color}>{capitalizedStatus}</Tag>;
-           },
-         },
-         {
-           title: 'Payment Method',
-           dataIndex: 'paymentType',
-           render: (value) => {
-             const capitalizedStatus = value.charAt(0).toUpperCase() + value.slice(1);
-             return <p>{capitalizedStatus}</p>;
-           },
-         },
-      {
-        title: 'Date',
-        dataIndex: 'paymentDate',
-        render: (paymentDate) => `${paymentDate?.slice(0,10)}`,
-      },
-    ];
+    },
+    {
+      title: 'Date',
+      dataIndex: 'paymentDate',
+      render: (paymentDate) => `${paymentDate?.slice(0, 10)}`,
+    },
+  ];
 
   // -------------------- Render --------------------
   return (
@@ -149,7 +148,7 @@ const currency = useSelector((store) => store.common.user.userDetails.currency);
       >
         {/* Title with counts */}
         <h2 style={{ fontSize: "1.25rem", fontWeight: "600" }}>
-          Recent Receipts List 
+          Recent Receipts List
         </h2>
 
         {/* View More Button with counts */}
@@ -159,7 +158,7 @@ const currency = useSelector((store) => store.common.user.userDetails.currency);
               onClick={() => navigate("/finance/receipts/receipt-list")}
               className="px-3 py-1 rounded-md border border-gray-400 shadow-md hover:shadow-md hover:shadow-gray-300 transition duration-200 text-white bg-gradient-to-r from-pink-500 to-purple-500"
             >
-              View More 
+              View More
             </button>
           </ProtectedAction>
 
@@ -167,24 +166,24 @@ const currency = useSelector((store) => store.common.user.userDetails.currency);
       </div>
       <ProtectedSection requiredPermission={PERMISSIONS.SHOWS_ALL_RECEIPTS} title={"Recent Receipts"}>
         {/* Loading Indicator */}
-        
-
-          <Table
-            rowKey={(record) => record._id}
-            columns={columns}
-            dataSource={receipts}
-        
-            size="small"
-            pagination={false} 
-            loading={{
-              spinning: loading,
-              indicator: <Spin size="large" />,
-              tip: "Loading...",
-            }}
-          />
 
 
-       
+        <Table
+          rowKey={(record) => record._id}
+          columns={columns}
+          dataSource={receipts}
+
+          size="small"
+          pagination={false}
+          loading={{
+            spinning: loading,
+            indicator: <Spin size="large" />,
+            tip: "Loading...",
+          }}
+        />
+
+
+
       </ProtectedSection>
     </div>
   );

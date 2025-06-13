@@ -262,7 +262,7 @@ const ExpenseList = () => {
               {selectedIds?.length > 0 && <button className="flex flex-row items-center gap-2 bg-red-500 text-white px-2 py-1 rounded-lg shadow-lg mb-4" onClick={() => dispatch(deleteOperationalExpenses((selectedIds)))}>Delete <MdDeleteOutline /></button>}
               <button className="flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 py-2 rounded-lg shadow-lg mb-4" onClick={() => { setExportModel(true) }}><FaFileExport /> Export</button>
               <button
-                onClick={() => navigate("/finance/add/operational-expenses")}
+                onClick={() => navigate("/finance/operational-expenses/add")}
                 className="inline-flex  items-center border border-gray-300 rounded-full ps-4 bg-white hover:shadow-lg transition duration-200 gap-2 mb-4"
               >
 

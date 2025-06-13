@@ -89,34 +89,37 @@ const CreateReceipt = () => {
     })
   }
 
-  const calculateLineItemValues = (item) => {
-    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
-    const baseAmount = item.rate * item.quantity;
-    let discountAmount = 0;
+const calculateLineItemValues = (item) => {
+  const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+  const baseAmount = item.rate * item.quantity;
 
-    // Handle percentage discount
-    if (item.discountType === "percentage") {
-      discountAmount = baseAmount * (editableDiscounts[item._id] || 0) / 100;
-    }
-    // Handle fixed discount
-    else {
-      discountAmount = parseFloat(editableDiscounts[item._id] || 0);
-    }
+  const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
+  const taxAmount = baseAmount * (item.tax || 0) / 100;
+  const newAmount = baseAmount + taxAmount + penaltyAmount;
 
-    const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
-    const taxableAmount = baseAmount - discountAmount;
-    const taxAmount = taxableAmount * (item.tax || 0) / 100;
-    const finalAmount = roundToTwo(taxableAmount + taxAmount + penaltyAmount);
+  let discountAmount = 0;
 
-    return {
-      baseAmount,
-      discountAmount,
-      penaltyAmount,
-      taxAmount,
-      finalAmount,
-      remaining: finalAmount - (item.paid_amount || 0)
-    };
+  // Handle percentage discount on baseAmount only
+  if (item.discountType === "percentage") {
+    discountAmount = newAmount * (editableDiscounts[item._id] || 0) / 100;
+  }
+  // Handle fixed discount
+  else {
+    discountAmount = parseFloat(editableDiscounts[item._id] || 0);
+  }
+
+  const finalAmount = roundToTwo(newAmount - discountAmount );
+
+  return {
+    baseAmount,
+    discountAmount,
+    penaltyAmount,
+    taxAmount,
+    finalAmount,
+    remaining: finalAmount - (item.paid_amount || 0),
   };
+};
+
 
 
   // Calculate totals using the new line item calculations
@@ -273,7 +276,7 @@ const CreateReceipt = () => {
                             <td className="p-2 border">{item.itemDetails} <br /> {item.frequency !== "Permanent Purchase" && ` ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
                             <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
                             <td className="p-2 border text-start">{item.quantity || 1}</td>
-                            <td className="p-2 border text-start">{values.taxAmount.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{item.tax.toFixed(2)}</td>
                             <td className="p-2 border text-start">
                               <input
                                 type="number"
@@ -332,15 +335,18 @@ const CreateReceipt = () => {
                 <Form
                   layout="vertical"
                   onFinish={() => {
-                     dispatch(createReceipt({ ...receiptData, invoiceNumber: searchInvoiceNumber
+                    dispatch(createReceipt({
+                      ...receiptData, invoiceNumber: searchInvoiceNumber
 
-                      }
-                    )).then(()=>{
-                      fetchAllEntityRevenue()
-                      navigate("/finance/receipts/receipt-list")}
-                    )}
-                    
                     }
+                    )).then(() => {
+                      fetchAllEntityRevenue()
+                      navigate("/finance/receipts/receipt-list")
+                    }
+                    )
+                  }
+
+                  }
                   initialValues={receiptData}
                   className="mt-4"
                 >
