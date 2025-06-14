@@ -53,7 +53,8 @@ const CreateReceipt = () => {
       amountPaid: value,
       discount,
       penalty,
-      updatedRemainingAmount: totalRemaining
+      updatedRemainingAmount: totalRemaining,
+      finalAmount
     };
 
     // Check if the lineItemId exists in the paidItems array
@@ -89,36 +90,36 @@ const CreateReceipt = () => {
     })
   }
 
-const calculateLineItemValues = (item) => {
-  const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
-  const baseAmount = item.rate * item.quantity;
+  const calculateLineItemValues = (item) => {
+    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+    const baseAmount = item.rate * item.quantity;
 
-  const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
-  const taxAmount = baseAmount * (item.tax || 0) / 100;
-  const newAmount = baseAmount + taxAmount + penaltyAmount;
+    const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
+    const taxAmount = baseAmount * (item.tax || 0) / 100;
+    const newAmount = baseAmount + taxAmount + penaltyAmount;
 
-  let discountAmount = 0;
+    let discountAmount = 0;
 
-  // Handle percentage discount on baseAmount only
-  if (item.discountType === "percentage") {
-    discountAmount = newAmount * (editableDiscounts[item._id] || 0) / 100;
-  }
-  // Handle fixed discount
-  else {
-    discountAmount = parseFloat(editableDiscounts[item._id] || 0);
-  }
+    // Handle percentage discount on baseAmount only
+    if (item.discountType === "percentage") {
+      discountAmount = newAmount * (editableDiscounts[item._id] || 0) / 100;
+    }
+    // Handle fixed discount
+    else {
+      discountAmount = parseFloat(editableDiscounts[item._id] || 0);
+    }
 
-  const finalAmount = roundToTwo(newAmount - discountAmount );
+    const finalAmount = roundToTwo(newAmount - discountAmount);
 
-  return {
-    baseAmount,
-    discountAmount,
-    penaltyAmount,
-    taxAmount,
-    finalAmount,
-    remaining: finalAmount - (item.paid_amount || 0),
+    return {
+      baseAmount,
+      discountAmount,
+      penaltyAmount,
+      taxAmount,
+      finalAmount,
+      remaining: finalAmount - (item.paid_amount || 0),
+    };
   };
-};
 
 
 
