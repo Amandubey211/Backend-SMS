@@ -24,7 +24,12 @@ const FinanceCategory = () => {
     totalPages,
     page,
     totalRevenue, } = useSelector((store) => store.admin.financialCategory);
+  const revenueCategories = categories.filter((category) => category.categoryType === "revenue").length;
+  const assetCategories = categories.filter((category) => category.categoryType === "asset").length;
+  const expenseCategories = categories.filter((category) => category.categoryType === "expense").length;
 
+  // Total categories
+  const totalCategories = categories.length;
   const [searchText, setSearchText] = useState("");
   const [categoryType, setCategoryType] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -89,29 +94,32 @@ const FinanceCategory = () => {
       <DashLayout>
         <div className="p-4">
           <div className="flex flex-row gap-4 mb-4">
-            {[{ title: "Total Categories", value: total, icon: <BiCategory /> },
-            { title: "Total Revenue Categories", value: totalRevenue, icon: <TbCategory2 /> },
-            { title: "Total Expense Categories", value: total - totalRevenue, icon: <TbCategoryMinus /> }].map((item, index) => (
+            {[
+              { title: "Total Categories", value: totalCategories, icon: <BiCategory /> },
+              { title: "Total Revenue Categories", value: revenueCategories, icon: <TbCategory2 /> },
+              { title: "Total Asset Categories", value: assetCategories, icon: <TbCategory2 /> },
+              { title: "Total Expense Categories", value: expenseCategories, icon: <TbCategoryMinus /> },
+            ].map((item, index) => (
               <div
+                key={index}
                 className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
                 style={{
-                  background:
-                    "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
+                  background: "radial-gradient(100.5% 129.64% at 50.05% 35.24%, #FBF7FF 0%, #FFCEDB 100%)",
                   borderColor: "#DABDFF",
                 }}
               >
                 {/* Title and Icon */}
                 <div className="flex items-center gap-2 mb-4">
                   <div className="p-3 rounded-md bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg">
-                    {item?.icon}
+                    {item.icon}
                   </div>
-                  <h3 className="text-sm font-medium text-gray-800 truncate">{item?.title}</h3>
+                  <h3 className="text-sm font-medium text-gray-800 truncate">{item.title}</h3>
                 </div>
 
-                {/* Value and Trend */}
+                {/* Value */}
                 <div className="flex justify-between items-center">
                   <h2 className="text-xl md:text-2xl font-bold text-purple-800 truncate">
-                    {item?.value}
+                    {item.value}
                   </h2>
                 </div>
               </div>
