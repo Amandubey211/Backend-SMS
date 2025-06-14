@@ -1,6 +1,6 @@
 import React from "react";
 import DateInput from "../../../../Component/DateInput";
-import AssignToSection from "../../../Discussion/AddDiscussion/Components/AssignToSection";
+import AssignToSection from "../Components/AssignToSection";
 
 const CreateAnnouncementForm = ({
   postTo,

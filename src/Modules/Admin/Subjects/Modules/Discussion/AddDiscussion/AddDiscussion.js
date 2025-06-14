@@ -32,7 +32,7 @@ const AddDiscussion = () => {
 
   // Component State – ensure sectionId and groupId are arrays
   const [formState, setFormState] = useState({
-    assignTo: currentDiscussion?.assignTo || "",
+    assignTo: currentDiscussion?.assignTo || "Everyone",
     dueDate: currentDiscussion?.dueDate || "",
     sectionId: Array.isArray(currentDiscussion?.sectionId)
       ? currentDiscussion.sectionId

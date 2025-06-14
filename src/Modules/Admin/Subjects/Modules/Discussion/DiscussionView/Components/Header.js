@@ -78,14 +78,15 @@ const Header = ({ discussion, refetchDiscussion }) => {
       <div className="flex items-center">
         <div className="ml-3">
           <h1 className="text-lg font-semibold">{discussion.createdBy}</h1>
-          <div className="flex items-center space-x-1">
-            <p className="text-sm text-green-600">{t("Discussion")}</p>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-green-600">{t("Discussion")}</span>
             <Tooltip
               title={
                 isPublished
                   ? t("Discussion is published")
                   : t("Discussion is unpublished")
               }
+              className="cursor-pointer"
             >
               {isPublished ? (
                 <BsPatchCheckFill
