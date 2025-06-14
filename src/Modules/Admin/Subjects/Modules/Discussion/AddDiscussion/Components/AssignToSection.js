@@ -15,7 +15,7 @@ const AssignToSection = ({
       <AssignToRadios
         assignTo={assignTo}
         handleChange={handleChange}
-        title={assignTitle}
+        isAssignToLabel={false}
       />
       <SectionSelect
         assignTo={assignTo}

@@ -29,7 +29,7 @@ const CreateAnnouncement = () => {
 
   // Keep sectionId/groupId as arrays in state
   const [formState, setFormState] = useState({
-    postTo: "",
+    postTo: "Everyone",
     availableFrom: "",
     sectionId: [], // array
     groupId: [], // array
