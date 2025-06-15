@@ -5,159 +5,120 @@ import autoTable from "jspdf-autotable";
 import moment from "moment";
 import QRCode from "qrcode";
 
-// Primary theme colors
+/* ─────────────────────────── CONSTANTS ─────────────────────────── */
 const PRIMARY_COLOR = [200, 59, 98]; // #C83B62
-const SECONDARY_COLOR = [127, 53, 205]; // #7F35CD
 const WHITE = [255, 255, 255];
 
-// Helper function to add loading indicator
+const IMAGE_X = 15; // photo X-coordinate (left side)
+const IMAGE_W = 30; // photo width & height
+const DEFAULT_LEFT = 15; // normal page left margin
+
+/* ─────────────────────────── HELPERS ─────────────────────────── */
 const showLoadingIndicator = () => {
-  const loadingElement = document.createElement("div");
-  loadingElement.id = "pdf-loading-indicator";
-  loadingElement.style.position = "fixed";
-  loadingElement.style.top = "0";
-  loadingElement.style.left = "0";
-  loadingElement.style.width = "100%";
-  loadingElement.style.height = "100%";
-  loadingElement.style.backgroundColor = "rgba(0,0,0,0.5)";
-  loadingElement.style.display = "flex";
-  loadingElement.style.justifyContent = "center";
-  loadingElement.style.alignItems = "center";
-  loadingElement.style.zIndex = "9999";
-
+  const el = document.createElement("div");
+  el.id = "pdf-loading-indicator";
+  Object.assign(el.style, {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 9999,
+  });
   const spinner = document.createElement("div");
-  spinner.style.border = "4px solid rgba(255,255,255,0.3)";
-  spinner.style.borderRadius = "50%";
-  spinner.style.borderTop = `4px solid rgb(${PRIMARY_COLOR.join(",")})`;
-  spinner.style.width = "40px";
-  spinner.style.height = "40px";
-  spinner.style.animation = "spin 1s linear infinite";
-
+  Object.assign(spinner.style, {
+    border: "4px solid rgba(255,255,255,0.3)",
+    borderRadius: "50%",
+    borderTop: `4px solid rgb(${PRIMARY_COLOR.join(",")})`,
+    width: "40px",
+    height: "40px",
+    animation: "spin 1s linear infinite",
+  });
   const style = document.createElement("style");
   style.textContent = `
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
+    @keyframes spin { 0% {transform:rotate(0deg);} 100% {transform:rotate(360deg);} }
   `;
-
-  loadingElement.appendChild(style);
-  loadingElement.appendChild(spinner);
-  document.body.appendChild(loadingElement);
+  el.appendChild(style);
+  el.appendChild(spinner);
+  document.body.appendChild(el);
 };
+const hideLoadingIndicator = () =>
+  document.getElementById("pdf-loading-indicator")?.remove();
 
-const hideLoadingIndicator = () => {
-  const loadingElement = document.getElementById("pdf-loading-indicator");
-  if (loadingElement) {
-    document.body.removeChild(loadingElement);
-  }
-};
-
-// Helper function to load images with retries
-const loadImage = (url, retries = 3, delay = 100) => {
-  return new Promise((resolve, reject) => {
+const loadImage = (url, retries = 3, delay = 100) =>
+  new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "Anonymous";
-
-    const attemptLoad = (attempt) => {
+    const attemptLoad = (count = 1) => {
       img.onload = () => resolve(img);
-      img.onerror = () => {
-        if (attempt <= retries) {
-          setTimeout(() => attemptLoad(attempt + 1), delay);
-        } else {
-          reject(new Error(`Failed to load image after ${retries} attempts`));
-        }
-      };
+      img.onerror = () =>
+        count <= retries
+          ? setTimeout(() => attemptLoad(count + 1), delay)
+          : reject(new Error("Image load failed"));
       img.src = url;
     };
-
-    attemptLoad(1);
+    attemptLoad();
   });
-};
 
-// Placeholder image for missing photos
-const createPlaceholderImage = (text, width = 200, height = 200) => {
+const createPlaceholderImage = (text, w = 200, h = 200) => {
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext("2d");
-
-  // Fill background
   ctx.fillStyle = "#f0f0f0";
-  ctx.fillRect(0, 0, width, height);
-
-  // Draw border
-  ctx.strokeStyle = "#cccccc";
+  ctx.fillRect(0, 0, w, h);
+  ctx.strokeStyle = "#ccc";
   ctx.lineWidth = 2;
-  ctx.strokeRect(0, 0, width, height);
-
-  // Draw text
-  ctx.fillStyle = "#999999";
+  ctx.strokeRect(0, 0, w, h);
+  ctx.fillStyle = "#999";
   ctx.font = "bold 16px Arial";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, width / 2, height / 2);
-
+  ctx.fillText(text, w / 2, h / 2);
   return canvas.toDataURL("image/png");
 };
 
-// Function to safely convert to uppercase
-const safeUpperCase = (str) => {
-  return str?.toString()?.toUpperCase() || "N/A";
-};
+const safeUpper = (str) => str?.toString()?.toUpperCase() || "N/A";
+const safeDate = (d) =>
+  d && moment(d).isValid() ? moment(d).format("DD MMM YYYY") : "N/A";
 
-// Function to safely format date
-const safeDateFormat = (date) => {
-  return date && moment(date).isValid()
-    ? moment(date).format("DD MMM YYYY")
-    : "N/A";
-};
-
-// Function to add footer only on last page
+/* ─────────────────────────── FOOTER & HEADER ─────────────────────────── */
 const addFooter = (doc) => {
-  const pageCount = doc.internal.getNumberOfPages();
-  doc.setPage(pageCount);
-
-  const footerY = doc.internal.pageSize.height - 15;
-
-  // Footer divider
-  doc.setDrawColor(200, 200, 200);
-  doc.setLineWidth(0.3);
-  doc.line(15, footerY - 20, 195, footerY - 20);
-
-  // Main footer text
-  doc.setFont("helvetica", "italic");
-  doc.setFontSize(8);
-  doc.setTextColor(100);
-  doc.text(
-    "This document is computer-generated and does not require a signature.",
-    105,
-    footerY - 15,
-    { align: "center" }
-  );
-
-  // Contact information
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(80);
-  doc.text(
-    "For any queries, contact: info@studentdiwan.com | +974 74449111",
-    105,
-    footerY - 10,
-    { align: "center" }
-  );
-
-  // Generated timestamp
-  doc.setFontSize(7);
-  doc.text(
-    `Generated on: ${moment().format("DD MMM YYYY HH:mm")}`,
-    105,
-    footerY - 5,
-    { align: "center" }
-  );
+  const pages = doc.internal.getNumberOfPages();
+  doc.setPage(pages);
+  const y = doc.internal.pageSize.height - 15;
+  doc
+    .setDrawColor(200)
+    .setLineWidth(0.3)
+    .line(15, y - 20, 195, y - 20);
+  doc
+    .setFont("helvetica", "italic")
+    .setFontSize(8)
+    .setTextColor(100)
+    .text(
+      "This document is computer-generated and does not require a signature.",
+      105,
+      y - 15,
+      { align: "center" }
+    )
+    .setFont("helvetica", "normal")
+    .setTextColor(80)
+    .text(
+      "For any queries, contact: info@studentdiwan.com | +974 74449111",
+      105,
+      y - 10,
+      { align: "center" }
+    )
+    .setFontSize(7)
+    .text(`Generated on: ${moment().format("DD MMM YYYY HH:mm")}`, 105, y - 5, {
+      align: "center",
+    });
 };
-
-// Helper function to add a new page with header
-const addNewPage = (doc, title) => {
+const addPageAndHeader = (doc, title) => {
   doc.addPage();
   doc
     .setFont("helvetica", "bold")
@@ -168,129 +129,102 @@ const addNewPage = (doc, title) => {
     .setDrawColor(...PRIMARY_COLOR)
     .setLineWidth(0.8)
     .line(50, 22, 160, 22);
-  return 30; // Return starting Y position
+  return 30; // return starting Y
 };
 
+/* ─────────────────────────── MAIN ─────────────────────────── */
 export const handleDownload = async (ApplicationData) => {
   try {
     showLoadingIndicator();
 
-    // Safely access application data with fallbacks
+    /* ---------- safely destructure data ---------- */
     const data = ApplicationData || {};
-    const candidate = data?.candidate || {};
-    const guardian = data?.guardian || {};
-    const fatherInfo = guardian?.fatherInfo || {};
-    const motherInfo = guardian?.motherInfo || {};
-    const guardianInfo = guardian?.guardianInformation || {};
-    const address = data?.address || {};
-    const residentialAddress = address?.residentialAddress || {};
-    const permanentAddress = address?.permanentAddress || {};
-    const academic = data?.academic || {};
-    const languagePreference = data?.languagePreference || {};
-    const documents = data?.documents || {};
-    const files = documents?.files || [];
+    const {
+      candidate = {},
+      guardian = {},
+      address = {},
+      academic = {},
+      languagePreference = {},
+      documents = {},
+    } = data;
+    const fatherInfo = guardian.fatherInfo || {};
+    const motherInfo = guardian.motherInfo || {};
+    const guardianInfo = guardian.guardianInformation || {};
+    const { residentialAddress = {}, permanentAddress = {} } = address;
+    const files = documents.files || [];
 
-    // Create a promise for each image to load in parallel
-    const imagePromises = [];
-
-    // School logo promise
-    const logoSrc =
-      "https://i.ibb.co/9HLp987z/Chat-GPT-Image-May-9-2025-02-32-43-PM.png";
-    imagePromises.push(loadImage(logoSrc).catch(() => null));
-
-    // Student photo promise
-    const studentPhoto = candidate?.profile
-      ? loadImage(candidate.profile).catch(() => null)
-      : Promise.resolve(createPlaceholderImage("Student Photo"));
-    imagePromises.push(studentPhoto);
-
-    // Father's photo promise
-    const fatherPhoto = fatherInfo?.photo
-      ? loadImage(fatherInfo.photo).catch(() => null)
-      : Promise.resolve(createPlaceholderImage("Father's Photo"));
-    imagePromises.push(fatherPhoto);
-
-    // Mother's photo promise
-    const motherPhoto = motherInfo?.photo
-      ? loadImage(motherInfo.photo).catch(() => null)
-      : Promise.resolve(createPlaceholderImage("Mother's Photo"));
-    imagePromises.push(motherPhoto);
-
-    // QR code promise
-    const qrPromise = QRCode.toDataURL(`https://app.studentdiwan.com/`, {
-      errorCorrectionLevel: "L",
-      margin: 0,
-    }).catch(() => null);
-    imagePromises.push(qrPromise);
-
-    // Wait for all images to load or fail
+    /* ---------- preload images ---------- */
     const [logoImg, studentImg, fatherImg, motherImg, qrB64] =
-      await Promise.all(imagePromises);
+      await Promise.all([
+        loadImage(
+          "https://i.ibb.co/9HLp987z/Chat-GPT-Image-May-9-2025-02-32-43-PM.png"
+        ).catch(() => null),
+        candidate.profile
+          ? loadImage(candidate.profile).catch(() => null)
+          : Promise.resolve(createPlaceholderImage("Student Photo")),
+        fatherInfo.photo
+          ? loadImage(fatherInfo.photo).catch(() => null)
+          : Promise.resolve(createPlaceholderImage("Father Photo")),
+        motherInfo.photo
+          ? loadImage(motherInfo.photo).catch(() => null)
+          : Promise.resolve(createPlaceholderImage("Mother Photo")),
+        QRCode.toDataURL("https://app.studentdiwan.com/", {
+          errorCorrectionLevel: "L",
+          margin: 0,
+        }).catch(() => null),
+      ]);
 
-    // ─────────────────────────── SET-UP ───────────────────────────
+    /* ---------- init jsPDF ---------- */
     const doc = new jsPDF({
       orientation: "portrait",
       unit: "mm",
       format: "a4",
     });
     doc.setProperties({
-      title: `Student Registration – ${candidate?.firstName || "N/A"} ${
-        candidate?.lastName || "N/A"
+      title: `Student Registration – ${candidate.firstName || "N/A"} ${
+        candidate.lastName || "N/A"
       }`,
-      subject: "Student Registration Form",
       author: "School Management System",
-      keywords: "student, registration, form",
-      creator: "School Management System",
     });
 
-    // Add watermark if draft status
-    if (data?.status === "draft") {
-      doc.setFont("helvetica", "italic");
-      doc.setFontSize(60);
-      doc.setTextColor(200, 200, 200);
-      doc.setGState(new doc.GState({ opacity: 0.2 }));
-      doc.text("DRAFT", 105, 150, { angle: 45, align: "center" });
-      doc.setGState(new doc.GState({ opacity: 1 }));
-    }
-
-    // ────────────────────── SCHOOL LOGO ──────────────────────
+    /* ---------- header banner ---------- */
+    /* ---------- HEADER BANNER (updated) ---------- */
     if (logoImg) {
-      try {
-        // Add subtle shadow and border
-        doc.setDrawColor(200);
-        doc.setFillColor(...WHITE);
-        doc.roundedRect(14, 9, 32, 17, 2, 2, "FD");
-        doc.addImage(logoImg, "PNG", 15, 10, 30, 15);
-      } catch {
-        /* ignore if it fails */
-      }
+      doc.setDrawColor(200).setFillColor(...WHITE);
+      doc.roundedRect(14, 9, 32, 17, 2, 2, "FD");
+      doc.addImage(logoImg, "PNG", 15, 10, 30, 15);
     }
 
-    // ─────────────────────────── HEADER ───────────────────────────
+    // Main title
     doc
       .setFont("helvetica", "bold")
       .setFontSize(18)
       .setTextColor(...PRIMARY_COLOR)
       .text("STUDENT REGISTRATION FORM", 105, 20, { align: "center" });
+
+    // **NEW** generated timestamp line (smaller font)
+    const generatedText = `Generated on: ${moment().format(
+      "DD MMM YYYY HH:mm"
+    )}`;
+    doc
+      .setFont("helvetica", "normal")
+      .setFontSize(9)
+      .setTextColor(80)
+      .text(generatedText, 105, 24, { align: "center" });
+
+    // Horizontal divider (moved down to y = 26)
     doc
       .setDrawColor(...PRIMARY_COLOR)
       .setLineWidth(0.8)
-      .line(50, 22, 160, 22);
+      .line(50, 26, 160, 26);
 
-    // ──────────────────── QR-CODE (Application ID) ───────────────────
+    // QR code (unchanged)
     if (qrB64) {
-      try {
-        // Add border to QR code
-        doc.setDrawColor(200);
-        doc.roundedRect(169, 9, 27, 27, 2, 2, "S");
-        doc.addImage(qrB64, "PNG", 170, 10, 25, 25);
-      } catch {
-        /* ignore if it fails */
-      }
+      doc.setDrawColor(200).roundedRect(169, 9, 27, 27, 2, 2, "S");
+      doc.addImage(qrB64, "PNG", 170, 10, 25, 25);
     }
 
-    // helpers for tables
-    const nextY = () => doc.lastAutoTable.finalY + 15;
+    /* ---------- reusable table options ---------- */
     const tableOpts = {
       theme: "grid",
       headStyles: {
@@ -302,298 +236,259 @@ export const handleDownload = async (ApplicationData) => {
         fontSize: 9,
         cellPadding: 3,
         overflow: "linebreak",
-        minCellHeight: 6,
       },
-      margin: { left: 15, right: 15 },
-      columnStyles: {
-        0: { cellWidth: 50, fontStyle: "bold" },
-        1: { cellWidth: "auto" },
-      },
-      alternateRowStyles: {
-        fillColor: [248, 248, 248],
-      },
-      didDrawPage: (data) => {
-        // Only add page numbers on each page
-        const pageCount = doc.internal.getNumberOfPages();
-        doc.setFontSize(8).setTextColor(150);
-        doc.text(
-          `Page ${
-            doc.internal.getCurrentPageInfo().pageNumber
-          } of ${pageCount}`,
-          doc.internal.pageSize.width - 20,
-          doc.internal.pageSize.height - 10
-        );
+      margin: { left: DEFAULT_LEFT, right: DEFAULT_LEFT },
+      alternateRowStyles: { fillColor: [248, 248, 248] },
+      didDrawPage: () => {
+        const page = doc.internal.getCurrentPageInfo().pageNumber;
+        const pages = doc.internal.getNumberOfPages();
+        doc
+          .setFontSize(8)
+          .setTextColor(150)
+          .text(
+            `Page ${page} of ${pages}`,
+            doc.internal.pageSize.width - 20,
+            doc.internal.pageSize.height - 10
+          );
       },
     };
 
-    // ───────────────── CANDIDATE INFORMATION (PAGE 1) ─────────────────
-    doc
-      .setFont("helvetica", "bold")
-      .setFontSize(14)
-      .setTextColor(...PRIMARY_COLOR)
-      .text("CANDIDATE INFORMATION", 15, 60);
-
-    // Add student photo above the table to the right
+    /* ─────────────── 1. CANDIDATE ─────────────── */
+    const topPad = 30;
+    let imgBottom = topPad;
     if (studentImg) {
-      try {
-        const photoX = 160;
-        const photoY = 60;
-        doc.setDrawColor(200);
-        doc.setFillColor(240, 240, 240);
-        doc.roundedRect(photoX - 1, photoY - 1, 32, 32, 2, 2, "FD");
-        doc.addImage(studentImg, "JPEG", photoX, photoY, 30, 30);
-        doc.setFontSize(6).setTextColor(150);
-        doc.text(
-          `Photo of ${candidate?.firstName || "student"}`,
-          photoX + 15,
-          photoY + 33,
+      doc.setDrawColor(200).setFillColor(240);
+      doc.roundedRect(
+        IMAGE_X - 1,
+        topPad - 1,
+        IMAGE_W + 2,
+        IMAGE_W + 2,
+        2,
+        2,
+        "FD"
+      );
+      doc.addImage(studentImg, "JPEG", IMAGE_X, topPad, IMAGE_W, IMAGE_W);
+      doc
+        .setFontSize(6)
+        .setTextColor(150)
+        .text(
+          `Photo of ${candidate.firstName || "student"}`,
+          IMAGE_X + IMAGE_W / 2,
+          topPad + IMAGE_W + 3,
           { align: "center" }
         );
-      } catch {}
+      imgBottom = topPad + IMAGE_W + 3;
     }
 
     autoTable(doc, {
-      startY: 95,
-      head: [["Field", "Details"]],
+      startY: imgBottom + 5,
+      head: [["CANDIDATE INFORMATION", "Details"]],
       body: [
         [
           "Full Name",
-          `${candidate?.firstName || "N/A"} ` +
-            `${candidate?.middleName || ""} ` +
-            `${candidate?.lastName || "N/A"}`.trim(),
+          `${candidate.firstName || "N/A"} ${candidate.middleName || ""} ${
+            candidate.lastName || "N/A"
+          }`.trim(),
         ],
         [
           "Date of Birth",
-          candidate?.dob
-            ? `${safeDateFormat(candidate.dob)} (Age: ${
-                candidate?.age || "N/A"
-              })`
+          candidate.dob
+            ? `${safeDate(candidate.dob)} (Age: ${candidate.age || "N/A"})`
             : "N/A",
         ],
-        ["Gender", safeUpperCase(candidate?.gender)],
-        ["Passport Number", candidate?.passportNumber || "N/A"],
-        ["Passport Expiry", safeDateFormat(candidate?.passportExpiry)],
-        ["ID Expiry", safeDateFormat(candidate?.idExpiry)],
-        ["Place of Birth", candidate?.placeOfBirth || "N/A"],
-        ["Nationality", safeUpperCase(candidate?.nationality)],
-        ["Religion", safeUpperCase(candidate?.religion)],
-        ["Blood Group", candidate?.bloodGroup || "N/A"],
-        ["Native Language", safeUpperCase(candidate?.nativeLanguage)],
-        ["Email", candidate?.email || "N/A"],
-        ["Phone Number", candidate?.contactNumber || "N/A"],
-        ["Emergency Number", candidate?.emergencyNumber || "N/A"],
+        ["Gender", safeUpper(candidate.gender)],
+        ["Passport Number", candidate.passportNumber || "N/A"],
+        ["Passport Expiry", safeDate(candidate.passportExpiry)],
+        ["ID Expiry", safeDate(candidate.idExpiry)],
+        ["Place of Birth", candidate.placeOfBirth || "N/A"],
+        ["Nationality", safeUpper(candidate.nationality)],
+        ["Religion", safeUpper(candidate.religion)],
+        ["Blood Group", candidate.bloodGroup || "N/A"],
+        ["Native Language", safeUpper(candidate.nativeLanguage)],
+        ["Email", candidate.email || "N/A"],
+        ["Phone Number", candidate.contactNumber || "N/A"],
+        ["Emergency Number", candidate.emergencyNumber || "N/A"],
       ],
       ...tableOpts,
     });
 
-    // ──────────────── FATHER'S & MOTHER'S INFO (PAGE 2) ────────────────
-    let startY = addNewPage(doc, "PARENT INFORMATION");
-
-    // Father's Info
-    doc
-      .setFont("helvetica", "bold")
-      .setFontSize(14)
-      .setTextColor(...PRIMARY_COLOR)
-      .text("FATHER'S INFORMATION", 15, startY);
+    /* ─────────────── 2. FATHER ─────────────── */
+    let startY = addPageAndHeader(doc, "FATHER INFORMATION");
 
     if (fatherImg) {
-      try {
-        const photoX = 160;
-        const photoY = startY;
-        doc.setDrawColor(200);
-        doc.setFillColor(240, 240, 240);
-        doc.roundedRect(photoX - 1, photoY - 1, 32, 32, 2, 2, "FD");
-        doc.addImage(fatherImg, "JPEG", photoX, photoY, 30, 30);
-        doc.setFontSize(6).setTextColor(150);
-        doc.text(`Photo of father`, photoX + 15, photoY + 33, {
+      doc.setDrawColor(200).setFillColor(240);
+      doc.roundedRect(
+        IMAGE_X - 1,
+        startY - 1,
+        IMAGE_W + 2,
+        IMAGE_W + 2,
+        2,
+        2,
+        "FD"
+      );
+      doc.addImage(fatherImg, "JPEG", IMAGE_X, startY, IMAGE_W, IMAGE_W);
+      doc
+        .setFontSize(6)
+        .setTextColor(150)
+        .text("Photo of father", IMAGE_X + IMAGE_W / 2, startY + IMAGE_W + 3, {
           align: "center",
         });
-      } catch {}
     }
 
     autoTable(doc, {
-      startY: startY + 40,
+      startY: startY + IMAGE_W + 10,
       head: [["FATHER'S INFORMATION", ""]],
       body: [
         [
           "Full Name",
-          `${fatherInfo?.firstName || "N/A"} ` +
-            `${fatherInfo?.middleName || ""} ` +
-            `${fatherInfo?.lastName || ""}`.trim(),
+          `${fatherInfo.firstName || "N/A"} ${fatherInfo.middleName || ""} ${
+            fatherInfo.lastName || ""
+          }`.trim(),
         ],
-        ["ID Number", fatherInfo?.idNumber || "N/A"],
-        ["ID Expiry", safeDateFormat(fatherInfo?.idExpiry)],
-        ["Nationality", safeUpperCase(fatherInfo?.nationality)],
-        ["Religion", safeUpperCase(fatherInfo?.religion)],
-        ["Company", fatherInfo?.company || "N/A"],
-        ["Job Title", fatherInfo?.jobTitle || "N/A"],
-        ["Primary Phone", fatherInfo?.cell1 || "N/A"],
-        ["Secondary Phone", fatherInfo?.cell2 || "N/A"],
-        ["Primary Email", fatherInfo?.email1 || "N/A"],
-        ["Secondary Email", fatherInfo?.email2 || "N/A"],
+        ["ID Number", fatherInfo.idNumber || "N/A"],
+        ["ID Expiry", safeDate(fatherInfo.idExpiry)],
+        ["Nationality", safeUpper(fatherInfo.nationality)],
+        ["Religion", safeUpper(fatherInfo.religion)],
+        ["Company", fatherInfo.company || "N/A"],
+        ["Job Title", fatherInfo.jobTitle || "N/A"],
+        ["Primary Phone", fatherInfo.cell1 || "N/A"],
+        ["Secondary Phone", fatherInfo.cell2 || "N/A"],
+        ["Primary Email", fatherInfo.email1 || "N/A"],
+        ["Secondary Email", fatherInfo.email2 || "N/A"],
       ],
-      margin: { left: 15, right: 40 },
       ...tableOpts,
     });
 
-    // Mother's Info
-    startY = doc.lastAutoTable.finalY + 15;
-    doc
-      .setFont("helvetica", "bold")
-      .setFontSize(14)
-      .setTextColor(...PRIMARY_COLOR)
-      .text("MOTHER'S INFORMATION", 15, startY);
+    /* ─────────────── 3. MOTHER ─────────────── */
+    startY = addPageAndHeader(doc, "MOTHER & GUARDIAN INFORMATION");
 
     if (motherImg) {
-      try {
-        const photoX = 160;
-        const photoY = startY;
-        doc.setDrawColor(200);
-        doc.setFillColor(240, 240, 240);
-        doc.roundedRect(photoX - 1, photoY - 1, 32, 32, 2, 2, "FD");
-        doc.addImage(motherImg, "JPEG", photoX, photoY, 30, 30);
-        doc.setFontSize(6).setTextColor(150);
-        doc.text(`Photo of mother`, photoX + 15, photoY + 33, {
+      doc.setDrawColor(200).setFillColor(240);
+      doc.roundedRect(
+        IMAGE_X - 1,
+        startY - 1,
+        IMAGE_W + 2,
+        IMAGE_W + 2,
+        2,
+        2,
+        "FD"
+      );
+      doc.addImage(motherImg, "JPEG", IMAGE_X, startY, IMAGE_W, IMAGE_W);
+      doc
+        .setFontSize(6)
+        .setTextColor(150)
+        .text("Photo of mother", IMAGE_X + IMAGE_W / 2, startY + IMAGE_W + 3, {
           align: "center",
         });
-      } catch {}
     }
 
     autoTable(doc, {
-      startY: startY + 40,
+      startY: startY + IMAGE_W + 10,
       head: [["MOTHER'S INFORMATION", ""]],
       body: [
         [
           "Full Name",
-          `${motherInfo?.firstName || "N/A"} ` +
-            `${motherInfo?.middleName || ""} ` +
-            `${motherInfo?.lastName || ""}`.trim(),
+          `${motherInfo.firstName || "N/A"} ${motherInfo.middleName || ""} ${
+            motherInfo.lastName || ""
+          }`.trim(),
         ],
-        ["ID Number", motherInfo?.idNumber || "N/A"],
-        ["ID Expiry", safeDateFormat(motherInfo?.idExpiry)],
-        ["Nationality", safeUpperCase(motherInfo?.nationality)],
-        ["Religion", safeUpperCase(motherInfo?.religion)],
-        ["Company", motherInfo?.company || "N/A"],
-        ["Job Title", motherInfo?.jobTitle || "N/A"],
-        ["Primary Phone", motherInfo?.cell1 || "N/A"],
-        ["Secondary Phone", motherInfo?.cell2 || "N/A"],
-        ["Primary Email", motherInfo?.email1 || "N/A"],
-        ["Secondary Email", motherInfo?.email2 || "N/A"],
+        ["ID Number", motherInfo.idNumber || "N/A"],
+        ["ID Expiry", safeDate(motherInfo.idExpiry)],
+        ["Nationality", safeUpper(motherInfo.nationality)],
+        ["Religion", safeUpper(motherInfo.religion)],
+        ["Company", motherInfo.company || "N/A"],
+        ["Job Title", motherInfo.jobTitle || "N/A"],
+        ["Primary Phone", motherInfo.cell1 || "N/A"],
+        ["Secondary Phone", motherInfo.cell2 || "N/A"],
+        ["Primary Email", motherInfo.email1 || "N/A"],
+        ["Secondary Email", motherInfo.email2 || "N/A"],
       ],
-      margin: { left: 15, right: 40 },
       ...tableOpts,
     });
 
-    // Guardian Info
+    /* ─────────────── 4. GUARDIAN (same page) ─────────────── */
     startY = doc.lastAutoTable.finalY + 15;
     autoTable(doc, {
-      startY: startY,
+      startY,
       head: [["PRIMARY GUARDIAN INFORMATION", ""]],
       body: [
-        ["Name", guardianInfo?.guardianName || "N/A"],
-        ["Relation", guardianInfo?.guardianRelationToStudent || "N/A"],
-        ["Contact Number", guardianInfo?.guardianContactNumber || "N/A"],
-        ["Email", guardianInfo?.guardianEmail || "N/A"],
+        ["Name", guardianInfo.guardianName || "N/A"],
+        ["Relation", guardianInfo.guardianRelationToStudent || "N/A"],
+        ["Contact Number", guardianInfo.guardianContactNumber || "N/A"],
+        ["Email", guardianInfo.guardianEmail || "N/A"],
       ],
       ...tableOpts,
     });
 
-    // ───────────────── ADDRESS & ACADEMIC INFO (PAGE 3) ─────────────────
-    startY = addNewPage(doc, "ADDRESS & ACADEMIC INFORMATION");
-
-    // Address Information
+    /* ─────────────── 5. ADDRESS & ACADEMIC ─────────────── */
+    startY = addPageAndHeader(doc, "ADDRESS & ACADEMIC INFORMATION");
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
       .setTextColor(...PRIMARY_COLOR)
-      .text("ADDRESS INFORMATION", 15, startY);
+      .text("ADDRESS INFORMATION", DEFAULT_LEFT, startY);
 
     autoTable(doc, {
-      startY: startY + 10,
+      startY: startY + 5,
       head: [["Address Type", "Details"]],
       body: [
-        ["Unit/Building", residentialAddress?.buildingNumber || "N/A"],
-        ["Street", residentialAddress?.streetName || "N/A"],
-        ["City", residentialAddress?.city || "N/A"],
-        ["Postal Code", residentialAddress?.postalCode || "N/A"],
-        ["Country", safeUpperCase(residentialAddress?.country)],
-        ["Transport Required", address?.transportRequirement ? "YES" : "NO"],
-        ["", ""], // spacer
+        ["Unit/Building", residentialAddress.buildingNumber || "N/A"],
+        ["Street", residentialAddress.streetName || "N/A"],
+        ["City", residentialAddress.city || "N/A"],
+        ["Postal Code", residentialAddress.postalCode || "N/A"],
+        ["Country", safeUpper(residentialAddress.country)],
+        ["Transport Required", address.transportRequirement ? "YES" : "NO"],
+        ["", ""],
         ["PERMANENT ADDRESS", ""],
-        ["Building", permanentAddress?.buildingNumber || "N/A"],
-        ["Street", permanentAddress?.streetName || "N/A"],
-        ["City", permanentAddress?.city || "N/A"],
-        ["Postal Code", permanentAddress?.postalCode || "N/A"],
-        ["Country", safeUpperCase(permanentAddress?.country)],
+        ["Unit/Building", permanentAddress.buildingNumber || "N/A"],
+        ["Street", permanentAddress.streetName || "N/A"],
+        ["City", permanentAddress.city || "N/A"],
+        ["Postal Code", permanentAddress.postalCode || "N/A"],
+        ["Country", safeUpper(permanentAddress.country)],
       ],
       ...tableOpts,
-      didDrawCell: (data) => {
-        if (data.cell.raw === "PERMANENT ADDRESS") {
-          try {
-            doc.setFillColor(240, 240, 240);
-            doc.rect(
-              data.cell.x,
-              data.cell.y,
-              data.cell.width +
-                data.cell.styles.cellPadding.left +
-                data.cell.styles.cellPadding.right,
-              data.cell.height,
-              "F"
+      didDrawCell: (d) => {
+        if (d.cell.raw === "PERMANENT ADDRESS") {
+          doc.setFillColor(240);
+          doc.rect(d.cell.x, d.cell.y, d.cell.width, d.cell.height, "F");
+          doc
+            .setTextColor(...PRIMARY_COLOR)
+            .setFont("helvetica", "bold")
+            .text(
+              "PERMANENT ADDRESS",
+              d.cell.x + 2,
+              d.cell.y + d.cell.height / 2 + 2
             );
-
-            doc
-              .setTextColor(...PRIMARY_COLOR)
-              .setFont("helvetica", "bold")
-              .text(
-                "PERMANENT ADDRESS",
-                data.cell.x + data.cell.padding.left,
-                data.cell.y + data.cell.padding.top + 4,
-                {
-                  maxWidth:
-                    data.cell.width -
-                    data.cell.padding.left -
-                    data.cell.padding.right,
-                }
-              );
-          } catch (error) {
-            console.error("Error drawing permanent address header:", error);
-            data.cell.styles.fillColor = [240, 240, 240];
-            data.cell.styles.textColor = PRIMARY_COLOR;
-            data.cell.styles.fontStyle = "bold";
-          }
         }
       },
     });
 
-    // Academic Information
     startY = doc.lastAutoTable.finalY + 15;
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
       .setTextColor(...PRIMARY_COLOR)
-      .text("ACADEMIC INFORMATION", 15, startY);
+      .text("ACADEMIC INFORMATION", DEFAULT_LEFT, startY);
 
     autoTable(doc, {
       startY: startY + 10,
       head: [["Academic Field", "Details"]],
       body: [
-        ["Previous Class", safeUpperCase(academic?.previousClass)],
-        ["Curriculum", safeUpperCase(academic?.curriculum)],
-        ["Previous School", academic?.previousSchoolName || "N/A"],
-        ["Source of Fee", safeUpperCase(academic?.sourceOfFee)],
+        ["Previous Class", safeUpper(academic.previousClass)],
+        ["Curriculum", safeUpper(academic.curriculum)],
+        ["Previous School", academic.previousSchoolName || "N/A"],
+        ["Source of Fee", safeUpper(academic.sourceOfFee)],
       ],
       ...tableOpts,
     });
 
-    // ───────────────── LANGUAGE & DOCUMENTS (PAGE 4) ─────────────────
-    startY = addNewPage(doc, "LANGUAGE & DOCUMENTS");
-
-    // Language Preferences
+    /* ─────────────── 6. LANGUAGE & DOCUMENTS ─────────────── */
+    startY = addPageAndHeader(doc, "LANGUAGE & DOCUMENTS");
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
       .setTextColor(...PRIMARY_COLOR)
-      .text("LANGUAGE & PREFERENCES", 15, startY);
+      .text("LANGUAGE & PREFERENCES", DEFAULT_LEFT, startY);
 
     autoTable(doc, {
       startY: startY + 10,
@@ -601,49 +496,41 @@ export const handleDownload = async (ApplicationData) => {
       body: [
         [
           "Second Language",
-          (languagePreference?.secondLanguage || [])
-            .map((lang) => safeUpperCase(lang))
-            .join(", ") || "N/A",
+          (languagePreference.secondLanguage || []).map(safeUpper).join(", ") ||
+            "N/A",
         ],
         [
           "Third Language",
-          (languagePreference?.thirdLanguage || [])
-            .map((lang) => safeUpperCase(lang))
-            .join(", ") || "N/A",
+          (languagePreference.thirdLanguage || []).map(safeUpper).join(", ") ||
+            "N/A",
         ],
         [
           "Value Education",
-          (languagePreference?.valueEducation || [])
-            .map((edu) => safeUpperCase(edu))
-            .join(", ") || "N/A",
+          (languagePreference.valueEducation || []).map(safeUpper).join(", ") ||
+            "N/A",
         ],
-        ["Left Handed", languagePreference?.isLeftHanded ? "YES" : "NO"],
+        ["Left Handed", languagePreference.isLeftHanded ? "YES" : "NO"],
         [
           "Medical Condition",
-          safeUpperCase(languagePreference?.medicalCondition) || "NONE",
+          safeUpper(languagePreference.medicalCondition) || "NONE",
         ],
       ],
       ...tableOpts,
     });
 
-    // Documents
     startY = doc.lastAutoTable.finalY + 15;
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
       .setTextColor(...PRIMARY_COLOR)
-      .text("DOCUMENTS SUBMITTED", 15, startY);
+      .text("DOCUMENTS SUBMITTED", DEFAULT_LEFT, startY);
 
     const docRows = files.map((f) => [
-      f?.fieldname || "N/A",
-      f?.documentName?.length > 30
-        ? f.documentName.slice(0, 27) + "…"
-        : f?.documentName || "N/A",
-      {
-        content: "View →",
-        url: f?.url || "#",
-        action: true,
-      },
+      f.fieldname || "N/A",
+      f.documentName?.length > 30
+        ? `${f.documentName.slice(0, 27)}…`
+        : f.documentName || "N/A",
+      { content: "View", url: f.url || "#", action: true },
     ]);
 
     autoTable(doc, {
@@ -652,51 +539,37 @@ export const handleDownload = async (ApplicationData) => {
       body: docRows.length ? docRows : [["No documents uploaded", "", ""]],
       styles: { ...tableOpts.styles, fontSize: 8 },
       columnStyles: {
-        0: { cellWidth: 60, fontStyle: "bold" },
+        0: { cellWidth: 60 },
         1: { cellWidth: 80 },
         2: { cellWidth: 30, halign: "center" },
       },
       ...tableOpts,
-      didParseCell: (data) => {
-        if (data.cell.raw?.action) {
-          data.cell.styles.textColor = [0, 0, 255]; // Blue color
-          data.cell.styles.fontStyle = "underline";
-          delete data.cell.styles.fillColor;
+      didParseCell: (d) => {
+        if (d.cell.raw?.action) {
+          d.cell.styles.textColor = [0, 0, 255];
+          d.cell.styles.fontStyle = "underline";
+          delete d.cell.styles.fillColor;
         }
       },
-      didDrawCell: (data) => {
-        if (data.cell.raw?.action) {
-          doc.link(
-            data.cell.x,
-            data.cell.y,
-            data.cell.width,
-            data.cell.height,
-            {
-              url: data.cell.raw.url,
-              target: "_blank",
-            }
-          );
+      didDrawCell: (d) => {
+        if (d.cell.raw?.action) {
+          doc.link(d.cell.x, d.cell.y, d.cell.width, d.cell.height, {
+            url: d.cell.raw.url,
+            newWindow: true, // forces browser to open link in a new tab/window
+          });
         }
       },
     });
 
-    // Add footer only on last page
+    /* ---------- footer & save ---------- */
     addFooter(doc);
-
-    // ─────────────────────── DOWNLOAD ───────────────────────
-    const fileName = `StudentRegistration_${
-      candidate?.firstName || "Unknown"
-    }_${candidate?.lastName || "Student"}_${moment().format(
-      "YYYYMMDD_HHmmss"
-    )}.pdf`;
-
-    // Hide loading indicator before saving
-    setTimeout(() => {
-      hideLoadingIndicator();
-      doc.save(fileName);
-    }, 100);
-  } catch (error) {
-    console.error("Error generating PDF:", error);
+    const fileName = `StudentRegistration_${candidate.firstName || "Unknown"}_${
+      candidate.lastName || "Student"
+    }_${moment().format("YYYYMMDD_HHmmss")}.pdf`;
+    hideLoadingIndicator();
+    doc.save(fileName);
+  } catch (err) {
+    console.error("PDF generation error:", err);
     hideLoadingIndicator();
     message.error("Failed to generate PDF. Please try again.");
   }
