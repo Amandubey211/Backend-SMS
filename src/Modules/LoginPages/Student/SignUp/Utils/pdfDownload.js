@@ -5,6 +5,11 @@ import autoTable from "jspdf-autotable";
 import moment from "moment";
 import QRCode from "qrcode";
 
+// Primary theme colors
+const PRIMARY_COLOR = [200, 59, 98]; // #C83B62
+const SECONDARY_COLOR = [127, 53, 205]; // #7F35CD
+const WHITE = [255, 255, 255];
+
 // Helper function to add loading indicator
 const showLoadingIndicator = () => {
   const loadingElement = document.createElement("div");
@@ -23,7 +28,7 @@ const showLoadingIndicator = () => {
   const spinner = document.createElement("div");
   spinner.style.border = "4px solid rgba(255,255,255,0.3)";
   spinner.style.borderRadius = "50%";
-  spinner.style.borderTop = "4px solid #2196F3";
+  spinner.style.borderTop = `4px solid rgb(${PRIMARY_COLOR.join(",")})`;
   spinner.style.width = "40px";
   spinner.style.height = "40px";
   spinner.style.animation = "spin 1s linear infinite";
@@ -70,42 +75,148 @@ const loadImage = (url, retries = 3, delay = 100) => {
   });
 };
 
+// Placeholder image for missing photos
+const createPlaceholderImage = (text, width = 200, height = 200) => {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+
+  // Fill background
+  ctx.fillStyle = "#f0f0f0";
+  ctx.fillRect(0, 0, width, height);
+
+  // Draw border
+  ctx.strokeStyle = "#cccccc";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(0, 0, width, height);
+
+  // Draw text
+  ctx.fillStyle = "#999999";
+  ctx.font = "bold 16px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, width / 2, height / 2);
+
+  return canvas.toDataURL("image/png");
+};
+
+// Function to safely convert to uppercase
+const safeUpperCase = (str) => {
+  return str?.toString()?.toUpperCase() || "N/A";
+};
+
+// Function to safely format date
+const safeDateFormat = (date) => {
+  return date && moment(date).isValid()
+    ? moment(date).format("DD MMM YYYY")
+    : "N/A";
+};
+
+// Function to add footer only on last page
+const addFooter = (doc) => {
+  const pageCount = doc.internal.getNumberOfPages();
+  doc.setPage(pageCount);
+
+  const footerY = doc.internal.pageSize.height - 15;
+
+  // Footer divider
+  doc.setDrawColor(200, 200, 200);
+  doc.setLineWidth(0.3);
+  doc.line(15, footerY - 20, 195, footerY - 20);
+
+  // Main footer text
+  doc.setFont("helvetica", "italic");
+  doc.setFontSize(8);
+  doc.setTextColor(100);
+  doc.text(
+    "This document is computer-generated and does not require a signature.",
+    105,
+    footerY - 15,
+    { align: "center" }
+  );
+
+  // Contact information
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(80);
+  doc.text(
+    "For any queries, contact: info@studentdiwan.com | +974 74449111",
+    105,
+    footerY - 10,
+    { align: "center" }
+  );
+
+  // Generated timestamp
+  doc.setFontSize(7);
+  doc.text(
+    `Generated on: ${moment().format("DD MMM YYYY HH:mm")}`,
+    105,
+    footerY - 5,
+    { align: "center" }
+  );
+};
+
+// Helper function to add a new page with header
+const addNewPage = (doc, title) => {
+  doc.addPage();
+  doc
+    .setFont("helvetica", "bold")
+    .setFontSize(18)
+    .setTextColor(...PRIMARY_COLOR)
+    .text(title, 105, 20, { align: "center" });
+  doc
+    .setDrawColor(...PRIMARY_COLOR)
+    .setLineWidth(0.8)
+    .line(50, 22, 160, 22);
+  return 30; // Return starting Y position
+};
+
 export const handleDownload = async (ApplicationData) => {
   try {
     showLoadingIndicator();
+
+    // Safely access application data with fallbacks
+    const data = ApplicationData || {};
+    const candidate = data?.candidate || {};
+    const guardian = data?.guardian || {};
+    const fatherInfo = guardian?.fatherInfo || {};
+    const motherInfo = guardian?.motherInfo || {};
+    const guardianInfo = guardian?.guardianInformation || {};
+    const address = data?.address || {};
+    const residentialAddress = address?.residentialAddress || {};
+    const permanentAddress = address?.permanentAddress || {};
+    const academic = data?.academic || {};
+    const languagePreference = data?.languagePreference || {};
+    const documents = data?.documents || {};
+    const files = documents?.files || [];
 
     // Create a promise for each image to load in parallel
     const imagePromises = [];
 
     // School logo promise
     const logoSrc =
-      ApplicationData?.school?.logoUrl ||
       "https://i.ibb.co/9HLp987z/Chat-GPT-Image-May-9-2025-02-32-43-PM.png";
     imagePromises.push(loadImage(logoSrc).catch(() => null));
 
     // Student photo promise
-    if (ApplicationData?.candidate?.profile) {
-      imagePromises.push(
-        loadImage(ApplicationData.candidate.profile).catch(() => null)
-      );
-    }
+    const studentPhoto = candidate?.profile
+      ? loadImage(candidate.profile).catch(() => null)
+      : Promise.resolve(createPlaceholderImage("Student Photo"));
+    imagePromises.push(studentPhoto);
 
     // Father's photo promise
-    if (ApplicationData?.guardian?.fatherInfo?.photo) {
-      imagePromises.push(
-        loadImage(ApplicationData.guardian.fatherInfo.photo).catch(() => null)
-      );
-    }
+    const fatherPhoto = fatherInfo?.photo
+      ? loadImage(fatherInfo.photo).catch(() => null)
+      : Promise.resolve(createPlaceholderImage("Father's Photo"));
+    imagePromises.push(fatherPhoto);
 
     // Mother's photo promise
-    if (ApplicationData?.guardian?.motherInfo?.photo) {
-      imagePromises.push(
-        loadImage(ApplicationData.guardian.motherInfo.photo).catch(() => null)
-      );
-    }
+    const motherPhoto = motherInfo?.photo
+      ? loadImage(motherInfo.photo).catch(() => null)
+      : Promise.resolve(createPlaceholderImage("Mother's Photo"));
+    imagePromises.push(motherPhoto);
 
-    // // QR code promise
-
+    // QR code promise
     const qrPromise = QRCode.toDataURL(`https://app.studentdiwan.com/`, {
       errorCorrectionLevel: "L",
       margin: 0,
@@ -123,9 +234,9 @@ export const handleDownload = async (ApplicationData) => {
       format: "a4",
     });
     doc.setProperties({
-      title: `Student Registration – ${
-        ApplicationData?.candidate?.firstName ?? "N/A"
-      } ${ApplicationData?.candidate?.lastName ?? "N/A"}`,
+      title: `Student Registration – ${candidate?.firstName || "N/A"} ${
+        candidate?.lastName || "N/A"
+      }`,
       subject: "Student Registration Form",
       author: "School Management System",
       keywords: "student, registration, form",
@@ -133,7 +244,7 @@ export const handleDownload = async (ApplicationData) => {
     });
 
     // Add watermark if draft status
-    if (ApplicationData?.status === "draft") {
+    if (data?.status === "draft") {
       doc.setFont("helvetica", "italic");
       doc.setFontSize(60);
       doc.setTextColor(200, 200, 200);
@@ -147,7 +258,7 @@ export const handleDownload = async (ApplicationData) => {
       try {
         // Add subtle shadow and border
         doc.setDrawColor(200);
-        doc.setFillColor(255, 255, 255);
+        doc.setFillColor(...WHITE);
         doc.roundedRect(14, 9, 32, 17, 2, 2, "FD");
         doc.addImage(logoImg, "PNG", 15, 10, 30, 15);
       } catch {
@@ -159,9 +270,12 @@ export const handleDownload = async (ApplicationData) => {
     doc
       .setFont("helvetica", "bold")
       .setFontSize(18)
-      .setTextColor(33, 150, 243)
+      .setTextColor(...PRIMARY_COLOR)
       .text("STUDENT REGISTRATION FORM", 105, 20, { align: "center" });
-    doc.setDrawColor(33, 150, 243).setLineWidth(0.8).line(50, 22, 160, 22);
+    doc
+      .setDrawColor(...PRIMARY_COLOR)
+      .setLineWidth(0.8)
+      .line(50, 22, 160, 22);
 
     // ──────────────────── QR-CODE (Application ID) ───────────────────
     if (qrB64) {
@@ -175,33 +289,13 @@ export const handleDownload = async (ApplicationData) => {
       }
     }
 
-    // ────────────── APPLICATION DETAILS BOX ──────────────
-    // doc
-    //   .setFillColor(245, 245, 245)
-    //   .roundedRect(15, 30, 180, 15, 3, 3, "F")
-    //   .setFont("helvetica", "bold")
-    //   .setFontSize(10)
-    //   .setTextColor(66, 66, 66)
-    //   .text("APPLICATION DETAILS", 22, 36)
-    //   .setFont("helvetica", "normal")
-    //   .setTextColor(80)
-    //   .text(`School ID: ${ApplicationData?.school?.schoolId ?? "N/A"}`, 120, 36)
-    //   .text(
-    //     `Class ID:  ${ApplicationData?.school?.applyingClass ?? "N/A"}`,
-    //     120,
-    //     42
-    //   )
-    //   .text(`Submission: ${moment().format("DD MMM YYYY")}`, 120, 48);
-    // doc.setDrawColor(200).setLineWidth(0.3).line(15, 52, 195, 52);
-
-    // ──────────────────────────────────────────────────────────
     // helpers for tables
     const nextY = () => doc.lastAutoTable.finalY + 15;
     const tableOpts = {
       theme: "grid",
       headStyles: {
-        fillColor: [33, 150, 243],
-        textColor: [255, 255, 255],
+        fillColor: PRIMARY_COLOR,
+        textColor: WHITE,
         fontStyle: "bold",
       },
       styles: {
@@ -219,50 +313,40 @@ export const handleDownload = async (ApplicationData) => {
         fillColor: [248, 248, 248],
       },
       didDrawPage: (data) => {
-        // Footer on each page
-        const footY = doc.internal.pageSize.height - 10;
-        doc
-          .setFont("helvetica", "italic")
-          .setFontSize(8)
-          .setTextColor(100)
-          .text(
-            "This document is computer-generated and does not require a signature.",
-            105,
-            footY - 5,
-            { align: "center" }
-          )
-          .text(
-            `Generated on: ${moment().format("DD MMM YYYY HH:mm")}`,
-            105,
-            footY,
-            {
-              align: "center",
-            }
-          );
+        // Only add page numbers on each page
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(8).setTextColor(150);
+        doc.text(
+          `Page ${
+            doc.internal.getCurrentPageInfo().pageNumber
+          } of ${pageCount}`,
+          doc.internal.pageSize.width - 20,
+          doc.internal.pageSize.height - 10
+        );
       },
     };
 
-    // ───────────────── CANDIDATE INFORMATION ─────────────────
+    // ───────────────── CANDIDATE INFORMATION (PAGE 1) ─────────────────
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
-      .setTextColor(33, 150, 243)
+      .setTextColor(...PRIMARY_COLOR)
       .text("CANDIDATE INFORMATION", 15, 60);
 
-    // student photo
+    // Add student photo above the table to the right
     if (studentImg) {
       try {
-        // Add border and shadow to photo
+        const photoX = 160;
+        const photoY = 60;
         doc.setDrawColor(200);
         doc.setFillColor(240, 240, 240);
-        doc.roundedRect(159, 54, 32, 32, 2, 2, "FD");
-        doc.addImage(studentImg, "JPEG", 160, 55, 30, 30);
-        // Add alt text description
+        doc.roundedRect(photoX - 1, photoY - 1, 32, 32, 2, 2, "FD");
+        doc.addImage(studentImg, "JPEG", photoX, photoY, 30, 30);
         doc.setFontSize(6).setTextColor(150);
         doc.text(
-          `Photo of ${ApplicationData?.candidate?.firstName || "student"}`,
-          175,
-          88,
+          `Photo of ${candidate?.firstName || "student"}`,
+          photoX + 15,
+          photoY + 33,
           { align: "center" }
         );
       } catch {}
@@ -274,303 +358,173 @@ export const handleDownload = async (ApplicationData) => {
       body: [
         [
           "Full Name",
-          `${ApplicationData?.candidate?.firstName ?? "N/A"} ` +
-            `${ApplicationData?.candidate?.middleName || ""} ` +
-            `${ApplicationData?.candidate?.lastName ?? "N/A"}`.trim(),
+          `${candidate?.firstName || "N/A"} ` +
+            `${candidate?.middleName || ""} ` +
+            `${candidate?.lastName || "N/A"}`.trim(),
         ],
         [
           "Date of Birth",
-          moment(ApplicationData?.candidate?.dob).isValid()
-            ? `${moment(ApplicationData.candidate.dob).format(
-                "DD MMM YYYY"
-              )} (Age: ${ApplicationData?.candidate?.age || "N/A"})`
+          candidate?.dob
+            ? `${safeDateFormat(candidate.dob)} (Age: ${
+                candidate?.age || "N/A"
+              })`
             : "N/A",
         ],
-        ["Gender", (ApplicationData?.candidate?.gender || "N/A").toUpperCase()],
-        [
-          "Passport Number",
-          ApplicationData?.candidate?.passportNumber || "N/A",
-        ],
-        [
-          "Passport Expiry",
-          moment(ApplicationData?.candidate?.passportExpiry).isValid()
-            ? moment(ApplicationData.candidate.passportExpiry).format(
-                "DD MMM YYYY"
-              )
-            : "N/A",
-        ],
-        [
-          "ID Expiry",
-          moment(ApplicationData?.candidate?.idExpiry).isValid()
-            ? moment(ApplicationData.candidate.idExpiry).format("DD MMM YYYY")
-            : "N/A",
-        ],
-        ["Place of Birth", ApplicationData?.candidate?.placeOfBirth || "N/A"],
-        [
-          "Nationality",
-          (ApplicationData?.candidate?.nationality || "N/A").toUpperCase(),
-        ],
-        [
-          "Religion",
-          (ApplicationData?.candidate?.religion || "N/A").toUpperCase(),
-        ],
-        ["Blood Group", ApplicationData?.candidate?.bloodGroup || "N/A"],
-        [
-          "Native Language",
-          (ApplicationData?.candidate?.nativeLanguage || "N/A").toUpperCase(),
-        ],
-        ["Email", ApplicationData?.candidate?.email || "N/A"],
-        ["Phone Number", ApplicationData?.candidate?.phoneNumber || "N/A"],
-        [
-          "Emergency Number",
-          ApplicationData?.candidate?.emergencyNumber || "N/A",
-        ],
-        [
-          "Primary Contact",
-          (ApplicationData?.candidate?.primaryContact || "N/A").toUpperCase(),
-        ],
+        ["Gender", safeUpperCase(candidate?.gender)],
+        ["Passport Number", candidate?.passportNumber || "N/A"],
+        ["Passport Expiry", safeDateFormat(candidate?.passportExpiry)],
+        ["ID Expiry", safeDateFormat(candidate?.idExpiry)],
+        ["Place of Birth", candidate?.placeOfBirth || "N/A"],
+        ["Nationality", safeUpperCase(candidate?.nationality)],
+        ["Religion", safeUpperCase(candidate?.religion)],
+        ["Blood Group", candidate?.bloodGroup || "N/A"],
+        ["Native Language", safeUpperCase(candidate?.nativeLanguage)],
+        ["Email", candidate?.email || "N/A"],
+        ["Phone Number", candidate?.contactNumber || "N/A"],
+        ["Emergency Number", candidate?.emergencyNumber || "N/A"],
       ],
       ...tableOpts,
     });
 
-    // ──────────────── GUARDIAN INFORMATION ────────────────
-    const fatherY = nextY() - 5;
+    // ──────────────── FATHER'S & MOTHER'S INFO (PAGE 2) ────────────────
+    let startY = addNewPage(doc, "PARENT INFORMATION");
+
+    // Father's Info
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
-      .setTextColor(33, 150, 243)
-      .text("FATHER'S INFORMATION", 15, fatherY);
+      .setTextColor(...PRIMARY_COLOR)
+      .text("FATHER'S INFORMATION", 15, startY);
 
-    // father's photo
     if (fatherImg) {
       try {
+        const photoX = 160;
+        const photoY = startY;
         doc.setDrawColor(200);
         doc.setFillColor(240, 240, 240);
-        doc.roundedRect(159, fatherY + 4, 22, 22, 2, 2, "FD");
-        doc.addImage(fatherImg, "JPEG", 160, fatherY + 5, 20, 20);
+        doc.roundedRect(photoX - 1, photoY - 1, 32, 32, 2, 2, "FD");
+        doc.addImage(fatherImg, "JPEG", photoX, photoY, 30, 30);
         doc.setFontSize(6).setTextColor(150);
-        doc.text(`Photo of father`, 170, fatherY + 27, { align: "center" });
+        doc.text(`Photo of father`, photoX + 15, photoY + 33, {
+          align: "center",
+        });
       } catch {}
     }
 
     autoTable(doc, {
-      startY: fatherY + 25,
+      startY: startY + 40,
       head: [["FATHER'S INFORMATION", ""]],
       body: [
         [
           "Full Name",
-          `${ApplicationData?.guardian?.fatherInfo?.firstName ?? "N/A"} ` +
-            `${ApplicationData?.guardian?.fatherInfo?.middleName || ""} ` +
-            `${ApplicationData?.guardian?.fatherInfo?.lastName || ""}`.trim(),
+          `${fatherInfo?.firstName || "N/A"} ` +
+            `${fatherInfo?.middleName || ""} ` +
+            `${fatherInfo?.lastName || ""}`.trim(),
         ],
-        ["ID Number", ApplicationData?.guardian?.fatherInfo?.idNumber || "N/A"],
-        [
-          "ID Expiry",
-          moment(ApplicationData?.guardian?.fatherInfo?.idExpiry).isValid()
-            ? moment(ApplicationData.guardian.fatherInfo.idExpiry).format(
-                "DD MMM YYYY"
-              )
-            : "N/A",
-        ],
-        [
-          "Nationality",
-          (
-            ApplicationData?.guardian?.fatherInfo?.nationality || "N/A"
-          ).toUpperCase(),
-        ],
-        [
-          "Religion",
-          (
-            ApplicationData?.guardian?.fatherInfo?.religion || "N/A"
-          ).toUpperCase(),
-        ],
-        ["Company", ApplicationData?.guardian?.fatherInfo?.company || "N/A"],
-        ["Job Title", ApplicationData?.guardian?.fatherInfo?.jobTitle || "N/A"],
-        [
-          "Primary Phone",
-          ApplicationData?.guardian?.fatherInfo?.cell1 || "N/A",
-        ],
-        [
-          "Secondary Phone",
-          ApplicationData?.guardian?.fatherInfo?.cell2 || "N/A",
-        ],
-        [
-          "Primary Email",
-          ApplicationData?.guardian?.fatherInfo?.email1 || "N/A",
-        ],
-        [
-          "Secondary Email",
-          ApplicationData?.guardian?.fatherInfo?.email2 || "N/A",
-        ],
+        ["ID Number", fatherInfo?.idNumber || "N/A"],
+        ["ID Expiry", safeDateFormat(fatherInfo?.idExpiry)],
+        ["Nationality", safeUpperCase(fatherInfo?.nationality)],
+        ["Religion", safeUpperCase(fatherInfo?.religion)],
+        ["Company", fatherInfo?.company || "N/A"],
+        ["Job Title", fatherInfo?.jobTitle || "N/A"],
+        ["Primary Phone", fatherInfo?.cell1 || "N/A"],
+        ["Secondary Phone", fatherInfo?.cell2 || "N/A"],
+        ["Primary Email", fatherInfo?.email1 || "N/A"],
+        ["Secondary Email", fatherInfo?.email2 || "N/A"],
       ],
       margin: { left: 15, right: 40 },
       ...tableOpts,
     });
 
-    // ───────────────── MOTHER'S INFORMATION ─────────────────
-    const motherY = nextY() - 5;
+    // Mother's Info
+    startY = doc.lastAutoTable.finalY + 15;
     doc
       .setFont("helvetica", "bold")
       .setFontSize(14)
-      .setTextColor(33, 150, 243)
-      .text(" MOTHER'S INFORMATION", 15, motherY);
+      .setTextColor(...PRIMARY_COLOR)
+      .text("MOTHER'S INFORMATION", 15, startY);
 
-    // mother's photo
     if (motherImg) {
       try {
+        const photoX = 160;
+        const photoY = startY;
         doc.setDrawColor(200);
         doc.setFillColor(240, 240, 240);
-        doc.roundedRect(159, motherY + 4, 22, 22, 2, 2, "FD");
-        doc.addImage(motherImg, "JPEG", 160, motherY + 5, 20, 20);
+        doc.roundedRect(photoX - 1, photoY - 1, 32, 32, 2, 2, "FD");
+        doc.addImage(motherImg, "JPEG", photoX, photoY, 30, 30);
         doc.setFontSize(6).setTextColor(150);
-        doc.text(`Photo of mother`, 170, motherY + 27, { align: "center" });
+        doc.text(`Photo of mother`, photoX + 15, photoY + 33, {
+          align: "center",
+        });
       } catch {}
     }
 
     autoTable(doc, {
-      startY: motherY + 25,
+      startY: startY + 40,
       head: [["MOTHER'S INFORMATION", ""]],
       body: [
         [
           "Full Name",
-          `${ApplicationData?.guardian?.motherInfo?.firstName ?? "N/A"} ` +
-            `${ApplicationData?.guardian?.motherInfo?.middleName || ""} ` +
-            `${ApplicationData?.guardian?.motherInfo?.lastName || ""}`.trim(),
+          `${motherInfo?.firstName || "N/A"} ` +
+            `${motherInfo?.middleName || ""} ` +
+            `${motherInfo?.lastName || ""}`.trim(),
         ],
-        ["ID Number", ApplicationData?.guardian?.motherInfo?.idNumber || "N/A"],
-        [
-          "ID Expiry",
-          moment(ApplicationData?.guardian?.motherInfo?.idExpiry).isValid()
-            ? moment(ApplicationData.guardian.motherInfo.idExpiry).format(
-                "DD MMM YYYY"
-              )
-            : "N/A",
-        ],
-        [
-          "Nationality",
-          (
-            ApplicationData?.guardian?.motherInfo?.nationality || "N/A"
-          ).toUpperCase(),
-        ],
-        [
-          "Religion",
-          (
-            ApplicationData?.guardian?.motherInfo?.religion || "N/A"
-          ).toUpperCase(),
-        ],
-        ["Company", ApplicationData?.guardian?.motherInfo?.company || "N/A"],
-        ["Job Title", ApplicationData?.guardian?.motherInfo?.jobTitle || "N/A"],
-        [
-          "Primary Phone",
-          ApplicationData?.guardian?.motherInfo?.cell1 || "N/A",
-        ],
-        [
-          "Secondary Phone",
-          ApplicationData?.guardian?.motherInfo?.cell2 || "N/A",
-        ],
-        [
-          "Primary Email",
-          ApplicationData?.guardian?.motherInfo?.email1 || "N/A",
-        ],
-        [
-          "Secondary Email",
-          ApplicationData?.guardian?.motherInfo?.email2 || "N/A",
-        ],
+        ["ID Number", motherInfo?.idNumber || "N/A"],
+        ["ID Expiry", safeDateFormat(motherInfo?.idExpiry)],
+        ["Nationality", safeUpperCase(motherInfo?.nationality)],
+        ["Religion", safeUpperCase(motherInfo?.religion)],
+        ["Company", motherInfo?.company || "N/A"],
+        ["Job Title", motherInfo?.jobTitle || "N/A"],
+        ["Primary Phone", motherInfo?.cell1 || "N/A"],
+        ["Secondary Phone", motherInfo?.cell2 || "N/A"],
+        ["Primary Email", motherInfo?.email1 || "N/A"],
+        ["Secondary Email", motherInfo?.email2 || "N/A"],
       ],
       margin: { left: 15, right: 40 },
       ...tableOpts,
     });
 
-    // ─────────────── PRIMARY GUARDIAN INFORMATION ───────────────
+    // Guardian Info
+    startY = doc.lastAutoTable.finalY + 15;
     autoTable(doc, {
-      startY: nextY(),
+      startY: startY,
       head: [["PRIMARY GUARDIAN INFORMATION", ""]],
       body: [
-        [
-          "Name",
-          ApplicationData?.guardian?.guardianInformation?.guardianName || "N/A",
-        ],
-        [
-          "Relation",
-          ApplicationData?.guardian?.guardianInformation
-            ?.guardianRelationToStudent || "N/A",
-        ],
-        [
-          "Contact Number",
-          ApplicationData?.guardian?.guardianInformation
-            ?.guardianContactNumber || "N/A",
-        ],
-        [
-          "Email",
-          ApplicationData?.guardian?.guardianInformation?.guardianEmail ||
-            "N/A",
-        ],
+        ["Name", guardianInfo?.guardianName || "N/A"],
+        ["Relation", guardianInfo?.guardianRelationToStudent || "N/A"],
+        ["Contact Number", guardianInfo?.guardianContactNumber || "N/A"],
+        ["Email", guardianInfo?.guardianEmail || "N/A"],
       ],
       ...tableOpts,
     });
 
-    // ───────────────── ADDRESS INFORMATION ─────────────────
-    const addSection = (title, icon = "📋") => {
-      doc
-        .setFont("helvetica", "bold")
-        .setFontSize(14)
-        .setTextColor(33, 150, 243);
-      doc.text(`${icon} ${title}`, 15, nextY());
-    };
+    // ───────────────── ADDRESS & ACADEMIC INFO (PAGE 3) ─────────────────
+    startY = addNewPage(doc, "ADDRESS & ACADEMIC INFORMATION");
 
-    addSection("ADDRESS INFORMATION", "🏠");
+    // Address Information
+    doc
+      .setFont("helvetica", "bold")
+      .setFontSize(14)
+      .setTextColor(...PRIMARY_COLOR)
+      .text("ADDRESS INFORMATION", 15, startY);
+
     autoTable(doc, {
-      startY: nextY() + 5,
+      startY: startY + 10,
       head: [["Address Type", "Details"]],
       body: [
-        [
-          "Unit/Building",
-          `${
-            ApplicationData?.address?.residentialAddress?.buildingNumber ||
-            "N/A"
-          }`,
-        ],
-        [
-          "Street",
-          ApplicationData?.address?.residentialAddress?.streetName || "N/A",
-        ],
-
-        ["City", ApplicationData?.address?.residentialAddress?.city || "N/A"],
-        [
-          "Country",
-          (
-            ApplicationData?.address?.residentialAddress?.country || "N/A"
-          ).toUpperCase(),
-        ],
-
-        [
-          "Transport Required",
-          ApplicationData?.address?.transportRequirement ? "YES" : "NO",
-        ],
+        ["Unit/Building", residentialAddress?.buildingNumber || "N/A"],
+        ["Street", residentialAddress?.streetName || "N/A"],
+        ["City", residentialAddress?.city || "N/A"],
+        ["Postal Code", residentialAddress?.postalCode || "N/A"],
+        ["Country", safeUpperCase(residentialAddress?.country)],
+        ["Transport Required", address?.transportRequirement ? "YES" : "NO"],
         ["", ""], // spacer
         ["PERMANENT ADDRESS", ""],
-
-        [
-          "Building",
-
-          `${ApplicationData?.address?.permanentAddress?.buildingNumber}`,
-        ],
-        [
-          "Street",
-          ApplicationData?.address?.permanentAddress?.streetName || "N/A",
-        ],
-
-        [
-          "Compound",
-          ApplicationData?.address?.permanentAddress?.compoundName || "N/A",
-        ],
-        ["City", ApplicationData?.address?.permanentAddress?.city || "N/A"],
-        [
-          "Country",
-          (
-            ApplicationData?.address?.permanentAddress?.country || "N/A"
-          ).toUpperCase(),
-        ],
+        ["Building", permanentAddress?.buildingNumber || "N/A"],
+        ["Street", permanentAddress?.streetName || "N/A"],
+        ["City", permanentAddress?.city || "N/A"],
+        ["Postal Code", permanentAddress?.postalCode || "N/A"],
+        ["Country", safeUpperCase(permanentAddress?.country)],
       ],
       ...tableOpts,
       didDrawCell: (data) => {
@@ -588,7 +542,7 @@ export const handleDownload = async (ApplicationData) => {
             );
 
             doc
-              .setTextColor(33, 150, 243)
+              .setTextColor(...PRIMARY_COLOR)
               .setFont("helvetica", "bold")
               .text(
                 "PERMANENT ADDRESS",
@@ -604,179 +558,135 @@ export const handleDownload = async (ApplicationData) => {
           } catch (error) {
             console.error("Error drawing permanent address header:", error);
             data.cell.styles.fillColor = [240, 240, 240];
-            data.cell.styles.textColor = [33, 150, 243];
+            data.cell.styles.textColor = PRIMARY_COLOR;
             data.cell.styles.fontStyle = "bold";
           }
         }
       },
     });
 
-    // ───────────────── ACADEMIC INFORMATION ─────────────────
-    addSection("ACADEMIC INFORMATION", "🎓");
+    // Academic Information
+    startY = doc.lastAutoTable.finalY + 15;
+    doc
+      .setFont("helvetica", "bold")
+      .setFontSize(14)
+      .setTextColor(...PRIMARY_COLOR)
+      .text("ACADEMIC INFORMATION", 15, startY);
+
     autoTable(doc, {
-      startY: nextY() + 5,
+      startY: startY + 10,
       head: [["Academic Field", "Details"]],
       body: [
-        [
-          "Previous Class",
-          (ApplicationData?.academic?.previousClass || "N/A").toUpperCase(),
-        ],
-        [
-          "Curriculum",
-          (ApplicationData?.academic?.curriculum || "N/A").toUpperCase(),
-        ],
-        [
-          "Previous School",
-          ApplicationData?.academic?.previousSchoolName || "N/A",
-        ],
-        [
-          "Source of Fee",
-          (ApplicationData?.academic?.sourceOfFee || "N/A").toUpperCase(),
-        ],
+        ["Previous Class", safeUpperCase(academic?.previousClass)],
+        ["Curriculum", safeUpperCase(academic?.curriculum)],
+        ["Previous School", academic?.previousSchoolName || "N/A"],
+        ["Source of Fee", safeUpperCase(academic?.sourceOfFee)],
       ],
       ...tableOpts,
     });
 
-    // ───────────── LANGUAGE & PREFERENCES ────────────────
-    addSection("LANGUAGE & PREFERENCES", "🗣️");
+    // ───────────────── LANGUAGE & DOCUMENTS (PAGE 4) ─────────────────
+    startY = addNewPage(doc, "LANGUAGE & DOCUMENTS");
+
+    // Language Preferences
+    doc
+      .setFont("helvetica", "bold")
+      .setFontSize(14)
+      .setTextColor(...PRIMARY_COLOR)
+      .text("LANGUAGE & PREFERENCES", 15, startY);
+
     autoTable(doc, {
-      startY: nextY() + 5,
+      startY: startY + 10,
       head: [["Preference Type", "Selection"]],
       body: [
         [
           "Second Language",
-          (ApplicationData?.languagePreference?.secondLanguage || [])
-            .join(", ")
-            .toUpperCase() || "N/A",
+          (languagePreference?.secondLanguage || [])
+            .map((lang) => safeUpperCase(lang))
+            .join(", ") || "N/A",
         ],
         [
           "Third Language",
-          (ApplicationData?.languagePreference?.thirdLanguage || [])
-            .join(", ")
-            .toUpperCase() || "N/A",
+          (languagePreference?.thirdLanguage || [])
+            .map((lang) => safeUpperCase(lang))
+            .join(", ") || "N/A",
         ],
         [
           "Value Education",
-          (ApplicationData?.languagePreference?.valueEducation || [])
-            .join(", ")
-            .toUpperCase() || "N/A",
+          (languagePreference?.valueEducation || [])
+            .map((edu) => safeUpperCase(edu))
+            .join(", ") || "N/A",
         ],
-        [
-          "Left Handed",
-          ApplicationData?.languagePreference?.isLeftHanded ? "YES" : "NO",
-        ],
+        ["Left Handed", languagePreference?.isLeftHanded ? "YES" : "NO"],
         [
           "Medical Condition",
-          (
-            ApplicationData?.languagePreference?.medicalCondition || "NONE"
-          ).toUpperCase(),
+          safeUpperCase(languagePreference?.medicalCondition) || "NONE",
         ],
       ],
       ...tableOpts,
     });
 
-    // ─────────────── DOCUMENTS SUBMITTED ────────────────
-    addSection("DOCUMENTS SUBMITTED", "📄");
-    const docRows = (ApplicationData?.documents?.files || []).map((f) => [
-      f.fieldname || "N/A",
+    // Documents
+    startY = doc.lastAutoTable.finalY + 15;
+    doc
+      .setFont("helvetica", "bold")
+      .setFontSize(14)
+      .setTextColor(...PRIMARY_COLOR)
+      .text("DOCUMENTS SUBMITTED", 15, startY);
+
+    const docRows = files.map((f) => [
+      f?.fieldname || "N/A",
+      f?.documentName?.length > 30
+        ? f.documentName.slice(0, 27) + "…"
+        : f?.documentName || "N/A",
       {
-        content:
-          f.documentName.length > 30
-            ? f.documentName.slice(0, 27) + "…"
-            : f.documentName,
-        url: f.url,
-        alt: `Document: ${f.documentName} (${f.type})`,
+        content: "View →",
+        url: f?.url || "#",
+        action: true,
       },
-      (f.type || "N/A").toUpperCase(),
     ]);
 
     autoTable(doc, {
-      startY: nextY() + 5,
-      head: [["Document Type", "File Name (click)", "File Type"]],
+      startY: startY + 10,
+      head: [["Document Type", "File Name", "Action"]],
       body: docRows.length ? docRows : [["No documents uploaded", "", ""]],
       styles: { ...tableOpts.styles, fontSize: 8 },
       columnStyles: {
         0: { cellWidth: 60, fontStyle: "bold" },
         1: { cellWidth: 80 },
-        2: { cellWidth: 30 },
+        2: { cellWidth: 30, halign: "center" },
       },
       ...tableOpts,
       didParseCell: (data) => {
-        if (data.cell.raw?.url) {
-          data.cell.text = data.cell.raw.content;
-          data.cell.styles.textColor = [0, 0, 255];
+        if (data.cell.raw?.action) {
+          data.cell.styles.textColor = [0, 0, 255]; // Blue color
           data.cell.styles.fontStyle = "underline";
-          data.cell.link = data.cell.raw.url;
-          // Add alt text for accessibility
-          data.cell.alt = data.cell.raw.alt;
+          delete data.cell.styles.fillColor;
+        }
+      },
+      didDrawCell: (data) => {
+        if (data.cell.raw?.action) {
+          doc.link(
+            data.cell.x,
+            data.cell.y,
+            data.cell.width,
+            data.cell.height,
+            {
+              url: data.cell.raw.url,
+              target: "_blank",
+            }
+          );
         }
       },
     });
 
-    // ──────────── CONSENT & ACKNOWLEDGEMENT ─────────────
-    // addSection("CONSENT & ACKNOWLEDGEMENT", "✅");
-    // autoTable(doc, {
-    //   startY: nextY() + 5,
-    //   head: [["Consent Type", "Status"]],
-    //   body: [
-    //     [
-    //       "Photo/Video Consent",
-    //       ApplicationData?.consent?.photoConsent === "yes"
-    //         ? { content: "GRANTED", color: [0, 128, 0] }
-    //         : { content: "NOT GRANTED", color: [255, 0, 0] },
-    //     ],
-    //     [
-    //       "Information Accuracy",
-    //       ApplicationData?.consent?.acknowledgements?.includes("infoAccurate")
-    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
-    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-    //     ],
-    //     [
-    //       "Legal Custody",
-    //       ApplicationData?.consent?.acknowledgements?.includes("legalCustody")
-    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
-    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-    //     ],
-    //     [
-    //       "Accept Policies",
-    //       ApplicationData?.consent?.acknowledgements?.includes("acceptPolicies")
-    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
-    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-    //     ],
-    //     [
-    //       "Data Usage",
-    //       ApplicationData?.consent?.acknowledgements?.includes("dataUsage")
-    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
-    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-    //     ],
-    //   ],
-    //   ...tableOpts,
-    //   didParseCell: (data) => {
-    //     if (data.cell.raw?.color) {
-    //       data.cell.styles.textColor = data.cell.raw.color;
-    //       data.cell.text = data.cell.raw.content;
-    //     }
-    //   },
-    // });
-
-    // page numbers
-    const pageCount = doc.internal.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc
-        .setPage(i)
-        .setFontSize(8)
-        .setTextColor(150)
-        .text(
-          `Page ${i} of ${pageCount}`,
-          doc.internal.pageSize.width - 20,
-          doc.internal.pageSize.height - 10
-        );
-    }
+    // Add footer only on last page
+    addFooter(doc);
 
     // ─────────────────────── DOWNLOAD ───────────────────────
     const fileName = `StudentRegistration_${
-      ApplicationData?.candidate?.firstName || "Unknown"
-    }_${ApplicationData?.candidate?.lastName || "Student"}_${moment().format(
+      candidate?.firstName || "Unknown"
+    }_${candidate?.lastName || "Student"}_${moment().format(
       "YYYYMMDD_HHmmss"
     )}.pdf`;
 
