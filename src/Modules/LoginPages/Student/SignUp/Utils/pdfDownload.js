@@ -179,23 +179,23 @@ export const handleDownload = async (ApplicationData) => {
     }
 
     // ────────────── APPLICATION DETAILS BOX ──────────────
-    doc
-      .setFillColor(245, 245, 245)
-      .roundedRect(15, 30, 180, 15, 3, 3, "F")
-      .setFont("helvetica", "bold")
-      .setFontSize(10)
-      .setTextColor(66, 66, 66)
-      .text("APPLICATION DETAILS", 22, 36)
-      .setFont("helvetica", "normal")
-      .setTextColor(80)
-      .text(`School ID: ${ApplicationData?.school?.schoolId ?? "N/A"}`, 120, 36)
-      .text(
-        `Class ID:  ${ApplicationData?.school?.applyingClass ?? "N/A"}`,
-        120,
-        42
-      )
-      .text(`Submission: ${moment().format("DD MMM YYYY")}`, 120, 48);
-    doc.setDrawColor(200).setLineWidth(0.3).line(15, 52, 195, 52);
+    // doc
+    //   .setFillColor(245, 245, 245)
+    //   .roundedRect(15, 30, 180, 15, 3, 3, "F")
+    //   .setFont("helvetica", "bold")
+    //   .setFontSize(10)
+    //   .setTextColor(66, 66, 66)
+    //   .text("APPLICATION DETAILS", 22, 36)
+    //   .setFont("helvetica", "normal")
+    //   .setTextColor(80)
+    //   .text(`School ID: ${ApplicationData?.school?.schoolId ?? "N/A"}`, 120, 36)
+    //   .text(
+    //     `Class ID:  ${ApplicationData?.school?.applyingClass ?? "N/A"}`,
+    //     120,
+    //     42
+    //   )
+    //   .text(`Submission: ${moment().format("DD MMM YYYY")}`, 120, 48);
+    // doc.setDrawColor(200).setLineWidth(0.3).line(15, 52, 195, 52);
 
     // ──────────────────────────────────────────────────────────
     // helpers for tables
@@ -272,7 +272,7 @@ export const handleDownload = async (ApplicationData) => {
     }
 
     autoTable(doc, {
-      startY: 65,
+      startY: 95,
       head: [["Field", "Details"]],
       body: [
         [
@@ -290,7 +290,6 @@ export const handleDownload = async (ApplicationData) => {
             : "N/A",
         ],
         ["Gender", (ApplicationData?.candidate?.gender || "N/A").toUpperCase()],
-        ["Student ID", ApplicationData?.candidate?.studentId || "N/A"],
         [
           "Passport Number",
           ApplicationData?.candidate?.passportNumber || "N/A",
@@ -528,38 +527,17 @@ export const handleDownload = async (ApplicationData) => {
       head: [["Address Type", "Details"]],
       body: [
         [
-          "Residence Type",
-          (
-            ApplicationData?.address?.residentialAddress?.residenceType || "N/A"
-          ).toUpperCase(),
-        ],
-        [
           "Unit/Building",
           `${
-            ApplicationData?.address?.residentialAddress?.unitNumber || "N/A"
-          }, ` +
-            `${
-              ApplicationData?.address?.residentialAddress?.buildingNumber ||
-              "N/A"
-            }`,
+            ApplicationData?.address?.residentialAddress?.buildingNumber ||
+            "N/A"
+          }`,
         ],
         [
           "Street",
           ApplicationData?.address?.residentialAddress?.streetName || "N/A",
         ],
-        // [
-        //   "Zone",
-        //   `${
-        //     ApplicationData?.address?.residentialAddress?.zoneName || "N/A"
-        //   } ` +
-        //     `(${
-        //       ApplicationData?.address?.residentialAddress?.zoneNumber || "N/A"
-        //     })`,
-        // ],
-        // [
-        //   "Compound",
-        //   ApplicationData?.address?.residentialAddress?.compoundName || "N/A",
-        // ],
+
         ["City", ApplicationData?.address?.residentialAddress?.city || "N/A"],
         [
           "Country",
@@ -567,37 +545,24 @@ export const handleDownload = async (ApplicationData) => {
             ApplicationData?.address?.residentialAddress?.country || "N/A"
           ).toUpperCase(),
         ],
-        // [
-        //   "Nearest Landmark",
-        //   ApplicationData?.address?.residentialAddress?.nearestLandmark ||
-        //     "N/A",
-        // ],
+
         [
           "Transport Required",
           ApplicationData?.address?.transportRequirement ? "YES" : "NO",
         ],
         ["", ""], // spacer
         ["PERMANENT ADDRESS", ""],
+
         [
-          "Residence Type",
-          (
-            ApplicationData?.address?.permanentAddress?.residenceType || "N/A"
-          ).toUpperCase(),
-        ],
-        [
-          "Unit/Building",
-          `${ApplicationData?.address?.permanentAddress?.unitNumber}, ` +
-            `${ApplicationData?.address?.permanentAddress?.buildingNumber}`,
+          "Building",
+
+          `${ApplicationData?.address?.permanentAddress?.buildingNumber}`,
         ],
         [
           "Street",
           ApplicationData?.address?.permanentAddress?.streetName || "N/A",
         ],
-        // [
-        //   "Zone",
-        //   `${ApplicationData?.address?.permanentAddress?.zoneName} ` +
-        //     `(${ApplicationData?.address?.permanentAddress?.zoneNumber})`,
-        // ],
+
         [
           "Compound",
           ApplicationData?.address?.permanentAddress?.compoundName || "N/A",
@@ -609,10 +574,6 @@ export const handleDownload = async (ApplicationData) => {
             ApplicationData?.address?.permanentAddress?.country || "N/A"
           ).toUpperCase(),
         ],
-        // [
-        //   "Nearest Landmark",
-        //   ApplicationData?.address?.permanentAddress?.nearestLandmark || "N/A",
-        // ],
       ],
       ...tableOpts,
       didDrawCell: (data) => {
@@ -667,7 +628,10 @@ export const handleDownload = async (ApplicationData) => {
           "Curriculum",
           (ApplicationData?.academic?.curriculum || "N/A").toUpperCase(),
         ],
-        ["Previous School", ApplicationData?.academic?.previousSchoolName || "N/A"],
+        [
+          "Previous School",
+          ApplicationData?.academic?.previousSchoolName || "N/A",
+        ],
         [
           "Source of Fee",
           (ApplicationData?.academic?.sourceOfFee || "N/A").toUpperCase(),
@@ -753,50 +717,50 @@ export const handleDownload = async (ApplicationData) => {
     });
 
     // ──────────── CONSENT & ACKNOWLEDGEMENT ─────────────
-    addSection("CONSENT & ACKNOWLEDGEMENT", "✅");
-    autoTable(doc, {
-      startY: nextY() + 5,
-      head: [["Consent Type", "Status"]],
-      body: [
-        [
-          "Photo/Video Consent",
-          ApplicationData?.consent?.photoConsent === "yes"
-            ? { content: "GRANTED", color: [0, 128, 0] }
-            : { content: "NOT GRANTED", color: [255, 0, 0] },
-        ],
-        [
-          "Information Accuracy",
-          ApplicationData?.consent?.acknowledgements?.includes("infoAccurate")
-            ? { content: "CONFIRMED", color: [0, 128, 0] }
-            : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-        ],
-        [
-          "Legal Custody",
-          ApplicationData?.consent?.acknowledgements?.includes("legalCustody")
-            ? { content: "CONFIRMED", color: [0, 128, 0] }
-            : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-        ],
-        [
-          "Accept Policies",
-          ApplicationData?.consent?.acknowledgements?.includes("acceptPolicies")
-            ? { content: "CONFIRMED", color: [0, 128, 0] }
-            : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-        ],
-        [
-          "Data Usage",
-          ApplicationData?.consent?.acknowledgements?.includes("dataUsage")
-            ? { content: "CONFIRMED", color: [0, 128, 0] }
-            : { content: "NOT CONFIRMED", color: [255, 0, 0] },
-        ],
-      ],
-      ...tableOpts,
-      didParseCell: (data) => {
-        if (data.cell.raw?.color) {
-          data.cell.styles.textColor = data.cell.raw.color;
-          data.cell.text = data.cell.raw.content;
-        }
-      },
-    });
+    // addSection("CONSENT & ACKNOWLEDGEMENT", "✅");
+    // autoTable(doc, {
+    //   startY: nextY() + 5,
+    //   head: [["Consent Type", "Status"]],
+    //   body: [
+    //     [
+    //       "Photo/Video Consent",
+    //       ApplicationData?.consent?.photoConsent === "yes"
+    //         ? { content: "GRANTED", color: [0, 128, 0] }
+    //         : { content: "NOT GRANTED", color: [255, 0, 0] },
+    //     ],
+    //     [
+    //       "Information Accuracy",
+    //       ApplicationData?.consent?.acknowledgements?.includes("infoAccurate")
+    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
+    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
+    //     ],
+    //     [
+    //       "Legal Custody",
+    //       ApplicationData?.consent?.acknowledgements?.includes("legalCustody")
+    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
+    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
+    //     ],
+    //     [
+    //       "Accept Policies",
+    //       ApplicationData?.consent?.acknowledgements?.includes("acceptPolicies")
+    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
+    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
+    //     ],
+    //     [
+    //       "Data Usage",
+    //       ApplicationData?.consent?.acknowledgements?.includes("dataUsage")
+    //         ? { content: "CONFIRMED", color: [0, 128, 0] }
+    //         : { content: "NOT CONFIRMED", color: [255, 0, 0] },
+    //     ],
+    //   ],
+    //   ...tableOpts,
+    //   didParseCell: (data) => {
+    //     if (data.cell.raw?.color) {
+    //       data.cell.styles.textColor = data.cell.raw.color;
+    //       data.cell.text = data.cell.raw.content;
+    //     }
+    //   },
+    // });
 
     // page numbers
     const pageCount = doc.internal.getNumberOfPages();

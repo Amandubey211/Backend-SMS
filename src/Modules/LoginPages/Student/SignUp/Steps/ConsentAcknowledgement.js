@@ -36,6 +36,7 @@ const ConsentAcknowledgement = ({ formData }) => {
     try {
       await handleDownload(ApplicationData);
     } catch (error) {
+      console.log(error);
       message.error("Failed to generate PDF. Please try again.");
     } finally {
       setPdfLoading(false);
