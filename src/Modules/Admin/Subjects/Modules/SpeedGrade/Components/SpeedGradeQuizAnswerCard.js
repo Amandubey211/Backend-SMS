@@ -108,9 +108,9 @@ const SpeedGradeQuizAnswerCard = memo(
             key={opt._id}
             className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${bg}`}
           >
-            <span className="w-6 text-right text-gray-500 font-medium">
+            {/* <span className="w-6 text-right text-gray-500 font-medium">
               {idx + 1}.
-            </span>
+            </span> */}
             {icon}
             <span className={txt}>{opt.text}</span>
             {(correct || active) && (
