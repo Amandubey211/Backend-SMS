@@ -24,7 +24,7 @@ const { selectedSemester } = useSelector(
   }
 
   const getStudentGrades = () => {
-    const params = {};
+    const params = {mode:"online",semesterId:selectedSemester?.id};
     if (sid) {
       params.subjectId = sid;
       dispatch(fetchStudentGrades({

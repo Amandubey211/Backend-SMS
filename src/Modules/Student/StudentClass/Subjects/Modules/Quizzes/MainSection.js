@@ -132,7 +132,7 @@ export default function MainSection() {
         </div>
 
         {/* -------- side bar -------- */}
-        <div className="w-80 bg-white border-l border-gray-200 p-4 overflow-y-auto">
+        <div className="w-[25rem] bg-white border-l border-gray-200 p-4 overflow-y-auto">
           {activeTab === "instructions" && (
             <div className="space-y-6">
               <QuizzDetailCard />

@@ -102,7 +102,7 @@ const QuizResultSummary = () => {
             return (
               <div
                 key={attempt?._id || index}
-                className={`bg-white rounded-xl shadow-sm border ${statusColors.border} transition-all duration-200 hover:shadow-md`}
+                className={`bg-white rounded-xl shadow-sm border ${statusColors.border} transition-all duration-200 hover:shadow-md `}
               >
                 <div
                   className="flex justify-between items-center p-4 cursor-pointer"
@@ -220,7 +220,7 @@ const QuizResultSummary = () => {
                 <FaClock className="text-blue-400 text-3xl" />
               </div>
             </div>
-            <h3 className="text-xl font-semibold text-gray-700 mb-2 text-center">
+            <h3 className="text-lg font-semibold text-gray-700 mb-2 text-center">
               No Attempt History Found
             </h3>
             <p className="text-gray-500 text-center max-w-md">

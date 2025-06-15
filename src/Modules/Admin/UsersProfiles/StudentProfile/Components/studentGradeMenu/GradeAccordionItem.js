@@ -11,7 +11,7 @@ import { useParams } from "react-router-dom";
 import { FiLoader } from "react-icons/fi";
 import { FaBook } from "react-icons/fa";
 import { GoAlertFill } from "react-icons/go";
-import { fetchStudentSubjects } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
+import { fetchStudentSubjectProgress, fetchStudentSubjects } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import SkeletonLoader from "../../../../../../Utils/SkeletonLoader";
 const GradeAccordionItem = ({  getData }) => {
   const [isOpen, setIsOpen] = useState(null);
@@ -40,16 +40,16 @@ const GradeAccordionItem = ({  getData }) => {
   };
 
   const { cid } = useParams();
-  const {grades,studentSubjects,loading} = useSelector((store) => store.admin.all_students);
+  const {grades,studentSubjectProgress,loading} = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
   useEffect(()=>{
-dispatch(fetchStudentSubjects(cid))
+dispatch(fetchStudentSubjectProgress(cid))
   },[dispatch])
 
   return (
     <>
-      {studentSubjects?.map((i, index) => (
-        <div key={i._id} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i._id) }}>
+      {studentSubjectProgress?.map((i, index) => (
+        <div key={i.subjectId} className="border-b p-3" onClick={() => { if (isOpen !== index) getData(i.subjectId) }}>
           <div
             className="cursor-pointer py-3 px-5 flex items-center justify-between"
             onClick={() => toggleOpen(index)}
@@ -59,7 +59,7 @@ dispatch(fetchStudentSubjects(cid))
                 <FaBook className="text-[2rem] text-pink-400" />
               </div>
 
-              <span className="font-bold">{i.name}</span>
+              <span className="font-bold">{i.subjectName}</span>
             </div>
 
             <span>

@@ -56,12 +56,11 @@ const GradeAccordionItem = ({ grade }) => {
             <table className="min-w-full bg-white rounded-lg overflow-hidden">
               <thead className="border-b">
                 <tr className="text-left">
-                  <th className="px-2 py-1">Name</th>
-                  <th className="px-2 py-1">Chapter</th>
-                  <th className="px-2 py-1">Due Date</th>
-                  <th className="px-2 py-1">Submit Date</th>
-                  <th className="px-2 py-1">Status</th>
-                  <th className="px-2 py-1">Score</th>
+                  <th className="px-2 py-1 text-sm">Name</th>
+                  <th className="px-2 py-1 text-sm">Due</th>
+                  <th className="px-2 py-1 text-sm">Submit</th>
+                  <th className="px-2 py-1 text-sm">Status</th>
+                  <th className="px-2 py-1 text-sm">Score</th>
                 </tr>
               </thead>
               <tbody>
