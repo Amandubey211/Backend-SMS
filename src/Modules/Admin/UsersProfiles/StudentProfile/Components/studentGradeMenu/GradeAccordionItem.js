@@ -94,7 +94,7 @@ dispatch(fetchStudentSubjectProgress(cid))
                     {grades?.grades?.length > 0 ? (
                       grades?.grades?.map((i, idx) => (
                         <tr key={idx} className="bg-white">
-                          <td className="px-5 py-2 flex items-center w-[10rem]">
+                          <td className="px-5 py-2 flex items-center w-full">
                             <span>{i?.Name}</span>
                           </td>
                           <td className="px-5 py-2">{i?.mode || "Online"}</td>

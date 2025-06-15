@@ -10,10 +10,10 @@ const formatDate = (iso) =>
 const BookIssueRow = memo(({ item }) => {
   console.log(item);
   
-  const bookName = item?.name || "N/A"
-  const bookAuthor = item?.author || "N/A"
-  const bookImage = item?.bookImage || null
-  const bookCategories = item?.bookCategories || []
+  const bookName = item?.name || item?.bookId?.name || "N/A"
+  const bookAuthor = item?.author || item?.bookId?.author||"N/A"
+  const bookImage = item?.bookImage ||  item?.bookId?.image || null
+  const bookCategories = item?.bookCategories ||  item?.bookId?.categories || []
   const issueDate = item?.issueDate || "N/A"
   const returnDate = item?.returnDate || "N/A"
   const status = item?.status || "N/A"
