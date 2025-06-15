@@ -8,10 +8,12 @@ const formatDate = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YY") : "N/A";
 
 const BookIssueRow = memo(({ item }) => {
-  const bookName = item?.bookId?.name || "N/A"
-  const bookAuthor = item?.bookId?.author || "N/A"
-  const bookImage = item?.bookId?.image || null
-  const bookCategories = item?.bookId?.categories || []
+  console.log(item);
+  
+  const bookName = item?.name || "N/A"
+  const bookAuthor = item?.author || "N/A"
+  const bookImage = item?.bookImage || null
+  const bookCategories = item?.bookCategories || []
   const issueDate = item?.issueDate || "N/A"
   const returnDate = item?.returnDate || "N/A"
   const status = item?.status || "N/A"

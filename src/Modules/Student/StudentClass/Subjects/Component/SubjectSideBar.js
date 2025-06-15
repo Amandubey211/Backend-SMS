@@ -38,7 +38,6 @@ const SubjectSideBar = () => {
     { name: "Grades", path: "grades" },
     { name: "Announcements", path: "announcements" },
     { name: "Syllabus", path: "syllabus" },
-    { name: "Rubric", path: "rubric" },
   ];
 
   // Construct the base path for each menu item
