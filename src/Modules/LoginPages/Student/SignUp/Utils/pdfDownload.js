@@ -104,12 +104,9 @@ export const handleDownload = async (ApplicationData) => {
       );
     }
 
-    // QR code promise
-    const id =
-      ApplicationData?.applicationId ||
-      ApplicationData?.candidate?.studentId ||
-      "UNKNOWN";
-    const qrPromise = QRCode.toDataURL(id, {
+    // // QR code promise
+
+    const qrPromise = QRCode.toDataURL(`https://app.studentdiwan.com/`, {
       errorCorrectionLevel: "L",
       margin: 0,
     }).catch(() => null);
