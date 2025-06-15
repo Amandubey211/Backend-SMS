@@ -19,6 +19,8 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 
 const AllSubject = () => {
   const { cid,studentId } = useParams();
+  console.log(studentId);
+  
   const dispatch = useDispatch();
   useNavHeading("My Child", "Courses & Progress");
   const [subjectsFetched, setSubjectsFetched] = useState(false);

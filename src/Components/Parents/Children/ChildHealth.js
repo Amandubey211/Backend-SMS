@@ -36,7 +36,10 @@ const ChildHealth = ({ student }) => {
         </div>
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-gray-700">Medical Condition</h3>
-          <p className="text-gray-600">{medicalCondition}</p>
+          <div
+    className="text-gray-600"
+    dangerouslySetInnerHTML={{ __html: medicalCondition }}
+  />
         </div>
       </div>
     </div>
