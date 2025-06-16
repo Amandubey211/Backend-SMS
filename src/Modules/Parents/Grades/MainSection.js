@@ -10,8 +10,7 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
   const [modules, setModules] = useState([]);
   const [expandedChapters, setExpandedChapters] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
-  
-   console.log("Selected module", selectedModule);
+
   // Pull courseProgress and error from the store
   const { courseProgress, error } = useSelector(
     (store) => store.admin.all_students
@@ -78,20 +77,15 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
             <ChapterSkeleton />
           ) : selectedModule ? (
             selectedModule.chapters && selectedModule.chapters.length > 0 ? (
-              selectedModule?.chapters?.map((chapter, index) => (
-                <Chapter
-                  key={chapter.chapterId}
-                  id={chapter.chapterId}
-                  title={chapter.name}
-                  chapterNumber={index + 1}
-                  imageUrl={chapter.thumbnail}
-                  assignments={chapter.assignments || []}
-                  quizzes={chapter.quizzes || []}
-                  attachments={chapter.attachments || []}
-                  isExpanded={expandedChapters === chapter.chapterId}
-                  onToggle={() => handleToggle(chapter.chapterId)}
-                />
-              ))
+
+              <Chapter
+                key={selectedModule.chapters[0].chapterId}
+                id={selectedModule.chapters[0].chapterId}
+                assignments={selectedModule.chapters[0].assignments || []}
+                quizzes={selectedModule.chapters[0].quizzes || []}
+                attachments={selectedModule.chapters[0].attachments || []}
+              />
+
             ) : (
               <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
                 <div className="flex flex-col items-center justify-center text-2xl text-center">
@@ -114,10 +108,10 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
       <div className="w-[35%] p-2 border-l border-gray-300 min-h-[100vh]">
         <div className="bg-white p-2 rounded-lg">
           <div className="flex items-center space-x-2 mb-4">
-            <h2 className="text-lg font-semibold">All Modules</h2>
-            <div className="bg-gradient-to-r from-pink-100 to-purple-200 text-pink-600 font-bold rounded-full px-3 py-1 text-sm">
+            <span className="text-lg font-semibold">All Modules</span>
+            <span className="bg-gradient-to-r from-pink-100 to-purple-200 text-pink-600 font-bold rounded-full px-3 py-1 text-sm">
               {modules.length}
-            </div>
+            </span>
           </div>
           <div className="grid grid-cols-1 gap-2">
             {moduleLoading ? (
@@ -132,10 +126,9 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
                     rounded-lg
                     mb-2
                     transition-all duration-200
-                    ${
-                      selectedModule?.moduleId === module.moduleId
-                        ? "border-2 border-red-500"
-                        : "border border-gray-200 hover:shadow-sm"
+                    ${selectedModule?.moduleId === module.moduleId
+                      ? "border-2 border-red-500"
+                      : "border border-gray-200 hover:shadow-sm"
                     }
                   `}
                 >

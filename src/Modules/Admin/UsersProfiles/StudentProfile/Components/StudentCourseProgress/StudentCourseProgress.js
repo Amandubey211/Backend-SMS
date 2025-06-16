@@ -13,6 +13,7 @@ import Spinner from '../../../../../../Components/Common/Spinner'
 import ProtectedSection from '../../../../../../Routes/ProtectedRoutes/ProtectedSection'
 import { PERMISSIONS } from '../../../../../../config/permission'
 import { setSelectedSemester } from "../../../../../../Store/Slices/Common/User/reducers/userSlice";
+import { fetchSemestersByClass } from '../../../../../../Store/Slices/Admin/Class/Semester/semesterThunks';
 const StudentCourseProgress = ({ student }) => {
   const { cid } = useParams()
   const { studentSubjectProgress, loading } = useSelector((store) => store.admin.all_students);
@@ -26,21 +27,25 @@ const StudentCourseProgress = ({ student }) => {
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
-
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(cid)).then(() => {
-      if (studentSubjectProgress?.length > 0) {
+      if (studentSubjectProgress?.length > 0 && selectedSemester?.id) {
         dispatch(
           fetchCourseProgress({ studentId: cid, subjectId: studentSubjectProgress[0]?.subjectId, semesterId: selectedSemester.id })
         )
       }
     });
   }, [selectedSemester]);
+  useEffect(() => {
+    dispatch(fetchSemestersByClass(student?.classId))
+  }, [dispatch, student?.classId])
   const fetchModules = (subjectId) => {
-    dispatch(
-      fetchCourseProgress({ studentId: cid, subjectId: subjectId, semesterId: selectedSemester.id })
-    )
+    if (selectedSemester?.id) {
+      dispatch(
+        fetchCourseProgress({ studentId: cid, subjectId: subjectId, semesterId: selectedSemester.id })
+      )
+    }
   }
   const handleSemesterSelect = (semester) => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));

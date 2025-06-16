@@ -28,7 +28,7 @@ const MainSection = () => {
 
   const selectModule = (module) => {
     setSeletedModuleId(module?.moduleId);
-    setChapters(module?.chapters || []);
+    setChapters(module?.chapters|| []);
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
@@ -39,7 +39,6 @@ const MainSection = () => {
       setExpandedChapters(id);
     }
   };
-
   return (
     <div className="flex min-h-screen my-2">
       <div className="w-[65%] bg-white p-2 border-l">
@@ -48,20 +47,14 @@ const MainSection = () => {
             {/* Add Chapter Button (if needed) */}
           </div>
           {chapters?.length > 0 ? (
-            chapters?.map((chapter, index) => (
               <Chapter
-                key={index}
-                id={chapter.chapterId}
-                title={chapter?.name}
-                chapterNumber={index + 1}
-                imageUrl={chapter?.thumbnail}
-                assignments={chapter.assignments}
-                attachments={chapter.attachments}
-                quizzes={chapter.quizzes}
-                isExpanded={expandedChapters}
-                onToggle={() => handleToggle(chapter.chapterId)}
+                key={0}
+                id={chapters[0].chapterId}
+                assignments={chapters[0].assignments}
+                attachments={chapters[0].attachments}
+                quizzes={chapters[0].quizzes}
               />
-            ))
+           
           ) : (
             <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
               <div className="flex items-center justify-center flex-col text-2xl">
