@@ -37,7 +37,7 @@ const StudentOverView = ({ student }) => {
           requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}
           title={"Grades Chart"}
         >
-          <div className="w-1/2 h-[20rem] flex flex-col items-center mt-4">
+          <div className="w-[full] h-[20rem] flex flex-col items-center mt-4">
             <p className="font-bold text-gray-500">{t("Student Grade")}</p>
             <div className="w-full h-[18rem]">
               <StudentGradePieChart />
@@ -49,7 +49,7 @@ const StudentOverView = ({ student }) => {
           requiredPermission={PERMISSIONS.GET_STUDENT_TASK}
           title={"Task Chart"}
         >
-          <div className="w-1/2 h-[20rem] flex flex-col items-center mt-4">
+          <div className="w-[full] h-[20rem] flex flex-col items-center mt-4">
             <p className="font-bold text-gray-500">{t("Task")}</p>
             <div className="w-full h-[18rem]">
               <TaskChart />

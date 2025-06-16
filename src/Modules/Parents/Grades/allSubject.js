@@ -14,13 +14,12 @@ import { fetchSemestersByClass } from "../../../Store/Slices/Parent/Semesters/pa
 import { setSelectedSemester } from "../../../Store/Slices/Parent/Semesters/parentSemesterSlice.js";
 import Layout from "../../../Components/Common/Layout.js";
 import { FaChevronDown, FaRegSadTear } from "react-icons/fa";
-import {BsFillJournalBookmarkFill} from "react-icons/bs";
+import { BsFillJournalBookmarkFill } from "react-icons/bs";
 import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 
 const AllSubject = () => {
-  const { cid,studentId } = useParams();
-  console.log(studentId);
-  
+  const { cid, studentId } = useParams();
+
   const dispatch = useDispatch();
   useNavHeading("My Child", "Courses & Progress");
   const [subjectsFetched, setSubjectsFetched] = useState(false);
@@ -38,32 +37,30 @@ const AllSubject = () => {
   // Redux store data (parent side for semesters)
   const { semesters, selectedSemester, loadingSemesters, errorSemesters } =
     useSelector((store) => store?.Parent?.semesters);
-    // console.log("semesters iiii: ", selectedSemester);
+  // console.log("semesters iiii: ", selectedSemester);
 
   const semesterId = selectedSemester?._id;
-
-  console.log("selected semesters: ", selectedSemester);
   // Get selected child from Redux
   const selectedChild = useSelector(
     (state) => state.Parent.children.selectedChild
   );
-  console.log("selected child is:->", selectedChild);
+
 
   // 2. Fetch semesters when selected child is available
   useEffect(() => {
     // const classId = selectedChild?.classId || null;
     // console.log("class id is :->", classId);
-    dispatch(fetchSemestersByClass({ classId:cid }));
+    dispatch(fetchSemestersByClass({ classId: cid }));
   }, [dispatch]);
 
   // 1. Fetch the student's subjects
   useEffect(() => {
     dispatch(
-      fetchStudentSubjectProgress({ id: studentId})
+      fetchStudentSubjectProgress(studentId)
     ).unwrap()
-    .finally(() => {
-      setSubjectsFetched(true);
-    });
+      .finally(() => {
+        setSubjectsFetched(true);
+      });
   }, [dispatch, studentId]);
 
   // 3. Auto-fetch modules for the first subject (if available)
@@ -80,7 +77,7 @@ const AllSubject = () => {
           semesterId,
         })
       ).unwrap()
-      .finally(() => setModuleLoading(false));
+        .finally(() => setModuleLoading(false));
     }
   }, [dispatch, studentSubjectProgress, studentId, selectedSemester]);
 
@@ -88,8 +85,7 @@ const AllSubject = () => {
   const handleSubjectClick = (subjectId) => {
     setSelectedSubjectId(subjectId);
     setModuleLoading(true);
-    console.log("aaaaa=>>>",semesterId)
-    dispatch(fetchCourseProgress({ studentId, subjectId,semesterId }))
+    dispatch(fetchCourseProgress({ studentId, subjectId, semesterId }))
       .unwrap()
       .finally(() => setModuleLoading(false));
   };
@@ -169,11 +165,10 @@ const AllSubject = () => {
                     rounded-lg
                     cursor-pointer
                     duration-200
-                    ${
-                      subject.subjectId === selectedSubjectId
-                        ? "border-2 border-red-500"
-                        : "border border-gray-200 hover:shadow-sm"
-                    }
+                    ${subject.subjectId === selectedSubjectId
+                    ? "border-2 border-red-500"
+                    : "border border-gray-200 hover:shadow-sm"
+                  }
                   `}
               >
                 <SubjectCard subject={subject} />
@@ -215,11 +210,10 @@ const AllSubject = () => {
                   <Button
                     key={sem._id}
                     onClick={() => handleSemesterSelect(sem)}
-                    className={`w-full text-left border rounded-md transition-colors duration-200 ${
-                      selectedSemester._id == sem._id
+                    className={`w-full text-left border rounded-md transition-colors duration-200 ${selectedSemester._id == sem._id
                         ? "bg-purple-100 border-purple-400"
                         : "bg-white hover:bg-purple-50"
-                    }`}
+                      }`}
                   >
                     {sem.title}
                   </Button>

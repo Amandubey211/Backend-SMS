@@ -45,206 +45,142 @@ const Chapter = ({
   const handleSectionClick = (section) => {
     setFocusedSection((prev) => (prev === section ? null : section));
   };
-  console.log("assignments", assignments);
-  console.log("quizzes", quizzes);
   return (
     <div className="mb-5">
-      {/* Module Name */}
-      {moduleName && (
-        <div className="p-4 bg-gray-100 border border-gray-300 rounded-md mb-4">
-          <h1 className="text-lg font-bold text-gray-700">{moduleName}</h1>
-        </div>
-      )}
 
-      {/* Chapter Header */}
-      <div
-        className="mb-3 p-3 bg-white rounded-lg border flex items-center justify-between cursor-pointer hover:shadow-lg transition-shadow duration-200 ease-in-out"
-        onClick={toggleChapter}
-      >
-        <div className="flex items-center">
-          <img
-            src={imageUrl}
-            alt={`Chapter ${chapterNumber}`}
-            className="w-14 h-14 mr-4 rounded-lg"
-          />
-          <div className="flex flex-col">
-            <h2 className="font-semibold text-md">{title}</h2>
-            <p className="text-gray-500">Chapter {chapterNumber}</p>
-          </div>
-        </div>
 
-        <div className="flex items-center space-x-3 relative">
-          {/* Show Attachment Icon If Attachments Are Available */}
-          {attachments?.length > 0 && (
-            <button
-              className="p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all text-red-600 relative"
-              onClick={handleAttachmentClick}
-              title="View Attachments"
-            >
-              <FaPaperclip />
-              <span className="absolute -top-1 -right-1 bg-red-100 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {attachments?.length}
+      <div className="mt-2 space-y-3">
+        {/* Attachments */}
+        <div
+          className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+          onClick={() => handleSectionClick("attachments")}
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <FaPaperclip className="text-red-500" />
+              <span className="font-medium text-gray-700">
+                Attachments ({attachments?.length})
               </span>
-            </button>
-          )}
+            </div>
+            <FaChevronDown
+              className={`transition-transform ${focusedSection === "attachments" ? "rotate-180" : ""
+                }`}
+            />
+          </div>
 
-          {/* Dropdown Button */}
-          <button
-            className={`p-2 rounded-full border bg-gray-50 hover:bg-gray-100 hover:shadow-md transition-all ${
-              chapterExpanded ? "rotate-180" : ""
-            }`}
-            aria-label="Toggle Chapter"
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleChapter();
-            }}
-          >
-            {chapterExpanded ? (
-              <FaChevronUp size={16} />
-            ) : (
-              <FaChevronDown size={16} />
-            )}
-          </button>
+          {focusedSection === "attachments" && (
+            <div className="mt-3">
+              {attachments?.length > 0 ? (
+                attachments.map((attachment, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center mb-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
+                  >
+                    <div className="flex items-center space-x-4">
+                      {attachment.type === "application/pdf" && (
+                        <FaFilePdf className="text-red-500" size={20} />
+                      )}
+                      <span className="text-gray-700 font-semibold">
+                        {attachment?.label || attachment?.name}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => openPreview(attachment.url)}
+                      className="text-green-500 p-1 border rounded-full transform hover:scale-110 transition"
+                      aria-label="Preview"
+                    >
+                      <FaEye size={18} />
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 italic text-center mt-2">
+                  No Attachments Available
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Assignments */}
+        <div
+          className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+          onClick={() => handleSectionClick("assignments")}
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <MdAssignment className="text-blue-500" />
+              <span className="font-medium text-gray-700">
+                Assignments ({assignments?.length})
+              </span>
+            </div>
+            <FaChevronDown
+              className={`transition-transform ${focusedSection === "assignments" ? "rotate-180" : ""
+                }`}
+            />
+          </div>
+
+          {focusedSection === "assignments" && (
+            <div className="mt-3">
+              {assignments?.length > 0 ? (
+                assignments.map((assignment, index) => (
+                  <ChapterItem
+                    key={index}
+                    type="assignment"
+                    title={assignment.title}
+                    submitted={assignment.submitted}
+                    dueDate={assignment.dueDate}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 italic text-center mt-2">
+                  No Assignments Available
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Quizzes */}
+        <div
+          className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
+          onClick={() => handleSectionClick("quizzes")}
+        >
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <MdQuiz className="text-green-500" />
+              <span className="font-medium text-gray-700">
+                Quizzes ({quizzes?.length})
+              </span>
+            </div>
+            <FaChevronDown
+              className={`transition-transform ${focusedSection === "quizzes" ? "rotate-180" : ""
+                }`}
+            />
+          </div>
+
+          {focusedSection === "quizzes" && (
+            <div className="mt-3">
+              {quizzes?.length > 0 ? (
+                quizzes.map((quiz, index) => (
+                  <ChapterItem
+                    key={index}
+                    type="quiz"
+                    title={quiz.title}
+                    submitted={quiz.submitted}
+                    dueDate={quiz.dueDate}
+                  />
+                ))
+              ) : (
+                <p className="text-gray-500 italic text-center mt-2">
+                  No Quizzes Available
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Expanded Chapter Content */}
-      {chapterExpanded && (
-        <div className="mt-2 space-y-3">
-          {/* Attachments */}
-          <div
-            className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
-            onClick={() => handleSectionClick("attachments")}
-          >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <FaPaperclip className="text-red-500" />
-                <span className="font-medium text-gray-700">
-                  Attachments ({attachments?.length})
-                </span>
-              </div>
-              <FaChevronDown
-                className={`transition-transform ${
-                  focusedSection === "attachments" ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-
-            {focusedSection === "attachments" && (
-              <div className="mt-3">
-                {attachments?.length > 0 ? (
-                  attachments.map((attachment, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center mb-2 p-3 bg-white border border-gray-300 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 ease-in-out"
-                    >
-                      <div className="flex items-center space-x-4">
-                        {attachment.type === "application/pdf" && (
-                          <FaFilePdf className="text-red-500" size={20} />
-                        )}
-                        <span className="text-gray-700 font-semibold">
-                          {attachment?.label || attachment?.name}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => openPreview(attachment.url)}
-                        className="text-green-500 p-1 border rounded-full transform hover:scale-110 transition"
-                        aria-label="Preview"
-                      >
-                        <FaEye size={18} />
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic text-center mt-2">
-                    No Attachments Available
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Assignments */}
-          <div
-            className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
-            onClick={() => handleSectionClick("assignments")}
-          >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <MdAssignment className="text-blue-500" />
-                <span className="font-medium text-gray-700">
-                  Assignments ({assignments?.length})
-                </span>
-              </div>
-              <FaChevronDown
-                className={`transition-transform ${
-                  focusedSection === "assignments" ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-
-            {focusedSection === "assignments" && (
-              <div className="mt-3">
-                {assignments?.length > 0 ? (
-                  assignments.map((assignment, index) => (
-                    <ChapterItem
-                      key={index}
-                      type="assignment"
-                      title={assignment.title}
-                      submitted={assignment.submitted}
-                      dueDate={assignment.dueDate}
-                    />
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic text-center mt-2">
-                    No Assignments Available
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Quizzes */}
-          <div
-            className="p-3 bg-gray-50 border rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
-            onClick={() => handleSectionClick("quizzes")}
-          >
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                <MdQuiz className="text-green-500" />
-                <span className="font-medium text-gray-700">
-                  Quizzes ({quizzes?.length})
-                </span>
-              </div>
-              <FaChevronDown
-                className={`transition-transform ${
-                  focusedSection === "quizzes" ? "rotate-180" : ""
-                }`}
-              />
-            </div>
-
-            {focusedSection === "quizzes" && (
-              <div className="mt-3">
-                {quizzes?.length > 0 ? (
-                  quizzes.map((quiz, index) => (
-                    <ChapterItem
-                      key={index}
-                      type="quiz"
-                      title={quiz.title}
-                      submitted={quiz.submitted}
-                      dueDate={quiz.dueDate}
-                    />
-                  ))
-                ) : (
-                  <p className="text-gray-500 italic text-center mt-2">
-                    No Quizzes Available
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* PDF Preview Modal */}
       {previewUrl && (

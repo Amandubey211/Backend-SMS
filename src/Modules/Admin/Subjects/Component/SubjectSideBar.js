@@ -7,11 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSelectedSemester } from "../../../../Store/Slices/Common/User/reducers/userSlice";
 import { setCellModal, setCellModalCancel } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.slice";
 import { addScoreCardCellData, getScoreCard } from "../../../../Store/Slices/Admin/scoreCard/scoreCard.thunk";
+import { fetchSemestersByClass } from "../../../../Store/Slices/Admin/Class/Semester/semesterThunks";
 import toast from "react-hot-toast";
 const ScoreCardModal = ({ isModalOpen, dispatch, Modaldata, setCellModal, setCellModalCancel, addScoreCardCellData, scoreCardData }) => {
   const [cellNumber, setCellNumber] = useState("");
   const [error, setError] = useState("");
-    
+
 
   // Validate input on change
   const validateInput = (value) => {
@@ -41,18 +42,18 @@ const ScoreCardModal = ({ isModalOpen, dispatch, Modaldata, setCellModal, setCel
   };
 
   // Handle form submission
-  const handleOk = async() => {
+  const handleOk = async () => {
     if (validateInput(cellNumber)) {
-    let res=    await  dispatch(addScoreCardCellData(Modaldata))
+      let res = await dispatch(addScoreCardCellData(Modaldata))
 
-    let result = res?.payload;
-    if(result?.success){
-      toast.success("Added Successfully")
-    }else{
-      toast.error(result?.message || "Something Is Wrong")
-    }
+      let result = res?.payload;
+      if (result?.success) {
+        toast.success("Added Successfully")
+      } else {
+        toast.error(result?.message || "Something Is Wrong")
+      }
 
-     dispatch(setCellModalCancel());
+      dispatch(setCellModalCancel());
 
     }
 
@@ -104,7 +105,6 @@ const SubjectSideBar = () => {
   const location = useLocation();
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
-
   // Retrieve semesters from the admin slice and selected semester from the common user slice
   const {
     semesters,
@@ -134,7 +134,9 @@ const SubjectSideBar = () => {
     { name: "Syllabus", path: "syllabus" },
     { name: "Rubric", path: "rubric" },
   ];
-
+  useEffect(() => {
+    dispatch(fetchSemestersByClass(cid))
+  }, [dispatch])
   // Construct the base path for each menu item
   const getBasePath = (item) => `/class/${cid}/${formattedSid}/${item.path}`;
 

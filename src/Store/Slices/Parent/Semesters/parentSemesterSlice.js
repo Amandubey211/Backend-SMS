@@ -19,7 +19,6 @@ const parentSemesterSlice = createSlice({
       state.loading = false;
     },
     setSelectedSemester:(state, action)=> {
-      console.log("setSelectedSemester=====>",action.payload);
       state.selectedSemester = action.payload || {};
     },
   },

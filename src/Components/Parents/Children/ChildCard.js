@@ -8,20 +8,18 @@ import { setSelectedChild } from '../../../Store/Slices/Parent/Children/children
 import { MdHealthAndSafety } from "react-icons/md";
 import { BiSpreadsheet } from "react-icons/bi";
 
-export const ChildCard = ({ student, onOpenHealthSidebar,handleOpenReportCardModal }) => {
+export const ChildCard = ({ student, onOpenHealthSidebar, handleOpenReportCardModal }) => {
   const navigate = useNavigate();
-  // console.log("student data:-> ", student)
   // Safeguard values if fields are missing
   const {
     name = "N/A",
     class: className = "N/A",
     admissionNumber = "N/A",
-    section = "N/A",
+    sectionName = "N/A",
     group = "N/A",
     profile = profileIcon,
     classId
   } = student || {};
-  console.log(student)
 
   return (
     <>
@@ -42,7 +40,7 @@ export const ChildCard = ({ student, onOpenHealthSidebar,handleOpenReportCardMod
                 Class: {className} | ID: {admissionNumber}
               </p>
               <p className="text-sm text-gray-600">
-                Section: {section} | Group: {group}
+                Section: {sectionName} | Group: {group}
               </p>
             </div>
           </div>

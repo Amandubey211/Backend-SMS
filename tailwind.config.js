@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ["./src/**/*.{html,js}"],
+  content: ["./src/**/*.{html,js,jsx}"], // Added .jsx for React components
   theme: {
     extend: {
       backgroundImage: {
@@ -17,6 +17,9 @@ module.exports = {
           "20%, 60%": { transform: "translateX(-5px)" },
           "40%, 80%": { transform: "translateX(5px)" },
         },
+      },
+      fontFamily: {
+        roboto: ['Roboto', 'sans-serif'], // Added Roboto font
       },
     },
   },

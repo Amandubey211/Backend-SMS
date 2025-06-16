@@ -7,7 +7,7 @@ const StudentGradePieChart = () => {
   const { studentSubjectProgress } = useSelector((store) => store.admin.all_students);
 
   // Debugging: Log the data to inspect its structure
-  console.log("studentSubjectProgress:", studentSubjectProgress);
+  // console.log("studentSubjectProgress:", studentSubjectProgress);
 
   // Validate and extract subject names and percentage values
   const labels = Array.isArray(studentSubjectProgress)
