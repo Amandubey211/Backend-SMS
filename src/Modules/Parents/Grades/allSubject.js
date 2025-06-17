@@ -19,11 +19,11 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading .js";
 
 const AllSubject = () => {
   const { cid, studentId } = useParams();
-  const [subjectColor, setSubjectColor] = useState("#808080"); // Default to gray
   const dispatch = useDispatch();
   useNavHeading("My Child", "Courses & Progress");
   const [subjectsFetched, setSubjectsFetched] = useState(false);
   const [moduleLoading, setModuleLoading] = useState(false);
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null); // Initially null
 
   // Semester modal state
   const [semesterModalVisible, setSemesterModalVisible] = useState(false);
@@ -32,7 +32,6 @@ const AllSubject = () => {
   const { studentSubjectProgress, error } = useSelector(
     (store) => store?.admin?.all_students
   );
-  const [selectedSubjectId, setSelectedSubjectId] = useState(studentSubjectProgress[0]?.subjectId);
 
   // Redux store data (parent side for semesters)
   const { semesters, selectedSemester, loadingSemesters, errorSemesters } =
@@ -47,55 +46,48 @@ const AllSubject = () => {
 
   // Fetch semesters when selected child is available
   useEffect(() => {
-    dispatch(fetchSemestersByClass({ classId: cid }));
+    dispatch(fetchSemestersByClass({ classId: cid })).then((response) => {
+      const fetchedSemesters = response.payload;
+      dispatch(setSelectedSemester({ _id: fetchedSemesters[0]._id, title: fetchedSemesters[0].title }));
+    });
   }, [dispatch, cid]);
 
-  // Fetch the student's subjects
+  // Fetch the student's subjects and set the default selected subject
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(studentId))
       .unwrap()
+      .then((response) => {
+        // After subjects are fetched, set the first subject as default if not already set
+        if (response && response.length > 0 && !selectedSubjectId) {
+          setSelectedSubjectId(response[0].subjectId);
+        }
+      })
       .finally(() => {
         setSubjectsFetched(true);
       });
-  }, [dispatch, studentId]);
+  }, [dispatch, studentId, selectedSubjectId]);
 
-  // Auto-fetch modules for the first subject (if available) and set default color
+  // Fetch course progress when selectedSubjectId or semester changes
   useEffect(() => {
-    if (studentSubjectProgress && studentSubjectProgress.length > 0) {
+    if (selectedSubjectId && semesterId && studentSubjectProgress?.length > 0) {
       setModuleLoading(true);
-      const fetchCourse = async () => {
-        const response = await dispatch(
-          fetchCourseProgress({
-            studentId,
-            subjectId: selectedSubjectId,
-            semesterId,
-          })
-        )
-          .unwrap()
-          .finally(() => setModuleLoading(false));
-        setSubjectColor(response.subjectColor || "#808080"); // Fallback to gray if no color
-      };
-      fetchCourse();
-    }
-  }, [dispatch, studentSubjectProgress, studentId, selectedSemester]);
 
-  // Handler when user selects a subject
-  const handleSubjectClick = (subjectId) => {
-    setSelectedSubjectId(subjectId);
-    setModuleLoading(true);
-    const fetchCourse = async () => {
-      const response = await dispatch(
+      dispatch(
         fetchCourseProgress({
           studentId,
-          subjectId: subjectId,
+          subjectId: selectedSubjectId,
           semesterId,
         })
       )
         .unwrap()
         .finally(() => setModuleLoading(false));
-      setSubjectColor(response.subjectColor || "#808080"); // Fallback to gray if no color
-    };
-    fetchCourse();
+
+    }
+  }, [dispatch, selectedSubjectId, semesterId]);
+
+  // Handler when user selects a subject
+  const handleSubjectClick = (subjectId) => {
+    setSelectedSubjectId(subjectId);
   };
 
   // Handler for selecting a semester from the modal
@@ -171,21 +163,16 @@ const AllSubject = () => {
                   rounded-lg
                   cursor-pointer
                   duration-200
-                  ${subject.subjectId === selectedSubjectId ||
-                    (index === 0 && selectedSubjectId === studentSubjectProgress[0].subjectId)
-                    ? "border-2"
-                    : "border border-gray-200 hover:shadow-sm"
+                  ${subject.subjectId === selectedSubjectId
+                    ? "border-l-[8px] shadow-md"
+                    : "border-l-[3px] border-gray-200 hover:shadow-sm"
                   }
                 `}
                 style={{
-                  borderColor:
-                    subject.subjectId === selectedSubjectId ||
-                      (index === 0 && selectedSubjectId === studentSubjectProgress[0].subjectId)
-                      ? subjectColor
-                      : undefined,
+                  borderColor: studentSubjectProgress[index]?.subjectColor
                 }}
               >
-                <SubjectCard subject={subject} />
+                <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} />
               </div>
             ))}
           </div>
@@ -224,7 +211,7 @@ const AllSubject = () => {
                   <Button
                     key={sem._id}
                     onClick={() => handleSemesterSelect(sem)}
-                    className={`w-full text-left border rounded-md transition-colors duration-200 ${selectedSemester._id === sem._id
+                    className={`w-full text-left border rounded-md transition-colors duration-200 ${selectedSemester?._id === sem._id
                       ? "bg-purple-100 border-purple-400"
                       : "bg-white hover:bg-purple-50"
                       }`}

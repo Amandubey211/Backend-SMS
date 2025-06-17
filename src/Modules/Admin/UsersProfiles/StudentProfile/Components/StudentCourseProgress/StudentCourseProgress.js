@@ -25,8 +25,7 @@ const StudentCourseProgress = ({ student }) => {
     loading: semesterLoading,
     error: semesterError,
   } = useSelector((state) => state.admin.semesters);
-  const [selectedSubject, setSelectedSubject] = useState(studentSubjectProgress[0]?.subjectId);
-  const [subjectColor, setSubjectColor] = useState("#808080"); // Default to gray
+  const [selectedSubject, setSelectedSubject] = useState(studentSubjectProgress[0]?.subjectId); // Initially null
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
@@ -34,24 +33,27 @@ const StudentCourseProgress = ({ student }) => {
 
   // Fetch subjects and initial course progress
   useEffect(() => {
-    dispatch(fetchStudentSubjectProgress(cid)).then(() => {
-      if (studentSubjectProgress?.length > 0 && selectedSemester?.id) {
+    dispatch(fetchStudentSubjectProgress(cid)).then((response) => {
+      if (response.payload?.length > 0 && selectedSemester?.id) {
         dispatch(
           fetchCourseProgress({
             studentId: cid,
             subjectId: selectedSubject,
             semesterId: selectedSemester.id,
           })
-        ).unwrap().then((response) => {
-          setSubjectColor(response.subjectColor || "#808080"); // Set the subject color from response
-        });
+        )
       }
     });
-  }, [dispatch, selectedSemester]);
+  }, [dispatch, cid, selectedSemester]);
 
-  // Fetch semesters
+  // Fetch semesters and set default to "Semester 1"
   useEffect(() => {
-    dispatch(fetchSemestersByClass(student?.classId));
+    if (student?.classId) {
+      dispatch(fetchSemestersByClass(student?.classId)).then((response) => {
+        const fetchedSemesters = response.payload;
+        dispatch(setSelectedSemester({ id: fetchedSemesters[0]._id, name: fetchedSemesters[0].title }));
+      });
+    }
   }, [dispatch, student?.classId]);
 
   // Fetch modules for the selected subject and update subject color
@@ -64,9 +66,7 @@ const StudentCourseProgress = ({ student }) => {
           subjectId: subjectId,
           semesterId: selectedSemester.id,
         })
-      ).unwrap().then((response) => {
-        setSubjectColor(response.subjectColor || "#808080"); // Update subject color from response
-      });
+      )
     }
   };
 
@@ -118,18 +118,15 @@ const StudentCourseProgress = ({ student }) => {
                         onClick={() => fetchModules(subject.subjectId)}
                       >
                         <div
-                          className={`rounded-lg border-2 transition-all duration-200 ${subject.subjectId === selectedSubject
-                            ? "shadow-md"
-                            : "border-gray-200 hover:shadow-sm"
+                          className={`rounded-lg  transition-all duration-200 ${subject.subjectId === selectedSubject
+                            ? "border-l-[8px] shadow-md"
+                            : "border-l-[3px] border-gray-200 hover:shadow-sm"
                             }`}
                           style={{
-                            borderColor:
-                              subject.subjectId === selectedSubject
-                                ? subjectColor
-                                : undefined,
+                            borderColor: studentSubjectProgress[index]?.subjectColor
                           }}
                         >
-                          <SubjectCard subject={subject} i={index} />
+                          <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} />
                         </div>
                       </div>
                     ))
