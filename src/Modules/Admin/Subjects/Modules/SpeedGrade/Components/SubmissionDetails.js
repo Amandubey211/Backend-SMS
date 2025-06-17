@@ -1,10 +1,4 @@
-/* src/Modules/Admin/Subjects/Modules/SpeedGrade/Components/SubmissionDetails.jsx */
-import React, {
-  useState,
-  useEffect,
-  useMemo, // ← added
-  useCallback,
-} from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { AiOutlineFileText } from "react-icons/ai";
 import { CiTextAlignJustify } from "react-icons/ci";
 import { FaFileAlt, FaFilePdf } from "react-icons/fa";
@@ -18,47 +12,22 @@ import { assignQuizGrade } from "../../../../../../Store/Slices/Admin/Class/Spee
 import { useTranslation } from "react-i18next";
 import { MdOutlineAssignmentLate } from "react-icons/md";
 
-/* ────────────────────────────────────────────────────────── */
-/*                      SubmissionDetails                     */
-/* ────────────────────────────────────────────────────────── */
 const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
   const { t } = useTranslation("admModule");
   const dispatch = useDispatch();
   const { type, sgid } = useParams();
 
-  /* redux loading flag */
   const loading = useSelector((s) =>
     type === "Assignment"
       ? s.admin.speedgrades.gradeAssignmentLoading
       : s.admin.speedgrades.gradeQuizLoading
   );
 
-  /* base meta */
   const base = details?.assignmentId || details?.quizId || {};
   const { dueDate, points, totalPoints } = base;
   const { content = "", media = [] } = details ?? {};
 
-  /* auto-graded + text-graded (Quiz) */
-  const { autoScore, maxTextPts } = useMemo(() => {
-    if (type !== "Quiz" || !details?.quizId)
-      return { autoScore: 0, maxTextPts: 0 };
-
-    let auto = 0,
-      txtMax = 0;
-    (details.quizId.questions || []).forEach((q) => {
-      if (q.type === "text") txtMax += q.questionPoint;
-      else {
-        const ans = details.answers?.find((a) => a.questionId === q._id);
-        if (ans?.isCorrect) auto += q.questionPoint;
-      }
-    });
-    return { autoScore: auto, maxTextPts: txtMax };
-  }, [details, type]);
-
-  /* local state */
-  const [textScore, setTextScore] = useState(
-    Math.max(0, initialGrade - autoScore)
-  );
+  const [grade, setGrade] = useState(initialGrade);
   const [attemptDate, setAttemptDate] = useState(
     details?.submittedAt
       ? new Date(details.submittedAt).toISOString().split("T")[0]
@@ -66,21 +35,21 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
   );
   const [status, setStatus] = useState(details?.status || t("Missing"));
 
-  /* sync when prop changes */
-  useEffect(
-    () => setTextScore(Math.max(0, initialGrade - autoScore)),
-    [initialGrade, autoScore]
-  );
+  useEffect(() => {
+    setGrade(initialGrade);
+  }, [initialGrade]);
 
-  /* totals */
-  const totalScore = autoScore + (Number(textScore) || 0);
+  const totalScore = Math.min(Number(grade) || 0);
+  const maxPoints = type === "Quiz" ? totalPoints : points;
 
-  /* handlers */
-  const onTextChange = (e) => {
-    const v = e.target.value;
-    if (v === "") return setTextScore("");
-    const n = Math.min(Math.max(+v, 0), maxTextPts);
-    setTextScore(n);
+  const onGradeChange = (e) => {
+    const value = e.target.value;
+    if (value === "") {
+      setGrade("");
+      return;
+    }
+    const num = Math.min(Math.max(+value, 0), maxPoints);
+    setGrade(num);
   };
 
   const submitGrade = useCallback(async () => {
@@ -101,13 +70,11 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
       await (type === "Quiz"
         ? dispatch(assignQuizGrade(body)).unwrap()
         : dispatch(assignAssignmentGrade(body)).unwrap());
-      toast.success(t("Grade submitted successfully"));
     } catch {
       toast.error(t("Failed to submit grade"));
     }
   }, [student, attemptDate, status, totalScore, type, sgid, dispatch, t]);
 
-  /* misc derived */
   const wordCount = content ? content.split(/\s+/).length : 0;
   const daysDiff = (() => {
     const d = dueDate ? new Date(dueDate) : new Date();
@@ -120,7 +87,6 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
   const daysLabelClass =
     daysDiff >= 0 ? "text-green-600 bg-green-100" : "text-red-600 bg-red-100";
 
-  /* file + word-count renderers (unchanged) */
   const renderWordCount = () =>
     wordCount ? (
       <div className="flex items-center gap-2">
@@ -185,7 +151,6 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
     );
   };
 
-  /* placeholder when no student */
   if (!student)
     return (
       <div className="flex-grow flex flex-col items-center justify-center text-gray-400 h-full">
@@ -196,10 +161,8 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
       </div>
     );
 
-  /* render */
   return (
     <div className="flex flex-col h-full">
-      {/* header strip */}
       <div className="flex justify-between items-center p-2">
         <h3 className="text-lg font-semibold">{t("Submission")}</h3>
         <span className={`text-sm px-2 py-0.5 rounded-full ${daysLabelClass}`}>
@@ -207,35 +170,33 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
         </span>
       </div>
 
-      {/* quiz summary */}
-      {type === "Quiz" && (
-        <div className="mx-3 mb-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
-          <h4 className="font-medium text-blue-800 mb-2">
-            {t("Quiz Summary")}
-          </h4>
-          <div className="grid grid-cols-3 gap-3 text-center text-sm">
-            <div>
-              <p className="text-gray-600">{t("Auto Score")}</p>
-              <p className="font-bold">{autoScore}</p>
-            </div>
-            <div>
-              <p className="text-gray-600">{t("Text Score")}</p>
-              <p className="font-bold">{textScore || 0}</p>
-            </div>
-            <div className="col-span-3 border-t pt-2">
-              <p className="text-gray-600">{t("Total Score")}</p>
-              <p className="font-bold">
-                {totalScore} / {totalPoints} (
-                {Math.round((totalScore / totalPoints) * 100)}%)
-              </p>
-            </div>
+      <div className="mx-3 mb-3 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+        <h4 className="font-medium text-blue-800 mb-2">
+          {type === "Quiz" ? t("Quiz Summary") : t("Assignment Summary")}
+        </h4>
+        <div className="grid grid-cols-3 gap-3 text-center text-sm">
+          <div className="col-span-3 border-b pb-2">
+            <p className="text-gray-600">{t("Total Points")}</p>
+            <p className="font-bold">{maxPoints}</p>
+          </div>
+          <div className="col-span-3 pt-2">
+            <p className="text-gray-600">{t("Grade")}</p>
+            <input
+              type="number"
+              value={grade}
+              onChange={onGradeChange}
+              min={0}
+              max={maxPoints}
+              className="w-full text-center font-bold border rounded px-3 py-1"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              {Math.round((totalScore / maxPoints) * 100)}%
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* main content */}
       <div className="flex-grow overflow-y-auto space-y-4 px-3">
-        {/* due date & attempt */}
         <div className="flex items-center gap-2 text-sm">
           <IoCalendarOutline className="text-green-500" />
           <span>
@@ -256,27 +217,6 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
           />
         </div>
 
-        {/* text score input */}
-        {type === "Quiz" && (
-          <div>
-            <label className="block text-sm font-medium">
-              {t("Text Score")}{" "}
-              <span className="text-xs italic text-pink-500">
-                ({t("Out of")} {maxTextPts})
-              </span>
-            </label>
-            <input
-              type="number"
-              value={textScore}
-              onChange={onTextChange}
-              min={0}
-              max={maxTextPts}
-              className="mt-1 w-full border rounded px-3 py-2 shadow-sm"
-            />
-          </div>
-        )}
-
-        {/* status radios (unchanged) */}
         <div>
           <label className="block text-sm font-medium">{t("Status")}</label>
           <div className="flex gap-4 mt-1">
@@ -311,13 +251,11 @@ const SubmissionDetails = ({ details = {}, student, initialGrade = 0 }) => {
           </div>
         </div>
 
-        {/* word count + files */}
         {renderWordCount()}
         {renderFiles()}
       </div>
 
-      {/* footer button */}
-      {type === "Quiz" && details?.quizId?.quizType !== "Practice" && (
+      {(type === "Quiz" || type === "Assignment") && (
         <div className="p-4 border-t">
           <button
             onClick={submitGrade}

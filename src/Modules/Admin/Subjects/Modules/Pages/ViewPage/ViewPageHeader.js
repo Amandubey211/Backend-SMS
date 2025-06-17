@@ -37,7 +37,6 @@ const ViewPageHeader = ({ title, LastEdit, page, refetchPage }) => {
   const handleConfirmDelete = async () => {
     await dispatch(deletePage({ pid: page._id }));
     if (!deleteError) {
-      toast.success("Page deleted successfully!");
       navigate(`/class/${cid}/${sid}/page`);
     } else {
       toast.error("Failed to delete the page.");
