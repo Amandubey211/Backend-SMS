@@ -9,7 +9,6 @@ import { Badge } from "antd";
 import { useTranslation } from "react-i18next";
 import clsx from "clsx";
 
-/* inject ribbon CSS once */
 const RIBBON_CSS_ID = "sgq-bottom-right-ribbon-css";
 if (!document.getElementById(RIBBON_CSS_ID)) {
   const style = document.createElement("style");
@@ -33,7 +32,7 @@ const SpeedGradeQuizAnswerCard = memo(
   ({ question, questionIndex, selectedOption, onUpdateTextQuestionGrade }) => {
     const { t } = useTranslation("admModule");
 
-    const [grade, setGrade] = useState("");
+    const [grade, setGrade] = useState(0);
     const [editing, setEdit] = useState(true);
 
     const {
@@ -44,12 +43,10 @@ const SpeedGradeQuizAnswerCard = memo(
       questionPoint,
     } = question;
 
-    /* flags */
     const isText = type === "text";
     const answered = !!selectedOption;
     const isCorrect = !isText && selectedOption === correctAnswer;
 
-    /* bg tint */
     const cardBg = isText
       ? "bg-white"
       : answered
@@ -58,27 +55,22 @@ const SpeedGradeQuizAnswerCard = memo(
         : "bg-red-50"
       : "bg-white";
 
-    /* text-question grading helpers */
-    const gradeMax = +questionPoint || 0;
-    const clamp = (num) => Math.max(0, Math.min(num, gradeMax));
-
     const handleGradeChange = (e) => {
       const val = e.target.value;
       if (val === "") {
-        setGrade("");
+        setGrade(0);
         return;
       }
-      const num = clamp(+val);
-      setGrade(num.toString());
+      const num = Math.min(Math.max(+val, 0), questionPoint);
+      setGrade(num);
     };
 
     const handleSave = () => {
-      const safe = clamp(+grade || 0);
-      onUpdateTextQuestionGrade(safe);
+      const safeGrade = Math.min(Math.max(+grade, 0), questionPoint);
+      onUpdateTextQuestionGrade(safeGrade);
       setEdit(false);
     };
 
-    /* render option (MCQ / TF) */
     const renderOption = useCallback(
       (opt, idx) => {
         const active = opt.text === selectedOption;
@@ -108,9 +100,6 @@ const SpeedGradeQuizAnswerCard = memo(
             key={opt._id}
             className={`flex items-center gap-2 p-2 rounded-md cursor-pointer ${bg}`}
           >
-            {/* <span className="w-6 text-right text-gray-500 font-medium">
-              {idx + 1}.
-            </span> */}
             {icon}
             <span className={txt}>{opt.text}</span>
             {(correct || active) && (
@@ -129,7 +118,6 @@ const SpeedGradeQuizAnswerCard = memo(
       [selectedOption, correctAnswer, t]
     );
 
-    /* core card */
     const coreCard = (
       <article className={clsx("relative border rounded-lg shadow-sm", cardBg)}>
         <header className="bg-gray-100 text-sm text-gray-600 font-semibold px-3 py-1 rounded-t-md flex gap-4 items-center">
@@ -148,7 +136,6 @@ const SpeedGradeQuizAnswerCard = memo(
             dangerouslySetInnerHTML={{ __html: questionText }}
           />
 
-          {/* answers */}
           {isText ? (
             <>
               <textarea
@@ -162,9 +149,9 @@ const SpeedGradeQuizAnswerCard = memo(
                   type="number"
                   value={grade}
                   onChange={handleGradeChange}
-                  max={gradeMax}
+                  max={questionPoint}
                   min={0}
-                  placeholder={`0 / ${gradeMax}`}
+                  placeholder={`0 / ${questionPoint}`}
                   disabled={!editing}
                   className="w-20 text-right p-1 border rounded bg-green-50"
                 />
@@ -188,7 +175,6 @@ const SpeedGradeQuizAnswerCard = memo(
       </article>
     );
 
-    /* wrap with Ribbon when needed */
     return !isText && answered ? (
       <Badge.Ribbon
         className="bottom-right-ribbon"

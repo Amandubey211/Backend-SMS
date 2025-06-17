@@ -16,7 +16,6 @@ import {
   MdTextFields,
 } from "react-icons/md";
 
-/* meta per question-type */
 const TYPES = {
   mcq: { labelKey: "MCQ", icon: MdQuiz },
   trueFalse: { labelKey: "True / False", icon: MdOutlineRule },
@@ -26,17 +25,15 @@ const TYPES = {
 const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
   const { t } = useTranslation("admModule");
 
-  /* ── state / refs ─────────────────────────────────────────── */
-  const [totalTextGrade, setTotalTextGrade] = useState(0);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [headerH, setHeaderH] = useState(0);
   const [navH, setNavH] = useState(0);
+  const [totalGrade, setTotalGrade] = useState(0);
 
   const headerRef = useRef(null);
   const navRef = useRef(null);
   const questionRefs = useRef([]);
 
-  /* read heights once DOM is ready / window resizes */
   useEffect(() => {
     const measure = () => {
       setHeaderH(headerRef.current?.offsetHeight ?? 0);
@@ -50,7 +47,6 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
   const container = details?.assignmentId ?? details?.quizId ?? {};
   const questions = container?.questions ?? [];
 
-  /* ── classify questions ───────────────────────────────────── */
   const indicesByType = useMemo(() => {
     const idx = { mcq: [], trueFalse: [], text: [] };
     questions.forEach((q, i) => {
@@ -68,27 +64,28 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
     return idx;
   }, [questions]);
 
-  /* ── derive non-text grade once ───────────────────────────── */
   useEffect(() => {
-    if (!student || !details) return;
-    const init =
-      questions.reduce((sum, q) => {
-        const ans = details.answers?.find((a) => a.questionId === q._id);
-        return ans?.isCorrect ? sum + q.questionPoint : sum;
-      }, 0) ?? 0;
-    setTotalTextGrade(init);
-    onTotalGradeUpdate(init);
+    if (!student || !details) {
+      setTotalGrade(0);
+      return;
+    }
+
+    const initialGrade = questions.reduce((sum, q) => {
+      const ans = details.answers?.find((a) => a.questionId === q._id);
+      if (ans?.isCorrect) return sum + q.questionPoint;
+      return sum;
+    }, 0);
+
+    setTotalGrade(initialGrade);
+    onTotalGradeUpdate(initialGrade);
   }, [student, details, questions, onTotalGradeUpdate]);
 
-  /* ── smart scroll helper (compensates sticky bars) ────────── */
   const scrollTo = useCallback(
     (idx) => {
       const el = questionRefs.current[idx];
       if (!el) return;
-      /* First bring it to viewport top */
       el.scrollIntoView({ behavior: "smooth", block: "start" });
-      /* Then nudge upward by combined sticky height */
-      const offset = headerH + navH + 8; // +8px buffer
+      const offset = headerH + navH + 8;
       window.scrollBy({ top: -offset, behavior: "smooth" });
       setCurrentIdx(idx);
     },
@@ -102,16 +99,25 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
     scrollTo(next);
   };
 
-  /* ── early exit ───────────────────────────────────────────── */
+  const handleQuestionGradeUpdate = (questionIndex, grade) => {
+    const newGrade = [...questions].reduce((sum, q, idx) => {
+      if (idx === questionIndex) return sum + grade;
+      const ans = details.answers?.find((a) => a.questionId === q._id);
+      if (ans?.isCorrect) return sum + q.questionPoint;
+      return sum;
+    }, 0);
+
+    setTotalGrade(newGrade);
+    onTotalGradeUpdate(newGrade);
+  };
+
   if (!student || !details) return null;
 
   const { content, grade, score } = details;
   const { name, points, dueDate, totalPoints } = container;
 
-  /* ── render ───────────────────────────────────────────────── */
   return (
     <div className="bg-white border-x border-gray-200 p-0 h-full overflow-y-auto">
-      {/* ==== Sticky Header ================================================= */}
       <div
         ref={headerRef}
         className="sticky top-0 z-30 bg-white/80 backdrop-blur p-4 border-b shadow-sm
@@ -149,16 +155,13 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
         </div>
       </div>
 
-      {/* ==== Sticky Navigator ============================================ */}
       {type === "Quiz" && (
         <div
           ref={navRef}
-          /* Inline style so it always sits immediately below header */
           style={{ top: `${headerH}px` }}
           className="sticky z-20 bg-white/70 backdrop-blur-md border-b
                      px-4 py-2 flex items-center gap-3 shadow-sm"
         >
-          {/* arrows */}
           <button
             className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 disabled:opacity-40"
             disabled={currentIdx === 0}
@@ -180,7 +183,6 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
 
           <span className="h-6 w-px bg-gray-300" />
 
-          {/* type chips */}
           {Object.entries(TYPES).map(([key, meta]) => {
             const Icon = meta.icon;
             const count = indicesByType[key].length;
@@ -203,7 +205,6 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
         </div>
       )}
 
-      {/* ==== Body ========================================================= */}
       <div className="p-4 space-y-4">
         {type === "Assignment" ? (
           <div
@@ -217,18 +218,15 @@ const AssignmentDetails = ({ student, details, type, onTotalGradeUpdate }) => {
               <div
                 key={q._id}
                 ref={(el) => (questionRefs.current[idx] = el)}
-                /* ensure manual scrolling still lands below sticky bar */
                 style={{ scrollMarginTop: headerH + navH + 16 }}
               >
                 <SpeedGradeQuizAnswerCard
                   question={q}
                   questionIndex={idx}
                   selectedOption={ans ? ans.selectedOption : ""}
-                  onUpdateTextQuestionGrade={(diff) => {
-                    const newTotal = totalTextGrade + diff;
-                    setTotalTextGrade(newTotal);
-                    onTotalGradeUpdate(newTotal);
-                  }}
+                  onUpdateTextQuestionGrade={(grade) =>
+                    handleQuestionGradeUpdate(idx, grade)
+                  }
                 />
               </div>
             );
