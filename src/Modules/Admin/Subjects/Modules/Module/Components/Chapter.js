@@ -46,7 +46,7 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
   const [previewType, setPreviewType] = useState(null);
   const [attachmentToDelete, setAttachmentToDelete] = useState(null);
   const [attachmentLoading, setAttachmentLoading] = useState({});
-  const [activeSection, setActiveSection] = useState("all");
+  const [activeSection, setActiveSection] = useState("attachments"); // Default to attachments only
   const [searchQuery, setSearchQuery] = useState("");
   const [isItemsLoading, setIsItemsLoading] = useState(false);
   const [errorLoading, setErrorLoading] = useState(null);
@@ -55,9 +55,9 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
     _id: chapterId,
     name: title,
     thumbnail: imageUrl,
-    assignments,
+    // assignments,
     attachments,
-    quizzes,
+    // quizzes,
   } = chapter;
   const dispatch = useDispatch();
   const { cid, sid } = useParams();
@@ -140,22 +140,32 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
 
   const toggleChapter = () => setChapterExpanded((prev) => !prev);
 
-  const getFileIcon = (type) => {
-    switch (type) {
+  const getFileIcon = (attachment) => {
+    if (attachment.type.startsWith("image/")) {
+      return (
+        <div className="w-10 h-10 mr-2 flex-shrink-0">
+          <img
+            src={attachment.url}
+            alt={attachment.name}
+            className="w-full h-full object-cover rounded"
+          />
+        </div>
+      );
+    }
+
+    switch (attachment.type) {
       case "application/pdf":
-        return <FaFilePdf className="text-red-500" size={24} />;
+        return <FaFilePdf className="text-red-500 mr-2" size={24} />;
       case "application/msword":
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        return <FaFileWord className="text-blue-500" size={24} />;
+        return <FaFileWord className="text-blue-500 mr-2" size={24} />;
       case "application/vnd.ms-powerpoint":
       case "application/vnd.openxmlformats-officedocument.presentationml.presentation":
-        return <FaFilePowerpoint className="text-orange-500" size={24} />;
+        return <FaFilePowerpoint className="text-orange-500 mr-2" size={24} />;
       default:
-        return null;
+        return <FaRegFileAlt className="text-gray-500 mr-2" size={24} />;
     }
   };
-
-  // Open preview modal by setting URL and type.
   const openPreviewModal = (url, type) => {
     setPreviewUrl(url);
     setPreviewType(type);
@@ -175,6 +185,8 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
       )
     : [];
 
+  // Commented out for future use
+  /*
   const filteredAssignments = assignments
     ? assignments.filter((item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -185,14 +197,16 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
         item.name.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : [];
-  const totalCount =
-    filteredAttachments.length +
-    filteredAssignments.length +
-    filteredQuizzes.length;
+  */
 
-  // Always show the header if items exist or if a search query is present.
+  const totalCount = filteredAttachments.length;
+  // Commented out for future use
+  // filteredAttachments.length +
+  // filteredAssignments.length +
+  // filteredQuizzes.length;
+
   const renderHeader = () => (
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center ">
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center">
       <div className="w-full sm:w-1/3 mb-2 sm:mb-0">
         <Input.Search
           placeholder="Search..."
@@ -207,30 +221,22 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
         aria-label="Filter options"
       >
         <Tag
-          onClick={() => setActiveSection("all")}
-          className={`cursor-pointer rounded-full border px-2 py-1 ${
-            activeSection === "all"
-              ? "bg-pink-100 text-pink-800"
-              : "bg-transparent text-gray-500"
-          }`}
-        >
-          All ({totalCount})
-        </Tag>
-        <Tag
           onClick={() => setActiveSection("attachments")}
           className={`cursor-pointer rounded-full border px-2 py-1 ${
             activeSection === "attachments"
-              ? "bg-pink-100 text-pink-800"
+              ? "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white"
               : "bg-transparent text-gray-500"
           }`}
         >
           Attachments ({filteredAttachments.length})
         </Tag>
+        {/* Commented out for future use */}
+        {/*
         <Tag
           onClick={() => setActiveSection("assignments")}
           className={`cursor-pointer rounded-full border px-2 py-1 ${
             activeSection === "assignments"
-              ? "bg-pink-100 text-pink-800"
+              ? "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white"
               : "bg-transparent text-gray-500"
           }`}
         >
@@ -240,46 +246,131 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
           onClick={() => setActiveSection("quizzes")}
           className={`cursor-pointer rounded-full border px-2 py-1 ${
             activeSection === "quizzes"
-              ? "bg-pink-100 text-pink-800"
+              ? "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white"
               : "bg-transparent text-gray-500"
           }`}
         >
           Quiz ({filteredQuizzes.length})
         </Tag>
+        */}
       </div>
     </div>
   );
 
-  // Smaller "No items found" placeholder.
-  const renderPlaceholder = () => (
-    <div className="flex flex-col items-center justify-center py-2">
-      <Empty description="No items found" />
-      <div className="mt-2 flex space-x-4">
-        <Button
-          type="primary"
-          onClick={handleAddAttachment}
-          icon={<GrAttachment size={12} />}
-          size="small"
-        >
-          Add Attachment
-        </Button>
-        <Link to={`/class/${cid}/${sid}/create_quiz`}>
-          <Button
-            type="primary"
-            icon={<FaClipboardList size={12} />}
-            size="small"
+  const renderEmptyState = (section) => {
+    let content;
+    switch (section) {
+      case "attachments":
+        content = (
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.UPLOAD_CHAPTER_FILES}
           >
-            Create Quiz
-          </Button>
-        </Link>
-        <Link to={`/class/${cid}/${sid}/createassignment`}>
-          <Button type="primary" icon={<FaRegFileAlt size={12} />} size="small">
-            Create Assignment
-          </Button>
-        </Link>
+            <Button
+              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+              onClick={handleAddAttachment}
+              icon={<GrAttachment size={12} />}
+              size="small"
+            >
+              Add Attachment
+            </Button>
+          </ProtectedAction>
+        );
+        break;
+      // Commented out for future use
+      /*
+      case "assignments":
+        content = (
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_ASSIGNMENT}>
+            <Link to={`/class/${cid}/${sid}/createassignment`}>
+              <Button
+                className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+                icon={<FaRegFileAlt size={12} />}
+                size="small"
+              >
+                Create Assignment
+              </Button>
+            </Link>
+          </ProtectedAction>
+        );
+        break;
+      case "quizzes":
+        content = (
+          <ProtectedAction requiredPermission={PERMISSIONS.CREATE_QUIZ}>
+            <Link to={`/class/${cid}/${sid}/create_quiz`}>
+              <Button
+                className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+                icon={<FaClipboardList size={12} />}
+                size="small"
+              >
+                Create Quiz
+              </Button>
+            </Link>
+          </ProtectedAction>
+        );
+        break;
+      default:
+        content = (
+          <div className="flex gap-2">
+            <ProtectedAction
+              requiredPermission={PERMISSIONS.UPLOAD_CHAPTER_FILES}
+            >
+              <Button
+                className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+                onClick={handleAddAttachment}
+                icon={<GrAttachment size={12} />}
+                size="small"
+              >
+                Add Attachment
+              </Button>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_QUIZ}>
+              <Link to={`/class/${cid}/${sid}/create_quiz`}>
+                <Button
+                  className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+                  icon={<FaClipboardList size={12} />}
+                  size="small"
+                >
+                  Create Quiz
+                </Button>
+              </Link>
+            </ProtectedAction>
+            <ProtectedAction requiredPermission={PERMISSIONS.CREATE_ASSIGNMENT}>
+              <Link to={`/class/${cid}/${sid}/createassignment`}>
+                <Button
+                  className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+                  icon={<FaRegFileAlt size={12} />}
+                  size="small"
+                >
+                  Create Assignment
+                </Button>
+              </Link>
+            </ProtectedAction>
+          </div>
+        );
+      */
+      default:
+        content = (
+          <ProtectedAction
+            requiredPermission={PERMISSIONS.UPLOAD_CHAPTER_FILES}
+          >
+            <Button
+              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white border-0"
+              onClick={handleAddAttachment}
+              icon={<GrAttachment size={12} />}
+              size="small"
+            >
+              Add Attachment
+            </Button>
+          </ProtectedAction>
+        );
+    }
+
+    return (
+      <div className="flex flex-col items-center justify-center py-4">
+        {content}
       </div>
-    </div>
-  );
+    );
+  };
 
   const handleRetry = () => setErrorLoading(null);
 
@@ -304,14 +395,14 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
           >
             <div className="relative">
               <button
-                className="border p-2 rounded-full hover:bg-gray-100 text-red-600"
+                className="border p-2 rounded-full hover:bg-gray-100 text-[#C83B62]"
                 aria-label="Add Attachment"
                 onClick={handleAddAttachment}
               >
                 <GrAttachment />
               </button>
               {attachments?.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-100 opacity-90 text-red-900 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-[#C83B62] to-[#7F35CD] opacity-90 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {attachments?.length}
                 </span>
               )}
@@ -323,14 +414,14 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
             placement="bottomRight"
           >
             <button
-              className="border p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring focus:ring-pink-300"
+              className="border p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring focus:ring-[#C83B62]"
               aria-label="Options menu"
             >
               <FaEllipsisV />
             </button>
           </Dropdown>
           <button
-            className="border p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring focus:ring-pink-300"
+            className="border p-2 rounded-full hover:bg-gray-100 focus:outline-none focus:ring focus:ring-[#C83B62]"
             onClick={toggleChapter}
             aria-label="Toggle Chapter"
             aria-expanded={chapterExpanded}
@@ -363,119 +454,111 @@ const Chapter = ({ onEdit, chapterNumber, chapter }) => {
                 </div>
               ) : isItemsLoading ? (
                 <Skeleton active paragraph={{ rows: 3 }} />
-              ) : totalCount === 0 ? (
-                renderPlaceholder()
               ) : (
                 <>
-                  {(activeSection === "all" ||
-                    activeSection === "attachments") &&
-                    filteredAttachments.length > 0 && (
-                      <div className="space-y-2">
-                        <h3 className="text-lg font-semibold">Attachments</h3>
-                        {filteredAttachments.map((attachment, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center p-2 border rounded-md"
-                          >
-                            {attachment.type === "application/pdf" ? (
-                              <FaFilePdf
-                                className="text-red-500 mr-2"
-                                size={24}
-                              />
-                            ) : attachment.type === "application/msword" ||
-                              attachment.type ===
-                                "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ? (
-                              <FaFileWord
-                                className="text-blue-500 mr-2"
-                                size={24}
-                              />
-                            ) : attachment.type ===
-                                "application/vnd.ms-powerpoint" ||
-                              attachment.type ===
-                                "application/vnd.openxmlformats-officedocument.presentationml.presentation" ? (
-                              <FaFilePowerpoint
-                                className="text-orange-500 mr-2"
-                                size={24}
-                              />
-                            ) : attachment.type.startsWith("image/") ? (
-                              <img
-                                src={attachment.url}
-                                alt={attachment.name}
-                                className="w-10 h-10 mr-2 object-cover rounded"
-                              />
-                            ) : (
-                              <FaRegFileAlt
-                                className="text-gray-500 mr-2"
-                                size={24}
-                              />
-                            )}
-                            <div>
-                              <p className="font-medium capitalize">
-                                {attachment.label}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {attachment.name}
-                              </p>
+                  {activeSection === "attachments" && (
+                    <div className="space-y-2">
+                      {filteredAttachments.length > 0 ? (
+                        <>
+                          <h3 className="text-lg font-semibold">Attachments</h3>
+                          {filteredAttachments.map((attachment, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center p-2 border rounded-md"
+                            >
+                              {getFileIcon(attachment)}
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium capitalize truncate">
+                                  {attachment.label || attachment.name}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {attachment.name}
+                                </p>
+                              </div>
+                              <div className="ml-auto flex items-center space-x-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openPreviewModal(
+                                      attachment.url,
+                                      attachment.type
+                                    );
+                                  }}
+                                  className="p-1 text-[#7F35CD] hover:text-[#C83B62]"
+                                  aria-label="View Attachment"
+                                >
+                                  <FaEye size={20} />
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setAttachmentToDelete(attachment);
+                                    setDeleteModalOpen(true);
+                                  }}
+                                  className="p-1 text-[#C83B62] hover:text-red-700"
+                                  aria-label="Delete Attachment"
+                                >
+                                  <FaTrashAlt size={20} />
+                                </button>
+                              </div>
                             </div>
-                            <div className="ml-auto flex items-center space-x-2">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openPreviewModal(
-                                    attachment.url,
-                                    attachment.type
-                                  );
-                                }}
-                                className="p-1 text-blue-500 hover:text-blue-700"
-                                aria-label="View Attachment"
-                              >
-                                <FaEye size={20} />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setAttachmentToDelete(attachment);
-                                  setDeleteModalOpen(true);
-                                }}
-                                className="p-1 text-red-500 hover:text-red-700"
-                                aria-label="Delete Attachment"
-                              >
-                                <FaTrashAlt size={20} />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                          ))}
+                        </>
+                      ) : (
+                        renderEmptyState("attachments")
+                      )}
+                    </div>
+                  )}
+                  {/* Commented out for future use */}
+                  {/*
                   {(activeSection === "all" ||
-                    activeSection === "assignments") &&
-                    filteredAssignments.length > 0 && (
-                      <div>
-                        {filteredAssignments.map((assignment, index) => (
-                          <ChapterItem
-                            key={`assignment-${index}`}
-                            type="assignment"
-                            title={assignment.name}
-                            id={assignment._id}
-                            isPublished={assignment.isPublished}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  {(activeSection === "all" || activeSection === "quizzes") &&
-                    filteredQuizzes.length > 0 && (
-                      <div>
-                        {filteredQuizzes.map((quiz, index) => (
-                          <ChapterItem
-                            key={`quiz-${index}`}
-                            type="quiz"
-                            title={quiz.name}
-                            id={quiz._id}
-                            isPublished={quiz.isPublished}
-                          />
-                        ))}
-                      </div>
-                    )}
+                    activeSection === "assignments") && (
+                    <div className="space-y-2">
+                      {filteredAssignments.length > 0 ? (
+                        <>
+                          <h3 className="text-lg font-semibold">Assignments</h3>
+                          {filteredAssignments.map((assignment, index) => (
+                            <ChapterItem
+                              key={`assignment-${index}`}
+                              type="assignment"
+                              title={assignment.name}
+                              id={assignment._id}
+                              isPublished={assignment.isPublished}
+                            />
+                          ))}
+                        </>
+                      ) : activeSection === "assignments" ? (
+                        renderEmptyState("assignments")
+                      ) : null}
+                    </div>
+                  )}
+                  {(activeSection === "all" || activeSection === "quizzes") && (
+                    <div className="space-y-2">
+                      {filteredQuizzes.length > 0 ? (
+                        <>
+                          <h3 className="text-lg font-semibold">Quizzes</h3>
+                          {filteredQuizzes.map((quiz, index) => (
+                            <ChapterItem
+                              key={`quiz-${index}`}
+                              type="quiz"
+                              title={quiz.name}
+                              id={quiz._id}
+                              isPublished={quiz.isPublished}
+                            />
+                          ))}
+                        </>
+                      ) : activeSection === "quizzes" ? (
+                        renderEmptyState("quizzes")
+                      ) : null}
+                    </div>
+                  )}
+                  {activeSection === "all" && totalCount === 0 && (
+                    <div className="flex flex-col items-center justify-center py-4">
+                      <Empty description="No items found" />
+                      {renderEmptyState("all")}
+                    </div>
+                  )}
+                  */}
                 </>
               )}
             </div>
