@@ -19,7 +19,6 @@ const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
 
     const handleSubmit = async (values) => {
         try {
-
             if (editData) {
                 const response = await dispatch(updatePenalty({ penaltyId: editData._id, penaltyData: values }));
                 // console.log("Update Response:", response);
