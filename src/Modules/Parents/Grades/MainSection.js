@@ -61,7 +61,7 @@ const MainSection = ({ selectedSubjectId, studentId, moduleLoading }) => {
       <div className="flex justify-center items-center my-20 h-full w-full">
         <div className="flex flex-col items-center justify-center text-2xl text-center">
           <FaFolderOpen className="text-6xl mb-4" />
-          <p>No modules foundfor this Subject</p>
+          <p>No modules found for this Subject</p>
         </div>
       </div>
     );
