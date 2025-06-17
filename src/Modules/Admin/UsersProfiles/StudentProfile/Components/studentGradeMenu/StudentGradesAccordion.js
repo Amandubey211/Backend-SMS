@@ -19,15 +19,10 @@ const StudentGradesAccordion = ({ student }) => {
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
-  const [selectedMode, setSelectedMode] = useState("online"); // Default mode is "online"
-  const [selectedSubjectId, setSelectedSubjectId] = useState(null); // Track selected subject
+  const [selectedMode, setSelectedMode] = useState("online");
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
 
-  const getStudentGrades = async (
-    subjectId,
-    moduleId,
-    chapterId,
-    arrangeBy
-  ) => {
+  const getStudentGrades = async (subjectId, moduleId, chapterId, arrangeBy) => {
     const params = { mode: selectedMode, semesterId: selectedSemester?.id };
     if (subjectId) params.subjectId = subjectId;
     if (moduleId) params.moduleId = moduleId;
@@ -42,12 +37,11 @@ const StudentGradesAccordion = ({ student }) => {
     );
   };
 
-  // Update grades when mode, semester, or selected subject changes
   useEffect(() => {
     if (selectedSubjectId) {
       getStudentGrades(selectedSubjectId);
     } else {
-      getStudentGrades(); // Fetch without subjectId if none is selected
+      getStudentGrades();
     }
   }, [dispatch, selectedSemester, selectedMode, selectedSubjectId]);
 
@@ -71,7 +65,6 @@ const StudentGradesAccordion = ({ student }) => {
     setSelectedMode(value);
   };
 
-  // Function to handle subject selection from GradeAccordionItem
   const handleSubjectSelect = (subjectId) => {
     setSelectedSubjectId(subjectId);
     getStudentGrades(subjectId);
@@ -84,79 +77,103 @@ const StudentGradesAccordion = ({ student }) => {
         title={"Grades"}
       >
         <div className="flex flex-row w-[100%]">
+          {/* Left Side: GradeAccordionItem */}
           <div className="w-[75%]">
             <GradeAccordionItem
-              getData={handleSubjectSelect} // Pass the subject selection handler
+              getData={handleSubjectSelect}
               selectedMode={selectedMode}
             />
           </div>
-          <div className="mt-4 p-3 w-[25%] border-l-2">
-            <div className="flex flex-col w-full mb-2">
-              {/* Mode Selection Dropdown */}
-              <div className="mb-2">
-                <Select
-                  defaultValue="online"
-                  onChange={handleModeChange}
-                  className="w-full"
-                  aria-label="Select Mode"
-                >
-                  <Option value="online">Online</Option>
-                  <Option value="offline">Offline</Option>
-                </Select>
-              </div>
 
-              {/* Semester Selection Section */}
-              <div>
-                <Button
-                  type="default"
-                  onClick={() => setSemesterModalVisible(true)}
-                  className="w-full border border-pink-400 bg-white text-black rounded-lg font-semibold text-sm transition-colors duration-200 hover:bg-pink-400 hover:text-pink-900"
-                  aria-label="Select Semester"
-                >
-                  {selectedSemester && selectedSemester.name ? (
-                    <>
-                      <span className="hidden sm:inline">{selectedSemester.name}</span>
-                      <span className="inline sm:hidden">{selectedSemester.name}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="hidden sm:inline">Select Semester</span>
-                      <span className="inline sm:hidden">Sem</span>
-                    </>
-                  )}
-                </Button>
+          {/* Right Side: Filters and Grade Summary */}
+          <div className="mt-4 p-4 w-[25%] border-l-2 flex flex-col gap-6">
+            {/* Filter Section */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
+              <div className="flex flex-col gap-4">
+                {/* Mode Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Mode
+                  </label>
+                  <Select
+                    value={selectedMode}
+                    onChange={handleModeChange}
+                    className="w-full"
+                    aria-label="Select Mode"
+                  >
+                    <Option value="online">Online</Option>
+                    <Option value="offline">Offline</Option>
+                  </Select>
+                </div>
+
+                {/* Semester Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Semester
+                  </label>
+                  <Button
+                    type="default"
+                    onClick={() => setSemesterModalVisible(true)}
+                    className="w-full border border-pink-400 bg-white text-black rounded-lg font-semibold text-sm transition-colors duration-200 hover:bg-pink-400 hover:text-pink-900"
+                    aria-label="Select Semester"
+                  >
+                    {selectedSemester && selectedSemester.name ? (
+                      <>
+                        <span className="hidden sm:inline">{selectedSemester.name}</span>
+                        <span className="inline sm:hidden">{selectedSemester.name}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="hidden sm:inline">Select Semester</span>
+                        <span className="inline sm:hidden">Sem</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
+
+                {/* Placeholder for Future Filters */}
+                {/* Add more filter inputs here as needed */}
               </div>
             </div>
-            <h3 className="text-md font-semibold mb-4">{t("Grade Summary")}</h3>
-            <div className="flex justify-between mb-2">
-              <p className="text-sm">{t("Assignment")}</p>
-              <p className="text-sm">
-                {grades?.totalScoreOfSubmitAssignments} /{" "}
-                {grades?.totalScoreOfAllAssignments}
-              </p>
-            </div>
-            <div className="flex justify-between mb-2">
-              <p className="text-sm">{t("Quiz")}</p>
-              <p className="text-sm">
-                {grades?.totalQuizCompletedScore} /{" "}
-                {grades?.totalScoreOfAllQuizzes}
-              </p>
-            </div>
-            <div className="flex justify-between mb-2">
-              <p className="text-sm">{t("Attendance")}</p>
-              <p className="text-sm">
-                {grades?.attendance} {t("DAY")}
-              </p>
-            </div>
-            <div className="border-t mt-4 flex p-3 justify-between px-4 gap-1">
-              <p className="text-lg font-semibold">{t("Total Score")}:</p>
-              <p className="text-pink-500 text-xl font-semibold">
-                {grades?.total}
-              </p>
+
+            {/* Grade Summary Section */}
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">{t("Grade Summary")}</h3>
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium text-gray-700">{t("Assignment")}</p>
+                  <p className="text-sm text-gray-600">
+                    {grades?.totalScoreOfSubmitAssignments ?? 0} /{" "}
+                    {grades?.totalScoreOfAllAssignments ?? 0}
+                  </p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium text-gray-700">{t("Quiz")}</p>
+                  <p className="text-sm text-gray-600">
+                    {grades?.totalQuizCompletedScore ?? 0} /{" "}
+                    {grades?.totalScoreOfAllQuizzes ?? 0}
+                  </p>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm font-medium text-gray-700">{t("Attendance")}</p>
+                  <p className="text-sm text-gray-600">
+                    {grades?.attendance ?? 0} {t("DAY")}
+                  </p>
+                </div>
+                <div className="border-t pt-3 mt-3 flex justify-between items-center">
+                  <p className="text-lg font-semibold text-gray-800">{t("Total Score")}:</p>
+                  <p className="text-pink-500 text-xl font-semibold">
+                    {grades?.total ?? 0}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </ProtectedSection>
+
+      {/* Semester Selection Modal */}
       <Modal
         visible={semesterModalVisible}
         onCancel={() => setSemesterModalVisible(false)}
@@ -186,11 +203,10 @@ const StudentGradesAccordion = ({ student }) => {
                   <Button
                     key={sem._id}
                     onClick={() => handleSemesterSelect(sem)}
-                    className={`w-full text-left border rounded-md transition-colors duration-200 ${
-                      selectedSemester && selectedSemester.id === sem._id
+                    className={`w-full text-left border rounded-md transition-colors duration-200 ${selectedSemester && selectedSemester.id === sem._id
                         ? "bg-purple-100 border-purple-400"
                         : "bg-white hover:bg-purple-50"
-                    }`}
+                      }`}
                     aria-label={`Select semester ${sem.title}`}
                   >
                     {sem.title}
@@ -207,4 +223,4 @@ const StudentGradesAccordion = ({ student }) => {
   );
 };
 
-export default StudentGradesAccordion;            
+export default StudentGradesAccordion;

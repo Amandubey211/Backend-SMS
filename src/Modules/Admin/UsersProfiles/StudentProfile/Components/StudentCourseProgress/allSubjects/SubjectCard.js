@@ -8,6 +8,7 @@ const SubjectCard = ({ subject, i }) => {
     totalModule = 0, // Default total modules
     completedModule = 0, // Default completed modules
     percentageValue = 0, // Default percentage value
+    subjectIcon = null
   } = subject;
 
   const [bgColor, setBgColor] = useState("");
@@ -27,10 +28,13 @@ const SubjectCard = ({ subject, i }) => {
     <div
       className="bg-white shadow-md cursor-pointer 
        rounded-lg  flex-none flex flex-col gap-3 p-4"
-      
+
     >
       <div className="flex items-center gap-2">
-        <FaBook className="text-[2.2rem] text-pink-400" />
+        {
+          subjectIcon ? <img src={subjectIcon} className="h-[50px]" /> :
+            <FaBook className="text-[2.2rem] text-pink-400" />
+        }
         <div className="flex flex-col">
           <span>{subjectName}</span>
           <span className="text-[12px] text-gray-600">Started: {started !== "N/A" ? started?.slice(0, 10) : "N/A"}</span>

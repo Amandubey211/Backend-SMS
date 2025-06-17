@@ -26,7 +26,7 @@ const Chapter = ({
     })),
     ...attachments?.map((a) => ({
       ...a,
-      type: a?.type,
+      type: "Attachment",
     })),
   ];
   return (
