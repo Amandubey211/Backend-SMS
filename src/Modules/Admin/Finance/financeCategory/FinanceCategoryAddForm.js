@@ -16,33 +16,33 @@ const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
   const { icons, selectedIcon } = useSelector(
     (state) => state.admin.classIcons
   );
+  const isViewMode = editData?.mode === "view";
+
   useEffect(() => {
     if (editData) {
       form.setFieldsValue(editData);
-      console.log(editData);
-      
-      dispatch(selectIcon(icons?.find((i)=>i?.imageLink==editData?.icon)));
+      dispatch(selectIcon(icons?.find((i) => i?.imageLink === editData?.icon)));
     } else {
       form.resetFields();
     }
-  }, [editData, form,onClose]);
-  
+  }, [editData, form, onClose]);
+
   const handleSubmit = async (values) => {
-    if(!selectedIcon){
+    if (!selectedIcon) {
       toast.error("Please Select an Icon");
-      return
+      return;
     }
-    console.log(selectedIcon);
-    
+
     if (editData) {
-      await dispatch(updateCategory({ id: editData._id,icon:selectedIcon?.imageLink, ...values }));
+      await dispatch(updateCategory({ id: editData._id, icon: selectedIcon?.imageLink, ...values }));
     } else {
-      await dispatch(createCategory({icon:selectedIcon?.imageLink,...values}));
+      await dispatch(createCategory({ icon: selectedIcon?.imageLink, ...values }));
     }
     onClose();
   };
-  
+
   const openModal = (icon = null) => {
+    if (isViewMode) return;
     dispatch(selectIcon(icon));
     setIsModalOpen(true);
   };
@@ -60,12 +60,13 @@ const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
         <Form.Item
           name="categoryName"
           label="Category Name"
-          rules={[{ required: true, message: "Please enter category name" },
-          { min: 3, message: "Category name must be at least 3 characters" },
-          { max: 24, message: "Category name cannot exceed 24 characters" },]}
+          rules={[
+            { required: true, message: "Please enter category name" },
+            { min: 3, message: "Category name must be at least 3 characters" },
+            { max: 24, message: "Category name cannot exceed 24 characters" },
+          ]}
         >
-
-          <Input placeholder="Enter category name" />
+          <Input placeholder="Enter category name" disabled={isViewMode} />
         </Form.Item>
 
         <Form.Item
@@ -74,7 +75,7 @@ const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
             <span className="flex flex-row gap-2 items-center">
               Category For
               <Tooltip
-              className="cursor-pointer"
+                className="cursor-pointer"
                 title={
                   <>
                     <div>The category is being added either to</div>
@@ -82,50 +83,75 @@ const FinanceCategoryAddForm = ({ visible, onClose, editData }) => {
                   </>
                 }
               >
-               <BsInfoCircle />
+                <BsInfoCircle />
               </Tooltip>
             </span>
           }
           rules={[{ required: true, message: "Please select category type" }]}
-
         >
-          <select placeholder="Select category type " className="w-full py-2 border border-gray-200 rounded-lg">
-          <option value="">Select Type</option>
+          <select
+            placeholder="Select category type"
+            className="w-full py-2 border border-gray-200 rounded-lg"
+            disabled={isViewMode}
+          >
+            <option value="">Select Type</option>
             <option value="revenue">Revenue</option>
             <option value="expense">Expense</option>
             <option value="asset">Asset</option>
-            {/* <option value="libility">libility</option> */}
           </select>
         </Form.Item>
 
         <Form.Item name="description" label="Description">
-          <Input.TextArea placeholder="Enter description" rows={3} />
+          <Input.TextArea placeholder="Enter description" rows={3} disabled={isViewMode} />
         </Form.Item>
 
         <div>
           <div className="flex flex-col gap-2 mt-6 mb-6 flex-grow">
-            <h3 className="font-semibold">Category Icons (Optional)</h3>
-            <IconGrid
-              icons={icons}
-              activeIconId={
-                selectedIcon
-                  ? selectedIcon._id || selectedIcon.id || selectedIcon
-                  : null
-              }
-              onEdit={openModal}
-              type="Category"
-            />
-          </div>
-        </div>
-        <Form.Item>
-          <button className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2" htmlType="submit">
-            {editData ? "Update Full Information" : "Add Category"}
-          </button>
-        </Form.Item>
 
+            {isViewMode ? (
+              <>
+                <h3 className="font-semibold">Category Icon</h3>
+                <div className="flex items-center justify-center border p-4 rounded-lg">
+                  {selectedIcon ? (
+                    <img
+                      src={selectedIcon.imageLink || editData.icon}
+                      alt="Selected Icon"
+                      className="h-12 w-12"
+                    />
+                  ) : (
+                    <span>No icon selected</span>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="font-semibold">Category Icons (Optional)</h3>
+                <IconGrid
+                  icons={icons}
+                  activeIconId={
+                    selectedIcon ? selectedIcon._id || selectedIcon.id || selectedIcon : null
+                  }
+                  onEdit={openModal}
+                  type="Category"
+                />
+              </>
+            )}
+          </div>
+
+        </div>
+
+        {!isViewMode && (
+          <Form.Item>
+            <button
+              className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2"
+              htmlType="submit"
+            >
+              {editData ? "Update Full Information" : "Add Category"}
+            </button>
+          </Form.Item>
+        )}
       </Form>
       {isModalOpen && <CreateEditIconModal onClose={closeModal} type="Category" />}
-
     </>
   );
 };
