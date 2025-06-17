@@ -47,23 +47,23 @@ export default function StudentsFilter({ filters, onFilterChange }) {
   };
 
   return (
-    <div>
-      <div className="flex md:flex-row flex-col md:items-end items-center gap-4 py-4 bg-white w-full justify-start">
-        {/* Search Box */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">
-            {t("Search")}
-          </label>
-          <Search
-            placeholder={t("Search by Name, QID, Admission number")}
-            onSearch={handleSearch}
-            allowClear
-            style={{ width: 320 }}
-            size="large"
-            className="mt-1"
-          />
-        </div>
+    <div className="flex items-center gap-4 bg-white w-full justify-between ">
+      {/* Search Box */}
+      <div className="flex flex-col">
+        <label className="text-sm font-medium text-gray-700">
+          {t("Search")}
+        </label>
+        <Search
+          placeholder={t("Search by Name, QID, Admission number")}
+          onSearch={handleSearch}
+          allowClear
+          style={{ width: 320 }}
+          size="large"
+          className="mt-1"
+        />
+      </div>
 
+      <div className="flex items-center gap-2">
         {/* Class Select */}
         <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">
@@ -111,7 +111,7 @@ export default function StudentsFilter({ filters, onFilterChange }) {
         </div>
 
         {/* Group Select */}
-        <div className="flex flex-col">
+        {/* <div className="flex flex-col">
           <label className="text-sm font-medium text-gray-700">
             {t("Group")}
           </label>
@@ -131,7 +131,7 @@ export default function StudentsFilter({ filters, onFilterChange }) {
               </Option>
             ))}
           </Select>
-        </div>
+        </div> */}
       </div>
     </div>
   );
