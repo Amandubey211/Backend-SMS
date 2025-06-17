@@ -4,7 +4,7 @@ import { RiListCheck3, RiFileUnknowLine } from "react-icons/ri";
 import { GoDiscussionClosed } from "react-icons/go";
 import { FiFileText } from "react-icons/fi";
 import { AiOutlineCloseCircle } from 'react-icons/ai';
-import { Tooltip } from 'react-tooltip';
+import { Tooltip } from 'antd'; // Import Ant Design Tooltip
 
 const getIcon = (type) => {
   switch (type) {
@@ -43,20 +43,17 @@ const ChapterItem = ({ type, title, submitted, url }) => {
     url !== null ? (
       <div className="flex items-center mb-3 rounded-lg p-2 hover:bg-gray-100 transition-colors">
         <span className="capitalize font-semibold font-roboto text-gray-700 w-24">{type}</span>
-        <span className="p-2 bg-white rounded-full">{getIcon(type)}</span>
+        <span className="p-2 bg-white rounded-full ml-2">{getIcon(type)}</span>
         <div className="flex flex-col gap-1 justify-center pr-4 flex-grow">
-          <span
-            className="font-roboto font-semibold text-gray-800 truncate max-w-[200px] cursor-pointer"
-            data-tooltip-id={`title-tooltip-${title}`}
-            data-tooltip-content={title}
-          >
-            {title?.slice(0, 30)}
-          </span>
           <Tooltip
-            id={`title-tooltip-${title}`}
-            place="top"
-            className="font-roboto bg-gray-800 text-white rounded-md p-2"
-          />
+            title={title}
+            placement="top"
+            overlayClassName="font-roboto bg-gray-800 text-white rounded-md p-2"
+          >
+            <span className="font-roboto font-semibold text-gray-800 truncate max-w-[200px] cursor-pointer">
+              {title?.slice(0, 30)}
+            </span>
+          </Tooltip>
         </div>
         <div
           className="flex items-center gap-1 justify-center cursor-pointer"
@@ -83,7 +80,7 @@ const ChapterItem = ({ type, title, submitted, url }) => {
               </button>
               <div className="flex justify-center">
                 <div className="overflow-y-auto max-h-[80vh] w-full">
-                  {previewType === "application/pdf" ? (
+                  {previewType === "Attachment" ? (
                     <embed
                       src={previewUrl}
                       type="application/pdf"
@@ -109,18 +106,15 @@ const ChapterItem = ({ type, title, submitted, url }) => {
         <span className="capitalize font-semibold font-roboto text-gray-700 w-24">{type}</span>
         <span className="p-2 bg-white rounded-full">{getIcon(type)}</span>
         <div className="flex flex-col gap-1 justify-center flex-grow">
-          <span
-            className="font-roboto font-semibold text-gray-800 truncate max-w-[200px] cursor-pointer"
-            data-tooltip-id={`title-tooltip-${title}`}
-            data-tooltip-content={title}
-          >
-            {title?.slice(0, 30)}
-          </span>
           <Tooltip
-            id={`title-tooltip-${title}`}
-            place="top"
-            className="font-roboto bg-gray-800 text-white rounded-md p-2"
-          />
+            title={title}
+            placement="top"
+            overlayClassName="font-roboto bg-gray-800 text-white rounded-md p-2"
+          >
+            <span className="font-roboto font-semibold text-gray-800 truncate max-w-[200px] cursor-pointer">
+              {title?.slice(0, 30)}
+            </span>
+          </Tooltip>
         </div>
         <div className="flex items-center gap-1 text-gray-500 justify-center">
           {submitted ? "Submitted" : "Not Submitted"}:

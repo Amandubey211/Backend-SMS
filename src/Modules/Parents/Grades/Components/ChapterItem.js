@@ -9,9 +9,9 @@ import {
 import { MdOutlineBlock } from "react-icons/md";
 import { RiListCheck3, RiFileUnknowLine } from "react-icons/ri";
 import { FiFileText } from "react-icons/fi";
-import { format } from "date-fns"; // Import date formatting
+import { format } from "date-fns";
 import { IoCalendarOutline } from "react-icons/io5";
-import { Tooltip } from 'react-tooltip';
+import { Tooltip } from "antd"; // Import Ant Design Tooltip
 
 // Function to get the correct icon based on the item type
 const getIcon = (type) => {
@@ -50,21 +50,17 @@ const ChapterItem = ({ type, title, submitted, dueDate, attachmentUrl }) => {
 
   return (
     <div className="flex items-center mb-3 gap-2 rounded-lg p-2 hover:bg-gray-100 transition-colors">
-      <span className="capitalize font-semibold font-roboto text-gray-700 w-24">{type}</span>
-      <div className="p-2 bg-white rounded-full">{getIcon(type)}</div>
+      <span className="p-2 bg-white rounded-full ml-2">{getIcon(type)}</span>
       <div className="flex flex-col gap-1 justify-center flex-grow">
-        <span
-          className="font-roboto font-semibold text-gray-800 truncate max-w-[200px]"
-          data-tooltip-id={`title-tooltip-${title}`}
-          data-tooltip-content={title}
-        >
-          {title?.slice(0, 30)}
-        </span>
         <Tooltip
-          id={`title-tooltip-${title}`}
-          place="top"
-          className="font-roboto bg-gray-800 text-white rounded-md p-2"
-        />
+          title={title}
+          placement="top"
+          overlayClassName="font-roboto bg-gray-800 text-white rounded-md p-2"
+        >
+          <span className="font-roboto font-semibold text-gray-800 truncate max-w-[200px]">
+            {title?.slice(0, 30)}
+          </span>
+        </Tooltip>
         {/* Show Due Date only for Quizzes & Assignments */}
         {formattedDueDate && (
           <div className="flex items-center gap-1 text-gray-500 text-sm">
@@ -84,7 +80,8 @@ const ChapterItem = ({ type, title, submitted, dueDate, attachmentUrl }) => {
       )}
 
       <div className="flex items-center gap-1 text-gray-500 justify-center">
-        {submitted ? "Submitted" : "Not Submitted"}: {submitted ? (
+        {submitted ? "Submitted" : "Not Submitted"}:{" "}
+        {submitted ? (
           <FaCheckCircle className="text-green-500" />
         ) : (
           <MdOutlineBlock className="text-red-500" />
