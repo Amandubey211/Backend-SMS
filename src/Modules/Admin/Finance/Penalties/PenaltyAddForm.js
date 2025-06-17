@@ -7,7 +7,7 @@ import toast from "react-hot-toast";
 const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
     const dispatch = useDispatch();
     const [form] = Form.useForm();
-
+    const isViewMode = editData?.mode === "view";
     useEffect(() => {
         if (editData) {
             form.setFieldsValue(editData);
@@ -64,7 +64,7 @@ const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
                     { max: 24, message: "Penalty name cannot exceed 24 characters" },
                 ]}
             >
-                <Input placeholder="Enter penalty name" />
+                <Input placeholder="Enter penalty name" disabled={isViewMode} />
             </Form.Item>
 
             <Form.Item
@@ -72,7 +72,7 @@ const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
                 label="Penalty Type"
                 rules={[{ required: true, message: "Please select penalty type" }]}
             >
-                <Select placeholder="Select penalty type" className="w-full">
+                <Select placeholder="Select penalty type" className="w-full" disabled={isViewMode}>
                     <Select.Option value="fixed">Fixed</Select.Option>
                     <Select.Option value="percentage">Percentage</Select.Option>
                 </Select>
@@ -86,7 +86,7 @@ const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
                     { type: "number", min: 0, message: "Penalty value must be a non-negative number" },
                 ]}
             >
-                <InputNumber placeholder="Enter penalty value" min={0} style={{ width: "100%" }} />
+                <InputNumber placeholder="Enter penalty value" min={0} style={{ width: "100%" }} disabled={isViewMode} />
             </Form.Item>
 
             <Form.Item
@@ -97,11 +97,11 @@ const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
                     { type: "number", min: 0, message: "Grace period must be a non-negative number" },
                 ]}
             >
-                <InputNumber placeholder="Enter grace period in days" min={0} defaultValue={0} style={{ width: "100%" }} />
+                <InputNumber placeholder="Enter grace period in days" min={0} defaultValue={0} style={{ width: "100%" }} disabled={isViewMode} />
             </Form.Item>
 
             <Form.Item name="description" label="Description">
-                <Input.TextArea placeholder="Enter description" rows={3} />
+                <Input.TextArea placeholder="Enter description" rows={3} disabled={isViewMode} />
             </Form.Item>
 
             <Form.Item
@@ -113,16 +113,19 @@ const PenaltyAddForm = ({ visible, onClose, editData, onSuccess }) => {
                     checkedChildren="Active"
                     unCheckedChildren="Inactive"
                     defaultChecked={true}
+                    disabled={isViewMode}
                 />
             </Form.Item>
 
             <Form.Item>
-                <Button
-                    className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2"
-                    htmlType="submit"
-                >
-                    {editData ? "Update Penalty" : "Add Penalty"}
-                </Button>
+                {
+                    !isViewMode && <Button
+                        className="bg-gradient-to-r from-pink-500 to-purple-500 flex items-center justify-center text-white w-full py-2"
+                        htmlType="submit"
+                    >
+                        {editData ? "Update Penalty" : "Add Penalty"}
+                    </Button>
+                }
             </Form.Item>
         </Form>
     );

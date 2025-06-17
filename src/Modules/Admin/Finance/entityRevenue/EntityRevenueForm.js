@@ -117,7 +117,6 @@ const EntityRevenueForm = () => {
   };
 
   const handleInputChange = (index, field, value) => {
-
     const updatedItems = [...lineItems];
     updatedItems[index][field] = field.includes("Date") && value ? value.format("YYYY-MM-DD") : value;
 
@@ -133,7 +132,6 @@ const EntityRevenueForm = () => {
     if (field === "penaltyId" && !value) {
       updatedItems[index].penaltyId = null;
     }
-    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 
     const rate = updatedItems[index].rate || 0;
     const quantity = updatedItems[index].quantity || 1;
@@ -144,10 +142,10 @@ const EntityRevenueForm = () => {
     let subtotal = rate * quantity;
     let taxAmount = (subtotal * tax) / 100;
 
-    let finalAmount = roundToTwo(subtotal + penalty + taxAmount);
+    let finalAmount = subtotal + penalty + taxAmount;
 
     if (discountType === "percentage") {
-      finalAmount -= roundToTwo((finalAmount * discount) / 100);
+      finalAmount -= (finalAmount * discount) / 100;
     } else {
       finalAmount -= discount;
     }
