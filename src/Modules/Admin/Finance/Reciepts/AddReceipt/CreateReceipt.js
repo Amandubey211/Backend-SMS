@@ -43,7 +43,7 @@ const CreateReceipt = () => {
     receiptData: null
   });
   const handlePayNowAmountChange = (e, lineItemId) => {
-    const value = e.target.value;
+    const value = parseFloat(e.target.value) || 0;
     const discount = editableDiscounts[lineItemId] || 0;
     const penalty = editablePenalties[lineItemId] || 0;
 
@@ -53,7 +53,7 @@ const CreateReceipt = () => {
       amountPaid: value,
       discount,
       penalty,
-      updatedRemainingAmount: totalRemaining,
+      updatedRemainingAmount: totalRemaining.toFixed(5),
       finalAmount
     };
 
@@ -68,7 +68,7 @@ const CreateReceipt = () => {
       setReceiptData((prevData) => ({ ...prevData, paidItems: updatedPaidItems }));
     } else {
       // If it doesn't exist, add a new item
-      const newItem = { lineItemId, amountPaid: value };
+      const newItem = { lineItemId};
       setReceiptData((prevData) => ({
         ...prevData,
         paidItems: [...prevData.paidItems, newItem]
@@ -326,7 +326,7 @@ const CreateReceipt = () => {
                       <p><strong>Total Tax</strong> = {totalTax}  {invoiceData?.schoolId?.currency}</p>
                       <p className="border-t mt-2"><strong>Final Amount</strong> = {finalAmount} {invoiceData?.schoolId?.currency}</p>
                       <p><strong>Total Paid</strong> = {totalPaid} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Remaining</strong> = {(finalAmount - totalPaid).toFixed(5)} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Remaining</strong> = {totalRemaining.toFixed(5)} {invoiceData?.schoolId?.currency}</p>
                     </div>
                   </div>
 

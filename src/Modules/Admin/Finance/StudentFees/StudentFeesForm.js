@@ -223,7 +223,7 @@ const StudentFeeForm = () => {
       <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="font-bold pb-2">Add New Fees</h1>
-          <button className=" flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white px-2 rounded-lg shadow-lg" onClick={() => setIsModalVisible(true)} >Select Students <span><VscListSelection /></span></button>
+          <button className=" flex flex-row items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white p-2 rounded-lg shadow-lg" onClick={() => setIsModalVisible(true)} >Select Students <span><VscListSelection /></span></button>
         </div>
         <div>
           <input type="text" className="w-[35rem] h-[3rem] border border-purple-600 rounded-lg p-2" placeholder="Enter Short Description " onClick={(e) => setDescription(e.target.value)} />

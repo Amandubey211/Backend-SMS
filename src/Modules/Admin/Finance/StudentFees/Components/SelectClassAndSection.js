@@ -191,11 +191,11 @@ const SidebarClassSelection = ({studentIds, setStudentIds,classAndSectionDetail,
                         />
                         <span className="text-sm m-1 cursor-pointer ">Select All Students</span>
                       </label>
-                      <div className="flex w-[99%] flex-wrap gap-8 border border-gray-200 h-[10rem] rounded-lg p-2 overflow-y-auto">
+                      <div className="flex w-[99%] flex-wrap gap-8 border border-gray-200  rounded-lg p-2 overflow-y-auto">
 
                         {
                           classAndSectionDetail?.find((c) => c.classId === cls._id)?.sections?.find((i) => i?.sectionId == sec?.sectionId)?.students?.map((std) => (
-                            <div className="w-auto h-[3rem] flex  items-start px-2 justify-center flex-col bg-purple-500  text-white text-sm rounded-lg">
+                            <div className="w-full  flex  items-start px-2 justify-center flex-col bg-purple-500  text-white text-sm rounded-lg">
                               <label key={std._id}>
                                 <input
                                   type="checkbox"

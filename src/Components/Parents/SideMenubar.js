@@ -76,7 +76,7 @@ const SideMenubar = () => {
   const navigate = useNavigate();
   return (
     <nav
-      className={`sticky top-0 transition-all duration-300 h-screen p-1 z-50 bg-white border-r flex flex-col ${isOpen ? "w-[15%]" : "w-[7%]"
+      className={`sticky top-0 transition-all duration-300 h-screen p-1 z-30 bg-white border-r flex flex-col ${isOpen ? "w-[15%]" : "w-[7%]"
         }`}
     >
       <NavLink to="/parent_dash" className="relative flex items-center justify-center border-b pb-1" style={{ zIndex: 1001 }}>
