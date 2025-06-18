@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import {  Navigate, NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ProtectedAction from "../../../../../Routes/ProtectedRoutes/ProtectedAction";
 import { gt } from "../../../../../Utils/translator/translation";
 import { FiCalendar } from "react-icons/fi";
@@ -11,28 +11,38 @@ const ButtonGroup = ({
   onAddNewSubject,
   onViewSemester,
   selectedTab,
-  setSelectedTab, 
+  setSelectedTab,
   role,
-  publishedCount, // <-- New prop
-  draftCount, // <-- New prop
-  cid
+  publishedCount,
+  draftCount,
+  cid,
 }) => {
   const { t } = useTranslation("admClass");
-   const naviagte = useNavigate()
+  const navigate = useNavigate();
+
+  // ───────────────────────────────────────────────
+  // Role checks
+  // ───────────────────────────────────────────────
+  const isAdmin = role?.toLowerCase() === "admin";
+
+  // Dynamic label for semester button
+  const semesterLabel = isAdmin ? t("Manage Semester") : t("Select Semester");
+
   return (
     <div className="flex justify-between items-center mb-4">
+      {/* ───────── Left: Published / Draft tabs ───────── */}
       <div className="flex space-x-4">
-        <ProtectedAction requiredPermission={"dd"}>
+        <ProtectedAction requiredPermission="dd">
           <Tooltip title={t("Published")}>
             <button
-              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${selectedTab === "Published"
+              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${
+                selectedTab === "Published"
                   ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
                   : "border border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-                }`}
+              }`}
               onClick={() => setSelectedTab("Published")}
             >
-              {/* Show published subjects count in parentheses */}
-              {t("Published")} ({publishedCount || 0})
+              {t("Published")} ({publishedCount ?? 0})
             </button>
           </Tooltip>
         </ProtectedAction>
@@ -40,20 +50,22 @@ const ButtonGroup = ({
         <ProtectedAction>
           <Tooltip title={t("Draft")}>
             <button
-              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${selectedTab === "Draft"
+              className={`px-4 py-2 rounded-md transition-all duration-200 focus:outline-none ${
+                selectedTab === "Draft"
                   ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:brightness-110"
                   : "border border-gray-300 text-gray-600 hover:bg-gray-100 hover:text-gray-800"
-                }`}
+              }`}
               onClick={() => setSelectedTab("Draft")}
             >
-              {/* Show draft subjects count in parentheses */}
-              {t("Draft")} ({draftCount || 0})
+              {t("Draft")} ({draftCount ?? 0})
             </button>
           </Tooltip>
         </ProtectedAction>
       </div>
 
-      <div className="flex justify-between items-center gap-2">
+      {/* ───────── Right: Action buttons ───────── */}
+      <div className="flex items-center gap-2">
+        {/* Add New Subject */}
         <ProtectedAction>
           <Tooltip title={t("Add New Subject")}>
             <button
@@ -62,30 +74,35 @@ const ButtonGroup = ({
             >
               <span className="mr-2">{t("Add New Subject")}</span>
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl ">+</span>
+                <span className="text-3xl">+</span>
               </div>
             </button>
           </Tooltip>
         </ProtectedAction>
 
-        <Tooltip title={t("Manage Semester")}>
+        {/* Manage / Select Semester */}
+        <Tooltip title={semesterLabel}>
           <button
             onClick={onViewSemester}
             className="px-4 py-3 rounded-md bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center transition-all duration-200 focus:outline-none hover:brightness-110 hover:shadow-md"
           >
             <FiCalendar className="mr-2" size={20} />
-            {t("Manage Semester")}
+            {semesterLabel}
           </button>
         </Tooltip>
-        <Tooltip title={t("Manage Report Card ")}>
-         <button
-         onClick={()=>naviagte(`/admin/scorecard/${cid}`)}
-             className="px-4 py-3 rounded-md bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center transition-all duration-200 focus:outline-none hover:brightness-110 hover:shadow-md"
-          >
-            <BiSpreadsheet className="text-lg mr-1" />
-            {t("Manage Report Card", gt.setting)}
-           </button>
-        </Tooltip>
+
+        {/* Manage Report Card – ADMIN ONLY */}
+        {isAdmin && (
+          <Tooltip title={t("Manage Report Card")}>
+            <button
+              onClick={() => navigate(`/admin/scorecard/${cid}`)}
+              className="px-4 py-3 rounded-md bg-gradient-to-r from-pink-500 to-purple-600 text-white flex items-center transition-all duration-200 focus:outline-none hover:brightness-110 hover:shadow-md"
+            >
+              <BiSpreadsheet className="text-lg mr-1" />
+              {t("Manage Report Card", gt.setting)}
+            </button>
+          </Tooltip>
+        )}
       </div>
     </div>
   );
