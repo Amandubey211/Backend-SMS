@@ -9,8 +9,8 @@ import { FaBook } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Select, Skeleton, Input, Tooltip } from "antd";
 import { FiRefreshCcw } from "react-icons/fi";
+import Pagination from "../../../../Components/Common/pagination";
 
-import Pagination from '../../../../Components/Common/pagination'
 const { Option } = Select;
 const { Search } = Input;
 
@@ -33,10 +33,7 @@ const initialFilters = {
   roleType: "",
 };
 
-const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
-  setPage,
-  limit,
-  setLimit, }) => {
+const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limit, setLimit }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const {
@@ -46,16 +43,17 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
   } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
   const { totalPages, totalBooks } = useSelector((state) => state.admin.library);
-  console.log("BookIssue",bookIssues)
-  const sectionList = useSelector(
-    (store) => store.admin.group_section.sectionsList
-  );
+  const sectionList = useSelector((store) => store.admin.group_section.sectionsList);
   const role = useSelector((store) => store.common.auth.role);
 
   // Local filters state
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
- 
+  useEffect(() => {
+    if (localFilters.classLevel) {
+      dispatch(fetchSectionsNamesByClass(localFilters.classLevel));
+    }
+  }, [dispatch, localFilters.classLevel]);
 
   const handleFilterChange = (name, value) => {
     setLocalFilters((prev) => ({ ...prev, [name]: value }));
@@ -74,33 +72,14 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
 
   // Filter logic for book issues based on filters
   const filteredBookIssues = bookIssues?.filter((issue) => {
-    if (
-      localFilters.classLevel &&
-      issue.classId?._id !== localFilters.classLevel
-    )
-      return false;
-    if (localFilters.section && issue.sectionId?._id !== localFilters.section)
-      return false;
-    if (localFilters.book && issue.bookId?._id !== localFilters.book)
-      return false;
-    if (
-      localFilters.status &&
-      issue.status?.toLowerCase() !== localFilters.status.toLowerCase()
-    )
-      return false;
-    if (
-      localFilters.roleType &&
-      issue.issuedTo?.userType?.toLowerCase() !==
-      localFilters.roleType.toLowerCase()
-    )
-      return false;
+    if (localFilters.classLevel && issue.classId?._id !== localFilters.classLevel) return false;
+    if (localFilters.section && issue.sectionId?._id !== localFilters.section) return false;
+    if (localFilters.book && issue.bookId?._id !== localFilters.book) return false;
+    if (localFilters.status && issue.status?.toLowerCase() !== localFilters.status.toLowerCase()) return false;
+    if (localFilters.roleType && issue.issuedTo?.userType?.toLowerCase() !== localFilters.roleType.toLowerCase()) return false;
     if (localFilters.searchQuery) {
-      const fullName = `${issue.issuedTo?.userId?.firstName || ""} ${issue.issuedTo?.userId?.lastName || ""
-        }`.trim();
-      if (
-        !fullName.toLowerCase().includes(localFilters.searchQuery.toLowerCase())
-      )
-        return false;
+      const fullName = `${issue.issuedTo?.userId?.firstName || ""} ${issue.issuedTo?.userId?.lastName || ""}`.trim();
+      if (!fullName.toLowerCase().includes(localFilters.searchQuery.toLowerCase())) return false;
     }
     return true;
   });
@@ -108,35 +87,27 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
   return (
     <>
       {/* Filter Header */}
-      <div className="flex flex-wrap items-center gap-4 mb-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white shadow rounded-lg">
         {/* Search Input at the Start */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
-            {t("Search")}
-          </label>
+        <div className="flex-shrink-0">
+          <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Search")}</label>
           <Search
             size="middle"
-            // style={{ width: "150px" }}
             placeholder={t("Search by student name")}
             onSearch={handleSearch}
             allowClear
+            style={{ width: 200 }}
           />
         </div>
 
         {/* Middle Filters */}
-        <div className="flex gap-4  items-end flex-wrap">
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t("Class")}
-            </label>
+        <div className="flex flex-wrap gap-4 items-end flex-grow justify-center">
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Class")}</label>
             <Select
               size="middle"
               placeholder={t("Select Class")}
-              value={
-                localFilters.classLevel === ""
-                  ? undefined
-                  : localFilters.classLevel
-              }
+              value={localFilters.classLevel === "" ? undefined : localFilters.classLevel}
               onChange={(value) => handleFilterChange("classLevel", value)}
               style={{ width: 120 }}
               allowClear
@@ -144,22 +115,16 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
               optionFilterProp="children"
             >
               {classList?.map((cls) => (
-                <Option key={cls._id} value={cls._id}>
-                  {cls.className}
-                </Option>
+                <Option key={cls._id} value={cls._id}>{cls.className}</Option>
               ))}
             </Select>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t("Section")}
-            </label>
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Section")}</label>
             <Select
               size="middle"
               placeholder={t("Select Section")}
-              value={
-                localFilters.section === "" ? undefined : localFilters.section
-              }
+              value={localFilters.section === "" ? undefined : localFilters.section}
               onChange={(value) => handleFilterChange("section", value)}
               style={{ width: 120 }}
               allowClear
@@ -168,16 +133,12 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
               optionFilterProp="children"
             >
               {sectionList?.map((section) => (
-                <Option key={section._id} value={section._id}>
-                  {section.sectionName}
-                </Option>
+                <Option key={section._id} value={section._id}>{section.sectionName}</Option>
               ))}
             </Select>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t("Book")}
-            </label>
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Book")}</label>
             <Select
               size="middle"
               placeholder={t("Select Book")}
@@ -189,24 +150,18 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
               optionFilterProp="children"
             >
               {books?.map((book) => (
-                <Option key={book._id} value={book._id}>
-                  {book.name}
-                </Option>
+                <Option key={book._id} value={book._id}>{book.name}</Option>
               ))}
             </Select>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t("Status")}
-            </label>
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Status")}</label>
             <Select
               size="middle"
               placeholder={t("Select Status")}
-              value={
-                localFilters.status === "" ? undefined : localFilters.status
-              }
+              value={localFilters.status === "" ? undefined : localFilters.status}
               onChange={(value) => handleFilterChange("status", value)}
-              style={{ width: 100 }}
+              style={{ width: 120 }}
               allowClear
               showSearch
               optionFilterProp="children"
@@ -215,52 +170,44 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
               <Option value="Returned">{t("Returned")}</Option>
             </Select>
           </div>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
-              {t("Role")}
-            </label>
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Role")}</label>
             <Select
               size="middle"
               placeholder={t("Select Role")}
-              value={
-                localFilters.roleType === "" ? undefined : localFilters.roleType
-              }
+              value={localFilters.roleType === "" ? undefined : localFilters.roleType}
               onChange={(value) => handleFilterChange("roleType", value)}
-              style={{ width: 100 }}
+              style={{ width: 120 }}
               allowClear
               showSearch
               optionFilterProp="children"
             >
               {roleOptions.map((r) => (
-                <Option key={r.value} value={r.value}>
-                  {r.label}
-                </Option>
+                <Option key={r.value} value={r.value}>{r.label}</Option>
               ))}
             </Select>
           </div>
-          {/* Reset Filters Button */}
-          <div>
+          <div className="flex-shrink-0">
             <Tooltip title={t("Reset Filters")}>
               <button
                 onClick={resetFilters}
-                className="flex items-center justify-center border border-gray-300 rounded-full p-2 hover:animate-spin"
+                className="flex items-center justify-center border border-gray-300 rounded-full p-2 hover:bg-gray-100 hover:animate-spin"
               >
                 <FiRefreshCcw size={20} />
               </button>
             </Tooltip>
           </div>
         </div>
+
         {/* Add Book Issue Button on the Right */}
         <ProtectedAction requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}>
-          <div className="ml-auto">
+          <div className="flex-shrink-0">
             <button
               onClick={handleSidebarOpen}
-              className="flex items-center border border-gray-300 ps-5 py-0 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full text-sm hover:from-purple-600 hover:to-pink-600 transition-colors"
             >
-              <span className="mr-2 text-sm">{t("Add Book Issue")}</span>
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl">+</span>
-              </div>
+              <span className="text-xl">+</span>
+              <span>{t("Add Book Issue")}</span>
             </button>
           </div>
         </ProtectedAction>
@@ -270,23 +217,18 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
       {libraryLoading ? (
         <Skeleton active paragraph={{ rows: 6 }} />
       ) : (
-        <div className="overflow-x-auto bg-white shadow rounded-lg">
-          <table className="min-w-full">
+        <div className="overflow-x-auto bg-white shadow rounded-lg mt-4">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead>
               <tr className="text-left text-gray-700 bg-gray-200">
                 <th className="px-6 py-3 font-semibold">{t("User Name")}</th>
                 <th className="px-6 py-3 font-semibold">{t("User Type")}</th>
-                {/* <th className="px-6 py-3 font-semibold">
-                  {t("Class & Section")}
-                </th> */}
                 <th className="px-6 py-3 font-semibold">{t("Book")}</th>
                 <th className="px-6 py-3 font-semibold">{t("Author")}</th>
                 <th className="px-6 py-3 font-semibold">{t("Issue Date")}</th>
                 <th className="px-6 py-3 font-semibold">{t("Status")}</th>
                 {role !== "teacher" && (
-                  <ProtectedAction
-                    requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}
-                  >
+                  <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}>
                     <th className="px-6 py-3 font-semibold">{t("Action")}</th>
                   </ProtectedAction>
                 )}
@@ -308,9 +250,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
                   <td colSpan={role !== "teacher" ? 8 : 7} className="h-80">
                     <NoDataFound
                       title={t("Book Issues")}
-                      desc={t(
-                        "No book issues available. Try adding or adjusting filters."
-                      )}
+                      desc={t("No book issues available. Try adding or adjusting filters.")}
                       icon={FaBook}
                       iconColor="text-blue-500"
                       textColor="text-gray-600"

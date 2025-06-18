@@ -120,7 +120,7 @@ const StudentCourseProgress = ({ student }) => {
     }).finally(() => {
       setSubjectsFetched(true);
     });
-  }, [dispatch, cid, selectedSubject]);
+  }, [dispatch, cid]);
 
   useEffect(() => {
     if (selectedSubject && selectedSemester && studentSubjectProgress?.length > 0) {
@@ -213,7 +213,7 @@ const StudentCourseProgress = ({ student }) => {
                   <div
                     className={`rounded-lg transition-all duration-200 cursor-pointer`}
                   >
-                    <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} />
+                    <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} selectedSubject={selectedSubject} />
                   </div>
                 </div>
               ))}
