@@ -1,92 +1,102 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Pie } from "react-chartjs-2";
 import "chart.js/auto";
 import { useSelector } from "react-redux";
 
 const StudentGradePieChart = () => {
-  const { studentSubjectProgress } = useSelector((store) => store.admin.all_students);
+  const { studentSubjectProgress } = useSelector((s) => s.admin.all_students);
 
-  // Debugging: Log the data to inspect its structure
-  // console.log("studentSubjectProgress:", studentSubjectProgress);
+  /* ── Build data ────────────────────────────────────────── */
+  const COLORS = [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#FF9F40",
+    "#4BC0C0",
+    "#9966FF",
+  ];
 
-  // Validate and extract subject names and percentage values
   const labels = Array.isArray(studentSubjectProgress)
-    ? studentSubjectProgress.map((subject) => subject.subjectName || "Unknown")
+    ? studentSubjectProgress.map((s) => s.subjectName || "Unknown")
     : [];
+
   const dataValues = Array.isArray(studentSubjectProgress)
-    ? studentSubjectProgress.map((subject) => parseFloat(subject.percentageValue) || 0)
+    ? studentSubjectProgress.map((s) => parseFloat(s.percentageValue) || 0)
     : [];
 
+  const hasData = dataValues.some((v) => v > 0);
 
-  const colors = ["#FF6384", "#36A2EB", "#FFCE56", "#FF9F40", "#4BC0C0", "#9966FF"];
+  const pieData = hasData
+    ? {
+        labels,
+        datasets: [
+          {
+            data: dataValues,
+            backgroundColor: dataValues.map((v, i) =>
+              v === 0 ? "#d3d3d3" : COLORS[i % COLORS.length]
+            ),
+            borderWidth: 5,
+            borderRadius: 10,
+            borderColor: "#ffffff",
+            cutout: "70%",
+          },
+        ],
+      }
+    : {
+        labels: ["No Data"],
+        datasets: [
+          {
+            data: [100],
+            backgroundColor: "#d3d3d3",
+            borderWidth: 5,
+            borderRadius: 10,
+            borderColor: "#ffffff",
+            cutout: "70%",
+          },
+        ],
+      };
 
-  // Check if all data values are 0 or if there's no data
-  const allZero = dataValues.length === 0 || dataValues.every((value) => value === 0);
-
-  // Default data for when there's no data or all values are 0
-  const defaultData = {
-    labels: ["No Data"],
-    datasets: [
-      {
-        data: [100],
-        backgroundColor: "#d3d3d3", // Gray for no data
-        hoverBackgroundColor: "#d3d3d3",
-        borderWidth: 5,
-        borderRadius: 10,
-        borderColor: "#ffffff",
-        cutout: "70%",
-      },
-    ],
-  };
-
-  // Data for the pie chart when there is valid data
-  const data = {
-    labels: labels,
-    datasets: [
-      {
-        data: dataValues,
-        backgroundColor: dataValues.map((value, index) =>
-          value === 0 ? "#d3d3d3" : colors[index % colors.length]
-        ),
-        hoverBackgroundColor: dataValues.map((value, index) =>
-          value === 0 ? "#d3d3d3" : colors[index % colors.length]
-        ),
-        borderWidth: 5,
-        borderRadius: 10,
-        borderColor: "#ffffff",
-        cutout: "70%",
-      },
-    ],
-  };
-
-
+  /* ── Same-size canvas options ──────────────────────────── */
   const options = {
     responsive: true,
-    maintainAspectRatio: false, // Allow the chart to resize freely
+    maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: true,
-        position: "bottom",
-        labels: {
-          boxWidth: 20,
-          padding: 20,
-          usePointStyle: true,
-        },
-      },
+      legend: { display: false }, // we’ll draw our own
       tooltip: {
         callbacks: {
-          label: function (tooltipItem) {
-            return `${tooltipItem.label}: ${tooltipItem.raw}%`;
-          },
+          label: (ctx) => `${ctx.label}: ${ctx.raw}%`,
         },
       },
     },
   };
 
+  /* ── Build custom legend items ─────────────────────────── */
+  const legendItems = useMemo(() => {
+    const bg = pieData.datasets[0].backgroundColor;
+    return pieData.labels.map((l, i) => ({
+      label: l,
+      color: Array.isArray(bg) ? bg[i] : bg,
+    }));
+  }, [pieData]);
+
   return (
-    <div className="w-full h-[18rem] flex flex-col justify-start items-center">
-      <div className="relative w-full h-[14rem]">
-        <Pie data={allZero ? defaultData : data} options={options} />
+    <div className="flex flex-col items-center w-full h-full">
+      {/* Chart */}
+      <div className="relative w-56 h-56 md:w-60 md:h-60">
+        <Pie data={pieData} options={options} />
+      </div>
+
+      {/* Legend */}
+      <div className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm">
+        {legendItems.map(({ label, color }, idx) => (
+          <span key={idx} className="flex items-center gap-1">
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ backgroundColor: color }}
+            />
+            <span>{label}</span>
+          </span>
+        ))}
       </div>
     </div>
   );
