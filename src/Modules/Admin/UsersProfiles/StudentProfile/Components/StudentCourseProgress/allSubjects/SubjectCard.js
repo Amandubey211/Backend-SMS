@@ -12,7 +12,7 @@ const SubjectCard = ({ subject = {} }) => {
     subjectColor = "#ec4899", // fallback pink
   } = subject;
 
-  /** Integer 0-100 padded to two digits */
+  /* Integer 0-100 padded to two digits */
   const pct = String(Math.round(+percentageValue || 0)).padStart(2, "0");
 
   return (
@@ -21,13 +21,20 @@ const SubjectCard = ({ subject = {} }) => {
                   border-gray-200 border-l-4`}
       style={{ borderLeftColor: subjectColor }}
     >
-      {/* Header */}
+      {/* ─── Header ───────────────────────────────────────── */}
       <div className="flex items-center gap-2">
-        {subjectIcon ? (
-          <img src={subjectIcon} alt="" className="h-[50px]" />
-        ) : (
-          <FaBook className="text-[2.2rem]" style={{ color: subjectColor }} />
-        )}
+        {/* Avatar block with fixed size (50 px × 50 px) */}
+        <div className="w-[50px] h-[50px] flex items-center justify-center">
+          {subjectIcon ? (
+            <img
+              src={subjectIcon}
+              alt=""
+              className="w-full h-full object-contain"
+            />
+          ) : (
+            <FaBook className="w-full h-full" style={{ color: subjectColor }} />
+          )}
+        </div>
 
         <div className="flex flex-col">
           <span className="font-medium">{subjectName}</span>
@@ -37,7 +44,7 @@ const SubjectCard = ({ subject = {} }) => {
         </div>
       </div>
 
-      {/* Progress bar */}
+      {/* ─── Progress bar ─────────────────────────────────── */}
       <div className="w-full bg-gray-200 rounded-full h-1.5">
         <div
           className="h-1.5 rounded-full"
@@ -48,7 +55,7 @@ const SubjectCard = ({ subject = {} }) => {
         />
       </div>
 
-      {/* Footer */}
+      {/* ─── Footer ───────────────────────────────────────── */}
       <div className="flex justify-between items-center text-sm">
         <span>
           {completedModule}/{totalModule} Modules

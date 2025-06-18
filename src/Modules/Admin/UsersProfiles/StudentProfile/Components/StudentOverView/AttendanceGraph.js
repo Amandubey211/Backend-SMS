@@ -2,18 +2,17 @@ import React, { useEffect, useState } from "react";
 import { Line } from "react-chartjs-2";
 import { Chart, registerables } from "chart.js";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { fetchAttendanceData } from "../../../../../../Store/Slices/Admin/Users/Students/student.action";
 
 Chart.register(...registerables);
 
 const AttendanceGraph = ({ cid }) => {
   const attendanceData = useSelector(
-    (store) => store.admin.all_students.attendanceData
+    (s) => s.admin.all_students.attendanceData
   );
-
   const dispatch = useDispatch();
 
+  /* ── Local state skeleton ─────────────────────────────── */
   const [chartData, setChartData] = useState({
     labels: [
       "Jan",
@@ -66,48 +65,49 @@ const AttendanceGraph = ({ cid }) => {
     ],
   });
 
+  /* ── Data fetch ───────────────────────────────────────── */
   useEffect(() => {
     dispatch(fetchAttendanceData(cid));
   }, [dispatch, cid]);
 
   useEffect(() => {
-    if (attendanceData) {
-      const months = [
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December",
-      ];
+    if (!attendanceData) return;
 
-      const presentData = [];
-      const absentData = [];
-      const leaveData = [];
+    const monthsFull = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
 
-      months.forEach((month) => {
-        presentData.push(attendanceData[month]?.presentCount || 0);
-        absentData.push(attendanceData[month]?.absentCount || 0);
-        leaveData.push(attendanceData[month]?.leaveCount || 0);
-      });
+    const present = [],
+      absent = [],
+      leave = [];
+    monthsFull.forEach((m) => {
+      present.push(attendanceData[m]?.presentCount || 0);
+      absent.push(attendanceData[m]?.absentCount || 0);
+      leave.push(attendanceData[m]?.leaveCount || 0);
+    });
 
-      setChartData((prev) => ({
-        ...prev,
-        datasets: [
-          { ...prev.datasets[0], data: presentData },
-          { ...prev.datasets[1], data: absentData },
-          { ...prev.datasets[2], data: leaveData },
-        ],
-      }));
-    }
+    setChartData((prev) => ({
+      ...prev,
+      datasets: [
+        { ...prev.datasets[0], data: present },
+        { ...prev.datasets[1], data: absent },
+        { ...prev.datasets[2], data: leave },
+      ],
+    }));
   }, [attendanceData]);
 
+  /* ── Chart options ────────────────────────────────────── */
   const options = {
     responsive: true,
     maintainAspectRatio: false,
@@ -116,10 +116,7 @@ const AttendanceGraph = ({ cid }) => {
         position: "top",
         labels: {
           color: "#6B7280",
-          font: {
-            size: 12,
-            weight: "600",
-          },
+          font: { size: 12, weight: "600" },
           padding: 20,
           usePointStyle: true,
           pointStyle: "circle",
@@ -134,57 +131,33 @@ const AttendanceGraph = ({ cid }) => {
         padding: 12,
         usePointStyle: true,
         callbacks: {
-          label: function (context) {
-            return ` ${context.dataset.label}: ${context.raw}`;
-          },
-          title: function (context) {
-            return `Month: ${context[0].label}`;
-          },
+          label: (ctx) => ` ${ctx.dataset.label}: ${ctx.raw}`,
+          title: (ctx) => `Month: ${ctx[0].label}`,
         },
       },
     },
     scales: {
       y: {
         beginAtZero: true,
-        grid: {
-          color: "#E5E7EB",
-          drawBorder: false,
-        },
-        ticks: {
-          color: "#6B7280",
-          precision: 0,
-          stepSize: 1,
-        },
+        grid: { color: "#E5E7EB", drawBorder: false },
+        ticks: { color: "#6B7280", precision: 0, stepSize: 1 },
       },
       x: {
-        grid: {
-          display: false,
-          drawBorder: false,
-        },
-        ticks: {
-          color: "#6B7280",
-        },
+        grid: { display: false, drawBorder: false },
+        ticks: { color: "#6B7280" },
       },
     },
-    interaction: {
-      intersect: false,
-      mode: "index",
-    },
+    interaction: { intersect: false, mode: "index" },
   };
 
+  /* ── Markup ───────────────────────────────────────────── */
   return (
-    <div className="w-full h-[400px] bg-white rounded-xl p-8 ">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">
-          Monthly Attendance Overview
-        </h3>
-        {/* <div className="flex gap-2">
-          <span className="text-xs text-gray-500">
-            Academic Year: {new Date().getFullYear()}
-          </span>
-        </div> */}
-      </div>
-      <div className="w-full h-[calc(100%-40px)]">
+    <div
+      className="w-full bg-white rounded-xl p-6 overflow-x-auto no-scrollbar"
+      /* flex: let canvas shrink; min-w stops jitter on tiny screens  */
+      style={{ minWidth: "0" }}
+    >
+      <div className="min-w-[640px] h-[340px]">
         <Line data={chartData} options={options} />
       </div>
     </div>

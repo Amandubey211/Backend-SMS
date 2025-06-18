@@ -17,7 +17,7 @@ const StudentOverView = ({ student }) => {
         requiredPermission={PERMISSIONS.GET_COURSE_PROGRESS}
         title="Subjects"
       >
-        <div className="pl-2">
+        <div className="pl-2 ">
           <AllSubjects student={student} />
         </div>
       </ProtectedSection>
