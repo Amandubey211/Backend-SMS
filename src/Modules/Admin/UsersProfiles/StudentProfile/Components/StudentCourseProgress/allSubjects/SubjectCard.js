@@ -1,7 +1,7 @@
 import React from "react";
 import { FaBook } from "react-icons/fa";
 
-const SubjectCard = ({ subject = {} }) => {
+const SubjectCard = ({ subject = {}, selectedSubject }) => {
   const {
     subjectName = "No Subject",
     started = "N/A",
@@ -9,16 +9,16 @@ const SubjectCard = ({ subject = {} }) => {
     completedModule = 0,
     percentageValue = 0,
     subjectIcon = null,
-    subjectColor = "#ec4899", // fallback pink
+    subjectColor = "#ec4899",
+    subjectId // fallback pink
   } = subject;
-
-  /* Integer 0-100 padded to two digits */
-  const pct = String(Math.round(+percentageValue || 0)).padStart(2, "0");
+  /* Integer part of percentageValue */
+  const pct = Math.floor(+percentageValue || 0);
 
   return (
     <div
       className={`bg-white shadow-md rounded-lg flex flex-col gap-3 p-4 border
-                  border-gray-200 border-l-4`}
+                  border-gray-200 ${selectedSubject === subjectId ? 'border-l-[8px]' : 'border-l-[3px]'}`}
       style={{ borderLeftColor: subjectColor }}
     >
       {/* ─── Header ───────────────────────────────────────── */}
@@ -50,7 +50,7 @@ const SubjectCard = ({ subject = {} }) => {
           className="h-1.5 rounded-full"
           style={{
             width: `${percentageValue || 0}%`,
-              backgroundColor: subjectColor,
+            backgroundColor: subjectColor,
           }}
         />
       </div>

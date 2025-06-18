@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 import { AiOutlineFileSearch } from "react-icons/ai";
 import { ChapterSkeleton, ModuleSkeleton } from "../../../../../../Parents/Skeletons";
 
-const MainSection = ({ loading }) => {
+const MainSection = ({ loading, selectedSemester }) => {
   const { t } = useTranslation("admAccounts");
   const [expandedChapters, setExpandedChapters] = useState(null);
   const [modules, setModules] = useState([]);
@@ -16,18 +16,30 @@ const MainSection = ({ loading }) => {
   const { cid } = useParams();
   const { courseProgress } = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
+  // console.log(courseProgress)
   useEffect(() => {
-    setModules(courseProgress?.module || []);
-    setChapters(courseProgress?.module[0]?.chapters || []);
+    if (courseProgress && courseProgress.module && selectedSemester?.id) {
+      setModules(courseProgress.module);
+      // Optionally set the first module as selected if none is selected yet
+      if (
+        !seletedModuleId ||
+        seletedModuleId !== courseProgress.module[0]?.moduleId
+      ) {
+        setSeletedModuleId(courseProgress.module[0]?.moduleId || null);
+        setChapters(courseProgress?.module[0]?.chapters || []);
+
+      }
+    } else {
+      setModules([]);
+      setSeletedModuleId(null);
+    }
 
   }, [courseProgress]);
-
   const selectModule = (module) => {
     setSeletedModuleId(module?.moduleId);
     setChapters(module?.chapters || []);
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
-
   const handleToggle = (id) => {
     if (expandedChapters === id) {
       setExpandedChapters(null);

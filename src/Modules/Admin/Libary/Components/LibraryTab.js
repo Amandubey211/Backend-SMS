@@ -29,7 +29,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
 
-  // fetch class list
+  // Fetch class list
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
@@ -46,7 +46,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
   const { classes } = useSelector((s) => s.admin.class);
   const role = useSelector((s) => s.common.auth.role);
 
-  // local state
+  // Local state
   const [isBookSidebarOpen, setBookSidebarOpen] = useState(false);
   const [isCategorySidebarOpen, setCategorySidebarOpen] = useState(false);
   const [editCategory, setEditCategory] = useState(null);
@@ -56,10 +56,10 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
   const [viewCategory, setViewCategory] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-  // show blur overlay when there are more than 3 categories
+  // Show blur overlay when there are more than 3 categories
   const showBlur = (categories?.length || 0) > 3;
 
-  // handlers
+  // Handlers
   const handleAddCategory = () => {
     setEditCategory(null);
     setCategorySidebarOpen(true);
@@ -136,10 +136,10 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
 
   return (
     <div className="w-full">
-      {/* top row: badges, add-category, filters */}
-      <div className="flex items-center">
-        {/* badges with blur overlay */}
-        <div className="relative">
+      {/* Top row: badges, add-category, filters */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4">
+        {/* Badges with blur overlay */}
+        <div className="relative flex-1 min-w-[300px]">
           <div className="overflow-x-auto whitespace-nowrap no-scrollbar">
             <div className="inline-flex gap-2 py-3">
               <Badge count={getBookCount(null)} showZero style={badgeStyle}>
@@ -214,18 +214,20 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
           )}
         </div>
 
-        {/* add category */}
-        <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK_CATEGORY}>
-          <button
-            onClick={handleAddCategory}
-            className="flex items-center px-4 py-2 ml-2 border-2 border-dashed border-pink-600 text-pink-600 rounded-full text-sm"
-          >
-            <span className="mr-1">+</span> {t("Add Category")}
-          </button>
-        </ProtectedAction>
+        {/* Add category and Add Book buttons */}
+        <div className="flex items-center gap-4">
+          <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK_CATEGORY}>
+            <button
+              onClick={handleAddCategory}
+              className="flex items-center px-4 py-2 border-2 border-dashed border-pink-600 text-pink-600 rounded-full text-sm hover:bg-pink-50 transition-colors"
+            >
+              <span className="mr-1">+</span> {t("Add Category")}
+            </button>
+          </ProtectedAction>
+        </div>
 
-        {/* filters pushed to right */}
-        <div className="ml-auto flex items-center gap-2">
+        {/* Filters pushed to right */}
+        <div className="flex items-center gap-2">
           <Select
             value={filters.class || ""}
             onChange={handleClassSelect}
@@ -243,19 +245,22 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
             ))}
           </Select>
           <Tooltip title={t("Reset Filters")}>
-            <Button onClick={resetFilters} className="rounded-full h-12 w-12">
+            <Button
+              onClick={resetFilters}
+              className="rounded-full h-12 w-12 flex items-center justify-center"
+            >
               <FiRefreshCcw size={20} className="hover:animate-spin" />
             </Button>
           </Tooltip>
         </div>
       </div>
 
-      {/* book listing */}
+      {/* Book listing */}
       <div className="mt-4 p-3">
         {loading ? (
           <Skeleton active paragraph={{ rows: 6 }} />
         ) : filteredBooks.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...filteredBooks].reverse().map((book) => (
               <BookCard key={book._id} book={book} />
             ))}
@@ -273,7 +278,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
         )}
       </div>
 
-      {/* pagination */}
+      {/* Pagination */}
       {!loading && totalPages > 0 && (
         <Pagination
           page={page}
@@ -286,7 +291,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
         />
       )}
 
-      {/* sidebars & modals */}
+      {/* Sidebars & Modals */}
       <Sidebar
         isOpen={isBookSidebarOpen}
         onClose={() => setBookSidebarOpen(false)}
