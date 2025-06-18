@@ -1,10 +1,8 @@
-import React from "react";
 import Layout from "../../../../../Components/Common/Layout";
 import DashLayout from "../../../../../Components/Admin/AdminDashLayout";
 import MainSection from "./MainSection";
 import useNavHeading from "../../../../../Hooks/CommonHooks/useNavHeading ";
 import { useSelector } from "react-redux";
-import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 
 const Grade = () => {
   const className = useSelector(

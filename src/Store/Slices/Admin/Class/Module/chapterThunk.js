@@ -47,7 +47,7 @@ export const addChapter = createAsyncThunk(
       );
 
       if (response && response.success) {
-        toast.success(response.msg);
+        toast.success(response.msg || "Chapter Added");
         await dispatch(fetchModules({ cid, sid: subjectId }));
 
         const updatedModules = getState().admin.module.modules;
@@ -118,7 +118,7 @@ export const editChapter = createAsyncThunk(
         }
       }
 
-      toast.success(response.msg);
+      toast.success(response.msg || "Chapter Updated");
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);
@@ -145,7 +145,7 @@ export const deleteChapter = createAsyncThunk(
       const response = await deleteData(endpoint);
 
       if (response && response.success) {
-        toast.success(response.msg);
+        toast.success(response.msg || "Chapter Deleted");
         await dispatch(fetchModules({ cid, sid: subjectId }));
 
         const modules = getState().admin.module.modules;
