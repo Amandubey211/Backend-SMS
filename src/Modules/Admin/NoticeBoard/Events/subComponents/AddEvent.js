@@ -7,7 +7,7 @@ import { createEventThunk } from "../../../../../Store/Slices/Admin/NoticeBoard/
 import { FiLoader } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
 
-const AddEvent = () => {
+const AddEvent = ({ onSave }) => {
   const { t } = useTranslation("admEvent"); // Use translation hook with "events" namespace
 
   const dispatch = useDispatch();
@@ -58,14 +58,20 @@ const AddEvent = () => {
     return `${hours}:${minute} ${suffix}`;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!eventData.title || !eventData.date) {
       toast.error(t("Please fill in all required fields."));
       return;
     }
     const formattedTime = eventData.time ? formatTimeTo12Hour(eventData.time) : "";
-    dispatch(createEventThunk({ ...eventData, time: formattedTime }));
+    try {
+
+      onSave({ ...eventData, time: formattedTime }); // Pass the event data to the parent
+
+    } catch (error) {
+      toast.error(t("Failed to save event"));
+    }
   };
 
   return (
@@ -157,6 +163,7 @@ const AddEvent = () => {
           type="submit"
           className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           onClick={handleSubmit}
+          disabled={Loading}
         >
           {Loading ? <FiLoader className="animate-spin mr-2" /> : t("Add Event")}
         </button>

@@ -3,14 +3,16 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchBooksThunk,
   issueBookThunk,
+  fetchBookIssuesThunk
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { Select, Radio, DatePicker, Button, Input } from "antd";
-import moment from "moment";
+import dayjs from 'dayjs'
 import { useTranslation } from "react-i18next";
 import { FaSchool } from "react-icons/fa";
 import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
 import { fetchAllUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import toast from "react-hot-toast";
 
 const { Option } = Select;
 
@@ -188,9 +190,12 @@ const AddIssue = ({ onClose, editIssueData }) => {
       classId: issueData.class,
     };
     try {
-      await dispatch(issueBookThunk(submissionData)).unwrap();
+      await dispatch(issueBookThunk(submissionData)).unwrap().then(() => {
+        dispatch(fetchBookIssuesThunk({ page: 1, limit: 10 }))
+      });
     } catch (error) {
       // Handle error if needed
+      toast.error(error)
     } finally {
       setSubmitting(false);
       onClose();
@@ -229,7 +234,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             <div className="flex-1">
               <label
                 htmlFor="class"
-                className="block text-sm font-medium text-gray-700 flex items-center gap-1"
+                className="text-sm font-medium text-gray-700 flex items-center gap-1"
               >
                 <FaSchool /> {t("Class")}
               </label>
@@ -309,9 +314,8 @@ const AddIssue = ({ onClose, editIssueData }) => {
             required
           >
             {filteredUsers?.map((usr) => {
-              const searchString = `${usr.name} ${usr.role} ${
-                usr.admissionNumber || ""
-              }`;
+              const searchString = `${usr.name} ${usr.role} ${usr.admissionNumber || ""
+                }`;
               return (
                 <Option
                   key={usr.userId}
@@ -400,7 +404,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
           <div className="flex-1">
             <label
               htmlFor="issueDate"
-              className="block text-sm font-medium text-gray-700 flex items-center gap-1"
+              className="text-sm font-medium text-gray-700 flex items-center gap-1"
             >
               <FiCalendar /> {t("Issue Date")}
             </label>
@@ -410,7 +414,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
               format="DD-MM-YYYY"
               value={
                 issueData.issueDate
-                  ? moment(issueData.issueDate, "YYYY-MM-DD")
+                  ? dayjs(issueData.issueDate)
                   : null
               }
               onChange={(dateObj) => handleDateChange("issueDate", dateObj)}
@@ -421,7 +425,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
           <div className="flex-1">
             <label
               htmlFor="returnDate"
-              className="block text-sm font-medium text-gray-700 flex items-center gap-1"
+              className="text-sm font-medium text-gray-700 flex items-center gap-1"
             >
               <FiClock /> {t("Return Date")}
             </label>
@@ -431,7 +435,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
               format="DD-MM-YYYY"
               value={
                 issueData.returnDate
-                  ? moment(issueData.returnDate, "YYYY-MM-DD")
+                  ? dayjs(issueData.returnDate)
                   : null
               }
               onChange={(dateObj) => handleDateChange("returnDate", dateObj)}
@@ -442,7 +446,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
         </div>
         {/* Status as Radio Buttons */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+          <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
             <FiAlertCircle /> {t("Status")}
           </label>
           <Radio.Group

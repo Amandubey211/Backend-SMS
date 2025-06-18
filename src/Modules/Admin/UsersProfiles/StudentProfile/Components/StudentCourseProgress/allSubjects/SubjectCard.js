@@ -50,7 +50,7 @@ const SubjectCard = ({ subject = {} }) => {
           className="h-1.5 rounded-full"
           style={{
             width: `${percentageValue || 0}%`,
-            backgroundColor: subjectColor,
+              backgroundColor: subjectColor,
           }}
         />
       </div>

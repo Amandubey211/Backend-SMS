@@ -9,7 +9,8 @@ import { FaBook } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { Select, Skeleton, Input, Tooltip } from "antd";
 import { FiRefreshCcw } from "react-icons/fi";
-import  Pagination from '../../../../Components/Common/pagination'
+
+import Pagination from '../../../../Components/Common/pagination'
 const { Option } = Select;
 const { Search } = Input;
 
@@ -45,6 +46,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
   } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
   const { totalPages, totalBooks } = useSelector((state) => state.admin.library);
+  console.log("BookIssue",bookIssues)
   const sectionList = useSelector(
     (store) => store.admin.group_section.sectionsList
   );
@@ -53,9 +55,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
   // Local filters state
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
-  useEffect(() => {
-    // Optionally fetch additional data here.
-  }, [dispatch]);
+ 
 
   const handleFilterChange = (name, value) => {
     setLocalFilters((prev) => ({ ...prev, [name]: value }));
@@ -259,7 +259,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page,
             >
               <span className="mr-2 text-sm">{t("Add Book Issue")}</span>
               <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl -mt-2">+</span>
+                <span className="text-3xl">+</span>
               </div>
             </button>
           </div>

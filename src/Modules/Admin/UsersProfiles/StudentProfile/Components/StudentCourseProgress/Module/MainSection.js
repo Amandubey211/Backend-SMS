@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Chapter from "./Components/Chapter";
-import ModuleCard from "./Components/ModuleCard";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { GoAlertFill } from "react-icons/go";
-import { fetchCourseProgress } from "../../../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { FaCheckCircle } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import { AiOutlineFileSearch } from "react-icons/ai";
+import { ChapterSkeleton, ModuleSkeleton } from "../../../../../../Parents/Skeletons";
 
-const MainSection = () => {
-  const { t } = useTranslation('admAccounts');
+const MainSection = ({ loading }) => {
+  const { t } = useTranslation("admAccounts");
   const [expandedChapters, setExpandedChapters] = useState(null);
   const [modules, setModules] = useState([]);
   const [seletedModuleId, setSeletedModuleId] = useState();
@@ -18,17 +16,15 @@ const MainSection = () => {
   const { cid } = useParams();
   const { courseProgress } = useSelector((store) => store.admin.all_students);
   const dispatch = useDispatch();
-
   useEffect(() => {
     setModules(courseProgress?.module || []);
-    if (courseProgress?.module?.length > 0) {
-      setChapters(courseProgress?.module[0]?.chapters || []);
-    }
+    setChapters(courseProgress?.module[0]?.chapters || []);
+
   }, [courseProgress]);
 
   const selectModule = (module) => {
     setSeletedModuleId(module?.moduleId);
-    setChapters(module?.chapters|| []);
+    setChapters(module?.chapters || []);
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
@@ -40,21 +36,19 @@ const MainSection = () => {
     }
   };
   return (
-    <div className="flex min-h-screen my-2">
+    <div className="flex min-h-screen">
       <div className="w-[65%] bg-white p-2 border-l">
         <div className="bg-white p-2 rounded-lg">
-          <div className="flex justify-between items-center mb-5">
-            {/* Add Chapter Button (if needed) */}
-          </div>
-          {chapters?.length > 0 ? (
-              <Chapter
-                key={0}
-                id={chapters[0].chapterId}
-                assignments={chapters[0].assignments}
-                attachments={chapters[0].attachments}
-                quizzes={chapters[0].quizzes}
-              />
-           
+          {loading ? (
+            <ChapterSkeleton count={3} /> // Use ChapterSkeleton for chapter loading
+          ) : chapters?.length > 0 ? (
+            <Chapter
+              key={0}
+              id={chapters[0].chapterId}
+              assignments={chapters[0].assignments}
+              attachments={chapters[0].attachments}
+              quizzes={chapters[0].quizzes}
+            />
           ) : (
             <div className="flex justify-center items-center font-bold text-gray-500 my-20 h-full w-full">
               <div className="flex items-center justify-center flex-col text-2xl">
@@ -75,16 +69,18 @@ const MainSection = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {modules?.map((module, index) => (
+            {loading ? (
+              <ModuleSkeleton count={3} /> // Use ModuleSkeleton for module loading
+            ) : modules?.map((module, index) => (
               <div
                 key={index}
                 onClick={() => selectModule(module)}
-                className={`cursor-pointer`}
+                className="cursor-pointer"
               >
                 <div
                   className={`relative mb-4 border-gradient bg-white rounded-lg shadow-md ${seletedModuleId === module.moduleId
-                      ? "border border-pink-500 rounded-lg"
-                      : null
+                    ? "border border-pink-500 rounded-lg"
+                    : null
                     }`}
                 >
                   <img

@@ -106,7 +106,7 @@ const LibraryAndBookIssue = () => {
                   >
                     <span className="mr-2 text-sm">{t("Add Book")}</span>
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                      <span className="text-3xl -mt-2">+</span>
+                      <span className="text-3xl ">+</span>
                     </div>
                   </button>
                 </ProtectedAction>

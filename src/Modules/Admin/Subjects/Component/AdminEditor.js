@@ -1,11 +1,4 @@
-import React, {
-  memo,
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-  useEffect,
-} from "react";
+import React, { memo, useState, useRef, useCallback, useMemo, useEffect } from "react";
 import JoditEditor from "jodit-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -38,13 +31,13 @@ function createFileWrapper(fileUrl, publicId) {
          data-public-id="${publicId}"
          data-uploaded-at="${now}"
          contenteditable="false"
-         style="position: relative; display: inline-block; margin: 5px;">
+         style="position: relative; display:flex; margin: 5px; align-items:center; gap:2px;">
       <a href="${fileUrl}" target="_blank" rel="noopener noreferrer"
          style="display: inline-flex; align-items: center; padding: 8px 16px; background-color: #C71585; color: #fff; border-radius: 4px; text-decoration: none; font-weight: bold;">
         📄 View PDF
       </a>
       <button type="button" class="delete-btn"
-              style="position: absolute; top: 5px; right: 5px; width:24px; height:24px; border-radius:50%; background: rgba(0,0,0,0.6); color: #fff; border: none; font-size:16px; line-height:24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s;">
+              style="width:20px; height:20px; border-radius:50%; background: rgba(0,0,0,0.6); color: #fff; border: none; font-size:18px; line-height:24px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.3s;">
         ×
       </button>
     </div>
@@ -63,13 +56,12 @@ const EditorComponent = ({
   nameError,
   contentError,
   inputRef,
-  readOnly = false, // Added readOnly prop with default false
+  readOnly,
 }) => {
   const editor = useRef(null);
   const containerRef = useRef(null);
   const lastDeleteTimeRef = useRef(0);
   const toastActions = useRef(new Set());
-
   const [scrollPosition, setScrollPosition] = useState(0);
   const processedDeletions = useRef(new Set());
   const uploadInProgress = useRef(false);
@@ -270,7 +262,6 @@ const EditorComponent = ({
         if (!publicId || processedDeletions.current.has(publicId)) return;
 
         const actionId = `delete-${publicId}-${now}`;
-        console.log(`Attempting to delete asset with publicId: ${publicId}`);
         const editorInstance = editor.current;
         let progressBarObj;
         if (editorInstance?.toolbar?.container) {
@@ -281,7 +272,6 @@ const EditorComponent = ({
 
         try {
           const data = await deleteMediaByPublicId(publicId);
-          console.log(`Deletion response: ${JSON.stringify(data)}`);
           if (data.result === "ok" || data.result === "not found") {
             if (progressBarObj)
               updateProgressBar(progressBarObj.progressBar, 100);
@@ -344,7 +334,7 @@ const EditorComponent = ({
 
   const config = useMemo(
     () => ({
-      readonly: readOnly, // Use the readOnly prop to control editability
+      readonly: readOnly,
       height: isCreateQuestion ? 300 : 400,
       spellcheck: true,
       toolbarSticky: true,
@@ -399,11 +389,27 @@ const EditorComponent = ({
         afterInit: (editorInstance) => {
           editor.current = editorInstance;
           containerRef.current = editorInstance.container;
+          // Initial focus without resetting cursor
+          if (!readOnly) editorInstance.focus();
         },
       },
     }),
-    [isCreateQuestion, triggerImageUpload, triggerFileUpload, readOnly] // Added readOnly to dependencies
+    [isCreateQuestion, triggerImageUpload, triggerFileUpload, readOnly]
   );
+
+  // Preserve cursor position during content updates
+  useEffect(() => {
+    const editorInstance = editor.current;
+    if (editorInstance && !readOnly) {
+      const selection = editorInstance.selection;
+      if (selection) {
+        selection.save(); // Save the current cursor position
+        editorInstance.setEditorValue(editorContent); // Update content
+        selection.restore(); // Restore the cursor position
+        editorInstance.focus(); // Ensure focus is maintained
+      }
+    }
+  }, [editorContent, readOnly]);
 
   return (
     <div className="relative w-full bg-white mb-3 p-2">
@@ -420,8 +426,8 @@ const EditorComponent = ({
               onChange={(e) => onNameChange(e.target.value)}
               ref={inputRef}
               className={`w-full p-2 border rounded-sm shadow-sm focus:outline-none focus:ring-1 ${nameError
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-blue-500"
+                ? "border-red-500 focus:ring-red-500"
+                : "border-gray-300 focus:ring-blue-500"
                 }`}
               spellCheck="true"
             />
@@ -441,24 +447,22 @@ const EditorComponent = ({
       <div
         className={`${contentError ? "border border-red-500 rounded-sm p-1" : ""}`}
       >
-        {
-          readOnly ?
-            <JoditEditor
-              ref={editor}
-              value={editorContent}
-              config={config}
-              tabIndex={1}
-            />
-            :
-            <JoditEditor
-              ref={editor}
-              value={editorContent}
-              config={config}
-              tabIndex={1}
-              onChange={(newContent) => onEditorChange(newContent)}
-            />
-
-        }
+        {readOnly ? (
+          <JoditEditor
+            ref={editor}
+            value={editorContent}
+            config={config}
+            tabIndex={1}
+          />
+        ) : (
+          <JoditEditor
+            ref={editor}
+            value={editorContent}
+            config={config}
+            tabIndex={1}
+            onChange={onEditorChange}
+          />
+        )}
       </div>
       {contentError && (
         <motion.p

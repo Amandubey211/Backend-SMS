@@ -42,7 +42,6 @@ const ChapterItem = ({ type, title, submitted, url }) => {
   return (
     url !== null ? (
       <div className="flex items-center mb-3 rounded-lg p-2 hover:bg-gray-100 transition-colors">
-        <span className="capitalize font-semibold font-roboto text-gray-700 w-24">{type}</span>
         <span className="p-2 bg-white rounded-full ml-2">{getIcon(type)}</span>
         <div className="flex flex-col gap-1 justify-center pr-4 flex-grow">
           <Tooltip
@@ -103,7 +102,6 @@ const ChapterItem = ({ type, title, submitted, url }) => {
       </div>
     ) : (
       <div className="flex items-center mb-3 gap-2 rounded-lg p-2 hover:bg-gray-100 transition-colors">
-        <span className="capitalize font-semibold font-roboto text-gray-700 w-24">{type}</span>
         <span className="p-2 bg-white rounded-full">{getIcon(type)}</span>
         <div className="flex flex-col gap-1 justify-center flex-grow">
           <Tooltip

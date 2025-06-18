@@ -20,7 +20,7 @@ const convertTo24HourFormat = (time12h) => {
   return `${hours}:${minutes}`;
 };
 
-const UpdateEvent = () => {
+const UpdateEvent = ({ onSave }) => {
   const { t } = useTranslation("admEvent");
   const dispatch = useDispatch();
   const selectedEvent = useSelector((state) => state.admin.events.selectedEvent);
@@ -43,8 +43,8 @@ const UpdateEvent = () => {
       setEventData({
         title: selectedEvent.title,
         location: selectedEvent.location,
-        date: format(new Date(selectedEvent.date), "yyyy-MM-dd"), // Format date to yyyy-MM-dd
-        time: convertTo24HourFormat(selectedEvent.time), // Convert time to 24-hour format
+        date: format(new Date(selectedEvent.date), "yyyy-MM-dd"),
+        time: convertTo24HourFormat(selectedEvent.time),
         director: selectedEvent.director,
         type: selectedEvent.type,
         description: selectedEvent.description,
@@ -78,18 +78,21 @@ const UpdateEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!eventData.title || !eventData.date || !eventData.time ) {
+    if (!eventData.title || !eventData.date || !eventData.time) {
       toast.error(t("Please fill in all required fields."));
       return;
     }
 
-    // Dispatch the update event thunk
-    await dispatch(updateEventThunk({ eventId: selectedEvent._id, eventData }));
-    toast.success(t("Event updated successfully!"));
+    try {
+
+      onSave({ eventId: selectedEvent._id, eventData }); // Pass the event data to the parent
+
+    } catch (error) {
+      toast.error(t("Failed to update event."));
+    }
   };
 
   return (
-    
     <div className="flex flex-col h-full max-w-xl mx-auto border-t bg-white">
       {/* Scrollable content area */}
       <div className="flex-grow overflow-auto p-4 no-scrollbar">
@@ -163,7 +166,7 @@ const UpdateEvent = () => {
               value={eventData.description}
               onChange={handleInputChange}
               rows={5}
-              className="mt-1 block w-full rounded-md border border-gray-700  p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-700 p-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
               placeholder={t("Enter event description")}
             />
           </div>
@@ -176,6 +179,7 @@ const UpdateEvent = () => {
           type="submit"
           className="w-full flex justify-center items-center bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-md"
           onClick={handleSubmit}
+          disabled={loading}
         >
           {loading ? t("Updating...") : t("Update Event")}
         </button>

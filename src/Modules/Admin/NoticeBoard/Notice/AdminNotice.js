@@ -269,6 +269,7 @@ const AdminNotice = () => {
               ".jodit-ui-list__box",
               ".jodit-popup",
               ".jodit-toolbar-button",
+              ".ant-select-clear"
             ]}
             width="70%"
           >
