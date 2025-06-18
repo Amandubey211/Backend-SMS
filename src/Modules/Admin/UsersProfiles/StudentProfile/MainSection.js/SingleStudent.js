@@ -56,7 +56,7 @@ const SingleStudent = () => {
     <Layout title="Student Details">
       <DashLayout>
         <div className="flex gap-2   ">
-          <div className="flex flex-col  h-auto w-[25%]">
+          <div className="flex flex-col h-auto w-[18%] min-w-[220px]">
             <StudentProfile student={student} />
             <NavigationMenu
               activeItem={activeItem}
@@ -93,7 +93,7 @@ const SingleStudent = () => {
               }
             />
           </div>
-          <div className="flex w-[75%] border-l border-l-gray-200">
+          <div className="flex w-[80%] border-l border-l-gray-200">
             <div className="w-full">{renderContent()}</div>
           </div>
         </div>
