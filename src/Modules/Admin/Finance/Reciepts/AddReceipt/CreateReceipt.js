@@ -91,35 +91,33 @@ const CreateReceipt = () => {
   }
 
   const calculateLineItemValues = (item) => {
-    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
-    const baseAmount = item.rate * item.quantity;
+    const roundToFive = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
 
+    const baseAmount = item.rate * item.quantity;
     const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
-    const taxAmount = baseAmount * (item.tax || 0) / 100;
-    const newAmount = baseAmount + taxAmount + penaltyAmount;
+    const taxAmount = (baseAmount * (item.tax || 0)) / 100;
+
+    let finalAmount = roundToFive(baseAmount + penaltyAmount + taxAmount);
 
     let discountAmount = 0;
-
-    // Handle percentage discount on baseAmount only
     if (item.discountType === "percentage") {
-      discountAmount = newAmount * (editableDiscounts[item._id] || 0) / 100;
-    }
-    // Handle fixed discount
-    else {
+      discountAmount = (finalAmount * (editableDiscounts[item._id] || 0)) / 100;
+    } else {
       discountAmount = parseFloat(editableDiscounts[item._id] || 0);
     }
 
-    const finalAmount = roundToTwo(newAmount - discountAmount);
+    finalAmount -= discountAmount;
 
     return {
-      baseAmount,
-      discountAmount,
-      penaltyAmount,
-      taxAmount,
-      finalAmount,
-      remaining: finalAmount - (item.paid_amount || 0),
+      baseAmount: roundToFive(baseAmount),
+      discountAmount: roundToFive(discountAmount),
+      penaltyAmount: roundToFive(penaltyAmount),
+      taxAmount: roundToFive(taxAmount),
+      finalAmount: roundToFive(finalAmount),
+      remaining: roundToFive(finalAmount - (item.paid_amount || 0)),
     };
   };
+
 
 
 
@@ -275,9 +273,9 @@ const CreateReceipt = () => {
                           <tr key={item._id || index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                             <td className="p-2 border">{item.name || "N/A"}</td>
                             <td className="p-2 border">{item.itemDetails} <br /> {item.frequency !== "Permanent Purchase" && ` ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
-                            <td className="p-2 border text-start">{item.rate?.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{item.rate}</td>
                             <td className="p-2 border text-start">{item.quantity || 1}</td>
-                            <td className="p-2 border text-start">{item.tax.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{item.tax}</td>
                             <td className="p-2 border text-start">
                               <input
                                 type="number"
@@ -299,9 +297,9 @@ const CreateReceipt = () => {
                                 {item.discountType === "percentage" && <span>%</span>}
                               </div>
                             </td>
-                            <td className="p-2 border text-start">{values.finalAmount.toFixed(2)}</td>
-                            <td className="p-2 border text-start">{item.paid_amount?.toFixed(2) || 0}</td>
-                            <td className="p-2 border text-start">{values.remaining.toFixed(2)}</td>
+                            <td className="p-2 border text-start">{values.finalAmount}</td>
+                            <td className="p-2 border text-start">{item.paid_amount || 0}</td>
+                            <td className="p-2 border text-start">{values.remaining}</td>
                             <td className="p-2 border text-start">{item?.dueDate?.slice(0, 10) || " "}</td>
                             <td className="pl-1 border text-start">
                               <input type="Number" className="w-[7rem] border border-gray-300 rounded-md p-2"
@@ -322,13 +320,13 @@ const CreateReceipt = () => {
 
                     </div>
                     <div className="flex flex-col items-start p-4 w-[40%] border-l-2 border-gray-300 text-sm">
-                      <p><strong>Total Amount</strong> = {totalAmount?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Discount</strong> = {totalDiscount?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Penalty</strong> = {totalPenalty?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Tax</strong> = {totalTax?.toFixed(2)}  {invoiceData?.schoolId?.currency}</p>
-                      <p className="border-t mt-2"><strong>Final Amount</strong> = {finalAmount?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Paid</strong> = {totalPaid?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Remaining</strong> = {(finalAmount - totalPaid)?.toFixed(2)} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Amount</strong> = {totalAmount} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Discount</strong> = {totalDiscount} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Penalty</strong> = {totalPenalty} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Tax</strong> = {totalTax}  {invoiceData?.schoolId?.currency}</p>
+                      <p className="border-t mt-2"><strong>Final Amount</strong> = {finalAmount} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Paid</strong> = {totalPaid} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Remaining</strong> = {(finalAmount - totalPaid).toFixed(5)} {invoiceData?.schoolId?.currency}</p>
                     </div>
                   </div>
 

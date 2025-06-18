@@ -34,16 +34,18 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
     totalTax = 0,
     totalPenalty = penalty,
     totalDiscount = 0;
+    const roundToFive = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
 
   lineItems.forEach((item) => {
     totalAmount += item.final_amount || 0;
     totalPaid += item.paid_amount || 0;
     totalRemaining += item.remaining_amount || 0;
-    totalTax += ((item.rate * item.quantity) / 100) * item.tax || 0;
-    totalPenalty += item.penalty_amount || 0;
+    totalTax += roundToFive(((item.rate * item.quantity) / 100) * item.tax || 0);
+    totalPenalty += roundToFive(item.penalty_amount || 0);
+    const newAmount = (item.rate * item.quantity) + totalPenalty + totalTax
     totalDiscount +=
       item.discountType === "percentage"
-        ? (item.final_amount * item.discount) / 100
+        ? roundToFive((newAmount * item.discount) / 100)
         : item.discount;
   });
 
@@ -58,7 +60,7 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
   } = schoolId || {};
 
   return (
-    <div className="p-6 bg-gray-50 rounded-md shadow-lg  max-w-3xl mx-auto " ref={ref}>
+    <div className="p-4 bg-gray-50 rounded-md shadow-lg  max-w-3xl mx-auto " ref={ref}>
 
       <div className="flex w-full flex-row  gap-10 mb-2 ">
 
@@ -124,14 +126,14 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
               <td className="p-2 border-4 border-white">{item.name || "N/A"}</td>
               <td className="p-2 border-4 border-white">{item.itemDetails} <br /> {item.frequency != "Permanent Purchase" && `
                ${item.frequency} from ${item?.startDate?.slice(0, 10)} to ${item?.endDate?.slice(0, 10)}`}</td>
-              <td className="p-2 border-4 border-white text-start">{item.rate?.toFixed(2)}</td>
+              <td className="p-2 border-4 border-white text-start">{item.rate}</td>
               <td className="p-2 border-4 border-white text-start">{item.quantity || 1}</td>
-              <td className="p-2 border-4 border-white text-start">{item.tax?.toFixed(2)}</td>
-              <td className="p-2 border-4 border-white text-start">{item.penalty_amount?.toFixed(2)}</td>
-              <td className="p-2 border-4 border-white text-start">{item.discount?.toFixed(2)}{item.discountType == "percentage" && "%"}</td>
-              <td className="p-2 border-4 border-white text-start">{item.final_amount?.toFixed(2)}</td>
-              <td className="p-2 border-4 border-white text-start">{item.paid_amount?.toFixed(2) || 0}</td>
-              <td className="p-2 border-4 border-white text-start">{item.remaining_amount?.toFixed(2) || 0}</td>
+              <td className="p-2 border-4 border-white text-start">{item.tax}</td>
+              <td className="p-2 border-4 border-white text-start">{item.penalty_amount}</td>
+              <td className="p-2 border-4 border-white text-start">{item.discount}{item.discountType == "percentage" && "%"}</td>
+              <td className="p-2 border-4 border-white text-start">{item.final_amount}</td>
+              <td className="p-2 border-4 border-white text-start">{item.paid_amount || 0}</td>
+              <td className="p-2 border-4 border-white text-start">{item.remaining_amount || 0}</td>
               <td className="p-2 border-4 border-white text-start">{item?.dueDate?.slice(0, 10) || " "}</td>
             </tr>
           ))}
@@ -145,27 +147,27 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
 
               <tr className="border-4 border-white text-start" >
                 <td className="p-2  text-center" colSpan={16}>Total Tax </td>
-                <td className="p-2 border-4 border-white">{totalTax?.toFixed(2)} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalTax} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2  text-center" colSpan={16}>Total Penalty</td>
-                <td className="p-2 border-4 border-white">{totalPenalty?.toFixed(2)} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalPenalty} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2  text-center" colSpan={16}>Total Discount</td>
-                <td className="p-2 border-4 border-white">{totalDiscount?.toFixed(2)} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalDiscount} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2 font-semibold text-center" colSpan={16}>Final Amount</td>
-                <td className="p-2 border-4 border-white">{totalAmount?.toFixed(2)} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalAmount} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2  text-center" colSpan={16}>Amount Paid</td>
-                <td className="p-2 border-4 border-white">{totalPaid?.toFixed(2)} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalPaid} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2 font-semibold text-center" colSpan={16}>Balance Due</td>
-                <td className="p-2 border-4 border-white">{(totalAmount - totalPaid).toFixed(2)} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalRemaining} {currency}</td>
               </tr>
             </tbody>
           </table>
