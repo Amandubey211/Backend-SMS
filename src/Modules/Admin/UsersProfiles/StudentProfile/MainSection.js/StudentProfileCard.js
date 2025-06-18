@@ -8,7 +8,7 @@ import {
   setSelectedClassName,
 } from "../../../../../Store/Slices/Common/User/reducers/userSlice";
 
-const StudentProfileCard = ({ student }) => {
+function StudentProfileCard({ student }) {
   const { t } = useTranslation("admAccounts");
   const { role } = useSelector((s) => s.common.auth);
   const navigate = useNavigate();
@@ -16,59 +16,51 @@ const StudentProfileCard = ({ student }) => {
 
   const handleClassClick = useCallback(() => {
     if (!student?.presentClassId) return;
-
     dispatch(setSelectedClassName(student?.className));
-    navigate(`/class/${student?.presentClassId}`);
-  }, [dispatch, navigate, student?.presentClassId, student?.className, t]);
+    navigate(`/class/${student.presentClassId}`);
+  }, [dispatch, navigate, student]);
 
   return (
-    <div className="flex flex-col items-center p-3 py-5 gap-2">
+    <section className="flex flex-col items-center gap-1 p-3 ">
+      {/* Compact avatar */}
       <img
         src={student?.profile || profileIcon}
         alt={t("student_image")}
-        className="rounded-full object-cover w-[100px] h-[100px] bg-gray-300 border"
+        className="w-28 h-28 rounded-full object-cover border bg-gray-200"
       />
 
-      <span className="font-bold capitalize">
-        {student?.firstName + " " + student?.lastName}
-      </span>
+      <h2 className="text-sm font-semibold capitalize text-center">
+        {student?.firstName} {student?.lastName}
+      </h2>
 
-      <div className="flex gap-4 text-sm font-medium text-gray-500">
-        <span className="text-black">
-          {t("Class")}:{" "}
-          <span className="text-gray-500">
-            {student?.className ?? t("N/A")}
-          </span>{" "}
-          <span className="text-gray-300">|</span>
+      <div className="flex gap-2 text-xs text-gray-600">
+        <span>
+          {t("Class")}: {student?.className ?? t("N/A")}
         </span>
-        <span className="text-black">
-          {t("Section")}:{" "}
-          <span className="text-gray-500">
-            {student?.sectionName ?? t("N/A")}
-          </span>
+        <span>|</span>
+        <span>
+          {t("Section")}: {student?.sectionName ?? t("N/A")}
         </span>
       </div>
 
-      <span>
+      <p className="text-xs text-gray-600">
         {t("ID")}:{" "}
-        <span className="text-gray-500">
+        <span className="font-medium">
           {student?.admissionNumber ?? t("N/A")}
         </span>
-      </span>
+      </p>
 
       {(role === "admin" || role === "teacher") && (
         <button
-          type="button"
           onClick={handleClassClick}
-          className="mt-2 border rounded-md px-9 py-1 border-red-300 cursor-pointer"
+          className="mt-2 rounded-md border border-pink-200 px-4 py-1 text-xs
+                     font-semibold text-pink-600 hover:bg-pink-50"
         >
-          <span className="font-semibold bg-gradient-to-r from-pink-500 to-purple-500 text-transparent bg-clip-text">
-            {t("Class")}
-          </span>
+          {t("Class")}
         </button>
       )}
-    </div>
+    </section>
   );
-};
+}
 
 export default memo(StudentProfileCard);

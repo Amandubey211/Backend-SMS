@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+
 import SubjectSideBar from "../../Component/SubjectSideBar";
 import GradeHeader from "./Component/GradeHeader";
 import StudentTable from "./Component/StudentTable";
 import StudentGradeModal from "./StudentGradeViewModal/StudentGradeModal";
+
 import ProtectedSection from "../../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../../config/permission";
+
 import { fetchSubjectGrades } from "../../../../../Store/Slices/Admin/Class/grades/grades.action";
 import { fetchStudentGrades } from "../../../../../Store/Slices/Admin/Users/Students/student.action";
 import { fetchFilteredAssignments } from "../../../../../Store/Slices/Admin/Class/Assignment/assignmentThunks";
@@ -16,16 +19,17 @@ import { fetchFilteredQuizzesThunk } from "../../../../../Store/Slices/Admin/Cla
 const MainSection = () => {
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
+
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
 
-  // Search/filter states
+  /* ───────── Local state ───────── */
   const [search, setSearch] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [student, setStudent] = useState(null);
 
-  // Filter state including semesterId
+  /* ───────── Filters (incl. semester) ───────── */
   const [filters, setFilters] = useState({
     moduleId: "",
     classId: cid,
@@ -39,82 +43,83 @@ const MainSection = () => {
     (store) => store.admin.subject_grades
   );
 
+  /* Sync semesterId when the user picks / changes semester */
   useEffect(() => {
     if (selectedSemester) {
-      setFilters((prev) => ({
-        ...prev,
-        semesterId: selectedSemester.id,
-      }));
+      setFilters((prev) => ({ ...prev, semesterId: selectedSemester.id }));
     }
   }, [selectedSemester]);
 
-  // Fetch data on mount or when filters change
+  /* Fetch grades + ancillary lists whenever filters change */
   useEffect(() => {
-    if (!filters.semesterId) return;
+    if (!filters.semesterId) return; // nothing until we have a semester
+
     dispatch(fetchSubjectGrades({ classId: cid, subjectId: sid, filters }));
     dispatch(fetchModules({ cid, sid }));
     dispatch(fetchFilteredAssignments({ sid }));
     dispatch(fetchFilteredQuizzesThunk({ sid }));
   }, [dispatch, cid, sid, filters]);
 
-  // Stabilize search change handler
-  const handleSearchChange = useCallback((value) => {
-    setSearch(value);
-  }, []);
+  /* Search bar handler */
+  const handleSearchChange = useCallback((val) => setSearch(val), []);
 
-  // Use a functional update to avoid stale closures and remove filters from dependencies
+  /* Header filter handler */
   const handleFilterChange = useCallback(
     (name, value) => {
-      setFilters((prevFilters) => {
-        const updatedFilters = { ...prevFilters, [name]: value };
+      setFilters((prev) => {
+        const next = { ...prev, [name]: value };
 
-        // Build params with only valid filter values
+        // build minimal params for re-fetch
         const params = {};
-        if (updatedFilters.moduleId) params.moduleId = updatedFilters.moduleId;
-        if (updatedFilters.quizId) params.quizId = updatedFilters.quizId;
-        if (updatedFilters.assignmentId)
-          params.assignmentId = updatedFilters.assignmentId;
-        if (updatedFilters.semesterId)
-          params.semesterId = updatedFilters.semesterId;
+        if (next.moduleId) params.moduleId = next.moduleId;
+        if (next.quizId) params.quizId = next.quizId;
+        if (next.assignmentId) params.assignmentId = next.assignmentId;
+        if (next.semesterId) params.semesterId = next.semesterId;
 
         dispatch(
           fetchSubjectGrades({ classId: cid, subjectId: sid, filters: params })
         );
-        return updatedFilters;
+        return next;
       });
     },
     [dispatch, cid, sid]
   );
 
-  // Handle student row click
+  /* Row click → open modal (🔑 now passes semesterId too) */
   const handleRowClick = (clickedStudent) => {
-    const params = {};
+    if (!clickedStudent) return;
+
+    const params = { semesterId: filters.semesterId };
     if (sid) params.subjectId = sid;
+
     dispatch(
       fetchStudentGrades({
         params,
-        studentId: clickedStudent?.studentId,
+        studentId: clickedStudent.studentId,
         studentClassId: cid,
       })
     );
+
     setStudent(clickedStudent);
     setIsModalOpen(true);
   };
 
-  // Modal close handler
+  /* Close modal */
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setStudent(null);
   };
 
-  // Filter students based on search text
-  const filteredStudents = subjectGrades?.filter((i) =>
-    i?.studentName?.toLowerCase().includes(search.toLowerCase())
+  /* Simple client-side search */
+  const filteredStudents = subjectGrades?.filter((s) =>
+    s.studentName.toLowerCase().includes(search.toLowerCase())
   );
 
+  /* ───────── Render ───────── */
   return (
     <div className="flex w-full h-full">
       <SubjectSideBar />
+
       <ProtectedSection
         title="Grades"
         requiredPermission={PERMISSIONS.GRADES_OF_ONE_CLASS}
@@ -124,6 +129,7 @@ const MainSection = () => {
             onSearch={handleSearchChange}
             onFilterChange={handleFilterChange}
           />
+
           <div className="h-screen overflow-y-scroll no-scrollbar">
             <StudentTable
               students={filteredStudents}
@@ -132,6 +138,7 @@ const MainSection = () => {
             />
           </div>
         </div>
+
         {subjectGrades && (
           <StudentGradeModal
             isOpen={isModalOpen}

@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import { Card, Alert, Steps, Button, message } from "antd"; // ⬅️ added `message`
+import { Card, Alert, Steps, Button, message } from "antd";
 import { motion } from "framer-motion";
 
 import SubjectSideBar from "../../Component/SubjectSideBar";

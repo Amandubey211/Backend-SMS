@@ -29,7 +29,6 @@ const QuestionForm = ({
 }) => {
   const { t } = useTranslation("admModule");
   const [answerError, setAnswerError] = useState("");
-
   /* ─────────────────── validation & submit ─────────────────── */
   const handleAddQuestion = () => {
     if (

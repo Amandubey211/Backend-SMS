@@ -149,7 +149,7 @@ function MainSection() {
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
-
+  const isAdmin = role?.toLowerCase() === "admin";
   // Fetch class details on mount/update
   useEffect(() => {
     dispatch(fetchClassDetails(cid));
@@ -364,7 +364,7 @@ function MainSection() {
       </Sidebar>
       {/* Sidebar for Semester Management */}
       <Sidebar
-        title="Semester Management"
+        title={isAdmin ? t("Semester Management") : t("Select Semester")}
         isOpen={isSemesterSidebarOpen}
         onClose={() => setIsSemesterSidebarOpen(false)}
         width="95%"

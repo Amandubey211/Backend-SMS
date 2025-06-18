@@ -116,3 +116,124 @@ const AnnouncementList = () => {
 };
 
 export default AnnouncementList;
+
+
+
+
+
+
+// import React, { useEffect, useState } from "react";
+// import { useSelector, useDispatch } from "react-redux";
+// import AnnouncementHeader from "./AnnouncementHeader";
+// import AnnouncementCard from "./AnnouncementCard";
+// import AnnouncementSkeletonCard from "./AnnouncementSkeletonCard";
+// import { fetchAnnouncements } from "../../../../../../Store/Slices/Admin/Class/Announcement/announcementThunk";
+// import { useParams } from "react-router-dom";
+// import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+// import { AiOutlineBell } from "react-icons/ai";
+// import { Tabs } from "antd";
+
+// const { TabPane } = Tabs;
+
+// // Random brand colours for cards
+// const COLORS = [
+//   "#efc42f",
+//   "#ee69b6",
+//   "#0066ad",
+//   "#b2cd09",
+//   "#5ac67c",
+//   "#e040ff",
+//   "#fd8263",
+//   "#5b9ef2",
+//   "#9966f6",
+//   "#5ac67c",
+// ];
+// const randomColor = () => COLORS[Math.floor(Math.random() * COLORS.length)];
+
+// const AnnouncementList = () => {
+//   const dispatch = useDispatch();
+//   const { cid, sid } = useParams();
+
+//   /* ───── Local UI state ───── */
+//   const [searchTerm, setSearchTerm] = useState("");
+
+//   /* ───── Redux state ───── */
+//   const { loading, announcements } = useSelector(
+//     (store) => store.admin.announcements
+//   );
+//   const { role } = useSelector((store) => store.common.auth);
+//   const isAdmin = role?.toLowerCase() === "admin";          // NEW
+
+//   /* ───── Fetch announcements on mount ───── */
+//   useEffect(() => {
+//     dispatch(fetchAnnouncements({ cid, sid }));
+//   }, [dispatch, cid, sid]);
+
+//   /* ───── Decorate + Filter ───── */
+//   const colored = announcements?.map((a) => ({ ...a, color: randomColor() }));
+
+//   const filtered = colored?.filter((a) =>
+//     a.title.toLowerCase().includes(searchTerm.toLowerCase())
+//   );
+
+//   const now = new Date();
+//   const posted = filtered?.filter((a) =>
+//     a.delayPosting ? new Date(a.delayPosting) <= now : true
+//   );
+//   const scheduled = filtered?.filter(
+//     (a) => a.delayPosting && new Date(a.delayPosting) > now
+//   );
+
+//   /* ───── Helper: announce grid or no-data component ───── */
+//   const grid = (arr) =>
+//     arr?.length ? (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+//         {arr.map((ann) => (
+//           <AnnouncementCard key={ann._id} {...ann} />
+//         ))}
+//       </div>
+//     ) : (
+//       <div className="flex flex-col items-center justify-center col-span-full py-10">
+//         <NoDataFound
+//           title="Announcements"
+//           desc="No announcements found. Please check back later."
+//           icon={AiOutlineBell}
+//         />
+//       </div>
+//     );
+
+//   /* ───── Render ───── */
+//   return (
+//     <div className="w-full ps-3">
+//       <AnnouncementHeader onSearch={setSearchTerm} />
+
+//       {/* Loading skeletons */}
+//       {loading ? (
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-2">
+//           {Array.from({ length: 6 }).map((_, idx) => (
+//             <AnnouncementSkeletonCard key={idx} />
+//           ))}
+//         </div>
+//       ) : isAdmin ? (
+//         /* ─── Admin view: tabs ─── */
+//         <Tabs defaultActiveKey="all">
+//           <TabPane tab="All" key="all">
+//             {grid(filtered)}
+//           </TabPane>
+//           <TabPane tab="Posted" key="posted">
+//             {grid(posted)}
+//           </TabPane>
+//           <TabPane tab="Scheduled" key="scheduled">
+//             {grid(scheduled)}
+//           </TabPane>
+//         </Tabs>
+//       ) : (
+//         /* ─── Non-admin view: posted announcements only ─── */
+//         grid(posted)
+//       )}
+//     </div>
+//   );
+// };
+
+// export default AnnouncementList;
+ 

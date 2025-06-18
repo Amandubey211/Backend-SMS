@@ -48,6 +48,7 @@ const SemesterManagement = () => {
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
+  const { role } = useSelector((store) => store.common.auth);
   const { t } = useTranslation("admClass");
   const { Title } = Typography;
 
@@ -59,6 +60,8 @@ const SemesterManagement = () => {
   const [modalDesc, setModalDesc] = useState("");
   const [formLoading, setFormLoading] = useState(false);
   const [guidelinesModalVisible, setGuidelinesModalVisible] = useState(false);
+
+  const isAdmin = role === "admin";
 
   // Reset form and clear editing state when the form resets
   useEffect(() => {
@@ -318,35 +321,43 @@ const SemesterManagement = () => {
         return <span>{`${start} - ${end}`}</span>;
       },
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_, record) => (
-        <Space size="middle">
-          <ProtectedAction requiredPermission={PERMISSIONS.UPDATE_SEMESTER}>
-            <Tooltip title="Edit Semester">
-              <Button
-                type="primary"
-                onClick={() => handleEdit(record)}
-                style={{ background: primaryGradient, border: "none" }}
-                icon={<FaRegEdit />}
-                aria-label={`Edit semester ${record.title}`}
-              />
-            </Tooltip>
-          </ProtectedAction>
-          <ProtectedAction requiredPermission={PERMISSIONS.DELETE_SEMESTER}>
-            <Tooltip title="Delete Semester">
-              <Button
-                danger
-                onClick={() => handleDelete(record._id)}
-                icon={<RiDeleteBin5Line />}
-                aria-label={`Delete semester ${record.title}`}
-              />
-            </Tooltip>
-          </ProtectedAction>
-        </Space>
-      ),
-    },
+    ...(isAdmin
+      ? [
+          {
+            title: "Actions",
+            key: "actions",
+            render: (_, record) => (
+              <Space size="middle">
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS.UPDATE_SEMESTER}
+                >
+                  <Tooltip title="Edit Semester">
+                    <Button
+                      type="primary"
+                      onClick={() => handleEdit(record)}
+                      style={{ background: primaryGradient, border: "none" }}
+                      icon={<FaRegEdit />}
+                      aria-label={`Edit semester ${record.title}`}
+                    />
+                  </Tooltip>
+                </ProtectedAction>
+                <ProtectedAction
+                  requiredPermission={PERMISSIONS.DELETE_SEMESTER}
+                >
+                  <Tooltip title="Delete Semester">
+                    <Button
+                      danger
+                      onClick={() => handleDelete(record._id)}
+                      icon={<RiDeleteBin5Line />}
+                      aria-label={`Delete semester ${record.title}`}
+                    />
+                  </Tooltip>
+                </ProtectedAction>
+              </Space>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -357,12 +368,12 @@ const SemesterManagement = () => {
         </div>
       )}
       <div className="flex flex-col md:flex-row w-full">
-        {/* Semester List */}
+        {/* Semester List - Full width for non-admin, 2/3 width for admin */}
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
-          className="w-full md:w-2/3 p-4"
+          className={`p-4 ${isAdmin ? "w-full md:w-2/3" : "w-full"}`}
         >
           <div className="overflow-x-auto">
             <Table
@@ -381,137 +392,147 @@ const SemesterManagement = () => {
           </div>
         </motion.div>
 
-        {/* Form Area */}
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3 }}
-          className="w-full md:w-1/3 p-4"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold" style={{ color: purpleColor }}>
-                {editingSemester ? "Edit Semester" : "Create Semester"}
-              </h2>
-              <Tooltip title="View Semester Guidelines">
-                <button
-                  onClick={() => setGuidelinesModalVisible(true)}
-                  className="ml-2 focus:outline-none"
-                  aria-label="Semester Guidelines"
+        {/* Form Area - Only visible for admin */}
+        {isAdmin && (
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="w-full md:w-1/3 p-4"
+          >
+            <div className="bg-white p-6 rounded-lg shadow-md">
+              <div className="flex items-center justify-between mb-6">
+                <h2
+                  className="text-xl font-bold"
+                  style={{ color: purpleColor }}
                 >
-                  <FiInfo className="text-blue-500 text-2xl" />
-                </button>
-              </Tooltip>
-            </div>
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onFinish}
-              className="space-y-4"
-              requiredMark="optional"
-            >
-              <Form.Item
-                label="Title"
-                name="title"
-                rules={[
-                  { required: true, message: "Please enter semester title" },
-                ]}
-                hasFeedback
-              >
-                <Input
-                  placeholder="Enter semester title"
-                  className="rounded-md border-gray-300 focus:ring-2"
-                  aria-label="Semester Title"
-                />
-              </Form.Item>
-
-              <Form.Item label="Description" name="description">
-                <Input.TextArea
-                  placeholder="Enter description"
-                  rows={3}
-                  className="rounded-md border-gray-300 focus:ring-2"
-                  aria-label="Semester Description"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="Start Date"
-                name="startDate"
-                rules={[
-                  { required: true, message: "Please select start date" },
-                ]}
-                hasFeedback
-              >
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD-MM-YYYY"
-                  className="rounded-md"
-                  aria-label="Start Date"
-                />
-              </Form.Item>
-
-              <Form.Item
-                label="End Date"
-                name="endDate"
-                rules={[{ required: true, message: "Please select end date" }]}
-                hasFeedback
-              >
-                <DatePicker
-                  style={{ width: "100%" }}
-                  format="DD-MM-YYYY"
-                  className="rounded-md"
-                  aria-label="End Date"
-                />
-              </Form.Item>
-
-              <Form.Item>
-                <Space>
-                  <Tooltip title="Clear form fields">
-                    <Button
-                      type="default"
-                      onClick={() => {
-                        setEditingSemester(null);
-                        form.resetFields();
-                      }}
-                      aria-label="Clear form"
-                    >
-                      Clear
-                    </Button>
-                  </Tooltip>
-                  <Tooltip
-                    title={
-                      editingSemester ? "Update Semester" : "Create Semester"
-                    }
+                  {editingSemester ? "Edit Semester" : "Create Semester"}
+                </h2>
+                <Tooltip title="View Semester Guidelines">
+                  <button
+                    onClick={() => setGuidelinesModalVisible(true)}
+                    className="ml-2 focus:outline-none"
+                    aria-label="Semester Guidelines"
                   >
-                    <ProtectedAction
-                      requiredPermission={
-                        editingSemester
-                          ? PERMISSIONS.ADD_SEMESTER
-                          : PERMISSIONS.UPDATE_SEMESTER
+                    <FiInfo className="text-blue-500 text-2xl" />
+                  </button>
+                </Tooltip>
+              </div>
+              <Form
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                className="space-y-4"
+                requiredMark="optional"
+              >
+                <Form.Item
+                  label="Title"
+                  name="title"
+                  rules={[
+                    { required: true, message: "Please enter semester title" },
+                  ]}
+                  hasFeedback
+                >
+                  <Input
+                    placeholder="Enter semester title"
+                    className="rounded-md border-gray-300 focus:ring-2"
+                    aria-label="Semester Title"
+                  />
+                </Form.Item>
+
+                <Form.Item label="Description" name="description">
+                  <Input.TextArea
+                    placeholder="Enter description"
+                    rows={3}
+                    className="rounded-md border-gray-300 focus:ring-2"
+                    aria-label="Semester Description"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label="Start Date"
+                  name="startDate"
+                  rules={[
+                    { required: true, message: "Please select start date" },
+                  ]}
+                  hasFeedback
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    format="DD-MM-YYYY"
+                    className="rounded-md"
+                    aria-label="Start Date"
+                  />
+                </Form.Item>
+
+                <Form.Item
+                  label="End Date"
+                  name="endDate"
+                  rules={[
+                    { required: true, message: "Please select end date" },
+                  ]}
+                  hasFeedback
+                >
+                  <DatePicker
+                    style={{ width: "100%" }}
+                    format="DD-MM-YYYY"
+                    className="rounded-md"
+                    aria-label="End Date"
+                  />
+                </Form.Item>
+
+                <Form.Item>
+                  <Space>
+                    <Tooltip title="Clear form fields">
+                      <Button
+                        type="default"
+                        onClick={() => {
+                          setEditingSemester(null);
+                          form.resetFields();
+                        }}
+                        aria-label="Clear form"
+                      >
+                        Clear
+                      </Button>
+                    </Tooltip>
+                    <Tooltip
+                      title={
+                        editingSemester ? "Update Semester" : "Create Semester"
                       }
                     >
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        style={{ background: primaryGradient, border: "none" }}
-                        aria-label={
+                      <ProtectedAction
+                        requiredPermission={
                           editingSemester
-                            ? "Update Semester"
-                            : "Create Semester"
+                            ? PERMISSIONS.ADD_SEMESTER
+                            : PERMISSIONS.UPDATE_SEMESTER
                         }
-                        loading={formLoading}
                       >
-                        {editingSemester
-                          ? "Update Semester"
-                          : "Create Semester"}
-                      </Button>
-                    </ProtectedAction>
-                  </Tooltip>
-                </Space>
-              </Form.Item>
-            </Form>
-          </div>
-        </motion.div>
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          style={{
+                            background: primaryGradient,
+                            border: "none",
+                          }}
+                          aria-label={
+                            editingSemester
+                              ? "Update Semester"
+                              : "Create Semester"
+                          }
+                          loading={formLoading}
+                        >
+                          {editingSemester
+                            ? "Update Semester"
+                            : "Create Semester"}
+                        </Button>
+                      </ProtectedAction>
+                    </Tooltip>
+                  </Space>
+                </Form.Item>
+              </Form>
+            </div>
+          </motion.div>
+        )}
       </div>
 
       {/* Full Description Modal */}

@@ -122,7 +122,6 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   // Grab quiz detail from Redux
   const { quizzDetail: quiz } = useSelector((state) => state.admin.quizzes);
   const quizIdFromRedux = quiz?._id || "";
-
   // Tab State
   const [activeTab, setActiveTab] = useState("instructions");
 
@@ -401,20 +400,31 @@ const MainSection = ({ setIsEditing, isEditing }) => {
   // ---------------------------------------------
   //   Edit an existing question
   // ---------------------------------------------
+  // ---------------------------------------------
+  //   Edit an existing question   ⟵  REPLACE THIS FUNCTION
+  // ---------------------------------------------
   const editQuestionHandler = useCallback(
     (questionId) => {
       const questionToEdit = questions.find((q) => q._id === questionId);
-      if (questionToEdit) {
-        setEditingQuestionId(questionToEdit._id);
-        setQuestion(questionToEdit.questionText);
-        setAnswers(questionToEdit.options);
-        setRightAnswerComment(questionToEdit.correctAnswerComment);
-        setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
-        setQuestionPoint(questionToEdit.questionPoint);
-        setQuestionType(questionToEdit.type || "multiple choice");
-        setQuestionSeconds(questionToEdit.seconds || 0); // Set seconds when editing
-        setSidebarOpen(true);
-      }
+      if (!questionToEdit) return;
+
+      // 🔑 1. Flag the correct option before sending it to <AnswerSection>
+      const mappedOptions = questionToEdit.options.map((opt) => ({
+        ...opt,
+        // mark true/false OR multiple-choice answer
+        isCorrect: opt.text.trim() === questionToEdit.correctAnswer?.trim(),
+      }));
+
+      // 🔑 2. Populate edit-state as before
+      setEditingQuestionId(questionToEdit._id);
+      setQuestion(questionToEdit.questionText);
+      setAnswers(mappedOptions); // <-- use mapped
+      setRightAnswerComment(questionToEdit.correctAnswerComment);
+      setWrongAnswerComment(questionToEdit.inCorrectAnswerComment);
+      setQuestionPoint(questionToEdit.questionPoint);
+      setQuestionType(questionToEdit.type || "multiple choice");
+      setQuestionSeconds(questionToEdit.seconds || 0);
+      setSidebarOpen(true);
     },
     [questions]
   );
@@ -498,8 +508,9 @@ const MainSection = ({ setIsEditing, isEditing }) => {
       <div className="w-full flex">
         {/*  Main content area  */}
         <div
-          className={`${activeTab === "instructions" ? "w-[70%]" : "w-full"
-            } border-x`}
+          className={`${
+            activeTab === "instructions" ? "w-[70%]" : "w-full"
+          } border-x`}
         >
           <Tabs
             createPage={true}

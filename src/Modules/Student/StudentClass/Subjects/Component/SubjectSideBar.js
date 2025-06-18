@@ -47,10 +47,21 @@ const SubjectSideBar = () => {
   useEffect(() => {
     dispatch(fetchSemestersByClass(cid));
   }, [cid, dispatch]);
-
+  // ───────────────────────────────────────────────
+  // Auto-select the first semester once they arrive
+  // ───────────────────────────────────────────────
+  useEffect(() => {
+    if (
+      semesters?.length > 0 && // we have data
+      (!selectedSemester || !selectedSemester.id) // none chosen yet
+    ) {
+      const first = semesters[0];
+      dispatch(setSelectedSemester({ id: first._id, name: first.title }));
+    }
+  }, [semesters, selectedSemester, dispatch]);
 
   // Handler for selecting a semester from the modal
-  const handleSemesterSelect = (semester) => { 
+  const handleSemesterSelect = (semester) => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
     setSemesterModalVisible(false);
   };
