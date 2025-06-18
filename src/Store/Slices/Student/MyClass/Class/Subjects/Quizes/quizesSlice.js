@@ -4,7 +4,6 @@ import {
   stdGetQuiz,
   stdGetSingleQuiz,
   submitQuiz,
-  // fetchAttemptHistory,
   fetchAllAttemptHistory,
   startQuiz,
   updateRemainingTime,
@@ -48,8 +47,12 @@ const stdQuizSlice = createSlice({
       state.activeTab = action.payload;
     },
     setSelectedOption: (state, action) => {
-      const { index, value } = action.payload;
-      state.selectedOptions[index] = value;
+      const { index, value, flag } = action.payload;
+      if (typeof value !== "undefined") {
+        state.selectedOptions[index] = flag ? { value, flag } : value;
+      } else if (flag) {
+        state.selectedOptions[index] = { flag };
+      }
     },
     setCurrentQuestionIndex: (state, action) => {
       state.currentQuestionIndex = action.payload;
@@ -68,6 +71,36 @@ const stdQuizSlice = createSlice({
     },
     setTotalTime: (state, action) => {
       state.totalTime = action.payload;
+    },
+    resetQuizState: (state) => {
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        itemDetails: {},
+        activeTab: "instructions",
+        selectedOptions: {},
+        currentQuestionIndex: 0,
+        quizResults: {
+          totalPoints: 0,
+          correctAnswers: 0,
+          wrongAnswers: 0,
+        },
+        timeLeft: 0,
+        totalTime: 0,
+      };
+    },
+    resetQuizAttempt: (state) => {
+      // Reset only the current attempt data
+      state.selectedOptions = {};
+      state.currentQuestionIndex = 0;
+      state.timeLeft = 0;
+      state.totalTime = 0;
+      state.quizResults = {
+        totalPoints: 0,
+        correctAnswers: 0,
+        wrongAnswers: 0,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -94,6 +127,14 @@ const stdQuizSlice = createSlice({
       .addCase(stdGetSingleQuiz.fulfilled, (state, action) => {
         state.loading = false;
         state.itemDetails = action.payload;
+        // Reset attempt-specific state when loading a new quiz
+        state.selectedOptions = {};
+        state.currentQuestionIndex = 0;
+        state.quizResults = {
+          totalPoints: 0,
+          correctAnswers: 0,
+          wrongAnswers: 0,
+        };
       })
       .addCase(stdGetSingleQuiz.rejected, (state, action) => {
         state.loading = false;
@@ -107,26 +148,17 @@ const stdQuizSlice = createSlice({
       })
       .addCase(submitQuiz.fulfilled, (state, action) => {
         state.loading = false;
-        // The quizResults and attemptHistory are updated in the action itself
+        state.quizResults = action.payload.results;
+        state.attemptHistory = [
+          ...state.attemptHistory,
+          action.payload.newAttempt,
+        ];
+        // Don't reset selectedOptions here - they're needed for review
       })
       .addCase(submitQuiz.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || true;
       })
-
-      // // Handle fetchAttemptHistory
-      // .addCase(fetchAttemptHistory.pending, (state) => {
-      //   state.loading = true;
-      //   state.error = false;
-      // })
-      // .addCase(fetchAttemptHistory.fulfilled, (state, action) => {
-      //   state.loading = false;
-      //   state.attemptHistory = action.payload;
-      // })
-      // .addCase(fetchAttemptHistory.rejected, (state, action) => {
-      //   state.loading = false;
-      //   state.error = action.payload || true;
-      // })
 
       // Handle fetchAllAttemptHistory
       .addCase(fetchAllAttemptHistory.pending, (state) => {
@@ -176,14 +208,15 @@ const stdQuizSlice = createSlice({
 export const {
   setSearchQuery,
   setActiveTab,
-  setSelectedOptions,
+  setSelectedOption,
   setCurrentQuestionIndex,
   setSelectedAttempt,
   setQuizResults,
   setAttemptHistory,
   setTimeLeft,
-  setSelectedOption,
   setTotalTime,
+  resetQuizState,
+  resetQuizAttempt,
 } = stdQuizSlice.actions;
 
 export default stdQuizSlice.reducer;
