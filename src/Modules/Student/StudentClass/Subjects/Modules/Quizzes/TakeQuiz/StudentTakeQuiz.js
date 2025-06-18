@@ -17,6 +17,7 @@ import {
   Switch,
   message,
   notification,
+  Skeleton,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -37,6 +38,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   startQuiz,
   submitQuiz,
+  stdGetSingleQuiz,
 } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizes.action";
 import {
   setAttemptHistory,
@@ -44,6 +46,7 @@ import {
   setTimeLeft,
   setTotalTime,
   setSelectedOption,
+  resetQuizState,
 } from "../../../../../../../Store/Slices/Student/MyClass/Class/Subjects/Quizes/quizesSlice";
 import QuestionPalette from "../Components/QuestionPalette";
 import CalculatorDrawer from "../Components/CalculatorDrawer";
@@ -186,6 +189,46 @@ const hcBtn = {
   border: "1px solid #555",
 };
 
+/* Shimmer UI component */
+const ShimmerUI = () => (
+  <Layout className="h-screen">
+    <Header
+      style={{
+        background: "#fff",
+        borderBottom: "1px solid #eee",
+        padding: "0 24px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <Skeleton.Button active size="large" style={{ width: 200 }} />
+      <div className="flex items-center gap-3">
+        <Skeleton.Button active size="small" style={{ width: 100 }} />
+        <Skeleton.Button active size="small" style={{ width: 150 }} />
+        <Skeleton.Button active size="small" style={{ width: 100 }} />
+      </div>
+    </Header>
+    <Layout>
+      <Sider width={260} style={{ background: "#fff", padding: "16px" }}>
+        <Skeleton active paragraph={{ rows: 10 }} />
+      </Sider>
+      <Content style={{ padding: 32 }}>
+        <div className="flex flex-col gap-6">
+          <Skeleton active paragraph={{ rows: 2 }} />
+          <Skeleton active paragraph={{ rows: 4 }} />
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton.Input key={i} active block size="large" />
+            ))}
+          </div>
+          <Skeleton active paragraph={{ rows: 1 }} />
+        </div>
+      </Content>
+    </Layout>
+  </Layout>
+);
+
 /* ───────────────────── component ───────────────────── */
 export default function StudentTakeQuiz() {
   const dispatch = useDispatch();
@@ -216,11 +259,13 @@ export default function StudentTakeQuiz() {
   const [warningShown, setWarningShown] = useState(false);
   const [violationCount, setViolationCount] = useState(0);
   const [isQuizEnded, setIsQuizEnded] = useState(false);
+  const [isReloading, setIsReloading] = useState(true);
 
   const mainTimerRef = useRef(null);
   const qTimerRef = useRef(null);
   const fullscreenAttemptRef = useRef(0);
-
+  const total = questions.length;
+  const isLast = current === total - 1;
   /* Security: Prevent copy/paste and context menu */
   useEffect(() => {
     const handleCopy = (e) => {
@@ -318,6 +363,56 @@ export default function StudentTakeQuiz() {
     }
   }, [timeLeft, totalTime, warningShown, api]);
 
+  /* Fetch quiz data on mount or reload */
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        setIsReloading(true);
+        await dispatch(stdGetSingleQuiz({ quizId })).unwrap();
+        setIsReloading(false);
+      } catch (error) {
+        message.error("Failed to load quiz data");
+        navigate(`/student_class/${cid}/${sid}/quizzes`);
+      }
+    };
+
+    fetchQuiz();
+
+    return () => {
+      // Clean up timers when component unmounts
+      clearInterval(mainTimerRef.current);
+      clearInterval(qTimerRef.current);
+    };
+  }, [dispatch, quizId, navigate, cid, sid]);
+
+  /* Start quiz timer when data is loaded */
+  useEffect(() => {
+    if (isReloading || !quizId || questions.length === 0) return;
+
+    // Clear any existing timers
+    clearInterval(mainTimerRef.current);
+
+    // Start main timer
+    dispatch(startQuiz({ quizId }))
+      .unwrap()
+      .then((r) => {
+        dispatch(setTimeLeft(r.remainingTime * 60));
+        dispatch(setTotalTime(itemDetails.timeLimit * 60));
+
+        mainTimerRef.current = setInterval(() => {
+          dispatch((d, g) => {
+            const t = g().student.studentQuiz.timeLeft;
+            if (t <= 1) {
+              clearInterval(mainTimerRef.current);
+              handleSubmit();
+            } else d(setTimeLeft(t - 1));
+          });
+        }, 1000);
+      });
+
+    return () => clearInterval(mainTimerRef.current);
+  }, [isReloading, quizId, questions, dispatch, itemDetails.timeLimit]);
+
   /* letters for MCQ */
   const letters = useMemo(() => {
     if (!questions[current]) return [];
@@ -341,33 +436,10 @@ export default function StudentTakeQuiz() {
     [questions, current]
   );
 
-  /* ───────── start + main timer ───────── */
-  useEffect(() => {
-    if (!quizId) return;
-
-    dispatch(startQuiz({ quizId }))
-      .unwrap()
-      .then((r) => {
-        dispatch(setTimeLeft(r.remainingTime * 60));
-        dispatch(setTotalTime(itemDetails.timeLimit * 60));
-      });
-
-    mainTimerRef.current = setInterval(() => {
-      dispatch((d, g) => {
-        const t = g().student.studentQuiz.timeLeft;
-        if (t <= 1) {
-          clearInterval(mainTimerRef.current);
-          handleSubmit();
-        } else d(setTimeLeft(t - 1));
-      });
-    }, 1000);
-
-    return () => clearInterval(mainTimerRef.current);
-    // eslint-disable-next-line
-  }, []);
-
   /* ───────── per-question timer ───────── */
   useEffect(() => {
+    if (isReloading) return;
+
     clearInterval(qTimerRef.current);
     setWarningShown(false);
 
@@ -407,7 +479,7 @@ export default function StudentTakeQuiz() {
     } else setQTimeLeft(null);
 
     return () => clearInterval(qTimerRef.current);
-  }, [current, questions, locked, api]);
+  }, [current, questions, locked, api, isReloading]);
 
   /* navigation lock rules */
   const selVal = selectedOptions[current]?.value ?? selectedOptions[current];
@@ -439,6 +511,7 @@ export default function StudentTakeQuiz() {
 
     dispatch(setAttemptHistory([...attemptHistory, res.newAttempt]));
     dispatch(setQuizResults(res));
+    dispatch(resetQuizState()); // Clear selected options after submission
 
     // Exit fullscreen after submission
     if (document.fullscreenElement) {
@@ -528,18 +601,25 @@ export default function StudentTakeQuiz() {
     return currentOption.flag === "review";
   }, [selectedOptions, current]);
 
+  /* Force navigation when time is up */
+  const handleTimeUpNavigation = useCallback(() => {
+    if (isLast) {
+      setSubmit(true);
+    } else {
+      setCurrent((c) => c + 1);
+    }
+    setTimesUp(false);
+  }, [isLast]);
+
   /* loader */
-  if (loading || questions.length === 0)
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <Spin size="large" />
-      </div>
-    );
+  if (loading || isReloading || questions.length === 0) {
+    return <ShimmerUI />;
+  }
 
   /* derived stats & flags */
   const q = questions[current];
   const qType = q.type.toLowerCase();
-  const total = questions.length;
+
   const attempted = Object.values(selectedOptions).filter((s) =>
     typeof s === "string" ? true : !!s?.value
   ).length;
@@ -547,7 +627,6 @@ export default function StudentTakeQuiz() {
     (s) => typeof s === "object" && s.flag === "review"
   ).length;
   const unanswered = total - attempted;
-  const isLast = current === total - 1;
 
   /* glamified confirmation modal content */
   const submitModalContent = (
@@ -657,7 +736,24 @@ export default function StudentTakeQuiz() {
         >
           <QuestionPalette
             current={current}
-            setCurrent={(i) => canNavigatePerTimer && setCurrent(i)}
+            setCurrent={(i) => {
+              // Allow navigation if:
+              // 1. No time limit for current question OR
+              // 2. Time is up for current question OR
+              // 3. User has selected an answer
+              const canNavigate =
+                (questions[current]?.seconds || 0) === 0 ||
+                qTimeLeft === 0 ||
+                !!selectedOptions[current];
+
+              if (canNavigate) {
+                setCurrent(i);
+              } else {
+                message.warning(
+                  "Please select an answer or wait for time to expire"
+                );
+              }
+            }}
             selectedOptions={selectedOptions}
             itemDetails={{ questions }}
             instruction={itemDetails.content}
@@ -913,7 +1009,16 @@ export default function StudentTakeQuiz() {
       <Modal
         title="Time's up!"
         open={timesUp}
-        footer={null}
+        footer={[
+          <Button
+            key="continue"
+            type="primary"
+            onClick={handleTimeUpNavigation}
+            style={modalStyles.okButton}
+          >
+            Continue
+          </Button>,
+        ]}
         centered
         onCancel={() => setTimesUp(false)}
         styles={modalStyles}

@@ -74,16 +74,10 @@ const QuizResultSummary = () => {
   return (
     <div className="bg-gray-50 rounded-xl p-4 shadow-sm">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+        <h2 className="text-xl font-bold text-gray-800 flex items-center">
           <FaHistory className="mr-3 text-blue-500" />
           My Attempt History ({attemptHistory.length})
         </h2>
-        {attemptHistory.length > 0 && (
-          <div className="flex items-center text-sm text-gray-500">
-            <FaChartLine className="mr-1" />
-            <span>Performance Overview</span>
-          </div>
-        )}
       </div>
 
       <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
@@ -126,17 +120,11 @@ const QuizResultSummary = () => {
                         >
                           {attempt?.submissionStatus || "Unknown"}
                         </span>
-                        <span className="text-xs text-gray-500 flex items-center">
-                          <FaClock className="mr-1" />
-                          {attempt?.submittedAt
-                            ? new Date(attempt.submittedAt).toLocaleDateString()
-                            : "In Progress"}
-                        </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="text-right">
+                    <div className="text-center">
                       <div className="text-lg font-bold text-gray-800">
                         {percentage}%
                       </div>
@@ -190,12 +178,6 @@ const QuizResultSummary = () => {
                         </div>
 
                         <div className="flex justify-between items-center">
-                          <button
-                            onClick={() => handleAttemptClick(attempt)}
-                            className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                          >
-                            View Details
-                          </button>
                           <div className="text-xs text-gray-500">
                             Submitted:{" "}
                             {new Date(attempt?.submittedAt).toLocaleString()}
