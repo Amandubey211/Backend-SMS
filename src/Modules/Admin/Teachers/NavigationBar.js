@@ -20,9 +20,12 @@ const NavigationBar = ({
   const { t } = useTranslation("admClass");
   const dispatch = useDispatch();
   const { cid } = useParams();
+
+  // ───── Redux selectors ─────
   const sections = useSelector(
     (state) => state.admin.group_section.sectionsList
   );
+  const role = useSelector((store) => store.common.auth.role);
   const selectedSection = useSelector(
     (state) => state.admin.teacher.selectedSection
   );
@@ -30,27 +33,33 @@ const NavigationBar = ({
     (state) => state.admin.teacher.assignedTeachers?.length
   );
 
+  // ───── Role check ─────
+  const isAdmin = role?.toLowerCase() === "admin"; // NEW
+
+  // ───── Helpers ─────
   const getButtonClass = useCallback(
-    (section) => {
-      return selectedSection === section
+    (section) =>
+      selectedSection === section
         ? "relative px-4 py-2 rounded-full bg-gradient-to-r from-red-400 to-purple-500 text-white"
-        : "relative px-4 py-2 rounded-full border border-gray-300";
-    },
+        : "relative px-4 py-2 rounded-full border border-gray-300",
     [selectedSection]
   );
 
+  // ───── Effects ─────
   useEffect(() => {
     dispatch(fetchSectionsByClass(cid));
   }, [dispatch, cid]);
 
   const handleSectionChange = (section) => {
-    dispatch(setSelectedSection(section)); // Set selected section
-    dispatch(filterTeachersBySection()); // Trigger filtering
+    dispatch(setSelectedSection(section));
+    dispatch(filterTeachersBySection());
   };
 
   return (
     <>
+      {/* ───────── Header ───────── */}
       <div className="flex justify-between items-center p-4">
+        {/* Title + count */}
         <div className="flex items-center space-x-2">
           <h1 className="text-xl font-semibold">{t("All Instructors")}</h1>
           <span className="bg-purple-200 text-purple-700 rounded-full w-7 h-7 flex justify-center items-center text-sm">
@@ -58,20 +67,25 @@ const NavigationBar = ({
           </span>
         </div>
 
-        {/* Button displays "Assign Instructor" for add mode or "Edit Instructor" when editing */}
-        <button
-          onClick={openSidebarForAdd}
-          className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
-        >
-          <span className="mr-2">
-            {editingTeacher ? t("Edit Instructor") : t("Assign Instructor")}
-          </span>
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-            <span className="text-3xl -mt-2">{editingTeacher ? "✎" : "+"}</span>
-          </div>
-        </button>
+        {/* Assign / Edit button – ADMIN ONLY */}
+        {isAdmin /* NEW */ && (
+          <button
+            onClick={openSidebarForAdd}
+            className="flex items-center border border-gray-300 ps-5 py-0 rounded-full"
+          >
+            <span className="mr-2">
+              {editingTeacher ? t("Edit Instructor") : t("Assign Instructor")}
+            </span>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
+              <span className="text-3xl -mt-2">
+                {editingTeacher ? "✎" : "+"}
+              </span>
+            </div>
+          </button>
+        )}
       </div>
 
+      {/* Sidebar for Assign/Edit Instructor (opens only if admin triggered) */}
       <Sidebar
         isOpen={isSidebarOpen}
         onClose={closeSidebar}
@@ -87,6 +101,7 @@ const NavigationBar = ({
         </Suspense>
       </Sidebar>
 
+      {/* ───────── Section filter buttons ───────── */}
       <div className="flex space-x-2 px-5">
         <button
           className={getButtonClass("Everyone")}
