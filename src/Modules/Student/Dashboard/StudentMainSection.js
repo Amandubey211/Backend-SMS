@@ -176,7 +176,7 @@ const StudentMainSection = () => {
 
           {/* Task Section */}
           <div className="flex flex-col  gap-1 w-[40%] ">
-            <div className="w-full h-full h-[250px] p-4 bg-white border rounded-md hover:shadow-sm mb-2">
+            <div className="w-full  h-[250px] p-4 bg-white border rounded-md hover:shadow-sm mb-2">
               <h1 className="text-lg font-semibold text-black">Task</h1>
               <TaskCompletionChart />
             </div>
