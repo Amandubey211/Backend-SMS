@@ -21,6 +21,7 @@ import {
   FiDollarSign,
   FiBookOpen,
 } from "react-icons/fi";
+import dayjs from "dayjs";
 import { AiOutlineFullscreen } from "react-icons/ai";
 import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
 import { useTranslation } from "react-i18next";
@@ -142,7 +143,6 @@ const AddNotice = ({ isEditing, onClose }) => {
     noticeForRoles: [],
     noticeForUsers: [],
   });
-
   const [isGuidelineModalVisible, setGuidelineModalVisible] = useState(false);
   const [isUserPickerVisible, setUserPickerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -181,10 +181,10 @@ const AddNotice = ({ isEditing, onClose }) => {
       const preloadedData = {
         title: selectedNotice?.title || "",
         startDate: selectedNotice?.startDate
-          ? moment(selectedNotice.startDate)
+          ? dayjs(selectedNotice.startDate)
           : null,
         endDate: selectedNotice?.endDate
-          ? moment(selectedNotice.endDate)
+          ? dayjs(selectedNotice.endDate)
           : null,
         priority: selectedNotice?.priority || "High priority",
         classId: selectedNotice?.classId?._id || "",
@@ -213,7 +213,7 @@ const AddNotice = ({ isEditing, onClose }) => {
       form.resetFields();
       setEditorContent("");
     }
-  }, [isEditing, selectedNotice, allUsers, form]);
+  }, [isEditing, selectedNotice, onClose]);
 
   /**
    * Filter user list for the full-screen user picker
@@ -287,16 +287,30 @@ const AddNotice = ({ isEditing, onClose }) => {
 
     try {
       if (isEditing) {
-        await dispatch(
+        const response = await dispatch(
           updateNoticeThunk({
             noticeId: selectedNotice._id,
             updatedData: payload,
           })
         ).unwrap();
-        toast.success(t("Notice Updated Successfully"));
+        // console.log("Response", response)
+        if (response.success) {
+
+          toast.success(t("Notice Updated Successfully"));
+        }
+        else {
+          toast.error(response.message || t("Failed to update notice."));
+        }
       } else {
-        await dispatch(createNoticeThunk(payload)).unwrap();
-        toast.success(t("Notice Added Successfully"));
+        const response = await dispatch(createNoticeThunk(payload)).unwrap();
+        // console.log("Response", response)
+        if (response.success) {
+
+          toast.success(t("Notice Added Successfully"));
+        }
+        else {
+          toast.error(response.message || t("Failed to add notice."));
+        }
       }
       form.resetFields();
       setEditorContent("");
@@ -307,8 +321,10 @@ const AddNotice = ({ isEditing, onClose }) => {
   };
 
   const handleClassChange = (value) => {
-    form.setFieldsValue({ classId: value });
-    dispatch(fetchStudentsByClassAndSection(value));
+    if (value) {
+      form.setFieldsValue({ classId: value });
+      dispatch(fetchStudentsByClassAndSection(value));
+    }
   };
 
   const openGuidelines = () => setGuidelineModalVisible(true);

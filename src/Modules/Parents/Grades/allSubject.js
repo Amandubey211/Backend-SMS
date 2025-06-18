@@ -46,10 +46,12 @@ const AllSubject = () => {
 
   // Fetch semesters when selected child is available
   useEffect(() => {
-    dispatch(fetchSemestersByClass({ classId: cid })).then((response) => {
-      const fetchedSemesters = response.payload;
-      dispatch(setSelectedSemester({ _id: fetchedSemesters[0]._id, title: fetchedSemesters[0].title }));
-    });
+    if (cid) {
+      dispatch(fetchSemestersByClass({ classId: cid })).then((response) => {
+        const fetchedSemesters = response.payload;
+        dispatch(setSelectedSemester({ _id: fetchedSemesters[0]._id, title: fetchedSemesters[0].title }));
+      });
+    }
   }, [dispatch, cid]);
 
   // Fetch the student's subjects and set the default selected subject
@@ -163,14 +165,8 @@ const AllSubject = () => {
                   rounded-lg
                   cursor-pointer
                   duration-200
-                  ${subject.subjectId === selectedSubjectId
-                    ? "border-l-[8px] shadow-md"
-                    : "border-l-[3px] border-gray-200 hover:shadow-sm"
-                  }
                 `}
-                style={{
-                  borderColor: studentSubjectProgress[index]?.subjectColor
-                }}
+
               >
                 <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} />
               </div>

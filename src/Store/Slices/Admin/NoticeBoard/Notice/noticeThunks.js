@@ -22,7 +22,6 @@ export const fetchNoticesThunk = createAsyncThunk(
       const response = await getData(
         `/${getRole}/all/notices?say=${say}&page=${page}&limit=${limit}`
       );
-      console.log(response, "fetched notices");
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

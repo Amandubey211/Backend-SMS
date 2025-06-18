@@ -12,7 +12,7 @@ import {
   setSidebarContent,
   resetSidebarContent,
 } from "../../../../../Store/Slices/Admin/NoticeBoard/Events/eventSlice";
-import { format, isValid, parseISO } from "date-fns";
+import { format, isValid, parseISO, getYear, getMonth } from "date-fns";
 import toast from "react-hot-toast";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
 import { IoCalendarOutline } from "react-icons/io5";
@@ -108,11 +108,23 @@ const EventScheduler = () => {
   const handleSaveEvent = async (data) => {
     try {
       if (selectedEvent) {
-        await dispatch(updateEventThunk(data));
-        toast.success(t("Event updated successfully!"));
+        const response = await dispatch(updateEventThunk(data));
+        if (response.payload.success) {
+
+          toast.success(t("Event updated successfully!"));
+        }
+        else {
+          toast.error(response.payload.message || t("Failed to update event!"));
+        }
       } else {
-        await dispatch(createEventThunk(data));
-        toast.success(t("Event created successfully!"));
+        const response = await dispatch(createEventThunk(data));
+        if (response.payload.success) {
+
+          toast.success(t("Event created successfully!"));
+        }
+        else {
+          toast.error(response.payload.message || t("Failed to create event!"));
+        }
       }
       handleSidebarClose();
       dispatch(fetchEventsThunk());
@@ -124,6 +136,20 @@ const EventScheduler = () => {
   const handleEventClick = (evt) => {
     dispatch(setSelectedEvent(evt));
     dispatch(setSidebarContent("viewEvent"));
+  };
+
+  // Aggregate events by month and year for year view
+  const getEventsByMonth = (year) => {
+    const monthEvents = Array(12).fill(0);
+    events.forEach((e) => {
+      if (e.date) {
+        const d = parseISO(e.date);
+        if (isValid(d) && getYear(d) === year) {
+          monthEvents[getMonth(d)] += 1;
+        }
+      }
+    });
+    return monthEvents;
   };
 
   // Calendar date-cell renderer
@@ -158,15 +184,29 @@ const EventScheduler = () => {
     );
   };
 
+  // Calendar month-cell renderer for year view
+  const monthCellRender = (value) => {
+    const year = value.year();
+    const monthEvents = getEventsByMonth(year);
+    const eventCount = monthEvents[value.month()];
+    return eventCount > 0 ? (
+      <div className="flex items-center justify-center h-full">
+        <span className="text-center text-gray-700 font-medium">
+          {eventCount} {eventCount === 1 ? t("Event") : t("Events")}
+        </span>
+      </div>
+    ) : null;
+  };
+
   // Sidebar title logic
   const sidebarTitle =
     sidebarContent === "viewEvent" && selectedEvent
       ? selectedEvent.title || t("Event details")
       : sidebarContent === "addEvent"
-      ? t("Add New Event")
-      : sidebarContent === "updateEvent"
-      ? t("Update Event")
-      : "";
+        ? t("Add New Event")
+        : sidebarContent === "updateEvent"
+          ? t("Update Event")
+          : "";
 
   // Month & year options
   const now = new Date();
@@ -184,7 +224,7 @@ const EventScheduler = () => {
           requiredPermission={PERMISSIONS.SHOW_EVENTS}
           title={t("Events")}
         >
-          <div className="p-4  min-h-screen">
+          <div className="p-4 min-h-screen">
             {/* Header */}
             <div className="flex justify-between mb-4">
               <h1 className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-purple-500">
@@ -261,6 +301,7 @@ const EventScheduler = () => {
             {/* AntD Calendar with Selects */}
             <Calendar
               dateCellRender={dateCellRender}
+              monthCellRender={monthCellRender} // Added for year view
               headerRender={({ value, type, onChange, onTypeChange }) => {
                 const year = value.year();
                 const month = value.month();
@@ -289,17 +330,15 @@ const EventScheduler = () => {
                     </Select>
                     <button
                       onClick={() => onTypeChange("month")}
-                      className={`px-2 py-1 border rounded ${
-                        type === "month" ? "bg-red-500 text-white" : ""
-                      }`}
+                      className={`px-2 py-1 border rounded ${type === "month" ? "bg-red-500 text-white" : ""
+                        }`}
                     >
                       {t("Month")}
                     </button>
                     <button
                       onClick={() => onTypeChange("year")}
-                      className={`px-2 py-1 border rounded ${
-                        type === "year" ? "bg-red-500 text-white" : ""
-                      }`}
+                      className={`px-2 py-1 border rounded ${type === "year" ? "bg-red-500 text-white" : ""
+                        }`}
                     >
                       {t("Year")}
                     </button>

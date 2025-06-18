@@ -50,7 +50,6 @@ export const createEventThunk = createAsyncThunk(
       );
 
       dispatch(fetchEventsThunk());
-      toast.success("Event created successfully!");
       return response;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

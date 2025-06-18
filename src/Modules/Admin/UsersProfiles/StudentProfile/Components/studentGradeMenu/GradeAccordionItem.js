@@ -74,6 +74,7 @@ const GradeAccordionItem = ({ getData }) => {
                     <tr>
                       <th className="px-6 py-3 text-left">Name</th>
                       <th className="px-6 py-3 text-left">Mode</th>
+                      <th className="px-6 py-3 text-left">Type</th> {/* New Type column */}
                       <th className="px-6 py-3 text-left">Status</th>
                       <th className="px-6 py-3 text-left">Score</th>
                     </tr>
@@ -81,7 +82,7 @@ const GradeAccordionItem = ({ getData }) => {
                   {loading ? (
                     <tbody>
                       <tr>
-                        <td colSpan="4" className="text-center py-8 text-gray-500">
+                        <td colSpan="5" className="text-center py-8 text-gray-500">
                           <SkeletonLoader />
                         </td>
                       </tr>
@@ -96,6 +97,7 @@ const GradeAccordionItem = ({ getData }) => {
                           >
                             <td className="px-6 py-3">{grade?.Name}</td>
                             <td className="px-6 py-3">{grade?.mode || "Online"}</td>
+                            <td className="px-6 py-3">{grade?.type || "N/A"}</td> {/* New Type column data */}
                             <td className="px-6 py-3">
                               <span className={`${getColorForStatus(grade?.status)} font-medium`}>
                                 {grade?.status}
@@ -108,7 +110,7 @@ const GradeAccordionItem = ({ getData }) => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan="4" className="text-center py-8 text-gray-500">
+                          <td colSpan="5" className="text-center py-8 text-gray-500">
                             <div className="flex items-center justify-center flex-col gap-2">
                               <FiAlertCircle className="text-4xl text-gray-400" />
                               <span className="text-lg">No Data Found</span>
