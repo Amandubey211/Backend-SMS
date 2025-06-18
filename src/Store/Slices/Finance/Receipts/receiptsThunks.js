@@ -112,7 +112,7 @@ export const fetchReciptInvoiceData = createAsyncThunk(
       const say = getAY();
       const response = await getData(`/${getRole}/receipt/getData/${searchInvoiceNumber}?say=${say}`);
 
-      if (response.success) {
+      if (response?.success) {
         return response.data;
       } else {
         toast.error(response?.message || "Failed to Get Invoice data.");

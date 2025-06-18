@@ -9,21 +9,22 @@ const StudentCardSection = () => {
   const {  paidAllAmount, totalAllAmount, } = useSelector(
     (state) => state.admin.studentFees
   );
+   const formatAmount = (amount) => amount.toFixed(2);
 
  const studentCardsData = [
    {
      title: "Total Collected Amount",
-     value: paidAllAmount,
+     value: formatAmount(paidAllAmount),
      icon: <FaDollarSign />, 
    },
    {
      title: "Amount not collected",
-     value: totalAllAmount -paidAllAmount,
+     value: formatAmount(totalAllAmount -paidAllAmount),
      icon: <FaExclamationCircle />, 
    },
    {
      title: "Total Amount",
-     value: totalAllAmount,
+     value: formatAmount(totalAllAmount),
      icon: <FaWallet />, 
    },
  ];

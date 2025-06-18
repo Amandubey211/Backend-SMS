@@ -71,9 +71,9 @@ const Penalty = () => {
             title: "Name",
             dataIndex: "name",
             key: "name",
-            render: (value) => <span className="text-md">{value || "N/A"}</span>,
+            render: (value) => <span className="text-sm">{value || "N/A"}</span>,
             ellipsis: true,
-            width: 100,
+            width: 120,
         },
         {
             title: "Description",
@@ -81,7 +81,7 @@ const Penalty = () => {
             key: "description",
             render: (value) => <span className="text-sm">{value?.slice(0, 60) || "-"}</span>,
             ellipsis: true,
-            width: 230,
+            width: 250,
         },
         {
             title: "Penalty Type",

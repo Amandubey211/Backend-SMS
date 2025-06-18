@@ -11,21 +11,21 @@ const EntityCardSection = () => {
    );
   const dispatch = useDispatch();
 
-
+ const formatAmount = (amount) => amount.toFixed(2);
   const EntityCardsData = [
     {
       title: "Total Collected Amount",
-      value: paidAllAmount,
+      value: formatAmount(paidAllAmount),
       icon: <FaDollarSign />, 
     },
     {
       title: "Amount Not Collected",
-      value: totalAllAmount -paidAllAmount,
+      value: formatAmount(totalAllAmount -paidAllAmount),
       icon: <FaExclamationCircle />, 
     },
     {
       title: "Total Amount",
-      value: totalAllAmount,
+      value: formatAmount(totalAllAmount),
       icon: <FaWallet />, 
     },
   ];

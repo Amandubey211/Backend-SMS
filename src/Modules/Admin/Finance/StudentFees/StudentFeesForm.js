@@ -120,7 +120,6 @@ const StudentFeeForm = () => {
 
   const handleItemChange = (index, itemId) => {
 
-
     const updatedItems = [...lineItems];
     updatedItems[index].itemId = itemId;
     updatedItems[index].itemDetails = itemId ? updatedItems[index].items.find((item) => item._id === itemId)?.name : "";
@@ -132,10 +131,9 @@ const StudentFeeForm = () => {
   };
 
   const handleInputChange = (index, field, value) => {
-    const roundToTwo = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+    const roundToFive = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
     const updatedItems = [...lineItems];
     updatedItems[index][field] = field.includes('Date') && value ? value?.format('YYYY-MM-DD') : value;
-
 
     const rate = updatedItems[index].rate || 0;
     const quantity = updatedItems[index].quantity || 1;
@@ -145,15 +143,17 @@ const StudentFeeForm = () => {
     const discountType = updatedItems[index].discountType;
 
     let subtotal = rate * quantity;
-    let taxAmount = (subtotal * tax) / 100;
+    let taxAmount = roundToFive((subtotal * tax) / 100);
+    let baseAmount = roundToFive(subtotal + penalty + taxAmount);
 
-    let finalAmount = roundToTwo(subtotal + penalty + taxAmount);
-
+    let finalAmount;
     if (discountType === "percentage") {
-      finalAmount -= roundToTwo((finalAmount * discount) / 100);
+      const discountAmount = roundToFive((baseAmount * discount) / 100);
+      finalAmount = roundToFive(baseAmount - discountAmount);
     } else {
-      finalAmount -= discount;
+      finalAmount = roundToFive(baseAmount - discount);
     }
+
 
     updatedItems[index].finalAmount = finalAmount;
     setLineItems(updatedItems);
@@ -403,7 +403,7 @@ const StudentFeeForm = () => {
         onClose={handleModalClose}
       >
         <SidebarClassSelection onClose={handleModalClose} studentIds={studentIds} setStudentIds={setStudentIds} classAndSectionDetail={classAndSectionDetail} setClassAndSectionDetail={setClassAndSectionDetail} />
-        {studentsIdsArray.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer absolute bottom-10" onClick={() => handleModalClose()}>Done</div>}
+        {studentsIdsArray.length > 0 && <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white w-[90%] h-[2rem] flex items-center justify-center rounded-lg cursor-pointer " onClick={() => handleModalClose()}>Done</div>}
       </Sidebar>
       <Modal
         open={configModel}

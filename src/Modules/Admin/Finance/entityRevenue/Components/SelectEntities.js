@@ -4,68 +4,75 @@ import { fetchEntity } from "../../../../../Store/Slices/Finance/entitie/entity.
 
 const SidebarEntitySelection = ({ entitiesIds, setEntitiesIds }) => {
   const dispatch = useDispatch();
-  const { entities, loading, total, totalPages, page } = useSelector(
-    (store) => store.admin.entity
-  );
+  const { entities, loading } = useSelector((store) => store.admin.entity);
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
     dispatch(fetchEntity({ search: searchText, page: 1, limit: 10000 }));
   }, [dispatch, searchText]);
 
-  // Handle individual entity checkbox change
   const handleEntityCheckboxChange = (e, entityId) => {
     if (e.target.checked) {
-      // Add entity ID to the list
       setEntitiesIds((prevIds) => [...prevIds, entityId]);
     } else {
-      // Remove entity ID from the list
-      setEntitiesIds((prevIds) => prevIds.filter((id) => id != entityId));
+      setEntitiesIds((prevIds) => prevIds.filter((id) => id !== entityId));
     }
-    console.log(e.target.checked,entityId);
-    
   };
 
-  // Handle Select All checkbox change
   const handleSelectAllChange = (e) => {
     if (e.target.checked) {
-      // Select all entities
       setEntitiesIds(entities.map((entity) => entity._id));
     } else {
-      // Deselect all entities
       setEntitiesIds([]);
     }
   };
 
   return (
     <div className="p-4 w-full">
-      <label>
+      <div className="flex items-center justify-between mb-4">
+        <label className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={entitiesIds?.length === entities?.length}
+            onChange={handleSelectAllChange}
+            className="w-4 h-4 cursor-pointer"
+          />
+          <span className="text-sm font-medium text-gray-700">
+            Select All Entities
+          </span>
+        </label>
         <input
-          type="checkbox"
-          checked={entitiesIds?.length === entities?.length}
-          onChange={handleSelectAllChange}
+          type="text"
+          placeholder="Search entities..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm w-1/2 sm:w-1/3 text-sm"
         />
-        <span className="text-sm m-1 cursor-pointer">Select All Entities</span>
-      </label>
-      <div className="flex w-[99%] flex-wrap gap-8 border border-gray-200 h-full rounded-lg p-2 overflow-y-auto">
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {entities?.map((e) => (
           <div
             key={e._id}
-            className="w-auto h-[3rem] flex items-start px-2 justify-center flex-col bg-purple-500 text-white text-sm rounded-lg"
+            className="flex flex-col items-start p-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg shadow-lg"
           >
-            <label>
+            <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
                 checked={entitiesIds.includes(e._id)}
                 onChange={(event) => handleEntityCheckboxChange(event, e._id)}
                 className="w-4 h-4 cursor-pointer"
               />
-              <span className="pl-2 cursor-pointer">{e.entityName}</span>
+              <span className="text-sm font-medium">{e.entityName}</span>
             </label>
-            <p>{e?.entityType}</p>
+            <p className="text-xs mt-1 opacity-80">{e?.entityType}</p>
           </div>
         ))}
       </div>
+      {loading && (
+        <div className="text-center mt-4 text-gray-500">
+          Loading entities...
+        </div>
+      )}
     </div>
   );
 };

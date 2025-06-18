@@ -132,6 +132,7 @@ const EntityRevenueForm = () => {
     if (field === "penaltyId" && !value) {
       updatedItems[index].penaltyId = null;
     }
+    
 
     const rate = updatedItems[index].rate || 0;
     const quantity = updatedItems[index].quantity || 1;
@@ -142,15 +143,15 @@ const EntityRevenueForm = () => {
     let subtotal = rate * quantity;
     let taxAmount = (subtotal * tax) / 100;
 
-    let finalAmount = subtotal + penalty + taxAmount;
+    let finalAmount = (subtotal + penalty + taxAmount).toFixed(5);
 
     if (discountType === "percentage") {
-      finalAmount -= (finalAmount * discount) / 100;
+      finalAmount -= ((finalAmount * discount) / 100).toFixed(5);
     } else {
-      finalAmount -= discount;
+      finalAmount -= (discount).toFixed(5);
     }
 
-    updatedItems[index].finalAmount = finalAmount;
+    updatedItems[index].finalAmount = finalAmount.toFixed(5);
     setLineItems(updatedItems);
   };
 

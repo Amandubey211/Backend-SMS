@@ -375,10 +375,10 @@ const SummaryRevenueList = () => {
 
               {/* Hidden container for PDF generation */}
               <div className="flex flex-row w-full gap-2">
-                <div className="w-[80%]">
+                <div className="w-[85%]">
                   <RecentInvoiceTemplate data={selectedInvoice} ref={pdfRef} />
                 </div>
-                <div className="w-[20%]">
+                <div className="w-[15%]">
                   <div className="px-4 py-2  font-semibold rounded-md  flex items-center justify-center mb-2 gap-2" >History <FaHistory /></div>
                   <div className="px-4 py-2 border border-purple-500 text-black font-semibold rounded-md hover:bg-gradient-to-r from-pink-500 to-purple-500 hover:text-white flex items-center justify-center flex-col mb-2 cursor-pointer" onClick={(e) => { e.stopPropagation(); setSelectedInvoice({ ...selectedInvoice, lineItems: selectedInvoice?.currentItmes?.length > 0 ? selectedInvoice?.currentItmes : selectedInvoice?.lineItems }) }}>
                     <p className="text-md">Current Verion</p>
