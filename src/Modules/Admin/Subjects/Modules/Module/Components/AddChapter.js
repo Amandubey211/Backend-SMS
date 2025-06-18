@@ -17,9 +17,11 @@ const AddChapter = ({ chapterData, isEditing, onClose }) => {
   const [chapterTitle, setChapterTitle] = useState("");
   const { cid, sid } = useParams();
   const dispatch = useDispatch();
-  const { selectedModule, loading, modules } = useSelector(
-    (state) => state.admin.module
-  );
+  const {
+    selectedModule,
+    chapterLoading: loading,
+    modules,
+  } = useSelector((state) => state.admin.module);
 
   useEffect(() => {
     if (isEditing && chapterData) {

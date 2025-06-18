@@ -115,7 +115,7 @@ const CreateAssignmentHolder = ({ isSubmitted, onClose }) => {
         assignmentId: assignmentData?._id,
         editorContent: sanitizedContent,
         fileUrls: submissionFiles,
-        type:assignmentData?.submissionType,
+        type: assignmentData?.submissionType,
         isReattempt: isSubmitted,
       })
     );
