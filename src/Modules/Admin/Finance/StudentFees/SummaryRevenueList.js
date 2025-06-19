@@ -45,7 +45,7 @@ const SummaryRevenueList = () => {
   }, [dispatch, selectedClass]);
 
   useEffect(() => {
-    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status, selectedClass, selectedSection }));
+    dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status, classId:selectedClass, sectionId:selectedSection }));
   }, [isCancel, status, selectedClass, selectedSection,searchText]);
 
   const handleCancelReceipt = (receipt) => {
