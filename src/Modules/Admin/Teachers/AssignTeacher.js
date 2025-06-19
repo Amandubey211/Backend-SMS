@@ -14,7 +14,6 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const { t } = useTranslation("admClass");
   const dispatch = useDispatch();
   const { cid } = useParams();
-
   // Local state for form fields
   const [teacherId, setTeacherId] = useState(
     editingTeacher ? editingTeacher._id : ""
@@ -49,6 +48,11 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   );
   const loading = useSelector((state) => state.admin.teacher.loading);
 
+  // Filter sections to only show those belonging to the current class (cid)
+  const filteredSections = allSections?.filter(
+    (section) => section.classId === cid
+  );
+
   // Fetch teachers and subjects on mount
   useEffect(() => {
     dispatch(fetchAllTeachers());
@@ -64,9 +68,14 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
           ? editingTeacher.subjects.map((sub) => sub._id)
           : []
       );
+      // Filter sectionIds to only include those from the current class
+      const currentClassSectionIds =
+        filteredSections?.map((section) => section._id) || [];
       setSectionIds(
         editingTeacher.sectionId
-          ? editingTeacher.sectionId.map((sec) => sec._id)
+          ? editingTeacher.sectionId
+              .map((sec) => sec._id)
+              .filter((id) => currentClassSectionIds.includes(id))
           : []
       );
     } else {
@@ -74,66 +83,8 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
       setSubjectIds([]);
       setSectionIds([]);
     }
-  }, [editingTeacher]);
+  }, [editingTeacher, filteredSections]);
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   // Reset errors
-  //   setTeacherError("");
-  //   setSubjectError("");
-  //   setSectionError("");
-
-  //   // Validate required fields
-  //   let isValid = true;
-  //   if (!teacherId) {
-  //     setTeacherError(t("Teacher is required"));
-  //     teacherRef.current?.focus();
-  //     isValid = false;
-  //   }
-  //   if (!subjectIds || subjectIds.length === 0) {
-  //     setSubjectError(t("Subject is required"));
-  //     if (isValid) {
-  //       subjectRef.current?.focus();
-  //     }
-  //     isValid = false;
-  //   }
-  //   if (!sectionIds || sectionIds.length === 0) {
-  //     setSectionError(t("Section is required"));
-  //     if (isValid) {
-  //       sectionRef.current?.focus();
-  //     }
-  //     isValid = false;
-  //   }
-  //   if (!isValid) {
-  //     return; // Do not make the API call
-  //   }
-
-  //   try {
-  //     if (editingTeacher) {
-  //       // For editing, backend expects subjects and sectionIds as arrays of objects.
-  //       const editData = {
-  //         id: editingTeacher._id,
-  //         subjects: subjectIds.map((id) => ({ _id: id })),
-  //         classIds: [{ _id: cid }],
-  //         sectionIds: sectionIds.map((id) => ({ _id: id })),
-  //       };
-  //       await dispatch(editTeacher(editData)).unwrap();
-  //     } else {
-  //       const assignData = {
-  //         classId: cid,
-  //         teacherId,
-  //         subjectIds,
-  //         sectionIds,
-  //       };
-  //       await dispatch(assignTeacher(assignData)).unwrap();
-  //     }
-  //     // Only close sidebar on success
-  //     closeSidebar();
-  //   } catch (error) {
-  //     // Optionally set a general error message here
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -172,9 +123,9 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
         // For editing, backend expects subjects and sectionIds as arrays of objects.
         const editData = {
           id: editingTeacher._id,
-          subjectIds: subjectIds.map((id) => (id )),
-          classIds: [ cid],
-          sectionIds: sectionIds.map((id) => ( id )),
+          subjectIds: subjectIds.map((id) => id),
+          classIds: [cid],
+          sectionIds: sectionIds.map((id) => id),
         };
         await dispatch(editTeacher(editData)).unwrap();
       } else {
@@ -274,7 +225,7 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
             disabled={loading}
             style={selectBoxStyle}
           >
-            {allSections?.map((section) => (
+            {filteredSections?.map((section) => (
               <Select.Option key={section._id} value={section._id}>
                 {section.sectionName}
               </Select.Option>
