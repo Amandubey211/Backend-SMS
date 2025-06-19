@@ -131,7 +131,7 @@ const StudentFeeForm = () => {
   };
 
   const handleInputChange = (index, field, value) => {
-    const roundToFive = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
+
     const updatedItems = [...lineItems];
     updatedItems[index][field] = field.includes('Date') && value ? value?.format('YYYY-MM-DD') : value;
 
@@ -143,19 +143,19 @@ const StudentFeeForm = () => {
     const discountType = updatedItems[index].discountType;
 
     let subtotal = rate * quantity;
-    let taxAmount = roundToFive((subtotal * tax) / 100);
-    let baseAmount = roundToFive(subtotal + penalty + taxAmount);
+    let taxAmount = (subtotal * tax) / 100;
+    let finalAmount = (subtotal + penalty + taxAmount).toFixed(5);
 
-    let finalAmount;
+
     if (discountType === "percentage") {
-      const discountAmount = roundToFive((baseAmount * discount) / 100);
-      finalAmount = roundToFive(baseAmount - discountAmount);
+      
+      finalAmount -= ((finalAmount * discount) / 100).toFixed(5);
     } else {
-      finalAmount = roundToFive(baseAmount - discount);
+      finalAmount -= (discount).toFixed(5);
     }
 
 
-    updatedItems[index].finalAmount = finalAmount;
+    updatedItems[index].finalAmount = finalAmount.toFixed(5);
     setLineItems(updatedItems);
   };
 
