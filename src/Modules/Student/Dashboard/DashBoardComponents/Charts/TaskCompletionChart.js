@@ -80,7 +80,7 @@ const TaskCompletionChart = () => {
         </div>
 
         {/* Chart */}
-        <div className="h-[145px]">
+        <div className="h-[130px]">
           <Doughnut data={data} options={options} />
         </div>
       </div>

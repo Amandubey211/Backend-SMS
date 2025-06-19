@@ -460,7 +460,7 @@ const EditorComponent = ({
             value={editorContent}
             config={config}
             tabIndex={1}
-            onChange={onEditorChange}
+            onBlur={newContent => onEditorChange(newContent)} // update state on blur
           />
         )}
       </div>

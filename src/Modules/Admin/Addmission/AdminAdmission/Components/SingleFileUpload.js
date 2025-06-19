@@ -220,7 +220,6 @@ const SingleFileUpload = memo(
         )}
       </div>
     );
-
     return (
       <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
         <Popover content={menu} trigger="click" placement="bottomLeft">
@@ -244,9 +243,9 @@ const SingleFileUpload = memo(
           </div>
         ) : fileObj?.url ? (
           <div className="flex items-center justify-between flex-1 px-3 bg-blue-50">
-            <Tooltip title={fileObj.fieldName || fileObj.url.split("/").pop()}>
+            <Tooltip title={fileObj?.file?.name || fileObj?.fieldName}>
               <span className="truncate">
-                {fileObj.fieldName || fileObj.url.split("/").pop()}
+                {fileObj?.file?.name || fileObj?.fieldName}
               </span>
             </Tooltip>
             <Space>

@@ -61,8 +61,6 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
     const missing = [];
     // profile
     if (!values.profile) missing.push("Profile Picture");
-    // dynamic mandatory attachments
-    console.log(values.attachments, "values.attachmentsvalues.attachments");
     if (values.attachments?.mandatory) {
       Object.entries(values.attachments.mandatory).forEach(([key, val]) => {
         if (!val?.url) missing.push(key);
@@ -94,9 +92,12 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
         "contactNumber",
         values.candidateInformation.contactNumber
       );
+      formData.append("height",values.candidateInformation.height)
+      formData.append("weight",values.candidateInformation.weight)
       formData.append("religion", values.candidateInformation.religion);
       formData.append("nativeLanguage", values.candidateInformation.nativeLanguage);
       formData.append("passportNumber", values.candidateInformation.passportNumber);
+      formData.append("passportExpiry",values.candidateInformation.passportExpiry)
       formData.append("idExpiry", values.candidateInformation.idExpiry);
       formData.append("bloodGroup", values.candidateInformation.bloodGroup);
       formData.append(
@@ -185,9 +186,6 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       ];
 
       fatherInfoFields.forEach((field) => {
-        if (values.fatherPhoto) {
-          formData.append(`fatherInfo[photo]`, values.fatherPhoto || "");
-        }
         if (field === "cell1" || field === "cell2") {
           const phoneValue = values.fatherInfo[field] || "";
           formData.append(`fatherInfo[${field}][value]`, phoneValue);
@@ -218,9 +216,6 @@ const AdminAdmissionForm = memo(({ onFormDataChange }) => {
       ];
 
       motherInfoFields.forEach((field) => {
-        if (values.motherPhoto) {
-          formData.append(`motherInfo[photo]`, values.motherPhoto || "");
-        }
         if (field === "cell1" || field === "cell2") {
           const phoneValue = values.motherInfo[field] || "";
           formData.append(`motherInfo[${field}][value]`, phoneValue);
