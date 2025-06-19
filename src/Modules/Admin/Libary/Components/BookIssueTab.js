@@ -102,7 +102,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
 
         {/* Middle Filters */}
         <div className="flex flex-wrap gap-4 items-end flex-grow justify-center">
-          <div className="flex-shrink-0">
+          {/* <div className="flex-shrink-0">
             <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Class")}</label>
             <Select
               size="middle"
@@ -136,7 +136,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
                 <Option key={section._id} value={section._id}>{section.sectionName}</Option>
               ))}
             </Select>
-          </div>
+          </div> */}
           <div className="flex-shrink-0">
             <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Book")}</label>
             <Select

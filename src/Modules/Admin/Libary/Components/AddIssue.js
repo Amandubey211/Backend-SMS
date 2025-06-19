@@ -3,11 +3,11 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchBooksThunk,
   issueBookThunk,
-  fetchBookIssuesThunk
+  fetchBookIssuesThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
-import { Select, Radio, DatePicker, Button, Input } from "antd";
-import dayjs from 'dayjs'
+import { Form, Select, Radio, DatePicker, Button, Input } from "antd";
+import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { FaSchool } from "react-icons/fa";
 import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
@@ -50,6 +50,7 @@ const roleOptions = [
 const AddIssue = ({ onClose, editIssueData }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
+  const [form] = Form.useForm();
 
   // Redux state
   const { books } = useSelector((state) => state.admin.library);
@@ -59,18 +60,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const classList = useSelector((state) => state.admin.class.classes);
   const { allUsers } = useSelector((state) => state.admin.notice);
   const { loading } = useSelector((state) => state.admin.students);
-
-  // Local form state
-  const [issueData, setIssueData] = useState({
-    class: "",
-    section: "",
-    user: "",
-    book: "",
-    authorName: "",
-    issueDate: "",
-    returnDate: "",
-    status: "Pending",
-  });
 
   // Local role filter state for users
   const [selectedRole, setSelectedRole] = useState("all");
@@ -85,78 +74,48 @@ const AddIssue = ({ onClose, editIssueData }) => {
   // Pre-populate form if editing
   useEffect(() => {
     if (editIssueData) {
-      setIssueData({
+      form.setFieldsValue({
         class: editIssueData.classId?._id || "",
         section: editIssueData.sectionId?._id || "",
         user: editIssueData.issuedTo?.userId?._id || "",
         book: editIssueData.bookId?._id || "",
         authorName: editIssueData.author || "",
         issueDate: editIssueData.issueDate
-          ? editIssueData.issueDate.slice(0, 10)
-          : "",
+          ? dayjs(editIssueData.issueDate)
+          : null,
         returnDate: editIssueData.returnDate
-          ? editIssueData.returnDate.slice(0, 10)
-          : "",
+          ? dayjs(editIssueData.returnDate)
+          : null,
         status: editIssueData.status || "Pending",
       });
       if (editIssueData.classId?._id) {
         dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
       }
     } else {
-      setIssueData({
-        class: "",
-        section: "",
-        user: "",
-        book: "",
-        authorName: "",
-        issueDate: "",
-        returnDate: "",
-        status: "Pending",
-      });
+      form.resetFields();
     }
   }, [editIssueData, dispatch]);
-
-  // Handle native input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setIssueData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // When a book is selected, auto-fill the authorName field
-  const handleBookChange = (bookId) => {
-    setIssueData((prev) => ({ ...prev, book: bookId }));
-    const selectedBook = books?.find((b) => b._id === bookId);
-    if (selectedBook) {
-      setIssueData((prev) => ({
-        ...prev,
-        authorName: selectedBook.author,
-      }));
-    }
-  };
 
   // Handle antd Select changes
   const handleSelectChange = (name, value) => {
     if (name === "class") {
       dispatch(fetchSectionsNamesByClass(value));
     }
-    setIssueData((prev) => ({ ...prev, [name]: value }));
+    form.setFieldValue(name, value);
+    if (name === "book") {
+      const selectedBook = books?.find((b) => b._id === value);
+      form.setFieldValue("authorName", selectedBook?.author || "");
+    }
   };
 
   // Handle status changes via radio buttons
   const handleStatusChange = (e) => {
-    setIssueData((prev) => ({ ...prev, status: e.target.value }));
+    form.setFieldValue("status", e.target.value);
   };
 
   // Handle date changes using DatePicker
   const handleDateChange = (name, dateObj) => {
-    if (dateObj && dateObj.isValid?.()) {
-      setIssueData((prev) => ({
-        ...prev,
-        [name]: dateObj.format("YYYY-MM-DD"),
-      }));
-    } else {
-      setIssueData((prev) => ({ ...prev, [name]: "" }));
-    }
+    form.setFieldValue(name, dateObj);
   };
 
   // Filter out any user whose role is 'admin', then apply role-based filter using fuzzy search
@@ -170,32 +129,27 @@ const AddIssue = ({ onClose, editIssueData }) => {
       ) || [];
 
   // Submit handler with loading state
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values) => {
     setSubmitting(true);
-    const selectedUser = allUsers?.find(
-      (usr) => usr.userId === issueData.user
-    );
+    const selectedUser = allUsers?.find((usr) => usr.userId === values.user);
     const userRole = selectedUser ? selectedUser.role : "";
     const submissionData = {
       id: editIssueData ? editIssueData._id : null,
-      status: issueData.status,
-      returnDate: issueData.returnDate,
-      issueDate: issueData.issueDate,
-      author: issueData.authorName,
-      bookId: issueData.book,
-      userId: issueData.user,
+      status: values.status,
+      returnDate: values.returnDate ? values.returnDate.format("YYYY-MM-DD") : "",
+      issueDate: values.issueDate ? values.issueDate.format("YYYY-MM-DD") : "",
+      author: values.authorName,
+      bookId: values.book,
+      userId: values.user,
       userType: userRole,
-      sectionId: issueData.section,
-      classId: issueData.class,
+      sectionId: values.section,
+      classId: values.class,
     };
     try {
       await dispatch(issueBookThunk(submissionData)).unwrap().then(() => {
-        dispatch(fetchBookIssuesThunk({ page: 1, limit: 10 }))
+        dispatch(fetchBookIssuesThunk({ page: 1, limit: 10 }));
       });
     } catch (error) {
-      // Handle error if needed
-      toast.error(error)
     } finally {
       setSubmitting(false);
       onClose();
@@ -203,7 +157,22 @@ const AddIssue = ({ onClose, editIssueData }) => {
   };
 
   return (
-    <form className="flex flex-col h-full space-y-6" onSubmit={handleSubmit}>
+    <Form
+      form={form}
+      layout="vertical"
+      onFinish={handleSubmit}
+      initialValues={{
+        class: "",
+        section: "",
+        user: "",
+        book: "",
+        authorName: "",
+        issueDate: null,
+        returnDate: null,
+        status: "Pending",
+      }}
+      className="flex flex-col h-full space-y-6"
+    >
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
         {/* Role Filter for Users */}
         <div>
@@ -213,94 +182,101 @@ const AddIssue = ({ onClose, editIssueData }) => {
           >
             {t("Filter by Role")}
           </label>
-          <Select
-            id="roleFilter"
-            value={selectedRole}
-            onChange={(value) => setSelectedRole(value)}
-            placeholder={t("Select Role")}
-            style={{ width: "100%" }}
-            size="large"
-          >
-            {roleOptions?.map((roleOption) => (
-              <Option key={roleOption.value} value={roleOption.value}>
-                {t(roleOption.label)}
-              </Option>
-            ))}
-          </Select>
+          <Form.Item name="roleFilter" initialValue="all">
+            <Select
+              id="roleFilter"
+              value={selectedRole}
+              onChange={(value) => setSelectedRole(value)}
+              placeholder={t("Select Role")}
+              style={{ width: "100%" }}
+              size="large"
+            >
+              {roleOptions?.map((roleOption) => (
+                <Option key={roleOption.value} value={roleOption.value}>
+                  {t(roleOption.label)}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
         </div>
         {/* Conditionally render Class & Section side by side if role is 'student' */}
         {selectedRole === "student" && (
           <div className="flex gap-4">
             <div className="flex-1">
-              <label
-                htmlFor="class"
-                className="text-sm font-medium text-gray-700 flex items-center gap-1"
-              >
-                <FaSchool /> {t("Class")}
-              </label>
-              <Select
-                id="class"
-                name="class"
-                value={issueData.class}
-                onChange={(value) => handleSelectChange("class", value)}
-                placeholder={t("Select Class")}
-                style={{ width: "100%" }}
-                size="large"
-                showSearch
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().includes(input.toLowerCase())
+              <Form.Item
+                label={
+                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                    <FaSchool /> {t("Class")}
+                  </span>
                 }
-                required
+                name="class"
+                rules={[{ required: true, message: t("Select Class") }]}
               >
-                {classList?.map((cls) => (
-                  <Option key={cls._id} value={cls._id}>
-                    {cls.className}
-                  </Option>
-                ))}
-              </Select>
+                <Select
+                  id="class"
+                  value={form.getFieldValue("class")}
+                  onChange={(value) => handleSelectChange("class", value)}
+                  placeholder={t("Select Class")}
+                  style={{ width: "100%" }}
+                  size="large"
+                  showSearch
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  }
+                >
+                  {classList?.map((cls) => (
+                    <Option key={cls._id} value={cls._id}>
+                      {cls.className}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
             </div>
             <div className="flex-1">
-              <label
-                htmlFor="section"
-                className="block text-sm font-medium text-gray-700"
-              >
-                {t("Section")}
-              </label>
-              <Select
-                id="section"
-                name="section"
-                value={issueData.section}
-                onChange={(value) => handleSelectChange("section", value)}
-                placeholder={t("Select Section")}
-                style={{ width: "100%" }}
-                size="large"
-                disabled={loading}
-                showSearch
-                filterOption={(input, option) =>
-                  option.children.toLowerCase().includes(input.toLowerCase())
+              <Form.Item
+                label={
+                  <span className="block text-sm font-medium text-gray-700">
+                    {t("Section")}
+                  </span>
                 }
+                name="section"
               >
-                {sectionList?.map((section) => (
-                  <Option key={section._id} value={section._id}>
-                    {section.sectionName}
-                  </Option>
-                ))}
-              </Select>
+                <Select
+                  id="section"
+                  value={form.getFieldValue("section")}
+                  onChange={(value) => handleSelectChange("section", value)}
+                  placeholder={t("Select Section")}
+                  style={{ width: "100%" }}
+                  size="large"
+                  disabled={loading}
+                  showSearch
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().includes(input.toLowerCase())
+                  }
+                >
+                  {sectionList?.map((section) => (
+                    <Option key={section._id} value={section._id}>
+                      {section.sectionName}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
             </div>
           </div>
         )}
         {/* User Field */}
-        <div>
-          <label
-            htmlFor="user"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {t("User")}
-          </label>
+        <Form.Item
+          label={
+            <span className="block text-sm font-medium text-gray-700">
+              {t("User")}
+            </span>
+          }
+          name="user"
+          rules={[{ required: true, message: t("Select User") }]}
+        >
           <Select
             id="user"
-            name="user"
-            value={issueData.user}
+            value={form.getFieldValue("user")}
             onChange={(value) => handleSelectChange("user", value)}
             placeholder={t("Select User")}
             style={{ width: "100%" }}
@@ -311,11 +287,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
               option.props["data-search"] &&
               fuzzySearch(input, option.props["data-search"])
             }
-            required
           >
             {filteredUsers?.map((usr) => {
-              const searchString = `${usr.name} ${usr.role} ${usr.admissionNumber || ""
-                }`;
+              const searchString = `${usr.name} ${usr.role} ${usr.admissionNumber || ""}`;
               return (
                 <Option
                   key={usr.userId}
@@ -350,20 +324,21 @@ const AddIssue = ({ onClose, editIssueData }) => {
               );
             })}
           </Select>
-        </div>
+        </Form.Item>
         {/* Book Field */}
-        <div>
-          <label
-            htmlFor="book"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {t("Book")}
-          </label>
+        <Form.Item
+          label={
+            <span className="block text-sm font-medium text-gray-700">
+              {t("Book")}
+            </span>
+          }
+          name="book"
+          rules={[{ required: true, message: t("Select Book") }]}
+        >
           <Select
             id="book"
-            name="book"
-            value={issueData.book}
-            onChange={handleBookChange}
+            value={form.getFieldValue("book")}
+            onChange={(value) => handleSelectChange("book", value)}
             placeholder={t("Select Book")}
             style={{ width: "100%" }}
             size="large"
@@ -379,81 +354,91 @@ const AddIssue = ({ onClose, editIssueData }) => {
               </Option>
             ))}
           </Select>
-        </div>
+        </Form.Item>
         {/* Author Name using AntD Input (read-only) */}
-        <div>
-          <label
-            htmlFor="authorName"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {t("Author Name")}
-          </label>
+        <Form.Item
+          label={
+            <span className="block text-sm font-medium text-gray-700">
+              {t("Author Name")}
+            </span>
+          }
+          name="authorName"
+        >
           <Input
             id="authorName"
-            name="authorName"
-            value={issueData.authorName}
-            onChange={handleInputChange}
+            value={
+              form.getFieldValue("book")
+                ? books?.find((b) => b._id === form.getFieldValue("book"))?.author ||
+                ""
+                : ""
+            }
             size="large"
             placeholder={t("Enter author name")}
             disabled
             readOnly
           />
-        </div>
+        </Form.Item>
         {/* Issue Date & Return Date side by side using DatePicker */}
         <div className="flex gap-4">
-          <div className="flex-1">
-            <label
-              htmlFor="issueDate"
-              className="text-sm font-medium text-gray-700 flex items-center gap-1"
-            >
-              <FiCalendar /> {t("Issue Date")}
-            </label>
+          <Form.Item
+            label={
+              <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                <FiCalendar /> {t("Issue Date")}
+              </span>
+            }
+            name="issueDate"
+            rules={[{ required: true, message: t("Select Issue Date") }]}
+          >
             <DatePicker
               style={{ width: "100%" }}
               placeholder="dd-mm-yyyy"
               format="DD-MM-YYYY"
-              value={
-                issueData.issueDate
-                  ? dayjs(issueData.issueDate)
-                  : null
-              }
               onChange={(dateObj) => handleDateChange("issueDate", dateObj)}
               allowClear
-              required
             />
-          </div>
-          <div className="flex-1">
-            <label
-              htmlFor="returnDate"
-              className="text-sm font-medium text-gray-700 flex items-center gap-1"
-            >
-              <FiClock /> {t("Return Date")}
-            </label>
+          </Form.Item>
+          <Form.Item
+            label={
+              <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                <FiClock /> {t("Return Date")}
+              </span>
+            }
+            name="returnDate"
+            rules={[
+              { required: true, message: t("Select Return Date") },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  const issueDate = getFieldValue("issueDate");
+                  if (!value || !issueDate || value.isAfter(issueDate)) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(
+                    new Error(t("Return date must be greater than issue date"))
+                  );
+                },
+              }),
+            ]}
+          >
             <DatePicker
               style={{ width: "100%" }}
               placeholder="dd-mm-yyyy"
               format="DD-MM-YYYY"
-              value={
-                issueData.returnDate
-                  ? dayjs(issueData.returnDate)
-                  : null
-              }
               onChange={(dateObj) => handleDateChange("returnDate", dateObj)}
               allowClear
-              required
             />
-          </div>
+          </Form.Item>
         </div>
         {/* Status as Radio Buttons */}
-        <div>
-          <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <FiAlertCircle /> {t("Status")}
-          </label>
-          <Radio.Group
-            onChange={handleStatusChange}
-            value={issueData.status}
-            size="large"
-          >
+        <Form.Item
+          label={
+            <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+              <FiAlertCircle /> {t("Status")}
+            </span>
+          }
+          name="status"
+          initialValue="Pending"
+        >
+          <Radio.Group onChange={handleStatusChange} size="large">
             <Radio value="Pending">
               <span className="flex items-center gap-1">{t("Pending")}</span>
             </Radio>
@@ -461,23 +446,25 @@ const AddIssue = ({ onClose, editIssueData }) => {
               <span className="flex items-center gap-1">{t("Returned")}</span>
             </Radio>
           </Radio.Group>
-        </div>
+        </Form.Item>
       </div>
       {/* Submit Button with loading state */}
       <div className="sticky bottom-0 w-full bg-white pb-3 px-5">
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={submitting}
-          disabled={submitting}
-          block
-          size="large"
-          className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
-        >
-          {editIssueData ? t("Edit Book Issue") : t("Add Book Issue")}
-        </Button>
+        <Form.Item>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={submitting}
+            disabled={submitting}
+            block
+            size="large"
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+          >
+            {editIssueData ? t("Edit Book Issue") : t("Add Book Issue")}
+          </Button>
+        </Form.Item>
       </div>
-    </form>
+    </Form>
   );
 };
 
