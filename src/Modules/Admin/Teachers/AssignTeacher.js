@@ -14,28 +14,18 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const { t } = useTranslation("admClass");
   const dispatch = useDispatch();
   const { cid } = useParams();
+
   // Local state for form fields
-  const [teacherId, setTeacherId] = useState(
-    editingTeacher ? editingTeacher._id : ""
-  );
-  // For subjects and sections, use arrays for multiple selections.
-  const [subjectIds, setSubjectIds] = useState(
-    editingTeacher && editingTeacher.subjects
-      ? editingTeacher.subjects.map((sub) => sub._id)
-      : []
-  );
-  const [sectionIds, setSectionIds] = useState(
-    editingTeacher && editingTeacher.sectionId
-      ? editingTeacher.sectionId.map((sec) => sec._id)
-      : []
-  );
+  const [teacherId, setTeacherId] = useState("");
+  const [subjectIds, setSubjectIds] = useState([]);
+  const [sectionIds, setSectionIds] = useState([]);
 
   // Error states for validation
   const [teacherError, setTeacherError] = useState("");
   const [subjectError, setSubjectError] = useState("");
   const [sectionError, setSectionError] = useState("");
 
-  // Refs for focus control (teacher remains a native or AntD component as needed)
+  // Refs for focus control
   const teacherRef = useRef(null);
   const subjectRef = useRef(null);
   const sectionRef = useRef(null);
@@ -49,9 +39,8 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const loading = useSelector((state) => state.admin.teacher.loading);
 
   // Filter sections to only show those belonging to the current class (cid)
-  const filteredSections = allSections?.filter(
-    (section) => section.classId === cid
-  );
+  const filteredSections =
+    allSections?.filter((section) => section.classId === cid) || [];
 
   // Fetch teachers and subjects on mount
   useEffect(() => {
@@ -59,7 +48,7 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
     dispatch(fetchSubjects(cid));
   }, [dispatch, cid]);
 
-  // Update local state when editingTeacher changes
+  // Initialize form when editingTeacher or filteredSections changes
   useEffect(() => {
     if (editingTeacher) {
       setTeacherId(editingTeacher._id);
@@ -68,22 +57,24 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
           ? editingTeacher.subjects.map((sub) => sub._id)
           : []
       );
-      // Filter sectionIds to only include those from the current class
-      const currentClassSectionIds =
-        filteredSections?.map((section) => section._id) || [];
-      setSectionIds(
-        editingTeacher.sectionId
-          ? editingTeacher.sectionId
-              .map((sec) => sec._id)
-              .filter((id) => currentClassSectionIds.includes(id))
-          : []
+
+      // Get only section IDs from the current class
+      const currentClassSectionIds = filteredSections.map(
+        (section) => section._id
       );
+      const teacherSectionsInThisClass = editingTeacher.sectionId
+        ? editingTeacher.sectionId
+            .filter((sec) => currentClassSectionIds.includes(sec._id))
+            .map((sec) => sec._id)
+        : [];
+
+      setSectionIds(teacherSectionsInThisClass);
     } else {
       setTeacherId("");
       setSubjectIds([]);
       setSectionIds([]);
     }
-  }, [editingTeacher, filteredSections]);
+  }, [editingTeacher]); // Removed filteredSections from dependencies
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,12 +106,11 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
       isValid = false;
     }
     if (!isValid) {
-      return; // Do not make the API call
+      return;
     }
 
     try {
       if (editingTeacher) {
-        // For editing, backend expects subjects and sectionIds as arrays of objects.
         const editData = {
           id: editingTeacher._id,
           subjectIds: subjectIds.map((id) => id),
@@ -137,13 +127,12 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
         };
         await dispatch(assignTeacher(assignData)).unwrap();
       }
-      // Only close sidebar on success
       closeSidebar();
     } catch (error) {
-      // Optionally set a general error message here
+      // Handle error
     }
   };
-  // Common select box styles (you may adjust these as needed)
+
   const selectBoxStyle = { width: "100%" };
 
   return (
