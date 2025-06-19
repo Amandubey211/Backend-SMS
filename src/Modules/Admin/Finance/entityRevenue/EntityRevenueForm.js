@@ -151,7 +151,7 @@ const EntityRevenueForm = () => {
       finalAmount -= (discount).toFixed(5);
     }
 
-    updatedItems[index].finalAmount = finalAmount.toFixed(5);
+    updatedItems[index].finalAmount = finalAmount;
     setLineItems(updatedItems);
   };
 
