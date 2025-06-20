@@ -147,7 +147,7 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
 
               <tr className="border-4 border-white text-start" >
                 <td className="p-2  text-center" colSpan={16}>Total Tax </td>
-                <td className="p-2 border-4 border-white">{totalTax} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalTax.toFixed(5)} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2  text-center" colSpan={16}>Total Penalty</td>
@@ -159,11 +159,11 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2 font-semibold text-center" colSpan={16}>Final Amount</td>
-                <td className="p-2 border-4 border-white">{totalAmount} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalAmount.toFixed(5)} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2  text-center" colSpan={16}>Amount Paid</td>
-                <td className="p-2 border-4 border-white">{totalPaid} {currency}</td>
+                <td className="p-2 border-4 border-white">{totalPaid.toFixed(5)} {currency}</td>
               </tr>
               <tr className="border-4 border-white text-start">
                 <td className="p-2 font-semibold text-center" colSpan={16}>Balance Due</td>
