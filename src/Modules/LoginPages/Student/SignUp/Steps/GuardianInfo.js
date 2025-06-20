@@ -64,7 +64,6 @@ const PhoneField = ({
 }) => {
   const hasError = form.getFieldError(name).length > 0;
   const borderCol = hasError ? "#ff4d4f" : "#d9d9d9";
-
   /* sync local ↔ form every time form resets */
   const [value, setValue] = useState(form.getFieldValue(name) || "");
   const [isWA, setIsWA] = useState(!!form.getFieldValue(whatsappName));
@@ -96,68 +95,53 @@ const PhoneField = ({
 
   return (
     <Form.Item
+      name={name}
       label={label}
-      required={required}
-      validateStatus={hasError ? "error" : ""}
-      help={hasError ? form.getFieldError(name)[0] : undefined}
+      rules={required ? [{ required: true, message: "Required" }] : []}
       className="mb-4"
     >
-      <Space.Compact
-        block
-        style={{
-          border: `1px solid ${borderCol}`,
-          borderRadius: 6,
-          height: 40,
-        }}
-      >
-        {/* ---- PHONE INPUT ---- */}
-        <Form.Item
-          name={name}
-          noStyle
-          rules={[{ required, message: "Phone number is required" }]}
-        >
-          <PhoneInput
-            country="qa"
-            placeholder={placeholder}
-            value={value}
-            onChange={handleChange}
-            enableSearch
-            countryCodeEditable={false}
-            inputStyle={{
-              width: "100%",
-              height: "100%",
-              fontSize: 16,
-              border: "none",
-              borderRadius: "6px 0 0 6px",
-            }}
-            containerStyle={{ width: "100%" }}
-            buttonStyle={{
-              border: "none",
-              borderRadius: "6px 0 0 6px",
-              background: "transparent",
-              padding: "0 10px",
-              width: "50px",
-            }}
-          />
-        </Form.Item>
-
-        {/* ---- WHATSAPP TOGGLE ---- */}
-        <Tooltip title={isWA ? "WhatsApp enabled" : "Click to enable WhatsApp"}>
+      <Space.Compact block>
+        <PhoneInput
+          country="qa"
+          placeholder={placeholder}
+          inputStyle={{
+            width: "100%",
+            height: 40,
+            fontSize: 16,
+            marginLeft: 4,
+            border: "1px solid #d9d9d9",
+            borderLeft: "none",
+            borderRight: "none",
+            borderRadius: 0,
+          }}
+          containerStyle={{ width: "100%" }}
+          value={value || ""}
+          onChange={(value) => {
+            form.setFieldsValue({ [name]: value });
+          }}
+          buttonStyle={{
+            border: "1px solid #d9d9d9",
+            borderRadius: "0",
+            background: "transparent",
+            padding: "0 5px",
+            width: "50px",
+          }}
+          enableSearch={true}
+          countryCodeEditable={false}
+        />
+        {
+          whatsappName[0] !== 'guardianInformation' &&
           <div
-            onClick={toggleWA}
-            className={`flex items-center justify-center w-12 cursor-pointer
-                       ${isWA ? "bg-[#25D366]" : "bg-gray-100"}`}
-            style={{
-              borderLeft: `1px solid ${borderCol}`,
-              borderRadius: "0 6px 6px 0",
-              height: "100%",
-            }}
+            className={`flex items-center border border-l-0 rounded-r px-3 ${isWA ? "bg-[#dcf8c6]" : "bg-white"
+              }`}
           >
-            <FaWhatsapp
-              className={`text-xl ${isWA ? "text-white" : "text-[#075E54]"}`}
-            />
+            <Tooltip title="Mark this number as WhatsApp">
+              <div className="cursor-pointer" onClick={toggleWA}>
+                <FaWhatsapp className="text-[#075E54] text-xl" />
+              </div>
+            </Tooltip>
           </div>
-        </Tooltip>
+        }
       </Space.Compact>
     </Form.Item>
   );
@@ -506,7 +490,6 @@ const GuardianInfo = ({ formData }) => {
     try {
       await form.validateFields();
       const formValues = form.getFieldsValue(true);
-      console.log(formValues, "formValues");
 
       const processedValues = {
         ...formValues,
@@ -666,8 +649,8 @@ const GuardianInfo = ({ formData }) => {
                   {activeTab === "father"
                     ? "Mother Info"
                     : activeTab === "mother"
-                    ? "Guardian Info"
-                    : "Save & Continue"}
+                      ? "Guardian Info"
+                      : "Save & Continue"}
                 </Button>
               </motion.div>
             </Col>

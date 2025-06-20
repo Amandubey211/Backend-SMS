@@ -61,13 +61,9 @@ const roleOptions = [
 
 /**
  * Custom tag renderer for "Notice for Users" select.
- * We store userId in the form field, so we look up the user
- * by matching user.userId === value. Then we display the user's
- * avatar, name, and role. If not found, we fallback to showing the value.
  */
 const userTagRender = (props, allUsers) => {
   const { value, closable, onClose } = props;
-  // 'value' is userId from the form
   const user = allUsers?.find((u) => u.userId === value);
 
   if (!user) {
@@ -77,7 +73,7 @@ const userTagRender = (props, allUsers) => {
         onClose={onClose}
         style={{ marginRight: 3, background: "#fff0f2" }}
       >
-        {value}d
+        {value}
       </Tag>
     );
   }
@@ -157,48 +153,25 @@ const AddNotice = ({ isEditing, onClose }) => {
   }, [dispatch]);
 
   /**
-   * Preload data if editing:
-   * The backend returns noticeForUsers as an array of objects with "_id".
-   * But the user array has "userId". We must map each `_id` to a `userId`
-   * so the tag renderer can find the correct user data (avatar, name, role).
+   * Preload data if editing
    */
   useEffect(() => {
     if (isEditing && selectedNotice) {
-      // Convert each { _id } to the matching userId
-      // so the form stores userId in noticeForUsers
-      const mappedUserIds = [];
-      if (selectedNotice.noticeForUsers?.length) {
-        selectedNotice.noticeForUsers.forEach((nfUser) => {
-          const matchedUser = allUsers?.find(
-            (nu) => nu.userId === nfUser._id
-          );
-          // If we found a user whose userId == nfUser._id,
-          // store that userId. Otherwise, store the raw _id
-          mappedUserIds.push(matchedUser ? matchedUser.userId : nfUser._id);
-        });
-      }
-
       const preloadedData = {
         title: selectedNotice?.title || "",
-        startDate: selectedNotice?.startDate
-          ? dayjs(selectedNotice.startDate)
-          : null,
-        endDate: selectedNotice?.endDate
-          ? dayjs(selectedNotice.endDate)
-          : null,
+        startDate: selectedNotice?.startDate ? dayjs(selectedNotice.startDate) : null,
+        endDate: selectedNotice?.endDate ? dayjs(selectedNotice.endDate) : null,
         priority: selectedNotice?.priority || "High priority",
         classId: selectedNotice?.classId?._id || "",
         noticeTarget:
           selectedNotice?.noticeForRoles?.length > 0 ? "roles" : "users",
         noticeForRoles: selectedNotice?.noticeForRoles || [],
-        // Now store userId in noticeForUsers for the form
-        noticeForUsers: mappedUserIds,
+        noticeForUsers: selectedNotice?.noticeForUsers?.map((nfUser) => nfUser._id) || [], // Use _id from backend
       };
       setAnnouncementData(preloadedData);
       form.setFieldsValue(preloadedData);
       setEditorContent(selectedNotice?.description || "");
     } else {
-      // Reset for creation
       const initialData = {
         title: "",
         startDate: null,
@@ -247,7 +220,7 @@ const AddNotice = ({ isEditing, onClose }) => {
   };
 
   /**
-   * On submit, convert userId -> _id if your backend truly needs _id
+   * On submit, convert userId -> _id if needed for backend
    */
   const onFinish = async (values) => {
     if (!editorContent.trim()) {
@@ -256,20 +229,25 @@ const AddNotice = ({ isEditing, onClose }) => {
       return;
     }
 
-    // Convert userIds to _id for final payload
     let finalNoticeForUsers = values.noticeForUsers || [];
-    finalNoticeForUsers = finalNoticeForUsers.map((uid) => {
-      // find matching user in allUsers
-      const matched = allUsers?.find((nu) => nu.userId === uid);
-      // if found, return matched userId or _id
-      // in your data, you want the `_id` that matches the original backend references
-      // but we only have userId. If your backend expects `_id`, you must have a link.
-      // If you truly only have userId, then store userId in your DB.
-      // For now, let's assume we want to store `_id` from the selectedNotice.
-      // If you do not have that, you might need to store userId in the DB instead.
-      // We'll do a fallback if not found.
-      return matched ? matched.userId : uid;
-    });
+    if (isEditing && selectedNotice?.noticeForUsers) {
+      // For editing, map selected userIds back to _id from original noticeForUsers
+      finalNoticeForUsers = finalNoticeForUsers.map((userId) => {
+        const originalUser = selectedNotice.noticeForUsers.find(
+          (nfUser) => {
+            const matchedUser = allUsers?.find((u) => u.userId === userId);
+            return matchedUser && nfUser._id === matchedUser.userId; // Match based on userId
+          }
+        );
+        return originalUser ? originalUser._id : userId; // Fallback to userId if no match
+      });
+    } else {
+      // For new notices, use userId as is (backend should handle mapping to _id)
+      finalNoticeForUsers = finalNoticeForUsers.map((userId) => {
+        const matchedUser = allUsers?.find((u) => u.userId === userId);
+        return matchedUser ? matchedUser.userId : userId; // Use userId
+      });
+    }
 
     const payload = {
       ...values,
@@ -277,7 +255,12 @@ const AddNotice = ({ isEditing, onClose }) => {
       endDate: values.endDate ? values.endDate.format("YYYY-MM-DD") : "",
       description: editorContent,
       noticeForUsers: finalNoticeForUsers,
+      classId: values.classId || null, // Explicitly set to null if empty
     };
+
+    // Remove undefined or empty fields that shouldn't be sent
+    if (!payload.classId) delete payload.classId;
+    if (payload.noticeForUsers.length === 0) payload.noticeForUsers = [];
 
     if (!payload.title || !payload.startDate || !payload.endDate) {
       toast.error(t("Please fill in all required fields."));
@@ -293,22 +276,16 @@ const AddNotice = ({ isEditing, onClose }) => {
             updatedData: payload,
           })
         ).unwrap();
-        // console.log("Response", response)
         if (response.success) {
-
           toast.success(t("Notice Updated Successfully"));
-        }
-        else {
+        } else {
           toast.error(response.message || t("Failed to update notice."));
         }
       } else {
         const response = await dispatch(createNoticeThunk(payload)).unwrap();
-        // console.log("Response", response)
         if (response.success) {
-
           toast.success(t("Notice Added Successfully"));
-        }
-        else {
+        } else {
           toast.error(response.message || t("Failed to add notice."));
         }
       }
@@ -324,6 +301,8 @@ const AddNotice = ({ isEditing, onClose }) => {
     if (value) {
       form.setFieldsValue({ classId: value });
       dispatch(fetchStudentsByClassAndSection(value));
+    } else {
+      form.setFieldsValue({ classId: null }); // Clear classId if "All" is selected
     }
   };
 
@@ -338,7 +317,6 @@ const AddNotice = ({ isEditing, onClose }) => {
       className="p-6 bg-white relative"
       style={{ borderRadius: "8px" }}
     >
-      {/* Guidelines Tooltip */}
       <Tooltip title={t("View Guidelines")}>
         <div
           style={{
@@ -354,7 +332,6 @@ const AddNotice = ({ isEditing, onClose }) => {
         </div>
       </Tooltip>
 
-      {/* Guidelines Modal */}
       <Modal
         open={isGuidelineModalVisible}
         onCancel={closeGuidelines}
@@ -430,7 +407,6 @@ const AddNotice = ({ isEditing, onClose }) => {
         </AnimatePresence>
       </Modal>
 
-      {/* Full-Screen User Picker Modal */}
       <Modal
         open={isUserPickerVisible}
         onCancel={() => setUserPickerVisible(false)}
@@ -452,7 +428,6 @@ const AddNotice = ({ isEditing, onClose }) => {
           />
           <Row gutter={[16, 16]}>
             {filteredUsers.map((user) => {
-              // user.userId is the unique identifier
               const isSelected = tempSelectedUsers.includes(user.userId);
               return (
                 <Col xs={12} sm={8} md={6} lg={4} key={user.userId}>
@@ -498,7 +473,6 @@ const AddNotice = ({ isEditing, onClose }) => {
         </div>
       </Modal>
 
-      {/* Main Form */}
       <Form
         form={form}
         layout="vertical"
@@ -516,7 +490,6 @@ const AddNotice = ({ isEditing, onClose }) => {
           noticeForUsers: announcementData.noticeForUsers,
         }}
       >
-        {/* SECTION 1: Notice Information */}
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-3">
             {t("1. Notice Information")}
@@ -581,7 +554,20 @@ const AddNotice = ({ isEditing, onClose }) => {
                   </span>
                 }
                 name="endDate"
-                rules={[{ required: true, message: t("Select end date") }]}
+                rules={[
+                  { required: true, message: t("Select end date") },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      const startDate = getFieldValue("startDate");
+                      if (!value || !startDate || value.isAfter(startDate)) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(t("End date must be greater than start date"))
+                      );
+                    },
+                  }),
+                ]}
               >
                 <DatePicker
                   size="large"
@@ -596,7 +582,6 @@ const AddNotice = ({ isEditing, onClose }) => {
 
         <hr className="my-3 border-gray-200" />
 
-        {/* SECTION 2: Notice Assignment */}
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-3">
             {t("2. Notice Assignment")}
@@ -616,7 +601,6 @@ const AddNotice = ({ isEditing, onClose }) => {
             </Radio.Group>
           </Form.Item>
 
-          {/* Notice for Roles */}
           {noticeTarget === "roles" && (
             <Form.Item
               label={
@@ -658,7 +642,6 @@ const AddNotice = ({ isEditing, onClose }) => {
             </Form.Item>
           )}
 
-          {/* Notice for Users */}
           {noticeTarget === "users" && (
             <Form.Item
               label={
@@ -683,6 +666,7 @@ const AddNotice = ({ isEditing, onClose }) => {
                 aria-label={t("Notice for Users")}
                 style={{ flex: 1 }}
                 tagRender={(props) => userTagRender(props, allUsers)}
+                onFocus={() => setTempSelectedUsers(form.getFieldValue("noticeForUsers") || [])}
               >
                 {(allUsers || []).map(({ userId, name, role, profile }) => (
                   <Option
@@ -719,7 +703,6 @@ const AddNotice = ({ isEditing, onClose }) => {
             </Form.Item>
           )}
 
-          {/* Optional Class Selection */}
           <Form.Item
             label={
               <span className="flex items-center">
@@ -748,7 +731,6 @@ const AddNotice = ({ isEditing, onClose }) => {
 
         <hr className="my-3 border-gray-200" />
 
-        {/* SECTION 3: Notice Details */}
         <div className="mb-4">
           <h2 className="text-xl font-semibold mb-3">
             {t("3. Notice Details")}
@@ -766,7 +748,6 @@ const AddNotice = ({ isEditing, onClose }) => {
           />
         </div>
 
-        {/* Submit Button */}
         <Form.Item>
           <Button
             htmlType="submit"

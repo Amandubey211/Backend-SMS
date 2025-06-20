@@ -34,7 +34,6 @@ export const staffLogin = createAsyncThunk(
 
       // 3) Attempt staff login
       const data = await postData("/auth/staff/login", userDetail);
-      console.log("Login response data:", data);
 
       if (!data?.success) {
         const errorMessage =

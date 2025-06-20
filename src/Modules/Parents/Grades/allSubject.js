@@ -168,7 +168,7 @@ const AllSubject = () => {
                 `}
 
               >
-                <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} />
+                <SubjectCard subject={subject} i={index} subjectColor={studentSubjectProgress[index]?.subjectColor} selectedSubject={selectedSubjectId} />
               </div>
             ))}
           </div>

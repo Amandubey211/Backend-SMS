@@ -9,7 +9,7 @@ const StudentCardSection = () => {
   const {  paidAllAmount, totalAllAmount, } = useSelector(
     (state) => state.admin.studentFees
   );
-   const formatAmount = (amount) => amount.toFixed(2);
+   const formatAmount = (amount) => amount?.toFixed(2);
 
  const studentCardsData = [
    {

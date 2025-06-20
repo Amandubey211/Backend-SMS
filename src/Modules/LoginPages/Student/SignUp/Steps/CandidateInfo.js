@@ -84,7 +84,9 @@ const PhoneField = ({
             width: "100%",
             height: 40,
             fontSize: 16,
+            marginLeft: 4,
             border: "1px solid #d9d9d9",
+            borderLeft:"none",
             borderRight: "none",
             borderRadius: 0,
           }}
@@ -97,7 +99,7 @@ const PhoneField = ({
             border: "1px solid #d9d9d9",
             borderRadius: "0",
             background: "transparent",
-            padding: "0 10px",
+            padding: "0 5px",
             width: "50px",
           }}
           enableSearch={true}

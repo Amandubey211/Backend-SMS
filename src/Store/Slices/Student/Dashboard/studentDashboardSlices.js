@@ -40,7 +40,7 @@ const studentDashboardSlice = createSlice({
         state.attendanceError = false;
       })
       .addCase(fetchDashboardDetails.fulfilled, (state, action) => {
-        console.log("card payload", action.payload);
+    
 
         state.loading = false;
         state.cardData = action.payload?.cardData;

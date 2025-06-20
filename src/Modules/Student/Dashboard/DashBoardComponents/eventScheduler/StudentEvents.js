@@ -14,7 +14,7 @@ import { Tooltip } from "antd";
 
 const localizer = momentLocalizer(moment);
 
-// 1) Define a list of light/pastel Tailwind color classes
+// Define a list of light/pastel Tailwind color classes
 const pastelColors = [
   "bg-pink-100",
   "bg-blue-100",
@@ -33,7 +33,7 @@ const StudentEvents = () => {
   );
   const [eventIndex, setEventIndex] = useState(0);
 
-  // 2) Local state to store the random color class for the selected event(s)
+  // Local state to store the random color class for the selected event(s)
   const [bgColor, setBgColor] = useState("bg-gray-200");
 
   const dispatch = useDispatch();
@@ -65,7 +65,7 @@ const StudentEvents = () => {
     }
   }, [eventData, dispatch]);
 
-  // 3) Whenever 'selectedEvent' changes, pick a new random pastel color
+  // Whenever 'selectedEvent' changes, pick a new random pastel color
   useEffect(() => {
     if (selectedEvent.length > 0) {
       const randomIndex = Math.floor(Math.random() * pastelColors.length);
@@ -105,8 +105,8 @@ const StudentEvents = () => {
       newMonth > 11
         ? selectedMonthYear.year + 1
         : newMonth < 0
-        ? selectedMonthYear.year - 1
-        : selectedMonthYear.year;
+          ? selectedMonthYear.year - 1
+          : selectedMonthYear.year;
     const adjustedMonth = newMonth > 11 ? 0 : newMonth < 0 ? 11 : newMonth;
     dispatch(
       setSelectedMonthYear({
@@ -138,9 +138,9 @@ const StudentEvents = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-4xl mx-auto p-4">
       {/* Month Navigation */}
-      <div className="flex justify-center items-center gap-8 p-4 bg-gray-100 rounded-lg mb-2">
+      <div className="flex justify-center items-center gap-8 p-4 bg-gray-100 rounded-lg mb-4">
         <button
           className="p-1 border rounded-full hover:bg-gray-700 hover:text-white"
           onClick={() => handleMonthChange(-1)}
@@ -162,7 +162,7 @@ const StudentEvents = () => {
       </div>
 
       {/* Calendar Component */}
-      <div className="bg-white rounded-lg">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <Calendar
           localizer={localizer}
           events={[]}
@@ -184,70 +184,71 @@ const StudentEvents = () => {
       </div>
 
       {/* Display Selected Events */}
-      {selectedEvent.length > 0 ? (
-        <div className="relative">
-          <div className="flex">
+      {selectedEvent.length > 0 && (
+        <div className="mt-4">
+          <div className="relative">
             {selectedEvent.map(
               (event, index) =>
                 index === eventIndex && (
                   <div
                     key={event.id}
-                    // 4) Apply the dynamic pastel background color here
-                    className={`mt-3 p-3 rounded-lg flex items-center gap-2 w-full ${bgColor}`}
+                    className={`p-4 rounded-lg flex items-start gap-3 w-full ${bgColor} shadow-md border border-gray-200`}
+                    style={{ maxHeight: "80px", overflow: "auto" }}
                   >
                     <img
                       src={announcement}
                       alt="Event"
                       className="w-8 h-8 rounded-lg object-cover"
                     />
-                    <div>
+                    <div className="flex-1 min-w-0">
                       <Tooltip title={event.title}>
-                        <h3 className="text-md w-[250px] truncate font-semibold text-gray-900">
+                        <h3 className="text-md font-semibold text-gray-900 truncate">
                           {event.title}
                         </h3>
                       </Tooltip>
                       <h3 className="text-xs font-semibold text-gray-600">
-                        {moment(selectedEvent[0].start).format(
-                          "ddd, MMM D, YYYY"
-                        )}{" "}
-                        ({event.time})
+                        {moment(event.start).format("ddd, MMM D, YYYY")} (
+                        {event.time})
                       </h3>
-                      <p className="text-gray-700 text-xs">
+                      <div
+                        className="text-gray-700 text-xs"
+                      >
                         {event.description}
-                      </p>
+                      </div>
                     </div>
                   </div>
                 )
             )}
+            {selectedEvent.length > 1 && (
+              <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-2">
+                <button
+                  className={`p-1 bg-gray-300 rounded-full ${eventIndex === 0
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer"
+                    }`}
+                  onClick={() => handleEventScroll(-1)}
+                  disabled={eventIndex === 0}
+                >
+                  <IoIosArrowBack />
+                </button>
+                <button
+                  className={`p-1 bg-gray-300 rounded-full ${eventIndex === selectedEvent.length - 1
+                      ? "opacity-50 cursor-not-allowed"
+                      : "cursor-pointer"
+                    }`}
+                  onClick={() => handleEventScroll(1)}
+                  disabled={eventIndex === selectedEvent.length - 1}
+                >
+                  <IoIosArrowForward />
+                </button>
+              </div>
+            )}
           </div>
-          {selectedEvent.length > 1 && (
-            <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between">
-              <button
-                className={`p-1 bg-gray-300 rounded-full ${
-                  eventIndex === 0
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer"
-                }`}
-                onClick={() => handleEventScroll(-1)}
-                disabled={eventIndex === 0}
-              >
-                <IoIosArrowBack />
-              </button>
-              <button
-                className={`p-1 bg-gray-300 rounded-full ${
-                  eventIndex === selectedEvent.length - 1
-                    ? "opacity-50 cursor-not-allowed"
-                    : "cursor-pointer"
-                }`}
-                onClick={() => handleEventScroll(1)}
-                disabled={eventIndex === selectedEvent.length - 1}
-              >
-                <IoIosArrowForward />
-              </button>
-            </div>
-          )}
         </div>
-      ) : (
+      )}
+
+      {/* Placeholder for no events */}
+      {selectedEvent.length === 0 && (
         <div className="mt-4 p-6 text-center text-gray-500 text-sm bg-gray-100 rounded-lg">
           Click on a date to view events.
         </div>
@@ -257,7 +258,7 @@ const StudentEvents = () => {
       <style>
         {`
           .rbc-month-view {
-            border-radius: 4px; /* Reduced rounding */
+            border-radius: 4px;
             background-color: #ffffff;
             padding: 10px;
             border: 1px solid #d1d5db;
@@ -270,7 +271,7 @@ const StudentEvents = () => {
           }
           .rbc-today {
             background-color: #f0f0f0 !important;
-            border-radius: 4px; /* Consistent rounding with the month view */
+            border-radius: 4px;
           }
           .rbc-date-cell {
             display: flex;
@@ -279,7 +280,7 @@ const StudentEvents = () => {
             font-size: 12px;
             position: relative;
             padding: 0 !important;
-            text-align: center; /* Ensures the date number is centered */
+            text-align: center;
           }
           .event-day {
             position: relative;
@@ -294,15 +295,43 @@ const StudentEvents = () => {
             transform: translate(-50%, -50%);
             width: 20px;
             height: 20px;
-            background-color:rgb(59, 130, 246);
+            background-color: rgb(59, 130, 246);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1;
           }
           .event-day span {
             position: absolute;
-            z-index: 2; 
+            z-index: 2;
             cursor: pointer;
+          }
+          /* Ensure description container handles overflow */
+          .overflow-y-auto {
+            overflow-y: auto;
+            line-height: 1.2;
+            word-wrap: break-word;
+          }
+          @media (max-width: 640px) {
+            .flex {
+              flex-direction: column;
+            }
+            .flex-1 {
+              flex: none;
+              width: 100%;
+            }
+            .p-4 {
+              padding: 1rem;
+            }
+            .w-[250px] {
+              width: 100%;
+              max-width: 200px;
+            }
+            .max-height-80px {
+              max-height: 60px;
+            }
+            .max-height-150px {
+              max-height: 120px;
+            }
           }
         `}
       </style>
