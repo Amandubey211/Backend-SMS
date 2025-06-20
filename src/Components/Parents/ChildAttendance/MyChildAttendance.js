@@ -44,8 +44,6 @@ const MyChildAttendance = () => {
     fetchData();
   }, [id, month, year, dispatch]);
 
-  console.log("attendanceData", attendanceData);
-
   const attendanceEntries = attendanceData?.report?.attendanceEntries || [];
   const {
     presentCount = 0,

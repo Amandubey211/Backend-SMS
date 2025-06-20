@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Row, Col, Input, DatePicker, Select } from "antd";
+import { Form, Row, Col, Input, DatePicker, Select, Alert } from "antd";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import {
@@ -27,7 +27,7 @@ const ParentGuardianInfo = ({ form }) => {
           <Form.Item
             name={["fatherInfo", "fatherPhoto"]}
             label="Father Photo"
-          // rules={[{ required: true, message: "Father photo is required" }]}
+            // rules={[{ required: true, message: "Father photo is required" }]}
           >
             <CustomUploadCard
               name="fatherPhoto"
@@ -35,7 +35,7 @@ const ParentGuardianInfo = ({ form }) => {
               recommendedSize="300x400"
               width="w-full"
               height="h-52"
-            // required
+              // required
             />
           </Form.Item>
         </Col>
@@ -204,7 +204,7 @@ const ParentGuardianInfo = ({ form }) => {
           <Form.Item
             name={["motherInfo", "motherPhoto"]}
             label="Mother Photo"
-          // rules={[{ required: true, message: "Mother photo is required" }]}
+            // rules={[{ required: true, message: "Mother photo is required" }]}
           >
             <CustomUploadCard
               name="motherPhoto"
@@ -212,7 +212,7 @@ const ParentGuardianInfo = ({ form }) => {
               recommendedSize="300x400"
               width="w-full"
               height="h-52"
-            // required
+              // required
             />
           </Form.Item>
         </Col>
@@ -368,50 +368,74 @@ const ParentGuardianInfo = ({ form }) => {
         </Col>
       </Row>
 
-      {/* Guardian Information */}
-      <h2 className="text-purple-500 bg-purple-100 rounded-md py-2 px-3 mt-8 mb-4">
+      {/* ─── Guardian / Parent-Portal Details (Admin) ───────────────────── */}
+      <h2 className="text-indigo-600 bg-indigo-100 rounded-md py-2 px-3 mt-8 mb-4">
         Guardian Information
       </h2>
+
+      {/* Admin notice */}
+      <Alert
+        showIcon
+        type="info"
+        className="mb-4"
+        message="Parent-Portal Account"
+        description={
+          <>
+            The e-mail entered below will be used to automatically create the
+            guardian’s Parent-Portal login. Once the record is saved, the system
+            will send the initial credentials to this address.
+          </>
+        }
+      />
+
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Form.Item
             name={["guardianInformation", "guardianName"]}
             label="Guardian Name"
-            rules={[{ required: true, message: "Guardian name is required" }]}
+            rules={[{ required: true, message: "Guardian name is required." }]}
           >
             <Input prefix={<UserOutlined />} placeholder="Guardian Name" />
           </Form.Item>
         </Col>
+
         <Col xs={24} md={12}>
           <Form.Item
             name={["guardianInformation", "guardianRelationToStudent"]}
             label="Relation to Student"
-            rules={[{ required: true, message: "Relation is required" }]}
+            rules={[{ required: true, message: "Relation is required." }]}
           >
             <Input prefix={<UserOutlined />} placeholder="Relation" />
           </Form.Item>
         </Col>
       </Row>
+
       <Row gutter={[16, 16]}>
         <Col xs={24} md={12}>
           <Form.Item
             name={["guardianInformation", "guardianContactNumber"]}
             label="Guardian Contact"
-            rules={[{ required: true, message: "Contact number is required" }]}
+            rules={[{ required: true, message: "Contact number is required." }]}
           >
             <PhoneInput country="qa" inputStyle={{ width: "100%" }} />
           </Form.Item>
         </Col>
+
         <Col xs={24} md={12}>
           <Form.Item
             name={["guardianInformation", "guardianEmail"]}
             label="Guardian Email"
             rules={[
-              { type: "email", message: "Invalid email" },
-              { required: true, message: "Email is required" },
+              { type: "email", message: "Enter a valid e-mail." },
+              { required: true, message: "Guardian e-mail is required." },
             ]}
+            extra="Initial login credentials will be e-mailed to the guardian."
           >
-            <Input prefix={<MailOutlined />} placeholder="Guardian Email" />
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="guardian@example.com"
+              autoComplete="email"
+            />
           </Form.Item>
         </Col>
       </Row>

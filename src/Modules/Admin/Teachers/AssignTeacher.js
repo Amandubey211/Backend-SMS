@@ -15,200 +15,128 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
   const dispatch = useDispatch();
   const { cid } = useParams();
 
-  // Local state for form fields
-  const [teacherId, setTeacherId] = useState(
-    editingTeacher ? editingTeacher._id : ""
-  );
-  // For subjects and sections, use arrays for multiple selections.
-  const [subjectIds, setSubjectIds] = useState(
-    editingTeacher && editingTeacher.subjects
-      ? editingTeacher.subjects.map((sub) => sub._id)
-      : []
-  );
-  const [sectionIds, setSectionIds] = useState(
-    editingTeacher && editingTeacher.sectionId
-      ? editingTeacher.sectionId.map((sec) => sec._id)
-      : []
-  );
+  // ── Local form state ──────────────────────────────
+  const [teacherId, setTeacherId] = useState("");
+  const [subjectIds, setSubjectIds] = useState([]);
+  const [sectionIds, setSectionIds] = useState([]);
 
-  // Error states for validation
+  // ── Validation errors ─────────────────────────────
   const [teacherError, setTeacherError] = useState("");
   const [subjectError, setSubjectError] = useState("");
   const [sectionError, setSectionError] = useState("");
 
-  // Refs for focus control (teacher remains a native or AntD component as needed)
+  // ── Refs for focus handling ───────────────────────
   const teacherRef = useRef(null);
   const subjectRef = useRef(null);
   const sectionRef = useRef(null);
 
-  // Data from Redux store
-  const allTeachers = useSelector((state) => state.admin.teacher.allTeachers);
-  const allSubjects = useSelector((state) => state.admin.subject.subjects);
-  const allSections = useSelector(
-    (state) => state.admin.group_section.sectionsList
-  );
-  const loading = useSelector((state) => state.admin.teacher.loading);
+  // ── Redux state ───────────────────────────────────
+  const allTeachers = useSelector((s) => s.admin.teacher.allTeachers);
+  const allSubjects = useSelector((s) => s.admin.subject.subjects);
+  const allSections = useSelector((s) => s.admin.group_section.sectionsList);
+  const loading = useSelector((s) => s.admin.teacher.loading);
 
-  // Fetch teachers and subjects on mount
+  // Filter sections for current class
+  const filteredSections =
+    allSections?.filter((sec) => sec.classId === cid) || [];
+
+  // Fetch teachers & subjects on mount
   useEffect(() => {
     dispatch(fetchAllTeachers());
     dispatch(fetchSubjects(cid));
   }, [dispatch, cid]);
 
-  // Update local state when editingTeacher changes
+  // Pre-fill form when editing
   useEffect(() => {
     if (editingTeacher) {
       setTeacherId(editingTeacher._id);
-      setSubjectIds(
-        editingTeacher.subjects
-          ? editingTeacher.subjects.map((sub) => sub._id)
-          : []
-      );
-      setSectionIds(
+      setSubjectIds(editingTeacher.subjects?.map((s) => s._id) || []);
+
+      const currentClassSectionIds = filteredSections.map((s) => s._id);
+      const teacherSectionsHere =
         editingTeacher.sectionId
-          ? editingTeacher.sectionId.map((sec) => sec._id)
-          : []
-      );
+          ?.filter((sec) => currentClassSectionIds.includes(sec._id))
+          .map((sec) => sec._id) || [];
+
+      setSectionIds(teacherSectionsHere);
     } else {
       setTeacherId("");
       setSubjectIds([]);
       setSectionIds([]);
     }
-  }, [editingTeacher]);
+  }, [editingTeacher]); // note: filteredSections not required
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
+  // ── Shared search filter for <Select> ─────────────
+  const filterOption = (input, option) =>
+    option?.children?.toString().toLowerCase().includes(input.toLowerCase());
 
-  //   // Reset errors
-  //   setTeacherError("");
-  //   setSubjectError("");
-  //   setSectionError("");
+  const selectBoxStyle = { width: "100%" };
 
-  //   // Validate required fields
-  //   let isValid = true;
-  //   if (!teacherId) {
-  //     setTeacherError(t("Teacher is required"));
-  //     teacherRef.current?.focus();
-  //     isValid = false;
-  //   }
-  //   if (!subjectIds || subjectIds.length === 0) {
-  //     setSubjectError(t("Subject is required"));
-  //     if (isValid) {
-  //       subjectRef.current?.focus();
-  //     }
-  //     isValid = false;
-  //   }
-  //   if (!sectionIds || sectionIds.length === 0) {
-  //     setSectionError(t("Section is required"));
-  //     if (isValid) {
-  //       sectionRef.current?.focus();
-  //     }
-  //     isValid = false;
-  //   }
-  //   if (!isValid) {
-  //     return; // Do not make the API call
-  //   }
-
-  //   try {
-  //     if (editingTeacher) {
-  //       // For editing, backend expects subjects and sectionIds as arrays of objects.
-  //       const editData = {
-  //         id: editingTeacher._id,
-  //         subjects: subjectIds.map((id) => ({ _id: id })),
-  //         classIds: [{ _id: cid }],
-  //         sectionIds: sectionIds.map((id) => ({ _id: id })),
-  //       };
-  //       await dispatch(editTeacher(editData)).unwrap();
-  //     } else {
-  //       const assignData = {
-  //         classId: cid,
-  //         teacherId,
-  //         subjectIds,
-  //         sectionIds,
-  //       };
-  //       await dispatch(assignTeacher(assignData)).unwrap();
-  //     }
-  //     // Only close sidebar on success
-  //     closeSidebar();
-  //   } catch (error) {
-  //     // Optionally set a general error message here
-  //   }
-  // };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Reset errors
+    // Reset & validate
     setTeacherError("");
     setSubjectError("");
     setSectionError("");
 
-    // Validate required fields
     let isValid = true;
     if (!teacherId) {
       setTeacherError(t("Teacher is required"));
       teacherRef.current?.focus();
       isValid = false;
     }
-    if (!subjectIds || subjectIds.length === 0) {
+    if (!subjectIds.length) {
       setSubjectError(t("Subject is required"));
-      if (isValid) {
-        subjectRef.current?.focus();
-      }
+      if (isValid) subjectRef.current?.focus();
       isValid = false;
     }
-    if (!sectionIds || sectionIds.length === 0) {
+    if (!sectionIds.length) {
       setSectionError(t("Section is required"));
-      if (isValid) {
-        sectionRef.current?.focus();
-      }
+      if (isValid) sectionRef.current?.focus();
       isValid = false;
     }
-    if (!isValid) {
-      return; // Do not make the API call
-    }
+    if (!isValid) return;
 
     try {
       if (editingTeacher) {
-        // For editing, backend expects subjects and sectionIds as arrays of objects.
-        const editData = {
-          id: editingTeacher._id,
-          subjectIds: subjectIds.map((id) => (id )),
-          classIds: [ cid],
-          sectionIds: sectionIds.map((id) => ( id )),
-        };
-        await dispatch(editTeacher(editData)).unwrap();
+        await dispatch(
+          editTeacher({
+            id: editingTeacher._id,
+            subjectIds,
+            classIds: [cid],
+            sectionIds,
+          })
+        ).unwrap();
       } else {
-        const assignData = {
-          classId: cid,
-          teacherId,
-          subjectIds,
-          sectionIds,
-        };
-        await dispatch(assignTeacher(assignData)).unwrap();
+        await dispatch(
+          assignTeacher({ classId: cid, teacherId, subjectIds, sectionIds })
+        ).unwrap();
       }
-      // Only close sidebar on success
       closeSidebar();
-    } catch (error) {
-      // Optionally set a general error message here
+    } catch (err) {
+      // optional: toast error.message
     }
   };
-  // Common select box styles (you may adjust these as needed)
-  const selectBoxStyle = { width: "100%" };
 
   return (
     <form className="flex flex-col h-full" onSubmit={handleSubmit}>
       <div className="bg-white rounded-lg p-4 w-full max-w-md">
-        {/* Teacher Select */}
-        <div className="mb-4">
+        {/* ── Teacher ───────────────────────────── */}
+        <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Teacher Name")} <span className="text-red-500">*</span>
           </label>
           <Select
+            showSearch
+            optionFilterProp="children"
+            filterOption={filterOption}
+            size="large"
             ref={teacherRef}
             value={teacherId}
-            onChange={(value) => {
-              setTeacherId(value);
-              if (value) setTeacherError("");
+            onChange={(v) => {
+              setTeacherId(v);
+              if (v) setTeacherError("");
             }}
             placeholder={t("Choose")}
             disabled={loading || Boolean(editingTeacher)}
@@ -225,30 +153,30 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
           )}
         </div>
 
-        {/* Subject Multi-Select */}
-        <div className="mb-4">
+        {/* ── Subject(s) ────────────────────────── */}
+        <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Subject")} <span className="text-red-500">*</span>
           </label>
           <Select
-            ref={subjectRef}
+            showSearch
+            optionFilterProp="children"
+            filterOption={filterOption}
             mode="multiple"
+            size="large"
+            ref={subjectRef}
             value={subjectIds}
-            onChange={(value) => {
-              setSubjectIds(value);
-              if (value && value.length > 0) setSubjectError("");
+            onChange={(v) => {
+              setSubjectIds(v);
+              if (v.length) setSubjectError("");
             }}
             placeholder={t("Choose a subject")}
             disabled={loading}
             style={selectBoxStyle}
           >
-            {allSubjects?.map((subject) => (
-              <Select.Option
-                key={subject?.subjectId}
-                value={subject?.subjectId}
-              >
-                {subject.subjectName}{" "}
-                {subject.isPublished ? "" : `(${t("Unpublished")})`}
+            {allSubjects?.map((sub) => (
+              <Select.Option key={sub.subjectId} value={sub.subjectId}>
+                {sub.subjectName} {!sub.isPublished && `(${t("Unpublished")})`}
               </Select.Option>
             ))}
           </Select>
@@ -257,26 +185,30 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
           )}
         </div>
 
-        {/* Section Multi-Select */}
-        <div className="mb-4">
+        {/* ── Section(s) ────────────────────────── */}
+        <div className="mb-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Section")} <span className="text-red-500">*</span>
           </label>
           <Select
-            ref={sectionRef}
+            showSearch
+            optionFilterProp="children"
+            filterOption={filterOption}
             mode="multiple"
+            size="large"
+            ref={sectionRef}
             value={sectionIds}
-            onChange={(value) => {
-              setSectionIds(value);
-              if (value && value.length > 0) setSectionError("");
+            onChange={(v) => {
+              setSectionIds(v);
+              if (v.length) setSectionError("");
             }}
             placeholder={t("Choose")}
             disabled={loading}
             style={selectBoxStyle}
           >
-            {allSections?.map((section) => (
-              <Select.Option key={section._id} value={section._id}>
-                {section.sectionName}
+            {filteredSections?.map((sec) => (
+              <Select.Option key={sec._id} value={sec._id}>
+                {sec.sectionName}
               </Select.Option>
             ))}
           </Select>
@@ -286,6 +218,39 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
         </div>
       </div>
 
+      {/* ── Info banner ─────────────────────────── */}
+      <div className="my-2 px-3 py-2 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+        <div className="flex items-start space-x-2">
+          <svg
+            className="h-4 w-4 flex-shrink-0 text-blue-400"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+              clipRule="evenodd"
+            />
+          </svg>
+          <div className="flex-1">
+            <h3 className="text-xs font-semibold text-blue-800">
+              {t("Important Notice")}
+            </h3>
+            <p className="mt-1 text-xs text-blue-700">
+              {t("Modifying teacher assignments will directly impact")}:
+            </p>
+            <ul className="list-disc pl-4 mt-1 space-y-0.5 text-xs text-blue-700">
+              <li>{t("Existing class timetables")}</li>
+            </ul>
+            <p className="mt-1 text-xs font-medium">
+              {t("Please verify all changes before submission.")}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Submit ───────────────────────────────── */}
       <div className="mt-auto mb-8">
         <button
           type="submit"

@@ -13,7 +13,7 @@ const SingleChildCard = ({ student, index }) => {
   const profileImage = student?.profile || profileIcon;
   const studentClass = student?.class || "N/A";
   const admissionNumber = student?.admissionNumber || "N/A";
-  const section = student?.section || "N/A";
+  const section = student?.sectionName || "N/A";
   const group = student?.group || "N/A";
 
   return (

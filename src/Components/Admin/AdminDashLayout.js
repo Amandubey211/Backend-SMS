@@ -12,24 +12,31 @@ const DashLayout = ({
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
   );
-  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   return (
-    <div className="flex w-full min-h-screen overflow-x-hidden  ">
+    <div className="flex w-full h-screen overflow-hidden ">
+      {/* Sidebar - fixed width */}
       <SideMenubar />
+
+      {/* Main content area */}
       <div
-        className={`transition-all duration-500 flex-1 w-full h-full ml-${sidebarWidth}`}
+        className="flex flex-col flex-1 overflow-hidden"
         style={{
           marginLeft: sidebarWidth,
+          transition: "margin-left 500ms ease",
         }}
       >
+        {/* Navbar - fixed height */}
         <Navbar
           hideSearchbar={hideSearchbar}
           hideAvatarList={hideAvatarList}
           hideStudentView={hideStudentView}
         />
-        <main className="w-full min-h-screen h-screen overflow-y-scroll no-scrollbar ">
-          {children}
+
+        {/* Scrollable content area */}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden smooth-scroll">
+          <div className="">{children}</div>
         </main>
       </div>
     </div>

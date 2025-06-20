@@ -33,11 +33,9 @@ const isHTML = (str) => {
 
 // Function to clean editor content for display (only applied to HTML content)
 const cleanEditorContent = (content) => {
-  // Parse the content as HTML
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, "text/html");
 
-  // Remove uploaded-image-wrapper and keep only the img tag
   const imageWrappers = doc.querySelectorAll(".uploaded-image-wrapper");
   imageWrappers.forEach((wrapper) => {
     const img = wrapper.querySelector("img");
@@ -46,7 +44,6 @@ const cleanEditorContent = (content) => {
     }
   });
 
-  // Remove uploaded-file-wrapper and keep only the link
   const fileWrappers = doc.querySelectorAll(".uploaded-file-wrapper");
   fileWrappers.forEach((wrapper) => {
     const link = wrapper.querySelector("a");
@@ -55,10 +52,7 @@ const cleanEditorContent = (content) => {
     }
   });
 
-  // Get the cleaned HTML
   const cleanedContent = doc.body.innerHTML;
-
-  // Check if the cleaned content is effectively empty
   const cleanedPlainText = doc.body.textContent.trim();
   if (!cleanedPlainText) {
     return "No Medical Conditions Reported";
@@ -69,24 +63,38 @@ const cleanEditorContent = (content) => {
 
 // Helper function to determine how to render medicalCondition
 const renderMedicalCondition = (medicalCondition) => {
-  // Handle null, undefined, or empty string
   if (!medicalCondition || medicalCondition.trim() === "") {
     return "No Medical Conditions Reported";
   }
 
-  // Check if the content is HTML
   if (isHTML(medicalCondition)) {
     const cleanedContent = cleanEditorContent(medicalCondition);
     return cleanedContent;
   }
 
-  // If it's plain text, wrap it in a <p> tag for consistent display in the editor
   return `<p>${medicalCondition}</p>`;
 };
 
 const ImageUploadCard = ({ name, recommendedSize, width, height, required, form, onChange, initialValue }) => {
-  const [image, setImage] = useState(initialValue || null);
-  const [preview, setPreview] = useState(initialValue || null);
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+
+  // Update image and preview when initialValue changes
+  useEffect(() => {
+    if (initialValue) {
+      if (typeof initialValue === 'string' && initialValue.startsWith('http')) {
+        setImage(initialValue);
+        setPreview(initialValue);
+      } else {
+        setImage(null);
+        setPreview(null);
+      }
+    } else {
+      setImage(null);
+      setPreview(null);
+    }
+  }, [initialValue]);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -115,13 +123,6 @@ const ImageUploadCard = ({ name, recommendedSize, width, height, required, form,
     form.setFieldsValue({ [name]: null });
     onChange(null);
   };
-
-  useEffect(() => {
-    if (initialValue) {
-      setImage(initialValue);
-      setPreview(initialValue);
-    }
-  }, [initialValue]);
 
   return (
     <div className={`relative ${width} ${height}`}>
@@ -176,7 +177,6 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
   const [fatherPhoto, setFatherPhoto] = useState(null);
   const [motherPhoto, setMotherPhoto] = useState(null);
   const [medicalConditionContent, setMedicalConditionContent] = useState("");
-
   const calculateAge = (dob) => {
     if (!dob || !dayjs.isDayjs(dob) || !dob.isValid()) return "";
     const today = dayjs();
@@ -315,9 +315,8 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
 
       const dateOfBirth = data.dateOfBirth ? dayjs(data.dateOfBirth) : null;
       let medicalCondition = data.medicalCondition || "";
-      // Process medicalCondition for display
       const processedMedicalCondition = renderMedicalCondition(medicalCondition);
-      setMedicalConditionContent(processedMedicalCondition)
+      setMedicalConditionContent(processedMedicalCondition);
       const updatedStudentData = {
         id: data._id || "",
         profile: data.profile || null,
@@ -483,7 +482,22 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
 
   const handleSubmit = async (values) => {
     setLoading(true);
+
+    // Validate mandatory attachments
+    const formAttachments = form.getFieldValue('attachments') || { mandatory: {}, optional: {} };
+    const mandatoryAttachments = formAttachments.mandatory || {};
+    const hasMissingMandatory = Object.entries(mandatoryAttachments).some(([key, attachment]) => {
+      return attachment === null || (attachment && !attachment.file && !attachment.url);
+    });
+
+    if (hasMissingMandatory) {
+      toast.error("Please upload all mandatory documents!");
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData();
+    formData.append("isSameAddress", isSameAddress)
     const addressFields = [
       "buildingNumber",
       "streetName",
@@ -508,8 +522,6 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
         idExpiry: studentData.motherInfo.idExpiry ? studentData.motherInfo.idExpiry.toISOString() : null,
       },
     };
-
-    const formAttachments = form.getFieldValue('attachments') || { mandatory: {}, optional: {} };
 
     const addDynamicAttachments = (type) => {
       const attachments = formAttachments[type] || {};
@@ -667,7 +679,11 @@ const UpdateStudent = ({ data, handleUpdateSidebarClose }) => {
 
         return (
           <Col span={24} key={a.key}>
-            <Form.Item name={["attachments", type, a.key]} label={a.name}>
+            <Form.Item
+              name={["attachments", type, a.key]}
+              label={a.name}
+              rules={a.mandatory ? [{ required: true, message: `${a.name} is a mandatory document!` }] : []}
+            >
               <SingleFileUpload
                 name={["attachments", type, a.key]}
                 label={a.name}

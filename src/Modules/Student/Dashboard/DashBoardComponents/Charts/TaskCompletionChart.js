@@ -63,6 +63,11 @@ const TaskCompletionChart = () => {
     <div className="flex flex-col items-center w-full">
       {/* Chart and Summary */}
       <div className="flex flex-col items-center justify-center ">
+        {/* Chart */}
+        <div className="h-[8rem]">
+          <Doughnut data={data} options={options} />
+        </div>
+
         {/* Task Summary */}
         <div className="flex flex-row justify-between w-full mb-3 px-9 text-sm">
           <p className="text-gray-500  text-left w-[40%]">
@@ -77,11 +82,6 @@ const TaskCompletionChart = () => {
               {Number(inCompletedTask).toFixed(2)}%
             </span>
           </p>
-        </div>
-
-        {/* Chart */}
-        <div className="h-[145px]">
-          <Doughnut data={data} options={options} />
         </div>
       </div>
     </div>

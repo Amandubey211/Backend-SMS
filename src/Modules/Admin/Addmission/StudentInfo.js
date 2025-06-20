@@ -20,7 +20,7 @@ const StudentInfo = memo(() => {
     <div className="h-full w-full">
       <div className="flex gap-2 h-screen">
         <div
-          className={`p-4 bg-white rounded-lg overflow-y-auto transition-all duration-500 ${
+          className={`p-2 bg-white rounded-lg overflow-y-auto transition-all duration-500 ${
             showStudentCard ? "w-3/4" : "w-full"
           }`}
         >

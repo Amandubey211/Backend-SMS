@@ -55,12 +55,12 @@ const StudentMainSection = () => {
   const { studentSubjectProgress } = useSelector(
     (store) => store.admin.all_students
   );
-  const { totalAllAmount,paidAllAmount,categories } = useSelector(
+  const { totalAllAmount, paidAllAmount, categories } = useSelector(
     (state) => state.admin.studentFees
   );
   useEffect(() => {
     dispatch(fetchStudentSubjectProgress(userDetails?.userId));
-    dispatch(fetchOneStudentFee({studentId:userDetails?.userId }))
+    dispatch(fetchOneStudentFee({ studentId: userDetails?.userId }));
     dispatch(fetchDashboardDetails());
     dispatch(fetchSubjects());
     dispatch(fetchTasks());
@@ -92,7 +92,7 @@ const StudentMainSection = () => {
                 },
                 {
                   label: "Unpiad Fees",
-                  value:0,
+                  value: 0,
                   bgColor: "bg-red-100",
                   textColor: "text-black-500",
                   pentagonColor: "bg-red-500",
@@ -177,13 +177,13 @@ const StudentMainSection = () => {
           {/* Task Section */}
           <div className="flex flex-col  gap-1 w-[40%] ">
             <div className="w-full  h-[250px] p-4 bg-white border rounded-md hover:shadow-sm mb-2">
-              <h1 className="text-lg font-semibold text-black">Task</h1>
+              <h1 className="text-lg font-semibold text-black">My Task</h1>
               <TaskCompletionChart />
             </div>
             <div className="flex w-full h-[250px] justify-between p-2 bg-white rounded-md border hover:shadow-sm mb-4">
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
-                amount={(totalAllAmount-paidAllAmount).toFixed(2) || 0}
+                amount={(totalAllAmount - paidAllAmount).toFixed(2) || 0}
                 buttonText="View More"
                 buttonAction={handlePayNow}
               />

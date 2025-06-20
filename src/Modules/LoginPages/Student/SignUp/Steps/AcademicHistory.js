@@ -57,7 +57,6 @@ const AcademicHistory = ({ formData }) => {
   const handleNext = async () => {
     try {
       const vals = form.getFieldsValue(true);
-      console.log("Academic History", vals);
       await AcademicSchema.validate(vals, { abortEarly: false });
       dispatch(updateFormData({ academic: vals }));
       dispatch(nextStep());
