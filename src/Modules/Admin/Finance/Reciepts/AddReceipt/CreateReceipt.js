@@ -47,17 +47,18 @@ const CreateReceipt = () => {
     const discount = editableDiscounts[lineItemId] || 0;
     const penalty = editablePenalties[lineItemId] || 0;
 
-        const item = invoiceData.lineItems.find(i => i._id === lineItemId);
+    const item = invoiceData.lineItems.find(i => i._id === lineItemId);
     const values = calculateLineItemValues(item);
-    const finalAmountForItem = values.remaining;
+    const finalAmountForItem = values.remaining + item?.paid_amount;
+    console.log(finalAmountForItem)
     // Update paid item with discount and penalty
     const updatedItem = {
       lineItemId,
       amountPaid: value,
       discount,
       penalty,
-      updatedRemainingAmount: finalAmountForItem,
-      finalAmount:finalAmountForItem
+      updatedRemainingAmount: finalAmountForItem-item?.paid_amount,
+      finalAmount: finalAmountForItem
     };
 
     // Check if the lineItemId exists in the paidItems array
@@ -71,7 +72,7 @@ const CreateReceipt = () => {
       setReceiptData((prevData) => ({ ...prevData, paidItems: updatedPaidItems }));
     } else {
       // If it doesn't exist, add a new item
-      const newItem = { lineItemId};
+      const newItem = { lineItemId };
       setReceiptData((prevData) => ({
         ...prevData,
         paidItems: [...prevData.paidItems, newItem]
@@ -98,9 +99,8 @@ const CreateReceipt = () => {
 
     const baseAmount = item.rate * item.quantity;
     const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
-    const taxAmount = (baseAmount * (item.tax || 0)) / 100;
+    const taxAmount = roundToFive((baseAmount * (item.tax || 0)) / 100);
     let finalAmount = roundToFive(baseAmount + penaltyAmount + taxAmount);
-
     let discountAmount = 0;
     if (item.discountType === "percentage") {
       discountAmount = (finalAmount * (editableDiscounts[item._id] || 0)) / 100;
@@ -109,6 +109,7 @@ const CreateReceipt = () => {
     }
 
     finalAmount -= discountAmount;
+ 
 
     return {
       baseAmount: roundToFive(baseAmount),
@@ -140,9 +141,8 @@ const CreateReceipt = () => {
       penalty += values.penaltyAmount;
       final += values.finalAmount;
     });
-
     setTotalAmount(amount);
-    setTotalPaid(paid);
+    setTotalPaid(paid.toFixed(5));
     setTotalTax(tax);
     setTotalDiscount(discount);
     setTotalPenalty(penalty);
@@ -322,8 +322,8 @@ const CreateReceipt = () => {
                       <p><strong>Total Amount</strong> = {totalAmount} {invoiceData?.schoolId?.currency}</p>
                       <p><strong>Total Discount</strong> = {totalDiscount} {invoiceData?.schoolId?.currency}</p>
                       <p><strong>Total Penalty</strong> = {totalPenalty} {invoiceData?.schoolId?.currency}</p>
-                      <p><strong>Total Tax</strong> = {totalTax}  {invoiceData?.schoolId?.currency}</p>
-                      <p className="border-t mt-2"><strong>Final Amount</strong> = {finalAmount} {invoiceData?.schoolId?.currency}</p>
+                      <p><strong>Total Tax</strong> = {totalTax.toFixed(5)}  {invoiceData?.schoolId?.currency}</p>
+                      <p className="border-t mt-2"><strong>Final Amount</strong> = {finalAmount.toFixed(5)} {invoiceData?.schoolId?.currency}</p>
                       <p><strong>Total Paid</strong> = {totalPaid} {invoiceData?.schoolId?.currency}</p>
                       <p><strong>Total Remaining</strong> = {totalRemaining.toFixed(5)} {invoiceData?.schoolId?.currency}</p>
                     </div>

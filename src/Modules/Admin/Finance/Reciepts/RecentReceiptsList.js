@@ -74,7 +74,7 @@ const ReceiptsList = () => {
         record.paidItems.map((i) => {
           total += i.amountPaid
         })
-        return total
+        return total.toFixed(5)
       },
     },
     {

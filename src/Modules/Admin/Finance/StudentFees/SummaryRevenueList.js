@@ -108,7 +108,7 @@ const SummaryRevenueList = () => {
       title: "Total Paid",
       key: "paid_amount",
       render: (_, record) =>
-        `${record?.lineItems?.reduce((sum, item) => sum + item.paid_amount, 0)} ${schoolCurrency}`,
+        `${record?.lineItems?.reduce((sum, item) => sum + item.paid_amount, 0).toFixed(5)} ${schoolCurrency}`,
     },
     {
       title: "Status",
