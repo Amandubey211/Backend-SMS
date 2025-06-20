@@ -50,7 +50,6 @@ const CreateReceipt = () => {
         const item = invoiceData.lineItems.find(i => i._id === lineItemId);
     const values = calculateLineItemValues(item);
     const finalAmountForItem = values.remaining;
-console.log(finalAmountForItem)
     // Update paid item with discount and penalty
     const updatedItem = {
       lineItemId,
