@@ -36,17 +36,17 @@ const SummaryRevenueList = () => {
 
   useEffect(() => {
     dispatch(fetchAllClasses());
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     if (selectedClass) {
       dispatch(fetchSectionsByClass(selectedClass));
     }
-  }, [dispatch, selectedClass]);
+  }, [selectedClass]);
 
   useEffect(() => {
     dispatch(fetchAllStudentFee({ page: currentPage || 1, search: searchText, limit: computedPageSize, isCancel, status, classId:selectedClass, sectionId:selectedSection }));
-  }, [isCancel, status, selectedClass, selectedSection,searchText]);
+  }, [isCancel, status, selectedClass, selectedSection]);
 
   const handleCancelReceipt = (receipt) => {
     setSelectedReceipt(receipt);
@@ -315,8 +315,11 @@ const SummaryRevenueList = () => {
                   setSelectedSection(null); // Reset the section when class changes
                 }}
               >
+                <Select.Option value=''>All</Select.Option>
                 {classList?.map((classItem) => (
+                     
                   <Select.Option key={classItem._id} value={classItem._id}>
+               
                     {classItem.className}
                   </Select.Option>
                 ))}
@@ -329,6 +332,7 @@ const SummaryRevenueList = () => {
                 onChange={(value) => setSelectedSection(value)}
                 disabled={!sectionsList || sectionsList.length === 0} // Disable if no sections
               >
+                   <Select.Option value=''>All</Select.Option>
                 {sectionsList?.map((section) => (
                   <Select.Option key={section._id} value={section._id}>
                     {section.sectionName}
