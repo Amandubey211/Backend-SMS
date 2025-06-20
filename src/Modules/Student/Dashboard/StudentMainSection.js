@@ -81,15 +81,15 @@ const StudentMainSection = () => {
           {(cardData?.length
             ? cardData
             : [
-                {
-                  label: "Upcoming Exams",
-                  value: 0,
-                  bgColor: "bg-purple-100",
-                  textColor: "text-black-500",
-                  pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
-                  icon: <MdOutlineSchool className="text-xl text-white" />,
-                  url: "/student_dash",
-                },
+                // {
+                //   label: "Upcoming Exams",
+                //   value: 0,
+                //   bgColor: "bg-purple-100",
+                //   textColor: "text-black-500",
+                //   pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
+                //   icon: <MdOutlineSchool className="text-xl text-white" />,
+                //   url: "/student_dash",
+                // },
                 {
                   label: "Unpiad Fees",
                   value: 0,

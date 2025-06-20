@@ -16,15 +16,15 @@ import {
 const formatDashboardData = (dashboardData) => {
 
   return [
-    {
-      label: "Upcoming Exams",
-      value: dashboardData?.upcomingExam,
-      bgColor: "bg-purple-100",
-      textColor: "text-black-500",
-      pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
-      icon: <MdOutlineSchool className="text-xl text-white" />, // Exam Icon
-      url: "/student_dash",
-    },
+    // {
+    //   label: "Upcoming Exams",
+    //   value: dashboardData?.upcomingExam,
+    //   bgColor: "bg-purple-100",
+    //   textColor: "text-black-500",
+    //   pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
+    //   icon: <MdOutlineSchool className="text-xl text-white" />, // Exam Icon
+    //   url: "/student_dash",
+    // },
     {
       label: "Due Fees",
       value: dashboardData?.dueFees,
