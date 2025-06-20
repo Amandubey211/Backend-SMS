@@ -47,14 +47,18 @@ const CreateReceipt = () => {
     const discount = editableDiscounts[lineItemId] || 0;
     const penalty = editablePenalties[lineItemId] || 0;
 
+        const item = invoiceData.lineItems.find(i => i._id === lineItemId);
+    const values = calculateLineItemValues(item);
+    const finalAmountForItem = values.remaining;
+console.log(finalAmountForItem)
     // Update paid item with discount and penalty
     const updatedItem = {
       lineItemId,
       amountPaid: value,
       discount,
       penalty,
-      updatedRemainingAmount: totalRemaining.toFixed(5),
-      finalAmount
+      updatedRemainingAmount: finalAmountForItem,
+      finalAmount:finalAmountForItem
     };
 
     // Check if the lineItemId exists in the paidItems array
@@ -96,7 +100,6 @@ const CreateReceipt = () => {
     const baseAmount = item.rate * item.quantity;
     const penaltyAmount = parseFloat(editablePenalties[item._id] || 0);
     const taxAmount = (baseAmount * (item.tax || 0)) / 100;
-
     let finalAmount = roundToFive(baseAmount + penaltyAmount + taxAmount);
 
     let discountAmount = 0;
@@ -117,9 +120,6 @@ const CreateReceipt = () => {
       remaining: roundToFive(finalAmount - (item.paid_amount || 0)),
     };
   };
-
-
-
 
   // Calculate totals using the new line item calculations
   useEffect(() => {
