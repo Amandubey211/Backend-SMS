@@ -13,27 +13,35 @@ const StudentDashLayout = ({
   const isSidebarOpen = useSelector(
     (state) => state.common.user.sidebar.isOpen
   );
-  const sidebarWidth = isSidebarOpen ? "15%" : "7%"; // Adjust the width based on sidebar state
+  const sidebarWidth = isSidebarOpen ? "15%" : "7%";
 
   return (
-    <div className="flex w-full h-auto border-l border-r border-t">
-      <Toaster/>
+    <div className="flex w-full h-screen overflow-hidden bg-white">
+      {/* Toaster should be at root level */}
+      <Toaster position="top-right" />
+
+      {/* Sidebar */}
       <SideMenubar isOpen={isSidebarOpen} />
-         
+
+      {/* Main content area */}
       <div
-        className={`ml-${sidebarWidth} transition-all duration-500 flex-1 h-full`}
+        className="flex-1 flex flex-col overflow-hidden"
         style={{
           marginLeft: sidebarWidth,
+          transition: "margin-left 500ms ease",
         }}
       >
-        {/* Navbar is sticky and stays at the top */}
-        <Navbar
-          hideSearchbar={hideSearchbar}
-          hideAvatarList={hideAvatarList}
-          hideStudentView={hideStudentView}
-        />
-        {/* Main content area */}
-        <main className="w-full h-[90vh] mt-[0.1vh] ">
+        {/* Sticky navbar */}
+        <div className="sticky top-0 z-10">
+          <Navbar
+            hideSearchbar={hideSearchbar}
+            hideAvatarList={hideAvatarList}
+            hideStudentView={hideStudentView}
+          />
+        </div>
+
+        {/* Scrollable content area */}
+        <main className="flex-1 overflow-y-auto smooth-scroll p-2">
           {children}
         </main>
       </div>

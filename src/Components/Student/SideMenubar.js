@@ -100,8 +100,8 @@ const SideMenubar = () => {
         </button>
       </div>
 
-      <div className="flex-grow overflow-y-auto no-scrollbar">
-        {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>}
+      <div className="flex-grow overflow-y-auto no-scrollbar py-1">
+        {/* {isOpen && <h2 className="text-gray-500 my-1">MENU</h2>} */}
         <ul className={`space-y-1 ${!isOpen && "mt-3"}`}>
           {sidebarData?.map((item, index) => (
             <React.Fragment key={index}>

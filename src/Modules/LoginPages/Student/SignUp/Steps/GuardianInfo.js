@@ -11,6 +11,7 @@ import {
   Tooltip,
   Space,
   message,
+  Alert,
 } from "antd";
 import { TeamOutlined } from "@ant-design/icons";
 import { LiaMaleSolid, LiaFemaleSolid } from "react-icons/lia";
@@ -441,6 +442,14 @@ const GuardianInfo = ({ formData }) => {
       <Divider orientation="left" dashed>
         Guardian Information
       </Divider>
+      <Alert
+        showIcon
+        type="info"
+        className="mb-4"
+        message="Why we need this"
+        description="The e-mail you provide will receive a Parent-Portal login so your guardian
+                  can track your progress and receive important updates."
+      />
       <Row gutter={16}>
         <Col xs={24} md={12}>
           <Form.Item
@@ -482,6 +491,7 @@ const GuardianInfo = ({ formData }) => {
         label="Guardian Email"
         rules={[{ type: "email", required: true, message: "Invalid email" }]}
         className="mb-4"
+        extra="Login credentials for the Parent-Portal will be sent here."
       >
         <Input size="large" placeholder="Guardian Email" />
       </Form.Item>
