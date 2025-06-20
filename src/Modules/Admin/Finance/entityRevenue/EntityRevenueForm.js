@@ -143,7 +143,7 @@ const EntityRevenueForm = () => {
     let subtotal = rate * quantity;
     let taxAmount = (subtotal * tax) / 100;
 
-    let finalAmount = (subtotal + penalty + taxAmount).toFixed(5);
+    let finalAmount = subtotal + penalty + taxAmount;
 
     if (discountType === "percentage") {
       finalAmount -= ((finalAmount * discount) / 100).toFixed(5);
@@ -151,7 +151,7 @@ const EntityRevenueForm = () => {
       finalAmount -= (discount).toFixed(5);
     }
 
-    updatedItems[index].finalAmount = finalAmount;
+    updatedItems[index].finalAmount = finalAmount.toFixed(5);
     setLineItems(updatedItems);
   };
 

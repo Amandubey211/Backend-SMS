@@ -94,7 +94,7 @@ const ReceiptTemplate = forwardRef((props, ref) => {
     <tbody>
       <tr className="border-b border-gray-400">
         <td className="font-semibold py-2 px-4 border-r border-gray-400">Total Paid:</td>
-        <td className="py-2 px-4">{totalAmount} {currency}</td>
+        <td className="py-2 px-4">{totalAmount?.toFixed(5)} {currency}</td>
       </tr>
       <tr className="border-b border-gray-400">
         <td className="font-semibold py-2 px-4 border-r border-gray-400">Payment Date:</td>
