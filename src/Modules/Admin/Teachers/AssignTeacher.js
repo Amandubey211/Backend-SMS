@@ -219,33 +219,38 @@ const AssignTeacher = ({ editingTeacher, closeSidebar }) => {
       </div>
 
       {/* ── Info banner ─────────────────────────── */}
-      <div className="my-2 px-3 py-2 bg-blue-50 border-l-4 border-blue-400 rounded-md">
-        <div className="flex items-start space-x-2">
-          <svg
-            className="h-4 w-4 flex-shrink-0 text-blue-400"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
-              clipRule="evenodd"
-            />
-          </svg>
+      <div className="my-4 p-3 bg-gradient-to-r from-[#C83B62]/5 to-[#7F35CD]/5 rounded-lg border border-[#7F35CD]/20">
+        <div className="flex items-start gap-2">
+          <div className="p-1.5 rounded-full bg-gradient-to-r from-[#C83B62] to-[#7F35CD] flex-shrink-0">
+            <svg
+              className="h-4 w-4 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </div>
           <div className="flex-1">
-            <h3 className="text-xs font-semibold text-blue-800">
-              {t("Important Notice")}
+            <h3 className="text-sm font-semibold text-[#7F35CD]">
+              {t("Timetable Update Notice")}
             </h3>
-            <p className="mt-1 text-xs text-blue-700">
-              {t("Modifying teacher assignments will directly impact")}:
-            </p>
-            <ul className="list-disc pl-4 mt-1 space-y-0.5 text-xs text-blue-700">
-              <li>{t("Existing class timetables")}</li>
-            </ul>
-            <p className="mt-1 text-xs font-medium">
-              {t("Please verify all changes before submission.")}
-            </p>
+            <div className="mt-1 text-xs text-gray-700 space-y-1.5">
+              <p>{t("For accurate scheduling, please:")}</p>
+              <ul className="list-disc pl-4 space-y-1">
+                <li>
+                  {t("Delete existing timetables when updating sections")}
+                </li>
+                <li>{t("Create new timetables to reflect changes")}</li>
+              </ul>
+              <p className="text-xs font-medium text-[#C83B62] mt-1.5">
+                {t("Verify all changes before submission")}
+              </p>
+            </div>
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import SubjectCard from "./SubjectCard";
 
@@ -7,19 +7,48 @@ export default function SubjectsCarousel({
   frameColor = "border-primary",
 }) {
   const scrollRef = useRef(null);
+  const [showLeft, setShowLeft] = useState(false);
+  const [showRight, setShowRight] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
-  /** Scroll by exactly one card width */
-  const scroll = (direction) => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const cardWidth = container.firstChild?.offsetWidth || 0;
-    container.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+  const updateScrollButtons = () => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setShowLeft(el.scrollLeft > 0);
+    setShowRight(el.scrollLeft + el.offsetWidth < el.scrollWidth);
   };
+
+  const scroll = (direction) => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = el.firstChild?.offsetWidth || 200;
+    el.scrollBy({ left: direction * cardWidth, behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    updateScrollButtons(); // initial check
+
+    const handleScroll = () => updateScrollButtons();
+    el.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", updateScrollButtons);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateScrollButtons);
+    };
+  }, []);
 
   if (!subjects?.length) return null;
 
   return (
-    <div className="relative w-full">
+    <div
+      className="relative w-full group"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {/* Scrollable list */}
       <ul
         ref={scrollRef}
@@ -37,24 +66,26 @@ export default function SubjectsCarousel({
       </ul>
 
       {/* Left control */}
-      <button
-        onClick={() => scroll(-1)}
-        aria-label="Scroll left"
-        className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/70 shadow hover:bg-white backdrop-blur disabled:opacity-40"
-        disabled={subjects.length <= 1}
-      >
-        <MdChevronLeft size={24} />
-      </button>
+      {hovered && showLeft && (
+        <button
+          onClick={() => scroll(-1)}
+          aria-label="Scroll left"
+          className="absolute left-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/70 shadow hover:bg-white backdrop-blur"
+        >
+          <MdChevronLeft size={24} />
+        </button>
+      )}
 
       {/* Right control */}
-      <button
-        onClick={() => scroll(1)}
-        aria-label="Scroll right"
-        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/70 shadow hover:bg-white backdrop-blur disabled:opacity-40"
-        disabled={subjects.length <= 1}
-      >
-        <MdChevronRight size={24} />
-      </button>
+      {hovered && showRight && (
+        <button
+          onClick={() => scroll(1)}
+          aria-label="Scroll right"
+          className="absolute right-0 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/70 shadow hover:bg-white backdrop-blur"
+        >
+          <MdChevronRight size={24} />
+        </button>
+      )}
     </div>
   );
 }

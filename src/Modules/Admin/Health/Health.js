@@ -1,5 +1,3 @@
-/* src/Modules/Admin/Health/Health.js */
-
 import React, { useEffect, useState } from "react";
 import {
   FaHeartbeat,
@@ -23,221 +21,7 @@ import NoDataFound from "../../../Components/Common/NoDataFound";
 import ProtectedSection from "../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../config/permission";
 import DOMPurify from "dompurify";
-
-/* ---------------------------
-   Helper utilities
---------------------------- */
-
-const isHTML = (str) =>
-  !!str && typeof str === "string" && /<\/?[a-z][\s\S]*>/i.test(str);
-
-const isValidImageUrl = (url) =>
-  !!url &&
-  typeof url === "string" &&
-  url.startsWith("http") &&
-  /\.(jpe?g|png|gif)$/i.test(url);
-
-const cleanEditorContent = (content) => {
-  if (!content || typeof content !== "string" || content.trim() === "")
-    return "No Medical Conditions Reported";
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(content, "text/html");
-
-  /* unwrap images */
-  doc.querySelectorAll(".uploaded-image-wrapper").forEach((wrapper) => {
-    const img = wrapper.querySelector("img");
-    if (img && isValidImageUrl(img.src)) wrapper.replaceWith(img);
-    else wrapper.remove();
-  });
-
-  /* unwrap files */
-  doc.querySelectorAll(".uploaded-file-wrapper").forEach((wrapper) => {
-    const link = wrapper.querySelector("a");
-    if (link && link.href.startsWith("http")) wrapper.replaceWith(link);
-    else wrapper.remove();
-  });
-
-  const plain = doc.body.textContent.trim();
-  return plain ? doc.body.innerHTML : "No Medical Conditions Reported";
-};
-
-const stripHTMLAndTruncate = (html, len) => {
-  if (!html || html === "No Medical Conditions Reported") return html;
-  const text = html.replace(/<[^>]+>/g, "");
-  return text.length > len ? `${text.substring(0, len)}…` : text;
-};
-
-const renderMedicalCondition = (val, truncate = false, max = 50) => {
-  if (!val || val.trim() === "") return "No Medical Conditions Reported";
-  if (isHTML(val)) {
-    const cleaned = cleanEditorContent(val);
-    return truncate ? stripHTMLAndTruncate(cleaned, max) : cleaned;
-  }
-  return val;
-};
-
-/* ---------------------------
-   Sub-components
---------------------------- */
-
-const RiskIndicator = ({ count, total, level, color, icon }) => {
-  const pct = total ? Math.round((count / total) * 100) : 0;
-
-  const pill = {
-    green: "text-green-600 bg-green-50",
-    orange: "text-amber-600 bg-amber-50",
-    red: "text-red-600 bg-red-50",
-  };
-  const bar = {
-    green: "bg-green-600",
-    orange: "bg-amber-600",
-    red: "bg-red-600",
-  };
-  const base = {
-    green: "bg-green-100",
-    orange: "bg-amber-100",
-    red: "bg-red-100",
-  };
-
-  return (
-    <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-xs">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-500">{level} Risk</h3>
-        <span className={`p-2 rounded-full ${pill[color]}`}>{icon}</span>
-      </div>
-
-      <div className="flex items-end justify-between">
-        <p className="text-2xl font-bold text-gray-800">{count}</p>
-        <p className="text-sm font-medium text-gray-500">{pct}%</p>
-      </div>
-
-      <div className={`mt-3 w-full h-1.5 rounded-full ${base[color]}`}>
-        <div
-          className={`h-1.5 rounded-full ${bar[color]}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-    </div>
-  );
-};
-
-const HealthStudentCard = ({ student, onEdit, onViewDetails }) => {
-  const stripe = {
-    Low: "bg-green-500/80",
-    Medium: "bg-amber-500/80",
-    High: "bg-red-500/80",
-  };
-  const badge = {
-    Low: "bg-green-100 text-green-800 border-green-200",
-    Medium: "bg-amber-100 text-amber-800 border-amber-200",
-    High: "bg-red-100 text-red-800 border-red-200",
-  };
-
-  const medical = renderMedicalCondition(student?.medicalCondition, true);
-
-  return (
-    <div className="relative rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-white transition hover:shadow-md hover:-translate-y-0.5">
-      {/* coloured side-stripe */}
-      <div
-        className={`absolute top-0 left-0 w-1 h-full ${
-          stripe[student.healthRisk]
-        }`}
-      />
-
-      <div className="p-5 pl-6">
-        {/* header */}
-        <div className="flex items-start gap-4">
-          {/* avatar */}
-          <div className="relative shrink-0">
-            <img
-              src={student?.profile}
-              alt={`${student.firstName} ${student.lastName}`}
-              className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
-            />
-            <span
-              className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
-                badge[student.healthRisk]
-              }`}
-            />
-          </div>
-
-          {/* identity */}
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900 truncate">
-                {student.firstName} {student.lastName}
-              </h3>
-              <span
-                className={`px-2.5 py-0.5 text-[11px] rounded-full ${
-                  badge[student.healthRisk]
-                }`}
-              >
-                {student.healthRisk} Risk
-              </span>
-            </div>
-
-            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-              <span className="flex items-center">
-                <FaUser className="mr-1 text-xs opacity-70" />
-                Age&nbsp;{student.age}
-              </span>
-              <span className="flex items-center">
-                <FaSchool className="mr-1 text-xs opacity-70" />
-                {student.className} ({student.sectionName})
-              </span>
-              <span className="flex items-center">
-                <FaTint className="mr-1 text-xs opacity-70" />
-                {student.bloodGroup || "N/A"}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* medical notes */}
-        <div className="mt-4">
-          <h4 className="text-[10px] font-medium tracking-wide text-gray-500 mb-0.5">
-            Medical Notes
-          </h4>
-          <div className="text-sm text-gray-700 line-clamp-2">
-            {isHTML(medical) ? (
-              <div
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(medical),
-                }}
-              />
-            ) : (
-              <p>{medical}</p>
-            )}
-          </div>
-        </div>
-
-        {/* actions */}
-        <div className="mt-4 flex justify-end gap-2">
-          <button
-            onClick={() => onViewDetails(student)}
-            className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
-          >
-            <span className="inline-flex items-center">
-              <FaInfoCircle className="mr-1.5" />
-              Details
-            </span>
-          </button>
-          <button
-            onClick={() => onEdit(student)}
-            className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white hover:opacity-90 transition"
-          >
-            Edit Health
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-/* ---------------------------
-   Page component
---------------------------- */
+import { motion } from "framer-motion";
 
 const Health = () => {
   const { t } = useTranslation("admAccounts");
@@ -255,30 +39,43 @@ const Health = () => {
     classId: "",
     sectionId: "",
     groupId: "",
+    searchTerm: "",
   });
 
   useNavHeading("Admin", "Health");
 
-  /* fetch master lists once */
   useEffect(() => {
     dispatch(fetchAllStudents());
     dispatch(fetchAllClasses());
   }, [dispatch]);
 
-  /* refetch when filters change */
-  useEffect(() => {
-    dispatch(fetchAllStudents(filters));
-  }, [filters, dispatch]);
+  const filteredStudents = allStudents?.filter((student) => {
+    // Class filter
+    const byClass = filters.classId
+      ? student.classId === filters.classId
+      : true;
 
-  const filteredStudents = allStudents?.filter((s) => {
-    const byClass = filters.classId ? s.classId === filters.classId : true;
+    // Section filter
     const bySection = filters.sectionId
-      ? s.sectionId === filters.sectionId
+      ? student.sectionId === filters.sectionId
       : true;
+
+    // Group filter
     const byGroup = filters.groupId
-      ? s.groups?.some((g) => g._id === filters.groupId)
+      ? student.groups?.some((g) => g._id === filters.groupId)
       : true;
-    return byClass && bySection && byGroup;
+
+    // Search filter
+    const searchTerm = (filters.searchTerm || "").toLowerCase();
+    const bySearch = searchTerm
+      ? student.firstName?.toLowerCase().includes(searchTerm) ||
+        student.lastName?.toLowerCase().includes(searchTerm) ||
+        student.admissionNumber?.toLowerCase().includes(searchTerm) ||
+        student.email?.toLowerCase().includes(searchTerm) ||
+        student.contactNumber?.toLowerCase().includes(searchTerm)
+      : true;
+
+    return byClass && bySection && byGroup && bySearch;
   });
 
   const counts = {
@@ -298,11 +95,186 @@ const Health = () => {
     setIsDetailsModalOpen(true);
   };
 
+  // Helper function to clean and render medical condition
+  const renderMedicalCondition = (val, truncate = false, max = 50) => {
+    if (!val || val.trim() === "") return "No Medical Conditions Reported";
+    if (typeof val === "string" && /<\/?[a-z][\s\S]*>/i.test(val)) {
+      const cleaned = DOMPurify.sanitize(val);
+      if (truncate) {
+        const text = cleaned.replace(/<[^>]+>/g, "");
+        return text.length > max ? `${text.substring(0, max)}…` : text;
+      }
+      return cleaned;
+    }
+    return truncate && val.length > max ? `${val.substring(0, max)}…` : val;
+  };
+
+  // Risk Indicator Component
+  const RiskIndicator = ({ count, total, level, color, icon }) => {
+    const pct = total ? Math.round((count / total) * 100) : 0;
+
+    const pill = {
+      green: "text-green-600 bg-green-50",
+      orange: "text-amber-600 bg-amber-50",
+      red: "text-red-600 bg-red-50",
+    };
+    const bar = {
+      green: "bg-green-600",
+      orange: "bg-amber-600",
+      red: "bg-red-600",
+    };
+    const base = {
+      green: "bg-green-100",
+      orange: "bg-amber-100",
+      red: "bg-red-100",
+    };
+
+    return (
+      <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-xs">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-medium text-gray-500">{level} Risk</h3>
+          <span className={`p-2 rounded-full ${pill[color]}`}>{icon}</span>
+        </div>
+
+        <div className="flex items-end justify-between">
+          <p className="text-2xl font-bold text-gray-800">{count}</p>
+          <p className="text-sm font-medium text-gray-500">{pct}%</p>
+        </div>
+
+        <div className={`mt-3 w-full h-1.5 rounded-full ${base[color]}`}>
+          <div
+            className={`h-1.5 rounded-full ${bar[color]}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  // Health Student Card Component
+  const HealthStudentCard = ({ student, onEdit, onViewDetails }) => {
+    const stripe = {
+      Low: "bg-green-500/80",
+      Medium: "bg-amber-500/80",
+      High: "bg-red-500/80",
+    };
+    const badge = {
+      Low: "bg-green-100 text-green-800 border-green-200",
+      Medium: "bg-amber-100 text-amber-800 border-amber-200",
+      High: "bg-red-100 text-red-800 border-red-200",
+    };
+
+    const medical = renderMedicalCondition(student?.medicalCondition, true);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ scale: 1.02 }}
+        className="relative rounded-xl overflow-hidden shadow-sm border border-gray-100 bg-white transition hover:shadow-md"
+      >
+        {/* coloured side-stripe */}
+        <div
+          className={`absolute top-0 left-0 w-1 h-full ${
+            stripe[student.healthRisk]
+          }`}
+        />
+
+        <div className="p-5 pl-6">
+          {/* header */}
+          <div className="flex items-start gap-4">
+            {/* avatar */}
+            <div className="relative shrink-0">
+              <img
+                src={student?.profile}
+                alt={`${student.firstName} ${student.lastName}`}
+                className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
+              />
+              <span
+                className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+                  badge[student.healthRisk]
+                }`}
+              />
+            </div>
+
+            {/* identity */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-gray-900 truncate">
+                  {student.firstName} {student.lastName}
+                </h3>
+                <span
+                  className={`px-2.5 py-0.5 text-[11px] rounded-full ${
+                    badge[student.healthRisk]
+                  }`}
+                >
+                  {student.healthRisk} Risk
+                </span>
+              </div>
+
+              <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                <span className="flex items-center">
+                  <FaUser className="mr-1 text-xs opacity-70" />
+                  Age&nbsp;{student.age}
+                </span>
+                <span className="flex items-center">
+                  <FaSchool className="mr-1 text-xs opacity-70" />
+                  {student.className} ({student.sectionName})
+                </span>
+                <span className="flex items-center">
+                  <FaTint className="mr-1 text-xs opacity-70" />
+                  {student.bloodGroup || "N/A"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* medical notes */}
+          <div className="mt-4">
+            <h4 className="text-[10px] font-medium tracking-wide text-gray-500 mb-0.5">
+              Medical Notes
+            </h4>
+            <div className="text-sm text-gray-700 line-clamp-2">
+              {typeof medical === "string" && medical.startsWith("<") ? (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(medical),
+                  }}
+                />
+              ) : (
+                <p>{medical}</p>
+              )}
+            </div>
+          </div>
+
+          {/* actions */}
+          <div className="mt-4 flex justify-end gap-2">
+            <button
+              onClick={() => onViewDetails(student)}
+              className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+            >
+              <span className="inline-flex items-center">
+                <FaInfoCircle className="mr-1.5" />
+                Details
+              </span>
+            </button>
+            <button
+              onClick={() => onEdit(student)}
+              className="px-3 py-1.5 text-sm font-medium rounded-lg bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white hover:opacity-90 transition"
+            >
+              Edit Health
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  };
+
   return (
-    <Layout title={t("Health Management")}>
+    <Layout title={t("Health Management | Student Diwan")}>
       <DashLayout>
         <div className="w-full max-w-[80vw] mx-auto px-2 sm:px-3 lg:px-4 py-3">
-          {/* ───── header + filters (now more compact) ───── */}
+          {/* ───── header + filters ───── */}
           <div className="mb-6">
             <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
               <h1 className="text-xl sm:text-2xl font-bold text-gradient">
@@ -337,8 +309,12 @@ const Health = () => {
               />
             </div>
             <div className="w-full">
-              {/* StudentsFilter renders the four controls */}
-              <StudentsFilter onFilterChange={setFilters} filters={filters} />
+              <StudentsFilter
+                onFilterChange={(name, value) =>
+                  setFilters((prev) => ({ ...prev, [name]: value }))
+                }
+                filters={filters}
+              />
             </div>
           </div>
 
@@ -460,7 +436,7 @@ const Health = () => {
                       const mc = renderMedicalCondition(
                         selectedStudent.medicalCondition
                       );
-                      return isHTML(mc) ? (
+                      return typeof mc === "string" && mc.startsWith("<") ? (
                         <div
                           dangerouslySetInnerHTML={{
                             __html: DOMPurify.sanitize(mc),

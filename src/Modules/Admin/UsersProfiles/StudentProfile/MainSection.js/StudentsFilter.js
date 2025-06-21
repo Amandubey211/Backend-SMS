@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Select, Input } from "antd";
+import { Select, Input, Button } from "antd";
 import {
   fetchGroupsByClass,
   fetchSectionsByClass,
@@ -19,18 +19,25 @@ export default function StudentsFilter({ filters, onFilterChange }) {
     (store) => store?.admin?.group_section
   );
 
+  // Reset all filters
+  const handleReset = () => {
+    onFilterChange("classId", "");
+    onFilterChange("sectionId", "");
+    onFilterChange("groupId", "");
+    onFilterChange("searchTerm", ""); // Changed from "search" to "searchTerm" for consistency
+    dispatch(fetchAllStudents({}));
+  };
+
   // When a class is selected
   const handleClassChange = (value) => {
-    if (value === "") {
-      dispatch(fetchAllStudents({ classId: "", sectionId: "", groupId: "" }));
-      onFilterChange("classId", "");
-      onFilterChange("sectionId", "");
-      onFilterChange("groupId", "");
-      return;
-    }
-    dispatch(fetchSectionsByClass(value));
-    dispatch(fetchGroupsByClass(value));
     onFilterChange("classId", value);
+    onFilterChange("sectionId", "");
+    onFilterChange("groupId", "");
+
+    if (value) {
+      dispatch(fetchSectionsByClass(value));
+      dispatch(fetchGroupsByClass(value));
+    }
   };
 
   const handleSectionChange = (value) => {
@@ -42,43 +49,47 @@ export default function StudentsFilter({ filters, onFilterChange }) {
   };
 
   const handleSearch = (value) => {
-    // When search text is entered, update the filter key "search"
-    onFilterChange("search", value);
+    onFilterChange("searchTerm", value);
+  };
+
+  const handleSearchChange = (e) => {
+    // Update search term immediately as user types
+    onFilterChange("searchTerm", e.target.value);
   };
 
   return (
-    <div className="flex items-center gap-4 bg-white w-full justify-between ">
+    <div className="flex flex-col md:flex-row items-start md:items-center gap-4 bg-white w-full justify-between p-1  ">
       {/* Search Box */}
-      <div className="flex flex-col">
-        <label className="text-sm font-medium text-gray-700">
+      <div className="w-full md:w-auto">
+        <label className="block text-sm font-medium text-gray-700 mb-1">
           {t("Search")}
         </label>
         <Search
-          placeholder={t("Search by Name, QID, Admission number")}
+          placeholder={t("Search by Name, ID, Admission number")}
           onSearch={handleSearch}
+          onChange={handleSearchChange}
           allowClear
-          style={{ width: 320 }}
+          enterButton
+          value={filters.searchTerm || ""}
+          style={{ width: "100%", maxWidth: 320 }}
           size="large"
-          className="mt-1"
         />
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col md:flex-row items-start md:items-end gap-4 w-full md:w-auto">
         {/* Class Select */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">
+        <div className="w-full md:w-48">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Class")}
           </label>
           <Select
-            value={filters?.classId || ""}
+            value={filters.classId || undefined}
             onChange={handleClassChange}
-            placeholder={t("All")}
-            style={{ width: 200 }}
+            placeholder={t("All Classes")}
+            style={{ width: "100%" }}
             allowClear
             size="large"
-            className="mt-1"
           >
-            <Option value="">{t("All")}</Option>
             {classes?.map((c) => (
               <Option key={c?._id} value={c?._id}>
                 {c?.className}
@@ -88,20 +99,19 @@ export default function StudentsFilter({ filters, onFilterChange }) {
         </div>
 
         {/* Section Select */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">
+        <div className="w-full md:w-48">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Section")}
           </label>
           <Select
-            value={filters?.sectionId || ""}
+            value={filters.sectionId || undefined}
             onChange={handleSectionChange}
-            placeholder={t("All")}
-            style={{ width: 200 }}
+            placeholder={t("All Sections")}
+            style={{ width: "100%" }}
             allowClear
             size="large"
-            className="mt-1"
+            disabled={!filters.classId}
           >
-            <Option value="">{t("All")}</Option>
             {sectionsList?.map((s) => (
               <Option key={s?._id} value={s?._id}>
                 {s?.sectionName}
@@ -110,28 +120,15 @@ export default function StudentsFilter({ filters, onFilterChange }) {
           </Select>
         </div>
 
-        {/* Group Select */}
-        {/* <div className="flex flex-col">
-          <label className="text-sm font-medium text-gray-700">
-            {t("Group")}
-          </label>
-          <Select
-            value={filters?.groupId || ""}
-            onChange={handleGroupChange}
-            placeholder={t("All")}
-            style={{ width: 200 }}
-            allowClear
-            size="large"
-            className="mt-1"
-          >
-            <Option value="">{t("All")}</Option>
-            {groupsList?.map((g) => (
-              <Option key={g?._id} value={g?._id}>
-                {g?.groupName}
-              </Option>
-            ))}
-          </Select>
-        </div> */}
+        {/* Reset Button */}
+        <Button
+          type="default"
+          onClick={handleReset}
+          size="large"
+          className="w-full md:w-auto"
+        >
+          {t("Reset")}
+        </Button>
       </div>
     </div>
   );
