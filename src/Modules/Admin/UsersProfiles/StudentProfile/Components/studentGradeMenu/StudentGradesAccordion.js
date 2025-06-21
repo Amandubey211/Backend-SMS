@@ -7,54 +7,79 @@ import ProtectedSection from "../../../../../../Routes/ProtectedRoutes/Protected
 import { PERMISSIONS } from "../../../../../../config/permission";
 import { setSelectedSemester } from "../../../../../../Store/Slices/Common/User/reducers/userSlice";
 import { fetchSemestersByClass } from "../../../../../../Store/Slices/Admin/Class/Semester/semesterThunks";
-import { Button, Modal, Select } from "antd";
-import { motion } from "framer-motion";
-
-const { Option } = Select;
+import { Button, Modal, Empty, Alert, Segmented } from "antd";
+import { motion, AnimatePresence } from "framer-motion";
+import { FiFilter, FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { BsStars } from "react-icons/bs";
 
 const StudentGradesAccordion = ({ student }) => {
   const { t } = useTranslation("admAccounts");
-  const { grades, loading } = useSelector((store) => store.admin.all_students);
+  const { grades, loading, error } = useSelector(
+    (store) => store.admin.all_students
+  );
   const dispatch = useDispatch();
   const { selectedSemester } = useSelector(
     (state) => state.common.user.classInfo
   );
   const [selectedMode, setSelectedMode] = useState("online");
   const [selectedSubjectId, setSelectedSubjectId] = useState(null);
-
-  const getStudentGrades = async (subjectId, moduleId, chapterId, arrangeBy) => {
-    const params = { mode: selectedMode, semesterId: selectedSemester?.id };
-    if (subjectId) params.subjectId = subjectId;
-    if (moduleId) params.moduleId = moduleId;
-    if (chapterId) params.chapterId = chapterId;
-    if (arrangeBy) params.arrangeBy = arrangeBy;
-    dispatch(
-      fetchStudentGrades({
-        params,
-        studentId: student?._id,
-        studentClassId: student?.presentClassId,
-      })
-    );
-  };
-
-  useEffect(() => {
-    if (selectedSubjectId) {
-      getStudentGrades(selectedSubjectId);
-    } else {
-      getStudentGrades();
-    }
-  }, [dispatch, selectedSemester, selectedMode, selectedSubjectId]);
-
-  useEffect(() => {
-    dispatch(fetchSemestersByClass(student?.classId));
-  }, [dispatch, student?.classId]);
-
+  const [selectedSubjectName, setSelectedSubjectName] = useState(null);
   const [semesterModalVisible, setSemesterModalVisible] = useState(false);
+  const [initialSubjectsLoaded, setInitialSubjectsLoaded] = useState(false);
+
   const {
     semesters,
     loading: semesterLoading,
     error: semesterError,
   } = useSelector((state) => state.admin.semesters);
+
+  const getStudentGrades = async (subjectId) => {
+    try {
+      const params = {
+        mode: selectedMode,
+        semesterId: selectedSemester?.id,
+        subjectId: subjectId,
+      };
+
+      await dispatch(
+        fetchStudentGrades({
+          params,
+          studentId: student?._id,
+          studentClassId: student?.presentClassId,
+        })
+      );
+    } catch (err) {
+      console.error("Failed to fetch grades:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedSubjectId) {
+      getStudentGrades(selectedSubjectId);
+    }
+  }, [dispatch, selectedSemester, selectedMode, selectedSubjectId]);
+
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      try {
+        await dispatch(fetchSemestersByClass(student?.classId));
+      } catch (err) {
+        console.error("Failed to fetch semesters:", err);
+      }
+    };
+    fetchSemesters();
+  }, [dispatch, student?.classId]);
+
+  useEffect(() => {
+    if (grades?.subjects?.length > 0 && !initialSubjectsLoaded) {
+      const firstSubject = grades.subjects[0];
+      if (firstSubject) {
+        setSelectedSubjectId(firstSubject.subjectId);
+        setSelectedSubjectName(firstSubject.subjectName);
+        setInitialSubjectsLoaded(true);
+      }
+    }
+  }, [grades?.subjects, initialSubjectsLoaded]);
 
   const handleSemesterSelect = (semester) => {
     dispatch(setSelectedSemester({ id: semester._id, name: semester.title }));
@@ -65,161 +90,182 @@ const StudentGradesAccordion = ({ student }) => {
     setSelectedMode(value);
   };
 
-  const handleSubjectSelect = (subjectId) => {
+  const handleSubjectSelect = (subjectId, subjectName) => {
     setSelectedSubjectId(subjectId);
-    getStudentGrades(subjectId);
+    setSelectedSubjectName(subjectName);
   };
 
   return (
-    <>
-      <ProtectedSection
-        requiredPermission={PERMISSIONS.GET_STUDENT_GRADES}
-        title={"Grades"}
-      >
-        <div className="flex flex-row w-[100%]">
-          {/* Left Side: GradeAccordionItem */}
-          <div className="w-[75%]">
+    <ProtectedSection
+      requiredPermission={PERMISSIONS.GET_STUDENT_GRADES}
+      title={
+        <div className="flex items-center gap-2">
+          <BsStars className="text-purple-500" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]">
+            Student Performance
+          </span>
+        </div>
+      }
+    >
+      <div className="flex flex-col h-full">
+        <motion.div
+          className="sticky top-0 z-10 bg-white border-b border-gray-200 py-3 px-4 shadow-sm"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-1.5 border border-gray-200">
+                <FiFilter className="text-pink-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  Filters
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <Segmented
+                  size="middle"
+                  options={[
+                    { label: "Online Mode", value: "online" },
+                    { label: "Offline Mode", value: "offline" },
+                  ]}
+                  value={selectedMode}
+                  onChange={handleModeChange}
+                  className="!text-sm"
+                />
+              </div>
+
+              <div className="h-5 w-px bg-gray-200 hidden sm:block"></div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => setSemesterModalVisible(true)}
+                  className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white px-4 py-1.5 rounded-md text-sm font-medium shadow"
+                >
+                  {selectedSemester?.name || "Select Semester"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <div className="flex-1 overflow-y-auto p-4">
+          {error ? (
+            <Alert
+              message="Error Loading Grades"
+              description={error.message || "Failed to load student grades."}
+              type="error"
+              showIcon
+              className="mb-4 text-sm"
+            />
+          ) : (
             <GradeAccordionItem
               getData={handleSubjectSelect}
               selectedMode={selectedMode}
+              loading={loading}
+              selectedSubjectId={selectedSubjectId}
             />
-          </div>
-
-          {/* Right Side: Filters and Grade Summary */}
-          <div className="mt-4 p-4 w-[25%] border-l-2 flex flex-col gap-6">
-            {/* Filter Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Filters</h3>
-              <div className="flex flex-col gap-4">
-                {/* Mode Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Mode
-                  </label>
-                  <Select
-                    value={selectedMode}
-                    onChange={handleModeChange}
-                    className="w-full"
-                    aria-label="Select Mode"
-                  >
-                    <Option value="online">Online</Option>
-                    <Option value="offline">Offline</Option>
-                  </Select>
-                </div>
-
-                {/* Semester Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Semester
-                  </label>
-                  <Button
-                    type="default"
-                    onClick={() => setSemesterModalVisible(true)}
-                    className="w-full border border-pink-400 bg-white text-black rounded-lg font-semibold text-sm transition-colors duration-200 hover:bg-pink-400 hover:text-pink-900"
-                    aria-label="Select Semester"
-                  >
-                    {selectedSemester && selectedSemester.name ? (
-                      <>
-                        <span className="hidden sm:inline">{selectedSemester.name}</span>
-                        <span className="inline sm:hidden">{selectedSemester.name}</span>
-                      </>
-                    ) : (
-                      <>
-                        <span className="hidden sm:inline">Select Semester</span>
-                        <span className="inline sm:hidden">Sem</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-
-                {/* Placeholder for Future Filters */}
-                {/* Add more filter inputs here as needed */}
-              </div>
-            </div>
-
-            {/* Grade Summary Section */}
-            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">{t("Grade Summary")}</h3>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-gray-700">{t("Assignment")}</p>
-                  <p className="text-sm text-gray-600">
-                    {grades?.totalScoreOfSubmitAssignments ?? 0} /{" "}
-                    {grades?.totalScoreOfAllAssignments ?? 0}
-                  </p>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-gray-700">{t("Quiz")}</p>
-                  <p className="text-sm text-gray-600">
-                    {grades?.totalQuizCompletedScore ?? 0} /{" "}
-                    {grades?.totalScoreOfAllQuizzes ?? 0}
-                  </p>
-                </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm font-medium text-gray-700">{t("Attendance")}</p>
-                  <p className="text-sm text-gray-600">
-                    {grades?.attendance ?? 0} {t("DAY")}
-                  </p>
-                </div>
-                <div className="border-t pt-3 mt-3 flex justify-between items-center">
-                  <p className="text-lg font-semibold text-gray-800">{t("Total Score")}:</p>
-                  <p className="text-pink-500 text-xl font-semibold">
-                    {grades?.total ?? 0}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-      </ProtectedSection>
+      </div>
 
-      {/* Semester Selection Modal */}
       <Modal
         visible={semesterModalVisible}
         onCancel={() => setSemesterModalVisible(false)}
         footer={null}
-        title="Select Semester"
+        title={
+          <div className="text-transparent bg-clip-text bg-gradient-to-r from-[#C83B62] to-[#7F35CD]">
+            Select Semester
+          </div>
+        }
         bodyStyle={{ padding: "1rem" }}
         destroyOnClose
+        centered
+        className="rounded-lg"
       >
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3 }}
-        >
+        <AnimatePresence>
           {semesterLoading ? (
-            <div className="flex justify-center items-center">
-              <span>{"Loading semesters..."}</span>
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex justify-center items-center h-40"
+            >
+              <div className="space-y-2 w-full">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-10 bg-gray-100 rounded-lg animate-pulse"
+                  ></div>
+                ))}
+              </div>
+            </motion.div>
           ) : semesterError ? (
-            <div className="text-red-500 text-center">
-              {"Failed to load semesters. Please try again."}
-            </div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <Alert
+                message="Error Loading Semesters"
+                description={
+                  semesterError.message || "Failed to load semesters."
+                }
+                type="error"
+                showIcon
+                className="rounded-lg text-sm"
+              />
+            </motion.div>
           ) : (
-            <div className="space-y-2">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="space-y-2"
+            >
               {semesters && semesters.length > 0 ? (
                 semesters.map((sem) => (
-                  <Button
+                  <motion.div
                     key={sem._id}
-                    onClick={() => handleSemesterSelect(sem)}
-                    className={`w-full text-left border rounded-md transition-colors duration-200 ${selectedSemester && selectedSemester.id === sem._id
-                        ? "bg-purple-100 border-purple-400"
-                        : "bg-white hover:bg-purple-50"
-                      }`}
-                    aria-label={`Select semester ${sem.title}`}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                   >
-                    {sem.title}
-                  </Button>
+                    <Button
+                      onClick={() => handleSemesterSelect(sem)}
+                      className={`w-full h-10 flex items-center justify-between text-left rounded-lg text-sm ${
+                        selectedSemester?.id === sem._id
+                          ? "bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white"
+                          : "bg-white hover:bg-gray-50 border border-gray-200"
+                      }`}
+                    >
+                      {sem.title}
+                      {selectedSemester?.id === sem._id && (
+                        <FiChevronUp className="ml-2" />
+                      )}
+                    </Button>
+                  </motion.div>
                 ))
               ) : (
-                <p className="text-center">{"No semesters available."}</p>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center justify-center py-6"
+                >
+                  <Empty
+                    description="No semesters available"
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    className="text-sm"
+                  />
+                </motion.div>
               )}
-            </div>
+            </motion.div>
           )}
-        </motion.div>
+        </AnimatePresence>
       </Modal>
-    </>
+    </ProtectedSection>
   );
 };
 

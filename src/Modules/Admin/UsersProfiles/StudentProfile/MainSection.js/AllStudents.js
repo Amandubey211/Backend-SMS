@@ -51,18 +51,37 @@ const AllStudents = () => {
     classId: "",
     sectionId: "",
     groupId: "",
+    searchTerm: "",
   });
 
-  useEffect(() => {
-    dispatch(fetchAllStudents(filters));
-  }, [filters, dispatch]);
+  const filteredStudents = allStudents?.filter((student) => {
+    // Class filter
+    const classMatch = filters.classId
+      ? student.classId === filters.classId
+      : true;
 
-  const handleFilterChange = (name, value) => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      [name]: value,
-    }));
-  };
+    // Section filter
+    const sectionMatch = filters.sectionId
+      ? student.sectionId === filters.sectionId
+      : true;
+
+    // Group filter
+    const groupMatch = filters.groupId
+      ? student.groups?.some((g) => g._id === filters.groupId)
+      : true;
+
+    // Search filter
+    const searchTerm = (filters.searchTerm || "").toLowerCase();
+    const searchMatch = searchTerm
+      ? student.firstName?.toLowerCase().includes(searchTerm) ||
+        student.lastName?.toLowerCase().includes(searchTerm) ||
+        student.admissionNumber?.toLowerCase().includes(searchTerm) ||
+        student.email?.toLowerCase().includes(searchTerm) ||
+        student.contactNumber?.toLowerCase().includes(searchTerm)
+      : true;
+
+    return classMatch && sectionMatch && groupMatch && searchMatch;
+  });
 
   const colors = [
     "bg-gradient-to-br from-blue-500 to-blue-600",
@@ -104,7 +123,7 @@ const AllStudents = () => {
                   {t("All Students")}
                 </h1>
                 <p className="text-sm text-gray-500">
-                  {allStudents?.length || 0} {t("students found")}
+                  {filteredStudents?.length || 0} {t("students found")}
                 </p>
               </div>
             </div>
@@ -131,7 +150,9 @@ const AllStudents = () => {
               className="mt-4 overflow-hidden"
             >
               <StudentsFilter
-                onFilterChange={handleFilterChange}
+                onFilterChange={(name, value) =>
+                  setFilters((prev) => ({ ...prev, [name]: value }))
+                }
                 filters={filters}
               />
             </motion.div>
@@ -148,8 +169,8 @@ const AllStudents = () => {
             title={"All Students"}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
-              {allStudents?.length > 0 ? (
-                allStudents?.map((student, index) => (
+              {filteredStudents?.length > 0 ? (
+                filteredStudents?.map((student, index) => (
                   <motion.div
                     key={student?._id}
                     initial={{ opacity: 0, y: 20 }}
@@ -320,7 +341,9 @@ const AllStudents = () => {
           {studentData && (
             <EditStudent
               studentId={studentData?._id}
-              onFilterChange={handleFilterChange}
+              onFilterChange={(name, value) =>
+                setFilters((prev) => ({ ...prev, [name]: value }))
+              }
               handleUpdateSidebarClose={handleEditSidebarClose}
             />
           )}
