@@ -253,8 +253,6 @@
   border-radius: 0 !important; /* Remove oval shape */
 }
 
-//  scrolling ----
-
 .smooth-scroll {
   scroll-behavior: smooth;
 }
