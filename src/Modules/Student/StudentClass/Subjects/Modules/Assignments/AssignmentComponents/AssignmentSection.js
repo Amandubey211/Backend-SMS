@@ -59,7 +59,7 @@ const AssignmentSection = ({ isSubmitted, onResubmit }) => {
       </div>
 
       <div
-        className="text-gray-700 mb-6 p-3"
+        className="text-gray-700 mb-6 p-3 ml-5"
         dangerouslySetInnerHTML={{ __html: content }}
       />
 
