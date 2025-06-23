@@ -26,7 +26,7 @@ const formatDashboardData = (dashboardData) => {
     // },
     {
       label: "Unpaid",
-      value: dashboardData?.upcomingExam,
+      value: dashboardData?.dueFees,
       bgColor: "bg-red-100",
       textColor: "text-black-500",
       pentagonColor: "bg-red-500",

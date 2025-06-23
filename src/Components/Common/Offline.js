@@ -12,7 +12,6 @@ import { motion, AnimatePresence } from "framer-motion"; // Import Framer Motion
  * @param {function} props.onDismiss - Callback when the alert is dismissed.
  */
 const OfflineModal = ({ error, onDismiss }) => {
-  console.log(error, "sdfsdfsdf");
   return (
     <AnimatePresence>
       {/* {error && ( */}

@@ -9,11 +9,10 @@ const formatDate = (iso) =>
 
 const BookIssueRow = memo(({ item }) => {
 
-
-  const bookName = item?.bookName || "N/A"
+  const bookName = item?.bookName || item?.bookId?.name || "N/A"
   const bookAuthor = item?.author || "N/A"
-  const bookImage = item?.bookImage || null
-  const bookCategories = item?.bookCategories || []
+  const bookImage = item?.bookImage || item?.bookId.image || null
+  const bookCategories = item?.bookCategories || item?.bookId?.categories || []
   const issueDate = item?.issueDate || "N/A"
   const returnDate = item?.returnDate || "N/A"
   const status = item?.status || "N/A"
