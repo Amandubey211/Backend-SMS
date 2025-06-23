@@ -46,38 +46,41 @@ const CreateReceipt = () => {
     const value = parseFloat(e.target.value) || 0;
     const discount = editableDiscounts[lineItemId] || 0;
     const penalty = editablePenalties[lineItemId] || 0;
-
+    console.log(value)
+    console.log(typeof (value))
+    console.log(e.target.value)
     const item = invoiceData.lineItems.find(i => i._id === lineItemId);
     const values = calculateLineItemValues(item);
     const finalAmountForItem = values.remaining + item?.paid_amount;
-    console.log(finalAmountForItem)
+    console.log(invoiceData.lineItems)
     // Update paid item with discount and penalty
     const updatedItem = {
       lineItemId,
       amountPaid: value,
       discount,
       penalty,
-      updatedRemainingAmount: finalAmountForItem-item?.paid_amount,
+      updatedRemainingAmount: (finalAmountForItem - item?.paid_amount).toFixed(5),
       finalAmount: finalAmountForItem
     };
-
+console.log(updatedItem)
     // Check if the lineItemId exists in the paidItems array
-    const itemIndex = receiptData.paidItems.findIndex(item => item.lineItemId === lineItemId);
-
-    if (itemIndex !== -1) {
-      // If it exists, update the existing item
-      const updatedPaidItems = [...receiptData.paidItems];
-      updatedPaidItems[itemIndex] = { ...updatedPaidItems[itemIndex], updatedItem };
-
-      setReceiptData((prevData) => ({ ...prevData, paidItems: updatedPaidItems }));
-    } else {
-      // If it doesn't exist, add a new item
-      const newItem = { lineItemId };
-      setReceiptData((prevData) => ({
+    console.log(receiptData)
+    setReceiptData(prevData => {
+      const existingIndex = prevData.paidItems.findIndex(item => item.lineItemId === lineItemId);
+  console.log(prevData.paidItems)
+      if (existingIndex !== -1) {
+         const updatedPaidItems = [...receiptData.paidItems];
+      updatedPaidItems[existingIndex] = { ...updatedPaidItems[existingIndex], updatedItem };
+       
+        return { ...prevData, paidItems: updatedPaidItems };
+      } else {
+        const newItem = { lineItemId };
+        return {
         ...prevData,
         paidItems: [...prevData.paidItems, newItem]
-      }));
-    }
+      };
+      }
+    });
   };
 
   const searchInvoice = () => {
@@ -93,7 +96,6 @@ const CreateReceipt = () => {
       setInvoiceData(data.payload?.invoice);
     })
   }
-
   const calculateLineItemValues = (item) => {
     const roundToFive = (num) => Math.round((num + Number.EPSILON) * 100000) / 100000;
 
@@ -109,7 +111,7 @@ const CreateReceipt = () => {
     }
 
     finalAmount -= discountAmount;
- 
+
 
     return {
       baseAmount: roundToFive(baseAmount),
