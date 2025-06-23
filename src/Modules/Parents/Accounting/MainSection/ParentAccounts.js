@@ -4,8 +4,12 @@ import { useDispatch } from "react-redux";
 import { useTranslation } from "react-i18next";
 import { fetchChildren } from "../../../../Store/Slices/Parent/Dashboard/dashboard.action";
 import { fetchOneStudentFee } from "../../../../Store/Slices/Finance/StudentFees/studentFeesThunks";
-import { Table, Skeleton } from 'antd';
-import { FaMoneyBillAlt, FaExclamationCircle, FaArrowRight } from "react-icons/fa";
+import { Table, Skeleton } from "antd";
+import {
+  FaMoneyBillAlt,
+  FaExclamationCircle,
+  FaArrowRight,
+} from "react-icons/fa";
 
 const AccountingSection = () => {
   const { t } = useTranslation("prtFinance");
@@ -27,7 +31,9 @@ const AccountingSection = () => {
           setStudents(fetchedStudents);
 
           const feesPromises = fetchedStudents.map(async (student) => {
-            const feeResponse = await dispatch(fetchOneStudentFee({ studentId: student._id }));
+            const feeResponse = await dispatch(
+              fetchOneStudentFee({ studentId: student._id })
+            );
             return {
               id: student._id,
               childName: `${student.firstName} ${student.lastName}`,
@@ -53,26 +59,27 @@ const AccountingSection = () => {
   const fees = useMemo(() => feesData ?? [], [feesData]);
 
   const tableData = useMemo(() => {
-    return fees.map(fee => ({
+    return fees.map((fee) => ({
       key: fee.id,
       childName: fee.childName,
-      amountRemaining: fee.paidAmount <= fee.totalAmount
-        ? (fee.totalAmount - fee.paidAmount).toFixed(2)
-        : "0.00",
+      amountRemaining:
+        fee.paidAmount <= fee.totalAmount
+          ? (fee.totalAmount - fee.paidAmount).toFixed(2)
+          : "0.00",
     }));
   }, [fees]);
 
   const columns = [
     {
-      title: 'Child Name',
-      dataIndex: 'childName',
-      key: 'childName',
+      title: "Child Name",
+      dataIndex: "childName",
+      key: "childName",
       sorter: (a, b) => a.childName.localeCompare(b.childName),
     },
     {
-      title: 'Amount Remaining (QAR)',
-      dataIndex: 'amountRemaining',
-      key: 'amountRemaining',
+      title: "Amount Remaining (QAR)",
+      dataIndex: "amountRemaining",
+      key: "amountRemaining",
       sorter: (a, b) => a.amountRemaining - b.amountRemaining,
     },
   ];
@@ -81,17 +88,22 @@ const AccountingSection = () => {
     navigate("/parentfinance");
   };
 
-  const skeletonRows = Array(5).fill().map((_, index) => (
-    <div key={index} className="flex items-center justify-between p-4 bg-gray-100 rounded-lg mb-2">
-      <Skeleton.Input active style={{ width: '40%' }} />
-      <Skeleton.Input active style={{ width: '50%' }} />
-    </div>
-  ));
+  const skeletonRows = Array(5)
+    .fill()
+    .map((_, index) => (
+      <div
+        key={index}
+        className="flex items-center justify-between p-2  rounded-lg mb-2"
+      >
+        <Skeleton.Input active style={{ width: "40%" }} />
+        <Skeleton.Input active style={{ width: "50%" }} />
+      </div>
+    ));
 
   return (
-    <div className="py-4 px-6 w-full bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl shadow-lg h-full">
+    <div className="p-1 w-full  h-full">
       <div className="flex flex-col lg:flex-row justify-between items-center mb-6">
-        <span className="text-l font-bold text-gray-800 flex items-center">
+        <span className="text-l font-bold text-gray-800 flex items-center p-3">
           <FaMoneyBillAlt className="w-8 h-8 mr-2 text-blue-400" />
           {t("Fees Pending")}
         </span>
@@ -115,7 +127,7 @@ const AccountingSection = () => {
               {skeletonRows}
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md">
+            <div className="flex flex-col items-center p-6 bg-white rounded-lg ">
               <FaExclamationCircle className="text-red-500 w-12 h-12 mb-4" />
               <p className="text-gray-700 text-lg font-medium">
                 {error ? `${error}: ` : ""}
@@ -123,12 +135,14 @@ const AccountingSection = () => {
               </p>
             </div>
           ) : tableData.length === 0 ? (
-            <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-md">
+            <div className="flex flex-col items-center p-6 bg-white rounded-lg ">
               <FaMoneyBillAlt className="text-indigo-500 w-16 h-16 mb-4" />
-              <p className="text-gray-700 text-lg font-medium">{t("No Fees Yet")}</p>
+              <p className="text-gray-700 text-lg font-medium">
+                {t("No Fees Yet")}
+              </p>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow-md overflow-y-auto max-h-[400px]">
+            <div className="bg-white rounded-lg  overflow-y-auto max-h-[400px]">
               <Table
                 columns={columns}
                 dataSource={tableData}
