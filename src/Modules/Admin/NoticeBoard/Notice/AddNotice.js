@@ -60,7 +60,7 @@ const roleOptions = [
 ];
 
 /**
- * Custom tag renderer for "Notice for Users" select.
+ * Custom tag renderer for "Notice for Users" select (unchanged)
  */
 const userTagRender = (props, allUsers) => {
   const { value, closable, onClose } = props;
@@ -166,7 +166,7 @@ const AddNotice = ({ isEditing, onClose }) => {
         noticeTarget:
           selectedNotice?.noticeForRoles?.length > 0 ? "roles" : "users",
         noticeForRoles: selectedNotice?.noticeForRoles || [],
-        noticeForUsers: selectedNotice?.noticeForUsers?.map((nfUser) => nfUser._id) || [], // Use _id from backend
+        noticeForUsers: selectedNotice?.noticeForUsers?.map((nfUser) => nfUser.userId) || [],
       };
       setAnnouncementData(preloadedData);
       form.setFieldsValue(preloadedData);
@@ -220,7 +220,18 @@ const AddNotice = ({ isEditing, onClose }) => {
   };
 
   /**
-   * On submit, convert userId -> _id if needed for backend
+   * Handle notice target change to clear the opposite field
+   */
+  const handleNoticeTargetChange = (value) => {
+    if (value === "users") {
+      form.setFieldsValue({ noticeForRoles: [] }); // Clear roles when switching to users
+    } else if (value === "roles") {
+      form.setFieldsValue({ noticeForUsers: [] }); // Clear users when switching to roles
+    }
+  };
+
+  /**
+   * On submit, transform noticeForUsers to include userId and userModel
    */
   const onFinish = async (values) => {
     if (!editorContent.trim()) {
@@ -230,22 +241,15 @@ const AddNotice = ({ isEditing, onClose }) => {
     }
 
     let finalNoticeForUsers = values.noticeForUsers || [];
-    if (isEditing && selectedNotice?.noticeForUsers) {
-      // For editing, map selected userIds back to _id from original noticeForUsers
+    if (finalNoticeForUsers.length > 0) {
+      // Map user IDs to objects with userId and userModel
       finalNoticeForUsers = finalNoticeForUsers.map((userId) => {
-        const originalUser = selectedNotice.noticeForUsers.find(
-          (nfUser) => {
-            const matchedUser = allUsers?.find((u) => u.userId === userId);
-            return matchedUser && nfUser._id === matchedUser.userId; // Match based on userId
-          }
-        );
-        return originalUser ? originalUser._id : userId; // Fallback to userId if no match
-      });
-    } else {
-      // For new notices, use userId as is (backend should handle mapping to _id)
-      finalNoticeForUsers = finalNoticeForUsers.map((userId) => {
-        const matchedUser = allUsers?.find((u) => u.userId === userId);
-        return matchedUser ? matchedUser.userId : userId; // Use userId
+        const user = allUsers?.find((u) => u.userId === userId);
+        const staffRoles = ["librarian", "teacher", "finance", "staff"];
+        return {
+          userId: userId,
+          userModel: user && staffRoles.includes(user.role?.toLowerCase()) ? "staff" : user?.role?.toLowerCase() || "student", // Fallback to "student" if role is missing
+        };
       });
     }
 
@@ -559,11 +563,11 @@ const AddNotice = ({ isEditing, onClose }) => {
                   ({ getFieldValue }) => ({
                     validator(_, value) {
                       const startDate = getFieldValue("startDate");
-                      if (!value || !startDate || value.isAfter(startDate)) {
+                      if (!value || !startDate || !value.isBefore(startDate)) {
                         return Promise.resolve();
                       }
                       return Promise.reject(
-                        new Error(t("End date must be greater than start date"))
+                        new Error(t("End date must be on or after start date"))
                       );
                     },
                   }),
@@ -595,7 +599,11 @@ const AddNotice = ({ isEditing, onClose }) => {
             name="noticeTarget"
             rules={[{ required: true, message: t("Select notice target") }]}
           >
-            <Radio.Group size="large" buttonStyle="solid">
+            <Radio.Group
+              size="large"
+              buttonStyle="solid"
+              onChange={(e) => handleNoticeTargetChange(e.target.value)}
+            >
               <Radio.Button value="users">{t("Users")}</Radio.Button>
               <Radio.Button value="roles">{t("Roles")}</Radio.Button>
             </Radio.Group>
