@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useParams, useNavigate, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { AiOutlineEye } from "react-icons/ai";
+import { Modal } from "antd"; // Import Ant Design Modal
 import Details from "./Details";
-import { useTranslation } from "react-i18next"; // Import useTranslation hook
+import { useTranslation } from "react-i18next";
 import ProtectedSection from "../../../../Routes/ProtectedRoutes/ProtectedSection";
 import { PERMISSIONS } from "../../../../config/permission";
 
@@ -19,7 +20,7 @@ const colors = [
 const getColor = (index) => colors[index % colors?.length];
 
 const StudentDetail = () => {
-  const { t } = useTranslation("admVerification"); // Initialize useTranslation hook
+  const { t } = useTranslation("admVerification");
   const { sid } = useParams();
   const navigate = useNavigate();
   const { unVerifiedStudents, rejectedStudents } = useSelector(
@@ -34,7 +35,11 @@ const StudentDetail = () => {
   const [modalOpen, setModalOpen] = useState(false);
 
   const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
+  const closeModal = () => {
+    setModalOpen(false);
+    setPreview(null);
+    setPreviewType(null);
+  };
 
   const handlePreviewClick = (url, type) => {
     if (url) {
@@ -45,7 +50,7 @@ const StudentDetail = () => {
       console.error("Invalid URL:", url);
     }
   };
-  console.log("Student Details:", student);
+
   if (!student) {
     return <p className="text-center text-red-500">{t("Student not found")}</p>;
   }
@@ -72,11 +77,11 @@ const StudentDetail = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.keys(student?.attachments?.mandatory || {}).map((key, index) => {
                 const docUrl = student?.attachments?.mandatory[key];
-                const docLabel = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the key for label
+                const docLabel = key.charAt(0).toUpperCase() + key.slice(1);
 
                 return (
                   <div
-                    key={key} // Use a unique identifier if available
+                    key={key}
                     className={`${getColor(index)} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
                   >
                     {docUrl?.startsWith("http") && docUrl?.match(/\.(jpg|jpeg|png)$/) ? (
@@ -84,14 +89,14 @@ const StudentDetail = () => {
                         src={docUrl}
                         alt={`${t("Document")} ${docLabel}`}
                         className="w-full h-40 object-cover mb-2 rounded-md"
-                        onError={(e) => e.target.src = "/path/to/default-image.jpg"} // Handle broken image URLs
+                        onError={(e) => e.target.src = "/path/to/default-image.jpg"}
                       />
                     ) : (
                       <embed
                         src={docUrl}
                         type="application/pdf"
                         className="w-full h-40 mb-2 rounded-md"
-                        alt={`${t("Document")} ${docLabel}`} // Ensure accessibility for embedded files
+                        alt={`${t("Document")} ${docLabel}`}
                       />
                     )}
                     <div className="flex justify-between items-center">
@@ -123,11 +128,11 @@ const StudentDetail = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {Object.keys(student?.attachments?.optional || {}).map((key, index) => {
                 const docUrl = student?.attachments?.optional[key];
-                const docLabel = key.charAt(0).toUpperCase() + key.slice(1); // Capitalize the key for label
+                const docLabel = key.charAt(0).toUpperCase() + key.slice(1);
 
                 return (
                   <div
-                    key={key} // Use a unique identifier if available
+                    key={key}
                     className={`${getColor(index)} p-4 border rounded-lg shadow-md transform hover:scale-105 transition-transform`}
                   >
                     {docUrl?.startsWith("http") && docUrl?.match(/\.(jpg|jpeg|png)$/) ? (
@@ -135,14 +140,14 @@ const StudentDetail = () => {
                         src={docUrl}
                         alt={`${t("Document")} ${docLabel}`}
                         className="w-full h-40 object-cover mb-2 rounded-md"
-                        onError={(e) => e.target.src = "/path/to/default-image.jpg"} // Handle broken image URLs
+                        onError={(e) => e.target.src = "/path/to/default-image.jpg"}
                       />
                     ) : (
                       <embed
                         src={docUrl}
                         type="application/pdf"
                         className="w-full h-40 mb-2 rounded-md"
-                        alt={`${t("Document")} ${docLabel}`} // Ensure accessibility for embedded files
+                        alt={`${t("Document")} ${docLabel}`}
                       />
                     )}
                     <div className="flex justify-between items-center">
@@ -169,39 +174,51 @@ const StudentDetail = () => {
           </div>
         </div>
 
-        {modalOpen && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
-            <div className="bg-white p-4 rounded-lg relative max-h-full overflow-y-auto shadow-lg">
-              <button
-                onClick={closeModal}
-                className="absolute top-2 right-2 p-2 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full shadow-lg hover:from-pink-600 hover:to-purple-600"
-              >
-                ✕
-              </button>
-              <div>
-                {preview ? (
-                  previewType == "image" ? (
-                    <img
-                      src={preview}
-                      alt={t("Preview")}
-                      className="max-h-[80vh] object-contain"
-                    />
-                  ) : (
-                    <embed
-                      src={preview}
-                      type={'application/pdf'}
-                      className="w-full h-[80vh] object-contain"
-                    />
-                  )
-                ) : (
-                  <p className="text-center text-gray-500">
-                    {t("No preview available")}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        <Modal
+          open={modalOpen}
+          onCancel={closeModal}
+          footer={null}
+          width="100%"
+          style={{ top: 20 }}
+          bodyStyle={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "calc(100vh - 100px)",
+            padding: 0,
+            overflow: "hidden"
+          }}
+          centered
+          destroyOnClose
+        >
+          {preview ? (
+            previewType === "image" ? (
+              <img
+                src={preview}
+                alt={t("Preview")}
+                style={{
+                  maxHeight: "100%",
+                  maxWidth: "100%",
+                  objectFit: "contain"
+                }}
+              />
+            ) : (
+              <embed
+                src={preview}
+                type="application/pdf"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  minHeight: "80vh"
+                }}
+              />
+            )
+          ) : (
+            <p className="text-center text-gray-500">
+              {t("No preview available")}
+            </p>
+          )}
+        </Modal>
       </ProtectedSection>
     </div>
   );

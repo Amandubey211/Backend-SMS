@@ -22,7 +22,7 @@ import {
   RELIGION_OPTIONS,
   bloodGroupOptions,
   CONTACT_TYPE_OPTIONS,
-  NATIVE_LANGUAGE_OPTIONS
+  NATIVE_LANGUAGE_OPTIONS,
 } from "../Configs/selectOptionsConfig";
 import LanguagePreferences from "./LanguagePreferences";
 import CustomUploadCard from "../../../../LoginPages/Student/SignUp/Components/CustomUploadCard";
@@ -33,7 +33,10 @@ const AcademicSessionCandidate = ({ form }) => {
   const dispatch = useDispatch();
   const academicYears = useSelector((s) => s.common.academicYear.academicYears);
   const classes = useSelector((s) => s.admin.class.classes);
-
+  const guardianEmail = Form.useWatch(
+    ["guardianInformation", "guardianEmail"],
+    form
+  );
   // fetch dropdown data
   useEffect(() => {
     dispatch(fetchAcademicYear());
@@ -104,8 +107,6 @@ const AcademicSessionCandidate = ({ form }) => {
                 required
               />
             </Form.Item>
-
-
 
             {/* Moved Age right below DOB */}
             <Form.Item name={["candidateInformation", "age"]} label="Age">
@@ -387,6 +388,18 @@ const AcademicSessionCandidate = ({ form }) => {
                   rules={[
                     { type: "email", message: "Invalid email" },
                     { required: true, message: "Email is required" },
+                    {
+                      validator: (_, value) => {
+                        if (value && value === guardianEmail) {
+                          return Promise.reject(
+                            new Error(
+                              "Student email cannot be same as guardian email"
+                            )
+                          );
+                        }
+                        return Promise.resolve();
+                      },
+                    },
                   ]}
                 >
                   <Input prefix={<MailOutlined />} placeholder="Email" />

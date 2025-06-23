@@ -53,7 +53,7 @@ const Details = ({ student }) => {
 
   return (
     <div className="container mx-auto p-4">
-      <div className="relative">
+      <div className="relative capitalize">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 mb-6 shadow-sm">
           <div className="flex flex-col md:flex-row items-center gap-6">
@@ -167,7 +167,7 @@ const Details = ({ student }) => {
                       />
                     )}
                     <div>
-                      <h3 className="font-medium text-lg text-gray-800">{`${student?.fatherInfo?.firstName} ${student?.fatherInfo?.middleName} ${student?.fatherInfo?.lastName}`}</h3>
+                      <h3 className="font-medium text-lg text-gray-800">{`${student?.fatherInfo?.firstName} ${student?.fatherInfo?.lastName}`}</h3>
                       <p className="text-gray-600">
                         {student?.fatherInfo?.jobTitle} at{" "}
                         {student?.fatherInfo?.company}
@@ -226,7 +226,7 @@ const Details = ({ student }) => {
                       />
                     )}
                     <div>
-                      <h3 className="font-medium text-lg text-gray-800">{`${student?.motherInfo?.firstName} ${student?.motherInfo?.middleName} ${student?.motherInfo?.lastName}`}</h3>
+                      <h3 className="font-medium text-lg text-gray-800">{`${student?.motherInfo?.firstName}  ${student?.motherInfo?.lastName}`}</h3>
                       <p className="text-gray-600">
                         {student?.motherInfo?.jobTitle} at{" "}
                         {student?.motherInfo?.company}

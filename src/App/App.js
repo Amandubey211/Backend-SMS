@@ -34,7 +34,6 @@ import AllLibrarian from "../Modules/Admin/UsersProfiles/LibrarianProfile/AllLib
 import AllStaff from "../Modules/Admin/UsersProfiles/StaffProfile/AllStaff.js";
 import AllAccountants from "../Modules/Admin/UsersProfiles/AccountantProfile/AllAccountants.js";
 import StudentParentProfile from "../Modules/Admin/UsersProfiles/StudentParentsProfile/StudentParentProfile.js";
-import UserProfile from "../Modules/Admin/UsersProfiles/AdminProfile/UserProfile.js";
 
 // Parent Modules
 import ParentEvent from "../Modules/Parents/ParentEvent/ParentEvent";
@@ -66,6 +65,9 @@ import TransportSimulator from "../Components/Common/TransportSimulator.js";
 // Lazy Loaded Components (Grouped by functionality)
 // =================================================================
 
+const UserProfile = lazy(() =>
+  import("../Modules/Admin/UsersProfiles/AdminProfile/UserProfile.js")
+);
 // 1. Finance Related Lazy Components
 const AllStudents = lazy(() =>
   import(
@@ -476,9 +478,15 @@ const Health = lazy(() => import("../Modules/Admin/Health/Health.js"));
 
 const ScoreCard = lazy(() => import("../Modules/Admin/ScoreCard/ScoreCard.js"));
 // Report Card
-const ReportCard = lazy(() => import("../Modules/Student/Dashboard/DashBoardComponents/ReportCard/SRCLayout.js"));
+const ReportCard = lazy(() =>
+  import(
+    "../Modules/Student/Dashboard/DashBoardComponents/ReportCard/SRCLayout.js"
+  )
+);
 // Penalties
-const Penalties = lazy(() => import("../Modules/Admin/Finance/Penalties/MainSection.js"));
+const Penalties = lazy(() =>
+  import("../Modules/Admin/Finance/Penalties/MainSection.js")
+);
 function App() {
   const [isOnline, setIsOnline] = useState(window.navigator.onLine);
   useFirebaseMessaging();
@@ -1554,7 +1562,13 @@ function App() {
       errorElement: <Error />,
     },
     { path: "/users/staffs", element: <AllStaff />, errorElement: <Error /> },
-    { path: "/users/admin", element: <UserProfile />, errorElement: <Error /> },
+    {
+      path: "/users/admin",
+      element: (
+        <ProtectRoute Component={UserProfile} allowedRoles={["admin"]} />
+      ),
+      errorElement: <Error />,
+    },
     {
       path: "/users/my/profile",
       element: (
@@ -1911,15 +1925,12 @@ function App() {
     },
     // Added Report Card Feature for students
     {
-      path: '/student_reportcard',
+      path: "/student_reportcard",
       element: (
-        <ProtectRoute
-          Component={ReportCard}
-          allowedRoles={["student"]}
-        />
+        <ProtectRoute Component={ReportCard} allowedRoles={["student"]} />
       ),
       errorElement: <Error />,
-    }
+    },
   ]);
 
   return (

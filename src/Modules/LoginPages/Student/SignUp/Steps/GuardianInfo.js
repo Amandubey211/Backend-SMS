@@ -13,7 +13,7 @@ import {
   message,
   Alert,
 } from "antd";
-import { TeamOutlined } from "@ant-design/icons";
+import { InfoCircleOutlined, TeamOutlined } from "@ant-design/icons";
 import { LiaMaleSolid, LiaFemaleSolid } from "react-icons/lia";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
@@ -129,11 +129,11 @@ const PhoneField = ({
           enableSearch={true}
           countryCodeEditable={false}
         />
-        {
-          whatsappName[0] !== 'guardianInformation' &&
+        {whatsappName[0] !== "guardianInformation" && (
           <div
-            className={`flex items-center border border-l-0 rounded-r px-3 ${isWA ? "bg-[#dcf8c6]" : "bg-white"
-              }`}
+            className={`flex items-center border border-l-0 rounded-r px-3 ${
+              isWA ? "bg-[#dcf8c6]" : "bg-white"
+            }`}
           >
             <Tooltip title="Mark this number as WhatsApp">
               <div className="cursor-pointer" onClick={toggleWA}>
@@ -141,7 +141,7 @@ const PhoneField = ({
               </div>
             </Tooltip>
           </div>
-        }
+        )}
       </Space.Compact>
     </Form.Item>
   );
@@ -162,6 +162,9 @@ const GuardianInfo = ({ formData }) => {
   const guardianSectionRef = useRef(null);
 
   const [activeTab, setActiveTab] = useState("father");
+  const studentEmail = useSelector(
+    (s) => s.common.studentSignup.formData?.school?.email
+  );
 
   /* Hydrate form with initial data */
   useEffect(() => {
@@ -473,11 +476,29 @@ const GuardianInfo = ({ formData }) => {
       <Form.Item
         name={["guardianInformation", "guardianEmail"]}
         label="Guardian Email"
-        rules={[{ type: "email", required: true, message: "Invalid email" }]}
-        className="mb-4"
-        extra="Login credentials for the Parent-Portal will be sent here."
+        rules={[
+          { type: "email", message: "Invalid email" },
+          // Simplified validation using Redux value
+          {
+            validator: (_, value) => {
+              if (value && value === studentEmail) {
+                return Promise.reject(
+                  "Guardian email cannot match student email"
+                );
+              }
+              return Promise.resolve();
+            },
+          },
+        ]}
+        extra={
+          studentEmail && (
+            <div className="text-xs mt-1 text-gray-500">
+              Student email: <span className="font-medium">{studentEmail}</span>
+            </div>
+          )
+        }
       >
-        <Input size="large" placeholder="Guardian Email" />
+        <Input placeholder="guardian@example.com" size="large" />
       </Form.Item>
     </div>
   );
@@ -649,8 +670,8 @@ const GuardianInfo = ({ formData }) => {
                   {activeTab === "father"
                     ? "Mother Info"
                     : activeTab === "mother"
-                      ? "Guardian Info"
-                      : "Save & Continue"}
+                    ? "Guardian Info"
+                    : "Save & Continue"}
                 </Button>
               </motion.div>
             </Col>

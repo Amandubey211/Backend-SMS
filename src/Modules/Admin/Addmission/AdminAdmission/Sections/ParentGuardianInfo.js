@@ -16,6 +16,16 @@ import CustomUploadCard from "../../../../LoginPages/Student/SignUp/Components/C
 const { Option } = Select;
 
 const ParentGuardianInfo = ({ form }) => {
+  const studentEmail = Form.useWatch(["candidateInformation", "email"], form);
+
+  const validateGuardianEmail = (_, value) => {
+    if (value && value === studentEmail) {
+      return Promise.reject(
+        new Error("Student and guardian email addresses must be different")
+      );
+    }
+    return Promise.resolve();
+  };
   return (
     <>
       {/* Father Information */}
@@ -428,6 +438,7 @@ const ParentGuardianInfo = ({ form }) => {
             rules={[
               { type: "email", message: "Enter a valid e-mail." },
               { required: true, message: "Guardian e-mail is required." },
+              { validator: validateGuardianEmail },
             ]}
             extra="Initial login credentials will be e-mailed to the guardian."
           >
