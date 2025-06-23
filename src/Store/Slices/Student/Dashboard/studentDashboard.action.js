@@ -14,7 +14,6 @@ import {
 
 // Helper function to format dashboard data
 const formatDashboardData = (dashboardData) => {
-
   return [
     // {
     //   label: "Upcoming Exams",
@@ -26,8 +25,8 @@ const formatDashboardData = (dashboardData) => {
     //   url: "/student_dash",
     // },
     {
-      label: "Due Fees",
-      value: dashboardData?.dueFees,
+      label: "Unpaid",
+      value: dashboardData?.upcomingExam,
       bgColor: "bg-red-100",
       textColor: "text-black-500",
       pentagonColor: "bg-red-500",
