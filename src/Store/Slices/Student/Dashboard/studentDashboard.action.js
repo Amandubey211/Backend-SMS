@@ -1,32 +1,26 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { CiMoneyBill } from "react-icons/ci";
 import { setErrorMsg, setShowError } from "../../Common/Alerts/alertsSlice";
 import { handleError } from "../../Common/Alerts/errorhandling.action";
 import { getData } from "../../../../services/apiEndpoints";
 import { getAY } from "../../../../Utils/academivYear";
-import { FaMoneyBillWave } from "react-icons/fa";
-import {
-  MdAttachMoney,
-  MdEvent,
-  MdNotifications,
-  MdOutlineSchool,
-} from "react-icons/md";
+import { TbMoneybag } from "react-icons/tb";
+import { MdAttachMoney, MdEvent, MdNotifications } from "react-icons/md";
 
 // Helper function to format dashboard data
 const formatDashboardData = (dashboardData) => {
   return [
-    // {
-    //   label: "Upcoming Exams",
-    //   value: dashboardData?.upcomingExam,
-    //   bgColor: "bg-purple-100",
-    //   textColor: "text-black-500",
-    //   pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
-    //   icon: <MdOutlineSchool className="text-xl text-white" />, // Exam Icon
-    //   url: "/student_dash",
-    // },
+    {
+      label: "Total Paid ",
+      value: dashboardData?.totalPaid || 0,
+      bgColor: "bg-purple-100",
+      textColor: "text-black-500",
+      pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
+      icon: <TbMoneybag className="text-xl text-white" />, // Exam Icon
+      url: "/student_finance",
+    },
     {
       label: "Unpaid",
-      value: dashboardData?.upcomingExam,
+      value: dashboardData?.dueFees || 0,
       bgColor: "bg-red-100",
       textColor: "text-black-500",
       pentagonColor: "bg-red-500",

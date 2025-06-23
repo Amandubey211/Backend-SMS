@@ -36,8 +36,8 @@ const DashCard = ({
           </span>
         </div>
         <div className="text-center">
-          <div className={`text-sm font-semibold ${textColor}`}>{label}</div>
-          <div className="text-xl font-semibold">{value}</div>
+          <div className={`text-sm  ${textColor}`}>{label}</div>
+          <div className="text-xl font-semibold mt-1">{value}</div>
         </div>
       </div>
     </div>

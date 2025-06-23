@@ -26,7 +26,7 @@ const BookCard = ({
   );
 
   // Calculate category count
-  const categoryCount = categories?.length-1;
+  const categoryCount = categories?.length - 1;
 
   const category =
     categories?.length === 1
@@ -42,7 +42,7 @@ const BookCard = ({
         <img
           src={coverImageUrl}
           alt={title}
-          className="h-40 object-fit w-full"
+          className="h-40 object-contain  p-2 w-full"
         />
 
         {studentIssueStatus === "Issued" && (
@@ -93,11 +93,13 @@ const BookCard = ({
                 border: "1px solid #ccc", // optional: for adding a border around the popover
               }}
             >
-              {categories?.length > 1 &&  <span
-                className={`inline-flex items-center justify-center ml-2 w-7 h-7 text-xs font-semibold text-white bg-gray-700 rounded-full`}
-              >
-              +{categories.length - 1}
-              </span>}
+              {categories?.length > 1 && (
+                <span
+                  className={`inline-flex items-center justify-center ml-2 w-7 h-7 text-xs font-semibold text-white bg-gray-700 rounded-full`}
+                >
+                  +{categories.length - 1}
+                </span>
+              )}
             </Popover>
             {/* Category Count in Rounded Circle */}
           </span>
