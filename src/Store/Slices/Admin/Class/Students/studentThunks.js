@@ -32,14 +32,14 @@ export const fetchStudentsByClassAndSectionNames = createAsyncThunk(
   "students/fetchByClassAndSectionNames",
   async (classId, { rejectWithValue, dispatch, getState }) => {
     try {
-      console.log("payload", classId);
+
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
       const say = getAY();
       const response = await getData(
         `/admin/all/student/${classId}?say=${say}`
       );
-      console.log("fetchStudentsByClassAndSectionNames", response);
+
       return response.data;
     } catch (error) {
       return handleError(error, dispatch, rejectWithValue);

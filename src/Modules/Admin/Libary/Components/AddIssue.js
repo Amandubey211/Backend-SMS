@@ -12,6 +12,7 @@ import { useTranslation } from "react-i18next";
 import { FaSchool } from "react-icons/fa";
 import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
 import { fetchAllUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import { fetchStudentsByClassAndSection } from '../../../../Store/Slices/Admin/Class/Students/studentThunks'
 import toast from "react-hot-toast";
 
 const { Option } = Select;
@@ -58,6 +59,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
     (state) => state.admin.group_section.sectionsList
   );
   const classList = useSelector((state) => state.admin.class.classes);
+  const [studentsList, setStudentsList] = useState([])
   const { allUsers } = useSelector((state) => state.admin.notice);
   const { loading } = useSelector((state) => state.admin.students);
 
@@ -100,6 +102,13 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const handleSelectChange = (name, value) => {
     if (name === "class") {
       dispatch(fetchSectionsNamesByClass(value));
+      const fetchClass = async () => {
+
+        const response = await dispatch(fetchStudentsByClassAndSection(value))
+        console.log(response);
+        setStudentsList(response.payload)
+      }
+      fetchClass()
     }
     form.setFieldValue(name, value);
     if (name === "book") {
@@ -107,7 +116,6 @@ const AddIssue = ({ onClose, editIssueData }) => {
       form.setFieldValue("authorName", selectedBook?.author || "");
     }
   };
-
   // Handle status changes via radio buttons
   const handleStatusChange = (e) => {
     form.setFieldValue("status", e.target.value);
@@ -288,41 +296,74 @@ const AddIssue = ({ onClose, editIssueData }) => {
               fuzzySearch(input, option.props["data-search"])
             }
           >
-            {filteredUsers?.map((usr) => {
-              const searchString = `${usr.name} ${usr.role} ${usr.admissionNumber || ""}`;
-              return (
-                <Option
-                  key={usr.userId}
-                  value={usr.userId}
-                  data-search={searchString}
-                >
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={
-                        usr.profile ||
-                        "https://via.placeholder.com/20?text=No+Image"
-                      }
-                      alt={usr.name}
-                      style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: "50%",
-                        objectFit: "cover",
-                      }}
-                    />
-                    <span>{usr.name}</span>
-                    <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-1 rounded">
-                      {usr.role}
-                    </span>
-                    {usr.role?.toLowerCase() === "student" && (
-                      <span className="text-xs bg-red-100 text-red-800 px-1 rounded">
-                        {usr.admissionNumber || "N/A"}
+            {selectedRole === 'student' ?
+              studentsList.map((usr) => {
+                const searchString = `${usr.firstName} student`;
+                return (
+                  <Option
+                    key={usr._id}
+                    value={usr._id}
+                    data-search={searchString}
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={
+                          usr.profile ||
+                          "https://via.placeholder.com/20?text=No+Image"
+                        }
+                        alt={usr.firstName}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <span>{usr.firstName} {usr.lastName}</span>
+                      <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-1 rounded">
+                        student
                       </span>
-                    )}
-                  </div>
-                </Option>
-              );
-            })}
+                    </div>
+                  </Option>
+                );
+              })
+              :
+              filteredUsers?.map((usr) => {
+                const searchString = `${usr.name} ${usr.role} ${usr.admissionNumber || ""}`;
+                return (
+                  <Option
+                    key={usr.userId}
+                    value={usr.userId}
+                    data-search={searchString}
+                  >
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={
+                          usr.profile ||
+                          "https://via.placeholder.com/20?text=No+Image"
+                        }
+                        alt={usr.name}
+                        style={{
+                          width: 20,
+                          height: 20,
+                          borderRadius: "50%",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <span>{usr.name}</span>
+                      <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-1 rounded">
+                        {usr.role}
+                      </span>
+                      {usr.role?.toLowerCase() === "student" && (
+                        <span className="text-xs bg-red-100 text-red-800 px-1 rounded">
+                          {usr.admissionNumber || "N/A"}
+                        </span>
+                      )}
+                    </div>
+                  </Option>
+                );
+              })
+            }
           </Select>
         </Form.Item>
         {/* Book Field */}
@@ -409,11 +450,11 @@ const AddIssue = ({ onClose, editIssueData }) => {
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   const issueDate = getFieldValue("issueDate");
-                  if (!value || !issueDate || value.isAfter(issueDate)) {
+                  if (!value || !issueDate || !value.isBefore(issueDate)) {
                     return Promise.resolve();
                   }
                   return Promise.reject(
-                    new Error(t("Return date must be greater than issue date"))
+                    new Error(t("Return date must be greater than or Equal issue date"))
                   );
                 },
               }),
