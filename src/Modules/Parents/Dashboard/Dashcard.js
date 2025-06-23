@@ -7,12 +7,16 @@ import { FaBell } from "react-icons/fa"; // for the bell icon
 import { useTranslation } from "react-i18next";
 import { ParentDashcard } from "../Skeletons.js";
 import { useNavigate } from "react-router-dom";
+import { TbMoneybag } from "react-icons/tb";
+
 const DashCard = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   // Get data from Redux store
-  const { cardsData = {}, loading } = useSelector((state) => state?.Parent?.dashboard || {});
+  const { cardsData = {}, loading } = useSelector(
+    (state) => state?.Parent?.dashboard || {}
+  );
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,20 +31,20 @@ const DashCard = () => {
 
   // Card configuration for the UI
   const cardData = [
-    // {
-    //   label: t("Upcoming Assignments & Quizzes", { ns: "stdFinance" }),
-    //   value: cardsData?.upcomingExamsCount?.toString() || "0",
-    //   cardBg: "bg-violet-100",  // Pastel background
-    //   hexBg: "bg-violet-500",   // Darker color for hex shape
-    //   icon: <RiBookOpenLine />,
-    // },
+    {
+      label: t("Total paid", { ns: "stdFinance" }),
+      value: cardsData?.totalPaid?.toString() || "0",
+      cardBg: "bg-violet-100", // Pastel background
+      hexBg: "bg-violet-500", // Darker color for hex shape
+      icon: <TbMoneybag />,
+    },
     {
       label: t("Due Fees", { ns: "stdFinance" }),
       value: cardsData?.dueFees?.toString() || "0",
       cardBg: "bg-rose-100",
       hexBg: "bg-rose-500",
       icon: <CiMoneyBill />,
-      path: '/parentfinance'
+      path: "/parentfinance",
     },
     {
       label: t("Upcoming Event", { ns: "stdFinance" }),
@@ -48,7 +52,7 @@ const DashCard = () => {
       cardBg: "bg-blue-100",
       hexBg: "bg-blue-500",
       icon: <RiCalendarCheckLine />,
-      path: '/parent/events'
+      path: "/parent/events",
     },
     {
       label: t("Upcoming Notice", { ns: "stdFinance" }),
@@ -56,7 +60,7 @@ const DashCard = () => {
       cardBg: "bg-orange-100",
       hexBg: "bg-orange-500",
       icon: <FaBell />,
-      path: '/parentchildnotice'
+      path: "/parentchildnotice",
     },
   ];
 
