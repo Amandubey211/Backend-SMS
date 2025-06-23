@@ -47,7 +47,7 @@ const MainSection = () => {
     });
 
     return (
-        <div className="p-4 space-y-4">
+        <div className=" wp-4 space-y-4">
             {/* Timetable Type Selection */}
             <div className="flex space-x-4 items-center">
                 <label className="font-medium">Select Timetable Type:</label>
