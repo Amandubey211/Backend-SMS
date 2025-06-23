@@ -77,6 +77,7 @@ const StudentMainSection = () => {
       {/* Left Section */}
       <div className="w-[65%] px-4">
         <div className="flex flex-wrap justify-around  py-3 w-full">
+
           {(cardData?.length
             ? cardData
             : [
@@ -118,6 +119,7 @@ const StudentMainSection = () => {
                 },
               ]
           )?.map((item, index) => (
+          {cardData?.map((item, index) => (
             <DashCard key={index} {...item} />
           ))}
         </div>
