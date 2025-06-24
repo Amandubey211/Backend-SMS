@@ -1,8 +1,6 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import Navbar from "../Common/Navbar";
 import SideMenubar from "./SideMenubar";
-import { Toaster } from "react-hot-toast";
 
 const StudentDashLayout = ({
   children,
@@ -17,9 +15,6 @@ const StudentDashLayout = ({
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-white">
-      {/* Toaster should be at root level */}
-      <Toaster position="top-right" />
-
       {/* Sidebar */}
       <SideMenubar isOpen={isSidebarOpen} />
 

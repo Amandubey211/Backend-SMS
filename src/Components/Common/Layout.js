@@ -1,7 +1,5 @@
-import React from "react";
 import { Helmet } from "react-helmet";
 import { Toaster } from "react-hot-toast";
-import useNavHeading from "../../Hooks/CommonHooks/useNavHeading ";
 import { useDispatch, useSelector } from "react-redux";
 import {
   setErrorMsg,
