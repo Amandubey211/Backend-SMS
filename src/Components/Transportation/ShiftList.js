@@ -1,20 +1,32 @@
 import React, { useEffect, useState } from "react";
+import { Table, Tag, Button, Modal, Space, Typography } from "antd";
+import {
+  FaTrashAlt,
+  FaEdit,
+  FaToggleOn,
+  FaToggleOff,
+} from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteShift,
   getAllShifts,
   toggleShiftStatus,
 } from "../../Store/Slices/Transportation/Shift/shift.action";
-import { FaTrashAlt, FaEdit, FaToggleOn, FaToggleOff } from "react-icons/fa";
-import DeleteModal from "../Common/DeleteModal";
+
+const { Title } = Typography;
 
 const ShiftList = ({ onEdit }) => {
   const { shifts, loading } = useSelector(
     (store) => store?.transportation?.transportShift
   );
   const dispatch = useDispatch();
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedShift, setSelectedShift] = useState(null);
+
+  useEffect(() => {
+    dispatch(getAllShifts());
+  }, [dispatch]);
 
   const handleDeleteShift = (shift) => {
     setSelectedShift(shift);
@@ -24,108 +36,111 @@ const ShiftList = ({ onEdit }) => {
   const handleConfirmDelete = async () => {
     if (!selectedShift) return;
     dispatch(deleteShift(selectedShift._id));
+    setDeleteModalOpen(false);
   };
 
   const handleToggleStatus = (shiftId, currentStatus) => {
     dispatch(toggleShiftStatus({ shiftId, deactivate: !currentStatus }));
   };
 
-  useEffect(() => {
-    dispatch(getAllShifts());
-  }, [dispatch]);
+  const columns = [
+    {
+      title: "S.No",
+      dataIndex: "index",
+      key: "index",
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: "Shift Name",
+      dataIndex: "shiftName",
+      key: "shiftName",
+      render: (text) => <strong>{text}</strong>,
+    },
+    {
+      title: "From Time",
+      dataIndex: "fromTime",
+      key: "fromTime",
+    },
+    {
+      title: "To Time",
+      dataIndex: "toTime",
+      key: "toTime",
+    },
+    {
+      title: "Shift",
+      dataIndex: "shift",
+      key: "shift",
+    },
+    {
+      title: "Status",
+      dataIndex: "deactivateShift",
+      key: "deactivateShift",
+      render: (deactivateShift) => (
+        <Tag color={deactivateShift ? "red" : "green"}>
+          {deactivateShift ? "Inactive" : "Active"}
+        </Tag>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_, shift) => (
+        <Space size="middle">
+          <Button
+            type="link"
+            onClick={() => onEdit(shift)}
+            icon={<FaEdit />}
+            title="Edit Shift"
+          />
 
-  if (loading) {
-    return <div className="p-6 text-center text-blue-500 font-semibold">Loading shifts...</div>;
-  }
+          <Button
+            type="link"
+            onClick={() =>
+              handleToggleStatus(shift._id, shift.deactivateShift)
+            }
+            icon={
+              shift.deactivateShift ? <FaToggleOn /> : <FaToggleOff />
+            }
+            title={shift.deactivateShift ? "Activate Shift" : "Deactivate Shift"}
+          />
+
+          <Button
+            type="link"
+            danger
+            onClick={() => handleDeleteShift(shift)}
+            icon={<FaTrashAlt />}
+            title="Delete Shift"
+          />
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <div className="p-6">
-      <div className="overflow-x-auto shadow-lg rounded-xl bg-white">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gradient-to-r from-blue-100 to-blue-300 text-gray-700 uppercase text-sm">
-            <tr>
-              <th className="py-4 px-6 text-left">S.No</th>
-              <th className="py-4 px-6 text-left">Shift Name</th>
-              <th className="py-4 px-6 text-left">From Time</th>
-              <th className="py-4 px-6 text-left">To Time</th>
-              <th className="py-4 px-6 text-left">Shift</th>
-              <th className="py-4 px-6 text-left">Status</th>
-              <th className="py-4 px-6 text-center">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-700">
-            {shifts?.map((shift, index) => (
-              <tr
-                key={shift._id}
-                className="border-b hover:bg-blue-50 transition duration-300"
-              >
-                <td className="py-4 px-6">{index + 1}</td>
-                <td className="py-4 px-6 font-semibold">{shift.shiftName}</td>
-                <td className="py-4 px-6">{shift.fromTime}</td>
-                <td className="py-4 px-6">{shift.toTime}</td>
-                <td className="py-4 px-6 capitalize">{shift.shift}</td>
-                <td className="py-4 px-6">
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-bold ${
-                      shift.deactivateShift
-                        ? "bg-red-100 text-red-600"
-                        : "bg-green-100 text-green-600"
-                    }`}
-                  >
-                    {shift.deactivateShift ? "Inactive" : "Active"}
-                  </span>
-                </td>
-                <td className="py-4 px-6 flex items-center justify-center space-x-4">
-                  {/* Edit */}
-                  <button
-                    onClick={() => onEdit(shift)}
-                    className="text-blue-500 hover:text-blue-700 transition"
-                    title="Edit Shift"
-                  >
-                    <FaEdit size={20} />
-                  </button>
+    <div className="p-6 bg-white rounded-lg shadow-md">
+   
 
-                  {/* Toggle Status */}
-                  <button
-                    onClick={() =>
-                      handleToggleStatus(shift._id, shift.deactivateShift)
-                    }
-                    className={`${
-                      shift.deactivateShift
-                        ? "text-green-500 hover:text-green-700"
-                        : "text-yellow-500 hover:text-yellow-700"
-                    } transition`}
-                    title={shift.deactivateShift ? "Activate Shift" : "Deactivate Shift"}
-                  >
-                    {shift.deactivateShift ? (
-                      <FaToggleOn size={22} />
-                    ) : (
-                      <FaToggleOff size={22} />
-                    )}
-                  </button>
-
-                  {/* Delete */}
-                  <button
-                    onClick={() => handleDeleteShift(shift)}
-                    className="text-red-500 hover:text-red-700 transition"
-                    title="Delete Shift"
-                  >
-                    <FaTrashAlt size={20} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Table
+        loading={loading}
+        columns={columns}
+        dataSource={shifts}
+        rowKey="_id"
+        pagination={{ pageSize: 5 }}
+        locale={{ emptyText: "No shifts available." }}
+      />
 
       {/* Delete Modal */}
-      <DeleteModal
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-        onConfirm={handleConfirmDelete}
-        title={selectedShift?.shiftName || "Shift"}
-      />
+      <Modal
+        visible={deleteModalOpen}
+        onCancel={() => setDeleteModalOpen(false)}
+        onOk={handleConfirmDelete}
+        title={`Delete Shift: ${selectedShift?.shiftName || "Shift"}`}
+        okText="Delete"
+        okButtonProps={{ danger: true }}
+        cancelText="Cancel"
+      >
+        Are you sure you want to delete this shift?
+      </Modal>
     </div>
   );
 };
