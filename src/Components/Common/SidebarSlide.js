@@ -1,17 +1,18 @@
-// SidebarSlide.js
-import React, { useEffect, useRef, useCallback } from "react";
+// SidebarSlide.jsx
+import React, { useCallback, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 import { RxCross2 } from "react-icons/rx";
 import { motion, AnimatePresence } from "framer-motion";
 
 const sidebarVariants = {
   hidden: { x: "100%" },
-  visible: { x: "0%" },
+  visible: { x: 0 },
   exit: { x: "100%" },
 };
 
 const overlayVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 0.5 },
+  visible: { opacity: 1 },
   exit: { opacity: 0 },
 };
 
@@ -21,124 +22,100 @@ const SidebarSlide = ({
   onClose,
   children,
   footer,
-  width,
-  height,
+  width = "33%",
 }) => {
   const sidebarRef = useRef(null);
 
-  // Focus trap logic
-  const trapFocus = useCallback(
-    (event) => {
-      if (event.key === "Tab" && sidebarRef.current) {
-        const focusableElements = sidebarRef.current.querySelectorAll(
-          'a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])'
-        );
+  /* ------------------ focus trap ------------------ */
+  const trapFocus = useCallback((e) => {
+    if (e.key !== "Tab" || !sidebarRef.current) return;
 
-        if (focusableElements?.length === 0) {
-          event.preventDefault();
-          return;
-        }
+    const focusables = sidebarRef.current.querySelectorAll(
+      'a[href], button, textarea, input, select, [tabindex]:not([tabindex="-1"])'
+    );
+    if (!focusables.length) return;
 
-        const firstElement = focusableElements[0];
-        const lastElement = focusableElements[focusableElements?.length - 1];
-
-        if (event.shiftKey) {
-          // Shift + Tab
-          if (document.activeElement === firstElement) {
-            event.preventDefault();
-            lastElement.focus();
-          }
-        } else {
-          // Tab
-          if (document.activeElement === lastElement) {
-            event.preventDefault();
-            firstElement.focus();
-          }
-        }
-      }
-    },
-    [sidebarRef]
-  );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (
+      e.shiftKey
+        ? document.activeElement === first
+        : document.activeElement === last
+    ) {
+      e.preventDefault();
+      (e.shiftKey ? last : first).focus();
+    }
+  }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      document.addEventListener("keydown", trapFocus);
-      // Optionally, prevent background scrolling when sidebar is open
-      document.body.style.overflow = "hidden";
-    } else {
-      document.removeEventListener("keydown", trapFocus);
-      document.body.style.overflow = "auto";
-    }
-
+    document.body.style.overflow = isOpen ? "hidden" : "auto";
+    if (isOpen) document.addEventListener("keydown", trapFocus);
     return () => {
-      document.removeEventListener("keydown", trapFocus);
       document.body.style.overflow = "auto";
+      document.removeEventListener("keydown", trapFocus);
     };
   }, [isOpen, trapFocus]);
 
+  /* ------------------ render ---------------------- */
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Overlay */}
+          {/* overlay blur */}
           <motion.div
-            className="fixed inset-0 bg-black z-40"
+            className="fixed inset-0 z-40 backdrop-blur-sm bg-black/40"
             variants={overlayVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
+            onClick={onClose}
             aria-hidden="true"
           />
 
-          {/* Sidebar */}
-          <motion.div
+          {/* sidebar */}
+          <motion.aside
             ref={sidebarRef}
-            className="fixed top-0 right-0 h-full bg-white z-50 shadow-lg"
-            style={{ width: width || "33%", height: height || "100%" }}
+            className="fixed right-0 top-0 h-full bg-white z-50 shadow-xl flex flex-col"
+            style={{ width }}
             variants={sidebarVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
-            transition={{ type: "tween", duration: 0.3 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="sidebar-title"
           >
-            <div
-              className="flex justify-between items-center px-4 py-1 border-b"
-              id="sidebar-title"
-            >
-              <h1 className="font-semibold text-xl ps-4 text-gradient">
-                {title || "Please provide a title"}
-              </h1>
+            {/* header */}
+            <header className="flex items-center justify-between px-5 py-3 border-b">
+              <h2 className="font-semibold text-lg">{title}</h2>
               <button
-                onClick={onClose}
-                className="p-1 m-1 opacity-70 hover:opacity-100 transition-opacity"
                 aria-label="Close sidebar"
+                onClick={onClose}
+                className="text-xl opacity-70 hover:opacity-100 transition"
               >
-                <RxCross2 className="text-2xl" />
+                <RxCross2 />
               </button>
-            </div>
-            <div className="p-1 overflow-y-auto h-full">{children}</div>
-            {footer && <div className="p-1 border-t">{footer}</div>}
-          </motion.div>
-          <style jsx>{`
-            ::-webkit-scrollbar {
-              width: 8px;
-            }
-            ::-webkit-scrollbar-track {
-              background: #f1f1f1;
-            }
-            ::-webkit-scrollbar-thumb {
-              background-color: #888;
-              border-radius: 10px;
-              border: 3px solid #f1f1f1;
-            }
-          `}</style>
+            </header>
+
+            {/* content */}
+            <section className="flex-1 overflow-y-auto p-4">{children}</section>
+
+            {/* footer (optional) */}
+            {footer && <footer className="border-t p-4">{footer}</footer>}
+          </motion.aside>
         </>
       )}
     </AnimatePresence>
   );
+};
+
+SidebarSlide.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  title: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
+  children: PropTypes.node,
+  footer: PropTypes.node,
+  width: PropTypes.string,
 };
 
 export default SidebarSlide;

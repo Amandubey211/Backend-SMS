@@ -1,107 +1,88 @@
-import React, { useState, useEffect } from "react";
-import Layout from "../../../../../../Components/Common/Layout";
-import DashLayout from "../../../../../../Components/Student/StudentDashLayout";
+// StudentTeacher.jsx  (listing page)
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import ProfileCard from "./ProfileCard";
+import Layout from "../../../../../../Components/Common/Layout";
+import DashLayout from "../../../../../../Components/Student/StudentDashLayout";
 import NoDataFound from "../../../../../../Components/Common/NoDataFound";
+import Spinner from "../../../../../../Components/Common/Spinner";
+import SidebarSlide from "../../../../../../Components/Common/SidebarSlide";
+import ProfileCard from "./ProfileCard";
+import TeacherModal from "./TeacherModal";
 import useNavHeading from "../../../../../../Hooks/CommonHooks/useNavHeading ";
 import { stdClassTeacher } from "../../../../../../Store/Slices/Student/MyClass/Class/classTeacher/classTeacher.action";
-import Spinner from "../../../../../../Components/Common/Spinner";
-import { GoAlertFill } from "react-icons/go";
-import TeacherModal from "./TeacherModal";
-import OfflineModal from "../../../../../../Components/Common/Offline";
 import { setShowError } from "../../../../../../Store/Slices/Common/Alerts/alertsSlice";
-import SidebarSlide from '../../../../../../Components/Common/SidebarSlide'
 
 const StudentTeacher = () => {
-  const { classData } = useSelector((store) => store?.student?.studentClass);
-
-  const className = classData?.className;
-
-  useNavHeading(` ${className}`, "Class Teachers");
   const dispatch = useDispatch();
-  const { teacherData, loading, error } = useSelector((store) => store?.student?.studentClassTeacher);
   const { classId } = useParams();
-  const [selectedTeacher, setSelectedTeacher] = useState(null); // Modal state
-  const {showError}=useSelector((store)=>store?.common?.alertMsg);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
 
+  /* ----------------- global state ----------------- */
+  const { classData } = useSelector((s) => s.student.studentClass);
+  const { teacherData, loading, error } = useSelector(
+    (s) => s.student.studentClassTeacher
+  );
 
+  /* ----------------- nav heading ------------------ */
+  useNavHeading(`${classData?.className ?? ""}`, "Class Teachers");
 
-
+  /* ----------------- fetch teachers --------------- */
   useEffect(() => {
-    dispatch(stdClassTeacher({ classId }))
+    dispatch(stdClassTeacher({ classId }));
   }, [dispatch, classId]);
-   const [isSidebarOpen,setIsSidebarOpen] = useState(false)
-  const handleProfileClick = (teacher) => {
-  
-    setSelectedTeacher(teacher); 
-    setIsSidebarOpen(true)
-  };
-  // console.log("selected teacher is", selectedTeacher)
 
- 
+  /* ----------------- helpers ---------------------- */
+  const handleDismiss = () => dispatch(setShowError(false));
+  const openModal = (teacher) => setSelectedTeacher(teacher);
+  const closeModal = () => setSelectedTeacher(null);
 
-  const handleSidebarClose = () => {
-    setIsSidebarOpen(false)
-    setSelectedTeacher(null);
-  };
-
-  const handleDismiss = () => {
-    dispatch(setShowError(false));
-  }
-
+  /* ----------------- render ----------------------- */
   return (
     <Layout title="My Class Teachers">
       <DashLayout>
-        <div className="p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <h2 className="text-xl font-semibold">My Class Teachers </h2>
-            <div className="flex justify-center items-center bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full w-[25px] h-[25px] border border-gray-300">
-              <p className="text-lg font-semibold text-purple-500">
-                {teacherData?.length || 0}
-              </p>
+        <section className="p-4">
+          {/* grid list */}
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Spinner />
             </div>
-          </div>
-          <div className="flex flex-wrap -mx-2">
-            {loading ? (
-              <div className="w-full flex flex-col items-center justify-center py-20">
-                <Spinner />
-              </div>
-            ) 
-            // : error ? (
-            //   <div className="w-full flex flex-col items-center justify-center py-20">
-            //     <GoAlertFill className="inline-block w-12 h-12 mb-3" />
-            //     <p className="text-lg font-semibold">{error}</p>
-            //   </div>
-            // ) 
-            : teacherData?.length > 0 ? (
-              teacherData?.map((teacher, index) => (
-                <ProfileCard key={index} profile={teacher} onClick={() => handleProfileClick(teacher)} />
-              ))
-            ) :(!loading && teacherData?.length === 0 ) && (
-              <div className="w-full flex flex-col items-center justify-center py-20">
-                <NoDataFound title="Teachers" />
-              </div>
-            )}
-          </div>
-        </div>
-        {selectedTeacher && (
-         <SidebarSlide
-         isOpen={isSidebarOpen}
-         onClose={handleSidebarClose}
-         title={<span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
-           Quick View of Teacher
-         </span>}
-         width="30%"
-         height="100%"
-       >
-        <TeacherModal teacher={selectedTeacher}/>
-       </SidebarSlide>
-        )}
+          ) : teacherData?.length ? (
+            <div
+              className="
+                grid gap-4
+                grid-cols-[repeat(auto-fill,minmax(12rem,1fr))]
+              "
+            >
+              {teacherData.map((t) => (
+                <ProfileCard
+                  key={t.teacherId || t.id}
+                  profile={t}
+                  onClick={() => openModal(t)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center py-20">
+              <NoDataFound title="Teachers" />
+            </div>
+          )}
+        </section>
 
-        {!loading && showError && (
-          <OfflineModal error={error} onDismiss={handleDismiss} />
+        {/* teacher quick view */}
+        {selectedTeacher && (
+          <SidebarSlide
+            isOpen={Boolean(selectedTeacher)}
+            onClose={closeModal}
+            title={
+              <span className="bg-gradient-to-r from-pink-500 to-purple-500 inline-block text-transparent bg-clip-text">
+                Quick View of Teacher
+              </span>
+            }
+            width="30%"
+          >
+            <TeacherModal teacher={selectedTeacher} />
+          </SidebarSlide>
         )}
       </DashLayout>
     </Layout>
