@@ -1,6 +1,6 @@
 import React from "react";
 
-const StudentCard = ({ title, value, comparison, percentage, icon, trend }) => {
+const StudentCard = ({ title, value,currency, comparison, percentage, icon, trend }) => {
   return (
     <div
       className="p-4 w-full h-full rounded-lg border hover:shadow-lg hover:scale-105 transition-transform duration-300"
@@ -21,7 +21,7 @@ const StudentCard = ({ title, value, comparison, percentage, icon, trend }) => {
       {/* Value and Trend */}
       <div className="flex justify-between items-center">
         <h2 className="px-2 text-xl md:text-2xl font-bold text-purple-800 truncate">
-          {value}
+          {value}{" "}{currency}
         </h2>
       </div>
     </div>

@@ -132,7 +132,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
   const AllData = ascClassTimeTableData || [];
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <div className=" min-h-screen">
       {AllData?.length >= 1 ? (
         AllData.map((data, index) => {
           // Sort the timetable entries

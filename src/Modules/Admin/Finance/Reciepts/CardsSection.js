@@ -6,8 +6,8 @@ import { FaReceipt, FaMoneyBillAlt, FaBan } from "react-icons/fa";
 
 const CardsSection = () => {
   const dispatch = useDispatch();
-
-  const {  totalRecords,totalCancelRecords, loading = false, error = null } = useSelector(
+  const currency = useSelector((store) => store.common.user.userDetails.currency);
+  const { totalRecords, totalCancelRecords, loading = false, error = null } = useSelector(
     (state) => state.admin.receipts || {}
   );
 
@@ -21,6 +21,7 @@ const CardsSection = () => {
     {
       title: "Total Receipts Issued",
       count: totalRecords || 0,
+      currency: currency,
       color: "bg-purple-100",
       textColor: "text-purple-700",
       tag: "",
@@ -32,7 +33,8 @@ const CardsSection = () => {
     },
     {
       title: "Total Active Receipts",
-      count: totalRecords -totalCancelRecords  || 0,
+      count: totalRecords - totalCancelRecords || 0,
+      currency: currency,
       color: "bg-green-100",
       textColor: "text-green-700",
       tag: "",
@@ -44,7 +46,8 @@ const CardsSection = () => {
     },
     {
       title: "Total Canceled Receipts",
-      count: totalCancelRecords  || 0,
+      count: totalCancelRecords || 0,
+      currency: currency,
       color: "bg-red-100",
       textColor: "text-red-700",
       tag: "",
