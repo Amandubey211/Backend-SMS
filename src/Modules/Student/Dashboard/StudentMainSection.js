@@ -77,48 +77,6 @@ const StudentMainSection = () => {
       {/* Left Section */}
       <div className="w-[65%] px-4">
         <div className="flex flex-wrap justify-around  py-3 w-full">
-
-          {(cardData?.length
-            ? cardData
-            : [
-                // {
-                //   label: "Upcoming Exams",
-                //   value: 0,
-                //   bgColor: "bg-purple-100",
-                //   textColor: "text-black-500",
-                //   pentagonColor: "bg-purple-500", // Pentagon color matching bgColor
-                //   icon: <MdOutlineSchool className="text-xl text-white" />,
-                //   url: "/student_dash",
-                // },
-                {
-                  label: "Unpaid",
-                  value: 0,
-                  bgColor: "bg-red-100",
-                  textColor: "text-black-500",
-                  pentagonColor: "bg-red-500",
-                  icon: <MdAttachMoney className="text-xl text-white" />,
-                  url: "/student_finance",
-                },
-                {
-                  label: "Upcoming Events",
-                  value: 0,
-                  bgColor: "bg-blue-100",
-                  textColor: "text-black-500",
-                  pentagonColor: "bg-blue-500",
-                  icon: <MdEvent className="text-xl text-white" />,
-                  url: "/student/noticeboard/events",
-                },
-                {
-                  label: "Upcoming Notices",
-                  value: 0,
-                  bgColor: "bg-orange-100",
-                  textColor: "text-black-500",
-                  pentagonColor: "bg-orange-500",
-                  icon: <MdNotifications className="text-xl text-white" />,
-                  url: "/student/noticeboard/announcements",
-                },
-              ]
-          )?.map((item, index) => (
           {cardData?.map((item, index) => (
             <DashCard key={index} {...item} />
           ))}
