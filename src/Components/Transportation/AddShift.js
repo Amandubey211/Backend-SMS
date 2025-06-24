@@ -1,181 +1,171 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { FaClock, FaCalendarAlt } from "react-icons/fa";
+import {
+  Form,
+  Input,
+  Select,
+  TimePicker,
+  Switch,
+  Button,
+  Typography,
+  Space,
+  message,
+} from "antd";
 import { createShift, updateShift } from "../../Store/Slices/Transportation/Shift/shift.action";
+import dayjs from "dayjs";
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
   const dispatch = useDispatch();
 
 
   // Form Data State
-  const [formData, setFormData] = useState({
-    shiftName: "",
-    fromTime: "",
-    toTime: "",
-    shift: "",
-    deactivateShift: false,
-  });
+  const [form] = Form.useForm();
 
-  // UseEffect to populate form data when selected shift or initial data is available
   useEffect(() => {
-    if (initialData && selectedShift) {
-      setFormData({
-        shiftName: selectedShift?.shiftName || "",
-        fromTime: selectedShift?.fromTime || "",
-        toTime: selectedShift?.toTime || "",
-        shift: selectedShift?.shift || "",
-        deactivateShift: selectedShift?.deactivateShift || false,
+    if (selectedShift) {
+      form.setFieldsValue({
+        shiftName: selectedShift.shiftName,
+        fromTime: selectedShift.fromTime ? dayjs(selectedShift.fromTime, "HH:mm") : null,
+        toTime: selectedShift.toTime ? dayjs(selectedShift.toTime, "HH:mm") : null,
+        shift: selectedShift.shift,
+        deactivateShift: selectedShift.deactivateShift,
       });
     } else {
-      // Reset form data when not editing
-      setFormData({
-        shiftName: "",
-        fromTime: "",
-        toTime: "",
-        shift: "",
-        deactivateShift: false,
-      });
+      form.resetFields();
     }
-  }, [initialData, selectedShift]);  // The form resets when either initialData or selectedShift changes
-  
+  }, [selectedShift, form]);
 
-  // Handle form input changes
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
+  const handleClose = ()=>{
+    form.resetFields();
+    onClose();
+  }
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (
-      formData.fromTime &&
-      new Date(formData.toTime) < new Date(formData.fromTime)
-    ) {
-      alert("ToTime date should not be earlier than  FromTime date.");
-      return;
-    }
-
+  const handleSubmit = async (values) => {
     const dataToSubmit = {
-      ...formData,
-      date: new Date().toISOString(),
+      ...values,
+      fromTime: values.fromTime ? values.fromTime.format("HH:mm") : "",
+      toTime: values.toTime ? values.toTime.format("HH:mm") : "",
     };
 
+    if (selectedShift) {
+      await dispatch(updateShift({ id: selectedShift._id, updatedData: dataToSubmit }));
+    } else {
+      await dispatch(createShift(dataToSubmit));
+    }
 
-    (initialData && selectedShift) ? dispatch(updateShift({id:selectedShift._id,updatedData: dataToSubmit})):dispatch(createShift(dataToSubmit));
+    message.success(selectedShift ? "Shift updated successfully!" : "Shift added successfully!");
+    form.resetFields(); // Clear the form after successful submission
+    if (onSave) onSave();
   };
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden">
-      <form onSubmit={handleSubmit} className="p-4">
-        <div className="space-y-6">
-          {/* Shift Name */}
-          <div className="bg-blue-50 p-3 rounded-md">
-            <h3 className="text-blue-800 font-medium mb-3">Shift Name</h3>
-            <input
-              type="text"
-              id="shiftName"
-              name="shiftName"
-              value={formData?.shiftName}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Shift Name"
-            />
-          </div>
-          {/* Shift Type */}
-          <div className="bg-purple-50 p-3 rounded-md">
-            <h3 className="text-purple-800 font-medium mb-3">Shift Type</h3>
-            <select
-              id="shift"
-              name="shift"
-              value={formData.shift}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
-            >
-              <option value="">Select a shift type</option>
-              <option value="morning">Morning</option>
-              <option value="afternoon">Afternoon</option>
-              <option value="evening">Evening</option>
-              <option value="night">Night</option>
-            </select>
-          </div>
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <Title level={3} className="mb-4">
+        {selectedShift ? "Edit Shift" : "Add Shift"}
+      </Title>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        className="space-y-4"
+      >
+        {/* Shift Name */}
+        <Form.Item
+          label="Shift Name"
+          name="shiftName"
+          rules={[{ required: true, message: "Please enter a shift name." }]}
+        >
+          <Input placeholder="Enter shift name" />
+        </Form.Item>
 
-          {/* From Time */}
-          <div className="bg-green-50 p-3 rounded-md">
-            <h3 className="text-green-800 font-medium mb-3">From Time</h3>
-            <input
-              type="time"
-              id="fromTime"
-              name="fromTime"
-              value={formData.fromTime}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-            />
-          </div>
+        {/* Shift Type */}
+        <Form.Item
+          label="Shift Type"
+          name="shift"
+          rules={[{ required: true, message: "Please select a shift type." }]}
+        >
+          <Select placeholder="Select a shift type">
+            <Option value="morning">Morning</Option>
+            <Option value="afternoon">Afternoon</Option>
+            <Option value="evening">Evening</Option>
+            <Option value="night">Night</Option>
+          </Select>
+        </Form.Item>
 
-          {/* To Time */}
-          <div className="bg-green-50 p-3 rounded-md">
-            <h3 className="text-green-800 font-medium mb-3">To Time</h3>
-            <input
-              type="time"
-              id="toTime"
-              name="toTime"
-              value={formData.toTime}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
-            />
-          </div>
+        {/* From Time */}
+        <Form.Item
+          label="From Time"
+          name="fromTime"
+          rules={[{ required: true, message: "Please select a from time." }]}
+        >
+          <TimePicker format="HH:mm" style={{ borderColor: "pink" }} />
+        </Form.Item>
 
-          {/* Deactivate Shift */}
-          {/* {initialData && (
-            <div className="bg-red-50 p-3 rounded-md">
-              <h3 className="text-red-800 font-medium mb-3">
-                Deactivate Shift
-              </h3>
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="deactivateShift"
-                  name="deactivateShift"
-                  checked={formData.deactivateShift}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-red-600"
-                />
-                <label
-                  htmlFor="deactivateShift"
-                  className="ml-2 text-sm text-gray-700"
-                >
-                  Mark as Inactive
-                </label>
-              </div>
-            </div>
-          )} */}
-        </div>
+        {/* To Time */}
+        <Form.Item
+          label="To Time"
+          name="toTime"
+          rules={[
+            { required: true, message: "Please select a to time." },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                const fromTime = getFieldValue("fromTime");
+                if (!value || !fromTime || value.isAfter(fromTime)) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error("To Time must be after From Time.")
+                );
+              },
+            }),
+          ]}
+        >
+          <TimePicker format="HH:mm" style={{ borderColor: "pink" }} />
+        </Form.Item>
+
+        {/* Deactivate Shift */}
+        {selectedShift && (
+          <Form.Item
+            label="Deactivate Shift"
+            name="deactivateShift"
+            valuePropName="checked"
+          >
+            <Switch />
+          </Form.Item>
+        )}
 
         {/* Buttons */}
-        <div className="flex justify-end space-x-3 mt-6">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            {initialData ? "Edit Shift" : "Save Shift"}
-          </button>
-        </div>
-      </form>
+        <Form.Item>
+          <Space>
+            <Button
+              onClick={handleClose}
+              style={{
+                backgroundColor: "#ff85c0",
+                borderColor: "#ff69b4",
+                color: "white",
+              }}
+              className="hover:bg-pink-400 hover:border-pink-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{
+                backgroundColor: "#ff85c0",
+                borderColor: "#ff69b4",
+                color: "white",
+              }}
+              className="hover:bg-pink-400 hover:border-pink-300"
+            >
+              {selectedShift ? "Update Shift" : "Save Shift"}
+            </Button>
+          </Space>
+        </Form.Item>
+      </Form>
     </div>
   );
 };

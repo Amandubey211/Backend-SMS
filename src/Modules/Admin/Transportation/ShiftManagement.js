@@ -41,7 +41,7 @@ const ShiftManagement = () => {
             <div className="mb-4 flex gap-4">
               <button
                 onClick={handleCreateNew}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 text-white rounded-lg "
               >
                 Add Shift
               </button>
@@ -51,7 +51,7 @@ const ShiftManagement = () => {
 
           <Sidebar
             isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
+            onClose={() =>{ setIsSidebarOpen(false)}}
             title={selectedShift ? "Edit Shift" : "Add New Shift"}
             width="30%"
           >

@@ -1,8 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Space, Button, Input, Empty, Spin } from "antd";
-import { DownOutlined, UpOutlined, CarOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Tag,
+  Button,
+  Input,
+  Empty,
+  Spin,
+  Typography,
+  Card,
+  Select,
+  Row,
+  Col,
+} from "antd";
+import {
+  DownOutlined,
+  UpOutlined,
+  CarOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { getSchedules } from "../../Store/Slices/Transportation/Schedule/schedule.action";
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const ScheduleList = () => {
   const { loading, error, schedules } = useSelector(
@@ -12,68 +32,70 @@ const ScheduleList = () => {
 
   const [expandedRowKeys, setExpandedRowKeys] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [shiftFilter, setShiftFilter] = useState("");
 
-  // Fetch schedules
   useEffect(() => {
     dispatch(getSchedules());
   }, [dispatch]);
 
-  // Handle row expansion (ensure only one row is expanded at a time)
   const handleExpand = (exp, record) => {
-    setExpandedRowKeys(exp ? [record._id] : []); // Only expand the clicked row
+    setExpandedRowKeys(exp ? [record._id] : []);
   };
 
-  // Filter schedules based on search text
+  const handleResetFilters = () => {
+    setSearchText("");
+    setShiftFilter("");
+  };
+
   const filteredSchedules = schedules?.filter((schedule) => {
     const q = searchText.toLowerCase();
-    return (
+    const matchesSearch =
       schedule.shift?.toLowerCase().includes(q) ||
       schedule.fromTime?.toLowerCase().includes(q) ||
-      schedule.toTime?.toLowerCase().includes(q)
-    );
+      schedule.toTime?.toLowerCase().includes(q);
+    const matchesShift = shiftFilter ? schedule.shift === shiftFilter : true;
+    return matchesSearch && matchesShift;
   });
 
-  // Expanded row render for vehicle details
-  const expandedRowRender = (record) =>
-    !record.vehicles.length ? (
-      <div className="p-4 text-center">
+  const expandedRowRender = (record) => (
+    <Card className="bg-gray-50 shadow-md">
+      {!record.vehicles.length ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description="No vehicles assigned"
-        >
-        </Empty>
-      </div>
-    ) : (
-      <Table
-        size="small"
-        pagination={false}
-        rowKey="vehicleId"
-        dataSource={record.vehicles}
-        columns={[
-          {
-            title: "Vehicle",
-            dataIndex: "vehicleNumber",
-            render: (text) => <strong>{text}</strong>,
-          },
-          {
-            title: "Type",
-            dataIndex: "vehicleType",
-          },
-          {
-            title: "Capacity",
-            dataIndex: "seatingCapacity",
-            render: (capacity) => `${capacity} seats`,
-          },
-          {
-            title: "Driver",
-            dataIndex: "driverName",
-            render: (driver) => driver || "N/A",
-          },
-        ]}
-      />
-    );
+        />
+      ) : (
+        <Table
+          size="small"
+          pagination={false}
+          rowKey="vehicleId"
+          dataSource={record.vehicles}
+          columns={[
+            {
+              title: "Vehicle Number",
+              dataIndex: "vehicleNumber",
+              render: (text) => <strong>{text}</strong>,
+            },
+            {
+              title: "Type",
+              dataIndex: "vehicleType",
+            },
+            {
+              title: "Capacity",
+              dataIndex: "seatingCapacity",
+              render: (capacity) => `${capacity} seats`,
+            },
+            {
+              title: "Driver",
+              dataIndex: "driverName",
+              render: (driver) => driver || "N/A",
+            },
+          ]}
+        />
+      )}
+    </Card>
+  );
 
-  // Columns for the schedule table
   const columns = [
     {
       title: "Shift",
@@ -109,27 +131,54 @@ const ScheduleList = () => {
     {
       title: "Vehicles",
       render: (_, record) => (
-        <div className="flex items-center">
-          <CarOutlined className="mr-1" />
+        <Tag icon={<CarOutlined />} color="blue">
           {record.vehicles.length}
-        </div>
+        </Tag>
       ),
     },
   ];
 
   return (
-    <div>
-      {/* Search Bar */}
-      <Input
-        prefix={<SearchOutlined />}
-        allowClear
-        placeholder="Search schedules..."
-        value={searchText}
-        onChange={(e) => setSearchText(e.target.value)}
-        className="mb-6 w-full"
-      />
+    <div className="p-6 bg-white rounded-lg shadow-md">
+      <Title level={3} className="mb-4">
+        Transportation Schedules
+      </Title>
 
-      <Spin spinning={loading}>
+      <Row gutter={[16, 16]} className="mb-4">
+        <Col xs={24} sm={12} md={8}>
+          <Input
+            prefix={<SearchOutlined />}
+            allowClear
+            placeholder="Search schedules..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            style={{ width: "100%" }}
+          />
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Select
+            placeholder="Filter by Shift"
+            allowClear
+            value={shiftFilter}
+            onChange={(value) => setShiftFilter(value)}
+            style={{ width: "100%" }}
+          >
+            <Option value="">All</Option>
+            {[...new Set(schedules?.map((s) => s.shift))].map((shift) => (
+              <Option key={shift} value={shift}>
+                {shift}
+              </Option>
+            ))}
+          </Select>
+        </Col>
+        <Col xs={24} sm={12} md={8}>
+          <Button type="default" onClick={handleResetFilters} block>
+            Reset Filters
+          </Button>
+        </Col>
+      </Row>
+
+      <Spin spinning={loading} tip="Loading schedules...">
         {error ? (
           <Empty description="Failed to load schedules">
             <Button type="primary" onClick={() => dispatch(getSchedules())}>
@@ -139,7 +188,7 @@ const ScheduleList = () => {
         ) : (
           <Table
             rowKey="_id"
-            pagination={false}
+            pagination={{ pageSize: 5 }}
             dataSource={filteredSchedules}
             columns={columns}
             expandable={{

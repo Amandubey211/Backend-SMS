@@ -1,8 +1,6 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import Navbar from "../Common/Navbar";
 import SideMenubar from "./SideMenubar";
-import { Toaster } from "react-hot-toast";
 
 const ParentDashLayout = ({
   children,
@@ -10,10 +8,11 @@ const ParentDashLayout = ({
   hideAvatarList,
   hideStudentView,
 }) => {
-  const isSidebarOpen = useSelector((state) => state.common.user.sidebar.isOpen);
+  const isSidebarOpen = useSelector(
+    (state) => state.common.user.sidebar.isOpen
+  );
   return (
     <div className="flex w-full h-full  ">
-     <Toaster />
       <SideMenubar />
 
       <div
