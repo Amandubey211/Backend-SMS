@@ -15,6 +15,7 @@ const StudentDashLayout = ({
 
   return (
     <div className="flex w-full h-screen overflow-hidden bg-white">
+
       {/* Sidebar */}
       <SideMenubar isOpen={isSidebarOpen} />
 

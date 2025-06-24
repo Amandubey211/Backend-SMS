@@ -39,13 +39,27 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     )
   );
 
+  // Define the correct day order
+  const dayOrder = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+  // Get unique days and sort them according to dayOrder
   const uniqueDays = Array.from(
     new Set(
       allSubjectsTiming
         .flatMap((item) => item?.days || [])
         .filter((day) => day && typeof day === "string")
+        .map(day => day.toLowerCase()) // Normalize to lowercase
     )
-  ).sort();
+  ).sort((a, b) => {
+    const indexA = dayOrder.indexOf(a);
+    const indexB = dayOrder.indexOf(b);
+    
+    // Handle days not in the predefined order
+    if (indexA === -1) return 1; // Push unknown days to end
+    if (indexB === -1) return -1; 
+    
+    return indexA - indexB;
+  });
 
   const dataSource = uniqueClassesSections.map((clsSection) => {
     const [className, sectionName] = clsSection.split("::");
@@ -57,7 +71,7 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
           (item) =>
             item?.class === className &&
             item?.section === sectionName &&
-            item?.days?.includes(day)
+            item?.days?.some(d => d.toLowerCase() === day) // Case-insensitive match
         )
         .sort((a, b) => {
           const timeA = a.timing?.startTime || "00:00";
@@ -73,7 +87,7 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
             >
               <Badge
                 count={subject.subjectName || "No Subject"}
-                style={{ backgroundColor: "#673ab7",borderRadius:'6px' }}
+                style={{ backgroundColor: "#673ab7", borderRadius: '6px' }}
               />
               <span className="text-sm text-gray-600 mt-1">
                 {subject.timing?.startTime || "??"} -{" "}
@@ -118,7 +132,7 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     "Teacher";
 
   return (
-    <div className="p-6 bg-gradient-to-br from-purple-100 to-pink-100 rounded-md shadow-lg">
+    <div className="rounded-md shadow-lg">
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <Spin size="large" />

@@ -41,8 +41,9 @@ const RecentInvoiceTemplate = forwardRef((props, ref) => {
     totalPaid += item.paid_amount || 0;
     totalRemaining += item.remaining_amount || 0;
     totalTax += roundToFive(((item.rate * item.quantity) / 100) * item.tax || 0);
-    totalPenalty += roundToFive(item.penalty_amount || 0);
+    totalPenalty = roundToFive(item.penalty_amount || 0);
     const newAmount = (item.rate * item.quantity) + totalPenalty + totalTax
+
     totalDiscount +=
       item.discountType === "percentage"
         ? roundToFive((newAmount * item.discount) / 100)

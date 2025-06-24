@@ -722,7 +722,9 @@ export default function TimeTableDash() {
     <div className="w-full min-h-screen flex">
       {/* Main Content */}
       <div
-        className={`flex-1 p-4 transition-all ${sidebarCollapsed ? "mr-0" : "mr-72"
+        className={`flex-1 p-4 transition-all ${
+    activeTab === "list" && !sidebarCollapsed ? "mr-72" : "mr-0"
+  }"
           }`}
       >
         {/* Header & Top Controls */}
@@ -903,7 +905,7 @@ export default function TimeTableDash() {
       </div>
 
       {/* Sidebar Stats */}
-      {!sidebarCollapsed && (
+      {(!sidebarCollapsed && activeTab === "list") && (
         <div className="w-64 border-l p-4 bg-white flex flex-col justify-between fixed right-0 h-full overflow-y-auto">
           {loadingFetch ? (
             <div className="space-y-4">

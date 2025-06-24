@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 
 const EntityCardSection = () => {
+   const currency = useSelector((store) => store.common.user.userDetails.currency);
  const {  paidAllAmount, totalAllAmount, } = useSelector(
      (state) => state.admin.entityRevenue
    );
@@ -16,16 +17,19 @@ const EntityCardSection = () => {
     {
       title: "Total Collected Amount",
       value: formatAmount(paidAllAmount),
+      currency:currency,
       icon: <FaDollarSign />, 
     },
     {
       title: "Amount Not Collected",
       value: formatAmount(totalAllAmount -paidAllAmount),
+       currency:currency,
       icon: <FaExclamationCircle />, 
     },
     {
       title: "Total Amount",
       value: formatAmount(totalAllAmount),
+       currency:currency,
       icon: <FaWallet />, 
     },
   ];

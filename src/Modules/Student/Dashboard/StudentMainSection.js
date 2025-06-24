@@ -47,7 +47,6 @@ const StudentMainSection = () => {
     tasks,
     examResults: results,
   } = useSelector((state) => state.student.studentDashboard);
-  console.log(cardData, "cardDatacardData");
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo
   );
