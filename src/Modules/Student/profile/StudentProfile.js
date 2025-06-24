@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import profileIcon from "../../../Assets/DashboardAssets/profileIcon.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import StudentDashLayout from "../../../Components/Student/StudentDashLayout";
@@ -22,7 +22,7 @@ import useNavHeading from "../../../Hooks/CommonHooks/useNavHeading ";
 const StudentProfile = () => {
   const { userDetails, status } = useSelector((store) => store.common.user);
   const dispatch = useDispatch();
-  useNavHeading("Student","Profile")
+  useNavHeading("Student", "Profile");
 
   // ---------------------------
   // Password Update Logic
@@ -151,7 +151,6 @@ const StudentProfile = () => {
 
   return (
     <StudentDashLayout>
-      <Toaster />
       <div className="flex flex-col w-full gap-6">
         {/* Profile Header Section */}
         <div className="relative bg-white shadow rounded-lg p-6 m-2">
