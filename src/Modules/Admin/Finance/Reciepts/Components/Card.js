@@ -1,6 +1,6 @@
 import React from "react";
 
-const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
+const Card = ({ title, count,currency, color, textColor, customContent, tag, icon }) => {
   return (
     <div
       className={`rounded-lg p-6 shadow-md border cursor-pointer hover:shadow-lg transform transition-transform duration-300 hover:scale-105`}
@@ -21,7 +21,7 @@ const Card = ({ title, count, color, textColor, customContent, tag, icon }) => {
       ) : (
         <div className="mt-4">
           <p className="text-2xl font-bold text-purple-800 px-2">
-            {count}{" "}
+            {count}{" "}{currency}
             <span
               className={`${
                 tag === "receipts" || tag === "receipt"

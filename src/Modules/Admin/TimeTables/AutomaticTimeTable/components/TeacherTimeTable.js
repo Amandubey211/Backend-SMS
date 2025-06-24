@@ -132,7 +132,7 @@ const TeacherTimeTable = ({ selectedTeacher }) => {
     "Teacher";
 
   return (
-    <div className="p-6 bg-gradient-to-br from-purple-100 to-pink-100 rounded-md shadow-lg">
+    <div className="rounded-md shadow-lg">
       {loading ? (
         <div className="flex justify-center items-center h-64">
           <Spin size="large" />
