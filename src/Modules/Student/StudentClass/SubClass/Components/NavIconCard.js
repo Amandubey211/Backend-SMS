@@ -14,7 +14,7 @@ const NavIconCard = ({
     <div
       onClick={onClick}
       className="
-        w-[24%] h-36 
+        w-[23%] h-36 
         flex items-center justify-center 
         border rounded-lg 
         transform transition duration-300 ease-in-out 

@@ -1,71 +1,95 @@
+// AllSubjects.jsx
 import React from "react";
 import { GoAlertFill } from "react-icons/go";
-import subjectIcon from "../../../../../Assets/DashboardAssets/subject.webp";
+import fallbackSubjectIcon from "../../../../../Assets/DashboardAssets/subject.webp";
 
-const AllSubjects = ({ subjects }) => {
-  const progressBarColors = ["#7C3AED", "#EF4444", "#3B82F6", "#F97316"];
+const AllSubjects = ({ subjects = [] }) => {
+  /* ---------- helpers ---------- */
+  const formatPercentage = (val) => Number.parseFloat(val ?? 0).toFixed(1);
 
+  const formatDate = (iso) =>
+    new Date(iso).toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+
+  /* ---------- ui ---------- */
   return (
     <div className="mt-1 h-full">
-      {subjects && subjects.length > 0 ? (
-        <div
-        className="
-        mt-4 
-        h-full
-        overflow-y-hidden group 
-        rounded 
-        scrollbar-hide 
-        hover:overflow-y-auto hover:scrollbar-auto
-      "
-        >
-          {subjects.map((subject, index) => {
-            const progressBarColor =
-              progressBarColors[index % progressBarColors.length];
+      {subjects.length ? (
+        <div className="mt-4 h-full overflow-y-hidden group rounded hover:overflow-y-auto no-scrollbar p-1  hover:scrollbar-auto">
+          {subjects.map((subject) => {
+            const pct       = formatPercentage(subject.percentageValue);
+            const barColor  = subject.subjectColor || "#7C3AED";
+            const iconSrc   = subject.subjectIcon  || fallbackSubjectIcon;
 
             return (
-              <div key={subject._id} className="subject-card mb-1 py-4 border-t">
+              <article
+                key={subject.subjectId || subject._id}
+                tabIndex={0}
+                aria-labelledby={`subject-${subject.subjectId}-title`}
+                /* Tailwind ring utilities will pick up --tw-ring-color */
+                style={{
+                  borderLeftColor: barColor,
+                  "--tw-ring-color": barColor,
+                }}
+                className="
+                  mb-2 py-4 pl-4 pr-2
+                  rounded-md border-t border-l-4 bg-white
+                  hover:shadow transition-shadow
+                  focus:outline-none focus:ring-2
+                "
+              >
+                {/* header */}
                 <div className="flex items-center mb-2">
                   <img
-                    src={
-                      subjectIcon ||
-                      "https://foundr.com/wp-content/uploads/2023/04/How-to-create-an-online-course.jpg.webp"
-                    }
-                    alt="subject"
-                    className="w-12 h-12 rounded mr-4"
+                    src={iconSrc}
+                    alt={`${subject.subjectName} icon`}
+                    className="w-12 h-12 rounded mr-4 object-cover flex-shrink-0"
                   />
                   <div>
-                    <h3 className="text-md font-semibold text-gray-700">
-                      {subject?.subjectName}
+                    <h3
+                      id={`subject-${subject.subjectId}-title`}
+                      className="text-md font-semibold text-gray-800"
+                    >
+                      {subject.subjectName}
                     </h3>
                     <p className="text-xs text-gray-500">
-                      Started: {subject?.started?.slice(0, 10)}
+                      Started:&nbsp;{formatDate(subject.started)}
                     </p>
                   </div>
                 </div>
 
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                {/* progress bar */}
+                <div
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={Number(pct)}
+                  aria-label={`${pct}% completed`}
+                  className="relative w-full bg-gray-200 rounded-full h-2"
+                >
                   <div
                     className="h-2 rounded-full"
-                    style={{
-                      width: `${subject?.percentageValue}%`,
-                      backgroundColor: progressBarColor,
-                    }}
-                  ></div>
+                    style={{ width: `${pct}%`, backgroundColor: barColor }}
+                  />
                 </div>
 
-                <div className="mt-2 flex justify-between text-sm text-gray-500">
+                {/* footer */}
+                <div className="mt-2 flex justify-between text-sm text-gray-600">
                   <span>
-                    {subject?.completedModule}/{subject?.totalModule} Modules
+                    {subject.completedModule}/{subject.totalModule} Modules
                   </span>
-                  <span>{subject?.percentageValue}%</span>
+                  <span>{pct}%</span>
                 </div>
-              </div>
+              </article>
             );
           })}
         </div>
       ) : (
-        <div className="flex w-full h-full text-gray-500 items-center justify-center flex-col text-2xl mt-4 mb-8">
-          <GoAlertFill className="text-[4rem]" />
+        <div className="flex w-full h-full items-center justify-center flex-col mt-4 mb-8 text-gray-500">
+          <GoAlertFill className="text-[4rem]" aria-hidden="true" />
           <span className="mt-2 text-xl font-semibold text-center">
             No Data Found
           </span>

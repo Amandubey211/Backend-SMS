@@ -1,16 +1,13 @@
-// MainSection.jsx
 import React, { useEffect, useState } from "react";
 import NavIconCard from "./Components/NavIconCard";
 import { FaSchool } from "react-icons/fa";
 import { SlEyeglass } from "react-icons/sl";
 import { FcGraduationCap, FcCalendar } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
-import { GoAlertFill } from "react-icons/go";
 import Spinner from "../../../../Components/Common/Spinner";
 import NoDataFound from "../../../../Components/Common/NoDataFound";
 import { stdClass } from "../../../../Store/Slices/Student/MyClass/Class/class.action";
 import SubjectCard from "./SubjectCard";
-import { Modal } from "antd";
 import SectionGroupModal from "./Components/Section/SectionModal";
 import { setShowError } from "../../../../Store/Slices/Common/Alerts/alertsSlice";
 import OfflineModal from "../../../../Components/Common/Offline";
