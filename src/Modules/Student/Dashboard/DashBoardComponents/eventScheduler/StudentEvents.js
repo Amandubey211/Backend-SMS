@@ -11,6 +11,7 @@ import {
   setSelectedMonthYear,
 } from "../../../../../Store/Slices/Student/Noticeboard/eventsSlice";
 import { Tooltip } from "antd";
+import { useNavigate } from "react-router-dom";
 
 const localizer = momentLocalizer(moment);
 
@@ -32,7 +33,7 @@ const StudentEvents = () => {
     (store) => store.student.studentEvent
   );
   const [eventIndex, setEventIndex] = useState(0);
-
+  const navigate = useNavigate();
   // Local state to store the random color class for the selected event(s)
   const [bgColor, setBgColor] = useState("bg-gray-200");
 
@@ -105,8 +106,8 @@ const StudentEvents = () => {
       newMonth > 11
         ? selectedMonthYear.year + 1
         : newMonth < 0
-          ? selectedMonthYear.year - 1
-          : selectedMonthYear.year;
+        ? selectedMonthYear.year - 1
+        : selectedMonthYear.year;
     const adjustedMonth = newMonth > 11 ? 0 : newMonth < 0 ? 11 : newMonth;
     dispatch(
       setSelectedMonthYear({
@@ -140,6 +141,15 @@ const StudentEvents = () => {
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
       {/* Month Navigation */}
+      <div className="flex justify-between items-center mb-2">
+        <span className=" font-bold ">Events</span>
+        <span
+          className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] bg-clip-text text-transparent font-normal cursor-pointer"
+          onClick={() => navigate("/student/noticeboard/events")}
+        >
+          View All
+        </span>
+      </div>
       <div className="flex justify-center items-center gap-8 p-4 bg-gray-100 rounded-lg mb-4">
         <button
           className="p-1 border rounded-full hover:bg-gray-700 hover:text-white"
@@ -210,9 +220,7 @@ const StudentEvents = () => {
                         {moment(event.start).format("ddd, MMM D, YYYY")} (
                         {event.time})
                       </h3>
-                      <div
-                        className="text-gray-700 text-xs"
-                      >
+                      <div className="text-gray-700 text-xs">
                         {event.description}
                       </div>
                     </div>
@@ -222,20 +230,22 @@ const StudentEvents = () => {
             {selectedEvent.length > 1 && (
               <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-2">
                 <button
-                  className={`p-1 bg-gray-300 rounded-full ${eventIndex === 0
+                  className={`p-1 bg-gray-300 rounded-full ${
+                    eventIndex === 0
                       ? "opacity-50 cursor-not-allowed"
                       : "cursor-pointer"
-                    }`}
+                  }`}
                   onClick={() => handleEventScroll(-1)}
                   disabled={eventIndex === 0}
                 >
                   <IoIosArrowBack />
                 </button>
                 <button
-                  className={`p-1 bg-gray-300 rounded-full ${eventIndex === selectedEvent.length - 1
+                  className={`p-1 bg-gray-300 rounded-full ${
+                    eventIndex === selectedEvent.length - 1
                       ? "opacity-50 cursor-not-allowed"
                       : "cursor-pointer"
-                    }`}
+                  }`}
                   onClick={() => handleEventScroll(1)}
                   disabled={eventIndex === selectedEvent.length - 1}
                 >

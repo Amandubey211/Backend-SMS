@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AiOutlineBook } from "react-icons/ai";
-import { IoNewspaperOutline } from "react-icons/io5";
-import { CiMoneyBill } from "react-icons/ci";
+
 import DashCard from "./Dashcard.js";
 import AllSubjects from "./DashBoardComponents/allSubjects/AllSubjects.js";
 import AttendanceDashboard from "./DashBoardComponents/Charts/AttendanceDashboard.js";
@@ -19,16 +18,8 @@ import {
   fetchExamResults,
 } from "../../../Store/Slices/Student/Dashboard/studentDashboard.action.js";
 import { fetchStudentSubjectProgress } from "../../../Store/Slices/Admin/Users/Students/student.action.js";
-import ExamResults from "./DashboardData/ExamResults.js";
 import StudentEvents from "./DashBoardComponents/eventScheduler/StudentEvents.js";
-import { FaMoneyBillWave, FaMoneyCheckAlt } from "react-icons/fa";
-import FeeCard from "../Finance/FeeCard.js";
-import {
-  MdAttachMoney,
-  MdEvent,
-  MdNotifications,
-  MdOutlineSchool,
-} from "react-icons/md";
+
 import { fetchOneStudentFee } from "../../../Store/Slices/Finance/StudentFees/studentFeesThunks.js";
 
 const StudentMainSection = () => {
@@ -162,7 +153,7 @@ const StudentMainSection = () => {
       {/* Right Section */}
       <div className="flex flex-col w-[35%] mr-4">
         {/* Event Section */}
-        <div className="w-full px-4 py-3 h-[510px] bg-white rounded-md mt-3 border hover:shadow-sm">
+        <div className="w-full px-4 py-3 h-[550px] bg-white rounded-md mt-3 border hover:shadow-sm">
           <StudentEvents />
         </div>
         {/* Notice Board */}
