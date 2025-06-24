@@ -1,300 +1,255 @@
 import { useEffect, useState } from "react";
+import { Form, Input, Select, Checkbox, Button } from "antd";
+import { useTranslation } from "react-i18next";
+
+const { Option } = Select;
 
 const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => {
-  // Local state for live typing
-  const [localVehicleData, setLocalVehicleData] = useState(vehicleData);
+  const { t } = useTranslation("transportation");
+  const [form] = Form.useForm();
 
-  // Whenever props.vehicleData changes (like on Edit click), update local form state
+  // Sync initial form values with vehicleData
   useEffect(() => {
-    setLocalVehicleData(vehicleData);
-  }, [vehicleData]);
+    form.setFieldsValue({
+      vehicleType: vehicleData?.vehicleType || undefined,
+      customVehicleType: vehicleData?.customVehicleType || "",
+      vehicleNumber: vehicleData?.vehicleNumber || "",
+      seatingCapacity: vehicleData?.seatingCapacity || "",
+      status: vehicleData?.status || "active",
+      fuelType: vehicleData?.fuelType || undefined,
+      vehicleCategory: vehicleData?.vehicleCategory || undefined,
+      customVehicleCategory: vehicleData?.customVehicleCategory || "",
+      cameraInstalled: vehicleData?.cameraInstalled || false,
+      firstAidAvailable: vehicleData?.firstAidAvailable || false,
+      speedGovernorInstalled: vehicleData?.speedGovernorInstalled || false,
+      vehicleName: vehicleData?.vehicleName || "",
+    });
+  }, [vehicleData, form]);
 
-  // Handle local change and update parent
-  const handleLocalChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-
-    setLocalVehicleData((prev) => ({
-      ...prev,
-      [name]: newValue,
-    }));
-
-    // Call parent handleChange to update the main vehicleData too
-    handleChange(e);
+  const validateVehicleNumber = (_, value) => {
+    const vehicleNumberRegex = /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/;
+    if (value && !vehicleNumberRegex.test(value)) {
+      return Promise.reject(new Error("Vehicle number must be in format XXDDXXDDDD (e.g., GJ01WQ4565) with uppercase letters for the first and third parts"));
+    }
+    return Promise.resolve();
   };
 
-  // Dropdown options
-  const vehicleTypes = ["Bus", "Van", "Cab", "Others"];
-  const fuelTypes = ["Diesel", "Petrol", "CNG", "Electric", "Hybrid"];
+  // Handle form submission with custom logic for vehicleType and vehicleCategory
+  const onFinish = (values) => {
+    let transformedValues = {
+      ...values,
+      vehicleType: values.vehicleType.toLowerCase(),
+      fuelType: values.fuelType.toLowerCase(),
+      vehicleCategory: values.vehicleCategory ? values.vehicleCategory.toLowerCase() : "",
+      status: values.status.toLowerCase(),
+    };
+
+    // Only include customVehicleType if vehicleType is "other" and a custom value is provided
+    if (values.vehicleType === "other" && values.customVehicleType) {
+      transformedValues.customVehicleType = values.customVehicleType;
+    } else {
+      delete transformedValues.customVehicleType; // Remove customVehicleType if not "other" or no custom value
+    }
+
+    // Only include customVehicleCategory if vehicleCategory is "other" and a custom value is provided
+    if (values.vehicleCategory === "other" && values.customVehicleCategory) {
+      transformedValues.customVehicleCategory = values.customVehicleCategory;
+    } else {
+      delete transformedValues.customVehicleCategory; // Remove customVehicleCategory if not "other" or no custom value
+    }
+
+    handleSubmit(transformedValues);
+  };
+
+  // Handle local change and update parent
+  const handleLocalChange = (changedValues, allValues) => {
+    const transformedValues = {
+      ...allValues,
+      vehicleType: allValues.vehicleType ? allValues.vehicleType.toLowerCase() : "",
+      fuelType: allValues.fuelType ? allValues.fuelType.toLowerCase() : "",
+      vehicleCategory: allValues.vehicleCategory ? allValues.vehicleCategory.toLowerCase() : "",
+      status: allValues.status ? allValues.status.toLowerCase() : "",
+    };
+    handleChange({ target: { name: Object.keys(changedValues)[0], value: transformedValues[Object.keys(changedValues)[0]] } });
+  };
+
+  // Dropdown options (display capitalized, send lowercase)
+  const vehicleTypes = ["bus", "van", "auto", "cab", "e-rickshaw", "other"];
+  const fuelTypes = ["diesel", "petrol", "cng", "electric", "hybrid"];
   const vehicleCategories = [
-    "AC", "Non-AC", "Sleeper", "Semi-Sleeper", "Mini",
-    "Double-Decker", "Hatchback", "Sedan",
-    "Open", "Cargo", "Others"
+    "ac",
+    "non-ac",
+    "sleeper",
+    "semi-sleeper",
+    "mini",
+    "double-decker",
+    "hatchback",
+    "sedan",
+    "e-rickshaw",
+    "open",
+    "cargo",
+    "other",
   ];
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSubmit(localVehicleData);  // <-- Pass the LIVE DATA here!
-      }}
+    <Form
+      form={form}
+      name="vehicleForm"
+      onFinish={onFinish}
+      onValuesChange={handleLocalChange}
+      layout="vertical"
       className="space-y-6"
+      initialValues={{
+        vehicleType: undefined, // Use undefined to show placeholder
+        customVehicleType: "",
+        vehicleNumber: "",
+        seatingCapacity: "",
+        status: "active",
+        fuelType: undefined, // Use undefined to show placeholder
+        vehicleCategory: undefined, // Use undefined to show placeholder
+        customVehicleCategory: "",
+        cameraInstalled: false,
+        firstAidAvailable: false,
+        speedGovernorInstalled: false,
+        vehicleName: "",
+      }}
     >
-      
-
       {/* Vehicle Information Section */}
-      <div className="bg-blue-50 p-3 rounded-md mb-4">
-        <h3 className="text-md font-medium text-blue-800 mb-3">Vehicle Information</h3>
+      <div className="bg-blue-50 p-4 rounded-md">
+        <h3 className="text-md font-medium text-blue-800 mb-3">{t("Vehicle Information")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* Vehicle Type */}
-          <div>
-            <label htmlFor="vehicleType" className="block text-sm font-medium text-gray-700 mb-1">
-              Vehicle Type *
-            </label>
-            <select
-              id="vehicleType"
-              name="vehicleType"
-              value={localVehicleData.vehicleType}
-              onChange={handleLocalChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            >
-              <option value="" disabled>Select vehicle type</option>
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Type")} *</span>}
+            name="vehicleType"
+            rules={[{ required: true, message: `${t("vehicleType")} is required` }]}
+          >
+            <Select placeholder={t("Select Vehicle Type")} allowClear>
               {vehicleTypes.map((type) => (
-                <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                <Option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Option>
               ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="vehicleName" className="block text-sm font-medium text-gray-700 mb-1">
-              Vehicle Name & Model
-            </label>
-            <input
-              type="text"
-              id="vehicleName"
-              name="vehicleName"
-              value={localVehicleData?.vehicleName}
-              onChange={handleLocalChange}
-              placeholder="Enter Vehicle Name & Model"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            />
-          </div>
-          {/* Custom Vehicle Type */}
-          {localVehicleData.vehicleType === "Others" && (
-            <div>
-              <label htmlFor="customVehicleType" className="block text-sm font-medium text-gray-700 mb-1">
-                Custom Vehicle Type *
-              </label>
-              <input
-                type="text"
-                id="customVehicleType"
-                name="customVehicleType"
-                value={localVehicleData.customVehicleType}
-                onChange={handleLocalChange}
-                placeholder="Enter custom vehicle type"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                required
-              />
-            </div>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Name")} *</span>}
+            name="vehicleName"
+            rules={[{ required: true, message: `${t("vehicleName")} is required` }]}
+          >
+            <Input placeholder={t("Enter Vehicle Name")} />
+          </Form.Item>
+          {form.getFieldValue("vehicleType") === "other" && (
+            <Form.Item
+              label={<span className="text-sm font-medium text-gray-700">{t("Custom Vehicle Type")} *</span>}
+              name="customVehicleType"
+              rules={[{ required: true, message: `${t("Custom Vehicle Type")} is required` }]}
+            >
+              <Input placeholder={t("Enter Custom Vehicle Type")} />
+            </Form.Item>
           )}
-
-          {/* Vehicle Number */}
-          <div>
-            <label htmlFor="vehicleNumber" className="block text-sm font-medium text-gray-700 mb-1">
-              Vehicle Number *
-            </label>
-            <input
-              type="text"
-              id="vehicleNumber"
-              name="vehicleNumber"
-              value={localVehicleData.vehicleNumber}
-              onChange={handleLocalChange}
-              placeholder="Enter vehicle number (e.g., KA-01-1234)"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Number")} *</span>}
+            name="vehicleNumber"
+            rules={[
+              { required: true, message: `${t("Vehicle Number")} is required` },
+              // { validator: validateVehicleNumber },
+            ]}
+          >
+            <Input placeholder={t("Enter Vehicle Number")} />
+          </Form.Item>
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Seating Capacity")} *</span>}
+            name="seatingCapacity"
+            rules={[
+              { required: true, message: `${t("Seating Capacity")} is required` },
+            ]}
+          >
+            <Input type="number" placeholder={t("Enter Seating Capacity")} min={1}
+              onKeyDown={(e) => {
+                if (e.key === "-" || e.key === "e" || e.key === "E" || e.key === "+" || e.key === ".") {
+                  e.preventDefault();
+                }
+              }}
             />
-          </div>
-
-          {/* Seating Capacity */}
-          <div>
-            <label htmlFor="seatingCapacity" className="block text-sm font-medium text-gray-700 mb-1">
-              Seating Capacity *
-            </label>
-            <input
-              type="number"
-              id="seatingCapacity"
-              name="seatingCapacity"
-              value={localVehicleData.seatingCapacity}
-              onChange={handleLocalChange}
-              placeholder="Enter seating capacity"
-              min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          {/* Status */}
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-              Status *
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={localVehicleData.status}
-              onChange={handleLocalChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="under_maintenance">Under Maintenance</option>
-            </select>
-          </div>
-
-          {/* Fuel Type */}
-          <div>
-            <label htmlFor="fuelType" className="block text-sm font-medium text-gray-700 mb-1">
-              Fuel Type *
-            </label>
-            <select
-              id="fuelType"
-              name="fuelType"
-              value={localVehicleData.fuelType}
-              onChange={handleLocalChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-              required
-            >
-              <option value="" disabled>Select fuel type</option>
+          </Form.Item>
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Status")} *</span>}
+            name="status"
+            rules={[{ required: true, message: `${t("Status")} is required` }]}
+          >
+            <Select>
+              <Option value="active">{t("Active")}</Option>
+              <Option value="inactive">{t("Inactive")}</Option>
+              <Option value="under_maintenance">{t("Under Maintenance")}</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Fuel Type")} *</span>}
+            name="fuelType"
+            rules={[{ required: true, message: `${t("Fuel Type")} is required` }]}
+          >
+            <Select placeholder={t("Select Fuel Type")} allowClear>
               {fuelTypes.map((type) => (
-                <option key={type} value={type}>{type.charAt(0).toUpperCase() + type.slice(1)}</option>
+                <Option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </Option>
               ))}
-            </select>
-          </div>
-
+            </Select>
+          </Form.Item>
         </div>
       </div>
-
       {/* Vehicle Category Section */}
-      <div className="bg-green-50 p-3 rounded-md mb-4">
-        <h3 className="text-md font-medium text-green-800 mb-3">Vehicle Category</h3>
+      <div className="bg-green-50 p-4 rounded-md">
+        <h3 className="text-md font-medium text-green-800 mb-3">{t("Vehicle Category")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-          {/* Vehicle Category */}
-          <div>
-            <label htmlFor="vehicleCategory" className="block text-sm font-medium text-gray-700 mb-1">
-              Vehicle Category
-            </label>
-            <select
-              id="vehicleCategory"
-              name="vehicleCategory"
-              value={localVehicleData.vehicleCategory}
-              onChange={handleLocalChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-            >
-              <option value="">Select category</option>
+          <Form.Item
+            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Category")}</span>}
+            name="vehicleCategory"
+          >
+            <Select placeholder={t("Select Category")} allowClear>
               {vehicleCategories.map((category) => (
-                <option key={category} value={category}>
+                <Option key={category} value={category}>
                   {category.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
-                </option>
+                </Option>
               ))}
-            </select>
-          </div>
-
-          {/* Custom Vehicle Category */}
-          {localVehicleData.vehicleCategory === "other" && (
-            <div>
-              <label htmlFor="customVehicleCategory" className="block text-sm font-medium text-gray-700 mb-1">
-                Custom Vehicle Category *
-              </label>
-              <input
-                type="text"
-                id="customVehicleCategory"
-                name="customVehicleCategory"
-                value={localVehicleData.customVehicleCategory}
-                onChange={handleLocalChange}
-                placeholder="Enter custom vehicle category"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
-                required
-              />
-            </div>
+            </Select>
+          </Form.Item>
+          {form.getFieldValue("vehicleCategory") === "other" && (
+            <Form.Item
+              label={<span className="text-sm font-medium text-gray-700">{t("Custom Vehicle Category")} *</span>}
+              name="customVehicleCategory"
+              rules={[{ required: true, message: `${t("Custom Vehicle Category")} is required` }]}
+            >
+              <Input placeholder={t("Enter Custom Vehicle Category")} />
+            </Form.Item>
           )}
         </div>
       </div>
-
       {/* Safety Features Section */}
-      <div className="bg-yellow-50 p-3 rounded-md mb-4">
-        <h3 className="text-md font-medium text-yellow-800 mb-3">Safety Features</h3>
-        <div className="space-y-3">
-
-          {/* Camera Installed */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="cameraInstalled"
-              name="cameraInstalled"
-              checked={localVehicleData.cameraInstalled}
-              onChange={handleLocalChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="cameraInstalled" className="ml-2 block text-sm text-gray-700">
-              Camera Installed
-            </label>
-          </div>
-
-          {/* First Aid */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="firstAidAvailable"
-              name="firstAidAvailable"
-              checked={localVehicleData.firstAidAvailable}
-              onChange={handleLocalChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="firstAidAvailable" className="ml-2 block text-sm text-gray-700">
-              First Aid Available
-            </label>
-          </div>
-
-          {/* Speed Governor */}
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              id="speedGovernorInstalled"
-              name="speedGovernorInstalled"
-              checked={localVehicleData.speedGovernorInstalled}
-              onChange={handleLocalChange}
-              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-            />
-            <label htmlFor="speedGovernorInstalled" className="ml-2 block text-sm text-gray-700">
-              Speed Governor Installed
-            </label>
-          </div>
-
+      <div className="bg-yellow-50 p-4 rounded-md">
+        <h3 className="text-md font-medium text-yellow-800 mb-3">{t("Safety Features")}</h3>
+        <div className="flex flex-col gap-1">
+          <Form.Item name="cameraInstalled" valuePropName="checked">
+            <Checkbox>{t("Camera Installed")}</Checkbox>
+          </Form.Item>
+          <Form.Item name="firstAidAvailable" valuePropName="checked">
+            <Checkbox>{t("First Aid Available")}</Checkbox>
+          </Form.Item>
+          <Form.Item name="speedGovernorInstalled" valuePropName="checked">
+            <Checkbox>{t("Speed Governor Installed")}</Checkbox>
+          </Form.Item>
         </div>
       </div>
-
       {/* Form Actions */}
       <div className="flex justify-end space-x-3">
-        <button
-          type="button"
-          onClick={() => window.history.back()}
-          className="px-4 py-2 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-        >
-          {isEditing ? "Update Vehicle" : "Add Vehicle"}
-        </button>
+        <Button onClick={() => window.history.back()} className="border border-gray-300 rounded-md">
+          {t("Cancel")}
+        </Button>
+        <Button type="primary" htmlType="submit" className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600 transition duration-300">
+          {isEditing ? t("Update Vehicle") : t("Add Vehicle")}
+        </Button>
       </div>
-
-    </form>
+    </Form>
   );
 };
 

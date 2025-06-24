@@ -29,7 +29,6 @@ export const getAllShifts = createAsyncThunk(
     try {
       dispatch(setShowError(false));
       const data = await getData(`/transport/get-shifts`);
-      console.log("shift data ---->", data);
       return data;
     } catch (error) {
       console.error("Error in getAllShifts:", error);

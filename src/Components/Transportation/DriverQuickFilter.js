@@ -1,26 +1,50 @@
+import { Input, Select, Button } from "antd";
+
+const { Option } = Select;
+
 const DriverQuickFilter = ({ filterConfig, handleFilterChange, resetFilters, uniqueBusRoutes }) => (
-    <div className="bg-white p-3 rounded-md shadow-sm mb-4">
-        <div className="flex flex-wrap gap-2 items-center">
-            <input
+    <div className="bg-white p-3  mb-4">
+        <div className="flex justify-between  items-center">
+            <Input
                 type="text"
                 name="name"
                 value={filterConfig.name}
-                onChange={handleFilterChange}
+                onChange={(e) => handleFilterChange({ target: { name: "name", value: e.target.value } })}
                 placeholder="Search by driver name..."
-                className="w-full max-w-xs px-3 py-2 border rounded-md"
+                className="w-full max-w-xs"
+                allowClear
             />
-            <select name="status" value={filterConfig.status} onChange={handleFilterChange} className="px-3 py-2 border rounded-md">
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-            </select>
-            <select name="assignedBus" value={filterConfig.assignedBus} onChange={handleFilterChange} className="px-3 py-2 border rounded-md">
-                <option value="all">All Buses</option>
-                {uniqueBusRoutes.filter(r => r !== "all").map((route, idx) => (
-                    <option key={idx} value={route}>{route}</option>
-                ))}
-            </select>
-            <button onClick={resetFilters} className="px-3 py-2 bg-gray-100 text-gray-700 rounded-md">Reset</button>
+            <div className="flex gap-1">
+
+                <Select
+                    name="status"
+                    value={filterConfig.status}
+                    onChange={(value) => handleFilterChange({ target: { name: "status", value } })}
+                    className="w-40"
+                    placeholder="Select Status"
+                >
+                    <Option value="all">All Status</Option>
+                    <Option value="active">Active</Option>
+                    <Option value="inactive">Inactive</Option>
+                </Select>
+                <Select
+                    name="assignedBus"
+                    value={filterConfig.assignedBus}
+                    onChange={(value) => handleFilterChange({ target: { name: "assignedBus", value } })}
+                    className="w-40"
+                    placeholder="Select Bus"
+                >
+                    <Option value="all">All Buses</Option>
+                    {uniqueBusRoutes.filter((r) => r !== "all").map((route, idx) => (
+                        <Option key={idx} value={route}>
+                            {route}
+                        </Option>
+                    ))}
+                </Select>
+                <Button onClick={resetFilters} className="bg-gray-100 text-gray-700">
+                    Reset
+                </Button>
+            </div>
         </div>
     </div>
 );

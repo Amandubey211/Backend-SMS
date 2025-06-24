@@ -14,7 +14,7 @@ const DriverVehicleAssignmentList = ({ onEdit }) => {
     dispatch(getDriverVehicleAssignments());
   }, [dispatch]);
 
-  console.log("VDA", assignments);
+
 
   return (
     <div className="bg-white rounded-lg shadow-sm">
