@@ -56,20 +56,6 @@ const StudentClassMates = () => {
     <Layout title="My Classmate">
       <DashLayout>
         <div className="p-4">
-          <div className="flex items-center mb-4 gap-3">
-            <span className="text-xl text-gray-600 font-semibold">
-              My Classmates
-            </span>
-            <div
-              className="flex items-center justify-center h-[30px] w-[30px] bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 rounded-full border border-gray-300 "
-              aria-label={`Number of classmates: ${classmateData?.length || 0}`}
-            >
-              <span className="text-lg font-semibold text-purple-500">
-                {classmateData?.length || 0}
-              </span>
-            </div>
-          </div>
-
           {loading ? (
             <div className="w-full flex flex-col items-center justify-center py-20">
               <Spinner />
@@ -110,7 +96,7 @@ const StudentClassMates = () => {
                 Classmate
               </span>
             }
-            width="30%"
+            width="40%"
             height="100%"
           >
             <ClassmateModal classmate={selectedClassmate} />
