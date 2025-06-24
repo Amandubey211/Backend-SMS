@@ -1,27 +1,87 @@
-import DriverTableRow from "./DriverTableRow";
+import { Table, Tag } from "antd";
+import { FiEdit3, FiXCircle } from "react-icons/fi";
 
 const DriverTable = ({ drivers, loading, error, onEdit, openDeleteModal }) => {
-    if (loading) return <div className="p-4 text-center">Loading...</div>;
-    if (error) return <div className="p-4 text-center text-red-500">Error: {error}</div>;
-    if (!drivers.length) return <div className="p-4 text-center text-gray-500">No drivers found matching the current filters.</div>;
+
+
+    const columns = [
+        {
+            title: "Driver Name",
+            dataIndex: "fullName",
+            key: "fullName",
+        },
+        {
+            title: "Badge Number",
+            dataIndex: "driverBadgeNumber",
+            key: "driverBadgeNumber",
+        },
+        {
+            title: "License Number",
+            dataIndex: "licenseNumber",
+            key: "licenseNumber",
+        },
+        {
+            title: "Contact Number",
+            dataIndex: "contactNumber",
+            key: "contactNumber",
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: (text) => {
+                let color;
+                let displayText = text.charAt(0).toUpperCase() + text.slice(1);
+                if (text === "under_maintenance") displayText = "Under Maintenance";
+
+                switch (text?.toLowerCase()) {
+                    case "active":
+                        color = "#34d399"; // Light green
+                        break;
+                    case "inactive":
+                        color = "#f87171"; // Light red
+                        break;
+                    case "under_maintenance":
+                        color = "#facc15"; // Light yellow
+                        break;
+                    default:
+                        color = "#9ca3af"; // Light gray
+                }
+                return <Tag color={color}>{displayText}</Tag>;
+            },
+        },
+        {
+            title: "Actions",
+            key: "actions",
+            render: (text, record) => (
+                <div className="flex items-center space-x-3">
+                    <button
+                        onClick={() => onEdit(record)}
+                        className="text-blue-500 hover:text-blue-600"
+                    >
+                        <FiEdit3 className="h-5 w-5" />
+                    </button>
+                    <button
+                        onClick={() => openDeleteModal(record)}
+                        className="text-red-500 hover:text-red-600"
+                    >
+                        <FiXCircle className="h-5 w-5" />
+                    </button>
+                </div>
+            ),
+        },
+    ];
 
     return (
-        <div className="bg-white rounded-md shadow-sm border overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                    <tr>
-                        {['Driver Name', 'Badge Number', 'License Number', 'Contact Number', 'Status', 'Actions'].map((col, idx) => (
-                            <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{col}</th>
-                        ))}
-                    </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                    {drivers.map((driver, index) => (
-                        <DriverTableRow key={driver?._id || index} driver={driver} onEdit={onEdit} openDeleteModal={openDeleteModal} />
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        <Table
+            columns={columns}
+            dataSource={drivers}
+            loading={loading}
+            rowKey="_id"
+            pagination={false}
+            className="ant-table-custom"
+            style={{ backgroundColor: "#f9fafb" }}
+        />
     );
 };
 

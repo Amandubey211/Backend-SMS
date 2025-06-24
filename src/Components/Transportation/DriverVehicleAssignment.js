@@ -20,7 +20,7 @@ import { fetchHelperList } from "../../Store/Slices/Transportation/Helper/helper
 
 const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignment }) => {
   const dispatch = useDispatch();
-  console.log("selectedAssignment==>", selectedAssignment)
+
   // Redux states for drivers, shifts, and vehicles
   const { drivers, loading: driversLoading } = useSelector(
     (store) => store.transportation?.transportDriver
@@ -75,9 +75,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
     }
   }, [initialData, selectedAssignment]);
 
-  console.log(drivers);
-  console.log(shifts);
-  console.log(vehicles);
+
 
   // Handle form input changes
   const handleChange = (e) => {

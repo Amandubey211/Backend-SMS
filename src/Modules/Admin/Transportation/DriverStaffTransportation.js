@@ -150,7 +150,7 @@ const DriverStaffTransportation = () => {
   // Apply filtering for helpers (similar to drivers)
   useEffect(() => {
     if (!helpers) return;
-    console.log("helperss----", helpers)
+
     let result = [...helpers];
 
     if (filterConfig.name) {
@@ -275,7 +275,7 @@ const DriverStaffTransportation = () => {
     setDeleteModalOpen(true);
   };
 
-  const openHelperDeleteModal = (helper)=>{
+  const openHelperDeleteModal = (helper) => {
     setSelectedHelper(helper);
     setDeleteHelperModalOpen(true)
   }
@@ -288,7 +288,7 @@ const DriverStaffTransportation = () => {
   };
 
   const handleHelperConfirmDelete = () => {
-    console.log('selectedHelper delete', selectedHelper)
+
     if (selectedHelper?._id) {
       dispatch(deleteHelper(selectedHelper._id));
     }
@@ -417,7 +417,7 @@ const DriverStaffTransportation = () => {
               >
                 <span className="mr-2 text-sm">Add Driver</span>
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                  <span className="text-3xl -mt-2">+</span>
+                  <span className="text-3xl ">+</span>
                 </div>
               </button>
             )}
@@ -432,7 +432,7 @@ const DriverStaffTransportation = () => {
               >
                 <span className="mr-2 text-sm">Add Helper</span>
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                  <span className="text-3xl -mt-2">+</span>
+                  <span className="text-3xl">+</span>
                 </div>
               </button>
             )}

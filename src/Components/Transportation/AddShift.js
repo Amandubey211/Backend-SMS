@@ -5,7 +5,7 @@ import { createShift, updateShift } from "../../Store/Slices/Transportation/Shif
 
 const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
   const dispatch = useDispatch();
-  console.log("selectedShift==>", selectedShift);
+
 
   // Form Data State
   const [formData, setFormData] = useState({
@@ -67,7 +67,7 @@ const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
 
     (initialData && selectedShift) ? dispatch(updateShift({id:selectedShift._id,updatedData: dataToSubmit})):dispatch(createShift(dataToSubmit));
   };
-console.log("ssss-->",selectedShift)
+
   return (
     <div className="bg-white rounded-lg overflow-hidden">
       <form onSubmit={handleSubmit} className="p-4">

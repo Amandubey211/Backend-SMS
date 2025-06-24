@@ -86,7 +86,9 @@ const StudentTimetablePage = () => {
   useNavHeading(role, t("TimeTable"));
 
   useEffect(() => {
-    dispatch(fetchChildren())
+    if(role === 'parent'){ 
+      dispatch(fetchChildren())
+    }
     if (role === 'student') {
       dispatch(
         fetchGroupsByStudent({
