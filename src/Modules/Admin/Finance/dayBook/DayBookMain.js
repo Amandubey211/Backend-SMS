@@ -97,7 +97,7 @@ const DayBookMain = () => {
           {/* Summary Cards */}
           <div className="flex flex-row gap-4 mb-4">
             {[{ title: "Total Income", value: dayBookData?.totalIncome || 0, icon: <BiCategory /> },
-            { title: "Total Expense", value: dayBookData?.totalExpense || 0, icon: <TbCategory2 /> },
+            { title: "Total Expense", value: dayBookData?.totalExpense.toFixed(5) || 0, icon: <TbCategory2 /> },
             { title: "Total Transactions", value: dayBookData?.totalTransactions || 0, icon: <TbCategoryMinus /> }].map((item, index) => (
               <div
                 key={index}
