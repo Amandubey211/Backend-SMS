@@ -37,9 +37,8 @@ const ScheduleList = () => {
   useEffect(() => {
     dispatch(getSchedules());
   }, [dispatch]);
-
   const handleExpand = (exp, record) => {
-    setExpandedRowKeys(exp ? [record._id] : []);
+    setExpandedRowKeys(exp ? [record.shift] : []);
   };
 
   const handleResetFilters = () => {
@@ -102,20 +101,6 @@ const ScheduleList = () => {
       dataIndex: "shift",
       render: (text, record) => (
         <div className="flex items-center">
-          <Button
-            type="text"
-            icon={
-              expandedRowKeys.includes(record._id) ? (
-                <UpOutlined />
-              ) : (
-                <DownOutlined />
-              )
-            }
-            onClick={(e) => {
-              e.stopPropagation();
-              handleExpand(!expandedRowKeys.includes(record._id), record);
-            }}
-          />
           <span className="ml-2 font-medium">{text}</span>
         </div>
       ),
@@ -187,7 +172,7 @@ const ScheduleList = () => {
           </Empty>
         ) : (
           <Table
-            rowKey="_id"
+            rowKey="shift"
             pagination={{ pageSize: 5 }}
             dataSource={filteredSchedules}
             columns={columns}
