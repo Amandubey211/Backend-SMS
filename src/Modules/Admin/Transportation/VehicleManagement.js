@@ -29,13 +29,11 @@ const VehicleManagement = () => {
   const [vehicleData, setVehicleData] = useState({
     vehicleType: "",
     vehicleName: "",
-    customVehicleType: "",
     vehicleNumber: "",
     seatingCapacity: "",
     status: "active",
     fuelType: "",
     vehicleCategory: "",
-    customVehicleCategory: "",
     cameraInstalled: false,
     firstAidAvailable: false,
     speedGovernorInstalled: false,
@@ -61,9 +59,6 @@ const VehicleManagement = () => {
   const handleSubmit = async (formData) => {
     try {
       const payload = { ...formData };
-
-
-
       let resultAction;
       if (isEditing && editingVehicleId) {
         resultAction = await dispatch(updateVehicle({ vehicleId: editingVehicleId, payload }));
@@ -76,13 +71,11 @@ const VehicleManagement = () => {
         setVehicleData({
           vehicleType: "",
           vehicleName: "",
-          customVehicleType: "",
           vehicleNumber: "",
           seatingCapacity: "",
           status: "active",
           fuelType: "",
           vehicleCategory: "",
-          customVehicleCategory: "",
           cameraInstalled: false,
           firstAidAvailable: false,
           speedGovernorInstalled: false,
@@ -108,8 +101,6 @@ const VehicleManagement = () => {
     setEditingVehicleId(vehicle._id);
     setVehicleData({
       ...vehicle,
-      customVehicleType: vehicle.customVehicleType || "",
-      customVehicleCategory: vehicle.customVehicleCategory || "",
       documents: vehicle.documents || [],
     });
     setIsSidebarOpen(true);
@@ -148,13 +139,12 @@ const VehicleManagement = () => {
                   setEditingVehicleId(null);
                   setVehicleData({
                     vehicleType: "",
-                    customVehicleType: "",
+                    vehicleName: "",
                     vehicleNumber: "",
                     seatingCapacity: "",
                     status: "active",
                     fuelType: "",
                     vehicleCategory: "",
-                    customVehicleCategory: "",
                     cameraInstalled: false,
                     firstAidAvailable: false,
                     speedGovernorInstalled: false,
@@ -191,6 +181,7 @@ const VehicleManagement = () => {
           >
             <div className="p-6 max-h-screen overflow-y-auto bg-white rounded-lg shadow-lg">
               <VehicleForm
+                key={editingVehicleId || "new"}
                 vehicleData={vehicleData}
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}

@@ -24,6 +24,7 @@ import { addHelper, deleteHelper, fetchHelperList, updateHelper } from "../../..
 import HelperQuickFilter from "../../../Components/Transportation/HelperQuickFilter";
 import HelperSidebarForm from "../../../Components/Transportation/HelperSidebarForm";
 import HelperFilterSidebar from "../../../Components/Transportation/HelperFilterSidebar";
+import toast from "react-hot-toast";
 
 const DriverStaffTransportation = () => {
   const dispatch = useDispatch();
@@ -172,13 +173,32 @@ const DriverStaffTransportation = () => {
   }, [helpers, filterConfig]);
 
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setDriverData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const handleChange = (e, name) => {
+    // Check if the event is from a file input
+    if (e.target && e.target.files) {
+      setDriverData((prev) => ({
+        ...prev,
+        [name]: e.target.files[0], // Assuming single file upload
+      }));
+    }
+    // Check if the event is from Select component
+    else if (typeof e === 'string' || !e.target) {
+      setDriverData((prev) => ({
+        ...prev,
+        [name]: e,
+      }));
+    }
+    // Handle standard input changes
+    else {
+      const { name, value, type, checked } = e.target;
+      setDriverData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
+
+
 
   const handleHelperChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -297,22 +317,58 @@ const DriverStaffTransportation = () => {
   }
 
   const handleSubmitDriver = (e) => {
-    e.preventDefault();
     if (isEditing && selectedDriverId) {
-      dispatch(updateDriver({ id: selectedDriverId, data: driverData }));
+      const updateDrive = async () => {
+
+        const response = await dispatch(updateDriver({ id: selectedDriverId, data: driverData }));
+        if (response.payload.success) {
+          toast.success("Driver updated successfully");
+        }
+        else {
+          toast.error(response.payload.message || "Failed to update driver");
+        }
+      }
+      updateDrive()
     } else {
-      dispatch(addDriver(driverData));
+      const createDrive = async () => {
+        const response = await dispatch(addDriver(driverData));
+        if (response.payload.success) {
+          toast.success("Driver created successfully");
+        }
+        else {
+          toast.error(response.payload.message || "Failed to create driver");
+        }
+      }
+      createDrive()
     }
     resetForm();
   };
 
 
   const handleSubmitHelper = (e) => {
-    e.preventDefault();
     if (isEditing && selectedHelperId) {
-      dispatch(updateHelper({ id: selectedHelperId, data: helperData }));
+      const updateHelper = async () => {
+        const response = await dispatch(updateHelper({ id: selectedHelperId, data: helperData }))
+        if (response.payload.success) {
+          toast.success("Helper updated successfully");
+        }
+        else {
+          toast.error(response.payload.message || "Failed to update helper");
+        }
+      }
+      updateHelper()
+
     } else {
-      dispatch(addHelper(helperData));
+      const createHelper = async () => {
+        const response = await dispatch(addHelper(helperData))
+        if (response.payload.success) {
+          toast.success("Helper created successfully");
+        }
+        else {
+          toast.error(response.payload.message || "Failed to create helper");
+        }
+      }
+      createHelper()
     }
     resetForm();
   };

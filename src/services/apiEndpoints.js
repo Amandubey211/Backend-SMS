@@ -19,7 +19,6 @@ export const postData = async (endpoint, data) => {
     return response?.data;
   } catch (error) {
     if (error.response && error.response.data) {
-      console.log(error.response.data, "sdf");
 
       return error.response.data;
     }

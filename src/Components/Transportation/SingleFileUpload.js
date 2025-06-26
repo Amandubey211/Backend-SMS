@@ -18,8 +18,8 @@ import {
   CloseOutlined,
   CheckOutlined,
 } from "@ant-design/icons";
-import useCloudinaryUpload from "../../../../../Hooks/CommonHooks/useCloudinaryUpload";
-import useCloudinaryDeleteByPublicId from "../../../../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
+import useCloudinaryUpload from "../../Hooks/CommonHooks/useCloudinaryUpload";
+import useCloudinaryDeleteByPublicId from "../../Hooks/CommonHooks/useCloudinaryDeleteByPublicId";
 
 const MAX_SIZE_MB = 5;
 const MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024;

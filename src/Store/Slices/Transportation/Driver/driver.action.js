@@ -41,7 +41,6 @@ export const addDriver = createAsyncThunk(
         `/transport/create-driver?say=${say}`,
         data
       );
-      console.log(response)
       dispatch(fetchDriverList());
       return response;
     } catch (error) {

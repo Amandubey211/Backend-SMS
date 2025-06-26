@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Form, Input, Select, Checkbox, Button } from "antd";
 import { useTranslation } from "react-i18next";
 
@@ -8,120 +8,109 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
   const { t } = useTranslation("transportation");
   const [form] = Form.useForm();
 
-  // Sync initial form values with vehicleData
-  useEffect(() => {
-    form.setFieldsValue({
-      vehicleType: vehicleData?.vehicleType || undefined,
-      customVehicleType: vehicleData?.customVehicleType || "",
-      vehicleNumber: vehicleData?.vehicleNumber || "",
-      seatingCapacity: vehicleData?.seatingCapacity || "",
-      status: vehicleData?.status || "active",
-      fuelType: vehicleData?.fuelType || undefined,
-      vehicleCategory: vehicleData?.vehicleCategory || undefined,
-      customVehicleCategory: vehicleData?.customVehicleCategory || "",
-      cameraInstalled: vehicleData?.cameraInstalled || false,
-      firstAidAvailable: vehicleData?.firstAidAvailable || false,
-      speedGovernorInstalled: vehicleData?.speedGovernorInstalled || false,
-      vehicleName: vehicleData?.vehicleName || "",
-    });
-  }, [vehicleData, form]);
+  // Watch the current select values for showing custom inputs
+  const currentVehicleType = Form.useWatch("vehicleType", form);
+  const currentVehicleCategory = Form.useWatch("vehicleCategory", form);
 
-  const validateVehicleNumber = (_, value) => {
-    const vehicleNumberRegex = /^[A-Z]{2}\d{2}[A-Z]{2}\d{4}$/;
-    if (value && !vehicleNumberRegex.test(value)) {
-      return Promise.reject(new Error("Vehicle number must be in format XXDDXXDDDD (e.g., GJ01WQ4565) with uppercase letters for the first and third parts"));
-    }
-    return Promise.resolve();
-  };
-
-  // Handle form submission with custom logic for vehicleType and vehicleCategory
-  const onFinish = (values) => {
-    let transformedValues = {
-      ...values,
-      vehicleType: values.vehicleType.toLowerCase(),
-      fuelType: values.fuelType.toLowerCase(),
-      vehicleCategory: values.vehicleCategory ? values.vehicleCategory.toLowerCase() : "",
-      status: values.status.toLowerCase(),
-    };
-
-    // Only include customVehicleType if vehicleType is "other" and a custom value is provided
-    if (values.vehicleType === "other" && values.customVehicleType) {
-      transformedValues.customVehicleType = values.customVehicleType;
-    } else {
-      delete transformedValues.customVehicleType; // Remove customVehicleType if not "other" or no custom value
-    }
-
-    // Only include customVehicleCategory if vehicleCategory is "other" and a custom value is provided
-    if (values.vehicleCategory === "other" && values.customVehicleCategory) {
-      transformedValues.customVehicleCategory = values.customVehicleCategory;
-    } else {
-      delete transformedValues.customVehicleCategory; // Remove customVehicleCategory if not "other" or no custom value
-    }
-
-    handleSubmit(transformedValues);
-  };
-
-  // Handle local change and update parent
-  const handleLocalChange = (changedValues, allValues) => {
-    const transformedValues = {
-      ...allValues,
-      vehicleType: allValues.vehicleType ? allValues.vehicleType.toLowerCase() : "",
-      fuelType: allValues.fuelType ? allValues.fuelType.toLowerCase() : "",
-      vehicleCategory: allValues.vehicleCategory ? allValues.vehicleCategory.toLowerCase() : "",
-      status: allValues.status ? allValues.status.toLowerCase() : "",
-    };
-    handleChange({ target: { name: Object.keys(changedValues)[0], value: transformedValues[Object.keys(changedValues)[0]] } });
-  };
-
-  // Dropdown options (display capitalized, send lowercase)
-  const vehicleTypes = ["bus", "van", "auto", "cab", "e-rickshaw", "other"];
+  const vehicleTypes = ["bus", "van", "cab", "other"];
   const fuelTypes = ["diesel", "petrol", "cng", "electric", "hybrid"];
   const vehicleCategories = [
     "ac",
     "non-ac",
     "sleeper",
-    "semi-sleeper",
     "mini",
     "double-decker",
-    "hatchback",
     "sedan",
-    "e-rickshaw",
     "open",
-    "cargo",
     "other",
   ];
+
+  useEffect(() => {
+    if (vehicleData) {
+      let initType = vehicleData.vehicleType;
+      let initCategory = vehicleData.vehicleCategory;
+      let customTypeInput = "";
+      let customCategoryInput = "";
+
+      // Check if incoming type is not one of the options
+      if (initType && !vehicleTypes.includes(initType)) {
+        customTypeInput = initType;
+        initType = "other";
+      }
+
+      // Check if incoming category is not one of the options
+      if (initCategory && !vehicleCategories.includes(initCategory)) {
+        customCategoryInput = initCategory;
+        initCategory = "other";
+      }
+
+      form.setFieldsValue({
+        vehicleType: initType || undefined,
+        customTypeInput,
+        vehicleNumber: vehicleData.vehicleNumber || "",
+        seatingCapacity: vehicleData.seatingCapacity || "",
+        status: vehicleData.status || "active",
+        fuelType: vehicleData.fuelType || undefined,
+        vehicleCategory: initCategory || undefined,
+        customCategoryInput,
+        cameraInstalled: vehicleData.cameraInstalled || false,
+        firstAidAvailable: vehicleData.firstAidAvailable || false,
+        speedGovernorInstalled: vehicleData.speedGovernorInstalled || false,
+        vehicleName: vehicleData.vehicleName || "",
+      });
+    } else {
+      form.resetFields();
+    }
+  }, [vehicleData, form, vehicleTypes, vehicleCategories]);
+
+  const onFinish = (values) => {
+    let { vehicleType, vehicleCategory } = values;
+
+    if (vehicleType === "other" && values.customTypeInput) {
+      vehicleType = values.customTypeInput;
+    }
+    if (vehicleCategory === "other" && values.customCategoryInput) {
+      vehicleCategory = values.customCategoryInput;
+    }
+
+    const transformedValues = {
+      ...values,
+      vehicleType: vehicleType?.toLowerCase(),
+      vehicleCategory: vehicleCategory?.toLowerCase(),
+      fuelType: values.fuelType?.toLowerCase(),
+      status: values.status?.toLowerCase(),
+    };
+    delete transformedValues.customTypeInput;
+    delete transformedValues.customCategoryInput;
+
+    handleSubmit(transformedValues);
+  };
+
+  const handleLocalChange = (changedValues, allValues) => {
+    const key = Object.keys(changedValues)[0];
+    handleChange({ target: { name: key, value: allValues[key] } });
+  };
 
   return (
     <Form
       form={form}
-      name="vehicleForm"
       onFinish={onFinish}
       onValuesChange={handleLocalChange}
       layout="vertical"
       className="space-y-6"
-      initialValues={{
-        vehicleType: undefined, // Use undefined to show placeholder
-        customVehicleType: "",
-        vehicleNumber: "",
-        seatingCapacity: "",
-        status: "active",
-        fuelType: undefined, // Use undefined to show placeholder
-        vehicleCategory: undefined, // Use undefined to show placeholder
-        customVehicleCategory: "",
-        cameraInstalled: false,
-        firstAidAvailable: false,
-        speedGovernorInstalled: false,
-        vehicleName: "",
-      }}
     >
-      {/* Vehicle Information Section */}
+      {/* Vehicle Information */}
       <div className="bg-blue-50 p-4 rounded-md">
-        <h3 className="text-md font-medium text-blue-800 mb-3">{t("Vehicle Information")}</h3>
+        <h3 className="text-md font-medium text-blue-800 mb-3">
+          {t("Vehicle Information")}
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Type")} *</span>}
+            label={t("Vehicle Type")}
             name="vehicleType"
-            rules={[{ required: true, message: `${t("vehicleType")} is required` }]}
+            rules={[
+              { required: true, message: `${t("vehicleType")} is required` },
+            ]}
           >
             <Select placeholder={t("Select Vehicle Type")} allowClear>
               {vehicleTypes.map((type) => (
@@ -131,51 +120,60 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
               ))}
             </Select>
           </Form.Item>
-          <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Name")} *</span>}
-            name="vehicleName"
-            rules={[{ required: true, message: `${t("vehicleName")} is required` }]}
-          >
-            <Input placeholder={t("Enter Vehicle Name")} />
-          </Form.Item>
-          {form.getFieldValue("vehicleType") === "other" && (
+          {currentVehicleType === "other" && (
             <Form.Item
-              label={<span className="text-sm font-medium text-gray-700">{t("Custom Vehicle Type")} *</span>}
-              name="customVehicleType"
-              rules={[{ required: true, message: `${t("Custom Vehicle Type")} is required` }]}
+              label={t("Enter Vehicle Type")}
+              name="customTypeInput"
+              rules={[
+                {
+                  required: true,
+                  message: `${t("Enter Vehicle Type")} is required`,
+                },
+              ]}
             >
-              <Input placeholder={t("Enter Custom Vehicle Type")} />
+              <Input placeholder={t("e.g. Rickshaw, SUV, etc.")} />
             </Form.Item>
           )}
           <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Number")} *</span>}
+            label={t("Vehicle Name")}
+            name="vehicleName"
+            rules={[
+              { required: true, message: `${t("vehicleName")} is required` },
+            ]}
+          >
+            <Input placeholder={t("Enter Vehicle Name")} />
+          </Form.Item>
+          <Form.Item
+            label={t("Vehicle Number")}
             name="vehicleNumber"
             rules={[
               { required: true, message: `${t("Vehicle Number")} is required` },
-              // { validator: validateVehicleNumber },
             ]}
           >
-            <Input placeholder={t("Enter Vehicle Number")} />
+            <Input placeholder={t("e.g. GJ01WQ4565")} />
           </Form.Item>
           <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Seating Capacity")} *</span>}
+            label={t("Seating Capacity")}
             name="seatingCapacity"
             rules={[
               { required: true, message: `${t("Seating Capacity")} is required` },
             ]}
           >
-            <Input type="number" placeholder={t("Enter Seating Capacity")} min={1}
-              onKeyDown={(e) => {
-                if (e.key === "-" || e.key === "e" || e.key === "E" || e.key === "+" || e.key === ".") {
-                  e.preventDefault();
-                }
-              }}
+            <Input
+              type="number"
+              min={1}
+              placeholder={t("Enter Seating Capacity")}
+              onKeyDown={(e) =>
+                ["-", "+", ".", "e", "E"].includes(e.key) && e.preventDefault()
+              }
             />
           </Form.Item>
           <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Status")} *</span>}
+            label={t("Status")}
             name="status"
-            rules={[{ required: true, message: `${t("Status")} is required` }]}
+            rules={[
+              { required: true, message: `${t("Status")} is required` },
+            ]}
           >
             <Select>
               <Option value="active">{t("Active")}</Option>
@@ -184,11 +182,13 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
             </Select>
           </Form.Item>
           <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Fuel Type")} *</span>}
+            label={t("Fuel Type")}
             name="fuelType"
-            rules={[{ required: true, message: `${t("Fuel Type")} is required` }]}
+            rules={[
+              { required: true, message: `${t("Fuel Type")} is required` },
+            ]}
           >
-            <Select placeholder={t("Select Fuel Type")} allowClear>
+            <Select placeholder={t("Select Fuel Type")}>
               {fuelTypes.map((type) => (
                 <Option key={type} value={type}>
                   {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -198,36 +198,44 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
           </Form.Item>
         </div>
       </div>
-      {/* Vehicle Category Section */}
+
+      {/* Vehicle Category */}
       <div className="bg-green-50 p-4 rounded-md">
-        <h3 className="text-md font-medium text-green-800 mb-3">{t("Vehicle Category")}</h3>
+        <h3 className="text-md font-medium text-green-800 mb-3">
+          {t("Vehicle Category")}
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Form.Item
-            label={<span className="text-sm font-medium text-gray-700">{t("Vehicle Category")}</span>}
-            name="vehicleCategory"
-          >
+          <Form.Item label={t("Vehicle Category")} name="vehicleCategory">
             <Select placeholder={t("Select Category")} allowClear>
               {vehicleCategories.map((category) => (
                 <Option key={category} value={category}>
-                  {category.split('-').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                  {category.charAt(0).toUpperCase() + category.slice(1)}
                 </Option>
               ))}
             </Select>
           </Form.Item>
-          {form.getFieldValue("vehicleCategory") === "other" && (
+          {currentVehicleCategory === "other" && (
             <Form.Item
-              label={<span className="text-sm font-medium text-gray-700">{t("Custom Vehicle Category")} *</span>}
-              name="customVehicleCategory"
-              rules={[{ required: true, message: `${t("Custom Vehicle Category")} is required` }]}
+              label={t("Enter Vehicle Category")}
+              name="customCategoryInput"
+              rules={[
+                {
+                  required: true,
+                  message: `${t("Enter Vehicle Category")} is required`,
+                },
+              ]}
             >
-              <Input placeholder={t("Enter Custom Vehicle Category")} />
+              <Input placeholder={t("e.g. Golf Cart, Tractor, etc.")} />
             </Form.Item>
           )}
         </div>
       </div>
-      {/* Safety Features Section */}
+
+      {/* Safety Features */}
       <div className="bg-yellow-50 p-4 rounded-md">
-        <h3 className="text-md font-medium text-yellow-800 mb-3">{t("Safety Features")}</h3>
+        <h3 className="text-md font-medium text-yellow-800 mb-3">
+          {t("Safety Features")}
+        </h3>
         <div className="flex flex-col gap-1">
           <Form.Item name="cameraInstalled" valuePropName="checked">
             <Checkbox>{t("Camera Installed")}</Checkbox>
@@ -240,12 +248,15 @@ const VehicleForm = ({ vehicleData, handleChange, handleSubmit, isEditing }) => 
           </Form.Item>
         </div>
       </div>
-      {/* Form Actions */}
+
+      {/* Submit Buttons */}
       <div className="flex justify-end space-x-3">
-        <Button onClick={() => window.history.back()} className="border border-gray-300 rounded-md">
-          {t("Cancel")}
-        </Button>
-        <Button type="primary" htmlType="submit" className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-md hover:from-purple-600 hover:to-pink-600 transition duration-300">
+        <Button onClick={() => window.history.back()}>{t("Cancel")}</Button>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+        >
           {isEditing ? t("Update Vehicle") : t("Add Vehicle")}
         </Button>
       </div>
