@@ -1,3 +1,4 @@
+// Store/Slices/Admin/Library/LibrarySlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchBooksThunk,
@@ -7,15 +8,20 @@ import {
   updateBookThunk,
   fetchBookIssuesThunk,
   issueBookThunk,
-  // NEW CATEGORY THUNKS
+  // CATEGORY thunks
   fetchCategoriesThunk,
   addCategoryThunk,
   updateCategoryThunk,
   deleteCategoryThunk,
+  // NEW 👉 ISBN lookup thunk
+  fetchBookByISBNThunk,
 } from "./LibraryThunks";
 
+/* ------------------------------------------------------------------ */
+/* STATE                                                              */
+/* ------------------------------------------------------------------ */
 const initialState = {
-  // BOOKS
+  /* BOOKS */
   books: [],
   bookIssues: [],
   loading: false,
@@ -23,25 +29,24 @@ const initialState = {
   addBookSuccess: false,
   error: null,
 
-  // FILTERS
-  filters: {
-    class: "",
-    category: "",
-    classLevel: "",
-    section: "",
-  },
+  /* BARCODE / ISBN LOOKUP */
+  isbnLoading: false, // 🔍 <-- added
+  isbnBookData: null, // 🔍 <-- added
 
-  // TABS
+  /* FILTERS */
+  filters: { class: "", category: "", classLevel: "", section: "" },
+
+  /* UI STATE */
   activeTab: "Library",
   isSidebarOpen: false,
   editIssueData: null,
 
-  // PAGINATION
+  /* PAGINATION */
   totalBooks: 0,
   totalPages: 0,
   currentPage: 1,
 
-  // CATEGORIES
+  /* CATEGORIES */
   categories: [],
   categoriesLoading: false,
   categoryError: null,
@@ -54,28 +59,29 @@ const librarySlice = createSlice({
   name: "library",
   initialState,
   reducers: {
-    setFilters(state, action) {
-      const { key, value } = action.payload;
+    setFilters(state, { payload: { key, value } }) {
       state.filters[key] = value;
     },
-    setActiveTab(state, action) {
-      state.activeTab = action.payload;
+    setActiveTab(state, { payload }) {
+      state.activeTab = payload;
     },
-    toggleSidebar(state, action) {
-      state.isSidebarOpen = action.payload;
+    toggleSidebar(state, { payload }) {
+      state.isSidebarOpen = payload;
     },
-    setEditIssueData(state, action) {
-      state.editIssueData = action.payload;
+    setEditIssueData(state, { payload }) {
+      state.editIssueData = payload;
     },
     resetLibraryState(state) {
       state.addBookSuccess = false;
       state.addCategorySuccess = false;
       state.updateCategorySuccess = false;
       state.deleteCategorySuccess = false;
-      // you can reset other states if needed
+      /* NEW 👉 clear ISBN lookup cache when drawer resets */
+      state.isbnLoading = false;
+      state.isbnBookData = null;
     },
-    setCurrentPage(state, action) {
-      state.currentPage = action.payload;
+    setCurrentPage(state, { payload }) {
+      state.currentPage = payload;
     },
   },
   extraReducers: (builder) => {
@@ -243,6 +249,19 @@ const librarySlice = createSlice({
       .addCase(deleteCategoryThunk.rejected, (state, action) => {
         state.categoriesLoading = false;
         state.categoryError = action.payload;
+      })
+
+      .addCase(fetchBookByISBNThunk.pending, (state) => {
+        state.isbnLoading = true;
+        state.isbnBookData = null;
+      })
+      .addCase(fetchBookByISBNThunk.fulfilled, (state, { payload }) => {
+        state.isbnLoading = false;
+        state.isbnBookData = payload; // <-- BookForm consumes this
+      })
+      .addCase(fetchBookByISBNThunk.rejected, (state, { payload }) => {
+        state.isbnLoading = false;
+        state.error = payload;
       });
   },
 });

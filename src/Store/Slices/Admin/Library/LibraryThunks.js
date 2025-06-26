@@ -79,14 +79,20 @@ export const addBookThunk = createAsyncThunk(
   }
 );
 
-// Update Book Thunk
+// Update Book Thunk (Updated to handle ISBN/barcode)
 export const updateBookThunk = createAsyncThunk(
   "library/updateBook",
-  async ({ bookId, formData }, { rejectWithValue, dispatch, getState }) => {
+  async ({ bookId, formData, barcodeValue }, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
+
+      // Add barcodeValue to form data if it exists
+      if (barcodeValue) {
+        formData.append("barcodeValue", barcodeValue);
+      }
+
       const response = await customRequest(
         "PUT",
         `/${getRole}/update/book/${bookId}?say=${say}`,
@@ -95,7 +101,8 @@ export const updateBookThunk = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         }
       );
-      toast.success("Book updated successfully!");
+      
+      toast.success(response.message || "Book updated successfully!");
       dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
       return response?.book;
     } catch (error) {
@@ -271,3 +278,103 @@ export const deleteCategoryThunk = createAsyncThunk(
     }
   }
 );
+
+
+// Add these to your existing LibraryThunks.js file
+
+// Fetch Book by ISBN (Updated to match your backend)
+export const fetchBookByISBNThunk = createAsyncThunk(
+  "library/fetchBookByISBN",
+  async (barcodeValue, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+
+      // First check if book exists in our system
+      const localResponse = await getData(
+        `/${getRole}/getBooksByIsbn/${barcodeValue}?say=${say}`
+      );
+
+      if (localResponse.success && localResponse.book) {
+        return {
+          exists: true,
+          book: localResponse.book
+        };
+      }
+
+      // If not found in our system, try Google Books API
+      try {
+        const googleResponse = await fetch(
+          `https://www.googleapis.com/books/v1/volumes?q=isbn:${barcodeValue}`
+        );
+        const googleData = await googleResponse.json();
+
+        if (googleData.totalItems > 0) {
+          const bookInfo = googleData.items[0].volumeInfo;
+          return {
+            exists: false,
+            book: {
+              name: bookInfo.title || "Unknown Title",
+              author: bookInfo.authors?.join(", ") || "Unknown Author",
+              barcodeValue: barcodeValue,
+              image: bookInfo.imageLinks?.thumbnail || null,
+              language: bookInfo.language || "en",
+              copies: "1"
+            },
+            googleData: bookInfo
+          };
+        }
+      } catch (googleError) {
+        console.error("Google Books API error:", googleError);
+      }
+
+      // If nothing found
+      return {
+        exists: false,
+        book: {
+          barcodeValue: barcodeValue,
+          copies: "1"
+        },
+        message: "Book not found in our system or Google Books"
+      };
+
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
+// Add Book with ISBN (Updated to match your backend)
+export const addBookWithISBNThunk = createAsyncThunk(
+  "library/addBookWithISBN",
+  async ({ formData }, { rejectWithValue, dispatch, getState }) => {
+    try {
+      const say = getAY();
+      const getRole = getUserRole(getState);
+      dispatch(setShowError(false));
+
+      // Add barcodeValue to form data if it exists
+      // if (barcodeValue) {
+      //   formData.append("barcodeValue", barcodeValue);
+      // }
+
+      const response = await customRequest(
+        "post",
+        `/${getRole}/add_book?say=${say}`,
+        formData,
+        {
+          "Content-Type": "multipart/form-data",
+        }
+      );
+
+      toast.success(response.message || "Book added successfully!");
+      dispatch(toggleSidebar());
+      dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
+      return response?.book;
+    } catch (error) {
+      return handleError(error, dispatch, rejectWithValue);
+    }
+  }
+);
+
