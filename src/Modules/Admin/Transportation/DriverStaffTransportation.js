@@ -53,7 +53,6 @@ const DriverStaffTransportation = () => {
   const [filterConfig, setFilterConfig] = useState({
     name: "",
     status: "all",
-    assignedBus: "all",
   });
 
   const [isEditing, setIsEditing] = useState(false);
@@ -72,7 +71,6 @@ const DriverStaffTransportation = () => {
     email: "",
     contactNumber: "",
     status: "active",
-    assignedBus: "",
     documents: [],
   });
 
@@ -96,7 +94,6 @@ const DriverStaffTransportation = () => {
     dateOfBirth: "",
     experienceInYears: "",
     status: "active",
-    assignedBus: "",
     documents: [],
   });
 
@@ -126,11 +123,6 @@ const DriverStaffTransportation = () => {
       result = result.filter((driver) => driver.status === filterConfig.status);
     }
 
-    if (filterConfig.assignedBus !== "all") {
-      result = result.filter(
-        (driver) => driver.assignedBus === filterConfig.assignedBus
-      );
-    }
 
     // Apply sorting
     if (sortConfig.key) {
@@ -163,33 +155,22 @@ const DriverStaffTransportation = () => {
     if (filterConfig.status !== "all") {
       result = result.filter((helper) => helper.status === filterConfig.status);
     }
-
-    if (filterConfig.assignedBus !== "all") {
-      result = result.filter(
-        (helper) => helper.assignedBus === filterConfig.assignedBus
-      );
-    }
     setFilteredHelpers(result);
   }, [helpers, filterConfig]);
 
 
   const handleChange = (e, name) => {
-    // Check if the event is from a file input
     if (e.target && e.target.files) {
       setDriverData((prev) => ({
         ...prev,
-        [name]: e.target.files[0], // Assuming single file upload
+        [name]: e.target.files[0],
       }));
-    }
-    // Check if the event is from Select component
-    else if (typeof e === 'string' || !e.target) {
+    } else if (typeof e === 'string' || !e.target) {
       setDriverData((prev) => ({
         ...prev,
         [name]: e,
       }));
-    }
-    // Handle standard input changes
-    else {
+    } else {
       const { name, value, type, checked } = e.target;
       setDriverData((prev) => ({
         ...prev,
@@ -200,12 +181,24 @@ const DriverStaffTransportation = () => {
 
 
 
-  const handleHelperChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setHelperData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+  const handleHelperChange = (e, name) => {
+    if (e.target && e.target.files) {
+      setHelperData((prev) => ({
+        ...prev,
+        [name]: e.target.files[0],
+      }));
+    } else if (typeof e === 'string' || !e.target) {
+      setHelperData((prev) => ({
+        ...prev,
+        [name]: e,
+      }));
+    } else {
+      const { name, value, type, checked } = e.target;
+      setHelperData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const handleFilterChange = (e) => {
@@ -252,7 +245,6 @@ const DriverStaffTransportation = () => {
       dateOfBirth: formatDate(driver.dateOfBirth),  // Ensure correct format
       experienceInYears: driver.experienceInYears || "",
       status: driver.status || "active",
-      assignedBus: driver.assignedBus || "",
       documents: driver.documents || [],
     });
 
@@ -269,7 +261,7 @@ const DriverStaffTransportation = () => {
     // Populate the form with driver data
     setHelperData({
       fullName: helper.fullName || "",
-      driverBadgeNumber: helper.helperBadgeNumber || "",
+      helperBadgeNumber: helper.helperBadgeNumber || "",
       gender: helper.gender || "",
       religion: helper.religion || "",
       email: helper.email || "",
@@ -284,7 +276,6 @@ const DriverStaffTransportation = () => {
       address: helper.address || "",
       dateOfBirth: formatDate(helper.dateOfBirth),  // Ensure correct format
       status: helper.status || "active",
-      assignedBus: helper.assignedBus || "",
       documents: helper.documents || [],
     });
 
@@ -320,7 +311,7 @@ const DriverStaffTransportation = () => {
     if (isEditing && selectedDriverId) {
       const updateDrive = async () => {
 
-        const response = await dispatch(updateDriver({ id: selectedDriverId, data: driverData }));
+        const response = await dispatch(updateDriver({ id: selectedDriverId, data: e }));
         if (response.payload.success) {
           toast.success("Driver updated successfully");
         }
@@ -331,7 +322,7 @@ const DriverStaffTransportation = () => {
       updateDrive()
     } else {
       const createDrive = async () => {
-        const response = await dispatch(addDriver(driverData));
+        const response = await dispatch(addDriver(e));
         if (response.payload.success) {
           toast.success("Driver created successfully");
         }
@@ -347,8 +338,8 @@ const DriverStaffTransportation = () => {
 
   const handleSubmitHelper = (e) => {
     if (isEditing && selectedHelperId) {
-      const updateHelper = async () => {
-        const response = await dispatch(updateHelper({ id: selectedHelperId, data: helperData }))
+      const updateHelpe = async () => {
+        const response = await dispatch(updateHelper({ id: selectedHelperId, data: e }))
         if (response.payload.success) {
           toast.success("Helper updated successfully");
         }
@@ -356,11 +347,11 @@ const DriverStaffTransportation = () => {
           toast.error(response.payload.message || "Failed to update helper");
         }
       }
-      updateHelper()
+      updateHelpe()
 
     } else {
       const createHelper = async () => {
-        const response = await dispatch(addHelper(helperData))
+        const response = await dispatch(addHelper(e))
         if (response.payload.success) {
           toast.success("Helper created successfully");
         }
@@ -394,7 +385,6 @@ const DriverStaffTransportation = () => {
       dateOfBirth: "",
       experienceInYears: "",
       status: "active",
-      assignedBus: "",
       documents: [],
     });
     setHelperData({
@@ -404,7 +394,6 @@ const DriverStaffTransportation = () => {
       email: "",
       contactNumber: "",
       status: "active",
-      assignedBus: "",
       documents: [],
     });
     setIsEditing(false);
@@ -418,7 +407,6 @@ const DriverStaffTransportation = () => {
     setFilterConfig({
       name: "",
       status: "all",
-      assignedBus: "all",
     });
     setSortConfig({ key: null, direction: "ascending" });
   };

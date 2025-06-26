@@ -3,8 +3,11 @@ import { Form, Input, Select, Checkbox, Button, DatePicker, message, Modal } fro
 import dayjs from 'dayjs';
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { useEffect, useState, useRef } from "react";
-import SingleFileUpload from "./SingleFileUpload";
+import { useEffect, useState } from "react";
+import { DeleteOutlined } from '@ant-design/icons';
+
+import CustomUploadCard from "./CustomUploadCard";
+import SingleFileUpload from './SingleFileUpload';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -14,25 +17,56 @@ const { Option } = Select;
 const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handleChange, handleSubmit, resetForm, vehicles }) => {
     const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
     const [form] = Form.useForm();
-    const [photoPreviewFile, setPhotoPreviewFile] = useState(null);
     const [documentPreviewFile, setDocumentPreviewFile] = useState(null);
-    const photoInputRef = useRef(null);
-    const documentInputRef = useRef(null);
+    const [photo, setPhoto] = useState("");
+    const [documents, setDocuments] = useState([]);
+
+    useEffect(() => {
+        if (isOpen && driverData) {
+            const initialDocuments = Array.isArray(driverData.documents)
+                ? driverData.documents.map((doc, index) => ({
+                    name: doc.name || `Document_${index + 1}`,
+                    url: doc.url || "",
+                    expiryDate: doc.expiryDate ? parseDate(doc.expiryDate) : null,
+                }))
+                : [];
+            setPhoto(driverData.photo || "");
+            setDocuments(initialDocuments);
+            form.setFieldsValue({
+                ...driverData,
+                dateOfBirth: driverData?.dateOfBirth ? parseDate(driverData.dateOfBirth) : null,
+                licenseExpiryDate: driverData?.licenseExpiryDate ? parseDate(driverData.licenseExpiryDate) : null,
+                joiningDate: driverData?.joiningDate ? parseDate(driverData.joiningDate) : null,
+                resignationDate: driverData?.resignationDate ? parseDate(driverData.resignationDate) : null,
+                documents: initialDocuments,
+                photo: driverData?.photo || "",
+            });
+        }
+    }, [isOpen, driverData, form]);
 
     const onFinish = (values) => {
+        const documentsArray = documents.length > 0 ? documents : values.documents || [];
         const processedValues = {
             ...values,
-            photo: driverData.photo || "",
-            documents: driverData.documents || [],
+            photo: photo || values?.photo || "",
+            documents: documentsArray.map((doc, index) => ({
+                name: doc?.name || `Document_${Date.now()}_${index}`,
+                url: doc?.url || "",
+                expiryDate: doc?.expiryDate || null,
+            })),
         };
         handleSubmit(processedValues);
+        if (!isEditing) {
+            setPhoto("");
+            setDocuments([]);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {
         const fieldOrder = [
             "fullName", "driverBadgeNumber", "gender", "religion", "dateOfBirth", "bloodGroup", "email",
             "contactNumber", "emergencyContact", "address", "licenseNumber", "licenseExpiryDate", "national_Id",
-            "experienceInYears", "joiningDate", "resignationDate", "policeVerificationDone", "status", "assignedBus"
+            "experienceInYears", "joiningDate", "resignationDate", "policeVerificationDone", "status"
         ];
         for (const fieldName of fieldOrder) {
             if (errorInfo.errorFields.some((field) => field.name[0] === fieldName)) {
@@ -45,10 +79,9 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
     const handleClose = () => {
         form.resetFields();
         resetForm();
-        setPhotoPreviewFile(null);
         setDocumentPreviewFile(null);
-        if (photoInputRef.current) photoInputRef.current.value = "";
-        if (documentInputRef.current) documentInputRef.current.value = "";
+        setPhoto("");
+        setDocuments([]);
     };
 
     const parseDate = (dateStr) => {
@@ -57,68 +90,38 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
         return d.isValid() ? d : null;
     };
 
-    useEffect(() => {
-        form.setFieldsValue({
-            fullName: driverData?.fullName || "",
-            driverBadgeNumber: driverData?.driverBadgeNumber || "",
-            gender: driverData?.gender || "",
-            religion: driverData?.religion || "",
-            dateOfBirth: parseDate(driverData?.dateOfBirth),
-            bloodGroup: driverData?.bloodGroup || "",
-            email: driverData?.email || "",
-            contactNumber: driverData?.contactNumber || "",
-            emergencyContact: driverData?.emergencyContact || "",
-            address: driverData?.address || "",
-            licenseNumber: driverData?.licenseNumber || "",
-            licenseExpiryDate: parseDate(driverData?.licenseExpiryDate),
-            national_Id: driverData?.national_Id || "",
-            experienceInYears: driverData?.experienceInYears || "",
-            joiningDate: parseDate(driverData?.joiningDate),
-            resignationDate: parseDate(driverData?.resignationDate),
-            policeVerificationDone: driverData?.policeVerificationDone || false,
-            status: driverData?.status || "",
-            assignedBus: driverData?.assignedBus || "",
-        });
-        if (driverData?.photo) {
-            setDriverData((prev) => ({
-                ...prev,
-                photo: driverData.photo,
-            }));
-        }
-        if (driverData?.documents) {
-            setDriverData((prev) => ({
-                ...prev,
-                documents: driverData.documents,
-            }));
-        }
-    }, [driverData, form]);
-
-    const handleFileChange = (fieldName, fileData) => {
+    const handleFileChange = (fieldName, fileData, index = null) => {
         if (fieldName === "photo") {
-            setDriverData((prev) => ({
-                ...prev,
-                photo: fileData.url,
-            }));
-        } else if (fieldName === "documents") {
-            setDriverData((prev) => ({
-                ...prev,
-                documents: [...(prev.documents || []), fileData],
-            }));
+            // console.log("Photo File Data:", fileData); // Debug log
+            setPhoto(fileData?.url || "");
+            form.setFieldsValue({ photo: fileData?.url || "" });
+        } else if (fieldName === "documents" && index !== null) {
+            const newDocuments = [...documents];
+            newDocuments[index] = { ...newDocuments[index], ...fileData };
+            setDocuments(newDocuments);
+            form.setFields([{ name: ["documents", index], value: newDocuments[index] }]);
+            // console.log("Updated Documents:", newDocuments); // Debug log
         }
     };
 
-    const handleRemove = (fieldName, index) => {
+    const handleRemove = (fieldName, index = null) => {
         if (fieldName === "photo") {
-            setDriverData((prev) => ({
-                ...prev,
-                photo: "",
-            }));
-        } else if (fieldName === "documents") {
-            setDriverData((prev) => ({
-                ...prev,
-                documents: prev.documents.filter((_, i) => i !== index),
-            }));
+            setPhoto("");
+            form.setFieldsValue({ photo: "" });
+        } else if (fieldName === "documents" && index !== null) {
+            const newDocuments = documents.filter((_, i) => i !== index);
+            setDocuments(newDocuments);
+            form.setFieldsValue({ documents: newDocuments });
+            // console.log("Documents after remove:", newDocuments); // Debug log
         }
+    };
+
+    const addNewDocument = () => {
+        const newDoc = { name: `Document_${documents.length + 1}`, url: "", expiryDate: null };
+        const newDocuments = [...documents, newDoc];
+        setDocuments(newDocuments);
+        form.setFieldsValue({ documents: newDocuments });
+        // console.log("Documents after add:", newDocuments); // Debug log
     };
 
     return (
@@ -151,7 +154,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="text"
                                     id="fullName"
                                     name="fullName"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter full name"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -166,7 +169,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="text"
                                     id="driverBadgeNumber"
                                     name="driverBadgeNumber"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter badge number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -199,7 +202,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="text"
                                     id="religion"
                                     name="religion"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter religion"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -217,13 +220,13 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                             }
                                             return Promise.resolve();
                                         },
-                                    },
+                                    }
                                 ]}
                             >
                                 <DatePicker
                                     id="dateOfBirth"
                                     name="dateOfBirth"
-                                    onChange={(date, dateString) => handleChange({ target: { name: "dateOfBirth", value: dateString } })}
+                                    onChange={(date, dateString) => handleChange(dateString, "dateOfBirth")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select date of birth"
                                 />
@@ -265,7 +268,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="email"
                                     id="email"
                                     name="email"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter email address"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -280,7 +283,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="tel"
                                     id="contactNumber"
                                     name="contactNumber"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter contact number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -295,7 +298,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="tel"
                                     id="emergencyContact"
                                     name="emergencyContact"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter emergency contact"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -309,7 +312,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                 <Input.TextArea
                                     id="address"
                                     name="address"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter address"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     rows="2"
@@ -333,7 +336,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="text"
                                     id="licenseNumber"
                                     name="licenseNumber"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter license number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -342,12 +345,23 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">License Expiry Date</span>}
                                 name="licenseExpiryDate"
                                 className="mb-4"
-                                rules={[{ required: true, message: "License Expiry Date is required." }]}
+                                rules={[
+                                    { required: true, message: "License Expiry Date is required." },
+                                    {
+                                        validator: (_, value) => {
+                                            const today = dayjs();
+                                            if (value && !value.isAfter(today, 'day')) {
+                                                return Promise.reject("License expiry date must be greater than today.");
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    }
+                                ]}
                             >
                                 <DatePicker
                                     id="licenseExpiryDate"
                                     name="licenseExpiryDate"
-                                    onChange={(date, dateString) => handleChange({ target: { name: "licenseExpiryDate", value: dateString } })}
+                                    onChange={(date, dateString) => handleChange(dateString, "licenseExpiryDate")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select license expiry date"
                                 />
@@ -362,7 +376,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="text"
                                     id="national_Id"
                                     name="national_Id"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter national ID"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -377,7 +391,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     type="number"
                                     id="experienceInYears"
                                     name="experienceInYears"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter years of experience"
                                     min="0"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
@@ -392,7 +406,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                 <DatePicker
                                     id="joiningDate"
                                     name="joiningDate"
-                                    onChange={(date, dateString) => handleChange({ target: { name: "joiningDate", value: dateString } })}
+                                    onChange={(date, dateString) => handleChange(dateString, "joiningDate")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select joining date"
                                 />
@@ -401,12 +415,12 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Resignation Date</span>}
                                 name="resignationDate"
                                 className="mb-4"
-                                rules={[{ required: true, message: "Resignation Date is required." }]}
+                                rules={[{ required: false, message: "Resignation Date is required." }]}
                             >
                                 <DatePicker
                                     id="resignationDate"
                                     name="resignationDate"
-                                    onChange={(date, dateString) => handleChange({ target: { name: "resignationDate", value: dateString } })}
+                                    onChange={(date, dateString) => handleChange(dateString, "resignationDate")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select resignation date"
                                 />
@@ -422,7 +436,7 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                 <Checkbox
                                     id="policeVerificationDone"
                                     name="policeVerificationDone"
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     className="flex items-center h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                                 >
                                     <span className="flex text-center text-sm text-gray-700 w-40">Police Verification Done</span>
@@ -453,27 +467,6 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                                     <Option value="inactive">Inactive</Option>
                                 </Select>
                             </Form.Item>
-                            <Form.Item
-                                label={<span className="block text-sm font-medium text-gray-700">Assigned Bus</span>}
-                                name="assignedBus"
-                                className="mb-4"
-                                rules={[{ required: true, message: "Assigned Bus is required." }]}
-                            >
-                                <Select
-                                    id="assignedBus"
-                                    name="assignedBus"
-                                    onChange={(value) => handleChange(value, "assignedBus")}
-                                    placeholder="Select assigned bus"
-                                    className="w-full border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-                                >
-                                    <Option value="">Not Assigned</Option>
-                                    {vehicles?.map((vehicle) => (
-                                        <Option key={vehicle._id} value={vehicle._id}>
-                                            {vehicle?.vehicleNumber} ({vehicle?.vehicleType})
-                                        </Option>
-                                    ))}
-                                </Select>
-                            </Form.Item>
                         </div>
                     </div>
 
@@ -485,56 +478,55 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                             <Form.Item
                                 label={<span className="block text-sm font-medium text-gray-700">Driver Photo</span>}
                                 name="photo"
+                                rules={[{ required: false, message: "Driver Photo is required." }]}
                             >
-                                <SingleFileUpload
+                                <CustomUploadCard
                                     name="photo"
-                                    label="Driver Photo"
-                                    type="mandatory"
+                                    form={form}
+                                    recommendedSize="300x400"
+                                    width="w-[300px]"
+                                    height="h-full"
+                                    required={false}
+                                    profilelink={photo}
                                     onChange={(fileData) => handleFileChange("photo", fileData)}
-                                    onPreview={(file) => setPhotoPreviewFile(file)}
-                                    fileUrl={driverData.photo}
+                                    onRemove={() => handleRemove("photo")}
                                 />
                             </Form.Item>
                             <Form.Item
                                 label={<span className="block text-sm font-medium text-gray-700">Additional Documents (License copy, ID proof, etc.)</span>}
                                 name="documents"
+                                rules={[{ required: false, message: "At least one document is recommended but optional." }]}
                             >
-                                {Array.isArray(driverData.documents) ? (
-                                    driverData.documents.map((doc, index) => (
-                                        <SingleFileUpload
-                                            key={index}
-                                            name={["documents", index]}
-                                            label={`Document ${index + 1}`}
-                                            type="optional"
-                                            onChange={(fileData) => handleFileChange("documents", fileData)}
-                                            onPreview={(file) => setDocumentPreviewFile(file)}
-                                            fileUrl={doc.url}
-                                            fileName={doc.name}
-                                        />
-                                    ))
-                                ) : (
-                                    <SingleFileUpload
-                                        name="documents"
-                                        label="Additional Documents"
-                                        type="optional"
-                                        onChange={(fileData) => handleFileChange("documents", fileData)}
-                                        onPreview={(file) => setDocumentPreviewFile(file)}
-                                        fileUrl={driverData.documents?.url}
-                                        fileName={driverData.documents?.name}
-                                    />
-                                )}
-                                <Button
-                                    type="dashed"
-                                    onClick={() => {
-                                        setDriverData((prev) => ({
-                                            ...prev,
-                                            documents: [...(prev.documents || []), {}],
-                                        }));
-                                    }}
-                                    style={{ marginTop: 8 }}
-                                >
-                                    Add Another Document
-                                </Button>
+                                <div className="space-y-4">
+                                    {documents.map((doc, index) => (
+                                        <div key={index} className="flex items-center space-x-2">
+                                            <div className="flex-1">
+                                                <SingleFileUpload
+                                                    name={["documents", index]}
+                                                    label={`Document ${index + 1}`}
+                                                    type="optional"
+                                                    onChange={(fileData) => handleFileChange("documents", fileData, index)}
+                                                    onPreview={(file) => setDocumentPreviewFile(file)}
+                                                    onRemove={() => handleRemove("documents", index)}
+                                                    fileUrl={doc.url}
+                                                    fileName={doc.name}
+                                                />
+                                            </div>
+                                            <Button
+                                                icon={<DeleteOutlined />}
+                                                onClick={() => handleRemove("documents", index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            />
+                                        </div>
+                                    ))}
+                                    <Button
+                                        type="dashed"
+                                        onClick={addNewDocument}
+                                        className="w-full"
+                                    >
+                                        Add Another Document
+                                    </Button>
+                                </div>
                             </Form.Item>
                         </div>
                     </div>
@@ -557,23 +549,6 @@ const DriverSidebarForm = ({ isOpen, isEditing, driverData, setDriverData, handl
                     </div>
                 </Form>
             </div>
-
-            <Modal
-                title="Photo Preview"
-                visible={!!photoPreviewFile}
-                onCancel={() => setPhotoPreviewFile(null)}
-                footer={null}
-                width={800}
-            >
-                {photoPreviewFile && (
-                    <img
-                        src={photoPreviewFile.preview || photoPreviewFile.url}
-                        alt="Photo Preview"
-                        style={{ maxWidth: "100%", maxHeight: "70vh" }}
-                    />
-                )}
-            </Modal>
-
             <Modal
                 title="Document Preview"
                 visible={!!documentPreviewFile}

@@ -1,9 +1,12 @@
 import Sidebar from "../Common/Sidebar";
-import { Form, Input, Select, Checkbox, Button, message, Modal } from "antd";
+import { Form, Input, Select, Checkbox, Button, DatePicker, message, Modal } from "antd";
 import dayjs from 'dayjs';
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import { DeleteOutlined } from '@ant-design/icons';
+
+import CustomUploadCard from "./CustomUploadCard";
 import SingleFileUpload from "./SingleFileUpload";
 
 dayjs.extend(utc);
@@ -14,18 +17,49 @@ const { Option } = Select;
 const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handleChange, handleSubmit, resetForm, vehicles }) => {
     const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
     const [form] = Form.useForm();
-    const [photoPreviewFile, setPhotoPreviewFile] = useState(null);
     const [documentPreviewFile, setDocumentPreviewFile] = useState(null);
-    const photoInputRef = useRef(null);
-    const documentInputRef = useRef(null);
+    const [photo, setPhoto] = useState("");
+    const [documents, setDocuments] = useState([]);
+
+    useEffect(() => {
+        if (isOpen && helperData) {
+            const initialDocuments = Array.isArray(helperData.documents)
+                ? helperData.documents.map((doc, index) => ({
+                    name: doc.name || `Document_${index + 1}`,
+                    url: doc.url || "",
+                    expiryDate: doc.expiryDate ? parseDate(doc.expiryDate) : null,
+                }))
+                : [];
+            setPhoto(helperData.photo || "");
+            setDocuments(initialDocuments);
+            form.setFieldsValue({
+                ...helperData,
+                helperBadgeNumber: helperData?.helperBadgeNumber || "",
+                dateOfBirth: helperData?.dateOfBirth ? parseDate(helperData.dateOfBirth) : null,
+                joiningDate: helperData?.joiningDate ? parseDate(helperData.joiningDate) : null,
+                resignationDate: helperData?.resignationDate ? parseDate(helperData.resignationDate) : null,
+                documents: initialDocuments,
+                photo: helperData?.photo || "",
+            });
+        }
+    }, [isOpen, helperData, form]);
 
     const onFinish = (values) => {
+        const documentsArray = documents.length > 0 ? documents : values.documents || [];
         const processedValues = {
             ...values,
-            photo: helperData.photo || "",
-            documents: helperData.documents || [],
+            photo: photo || values?.photo || "",
+            documents: documentsArray.map((doc, index) => ({
+                name: doc?.name || `Document_${Date.now()}_${index}`,
+                url: doc?.url || "",
+                expiryDate: doc?.expiryDate || null,
+            })),
         };
         handleSubmit(processedValues);
+        if (!isEditing) {
+            setPhoto("");
+            setDocuments([]);
+        }
     };
 
     const onFinishFailed = (errorInfo) => {
@@ -45,10 +79,9 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
     const handleClose = () => {
         form.resetFields();
         resetForm();
-        setPhotoPreviewFile(null);
         setDocumentPreviewFile(null);
-        if (photoInputRef.current) photoInputRef.current.value = "";
-        if (documentInputRef.current) documentInputRef.current.value = "";
+        setPhoto("");
+        setDocuments([]);
     };
 
     const parseDate = (dateStr) => {
@@ -57,64 +90,34 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
         return d.isValid() ? d : null;
     };
 
-    useEffect(() => {
-        form.setFieldsValue({
-            fullName: helperData?.fullName || "",
-            helperBadgeNumber: helperData?.helperBadgeNumber || "",
-            gender: helperData?.gender || "",
-            religion: helperData?.religion || "",
-            dateOfBirth: parseDate(helperData?.dateOfBirth),
-            bloodGroup: helperData?.bloodGroup || "",
-            email: helperData?.email || "",
-            contactNumber: helperData?.contactNumber || "",
-            emergencyContact: helperData?.emergencyContact || "",
-            address: helperData?.address || "",
-            national_Id: helperData?.national_Id || "",
-            joiningDate: parseDate(helperData?.joiningDate),
-            resignationDate: parseDate(helperData?.resignationDate),
-            policeVerificationDone: helperData?.policeVerificationDone || false,
-            status: helperData?.status || "",
-        });
-        if (helperData?.photo) {
-            setHelperData((prev) => ({
-                ...prev,
-                photo: helperData.photo,
-            }));
-        }
-        if (helperData?.documents) {
-            setHelperData((prev) => ({
-                ...prev,
-                documents: helperData.documents,
-            }));
-        }
-    }, [helperData, form]);
-
-    const handleFileChange = (fieldName, fileData) => {
+    const handleFileChange = (fieldName, fileData, index = null) => {
         if (fieldName === "photo") {
-            setHelperData((prev) => ({
-                ...prev,
-                photo: fileData.url,
-            }));
-        } else if (fieldName === "documents") {
-            setHelperData((prev) => ({
-                ...prev,
-                documents: [...(prev.documents || []), fileData],
-            }));
+            setPhoto(fileData?.url || "");
+            form.setFieldsValue({ photo: fileData?.url || "" });
+        } else if (fieldName === "documents" && index !== null) {
+            const newDocuments = [...documents];
+            newDocuments[index] = { ...newDocuments[index], ...fileData };
+            setDocuments(newDocuments);
+            form.setFields([{ name: ["documents", index], value: newDocuments[index] }]);
         }
     };
 
-    const handleRemove = (fieldName, index) => {
+    const handleRemove = (fieldName, index = null) => {
         if (fieldName === "photo") {
-            setHelperData((prev) => ({
-                ...prev,
-                photo: "",
-            }));
-        } else if (fieldName === "documents") {
-            setHelperData((prev) => ({
-                ...prev,
-                documents: prev.documents.filter((_, i) => i !== index),
-            }));
+            setPhoto("");
+            form.setFieldsValue({ photo: "" });
+        } else if (fieldName === "documents" && index !== null) {
+            const newDocuments = documents.filter((_, i) => i !== index);
+            setDocuments(newDocuments);
+            form.setFieldsValue({ documents: newDocuments });
         }
+    };
+
+    const addNewDocument = () => {
+        const newDoc = { name: `Document_${documents.length + 1}`, url: "", expiryDate: null };
+        const newDocuments = [...documents, newDoc];
+        setDocuments(newDocuments);
+        form.setFieldsValue({ documents: newDocuments });
     };
 
     return (
@@ -147,8 +150,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="text"
                                     id="fullName"
                                     name="fullName"
-                                    value={helperData.fullName}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter full name"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -157,13 +159,13 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Badge Number</span>}
                                 name="helperBadgeNumber"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Badge Number is required." }]}
                             >
                                 <Input
                                     type="text"
                                     id="helperBadgeNumber"
                                     name="helperBadgeNumber"
-                                    value={helperData.helperBadgeNumber}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter badge number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -177,8 +179,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Select
                                     id="gender"
                                     name="gender"
-                                    value={helperData.gender}
-                                    onChange={(value) => handleChange({ target: { name: "gender", value } })}
+                                    onChange={(value) => handleChange(value, "gender")}
                                     placeholder="Select gender"
                                     className="w-full h-[40px] border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
@@ -191,13 +192,13 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Religion</span>}
                                 name="religion"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Religion is required." }]}
                             >
                                 <Input
                                     type="text"
                                     id="religion"
                                     name="religion"
-                                    value={helperData.religion}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter religion"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -206,26 +207,36 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Date of Birth</span>}
                                 name="dateOfBirth"
                                 className="mb-4"
+                                rules={[
+                                    { required: true, message: "Date of Birth is required." },
+                                    {
+                                        validator: (_, value) => {
+                                            if (value && dayjs().diff(dayjs(value), 'year') < 18) {
+                                                return Promise.reject("Helper must be at least 18 years old.");
+                                            }
+                                            return Promise.resolve();
+                                        },
+                                    }
+                                ]}
                             >
-                                <Input
-                                    type="date"
+                                <DatePicker
                                     id="dateOfBirth"
                                     name="dateOfBirth"
-                                    value={helperData.dateOfBirth}
-                                    onChange={handleChange}
+                                    onChange={(date, dateString) => handleChange(dateString, "dateOfBirth")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    placeholder="Select date of birth"
                                 />
                             </Form.Item>
                             <Form.Item
                                 label={<span className="block text-sm font-medium text-gray-700">Blood Group</span>}
                                 name="bloodGroup"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Blood Group is required." }]}
                             >
                                 <Select
                                     id="bloodGroup"
                                     name="bloodGroup"
-                                    value={helperData.bloodGroup}
-                                    onChange={(value) => handleChange({ target: { name: "bloodGroup", value } })}
+                                    onChange={(value) => handleChange(value, "bloodGroup")}
                                     placeholder="Select blood group"
                                     className="w-full h-[40px] border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
@@ -247,13 +258,13 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Email</span>}
                                 name="email"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Email is required." }]}
                             >
                                 <Input
                                     type="email"
                                     id="email"
                                     name="email"
-                                    value={helperData.email}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter email address"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -268,8 +279,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="tel"
                                     id="contactNumber"
                                     name="contactNumber"
-                                    value={helperData.contactNumber}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter contact number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -278,13 +288,13 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Emergency Contact</span>}
                                 name="emergencyContact"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Emergency Contact is required." }]}
                             >
                                 <Input
                                     type="tel"
                                     id="emergencyContact"
                                     name="emergencyContact"
-                                    value={helperData.emergencyContact}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter emergency contact"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -293,12 +303,12 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Address</span>}
                                 name="address"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Address is required." }]}
                             >
                                 <Input.TextArea
                                     id="address"
                                     name="address"
-                                    value={helperData.address}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter address"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     rows="2"
@@ -316,13 +326,13 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">National ID</span>}
                                 name="national_Id"
                                 className="mb-4"
+                                rules={[{ required: true, message: "National ID is required." }]}
                             >
                                 <Input
                                     type="text"
                                     id="national_Id"
                                     name="national_Id"
-                                    value={helperData.national_Id}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter national ID"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -331,28 +341,28 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 label={<span className="block text-sm font-medium text-gray-700">Joining Date</span>}
                                 name="joiningDate"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Joining Date is required." }]}
                             >
-                                <Input
-                                    type="date"
+                                <DatePicker
                                     id="joiningDate"
                                     name="joiningDate"
-                                    value={helperData.joiningDate}
-                                    onChange={handleChange}
+                                    onChange={(date, dateString) => handleChange(dateString, "joiningDate")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    placeholder="Select joining date"
                                 />
                             </Form.Item>
                             <Form.Item
                                 label={<span className="block text-sm font-medium text-gray-700">Resignation Date</span>}
                                 name="resignationDate"
                                 className="mb-4"
+                                rules={[{ required: false, message: "Resignation Date is required." }]}
                             >
-                                <Input
-                                    type="date"
+                                <DatePicker
                                     id="resignationDate"
                                     name="resignationDate"
-                                    value={helperData.resignationDate}
-                                    onChange={handleChange}
+                                    onChange={(date, dateString) => handleChange(dateString, "resignationDate")}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                    placeholder="Select resignation date"
                                 />
                             </Form.Item>
                         </div>
@@ -361,12 +371,12 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 name="policeVerificationDone"
                                 valuePropName="checked"
                                 className="mb-4"
+                                rules={[{ required: true, message: "Police Verification Done is required." }]}
                             >
                                 <Checkbox
                                     id="policeVerificationDone"
                                     name="policeVerificationDone"
-                                    checked={helperData.policeVerificationDone}
-                                    onChange={handleChange}
+                                    onChange={(e) => handleChange(e)}
                                     className="flex items-center h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                                 >
                                     <span className="flex text-center text-sm text-gray-700 w-40">Police Verification Done</span>
@@ -389,8 +399,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Select
                                     id="status"
                                     name="status"
-                                    value={helperData.status}
-                                    onChange={(value) => handleChange({ target: { name: "status", value } })}
+                                    onChange={(value) => handleChange(value, "status")}
                                     placeholder="Select status"
                                     className="w-full border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
@@ -409,56 +418,55 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                             <Form.Item
                                 label={<span className="block text-sm font-medium text-gray-700">Helper Photo</span>}
                                 name="photo"
+                                rules={[{ required: false, message: "Helper Photo is required." }]}
                             >
-                                <SingleFileUpload
+                                <CustomUploadCard
                                     name="photo"
-                                    label="Helper Photo"
-                                    type="mandatory"
+                                    form={form}
+                                    recommendedSize="300x400"
+                                    width="w-[300px]"
+                                    height="h-full"
+                                    required={false}
+                                    profilelink={photo}
                                     onChange={(fileData) => handleFileChange("photo", fileData)}
-                                    onPreview={(file) => setPhotoPreviewFile(file)}
-                                    fileUrl={helperData.photo}
+                                    onRemove={() => handleRemove("photo")}
                                 />
                             </Form.Item>
                             <Form.Item
                                 label={<span className="block text-sm font-medium text-gray-700">Additional Documents (License copy, ID proof, etc.)</span>}
                                 name="documents"
+                                rules={[{ required: false, message: "At least one document is recommended but optional." }]}
                             >
-                                {Array.isArray(helperData.documents) ? (
-                                    helperData.documents.map((doc, index) => (
-                                        <SingleFileUpload
-                                            key={index}
-                                            name={["documents", index]}
-                                            label={`Document ${index + 1}`}
-                                            type="optional"
-                                            onChange={(fileData) => handleFileChange("documents", fileData)}
-                                            onPreview={(file) => setDocumentPreviewFile(file)}
-                                            fileUrl={doc.url}
-                                            fileName={doc.name}
-                                        />
-                                    ))
-                                ) : (
-                                    <SingleFileUpload
-                                        name="documents"
-                                        label="Additional Documents"
-                                        type="optional"
-                                        onChange={(fileData) => handleFileChange("documents", fileData)}
-                                        onPreview={(file) => setDocumentPreviewFile(file)}
-                                        fileUrl={helperData.documents?.url}
-                                        fileName={helperData.documents?.name}
-                                    />
-                                )}
-                                <Button
-                                    type="dashed"
-                                    onClick={() => {
-                                        setHelperData((prev) => ({
-                                            ...prev,
-                                            documents: [...(prev.documents || []), {}],
-                                        }));
-                                    }}
-                                    style={{ marginTop: 8 }}
-                                >
-                                    Add Another Document
-                                </Button>
+                                <div className="space-y-4">
+                                    {documents.map((doc, index) => (
+                                        <div key={index} className="flex items-center space-x-2">
+                                            <div className="flex-1">
+                                                <SingleFileUpload
+                                                    name={["documents", index]}
+                                                    label={`Document ${index + 1}`}
+                                                    type="optional"
+                                                    onChange={(fileData) => handleFileChange("documents", fileData, index)}
+                                                    onPreview={(file) => setDocumentPreviewFile(file)}
+                                                    onRemove={() => handleRemove("documents", index)}
+                                                    fileUrl={doc.url}
+                                                    fileName={doc.name}
+                                                />
+                                            </div>
+                                            <Button
+                                                icon={<DeleteOutlined />}
+                                                onClick={() => handleRemove("documents", index)}
+                                                className="text-red-500 hover:text-red-700"
+                                            />
+                                        </div>
+                                    ))}
+                                    <Button
+                                        type="dashed"
+                                        onClick={addNewDocument}
+                                        className="w-full"
+                                    >
+                                        Add Another Document
+                                    </Button>
+                                </div>
                             </Form.Item>
                         </div>
                     </div>
@@ -481,23 +489,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                     </div>
                 </Form>
             </div>
-
-            <Modal
-                title="Photo Preview"
-                visible={!!photoPreviewFile}
-                onCancel={() => setPhotoPreviewFile(null)}
-                footer={null}
-                width={800}
-            >
-                {photoPreviewFile && (
-                    <img
-                        src={photoPreviewFile.preview || photoPreviewFile.url}
-                        alt="Photo Preview"
-                        style={{ maxWidth: "100%", maxHeight: "70vh" }}
-                    />
-                )}
-            </Modal>
-
             <Modal
                 title="Document Preview"
                 visible={!!documentPreviewFile}
