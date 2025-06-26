@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import BookIssueRow from "../Components/BookIssueRow";
@@ -7,9 +7,10 @@ import ProtectedAction from "../../../../Routes/ProtectedRoutes/ProtectedAction"
 import { PERMISSIONS } from "../../../../config/permission";
 import { FaBook } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
-import { Select, Skeleton, Input, Tooltip } from "antd";
+import { Select, Skeleton, Input, Tooltip, DatePicker, message } from "antd";
 import { FiRefreshCcw } from "react-icons/fi";
 import Pagination from "../../../../Components/Common/pagination";
+import moment from "moment";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -31,9 +32,18 @@ const initialFilters = {
   book: "",
   status: "",
   roleType: "",
+  issueDate: null, // moment | null
+  returnDate: null, // moment | null
 };
 
-const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limit, setLimit }) => {
+const BookIssueTab = ({
+  handleSidebarOpen,
+  setEditIssueData,
+  page,
+  setPage,
+  limit,
+  setLimit,
+}) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const {
@@ -42,11 +52,14 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
     loading: libraryLoading,
   } = useSelector((state) => state.admin.library);
   const classList = useSelector((store) => store.admin.class.classes);
-  const { totalPages, totalBooks } = useSelector((state) => state.admin.library);
-  const sectionList = useSelector((store) => store.admin.group_section.sectionsList);
+  const { totalPages, totalBooks } = useSelector(
+    (state) => state.admin.library
+  );
+  const sectionList = useSelector(
+    (store) => store.admin.group_section.sectionsList
+  );
   const role = useSelector((store) => store.common.auth.role);
 
-  // Local filters state
   const [localFilters, setLocalFilters] = useState(initialFilters);
 
   useEffect(() => {
@@ -70,27 +83,84 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
     setLocalFilters(initialFilters);
   };
 
-  // Filter logic for book issues based on filters
-  const filteredBookIssues = bookIssues?.filter((issue) => {
-    if (localFilters.classLevel && issue.classId?._id !== localFilters.classLevel) return false;
-    if (localFilters.section && issue.sectionId?._id !== localFilters.section) return false;
-    if (localFilters.book && issue.bookId?._id !== localFilters.book) return false;
-    if (localFilters.status && issue.status?.toLowerCase() !== localFilters.status.toLowerCase()) return false;
-    if (localFilters.roleType && issue.issuedTo?.userType?.toLowerCase() !== localFilters.roleType.toLowerCase()) return false;
-    if (localFilters.searchQuery) {
-      const fullName = `${issue.issuedTo?.userId?.firstName || ""} ${issue.issuedTo?.userId?.lastName || ""}`.trim();
-      if (!fullName.toLowerCase().includes(localFilters.searchQuery.toLowerCase())) return false;
+  // ---------- Filtering ----------
+  const filteredBookIssues = useMemo(() => {
+    try {
+      return bookIssues?.filter((issue) => {
+        // class / section / book / status / roleType -----------------------------------------
+        if (
+          localFilters.classLevel &&
+          issue.classId?._id !== localFilters.classLevel
+        )
+          return false;
+        if (
+          localFilters.section &&
+          issue.sectionId?._id !== localFilters.section
+        )
+          return false;
+        if (localFilters.book && issue.bookId?._id !== localFilters.book)
+          return false;
+        if (
+          localFilters.status &&
+          issue.status?.toLowerCase() !== localFilters.status.toLowerCase()
+        )
+          return false;
+        if (
+          localFilters.roleType &&
+          issue.issuedTo?.userType?.toLowerCase() !==
+            localFilters.roleType.toLowerCase()
+        )
+          return false;
+
+        // search query -----------------------------------------------------------------------
+        if (localFilters.searchQuery) {
+          const fullName = `${issue.issuedTo?.userId?.firstName || ""} ${
+            issue.issuedTo?.userId?.lastName || ""
+          }`.trim();
+          if (
+            !fullName
+              .toLowerCase()
+              .includes(localFilters.searchQuery.toLowerCase())
+          )
+            return false;
+        }
+
+        // issue date -------------------------------------------------------------------------
+        if (localFilters.issueDate) {
+          const filterDate = localFilters.issueDate;
+          const issueMoment = issue.issueDate ? moment(issue.issueDate) : null;
+          if (!issueMoment || !issueMoment.isSame(filterDate, "day"))
+            return false;
+        }
+
+        // return date ------------------------------------------------------------------------
+        if (localFilters.returnDate) {
+          const filterDate = localFilters.returnDate;
+          const returnMoment = issue.returnDate
+            ? moment(issue.returnDate)
+            : null;
+          if (!returnMoment || !returnMoment.isSame(filterDate, "day"))
+            return false;
+        }
+
+        return true;
+      });
+    } catch (err) {
+      console.error("Filter error:", err);
+      message.error(t("An error occurred while filtering data."));
+      return [];
     }
-    return true;
-  });
+  }, [bookIssues, localFilters, t]);
 
   return (
     <>
-      {/* Filter Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white shadow rounded-lg">
-        {/* Search Input at the Start */}
+      {/* ------------------ Filter Header ------------------ */}
+      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-white  rounded-lg">
+        {/* Search Input */}
         <div className="flex-shrink-0">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Search")}</label>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            {t("Search")}
+          </label>
           <Search
             size="middle"
             placeholder={t("Search by student name")}
@@ -102,43 +172,11 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
 
         {/* Middle Filters */}
         <div className="flex flex-wrap gap-4 items-end flex-grow justify-center">
-          {/* <div className="flex-shrink-0">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Class")}</label>
-            <Select
-              size="middle"
-              placeholder={t("Select Class")}
-              value={localFilters.classLevel === "" ? undefined : localFilters.classLevel}
-              onChange={(value) => handleFilterChange("classLevel", value)}
-              style={{ width: 120 }}
-              allowClear
-              showSearch
-              optionFilterProp="children"
-            >
-              {classList?.map((cls) => (
-                <Option key={cls._id} value={cls._id}>{cls.className}</Option>
-              ))}
-            </Select>
-          </div>
+          {/* ---------- Book ---------- */}
           <div className="flex-shrink-0">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Section")}</label>
-            <Select
-              size="middle"
-              placeholder={t("Select Section")}
-              value={localFilters.section === "" ? undefined : localFilters.section}
-              onChange={(value) => handleFilterChange("section", value)}
-              style={{ width: 120 }}
-              allowClear
-              disabled={!localFilters.classLevel}
-              showSearch
-              optionFilterProp="children"
-            >
-              {sectionList?.map((section) => (
-                <Option key={section._id} value={section._id}>{section.sectionName}</Option>
-              ))}
-            </Select>
-          </div> */}
-          <div className="flex-shrink-0">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Book")}</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              {t("Book")}
+            </label>
             <Select
               size="middle"
               placeholder={t("Select Book")}
@@ -150,16 +188,24 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
               optionFilterProp="children"
             >
               {books?.map((book) => (
-                <Option key={book._id} value={book._id}>{book.name}</Option>
+                <Option key={book._id} value={book._id}>
+                  {book.name}
+                </Option>
               ))}
             </Select>
           </div>
+
+          {/* ---------- Status ---------- */}
           <div className="flex-shrink-0">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Status")}</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              {t("Status")}
+            </label>
             <Select
               size="middle"
               placeholder={t("Select Status")}
-              value={localFilters.status === "" ? undefined : localFilters.status}
+              value={
+                localFilters.status === "" ? undefined : localFilters.status
+              }
               onChange={(value) => handleFilterChange("status", value)}
               style={{ width: 120 }}
               allowClear
@@ -170,12 +216,18 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
               <Option value="Returned">{t("Returned")}</Option>
             </Select>
           </div>
+
+          {/* ---------- Role ---------- */}
           <div className="flex-shrink-0">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">{t("Role")}</label>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              {t("Role")}
+            </label>
             <Select
               size="middle"
               placeholder={t("Select Role")}
-              value={localFilters.roleType === "" ? undefined : localFilters.roleType}
+              value={
+                localFilters.roleType === "" ? undefined : localFilters.roleType
+              }
               onChange={(value) => handleFilterChange("roleType", value)}
               style={{ width: 120 }}
               allowClear
@@ -183,10 +235,50 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
               optionFilterProp="children"
             >
               {roleOptions.map((r) => (
-                <Option key={r.value} value={r.value}>{r.label}</Option>
+                <Option key={r.value} value={r.value}>
+                  {r.label}
+                </Option>
               ))}
             </Select>
           </div>
+
+          {/* ---------- Issue Date ---------- */}
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              {t("Issue Date")}
+            </label>
+            <DatePicker
+              size="middle"
+              value={localFilters.issueDate}
+              onChange={(date) => handleFilterChange("issueDate", date)}
+              allowClear
+              style={{ width: 150 }}
+              format="DD-MM-YYYY"
+              disabledDate={(current) =>
+                current && current > moment().endOf("day")
+              }
+            />
+          </div>
+
+          {/* ---------- Return Date ---------- */}
+          <div className="flex-shrink-0">
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              {t("Return Date")}
+            </label>
+            <DatePicker
+              size="middle"
+              value={localFilters.returnDate}
+              onChange={(date) => handleFilterChange("returnDate", date)}
+              allowClear
+              style={{ width: 150 }}
+              format="DD-MM-YYYY"
+              disabledDate={(current) =>
+                current && current > moment().endOf("day")
+              }
+            />
+          </div>
+
+          {/* ---------- Reset Button ---------- */}
           <div className="flex-shrink-0">
             <Tooltip title={t("Reset Filters")}>
               <button
@@ -199,7 +291,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
           </div>
         </div>
 
-        {/* Add Book Issue Button on the Right */}
+        {/* Add Book Issue Button */}
         <ProtectedAction requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}>
           <div className="flex-shrink-0">
             <button
@@ -213,7 +305,7 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
         </ProtectedAction>
       </div>
 
-      {/* Table or Skeleton Shimmer */}
+      {/* ------------------ Table / Skeleton ------------------ */}
       {libraryLoading ? (
         <Skeleton active paragraph={{ rows: 6 }} />
       ) : (
@@ -228,7 +320,9 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
                 <th className="px-6 py-3 font-semibold">{t("Issue Date")}</th>
                 <th className="px-6 py-3 font-semibold">{t("Status")}</th>
                 {role !== "teacher" && (
-                  <ProtectedAction requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}>
+                  <ProtectedAction
+                    requiredPermission={PERMISSIONS.EDIT_ISSUE_BOOK}
+                  >
                     <th className="px-6 py-3 font-semibold">{t("Action")}</th>
                   </ProtectedAction>
                 )}
@@ -250,7 +344,9 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
                   <td colSpan={role !== "teacher" ? 8 : 7} className="h-80">
                     <NoDataFound
                       title={t("Book Issues")}
-                      desc={t("No book issues available. Try adding or adjusting filters.")}
+                      desc={t(
+                        "No book issues available. Try adding or adjusting filters."
+                      )}
                       icon={FaBook}
                       iconColor="text-blue-500"
                       textColor="text-gray-600"
@@ -262,6 +358,8 @@ const BookIssueTab = ({ handleSidebarOpen, setEditIssueData, page, setPage, limi
           </table>
         </div>
       )}
+
+      {/* ------------------ Pagination ------------------ */}
       {filteredBookIssues.length > 0 && (
         <Pagination
           page={page}

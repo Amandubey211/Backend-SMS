@@ -296,6 +296,7 @@ const LibraryTab = ({ page, setPage, limit, setLimit }) => {
         isOpen={isBookSidebarOpen}
         onClose={() => setBookSidebarOpen(false)}
         title={t("Add New Book")}
+        width="60%"
       >
         <BookForm onClose={() => setBookSidebarOpen(false)} />
       </Sidebar>
