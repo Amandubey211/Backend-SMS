@@ -31,7 +31,7 @@ const VALID_FILE_TYPES = [
 ];
 
 const SingleFileUpload = memo(
-  ({ name, label, displayKey, type, onEdit, onDelete, onPreview }) => {
+  ({ name, label, displayKey, type, onChange, onEdit, onDelete, onPreview, fileUrl, fileName }) => {
     const form = Form.useFormInstance();
     const fileObj = Form.useWatch(name, form);
     const namePath = Array.isArray(name) ? name : [name];
@@ -63,9 +63,13 @@ const SingleFileUpload = memo(
     useEffect(() => {
       if (fileObj?.url) {
         setPublicId(extractPublicId(fileObj.url));
+      } else if (fileUrl) {
+        setPublicId(extractPublicId(fileUrl));
+      } else {
+        setPublicId(null);
       }
       resetUpload();
-    }, [fileObj, extractPublicId, resetUpload]);
+    }, [fileObj, fileUrl, extractPublicId, resetUpload]);
 
     useEffect(() => {
       return () => {
@@ -90,19 +94,9 @@ const SingleFileUpload = memo(
       return true;
     }, []);
 
-    const setNested = useCallback(
+    const setFieldValue = useCallback(
       (value) => {
-        const out = {};
-        let cur = out;
-        namePath.forEach((seg, i) => {
-          if (i === namePath.length - 1) {
-            cur[seg] = value;
-          } else {
-            cur[seg] = cur[seg] || {};
-            cur = cur[seg];
-          }
-        });
-        form.setFieldsValue(out);
+        form.setFields([{ name: namePath, value }]);
       },
       [form, namePath]
     );
@@ -140,13 +134,18 @@ const SingleFileUpload = memo(
             file: localFile,
             preview: localFile.type.startsWith("image/") ? localURL : null,
             url,
-            fieldName: namePath[namePath.length - 1],
+            name: fileName || localFile.name,
           };
 
-          setNested(fileData);
+          setFieldValue(fileData);
           setLocalFile(null);
           setLocalURL(null);
           setSizeError(false);
+
+          // Notify parent component of the change
+          if (onChange) {
+            onChange(fileData);
+          }
         }
       } catch (err) {
         message.error("Upload failed");
@@ -159,21 +158,25 @@ const SingleFileUpload = memo(
       uploadFile,
       deleteMediaByPublicId,
       extractPublicId,
-      setNested,
-      namePath,
+      setFieldValue,
+      onChange,
+      fileName,
     ]);
 
     const handleRemove = useCallback(async () => {
       try {
         if (publicId) await deleteMediaByPublicId(publicId);
         setPublicId(null);
-        setNested(null);
+        setFieldValue(null);
+        if (onChange) {
+          onChange(null);
+        }
         message.success("File removed");
       } catch (err) {
         message.error("Failed to remove file");
         console.error(err);
       }
-    }, [publicId, deleteMediaByPublicId, setNested]);
+    }, [publicId, deleteMediaByPublicId, setFieldValue, onChange]);
 
     const cancelUpload = useCallback(() => {
       setLocalFile(null);
@@ -183,22 +186,30 @@ const SingleFileUpload = memo(
     }, [resetUpload]);
 
     const handlePreview = useCallback(() => {
-      if (fileObj?.url || fileObj?.preview) {
-        onPreview({
-          url: fileObj.url,
-          preview: fileObj.preview,
+      let previewData = null;
+      if (fileObj?.url || fileUrl) {
+        // Use the current fileObj or fileUrl for preview
+        previewData = {
+          url: fileObj?.url || fileUrl,
+          preview: fileObj?.preview,
           type:
-            fileObj.file?.type ||
-            (fileObj.url?.endsWith(".pdf") ? "application/pdf" : "image/jpeg"),
-        });
+            fileObj?.file?.type ||
+            (fileObj?.url?.endsWith(".pdf") || fileUrl?.endsWith(".pdf")
+              ? "application/pdf"
+              : "image/jpeg"),
+        };
       } else if (localFile) {
-        onPreview({
+        // Use the local file being uploaded
+        previewData = {
           url: null,
           preview: localURL,
           type: localFile.type,
-        });
+        };
       }
-    }, [fileObj, localFile, localURL, onPreview]);
+      if (onPreview && previewData) {
+        onPreview(previewData);
+      }
+    }, [fileObj, fileUrl, localFile, localURL, onPreview]);
 
     const menu = (
       <div>
@@ -219,12 +230,9 @@ const SingleFileUpload = memo(
         )}
       </div>
     );
+
     return (
       <div className="flex items-center border border-gray-300 rounded-md overflow-hidden">
-        <Popover content={menu} trigger="click" placement="bottomLeft">
-          <Button type="text" icon={<MoreOutlined />} style={{ width: 40 }} />
-        </Popover>
-
         <Tooltip title={displayKey || label}>
           <div className="px-3 w-1/2 bg-gray-50 truncate">
             {`${displayKey || label}${type === "mandatory" ? " *" : ""}`}
@@ -240,11 +248,11 @@ const SingleFileUpload = memo(
               showInfo={false}
             />
           </div>
-        ) : fileObj?.url ? (
+        ) : fileObj?.url || fileUrl ? (
           <div className="flex items-center justify-between flex-1 px-3 bg-blue-50">
-            <Tooltip title={fileObj?.file?.name || fileObj?.fieldName}>
+            <Tooltip title={fileObj?.name || fileName || fileObj?.file?.name || fileObj?.fieldName}>
               <span className="truncate">
-                {fileObj?.file?.name || fileObj?.fieldName}
+                {fileObj?.name || fileName || fileObj?.file?.name || fileObj?.fieldName}
               </span>
             </Tooltip>
             <Space>
