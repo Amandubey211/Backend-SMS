@@ -175,7 +175,7 @@ const BookForm = ({ book, onClose, setSidebarTitle }) => {
         categories: bk.categories?.map((c) => c._id) || [],
         copies: "1",
         barcodeValue: scannedBarcode,
-        language: bk.language || "en",
+        language: bk.language || "English",
       },
       imagePreview: bk.image || null,
     }));
@@ -213,7 +213,7 @@ const BookForm = ({ book, onClose, setSidebarTitle }) => {
         authorName: payload.book.author || "",
         barcodeValue: scannedBarcode,
         copies: "1",
-        language: payload.book.language || "en",
+        language: payload.book.language || "English",
         // bookImage will be injected above if fetch succeeds
       },
       googleBookData: payload.googleData,
@@ -282,7 +282,7 @@ const BookForm = ({ book, onClose, setSidebarTitle }) => {
     fd.append("classId", bookData.class || "");
     bookData.categories.forEach((c) => fd.append("categories", c));
     fd.append("copies", total);
-    fd.append("language", bookData.language);
+    fd.append("language", bookData.language || "English");
     if (bookData.bookImage) fd.append("image", bookData.bookImage);
     if (bookData.barcodeValue) fd.append("barcodeValue", bookData.barcodeValue);
     return fd;

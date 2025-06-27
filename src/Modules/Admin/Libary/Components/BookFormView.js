@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import ImageUpload from "./ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
 import { FiX } from "react-icons/fi";
+import { LANGUAGE_OPTIONS } from "../../Addmission/AdminAdmission/Configs/selectOptionsConfig";
 
 const { Option } = Select;
 
@@ -121,7 +122,37 @@ const BookFormView = ({
             required
             inputClassName="h-12 text-base"
           />
-
+          {/* Language Select */}
+          <div className="my-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t("Language")} <span className="text-red-500">*</span>
+            </label>
+            <Select
+              showSearch
+              optionFilterProp="children"
+              filterOption={(input, option) =>
+                option.children.toLowerCase().includes(input.toLowerCase())
+              }
+              placeholder={t("Select Language")}
+              value={bookData.language}
+              onChange={(value) =>
+                onInputChange({
+                  target: {
+                    name: "language",
+                    value: value,
+                  },
+                })
+              }
+              style={{ width: "100%" }}
+              size="large"
+            >
+              {LANGUAGE_OPTIONS.map((lang) => (
+                <Option key={lang.value} value={lang.value}>
+                  {lang.label}
+                </Option>
+              ))}
+            </Select>
+          </div>
           <div className="flex gap-4 my-4 items-center">
             <div className="flex-1">
               <label
