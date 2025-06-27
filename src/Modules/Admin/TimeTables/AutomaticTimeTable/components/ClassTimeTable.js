@@ -10,7 +10,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
   const dispatch = useDispatch();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
-  const [isPublished, setIsPublished] = useState(false);
+
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
   const [reloadTable, setReloadTable] = useState(false);
@@ -27,7 +27,10 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
       })
     );
     setReloadTable(false);
+
   }, [dispatch, selectedClass, selectedSection, reloadTable]);
+
+
 
   // Function to convert time string to minutes for sorting
   const timeToMinutes = (timeStr) => {
@@ -100,17 +103,16 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
       });
   };
 
-  const handleTogglePublish = () => {
-    const newPublishStatus = !isPublished;
-    setIsPublished(newPublishStatus);
-
+  const handleTogglePublish = (id,currentStatus) => {
+    const newPublishStatus = !currentStatus;
     dispatch(
       updateTimeTable({
-        timetableData: { ...ascClassTimeTableData, isPublished: newPublishStatus },
+        timetableData: { id, publish: newPublishStatus },
       })
     )
       .unwrap()
       .then(() => {
+        setReloadTable(true)
         message.success(`Timetable ${newPublishStatus ? 'published' : 'unpublished'} successfully`);
       })
       .catch((error) => {
@@ -164,22 +166,22 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
                   <div className="flex items-center">
                     {(role === 'admin' || role === 'teacher') ? (
                       <div
-                        className={`relative inline-flex items-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer ${isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-                        onClick={handleTogglePublish}
+                        className={`relative inline-flex items-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer ${data.publish ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                        onClick={() => handleTogglePublish(data._id,data.publish)}
                       >
-                        {isPublished ? 'Published' : 'Unpublished'}
+                        {data?.publish ? 'Published' : 'Unpublished'}
                         <span className="ml-2 inline-block w-8 h-4 rounded-full bg-white relative">
                           <span
-                            className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${isPublished ? 'left-4 bg-green-500' : 'left-0.5 bg-gray-500'}`}
+                            className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${data.publish ? 'left-4 bg-green-500' : 'left-0.5 bg-gray-500'}`}
                           />
                         </span>
                       </div>
                     ) : (
                       <Tag
-                        color={isPublished ? 'green' : 'red'}
+                        color={data?.publish ? 'green' : 'red'}
                         className="py-1 px-3 rounded-md text-sm font-medium"
                       >
-                        {isPublished ? 'Published' : 'Unpublished'}
+                        {data?.publish ? 'Published' : 'Unpublished'}
                       </Tag>
                     )}
                   </div>
