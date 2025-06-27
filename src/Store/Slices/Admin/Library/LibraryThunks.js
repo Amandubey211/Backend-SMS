@@ -82,7 +82,10 @@ export const addBookThunk = createAsyncThunk(
 // Update Book Thunk (Updated to handle ISBN/barcode)
 export const updateBookThunk = createAsyncThunk(
   "library/updateBook",
-  async ({ bookId, formData, barcodeValue }, { rejectWithValue, dispatch, getState }) => {
+  async (
+    { bookId, formData, barcodeValue },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     try {
       const say = getAY();
       const getRole = getUserRole(getState);
@@ -101,7 +104,7 @@ export const updateBookThunk = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         }
       );
-      
+
       toast.success(response.message || "Book updated successfully!");
       dispatch(fetchBooksDetailsThunk({ page: 1, limit: 10 }));
       return response?.book;
@@ -176,19 +179,19 @@ export const issueBookThunk = createAsyncThunk(
 
       const response = await customRequest(method, url, bookIssueData);
       dispatch(fetchBookIssuesThunk());
-      if(response.success){
-toast.success(
-        id
-          ? "Book issue updated successfully!"
-          : "Book issue created successfully!"
-      );
-      }else{
-       toast.error( response.message|| "Book not issued"); 
+      if (response.success) {
+        toast.success(
+          id
+            ? "Book issue updated successfully!"
+            : "Book issue created successfully!"
+        );
+      } else {
+        toast.error(response.message || "Book not issued");
       }
-      
+
       return response?.book;
     } catch (error) {
-             toast.error( error?.response?.data?.message|| "Book not issued"); 
+      toast.error(error?.response?.data?.message || "Book not issued");
       return handleError(error, dispatch, rejectWithValue);
     }
   }
@@ -279,68 +282,65 @@ export const deleteCategoryThunk = createAsyncThunk(
   }
 );
 
-
-// Add these to your existing LibraryThunks.js file
-
 // Fetch Book by ISBN (Updated to match your backend)
 export const fetchBookByISBNThunk = createAsyncThunk(
   "library/fetchBookByISBN",
   async (barcodeValue, { rejectWithValue, dispatch, getState }) => {
     try {
       const say = getAY();
-      const getRole = getUserRole(getState);
+      const role = getUserRole(getState);
       dispatch(setShowError(false));
 
-      // First check if book exists in our system
-      const localResponse = await getData(
-        `/${getRole}/getBooksByIsbn/${barcodeValue}?say=${say}`
+      /* ① Check local DB */
+      const localRes = await getData(
+        `/${role}/getBooksByIsbn/${barcodeValue}?say=${say}`
       );
 
-      if (localResponse.success && localResponse.book) {
-        return {
-          exists: true,
-          book: localResponse.book
-        };
+      if (localRes.success && localRes.book) {
+        return { exists: true, book: localRes.book };
       }
 
-      // If not found in our system, try Google Books API
+      /* ② Google Books fallback */
       try {
-        const googleResponse = await fetch(
+        const gRes = await fetch(
           `https://www.googleapis.com/books/v1/volumes?q=isbn:${barcodeValue}`
         );
-        const googleData = await googleResponse.json();
+        const gData = await gRes.json();
 
-        if (googleData.totalItems > 0) {
-          const bookInfo = googleData.items[0].volumeInfo;
+        if (gData.totalItems > 0) {
+          const info = gData.items[0].volumeInfo;
+          const thumb = info.imageLinks?.thumbnail
+            ? info.imageLinks.thumbnail.replace("http://", "https://")
+            : null;
+
           return {
             exists: false,
             book: {
-              name: bookInfo.title || "Unknown Title",
-              author: bookInfo.authors?.join(", ") || "Unknown Author",
-              barcodeValue: barcodeValue,
-              image: bookInfo.imageLinks?.thumbnail || null,
-              language: bookInfo.language || "en",
-              copies: "1"
+              name: info.title || "Unknown Title",
+              author: info.authors?.join(", ") || "Unknown Author",
+              barcodeValue,
+              image: thumb, // HTTPS thumbnail URL
+              language: info.language || "en",
+              copies: "1",
             },
-            googleData: bookInfo
+            googleData: info,
           };
         }
-      } catch (googleError) {
-        console.error("Google Books API error:", googleError);
+      } catch (gErr) {
+        console.error("Google Books API error:", gErr);
       }
 
-      // If nothing found
+      /* ③ Nothing found */
       return {
         exists: false,
         book: {
-          barcodeValue: barcodeValue,
-          copies: "1"
+          barcodeValue,
+          copies: "1",
         },
-        message: "Book not found in our system or Google Books"
+        message: "Book not found in our system or Google Books",
       };
-
-    } catch (error) {
-      return handleError(error, dispatch, rejectWithValue);
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
     }
   }
 );
@@ -353,11 +353,6 @@ export const addBookWithISBNThunk = createAsyncThunk(
       const say = getAY();
       const getRole = getUserRole(getState);
       dispatch(setShowError(false));
-
-      // Add barcodeValue to form data if it exists
-      // if (barcodeValue) {
-      //   formData.append("barcodeValue", barcodeValue);
-      // }
 
       const response = await customRequest(
         "post",
@@ -377,4 +372,3 @@ export const addBookWithISBNThunk = createAsyncThunk(
     }
   }
 );
-

@@ -8,7 +8,7 @@ import TabButton from "../Components/TabButton";
 import {
   fetchBookIssuesThunk,
   fetchBooksDetailsThunk,
-  fetchCategoriesThunk, // <-- new import
+  fetchCategoriesThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { resetLibraryState } from "../../../../Store/Slices/Admin/Library/LibrarySlice";
 import LibraryTab from "../Components/LibraryTab";
@@ -28,61 +28,68 @@ const LibraryAndBookIssue = () => {
   const { loading, addBookSuccess } = useSelector(
     (state) => state.admin.library
   );
+
+  /* ---------------- local UI state ---------------- */
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarTitle, setSidebarTitle] = useState(t("Add New Book"));
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
 
-  // Fetch initial data on mount
+  /* ------------------------------ data fetch ------------------------------ */
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
-
-  const handleTabSwitch = (tab) => {
-    setActiveTab(tab);
-    if (tab === "BookIssue") {
-      setPage(1); // reset pagination to first page
-    }
-  };
-
-  // Re-fetch data when switching tabs
   useEffect(() => {
     if (activeTab === "Library") {
       dispatch(fetchBooksDetailsThunk({ page, limit }));
-      dispatch(fetchCategoriesThunk()); // <-- fetch categories here
+      dispatch(fetchCategoriesThunk());
     } else if (activeTab === "BookIssue") {
       dispatch(fetchBookIssuesThunk({ page, limit }));
     }
   }, [activeTab, dispatch, page, limit]);
 
+  /* close on success */
   useEffect(() => {
     if (addBookSuccess) {
       setSidebarOpen(false);
       setEditIssueData(null);
-      // Reset success state after closing sidebar
-      setTimeout(() => {
-        dispatch(resetLibraryState());
-      }, 500);
+      setTimeout(() => dispatch(resetLibraryState()), 500);
     }
   }, [addBookSuccess, dispatch]);
 
-  const handleSidebarOpen = () => setSidebarOpen(true);
+  /* helpers */
+  const handleTabSwitch = (tab) => {
+    setActiveTab(tab);
+    if (tab === "BookIssue") setPage(1);
+  };
+
+  const handleSidebarOpen = () => {
+    dispatch(resetLibraryState());
+    setSidebarTitle(t("Add New Book"));
+    setSidebarOpen(true);
+  };
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     setEditIssueData(null);
   };
-  const currentPath = activeTab === "Library" ? t("Library") : t("Book Issue");
-  useNavHeading(t("Admin"), currentPath);
 
+  /* heading */
+  useNavHeading(
+    t("Admin"),
+    activeTab === "Library" ? t("Library") : t("Book Issue")
+  );
+
+  /* ============================== render ================================= */
   return (
-    <Layout title={`Library & Book Issues | Admin Panel`}>
+    <Layout title="Library & Book Issues | Admin Panel">
       <DashLayout>
         {loading ? (
           <Spinner />
         ) : (
           <div className="min-h-screen p-2 flex flex-col">
-            {/* Tab Buttons with Add Book button on right (if Library tab is active) */}
+            {/* top bar ---------------------------------------------------- */}
             <div className="flex justify-between items-center mb-2">
               <div className="flex gap-4">
                 <TabButton
@@ -98,6 +105,7 @@ const LibraryAndBookIssue = () => {
                   {t("Book Issue")}
                 </TabButton>
               </div>
+
               {activeTab === "Library" && (
                 <ProtectedAction requiredPermission={PERMISSIONS.ADD_BOOK}>
                   <button
@@ -106,19 +114,19 @@ const LibraryAndBookIssue = () => {
                   >
                     <span className="mr-2 text-sm">{t("Add Book")}</span>
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-full w-12 h-12 flex items-center justify-center">
-                      <span className="text-3xl ">+</span>
+                      <span className="text-3xl">+</span>
                     </div>
                   </button>
                 </ProtectedAction>
               )}
             </div>
 
-            {/* Tab Content */}
+            {/* main area ---------------------------------------------------- */}
             <div className="flex-1">
               {activeTab === "Library" ? (
                 <ProtectedSection
                   requiredPermission={PERMISSIONS.GET_ALL_BOOKS}
-                  title={"Library"}
+                  title="Library"
                 >
                   <LibraryTab
                     page={page}
@@ -130,7 +138,7 @@ const LibraryAndBookIssue = () => {
               ) : (
                 <ProtectedSection
                   requiredPermission={PERMISSIONS.GET_ALL_ISSUE_BOOKS}
-                  title={"Book Issue"}
+                  title="Book Issue"
                 >
                   <BookIssueTab
                     handleSidebarOpen={handleSidebarOpen}
@@ -144,35 +152,23 @@ const LibraryAndBookIssue = () => {
               )}
             </div>
 
-            {/* Sidebar for Add/Edit Book or Issue */}
+            {/* drawer ------------------------------------------------------ */}
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={handleSidebarClose}
-              title={
-                activeTab === "Library"
-                  ? t("Add New Book")
-                  : editIssueData
-                  ? t("Edit Book Issue")
-                  : t("Add Book Issue")
-              }
+              title={sidebarTitle} /* dynamic */
             >
               {activeTab === "Library" ? (
-                <ProtectedSection
-                  requiredPermission={PERMISSIONS.ADD_BOOK}
-                  title={"Add Library Book"}
-                >
-                  <AddBook onClose={handleSidebarClose} />
-                </ProtectedSection>
+                <AddBook
+                  onClose={handleSidebarClose}
+                  /* pass setter so BookForm can change title when needed */
+                  setSidebarTitle={setSidebarTitle}
+                />
               ) : (
-                <ProtectedSection
-                  requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}
-                  title={"Add Issue Book"}
-                >
-                  <AddIssue
-                    editIssueData={editIssueData}
-                    onClose={handleSidebarClose}
-                  />
-                </ProtectedSection>
+                <AddIssue
+                  editIssueData={editIssueData}
+                  onClose={handleSidebarClose}
+                />
               )}
             </Sidebar>
           </div>

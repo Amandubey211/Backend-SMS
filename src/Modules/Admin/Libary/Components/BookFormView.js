@@ -1,11 +1,11 @@
 import React from "react";
 import { Select, Input } from "antd";
 import { useTranslation } from "react-i18next";
-import { BsBook } from "react-icons/bs";
-import { FiX } from "react-icons/fi";
+import { BsBook, BsArrowLeft } from "react-icons/bs";
 import { motion } from "framer-motion";
 import ImageUpload from "./ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
+import { FiX } from "react-icons/fi";
 
 const { Option } = Select;
 
@@ -38,20 +38,19 @@ const BookFormView = ({
       exit={{ opacity: 0 }}
       className="flex flex-col h-full"
       onSubmit={onSubmit}
-      style={{ maxHeight: "97vh" }}
     >
-      <div className="flex-1 overflow-auto mb-8 no-scrollbar">
+      <div className="flex-1 overflow-auto">
         {scannedBarcode && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="bg-blue-50 p-3 mb-4 rounded-lg flex justify-between items-center"
+            className="bg-blue-50 p-3 mb-4 flex justify-between items-center"
           >
             <div className="flex items-center">
               <BsBook className="text-blue-600 mr-2" />
               <div>
                 <span className="text-sm text-blue-700 font-medium">
-                  {t("Barcode")}:
+                  {t("ISBN")}:
                 </span>
                 <span className="ml-2 font-mono">{scannedBarcode}</span>
               </div>
@@ -61,7 +60,7 @@ const BookFormView = ({
               onClick={onToggleScanMode}
               className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
             >
-              <FiX className="mr-1" /> {t("Change")}
+              <BsArrowLeft className="mr-1" /> {t("Scan Again")}
             </button>
           </motion.div>
         )}
@@ -212,7 +211,7 @@ const BookFormView = ({
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.99 }}
           type="submit"
-          className="w-full p-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg text-base font-medium hover:shadow-lg transition-all"
+          className="w-full p-3 bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white rounded-lg text-base font-medium hover:shadow-lg transition-all"
           disabled={loading}
         >
           {book ? t("Update Book") : loading ? t("Adding...") : t("Add Book")}
