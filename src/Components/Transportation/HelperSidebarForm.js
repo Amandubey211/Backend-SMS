@@ -14,7 +14,7 @@ dayjs.extend(timezone);
 
 const { Option } = Select;
 
-const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handleChange, handleSubmit, resetForm, vehicles }) => {
+const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handleSubmit, resetForm, vehicles }) => {
     const bloodGroups = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
     const [form] = Form.useForm();
     const [documentPreviewFile, setDocumentPreviewFile] = useState(null);
@@ -90,34 +90,51 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
         return d.isValid() ? d : null;
     };
 
-    const handleFileChange = (fieldName, fileData, index = null) => {
-        if (fieldName === "photo") {
+    const handleFileChange = (field, fileData, idx = null) => {
+        if (field === "photo") {
             setPhoto(fileData?.url || "");
             form.setFieldsValue({ photo: fileData?.url || "" });
-        } else if (fieldName === "documents" && index !== null) {
-            const newDocuments = [...documents];
-            newDocuments[index] = { ...newDocuments[index], ...fileData };
-            setDocuments(newDocuments);
-            form.setFields([{ name: ["documents", index], value: newDocuments[index] }]);
+        } else if (field === "documents" && idx !== null) {
+            const copy = [...documents];
+            copy[idx] = {
+                ...copy[idx],
+                url: fileData.url,
+                expiryDate: fileData.expiryDate ?? copy[idx].expiryDate,
+                name:
+                    copy[idx].name ||
+                    fileData.name ||
+                    `Document_${idx + 1}`,
+            };
+            setDocuments(copy);
+            form.setFields([
+                { name: ["documents", idx], value: copy[idx] },
+            ]);
         }
     };
 
-    const handleRemove = (fieldName, index = null) => {
-        if (fieldName === "photo") {
+    const handleRemove = (field, idx = null) => {
+        if (field === "photo") {
             setPhoto("");
             form.setFieldsValue({ photo: "" });
-        } else if (fieldName === "documents" && index !== null) {
-            const newDocuments = documents.filter((_, i) => i !== index);
-            setDocuments(newDocuments);
-            form.setFieldsValue({ documents: newDocuments });
+        } else if (field === "documents" && idx !== null) {
+            const copy = [...documents];
+            copy.splice(idx, 1);
+            setDocuments(copy);
+            form.setFieldsValue({ documents: copy });
+            message.success("Document removed");
         }
     };
 
+
     const addNewDocument = () => {
-        const newDoc = { name: `Document_${documents.length + 1}`, url: "", expiryDate: null };
-        const newDocuments = [...documents, newDoc];
-        setDocuments(newDocuments);
-        form.setFieldsValue({ documents: newDocuments });
+        setDocuments((prev) => {
+            const next = [
+                ...prev,
+                { name: "", url: "", expiryDate: null },
+            ];
+            form.setFieldsValue({ documents: next });
+            return next;
+        });
     };
 
     return (
@@ -150,7 +167,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="text"
                                     id="fullName"
                                     name="fullName"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter full name"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -165,7 +181,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="text"
                                     id="helperBadgeNumber"
                                     name="helperBadgeNumber"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter badge number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -179,7 +194,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Select
                                     id="gender"
                                     name="gender"
-                                    onChange={(value) => handleChange(value, "gender")}
+                                    onChange={(value) => form.setFieldsValue({ gender: value })}
                                     placeholder="Select gender"
                                     className="w-full h-[40px] border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
@@ -198,7 +213,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="text"
                                     id="religion"
                                     name="religion"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter religion"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -222,7 +236,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <DatePicker
                                     id="dateOfBirth"
                                     name="dateOfBirth"
-                                    onChange={(date, dateString) => handleChange(dateString, "dateOfBirth")}
+                                    onChange={(date, dateString) => form.setFieldsValue({ dateOfBirth: date })}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select date of birth"
                                 />
@@ -236,7 +250,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Select
                                     id="bloodGroup"
                                     name="bloodGroup"
-                                    onChange={(value) => handleChange(value, "bloodGroup")}
+                                    onChange={(value) => form.setFieldsValue({ bloodGroup: value })}
                                     placeholder="Select blood group"
                                     className="w-full h-[40px] border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
@@ -264,7 +278,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="email"
                                     id="email"
                                     name="email"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter email address"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -279,7 +292,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="tel"
                                     id="contactNumber"
                                     name="contactNumber"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter contact number"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -294,7 +306,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="tel"
                                     id="emergencyContact"
                                     name="emergencyContact"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter emergency contact"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -308,7 +319,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Input.TextArea
                                     id="address"
                                     name="address"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter address"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     rows="2"
@@ -332,7 +342,6 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                     type="text"
                                     id="national_Id"
                                     name="national_Id"
-                                    onChange={(e) => handleChange(e)}
                                     placeholder="Enter national ID"
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 />
@@ -346,7 +355,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <DatePicker
                                     id="joiningDate"
                                     name="joiningDate"
-                                    onChange={(date, dateString) => handleChange(dateString, "joiningDate")}
+                                    onChange={(date, dateString) => form.setFieldsValue({ joiningDate: date })}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select joining date"
                                 />
@@ -360,7 +369,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <DatePicker
                                     id="resignationDate"
                                     name="resignationDate"
-                                    onChange={(date, dateString) => handleChange(dateString, "resignationDate")}
+                                    onChange={(date, dateString) => form.setFieldsValue({ resignationDate: date })}
                                     className="w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     placeholder="Select resignation date"
                                 />
@@ -376,7 +385,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Checkbox
                                     id="policeVerificationDone"
                                     name="policeVerificationDone"
-                                    onChange={(e) => handleChange(e)}
+                                    onChange={(e) => form.setFieldsValue({ policeVerificationDone: e.target.checked })}
                                     className="flex items-center h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
                                 >
                                     <span className="flex text-center text-sm text-gray-700 w-40">Police Verification Done</span>
@@ -399,7 +408,7 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                 <Select
                                     id="status"
                                     name="status"
-                                    onChange={(value) => handleChange(value, "status")}
+                                    onChange={(value) => form.setFieldsValue({ status: value })}
                                     placeholder="Select status"
                                     className="w-full border-none rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                                 >
@@ -443,20 +452,15 @@ const HelperSidebarForm = ({ isOpen, isEditing, helperData, setHelperData, handl
                                             <div className="flex-1">
                                                 <SingleFileUpload
                                                     name={["documents", index]}
-                                                    label={`Document ${index + 1}`}
+                                                    label={doc.name}
                                                     type="optional"
-                                                    onChange={(fileData) => handleFileChange("documents", fileData, index)}
+                                                    onChange={(fileData) => handleFileChange("documents", fileData || {}, index)}
                                                     onPreview={(file) => setDocumentPreviewFile(file)}
                                                     onRemove={() => handleRemove("documents", index)}
                                                     fileUrl={doc.url}
                                                     fileName={doc.name}
                                                 />
                                             </div>
-                                            <Button
-                                                icon={<DeleteOutlined />}
-                                                onClick={() => handleRemove("documents", index)}
-                                                className="text-red-500 hover:text-red-700"
-                                            />
                                         </div>
                                     ))}
                                     <Button
