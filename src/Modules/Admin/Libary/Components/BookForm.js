@@ -12,10 +12,28 @@ import ScanModeView from "./ScanModeView";
 import BookFormView from "./BookFormView";
 import BookFoundView from "./BookFoundView";
 
-const BookForm = ({ book, onClose }) => {
+/* helper: download URL ➜ File (for FormData upload) */
+const urlToFile = async (url, filename = "cover.jpg") => {
+  // force https and strip protocol for the proxy
+  const clean = url.replace(/^https?:\/\//, "");
+  const proxied = `https://images.weserv.nl/?url=${encodeURIComponent(clean)}`;
+
+  try {
+    const res = await fetch(proxied, { mode: "cors" });
+    if (!res.ok) throw new Error("proxy fetch failed");
+    const blob = await res.blob();
+    const type = blob.type || "image/jpeg";
+    return new File([blob], filename, { type });
+  } catch (err) {
+    console.warn("Thumbnail fetch failed, falling back to URL:", err);
+    return null; // caller will handle null (no File)
+  }
+};
+
+const BookForm = ({ book, onClose, setSidebarTitle }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
-  const classList = useSelector((state) => state.admin.class.classes);
+  const classList = useSelector((s) => s.admin.class.classes);
 
   const {
     library: {
@@ -25,9 +43,9 @@ const BookForm = ({ book, onClose }) => {
       isbnLoading,
       isbnBookData,
     },
-  } = useSelector((state) => state.admin);
+  } = useSelector((s) => s.admin);
 
-  /* ----------------------------- local form state ----------------------------- */
+  /* ───────────────── local state ───────────────── */
   const [formState, setFormState] = useState({
     bookData: {
       bookName: "",
@@ -57,10 +75,9 @@ const BookForm = ({ book, onClose }) => {
     existingBook,
   } = formState;
 
-  /* ------------------------------- helpers ------------------------------------ */
-  const updateFormState = (updates) =>
-    setFormState((prev) => ({ ...prev, ...updates }));
+  const updateFormState = (u) => setFormState((p) => ({ ...p, ...u }));
 
+  /* ───────────────── helpers ───────────────── */
   const resetForm = () => {
     setFormState({
       bookData: {
@@ -80,22 +97,22 @@ const BookForm = ({ book, onClose }) => {
       googleBookData: null,
       existingBook: null,
     });
+    setSidebarTitle?.(t("Add New Book"));
   };
 
-  /* ---------------------------- effect hooks ---------------------------------- */
+  /* ───────────────── effects ───────────────── */
   useEffect(() => {
     if (book) {
-      const initialCategories = Array.isArray(book.categories)
+      const cats = Array.isArray(book.categories)
         ? book.categories.map((c) => c._id || c)
         : [];
-
       setFormState((prev) => ({
         ...prev,
         bookData: {
           bookName: book.name || "",
           authorName: book.author || "",
           class: book.classId?._id || book.classId || null,
-          categories: initialCategories,
+          categories: cats,
           copies: book.copies?.toString() || "1",
           bookImage: null,
           barcodeValue: book.barcodeValue || "",
@@ -113,6 +130,7 @@ const BookForm = ({ book, onClose }) => {
     }
   }, [success, onClose, book]);
 
+  /* when thunk resolves */
   useEffect(() => {
     if (isbnBookData && scannedBarcode && !isbnLoading) {
       if (isbnBookData.exists && isbnBookData.book) {
@@ -123,78 +141,84 @@ const BookForm = ({ book, onClose }) => {
         handleBookNotFound();
       }
     }
-  }, [isbnBookData, scannedBarcode, isbnLoading, t]);
+  }, [isbnBookData, scannedBarcode, isbnLoading]);
 
-  /* --------------------------- barcode helpers -------------------------------- */
-  const handleScanComplete = (barcodeValue) => {
-    const cleanBarcode = barcodeValue.replace(/\D/g, "");
-    if (!/^(97[89]\d{10}|\d{10})$/.test(cleanBarcode)) {
+  /* ───────────────── scan / manual entry ───────────────── */
+  const handleScanComplete = (raw) => {
+    const clean = raw.replace(/\D/g, "");
+    if (!/^(97[89]\d{10}|\d{10})$/.test(clean)) {
       toast.error(t("Invalid barcode format"));
       return;
     }
-
-    updateFormState({ scannedBarcode: cleanBarcode });
-    dispatch(fetchBookByISBNThunk(cleanBarcode));
+    updateFormState({ scannedBarcode: clean });
+    dispatch(fetchBookByISBNThunk(clean));
   };
 
-  /* CHANGE #1 ================================================================ */
-  /**
-   * Manual entry now runs through the **exact same** code-path
-   * as the scanner, so scannedBarcode is set before the thunk dispatches.
-   */
-  const handleManualBarcodeEntry = (barcode) => {
-    if (!barcode) {
-      message.error(t("Please enter a valid barcode"));
-      return;
-    }
-    if (!/^(97[89]\d{10}|\d{10})$/.test(barcode)) {
-      message.error(t("Invalid barcode format"));
-      return;
-    }
-
-    // simply reuse the scan helper
-    handleScanComplete(barcode);
+  const handleManualBarcodeEntry = (v) => {
+    if (!v) return message.error(t("Please enter a valid barcode"));
+    if (!/^(97[89]\d{10}|\d{10})$/.test(v))
+      return message.error(t("Invalid barcode format"));
+    handleScanComplete(v);
   };
-  /* ========================================================================= */
 
-  /* -------------------------- existing / new book -------------------------- */
-  const handleExistingBook = (book) => {
-    setFormState((prev) => ({
-      ...prev,
-      existingBook: book,
+  /* ───────────────── exist / new handlers ───────────────── */
+  const handleExistingBook = (bk) => {
+    setSidebarTitle?.(t("Edit Book Copies"));
+    setFormState((p) => ({
+      ...p,
+      existingBook: bk,
       bookData: {
-        ...prev.bookData,
-        bookName: book.name || "",
-        authorName: book.author || "",
-        class: book.classId?._id || book.classId || null,
-        categories: book.categories?.map((c) => c._id) || [],
-        // copies: (parseInt(book.copies || 0) + 1).toString(),
+        ...p.bookData,
+        bookName: bk.name || "",
+        authorName: bk.author || "",
+        class: bk.classId?._id || bk.classId || null,
+        categories: bk.categories?.map((c) => c._id) || [],
         copies: "1",
-
         barcodeValue: scannedBarcode,
-        language: book.language || "en",
+        language: bk.language || "en",
       },
-      imagePreview: book.image || null,
+      imagePreview: bk.image || null,
     }));
   };
 
-  const handleNewBookFromGoogle = (isbnBookData) => {
+  /* NEW: fetch thumbnail, convert to File, attach */
+  const handleNewBookFromGoogle = (payload) => {
     toast(t("New book detected from Google Books. Please verify details."), {
       icon: "ℹ️",
     });
-    setFormState((prev) => ({
-      ...prev,
+
+    // try to proxy-fetch the image; if it fails we still keep the URL
+    if (payload.book.image) {
+      urlToFile(payload.book.image).then((file) => {
+        if (file) {
+          setFormState((prev) => ({
+            ...prev,
+            bookData: { ...prev.bookData, bookImage: file },
+            imagePreview: URL.createObjectURL(file),
+          }));
+        } else {
+          // fallback: just keep remote URL for preview
+          setFormState((prev) => ({
+            ...prev,
+            imagePreview: payload.book.image,
+          }));
+        }
+      });
+    }
+
+    updateFormState({
       bookData: {
-        ...prev.bookData,
-        bookName: isbnBookData.book.name || "",
-        authorName: isbnBookData.book.author || "",
+        ...bookData,
+        bookName: payload.book.name || "",
+        authorName: payload.book.author || "",
         barcodeValue: scannedBarcode,
         copies: "1",
-        language: isbnBookData.book.language || "en",
+        language: payload.book.language || "en",
+        // bookImage will be injected above if fetch succeeds
       },
-      googleBookData: isbnBookData.googleData || null,
-      imagePreview: isbnBookData.book.image || null,
-    }));
+      googleBookData: payload.googleData,
+      imagePreview: payload.book.image || null,
+    });
   };
 
   const handleBookNotFound = () => {
@@ -202,35 +226,25 @@ const BookForm = ({ book, onClose }) => {
       t("No book found with this barcode. Please enter details manually."),
       { icon: "⚠️" }
     );
-    setFormState((prev) => ({
-      ...prev,
-      bookData: {
-        ...prev.bookData,
-        barcodeValue: scannedBarcode,
-        copies: "1",
-      },
-    }));
+    updateFormState({
+      bookData: { ...bookData, barcodeValue: scannedBarcode, copies: "1" },
+    });
   };
 
-  /* ------------------------------ form logic ------------------------------- */
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  /* ───────────────── form field handlers ───────────────── */
+  const handleInputChange = ({ target: { name, value } }) =>
     updateFormState({
       bookData: { ...bookData, [name]: value },
       errors: { ...errors, [name]: undefined },
     });
-  };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => updateFormState({ imagePreview: reader.result });
-      reader.readAsDataURL(file);
-      updateFormState({
-        bookData: { ...bookData, bookImage: file },
-      });
-    }
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onloadend = () => updateFormState({ imagePreview: reader.result });
+    reader.readAsDataURL(f);
+    updateFormState({ bookData: { ...bookData, bookImage: f } });
   };
 
   const handleRemoveImage = () =>
@@ -240,67 +254,59 @@ const BookForm = ({ book, onClose }) => {
       imageKey: Date.now(),
     });
 
+  /* ───────────────── submit helpers ───────────────── */
   const validateForm = () => {
-    const newErrors = {};
-    if (!bookData.bookName.trim())
-      newErrors.bookName = t("Book name is required.");
+    const errs = {};
+    if (!bookData.bookName.trim()) errs.bookName = t("Book name is required.");
     if (!bookData.authorName.trim())
-      newErrors.authorName = t("Author name is required.");
-    if (bookData.categories.length === 0)
-      newErrors.categories = t("At least one category is required.");
+      errs.authorName = t("Author name is required.");
+    if (!bookData.categories.length)
+      errs.categories = t("At least one category is required.");
     if (Number(bookData.copies) < 1)
-      newErrors.copies = t("Copies must be at least 1.");
+      errs.copies = t("Copies must be at least 1.");
+    updateFormState({ errors: errs });
+    return !Object.keys(errs).length;
+  };
 
-    updateFormState({ errors: newErrors });
-    return Object.keys(newErrors).length === 0;
+  const createFormData = () => {
+    const total = existingBook
+      ? (
+          parseInt(existingBook.copies || 0, 10) +
+          parseInt(bookData.copies || 0, 10)
+        ).toString()
+      : bookData.copies;
+
+    const fd = new FormData();
+    fd.append("name", bookData.bookName);
+    fd.append("author", bookData.authorName);
+    fd.append("classId", bookData.class || "");
+    bookData.categories.forEach((c) => fd.append("categories", c));
+    fd.append("copies", total);
+    fd.append("language", bookData.language);
+    if (bookData.bookImage) fd.append("image", bookData.bookImage);
+    if (bookData.barcodeValue) fd.append("barcodeValue", bookData.barcodeValue);
+    return fd;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    const formData = createFormData();
+    const fd = createFormData();
 
     if (existingBook) {
       dispatch(
-        updateBookThunk({
-          bookId: existingBook._id,
-          formData,
-        })
+        updateBookThunk({ bookId: existingBook._id, formData: fd })
       ).then(() => onClose());
     } else if (book) {
-      dispatch(
-        updateBookThunk({
-          bookId: book._id,
-          formData,
-        })
-      ).then(() => onClose());
+      dispatch(updateBookThunk({ bookId: book._id, formData: fd })).then(() =>
+        onClose()
+      );
     } else {
-      dispatch(addBookThunk(formData));
+      dispatch(addBookThunk(fd));
     }
   };
 
-  const createFormData = () => {
-    const formData = new FormData();
-    formData.append("name", bookData.bookName);
-    formData.append("author", bookData.authorName);
-    formData.append("classId", bookData.class || "");
-    bookData.categories.forEach((catId) =>
-      formData.append("categories", catId)
-    );
-    formData.append("copies", bookData.copies);
-    formData.append("language", bookData.language);
-    if (bookData.bookImage) formData.append("image", bookData.bookImage);
-    if (bookData.barcodeValue)
-      formData.append("barcodeValue", bookData.barcodeValue);
-    return formData;
-  };
-
-  const continueWithoutBarcode = () =>
-    updateFormState({ scannedBarcode: "", existingBook: null });
-
-  const handleEditBook = () => updateFormState({ existingBook: null });
-
+  /* ───────────────── counters ───────────────── */
   const handleIncrementCopy = () =>
     updateFormState({
       bookData: {
@@ -308,7 +314,6 @@ const BookForm = ({ book, onClose }) => {
         copies: (parseInt(bookData.copies) + 1).toString(),
       },
     });
-
   const handleDecrementCopy = () =>
     updateFormState({
       bookData: {
@@ -317,18 +322,19 @@ const BookForm = ({ book, onClose }) => {
       },
     });
 
-  /* ============================== render ==================================== */
+  /* ───────────────── render branches ───────────────── */
   if (existingBook) {
     return (
       <BookFoundView
         book={existingBook}
         copies={bookData.copies}
-        onEdit={handleEditBook}
+        onCancel={() =>
+          updateFormState({ scannedBarcode: "", existingBook: null })
+        }
         onIncrement={handleIncrementCopy}
         onDecrement={handleDecrementCopy}
         onSubmit={handleSubmit}
         loading={loading}
-        onClose={onClose}
       />
     );
   }
@@ -339,7 +345,9 @@ const BookForm = ({ book, onClose }) => {
         onScanComplete={handleScanComplete}
         onManualBarcodeEntry={handleManualBarcodeEntry}
         isbnLoading={isbnLoading}
-        onContinueWithoutBarcode={continueWithoutBarcode}
+        onContinueWithoutBarcode={() =>
+          updateFormState({ scannedBarcode: "", existingBook: null })
+        }
       />
     );
   }
@@ -348,7 +356,9 @@ const BookForm = ({ book, onClose }) => {
     <BookFormView
       scannedBarcode={scannedBarcode}
       googleBookData={googleBookData}
-      onToggleScanMode={continueWithoutBarcode}
+      onToggleScanMode={() =>
+        updateFormState({ scannedBarcode: "", existingBook: null })
+      }
       onHideGoogleData={() => updateFormState({ googleBookData: null })}
       imageKey={imageKey}
       imagePreview={imagePreview}
@@ -356,11 +366,11 @@ const BookForm = ({ book, onClose }) => {
       onRemoveImage={handleRemoveImage}
       bookData={bookData}
       onInputChange={handleInputChange}
-      onClassChange={(value) =>
-        updateFormState({ bookData: { ...bookData, class: value } })
+      onClassChange={(v) =>
+        updateFormState({ bookData: { ...bookData, class: v } })
       }
-      onCategoriesChange={(value) =>
-        updateFormState({ bookData: { ...bookData, categories: value } })
+      onCategoriesChange={(v) =>
+        updateFormState({ bookData: { ...bookData, categories: v } })
       }
       errors={errors}
       classList={classList}

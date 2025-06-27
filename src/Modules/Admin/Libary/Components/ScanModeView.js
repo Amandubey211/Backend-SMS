@@ -11,67 +11,52 @@ const ScanModeView = ({
   onContinueWithoutBarcode,
 }) => {
   const { t } = useTranslation("admLibrary");
-
-  /* ------------------------------------------------------------------ */
-  /*  Local state                                                       */
-  /* ------------------------------------------------------------------ */
   const [manualBarcode, setManualBarcode] = useState("");
-
-  /* ------------------------------------------------------------------ */
-  /*  Focus helpers                                                     */
-  /* ------------------------------------------------------------------ */
   const inputRef = useRef(null);
-  const setFocus = useCallback(() => {
-    inputRef.current?.focus({ cursor: "end" });
-  }, []);
 
+  /* ───────────────── focus helper ───────────────── */
+  const focusInput = useCallback(
+    () => inputRef.current?.focus({ cursor: "end" }),
+    []
+  );
+
+  /* focus once component appears */
   useEffect(() => {
-    const id = requestAnimationFrame(setFocus);
+    const id = requestAnimationFrame(focusInput);
     return () => cancelAnimationFrame(id);
-  }, [setFocus]);
+  }, [focusInput]);
 
-  /* ------------------------------------------------------------------ */
-  /*  Keyboard: submit on Enter                                         */
-  /* ------------------------------------------------------------------ */
+  /* ───────────────── keyboard submit on Enter ───────────────── */
+  const isValidISBN = (v) => /^(\d{10}|\d{13})$/.test(v.replace(/\D/g, ""));
+
   useEffect(() => {
     const handleEnter = (e) => {
-      if (e.key === "Enter" && manualBarcode) submitBarcode();
+      if (e.key === "Enter" && isValidISBN(manualBarcode)) submitBarcode();
     };
     window.addEventListener("keypress", handleEnter);
     return () => window.removeEventListener("keypress", handleEnter);
   }, [manualBarcode]);
 
-  /* ------------------------------------------------------------------ */
-  /*  Barcode helpers                                                   */
-  /* ------------------------------------------------------------------ */
-  const isValidISBN = (v) => /^(\d{10}|\d{13})$/.test(v.replace(/\D/g, ""));
-
+  /* ───────────────── local handlers ───────────────── */
   const submitBarcode = () => onManualBarcodeEntry(manualBarcode);
 
   const handleChange = (e) => {
-    const value = e.target.value.replace(/\D/g, "");
-    setManualBarcode(value);
-
-    // Auto-submit when scanner finishes
-    if (isValidISBN(value)) onManualBarcodeEntry(value);
+    /* strip non-digits but don’t auto-submit */
+    const v = e.target.value.replace(/\D/g, "");
+    setManualBarcode(v);
   };
 
   const clearInput = () => {
     setManualBarcode("");
-    setFocus();
+    focusInput();
   };
 
-  /* ------------------------------------------------------------------ */
-  /*  Icon micro-animation                                              */
-  /* ------------------------------------------------------------------ */
+  /* ───────────────── micro animations ───────────────── */
   const [hoverCycle, cycleHover] = useCycle(
     { scale: 1, rotate: 0 },
     { scale: 1.12, rotate: 8 }
   );
 
-  /* ------------------------------------------------------------------ */
-  /*  Motion variants                                                   */
-  /* ------------------------------------------------------------------ */
   const cardVariants = {
     hidden: { opacity: 0, y: -16 },
     visible: {
@@ -82,15 +67,9 @@ const ScanModeView = ({
     exit: { opacity: 0, y: 16 },
   };
 
-  const pulseTransition = {
-    yoyo: Infinity,
-    ease: "easeInOut",
-    duration: 0.8,
-  };
+  const pulseTransition = { yoyo: Infinity, ease: "easeInOut", duration: 0.8 };
 
-  /* ------------------------------------------------------------------ */
-  /*  Render                                                            */
-  /* ------------------------------------------------------------------ */
+  /* ───────────────── render ───────────────── */
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -108,7 +87,7 @@ const ScanModeView = ({
             exit="exit"
             className="bg-gradient-to-r from-[#C83B62]/10 to-[#7F35CD]/10 p-8 rounded-2xl mb-6 border border-gray-100 shadow-sm"
           >
-            {/* Barcode icon with subtle breathing & hover wiggle */}
+            {/* icon */}
             <div className="flex items-center justify-center mb-4">
               <motion.div
                 animate={{ scale: [1, 1.05, 1] }}
@@ -127,10 +106,11 @@ const ScanModeView = ({
               {t("Scan the barcode using your scanner or enter manually")}
             </p>
 
-            {/* ISBN input ------------------------------------------------ */}
+            {/* ISBN input */}
             <div className="relative mb-4">
               <Input
                 ref={inputRef}
+                autoFocus /* ensures browser attempts focus */
                 placeholder={t("Enter 10 or 13 digit ISBN")}
                 value={manualBarcode}
                 onChange={handleChange}
@@ -145,7 +125,11 @@ const ScanModeView = ({
                     initial={{ scale: 0, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0, opacity: 0 }}
-                    transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 260,
+                      damping: 20,
+                    }}
                     onClick={clearInput}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#C83B62]"
                     title={t("Clear")}
@@ -169,7 +153,7 @@ const ScanModeView = ({
           </motion.div>
         </AnimatePresence>
 
-        {/* Buttons ------------------------------------------------------- */}
+        {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}

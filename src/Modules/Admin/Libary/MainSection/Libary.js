@@ -29,8 +29,9 @@ const LibraryAndBookIssue = () => {
     (state) => state.admin.library
   );
 
-  /* ---------------------------- local UI state ---------------------------- */
+  /* ---------------- local UI state ---------------- */
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarTitle, setSidebarTitle] = useState(t("Add New Book"));
   const [activeTab, setActiveTab] = useState("Library");
   const [editIssueData, setEditIssueData] = useState(null);
   const [page, setPage] = useState(1);
@@ -40,7 +41,6 @@ const LibraryAndBookIssue = () => {
   useEffect(() => {
     dispatch(fetchAllClasses());
   }, [dispatch]);
-
   useEffect(() => {
     if (activeTab === "Library") {
       dispatch(fetchBooksDetailsThunk({ page, limit }));
@@ -50,37 +50,36 @@ const LibraryAndBookIssue = () => {
     }
   }, [activeTab, dispatch, page, limit]);
 
-  /* ---------------------- success-driven sidebar close -------------------- */
+  /* close on success */
   useEffect(() => {
     if (addBookSuccess) {
       setSidebarOpen(false);
       setEditIssueData(null);
-
-      // clear transient flags so they don't affect the next open
       setTimeout(() => dispatch(resetLibraryState()), 500);
     }
   }, [addBookSuccess, dispatch]);
 
-  /* ---------------------------- helpers ---------------------------------- */
+  /* helpers */
   const handleTabSwitch = (tab) => {
     setActiveTab(tab);
     if (tab === "BookIssue") setPage(1);
   };
 
   const handleSidebarOpen = () => {
-    /* ① – NEW: wipe all transient success / ISBN cache BEFORE opening */
     dispatch(resetLibraryState());
+    setSidebarTitle(t("Add New Book"));
     setSidebarOpen(true);
   };
-
   const handleSidebarClose = () => {
     setSidebarOpen(false);
     setEditIssueData(null);
   };
 
-  /* --------------------------- nav heading ------------------------------- */
-  const currentPath = activeTab === "Library" ? t("Library") : t("Book Issue");
-  useNavHeading(t("Admin"), currentPath);
+  /* heading */
+  useNavHeading(
+    t("Admin"),
+    activeTab === "Library" ? t("Library") : t("Book Issue")
+  );
 
   /* ============================== render ================================= */
   return (
@@ -157,31 +156,19 @@ const LibraryAndBookIssue = () => {
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={handleSidebarClose}
-              title={
-                activeTab === "Library"
-                  ? t("Add New Book")
-                  : editIssueData
-                  ? t("Edit Book Issue")
-                  : t("Add Book Issue")
-              }
+              title={sidebarTitle} /* dynamic */
             >
               {activeTab === "Library" ? (
-                <ProtectedSection
-                  requiredPermission={PERMISSIONS.ADD_BOOK}
-                  title="Add Library Book"
-                >
-                  <AddBook onClose={handleSidebarClose} />
-                </ProtectedSection>
+                <AddBook
+                  onClose={handleSidebarClose}
+                  /* pass setter so BookForm can change title when needed */
+                  setSidebarTitle={setSidebarTitle}
+                />
               ) : (
-                <ProtectedSection
-                  requiredPermission={PERMISSIONS.ADD_ISSUE_BOOK}
-                  title="Add Issue Book"
-                >
-                  <AddIssue
-                    editIssueData={editIssueData}
-                    onClose={handleSidebarClose}
-                  />
-                </ProtectedSection>
+                <AddIssue
+                  editIssueData={editIssueData}
+                  onClose={handleSidebarClose}
+                />
               )}
             </Sidebar>
           </div>
