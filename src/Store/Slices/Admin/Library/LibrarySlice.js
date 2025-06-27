@@ -15,6 +15,7 @@ import {
   deleteCategoryThunk,
   // NEW 👉 ISBN lookup thunk
   fetchBookByISBNThunk,
+  validateIssuedBookThunk,
 } from "./LibraryThunks";
 
 /* ------------------------------------------------------------------ */
@@ -53,6 +54,8 @@ const initialState = {
   addCategorySuccess: false,
   updateCategorySuccess: false,
   deleteCategorySuccess: false,
+  validateLoading: false,
+  validateSuccess: false,
 };
 
 const librarySlice = createSlice({
@@ -262,6 +265,18 @@ const librarySlice = createSlice({
       .addCase(fetchBookByISBNThunk.rejected, (state, { payload }) => {
         state.isbnLoading = false;
         state.error = payload;
+      })
+      .addCase(validateIssuedBookThunk.pending, (s) => {
+        s.validateLoading = true;
+        s.validateSuccess = false;
+      })
+      .addCase(validateIssuedBookThunk.fulfilled, (s) => {
+        s.validateLoading = false;
+        s.validateSuccess = true;
+      })
+      .addCase(validateIssuedBookThunk.rejected, (s) => {
+        s.validateLoading = false;
+        s.validateSuccess = false;
       });
   },
 });

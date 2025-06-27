@@ -1,45 +1,240 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchBooksThunk,
   issueBookThunk,
   fetchBookIssuesThunk,
+  validateIssuedBookThunk,
 } from "../../../../Store/Slices/Admin/Library/LibraryThunks";
 import { fetchSectionsNamesByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
-import { Form, Select, Radio, DatePicker, Button, Input } from "antd";
+import { fetchAllUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
+import { fetchStudentsByClassAndSection } from "../../../../Store/Slices/Admin/Class/Students/studentThunks";
+import {
+  Form,
+  Select,
+  Radio,
+  DatePicker,
+  Button,
+  Input,
+  Modal,
+  Spin,
+  Alert,
+  Steps,
+  Tag,
+} from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
-import { FaSchool } from "react-icons/fa";
-import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
-import { fetchAllUsersThunk } from "../../../../Store/Slices/Admin/NoticeBoard/Notice/noticeThunks";
-import { fetchStudentsByClassAndSection } from '../../../../Store/Slices/Admin/Class/Students/studentThunks'
+import { FaSchool, FaCheckCircle } from "react-icons/fa";
+import {
+  FiAlertCircle,
+  FiCalendar,
+  FiClock,
+  FiX,
+  FiCheck,
+} from "react-icons/fi";
+import { BsQrCodeScan, BsExclamationTriangle } from "react-icons/bs";
 import toast from "react-hot-toast";
 
-const { Option } = Select;
+/* ------------------------------------------------------------------ */
+/* 📷 Enhanced Scanner Modal                                          */
+/* ------------------------------------------------------------------ */
+const BookScannerModal = ({ visible, onClose, onScanComplete, status }) => {
+  const { t } = useTranslation("admLibrary");
+  const [scanning, setScanning] = useState(false);
+  const [scannedData, setScannedData] = useState("");
+  const [scanStatus, setScanStatus] = useState("ready"); // ready, scanning, success, error
 
-/**
- * A simple fuzzy search helper.
- * Checks if all characters in 'search' appear in order in 'text'.
- */
+  const handleClose = () => {
+    setScanning(false);
+    setScannedData("");
+    setScanStatus("ready");
+    onClose();
+  };
+
+  useEffect(() => {
+    if (!visible) {
+      setScannedData("");
+      setScanStatus("ready");
+      return;
+    }
+
+    const handleKeyPress = (e) => {
+      if (e.key === "Enter") {
+        if (scannedData) {
+          setScanStatus("scanning");
+          onScanComplete(scannedData)
+            .then(() => setScanStatus("success"))
+            .catch(() => setScanStatus("error"))
+            .finally(() => {
+              setTimeout(() => setScannedData(""), 1000);
+            });
+        }
+      } else {
+        setScannedData((prev) => prev + e.key);
+      }
+    };
+
+    window.addEventListener("keypress", handleKeyPress);
+    return () => window.removeEventListener("keypress", handleKeyPress);
+  }, [visible, scannedData, onScanComplete]);
+
+  const getStatusColor = () => {
+    switch (scanStatus) {
+      case "success":
+        return "bg-green-100 border-green-400";
+      case "error":
+        return "bg-red-100 border-red-400";
+      case "scanning":
+        return "bg-blue-100 border-blue-400";
+      default:
+        return "bg-gray-50 border-gray-200";
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (scanStatus) {
+      case "success":
+        return <FiCheck className="text-green-500" />;
+      case "error":
+        return <BsExclamationTriangle className="text-red-500" />;
+      case "scanning":
+        return <Spin />;
+      default:
+        return <BsQrCodeScan className="text-gray-500" />;
+    }
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      onCancel={handleClose}
+      footer={null}
+      centered
+      width={480}
+      destroyOnClose
+      closable={scanStatus !== "scanning"}
+      maskClosable={false}
+      title={
+        <div className="flex items-center gap-2">
+          <BsQrCodeScan className="text-purple-500" />
+          <span className="font-semibold">{t("Book Return Validation")}</span>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        <Steps
+          current={
+            scanStatus === "ready" ? 0 : scanStatus === "scanning" ? 1 : 2
+          }
+          items={[
+            {
+              title: t("Ready"),
+              description: t("Prepare to scan"),
+            },
+            {
+              title: t("Scanning"),
+              description: t("Validating book"),
+            },
+            {
+              title: t(status === "success" ? "Verified" : "Failed"),
+              description: t(
+                status === "success" ? "Validation complete" : "Try again"
+              ),
+            },
+          ]}
+        />
+
+        <div className="rounded-xl overflow-hidden border">
+          <div className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] p-6 text-center">
+            <div className="mx-auto w-20 h-20 flex items-center justify-center bg-white/20 rounded-full mb-4">
+              <div className="text-3xl text-white animate-pulse">
+                {getStatusIcon()}
+              </div>
+            </div>
+            <p className="text-white font-medium">
+              {scanStatus === "ready" && t("Scan the book barcode")}
+              {scanStatus === "scanning" && t("Validating...")}
+              {scanStatus === "success" && t("Validation successful!")}
+              {scanStatus === "error" && t("Validation failed")}
+            </p>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm text-gray-600 mb-2">{t("Scanner input")}</p>
+          <div
+            className={`${getStatusColor()} rounded-lg p-3 font-mono h-12 flex items-center justify-between`}
+          >
+            <span className={scannedData ? "text-gray-800" : "text-gray-400"}>
+              {scannedData || t("[Waiting for input]")}
+            </span>
+            {scanStatus !== "ready" && (
+              <Tag
+                color={
+                  scanStatus === "success"
+                    ? "green"
+                    : scanStatus === "error"
+                    ? "red"
+                    : "blue"
+                }
+              >
+                {scanStatus}
+              </Tag>
+            )}
+          </div>
+        </div>
+
+        {scanStatus === "error" && (
+          <Alert
+            message={t("Validation failed")}
+            description={t("The scanned book doesn't match the issued book.")}
+            type="error"
+            showIcon
+          />
+        )}
+
+        <div className="flex gap-3">
+          <Button
+            block
+            size="large"
+            onClick={handleClose}
+            disabled={scanStatus === "scanning"}
+          >
+            {scanStatus === "success" ? t("Done") : t("Cancel")}
+          </Button>
+          {scanStatus !== "success" && (
+            <Button
+              block
+              type="primary"
+              size="large"
+              loading={scanning}
+              onClick={() => setScanning(true)}
+              disabled={scanning || scanStatus === "scanning"}
+              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
+            >
+              {t("Start Scan")}
+            </Button>
+          )}
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                            */
+/* ------------------------------------------------------------------ */
 const fuzzySearch = (search, text) => {
   search = search.toLowerCase();
   text = text.toLowerCase();
   let j = 0;
   for (let i = 0; i < text.length && j < search.length; i++) {
-    if (text[i] === search[j]) {
-      j++;
-    }
+    if (text[i] === search[j]) j++;
   }
   return j === search.length;
 };
 
-/**
- * Role options for filtering.
- * The admin role is commented out. Uncomment the line below to enable it in the future.
- */
 const roleOptions = [
   { value: "all", label: "All" },
-  // { value: "admin", label: "Admin" }, // Admin role removed; uncomment to re-enable in future
   { value: "student", label: "Student" },
   { value: "parent", label: "Parent" },
   { value: "finance", label: "Finance" },
@@ -48,32 +243,35 @@ const roleOptions = [
   { value: "staff", label: "Staff" },
 ];
 
+/* ------------------------------------------------------------------ */
+/* Main component                                                     */
+/* ------------------------------------------------------------------ */
 const AddIssue = ({ onClose, editIssueData }) => {
   const { t } = useTranslation("admLibrary");
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
-  // Redux state
-  const { books } = useSelector((state) => state.admin.library);
-  const sectionList = useSelector(
-    (state) => state.admin.group_section.sectionsList
-  );
-  const classList = useSelector((state) => state.admin.class.classes);
-  const [studentsList, setStudentsList] = useState([])
-  const { allUsers } = useSelector((state) => state.admin.notice);
-  const { loading } = useSelector((state) => state.admin.students);
+  const { books } = useSelector((s) => s.admin.library);
+  const sectionList = useSelector((s) => s.admin.group_section.sectionsList);
+  const classList = useSelector((s) => s.admin.class.classes);
+  const { allUsers } = useSelector((s) => s.admin.notice);
+  const { loading } = useSelector((s) => s.admin.students);
 
-  // Local role filter state for users
+  const [studentsList, setStudentsList] = useState([]);
   const [selectedRole, setSelectedRole] = useState("all");
-
-  // Local submitting state for the button
   const [submitting, setSubmitting] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [validationOK, setValidationOK] = useState(
+    editIssueData ? editIssueData.status === "Returned" : false
+  );
 
+  /* -------------------------------------------------------------- */
+  /* lifecycle                                                     */
+  /* -------------------------------------------------------------- */
   useEffect(() => {
     dispatch(fetchAllUsersThunk());
-  }, [dispatch]);
+  }, []);
 
-  // Pre-populate form if editing
   useEffect(() => {
     if (editIssueData) {
       form.setFieldsValue({
@@ -96,74 +294,107 @@ const AddIssue = ({ onClose, editIssueData }) => {
     } else {
       form.resetFields();
     }
-  }, [editIssueData, dispatch]);
+  }, [editIssueData, dispatch, form]);
 
-  // Handle antd Select changes
+  /* -------------------------------------------------------------- */
+  /* handlers                                                      */
+  /* -------------------------------------------------------------- */
   const handleSelectChange = (name, value) => {
     if (name === "class") {
       dispatch(fetchSectionsNamesByClass(value));
-      const fetchClass = async () => {
-
-        const response = await dispatch(fetchStudentsByClassAndSection(value))
-        console.log(response);
-        setStudentsList(response.payload)
-      }
-      fetchClass()
+      dispatch(fetchStudentsByClassAndSection(value))
+        .unwrap()
+        .then((list) => setStudentsList(list || []));
     }
     form.setFieldValue(name, value);
     if (name === "book") {
-      const selectedBook = books?.find((b) => b._id === value);
-      form.setFieldValue("authorName", selectedBook?.author || "");
+      const sel = books?.find((b) => b._id === value);
+      form.setFieldValue("authorName", sel?.author || "");
     }
   };
-  // Handle status changes via radio buttons
+
   const handleStatusChange = (e) => {
-    form.setFieldValue("status", e.target.value);
+    const val = e.target.value;
+    form.setFieldValue("status", val);
+    if (
+      editIssueData &&
+      editIssueData.status === "Pending" &&
+      val === "Returned"
+    ) {
+      setShowScanner(true);
+      setValidationOK(false);
+    }
   };
 
-  // Handle date changes using DatePicker
-  const handleDateChange = (name, dateObj) => {
-    form.setFieldValue(name, dateObj);
+  const handleDateChange = (name, date) => form.setFieldValue(name, date);
+
+  const handleScanComplete = async (barcode) => {
+    if (!editIssueData) return;
+    try {
+      await dispatch(
+        validateIssuedBookThunk({
+          bookIssueId: editIssueData._id,
+          barcodeValue: barcode,
+        })
+      ).unwrap();
+      setValidationOK(true);
+      return Promise.resolve();
+    } catch (_) {
+      setValidationOK(false);
+      return Promise.reject();
+    }
   };
 
-  // Filter out any user whose role is 'admin', then apply role-based filter using fuzzy search
-  const filteredUsers =
-    allUsers
-      ?.filter((user) => user.role?.toLowerCase() !== "admin")
-      .filter((user) =>
-        selectedRole === "all"
-          ? true
-          : user.role?.toLowerCase() === selectedRole.toLowerCase()
-      ) || [];
-
-  // Submit handler with loading state
   const handleSubmit = async (values) => {
+    if (
+      editIssueData &&
+      editIssueData.status === "Pending" &&
+      values.status === "Returned" &&
+      !validationOK
+    ) {
+      toast.error(t("Please validate the book before marking as returned."));
+      return;
+    }
+
     setSubmitting(true);
-    const selectedUser = allUsers?.find((usr) => usr.userId === values.user);
-    const userRole = selectedUser ? selectedUser.role : "";
-    const submissionData = {
+    const userRec = allUsers?.find((u) => u.userId === values.user);
+    const payload = {
       id: editIssueData ? editIssueData._id : null,
       status: values.status,
-      returnDate: values.returnDate ? values.returnDate.format("YYYY-MM-DD") : "",
+      returnDate: values.returnDate
+        ? values.returnDate.format("YYYY-MM-DD")
+        : "",
       issueDate: values.issueDate ? values.issueDate.format("YYYY-MM-DD") : "",
       author: values.authorName,
       bookId: values.book,
       userId: values.user,
-      userType: userRole,
+      userType: userRec ? userRec.role : "",
       sectionId: values.section,
       classId: values.class,
     };
     try {
-      await dispatch(issueBookThunk(submissionData)).unwrap().then(() => {
-        dispatch(fetchBookIssuesThunk({ page: 1, limit: 10 }));
-      });
-    } catch (error) {
+      await dispatch(issueBookThunk(payload)).unwrap();
+      dispatch(fetchBookIssuesThunk({ page: 1, limit: 10 }));
+      onClose();
     } finally {
       setSubmitting(false);
-      onClose();
     }
   };
 
+  /* -------------------------------------------------------------- */
+  /* filtering helpers for users                                    */
+  /* -------------------------------------------------------------- */
+  const filteredUsers =
+    allUsers
+      ?.filter((u) => u.role?.toLowerCase() !== "admin")
+      .filter((u) =>
+        selectedRole === "all" ? true : u.role?.toLowerCase() === selectedRole
+      ) || [];
+
+  /* -------------------------------------------------------------- */
+  /* JSX                                                            */
+  /* -------------------------------------------------------------- */
+  const { Option } = Select;
   return (
     <Form
       form={form}
@@ -182,212 +413,103 @@ const AddIssue = ({ onClose, editIssueData }) => {
       className="flex flex-col h-full space-y-6"
     >
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
-        {/* Role Filter for Users */}
-        <div>
-          <label
-            htmlFor="roleFilter"
-            className="block text-sm font-medium text-gray-700"
-          >
-            {t("Filter by Role")}
-          </label>
-          <Form.Item name="roleFilter" initialValue="all">
-            <Select
-              id="roleFilter"
-              value={selectedRole}
-              onChange={(value) => setSelectedRole(value)}
-              placeholder={t("Select Role")}
-              style={{ width: "100%" }}
-              size="large"
-            >
-              {roleOptions?.map((roleOption) => (
-                <Option key={roleOption.value} value={roleOption.value}>
-                  {t(roleOption.label)}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-        </div>
-        {/* Conditionally render Class & Section side by side if role is 'student' */}
+        {/* Role filter */}
+        <Form.Item label={t("Filter by Role")}>
+          <Select value={selectedRole} onChange={setSelectedRole} size="large">
+            {roleOptions.map((r) => (
+              <Option key={r.value} value={r.value}>
+                {t(r.label)}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
         {selectedRole === "student" && (
           <div className="flex gap-4">
-            <div className="flex-1">
-              <Form.Item
-                label={
-                  <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                    <FaSchool /> {t("Class")}
-                  </span>
+            <Form.Item
+              className="flex-1"
+              label={
+                <span className="flex items-center gap-1">
+                  <FaSchool /> {t("Class")}
+                </span>
+              }
+              name="class"
+              rules={[{ required: true, message: t("Select Class") }]}
+            >
+              <Select
+                onChange={(v) => handleSelectChange("class", v)}
+                size="large"
+                showSearch
+                filterOption={(i, o) =>
+                  o.children.toLowerCase().includes(i.toLowerCase())
                 }
-                name="class"
-                rules={[{ required: true, message: t("Select Class") }]}
               >
-                <Select
-                  id="class"
-                  value={form.getFieldValue("class")}
-                  onChange={(value) => handleSelectChange("class", value)}
-                  placeholder={t("Select Class")}
-                  style={{ width: "100%" }}
-                  size="large"
-                  showSearch
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().includes(input.toLowerCase())
-                  }
-                >
-                  {classList?.map((cls) => (
-                    <Option key={cls._id} value={cls._id}>
-                      {cls.className}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </div>
-            <div className="flex-1">
-              <Form.Item
-                label={
-                  <span className="block text-sm font-medium text-gray-700">
-                    {t("Section")}
-                  </span>
-                }
-                name="section"
+                {classList?.map((c) => (
+                  <Option key={c._id} value={c._id}>
+                    {c.className}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
+            <Form.Item className="flex-1" label={t("Section")} name="section">
+              <Select
+                onChange={(v) => handleSelectChange("section", v)}
+                loading={loading}
+                size="large"
+                disabled={loading}
               >
-                <Select
-                  id="section"
-                  value={form.getFieldValue("section")}
-                  onChange={(value) => handleSelectChange("section", value)}
-                  placeholder={t("Select Section")}
-                  style={{ width: "100%" }}
-                  size="large"
-                  disabled={loading}
-                  showSearch
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().includes(input.toLowerCase())
-                  }
-                >
-                  {sectionList?.map((section) => (
-                    <Option key={section._id} value={section._id}>
-                      {section.sectionName}
-                    </Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </div>
+                {sectionList?.map((s) => (
+                  <Option key={s._id} value={s._id}>
+                    {s.sectionName}
+                  </Option>
+                ))}
+              </Select>
+            </Form.Item>
           </div>
         )}
-        {/* User Field */}
+        {/* User */}
         <Form.Item
-          label={
-            <span className="block text-sm font-medium text-gray-700">
-              {t("User")}
-            </span>
-          }
+          label={t("User")}
           name="user"
           rules={[{ required: true, message: t("Select User") }]}
         >
           <Select
-            id="user"
-            value={form.getFieldValue("user")}
-            onChange={(value) => handleSelectChange("user", value)}
-            placeholder={t("Select User")}
-            style={{ width: "100%" }}
             size="large"
             showSearch
             optionFilterProp="data-search"
-            filterOption={(input, option) =>
-              option.props["data-search"] &&
-              fuzzySearch(input, option.props["data-search"])
+            filterOption={(i, o) =>
+              fuzzySearch(i, o.props["data-search"] || "")
             }
+            onChange={(v) => handleSelectChange("user", v)}
           >
-            {selectedRole === 'student' ?
-              studentsList.map((usr) => {
-                const searchString = `${usr.firstName} student`;
+            {(selectedRole === "student" ? studentsList : filteredUsers).map(
+              (u) => {
+                const val = selectedRole === "student" ? u._id : u.userId;
+                const name =
+                  selectedRole === "student"
+                    ? `${u.firstName} ${u.lastName}`
+                    : u.name;
+                const role = selectedRole === "student" ? "student" : u.role;
+                const searchStr = `${name} ${role}`;
                 return (
-                  <Option
-                    key={usr._id}
-                    value={usr._id}
-                    data-search={searchString}
-                  >
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={
-                          usr.profile ||
-                          "https://via.placeholder.com/20?text=No+Image"
-                        }
-                        alt={usr.firstName}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <span>{usr.firstName} {usr.lastName}</span>
-                      <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-1 rounded">
-                        student
-                      </span>
-                    </div>
+                  <Option key={val} value={val} data-search={searchStr}>
+                    {name}{" "}
+                    <span className="ml-2 text-xs text-blue-600">{role}</span>
                   </Option>
                 );
-              })
-              :
-              filteredUsers?.map((usr) => {
-                const searchString = `${usr.name} ${usr.role} ${usr.admissionNumber || ""}`;
-                return (
-                  <Option
-                    key={usr.userId}
-                    value={usr.userId}
-                    data-search={searchString}
-                  >
-                    <div className="flex items-center gap-2">
-                      <img
-                        src={
-                          usr.profile ||
-                          "https://via.placeholder.com/20?text=No+Image"
-                        }
-                        alt={usr.name}
-                        style={{
-                          width: 20,
-                          height: 20,
-                          borderRadius: "50%",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <span>{usr.name}</span>
-                      <span className="ml-auto text-xs bg-blue-100 text-blue-800 px-1 rounded">
-                        {usr.role}
-                      </span>
-                      {usr.role?.toLowerCase() === "student" && (
-                        <span className="text-xs bg-red-100 text-red-800 px-1 rounded">
-                          {usr.admissionNumber || "N/A"}
-                        </span>
-                      )}
-                    </div>
-                  </Option>
-                );
-              })
-            }
+              }
+            )}
           </Select>
         </Form.Item>
-        {/* Book Field */}
+        {/* Book */}
         <Form.Item
-          label={
-            <span className="block text-sm font-medium text-gray-700">
-              {t("Book")}
-            </span>
-          }
+          label={t("Book")}
           name="book"
           rules={[{ required: true, message: t("Select Book") }]}
         >
           <Select
-            id="book"
-            value={form.getFieldValue("book")}
-            onChange={(value) => handleSelectChange("book", value)}
-            placeholder={t("Select Book")}
-            style={{ width: "100%" }}
             size="large"
             showSearch
-            optionFilterProp="children"
-            filterOption={(input, option) =>
-              option.children.toLowerCase().includes(input.toLowerCase())
-            }
+            onChange={(v) => handleSelectChange("book", v)}
           >
             {books?.map((b) => (
               <Option key={b._id} value={b._id}>
@@ -396,34 +518,16 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </Select>
         </Form.Item>
-        {/* Author Name using AntD Input (read-only) */}
-        <Form.Item
-          label={
-            <span className="block text-sm font-medium text-gray-700">
-              {t("Author Name")}
-            </span>
-          }
-          name="authorName"
-        >
-          <Input
-            id="authorName"
-            value={
-              form.getFieldValue("book")
-                ? books?.find((b) => b._id === form.getFieldValue("book"))?.author ||
-                ""
-                : ""
-            }
-            size="large"
-            placeholder={t("Enter author name")}
-            disabled
-            readOnly
-          />
+        {/* Author */}
+        <Form.Item label={t("Author Name")} name="authorName">
+          <Input disabled size="large" />
         </Form.Item>
-        {/* Issue Date & Return Date side by side using DatePicker */}
+        {/* Dates */}
         <div className="flex gap-4">
           <Form.Item
+            className="flex-1"
             label={
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+              <span className="flex items-center gap-1">
                 <FiCalendar /> {t("Issue Date")}
               </span>
             }
@@ -431,80 +535,98 @@ const AddIssue = ({ onClose, editIssueData }) => {
             rules={[{ required: true, message: t("Select Issue Date") }]}
           >
             <DatePicker
-              style={{ width: "100%" }}
-              placeholder="dd-mm-yyyy"
               format="DD-MM-YYYY"
-              onChange={(dateObj) => handleDateChange("issueDate", dateObj)}
-              allowClear
+              size="large"
+              onChange={(d) => handleDateChange("issueDate", d)}
             />
           </Form.Item>
           <Form.Item
+            className="flex-1"
             label={
-              <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+              <span className="flex items-center gap-1">
                 <FiClock /> {t("Return Date")}
               </span>
             }
             name="returnDate"
             rules={[
-              { required: true, message: t("Select Return Date") },
+              {
+                required: true,
+                message: t("Select Return Date"),
+              },
               ({ getFieldValue }) => ({
                 validator(_, value) {
-                  const issueDate = getFieldValue("issueDate");
-                  if (!value || !issueDate || !value.isBefore(issueDate)) {
+                  const issue = getFieldValue("issueDate");
+                  if (!value || !issue || !value.isBefore(issue))
                     return Promise.resolve();
-                  }
                   return Promise.reject(
-                    new Error(t("Return date must be greater than or Equal issue date"))
+                    new Error(
+                      t("Return date must be greater than or Equal issue date")
+                    )
                   );
                 },
               }),
             ]}
           >
             <DatePicker
-              style={{ width: "100%" }}
-              placeholder="dd-mm-yyyy"
               format="DD-MM-YYYY"
-              onChange={(dateObj) => handleDateChange("returnDate", dateObj)}
-              allowClear
+              size="large"
+              onChange={(d) => handleDateChange("returnDate", d)}
             />
           </Form.Item>
         </div>
-        {/* Status as Radio Buttons */}
+        {/* Status */}
         <Form.Item
           label={
-            <span className="text-sm font-medium text-gray-700 flex items-center gap-1">
+            <span className="flex items-center gap-1">
               <FiAlertCircle /> {t("Status")}
             </span>
           }
           name="status"
-          initialValue="Pending"
         >
           <Radio.Group onChange={handleStatusChange} size="large">
-            <Radio value="Pending">
-              <span className="flex items-center gap-1">{t("Pending")}</span>
-            </Radio>
+            <Radio value="Pending">{t("Pending")}</Radio>
             <Radio value="Returned">
-              <span className="flex items-center gap-1">{t("Returned")}</span>
+              <div className="flex items-center gap-2">
+                {t("Returned")}
+                {validationOK && (
+                  <Tag icon={<FaCheckCircle />} color="green">
+                    {t("Verified")}
+                  </Tag>
+                )}
+              </div>
             </Radio>
           </Radio.Group>
         </Form.Item>
       </div>
-      {/* Submit Button with loading state */}
+      {/* Submit */}
       <div className="sticky bottom-0 w-full bg-white pb-3 px-5">
         <Form.Item>
           <Button
+            block
             type="primary"
             htmlType="submit"
-            loading={submitting}
-            disabled={submitting}
-            block
             size="large"
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-md hover:from-pink-600 hover:to-purple-600"
+            loading={submitting}
+            disabled={
+              submitting ||
+              (editIssueData &&
+                form.getFieldValue("status") === "Returned" &&
+                !validationOK)
+            }
+            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white"
           >
-            {editIssueData ? t("Edit Book Issue") : t("Add Book Issue")}
+            {editIssueData ? t("Update Book Issue") : t("Add Book Issue")}
           </Button>
         </Form.Item>
       </div>
+
+      {/* Enhanced Scanner modal */}
+      <BookScannerModal
+        visible={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScanComplete={handleScanComplete}
+        status={validationOK ? "success" : "error"}
+      />
     </Form>
   );
 };

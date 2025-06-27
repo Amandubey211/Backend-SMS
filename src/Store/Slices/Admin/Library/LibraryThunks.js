@@ -197,6 +197,34 @@ export const issueBookThunk = createAsyncThunk(
   }
 );
 
+export const validateIssuedBookThunk = createAsyncThunk(
+  "library/validateIssuedBook",
+  async (
+    { bookIssueId, barcodeValue },
+    { rejectWithValue, dispatch, getState }
+  ) => {
+    try {
+      const say = getAY();
+      const role = getUserRole(getState);
+      dispatch(setShowError(false));
+
+      const res = await postData(
+        `/${role}/all/validateissuedbook/${bookIssueId}?say=${say}`,
+        { barcodeValue }
+      );
+
+      if (res.success) {
+        toast.success(res.message || "Book validated!");
+        return true; // payload = true
+      }
+
+      toast.error(res.message || "Validation failed");
+      return rejectWithValue(res.message || "Validation failed");
+    } catch (err) {
+      return handleError(err, dispatch, rejectWithValue);
+    }
+  }
+);
 // --------------------------- CATEGORIES ---------------------------
 
 // Fetch All Categories
