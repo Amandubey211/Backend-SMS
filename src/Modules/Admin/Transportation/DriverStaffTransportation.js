@@ -159,48 +159,6 @@ const DriverStaffTransportation = () => {
   }, [helpers, filterConfig]);
 
 
-  const handleChange = (e, name) => {
-    if (e.target && e.target.files) {
-      setDriverData((prev) => ({
-        ...prev,
-        [name]: e.target.files[0],
-      }));
-    } else if (typeof e === 'string' || !e.target) {
-      setDriverData((prev) => ({
-        ...prev,
-        [name]: e,
-      }));
-    } else {
-      const { name, value, type, checked } = e.target;
-      setDriverData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
-    }
-  };
-
-
-
-  const handleHelperChange = (e, name) => {
-    if (e.target && e.target.files) {
-      setHelperData((prev) => ({
-        ...prev,
-        [name]: e.target.files[0],
-      }));
-    } else if (typeof e === 'string' || !e.target) {
-      setHelperData((prev) => ({
-        ...prev,
-        [name]: e,
-      }));
-    } else {
-      const { name, value, type, checked } = e.target;
-      setHelperData((prev) => ({
-        ...prev,
-        [name]: type === "checkbox" ? checked : value,
-      }));
-    }
-  };
-
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilterConfig((prev) => ({
@@ -488,7 +446,7 @@ const DriverStaffTransportation = () => {
               <>
                 <DriverQuickFilter {...{ filterConfig, handleFilterChange, resetFilters, uniqueBusRoutes }} />
                 <DriverTable drivers={filteredDrivers} loading={loading} error={error} onEdit={handleEdit} openDeleteModal={openDeleteModal} />
-                <DriverSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} driverData={driverData} setDriverData={setDriverData} handleChange={handleChange} handleSubmit={handleSubmitDriver} resetForm={resetForm} vehicles={vehicles} />
+                <DriverSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} driverData={driverData} setDriverData={setDriverData} handleSubmit={handleSubmitDriver} resetForm={resetForm} vehicles={vehicles} />
                 <DriverFilterSidebar isOpen={isFilterSidebarOpen} setIsOpen={setIsFilterSidebarOpen} filterConfig={filterConfig} handleFilterChange={handleFilterChange} resetFilters={resetFilters} uniqueBusRoutes={uniqueBusRoutes} />
                 <DeleteModal
                   isOpen={deleteModalOpen}
@@ -502,7 +460,7 @@ const DriverStaffTransportation = () => {
                 {/* Helper Management Components (similar to Driver) */}
                 <HelperQuickFilter {...{ filterConfig, handleFilterChange, resetFilters, uniqueBusRoutes }} />
                 <HelperTable helpers={filteredHelpers} loading={loading} error={error} onEdit={handleHelperEdit} openDeleteModal={openHelperDeleteModal} />
-                <HelperSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} helperData={helperData} setHelperData={setHelperData} handleChange={handleHelperChange} handleSubmit={handleSubmitHelper} resetForm={resetForm} vehicles={vehicles} />
+                <HelperSidebarForm isOpen={isSidebarOpen} isEditing={isEditing} helperData={helperData} setHelperData={setHelperData} handleSubmit={handleSubmitHelper} resetForm={resetForm} vehicles={vehicles} />
                 <HelperFilterSidebar isOpen={isFilterSidebarOpen} setIsOpen={setIsFilterSidebarOpen} filterConfig={filterConfig} handleFilterChange={handleFilterChange} resetFilters={resetFilters} uniqueBusRoutes={uniqueBusRoutes} />
                 <DeleteModal
                   isOpen={deleteHelperModalOpen}
