@@ -6,7 +6,7 @@ import { updateTimeTable, deleteTimeTable, getClassTimeTable } from '../../../..
 import TimeTableForm from '../../Components/TimeTableForm';
 import { setRole } from '../../../../../Store/Slices/Common/Auth/reducers/authSlice';
 
-const ClassTimeTable = ({ selectedClass, selectedSection }) => {
+const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, selectedSectionName }) => {
   const dispatch = useDispatch();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [editingTimetable, setEditingTimetable] = useState(null);
@@ -14,7 +14,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
   const [reloadTable, setReloadTable] = useState(false);
-
+  const role = useSelector((store) => store.common.auth.role);
   const { ascClassTimeTableData, loading } = useSelector(
     (state) => state.admin.ascTimeTable
   );
@@ -32,32 +32,32 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
   // Function to convert time string to minutes for sorting
   const timeToMinutes = (timeStr) => {
     if (!timeStr) return Infinity; // Return high value for missing times
-    
+
     // Normalize time format (remove spaces, make uppercase)
     const normalized = timeStr.replace(/\s+/g, '').toUpperCase();
-    
+
     // Extract time parts
     const timePart = normalized.replace(/[AP]M$/, '');
     const [hours, minutes] = timePart.split(':').map(Number);
     const period = normalized.includes('PM') ? 'PM' : 'AM';
-    
+
     // Convert to 24-hour format minutes
     let totalMinutes = hours * 60 + minutes;
     if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
     if (period === 'AM' && hours === 12) totalMinutes -= 12 * 60;
-    
+
     return totalMinutes;
   };
 
   // Function to sort timetable entries
   const sortTimetable = (timetable) => {
     if (!timetable || !timetable.generatedTimeTabel) return [];
-    
+
     return [...timetable.generatedTimeTabel].sort((a, b) => {
       // Get start times in minutes
       const aStart = a?.timing?.startTime ? timeToMinutes(a.timing.startTime) : Infinity;
       const bStart = b?.timing?.startTime ? timeToMinutes(b.timing.startTime) : Infinity;
-      
+
       // Compare start times
       return aStart - bStart;
     });
@@ -137,7 +137,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
         AllData.map((data, index) => {
           // Sort the timetable entries
           const sortedTimetable = sortTimetable(data);
-          
+
           return (
             <div
               key={index}
@@ -146,7 +146,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <p className="text-xl font-semibold text-gray-800 mb-1">
-                    Class Timetable
+                    {selectedClassName + " " || ""}{selectedSectionName + " " || ""} Timetable
                   </p>
                   <p className="text-gray-500">
                     Timings: <span className="font-medium">{data.startTime || 'N/A'}</span> to{' '}
@@ -155,41 +155,52 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                   <div className="mt-2">
                     {data?.days?.map((day, index) => (
                       <Tag key={index} color="blue" className="mb-1">
-                        {day}
+                        {day.toUpperCase()}
                       </Tag>
                     ))}
                   </div>
                 </div>
                 <div className="flex space-x-4">
-                  <div className='flex justify-center items-center '>
-                    <Tag
-                      color={isPublished ? 'green' : 'red'}
-                      className="py-1 px-3 rounded-md text-sm"
-                    >
-                      {isPublished ? 'Published' : 'Unpublished'}
-                    </Tag>
-                    <Switch
-                      checked={isPublished}
-                      onChange={handleTogglePublish}
-                      checkedChildren="On"
-                      unCheckedChildren="Off"
-                    />
+                  <div className="flex items-center">
+                    {(role === 'admin' || role === 'teacher') ? (
+                      <div
+                        className={`relative inline-flex items-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer ${isPublished ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                        onClick={handleTogglePublish}
+                      >
+                        {isPublished ? 'Published' : 'Unpublished'}
+                        <span className="ml-2 inline-block w-8 h-4 rounded-full bg-white relative">
+                          <span
+                            className={`absolute top-0.5 w-3 h-3 rounded-full transition-all ${isPublished ? 'left-4 bg-green-500' : 'left-0.5 bg-gray-500'}`}
+                          />
+                        </span>
+                      </div>
+                    ) : (
+                      <Tag
+                        color={isPublished ? 'green' : 'red'}
+                        className="py-1 px-3 rounded-md text-sm font-medium"
+                      >
+                        {isPublished ? 'Published' : 'Unpublished'}
+                      </Tag>
+                    )}
                   </div>
-                  <button
-                    className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                    onClick={() => handleDeleteConfirmation(data)}
-                  >
-                    <FaTrashAlt className="mr-2" /> Delete
-                  </button>
+                  {
+                    (role === 'admin' || role === 'teacher') && <button
+                      className="flex items-center bg-red-400 text-white px-4 py-2 rounded hover:bg-red-600"
+                      onClick={() => handleDeleteConfirmation(data)}
+                    >
+                      <FaTrashAlt className="mr-2" /> Delete
+                    </button>
+                  }
+
                 </div>
               </div>
 
               <table className="w-full table-auto border border-gray-300 rounded-md">
                 <thead>
                   <tr className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-left">
-                    <th className="px-4 py-2 border text-center">Time</th>
-                    <th className="px-4 py-2 border text-center">Subject</th>
-                    <th className="px-4 py-2 border text-center">Teacher</th>
+                    <th className="px-4 py-2 border text-start">Time</th>
+                    <th className="px-4 py-2 border text-start">Subject</th>
+                    <th className="px-4 py-2 border text-start">Teacher</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -198,11 +209,11 @@ const ClassTimeTable = ({ selectedClass, selectedSection }) => {
                       key={index}
                       className="hover:bg-gray-50 transition duration-200"
                     >
-                      <td className="px-4 py-2 border text-center">
-                        {item?.timing?.startTime || 'No time'} - {item?.timing?.endTime || ''}
+                      <td className="px-4 py-2 border text-start">
+                        {item?.timing?.startTime || ''} - {item?.timing?.endTime || ''}
                       </td>
-                      <td className="px-4 py-2 border text-center">{item?.subjectName || '-'}</td>
-                      <td className={`px-4 py-2 border text-center ${getColorForTeachers(item?.teacherName)}`}>
+                      <td className="px-4 py-2 border text-start">{item?.subjectName || '-'}</td>
+                      <td className={`px-4 py-2 border text-start ${getColorForTeachers(item?.teacherName)}`}>
                         {item?.teacherName || 'Not Assigned'}
                       </td>
                     </tr>

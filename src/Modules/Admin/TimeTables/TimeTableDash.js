@@ -775,13 +775,13 @@ export default function TimeTableDash() {
 
 
               {
-                role === 'teacher' && activeTab === 'autoCalendar' ? null : <Button
+                (role === 'admin' || role === 'teacher') && activeTab === 'autoCalendar' ?   <Button
                   type="primary"
                   className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
                   onClick={() => openDrawer(null)}
                 >
                   + Add Timetable
-                </Button>
+                </Button> : null
               }
 
 

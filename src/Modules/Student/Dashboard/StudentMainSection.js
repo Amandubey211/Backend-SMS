@@ -41,6 +41,7 @@ const StudentMainSection = () => {
   const { selectedClass, selectedSection } = useSelector(
     (state) => state?.common?.user?.classInfo
   );
+  console.log(cardData)
   const { userDetails } = useSelector((state) => state?.common?.user);
   const { studentSubjectProgress } = useSelector(
     (store) => store.admin.all_students
@@ -133,7 +134,7 @@ const StudentMainSection = () => {
             <div className="flex w-full h-[250px] justify-between p-2 bg-white rounded-md border hover:shadow-sm mb-4">
               <StudentDashFeeCard
                 title="Total Unpaid Fees"
-                amount={(totalAllAmount - paidAllAmount).toFixed(2) || 0}
+                amount={(totalAllAmount - paidAllAmount).toFixed(5) || 0}
                 buttonText="View More"
                 buttonAction={handlePayNow}
               />

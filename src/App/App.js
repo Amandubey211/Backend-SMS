@@ -1190,7 +1190,7 @@ function App() {
         <ProtectRoute
           // Component={TimeTablePage}
           Component={TimeTableDash}
-          allowedRoles={["admin", "teacher", "student", "parent", "staff"]}
+          allowedRoles={["admin", "teacher", "student", "parent", "staff", "librarian"]}
         />
       ),
       errorElement: <Error />,
