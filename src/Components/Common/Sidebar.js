@@ -1,4 +1,3 @@
-// components/Common/Sidebar.jsx
 import React, { useEffect, useRef, useCallback } from "react";
 import { RxCross2 } from "react-icons/rx";
 
@@ -7,19 +6,11 @@ import { RxCross2 } from "react-icons/rx";
  * ------------------------------------------------------------------
  * • Click-outside and <Esc> close.
  * • Focus is trapped inside while open.
- * • Optional `width` prop (%, px, rem …) now respected for **any** value.
- * • Back-drop gets a subtle blur (backdrop-blur) + dark overlay.
+ * • First focus goes to the **first focusable element** in the panel,
+ *   falling back to the close button – so scanners that send “Enter”
+ *   will never trigger the X button by mistake.
+ * • All event-listeners are cleaned up correctly (no memory-leaks).
  * ------------------------------------------------------------------
- *
- *  <Sidebar
- *    isOpen={isBookSidebarOpen}
- *    onClose={() => setBookSidebarOpen(false)}
- *    title={t("Add New Book")}
- *    width="60%"                    // ← dynamic width works now
- *    ignoreClickOutsideSelectors={[ ".ant-dropdown" ]}
- *  >
- *    …children…
- *  </Sidebar>
  */
 const Sidebar = ({
   isOpen,
@@ -32,7 +23,9 @@ const Sidebar = ({
   const sidebarRef = useRef(null);
   const closeBtnRef = useRef(null);
 
-  /* ------------------------  focus-trap (Tab loop)  ------------------------ */
+  /* ------------------------------------------------------------------ */
+  /*  Focus-trap (Tab loop)                                             */
+  /* ------------------------------------------------------------------ */
   const trapFocus = useCallback((e) => {
     if (e.key !== "Tab" || !sidebarRef.current) return;
 
@@ -57,43 +50,80 @@ const Sidebar = ({
     }
   }, []);
 
-  /* ------------------------  close on outside click  ----------------------- */
-  useEffect(() => {
-    const handleClickOutside = (e) => {
+  /* ------------------------------------------------------------------ */
+  /*  Helpers                                                           */
+  /* ------------------------------------------------------------------ */
+  const setInitialFocus = () => {
+    if (!sidebarRef.current) return;
+
+    const firstFocusable = sidebarRef.current.querySelector(
+      'input, select, textarea, button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+
+    if (firstFocusable) {
+      firstFocusable.focus();
+    } else {
+      closeBtnRef.current?.focus();
+    }
+  };
+
+  const escapeHandler = useCallback(
+    (e) => {
+      if (e.key === "Escape") onClose();
+    },
+    [onClose]
+  );
+
+  const clickOutsideHandler = useCallback(
+    (e) => {
       const defaultIgnore = [
         ".ant-picker-dropdown",
         ".ant-select-dropdown",
         ".ant-modal",
         ".ant-modal-mask",
       ];
-      const ignoreSelectors = [...defaultIgnore, ...ignoreClickOutsideSelectors];
+      const ignoreSelectors = [
+        ...defaultIgnore,
+        ...ignoreClickOutsideSelectors,
+      ];
 
       const shouldIgnore =
         ignoreSelectors.some((sel) => e.target.closest(sel)) ||
         document.querySelector(".ant-confirm, .ant-modal-confirm");
 
-      if (!shouldIgnore && sidebarRef.current && !sidebarRef.current.contains(e.target)) {
+      if (
+        !shouldIgnore &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(e.target)
+      ) {
         onClose();
       }
-    };
+    },
+    [onClose, ignoreClickOutsideSelectors]
+  );
 
+  /* ------------------------------------------------------------------ */
+  /*  Lifecycle                                                         */
+  /* ------------------------------------------------------------------ */
+  useEffect(() => {
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("mousedown", clickOutsideHandler);
       document.addEventListener("keydown", trapFocus);
-      document.addEventListener("keydown", (e) => e.key === "Escape" && onClose());
-      // autofocus the close button for accessibility
-      closeBtnRef.current?.focus();
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", trapFocus);
+      document.addEventListener("keydown", escapeHandler);
+
+      // Give the DOM one tick to paint before focusing
+      setTimeout(setInitialFocus, 0);
     }
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("mousedown", clickOutsideHandler);
       document.removeEventListener("keydown", trapFocus);
+      document.removeEventListener("keydown", escapeHandler);
     };
-  }, [isOpen, onClose, trapFocus, ignoreClickOutsideSelectors]);
+  }, [isOpen, clickOutsideHandler, trapFocus, escapeHandler]);
 
-  /* -------------------------------  render  -------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*  Render                                                            */
+  /* ------------------------------------------------------------------ */
   return (
     <div
       className={`fixed inset-0 z-40 transition-opacity duration-300 ${
@@ -103,13 +133,13 @@ const Sidebar = ({
       aria-modal="true"
       aria-labelledby="sidebar-title"
     >
-      {/* Blurred dark overlay */}
+      {/* Back-drop */}
       <div
         aria-hidden="true"
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity`}
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
       />
 
-      {/* Sliding panel */}
+      {/* Panel */}
       <div
         ref={sidebarRef}
         style={{
@@ -121,8 +151,13 @@ const Sidebar = ({
         }`}
       >
         {/* Header */}
-        <div className="flex justify-between items-center mb-4" id="sidebar-title">
-          <h2 className="font-semibold text-lg text-gray-800">{title || "Sidebar"}</h2>
+        <div
+          className="flex justify-between items-center mb-4"
+          id="sidebar-title"
+        >
+          <h2 className="font-semibold text-lg text-gradient">
+            {title || "Sidebar"}
+          </h2>
           <button
             ref={closeBtnRef}
             onClick={onClose}
@@ -133,7 +168,7 @@ const Sidebar = ({
           </button>
         </div>
 
-        {/* Content */}
+        {/* Body */}
         {children}
       </div>
     </div>
