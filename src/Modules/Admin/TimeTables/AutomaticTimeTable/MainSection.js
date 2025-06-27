@@ -5,7 +5,6 @@ import { fetchPayrollStaff } from "../../../../Store/Slices/Finance/payroll/payr
 import { fetchAllClasses } from "../../../../Store/Slices/Admin/Class/actions/classThunk";
 import TeacherTimeTable from './components/TeacherTimeTable';
 import ClassTimeTable from './components/ClassTimeTable';
-import SchoolTimeTable from './components/SchoolTimeTable';
 import { fetchSectionsByClass } from "../../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 
 const { Option } = Select;
@@ -14,7 +13,8 @@ const MainSection = () => {
     const dispatch = useDispatch();
     const { classes } = useSelector((state) => state?.admin?.class);
     const { sectionsList } = useSelector((state) => state?.admin?.group_section);
-      const role = useSelector((store) => store.common.auth.role);
+    const role = useSelector((store) => store.common.auth.role);
+
     const [timetableType, setTimetableType] = useState("class");
     const [selectedClass, setSelectedClass] = useState(null);
     const [selectedSection, setSelectedSection] = useState(null);
@@ -34,6 +34,10 @@ const MainSection = () => {
         await dispatch(fetchSectionsByClass(value));
     };
 
+    // Get class and section names based on selection
+    const selectedClassName = classes?.find((cls) => cls._id === selectedClass)?.className || "";
+    const selectedSectionName = sectionsList?.find((sec) => sec._id === selectedSection)?.sectionName || "";
+
     // Sort classes by numeric value
     const sortedClasses = classes?.slice().sort((a, b) => {
         const classA = parseInt(a.className.match(/\d+/)) || 0;
@@ -47,7 +51,7 @@ const MainSection = () => {
     });
 
     return (
-        <div className=" wp-4 space-y-4">
+        <div className="wp-4 space-y-4">
             {/* Timetable Type Selection */}
             <div className="flex space-x-4 items-center">
                 <label className="font-medium">Select Timetable Type:</label>
@@ -56,7 +60,6 @@ const MainSection = () => {
                     style={{ width: 200 }}
                     onChange={setTimetableType}
                 >
-                    {/* <Option value="school">All</Option> */}
                     <Option value="class">Class & Section Wise</Option>
                     <Option value="teacher">Teacher Wise</Option>
                 </Select>
@@ -70,7 +73,7 @@ const MainSection = () => {
                         style={{ width: 150 }}
                         onChange={handleClassChange}
                         placeholder="Select Class"
-                        value={selectedClass} // Bind the selected value
+                        value={selectedClass}
                     >
                         {sortedClasses?.map((cls, index) => (
                             <Option key={cls._id || `class-${index}`} value={cls._id}>
@@ -84,8 +87,8 @@ const MainSection = () => {
                         style={{ width: 150 }}
                         onChange={setSelectedSection}
                         placeholder="Select Section"
-                        value={selectedSection} // Bind the selected value
-                        disabled={!sectionsList?.length} // Disable if no sections are available
+                        value={selectedSection}
+                        disabled={!sectionsList?.length}
                     >
                         {sortedSections?.map((sec, index) => (
                             <Option key={sec._id || `section-${index}`} value={sec._id}>
@@ -104,7 +107,7 @@ const MainSection = () => {
                         style={{ width: 200 }}
                         onChange={setSelectedTeacher}
                         placeholder="Select Teacher"
-                        value={selectedTeacher} 
+                        value={selectedTeacher}
                     >
                         {teachersList?.map((teacher) => (
                             <Option key={teacher.id} value={teacher.id}>
@@ -116,25 +119,17 @@ const MainSection = () => {
             )}
 
             {/* Timetable Components */}
-            {sectionsList?.length >= 1 ? timetableType === "class" && selectedClass && selectedSection && (
+            {timetableType === "class" && selectedClass && selectedSection && (
                 <ClassTimeTable
                     selectedClass={selectedClass}
                     selectedSection={selectedSection}
+                    selectedClassName={selectedClassName}
+                    selectedSectionName={selectedSectionName}
                 />
-            ) : timetableType === "class" && selectedClass && (
-                <ClassTimeTable
-                    selectedClass={selectedClass}
-                    selectedSection={selectedSection}
-                />
-            )
-
-            }
+            )}
             {timetableType === "teacher" && selectedTeacher && (
                 <TeacherTimeTable selectedTeacher={selectedTeacher} />
             )}
-            {/* {timetableType === "school" && (
-                <SchoolTimeTable />
-            )} */}
         </div>
     );
 };
