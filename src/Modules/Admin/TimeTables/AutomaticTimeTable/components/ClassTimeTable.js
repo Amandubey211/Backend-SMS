@@ -34,37 +34,25 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
 
   // Function to convert time string to minutes for sorting
   const timeToMinutes = (timeStr) => {
-    if (!timeStr) return Infinity; // Return high value for missing times
+    if (!timeStr) return Infinity;
 
-    // Normalize time format (remove spaces, make uppercase)
-    const normalized = timeStr.replace(/\s+/g, '').toUpperCase();
-
-    // Extract time parts
-    const timePart = normalized.replace(/[AP]M$/, '');
-    const [hours, minutes] = timePart.split(':').map(Number);
-    const period = normalized.includes('PM') ? 'PM' : 'AM';
-
-    // Convert to 24-hour format minutes
-    let totalMinutes = hours * 60 + minutes;
-    if (period === 'PM' && hours !== 12) totalMinutes += 12 * 60;
-    if (period === 'AM' && hours === 12) totalMinutes -= 12 * 60;
-
-    return totalMinutes;
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes; // Convert hours and minutes to total minutes
   };
+
 
   // Function to sort timetable entries
   const sortTimetable = (timetable) => {
     if (!timetable || !timetable.generatedTimeTabel) return [];
 
     return [...timetable.generatedTimeTabel].sort((a, b) => {
-      // Get start times in minutes
       const aStart = a?.timing?.startTime ? timeToMinutes(a.timing.startTime) : Infinity;
       const bStart = b?.timing?.startTime ? timeToMinutes(b.timing.startTime) : Infinity;
 
-      // Compare start times
       return aStart - bStart;
     });
   };
+
 
   const handleEdit = (record) => {
     setEditingTimetable(record);
@@ -103,7 +91,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
       });
   };
 
-  const handleTogglePublish = (id,currentStatus) => {
+  const handleTogglePublish = (id, currentStatus) => {
     const newPublishStatus = !currentStatus;
     dispatch(
       updateTimeTable({
@@ -126,8 +114,8 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
     setEditingTimetable(null);
   };
 
-  const getColorForTeachers = (teachers) => {
-    if (!teachers || teachers.length === 0) return 'bg-red-300';
+  const getColorForTeachers = (item) => {
+    if ((!item?.teacherName || item?.teacherName.length === 0) && item?.subjectId) return 'bg-red-300';
     return 'bg-white';
   };
 
@@ -148,7 +136,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
               <div className="flex justify-between items-center mb-4">
                 <div>
                   <p className="text-xl font-semibold text-gray-800 mb-1">
-                    {selectedClassName + " " || ""}{selectedSectionName + " " || ""} Timetable
+                    {selectedClassName ? selectedClassName + " " : ""}{selectedSectionName ? selectedSectionName + " " : ""} Timetable
                   </p>
                   <p className="text-gray-500">
                     Timings: <span className="font-medium">{data.startTime || 'N/A'}</span> to{' '}
@@ -167,7 +155,7 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
                     {(role === 'admin' || role === 'teacher') ? (
                       <div
                         className={`relative inline-flex items-center py-2 px-3 rounded-md text-sm font-medium cursor-pointer ${data.publish ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
-                        onClick={() => handleTogglePublish(data._id,data.publish)}
+                        onClick={() => handleTogglePublish(data._id, data.publish)}
                       >
                         {data?.publish ? 'Published' : 'Unpublished'}
                         <span className="ml-2 inline-block w-8 h-4 rounded-full bg-white relative">
@@ -215,8 +203,8 @@ const ClassTimeTable = ({ selectedClass, selectedSection, selectedClassName, sel
                         {item?.timing?.startTime || ''} - {item?.timing?.endTime || ''}
                       </td>
                       <td className="px-4 py-2 border text-start">{item?.subjectName || '-'}</td>
-                      <td className={`px-4 py-2 border text-start ${getColorForTeachers(item?.teacherName)}`}>
-                        {item?.teacherName || 'Not Assigned'}
+                      <td className={`px-4 py-2 border text-start ${getColorForTeachers(item)}`}>
+                        {item?.teacherName ? item?.teacherName : (item.subjectId ? 'Not Assigned' : 'Break')}
                       </td>
                     </tr>
                   ))}

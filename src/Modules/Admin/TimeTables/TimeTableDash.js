@@ -98,7 +98,7 @@ export default function TimeTableDash() {
   const [activeTab, setActiveTab] = useState("autoCalendar");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [viewMode, setViewMode] = useState("month");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   // Drawer & Modal
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -715,6 +715,7 @@ export default function TimeTableDash() {
                   : value,
     }));
 
+
   // --------------------------
   // Render
   // --------------------------
@@ -722,9 +723,8 @@ export default function TimeTableDash() {
     <div className="w-full min-h-screen flex">
       {/* Main Content */}
       <div
-        className={`flex-1 p-4 transition-all ${
-    activeTab === "list" && !sidebarCollapsed ? "mr-72" : "mr-0"
-  }"
+        className={`flex-1 p-4 transition-all ${!sidebarCollapsed && activeTab === "list" ? "mr-72" : "mr-0"
+          }"
           }`}
       >
         {/* Header & Top Controls */}
@@ -754,13 +754,16 @@ export default function TimeTableDash() {
               )}
 
               {
-                activeTab === 'list' && <Button
-                  type="default"
-                  onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                  icon={<AiOutlineFilter />}
-                >
-                  {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
-                </Button>
+                activeTab === 'list' && (
+                  <Button
+                    type="default"
+                    onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                    icon={<AiOutlineFilter />}
+                    style={{ zIndex: 10 }} // Ensure button stays above sidebar
+                  >
+                    {sidebarCollapsed ? "Show Stats" : "Hide Stats"}
+                  </Button>
+                )
               }
 
               {
@@ -775,7 +778,7 @@ export default function TimeTableDash() {
 
 
               {
-                (role === 'admin' || role === 'teacher') && activeTab === 'autoCalendar' ?   <Button
+                (role === 'admin' || role === 'teacher') ? <Button
                   type="primary"
                   className="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold border-none hover:opacity-90"
                   onClick={() => openDrawer(null)}
