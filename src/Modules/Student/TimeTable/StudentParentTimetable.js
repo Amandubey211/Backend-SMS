@@ -31,6 +31,7 @@ import { Select } from 'antd';
 import AscTimeTableView from "./Components/AscTimeTableView";
 import { fetchGroupsByClassAndSection, fetchGroupsByStudent } from "../../../Store/Slices/Admin/Class/Section_Groups/groupSectionThunks";
 import { fetchTimetableList } from "../../../Store/Slices/Admin/TimeTable/timetable.action";
+import ClassTimeTable from "../../Admin/TimeTables/AutomaticTimeTable/components/ClassTimeTable";
 const { Option } = Select;
 
 const StudentTimetablePage = () => {
@@ -86,7 +87,7 @@ const StudentTimetablePage = () => {
   useNavHeading(role, t("TimeTable"));
 
   useEffect(() => {
-    if(role === 'parent'){ 
+    if (role === 'parent') {
       dispatch(fetchChildren())
     }
     if (role === 'student') {
@@ -124,11 +125,14 @@ const StudentTimetablePage = () => {
    * Gets filter information (class and section) based on role
    * @returns {Object} Contains classId and sectionId
    */
+
   const getFilterInfo = () => {
     if (role === "student") {
       return {
         classId: userDetails.classId,
         sectionId: userDetails.sectionId,
+        className: userDetails.className,
+        sectionName: userDetails.sectionName
       };
     } else if (role === "parent" && selectedChildId) {
       const selectedChild = children.find(
@@ -137,12 +141,14 @@ const StudentTimetablePage = () => {
       return {
         classId: selectedChild?.presentClassId,
         sectionId: selectedChild?.sectionId,
+        className: userDetails.className,
+        sectionName: userDetails.sectionName
       };
     }
     return { classId: null, sectionId: null };
   };
 
-  const { classId, sectionId } = getFilterInfo();
+  const { classId, sectionId,className,sectionName } = getFilterInfo();
 
   const fetchTimetables = useCallback(
     (params = {}) => {
@@ -246,7 +252,7 @@ const StudentTimetablePage = () => {
 
           {/* Main Content */}
           <div
-            className={`flex-1 p-4 transition-all ${sidebarCollapsed ? "mr-0" : "mr-72"
+            className={`flex-1 p-4 transition-all ${selectedTimeTable === 'others' && !sidebarCollapsed ? "mr-72" : "mr-0"
               }`}
           >
             {/* Children selector for parent role */}
@@ -260,7 +266,7 @@ const StudentTimetablePage = () => {
             )}
 
             {/* Header and Controls */}
-            {
+            {/* {
               role === "student" && <TimetableHeader
                 sidebarCollapsed={sidebarCollapsed}
                 setSidebarCollapsed={setSidebarCollapsed}
@@ -275,9 +281,10 @@ const StudentTimetablePage = () => {
                 loadingFetch={loadingFetch}
                 t={t}
               />
-            }
+            } */}
             {
-              role === "parent" && <div className="my-6 flex justify-end gap-4">
+                    
+              <div className="my-6 flex justify-end gap-4">
                 <Select
                   style={{ width: 150 }}
                   onChange={setSelectedTimeTable}
@@ -308,9 +315,14 @@ const StudentTimetablePage = () => {
 
             {/* Timetable Views */}
             {
-              role === 'parent' && (
+              (
                 selectedTimeTable === 'classTimeTable' ?
-                  <AscTimeTableView selectedClass={classId} selectedSection={sectionId} /> :
+                  <ClassTimeTable
+                   selectedClass={classId}
+                   selectedSection={sectionId}
+                   selectedClassName={className}
+                    selectedSectionName={sectionName}
+                      /> :
                   <TimetableViews
                     loadingFetch={loadingFetch}
                     loadingChildren={loadingChildren}
@@ -330,7 +342,7 @@ const StudentTimetablePage = () => {
           </div>
 
           {/* Stats Sidebar */}
-          {!sidebarCollapsed && (
+          {(selectedTimeTable === 'others' && !sidebarCollapsed) && (
             <StatsSidebar
               loadingFetch={loadingFetch}
               loadingChildren={loadingChildren}

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import ClassTimeTable from './ClassTimeTable';
+import ClassTimeTable from "../../../Admin/TimeTables/AutomaticTimeTable/components/ClassTimeTable";
+
 
 const MainSection = () => {
     const { userDetails } = useSelector((state) => state?.common?.user);
