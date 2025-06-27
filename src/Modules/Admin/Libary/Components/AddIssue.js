@@ -16,205 +16,57 @@ import {
   Button,
   Input,
   Modal,
-  Spin,
-  Alert,
-  Steps,
   Tag,
 } from "antd";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { FaSchool, FaCheckCircle } from "react-icons/fa";
-import {
-  FiAlertCircle,
-  FiCalendar,
-  FiClock,
-  FiX,
-  FiCheck,
-} from "react-icons/fi";
-import { BsQrCodeScan, BsExclamationTriangle } from "react-icons/bs";
+import { FiAlertCircle, FiCalendar, FiClock } from "react-icons/fi";
+import { BsQrCodeScan } from "react-icons/bs";
 import toast from "react-hot-toast";
 
 /* ------------------------------------------------------------------ */
-/* 📷 Enhanced Scanner Modal                                          */
+/* In-file scanner modal (very light UI)                              */
 /* ------------------------------------------------------------------ */
-const BookScannerModal = ({ visible, onClose, onScanComplete, status }) => {
+const BookScannerModal = ({ visible, onClose, onScanComplete }) => {
   const { t } = useTranslation("admLibrary");
-  const [scanning, setScanning] = useState(false);
-  const [scannedData, setScannedData] = useState("");
-  const [scanStatus, setScanStatus] = useState("ready"); // ready, scanning, success, error
-
-  const handleClose = () => {
-    setScanning(false);
-    setScannedData("");
-    setScanStatus("ready");
-    onClose();
-  };
+  const [buffer, setBuffer] = useState("");
 
   useEffect(() => {
     if (!visible) {
-      setScannedData("");
-      setScanStatus("ready");
+      setBuffer("");
       return;
     }
-
-    const handleKeyPress = (e) => {
+    const handler = (e) => {
       if (e.key === "Enter") {
-        if (scannedData) {
-          setScanStatus("scanning");
-          onScanComplete(scannedData)
-            .then(() => setScanStatus("success"))
-            .catch(() => setScanStatus("error"))
-            .finally(() => {
-              setTimeout(() => setScannedData(""), 1000);
-            });
+        if (buffer.trim()) {
+          onScanComplete(buffer.trim());
+          setBuffer("");
         }
       } else {
-        setScannedData((prev) => prev + e.key);
+        setBuffer((p) => p + e.key);
       }
     };
-
-    window.addEventListener("keypress", handleKeyPress);
-    return () => window.removeEventListener("keypress", handleKeyPress);
-  }, [visible, scannedData, onScanComplete]);
-
-  const getStatusColor = () => {
-    switch (scanStatus) {
-      case "success":
-        return "bg-green-100 border-green-400";
-      case "error":
-        return "bg-red-100 border-red-400";
-      case "scanning":
-        return "bg-blue-100 border-blue-400";
-      default:
-        return "bg-gray-50 border-gray-200";
-    }
-  };
-
-  const getStatusIcon = () => {
-    switch (scanStatus) {
-      case "success":
-        return <FiCheck className="text-green-500" />;
-      case "error":
-        return <BsExclamationTriangle className="text-red-500" />;
-      case "scanning":
-        return <Spin />;
-      default:
-        return <BsQrCodeScan className="text-gray-500" />;
-    }
-  };
+    window.addEventListener("keypress", handler);
+    return () => window.removeEventListener("keypress", handler);
+  }, [visible, buffer, onScanComplete]);
 
   return (
     <Modal
-      visible={visible}
-      onCancel={handleClose}
+      open={visible}
+      onCancel={onClose}
       footer={null}
       centered
-      width={480}
+      width={420}
       destroyOnClose
-      closable={scanStatus !== "scanning"}
-      maskClosable={false}
-      title={
-        <div className="flex items-center gap-2">
-          <BsQrCodeScan className="text-purple-500" />
-          <span className="font-semibold">{t("Book Return Validation")}</span>
-        </div>
-      }
+      title={<span className="font-semibold">{t("Scan Book Barcode")}</span>}
     >
-      <div className="space-y-6">
-        <Steps
-          current={
-            scanStatus === "ready" ? 0 : scanStatus === "scanning" ? 1 : 2
-          }
-          items={[
-            {
-              title: t("Ready"),
-              description: t("Prepare to scan"),
-            },
-            {
-              title: t("Scanning"),
-              description: t("Validating book"),
-            },
-            {
-              title: t(status === "success" ? "Verified" : "Failed"),
-              description: t(
-                status === "success" ? "Validation complete" : "Try again"
-              ),
-            },
-          ]}
-        />
-
-        <div className="rounded-xl overflow-hidden border">
-          <div className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] p-6 text-center">
-            <div className="mx-auto w-20 h-20 flex items-center justify-center bg-white/20 rounded-full mb-4">
-              <div className="text-3xl text-white animate-pulse">
-                {getStatusIcon()}
-              </div>
-            </div>
-            <p className="text-white font-medium">
-              {scanStatus === "ready" && t("Scan the book barcode")}
-              {scanStatus === "scanning" && t("Validating...")}
-              {scanStatus === "success" && t("Validation successful!")}
-              {scanStatus === "error" && t("Validation failed")}
-            </p>
-          </div>
+      <div className="text-center p-4 space-y-4">
+        <BsQrCodeScan className="text-5xl text-purple-600 mx-auto animate-pulse" />
+        <div className="bg-gray-50 border rounded font-mono p-3 h-12 flex items-center justify-center">
+          {buffer || t("[Waiting…]")}
         </div>
-
-        <div>
-          <p className="text-sm text-gray-600 mb-2">{t("Scanner input")}</p>
-          <div
-            className={`${getStatusColor()} rounded-lg p-3 font-mono h-12 flex items-center justify-between`}
-          >
-            <span className={scannedData ? "text-gray-800" : "text-gray-400"}>
-              {scannedData || t("[Waiting for input]")}
-            </span>
-            {scanStatus !== "ready" && (
-              <Tag
-                color={
-                  scanStatus === "success"
-                    ? "green"
-                    : scanStatus === "error"
-                    ? "red"
-                    : "blue"
-                }
-              >
-                {scanStatus}
-              </Tag>
-            )}
-          </div>
-        </div>
-
-        {scanStatus === "error" && (
-          <Alert
-            message={t("Validation failed")}
-            description={t("The scanned book doesn't match the issued book.")}
-            type="error"
-            showIcon
-          />
-        )}
-
-        <div className="flex gap-3">
-          <Button
-            block
-            size="large"
-            onClick={handleClose}
-            disabled={scanStatus === "scanning"}
-          >
-            {scanStatus === "success" ? t("Done") : t("Cancel")}
-          </Button>
-          {scanStatus !== "success" && (
-            <Button
-              block
-              type="primary"
-              size="large"
-              loading={scanning}
-              onClick={() => setScanning(true)}
-              disabled={scanning || scanStatus === "scanning"}
-              className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
-            >
-              {t("Start Scan")}
-            </Button>
-          )}
-        </div>
+        <p className="text-gray-600 text-sm">{t("Scan and press Enter")}</p>
       </div>
     </Modal>
   );
@@ -223,14 +75,12 @@ const BookScannerModal = ({ visible, onClose, onScanComplete, status }) => {
 /* ------------------------------------------------------------------ */
 /* Helpers                                                            */
 /* ------------------------------------------------------------------ */
-const fuzzySearch = (search, text) => {
-  search = search.toLowerCase();
-  text = text.toLowerCase();
+const fuzzySearch = (q, txt) => {
+  q = q.toLowerCase();
+  txt = txt.toLowerCase();
   let j = 0;
-  for (let i = 0; i < text.length && j < search.length; i++) {
-    if (text[i] === search[j]) j++;
-  }
-  return j === search.length;
+  for (let i = 0; i < txt.length && j < q.length; i++) if (txt[i] === q[j]) j++;
+  return j === q.length;
 };
 
 const roleOptions = [
@@ -251,26 +101,31 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
 
+  /* redux state */
   const { books } = useSelector((s) => s.admin.library);
   const sectionList = useSelector((s) => s.admin.group_section.sectionsList);
   const classList = useSelector((s) => s.admin.class.classes);
   const { allUsers } = useSelector((s) => s.admin.notice);
   const { loading } = useSelector((s) => s.admin.students);
 
+  /* local state */
   const [studentsList, setStudentsList] = useState([]);
   const [selectedRole, setSelectedRole] = useState("all");
   const [submitting, setSubmitting] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
+
+  /* does the book we are editing carry a barcode? */
+  const hasBarcode = Boolean(editIssueData?.bookId?.barcodeValue);
   const [validationOK, setValidationOK] = useState(
-    editIssueData ? editIssueData.status === "Returned" : false
+    !hasBarcode || editIssueData?.status === "Returned"
   );
 
-  /* -------------------------------------------------------------- */
-  /* lifecycle                                                     */
-  /* -------------------------------------------------------------- */
+  /* ---------------------------------------------------------------- */
+  /* lifecycle                                                        */
+  /* ---------------------------------------------------------------- */
   useEffect(() => {
     dispatch(fetchAllUsersThunk());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (editIssueData) {
@@ -288,17 +143,16 @@ const AddIssue = ({ onClose, editIssueData }) => {
           : null,
         status: editIssueData.status || "Pending",
       });
-      if (editIssueData.classId?._id) {
+      if (editIssueData.classId?._id)
         dispatch(fetchSectionsNamesByClass(editIssueData.classId._id));
-      }
     } else {
       form.resetFields();
     }
   }, [editIssueData, dispatch, form]);
 
-  /* -------------------------------------------------------------- */
-  /* handlers                                                      */
-  /* -------------------------------------------------------------- */
+  /* ---------------------------------------------------------------- */
+  /* handlers                                                         */
+  /* ---------------------------------------------------------------- */
   const handleSelectChange = (name, value) => {
     if (name === "class") {
       dispatch(fetchSectionsNamesByClass(value));
@@ -307,6 +161,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
         .then((list) => setStudentsList(list || []));
     }
     form.setFieldValue(name, value);
+
     if (name === "book") {
       const sel = books?.find((b) => b._id === value);
       form.setFieldValue("authorName", sel?.author || "");
@@ -316,7 +171,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
   const handleStatusChange = (e) => {
     const val = e.target.value;
     form.setFieldValue("status", val);
+
     if (
+      hasBarcode &&
       editIssueData &&
       editIssueData.status === "Pending" &&
       val === "Returned"
@@ -326,10 +183,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
     }
   };
 
-  const handleDateChange = (name, date) => form.setFieldValue(name, date);
-
   const handleScanComplete = async (barcode) => {
-    if (!editIssueData) return;
     try {
       await dispatch(
         validateIssuedBookThunk({
@@ -338,15 +192,17 @@ const AddIssue = ({ onClose, editIssueData }) => {
         })
       ).unwrap();
       setValidationOK(true);
-      return Promise.resolve();
-    } catch (_) {
+    } catch {
       setValidationOK(false);
-      return Promise.reject();
+      // toast.error(t("Validation failed"));
+    } finally {
+      setShowScanner(false);
     }
   };
 
   const handleSubmit = async (values) => {
     if (
+      hasBarcode &&
       editIssueData &&
       editIssueData.status === "Pending" &&
       values.status === "Returned" &&
@@ -381,9 +237,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
     }
   };
 
-  /* -------------------------------------------------------------- */
-  /* filtering helpers for users                                    */
-  /* -------------------------------------------------------------- */
+  /* users list for dropdown */
   const filteredUsers =
     allUsers
       ?.filter((u) => u.role?.toLowerCase() !== "admin")
@@ -391,26 +245,19 @@ const AddIssue = ({ onClose, editIssueData }) => {
         selectedRole === "all" ? true : u.role?.toLowerCase() === selectedRole
       ) || [];
 
-  /* -------------------------------------------------------------- */
-  /* JSX                                                            */
-  /* -------------------------------------------------------------- */
+  /* ---------------------------------------------------------------- */
+  /* JSX                                                              */
+  /* ---------------------------------------------------------------- */
   const { Option } = Select;
   return (
     <Form
       form={form}
       layout="vertical"
       onFinish={handleSubmit}
+      className="flex flex-col h-full space-y-6"
       initialValues={{
-        class: "",
-        section: "",
-        user: "",
-        book: "",
-        authorName: "",
-        issueDate: null,
-        returnDate: null,
         status: "Pending",
       }}
-      className="flex flex-col h-full space-y-6"
     >
       <div className="flex-1 overflow-auto no-scrollbar px-5 space-y-4">
         {/* Role filter */}
@@ -423,6 +270,8 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </Select>
         </Form.Item>
+
+        {/* Class & Section if student */}
         {selectedRole === "student" && (
           <div className="flex gap-4">
             <Form.Item
@@ -436,9 +285,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
               rules={[{ required: true, message: t("Select Class") }]}
             >
               <Select
-                onChange={(v) => handleSelectChange("class", v)}
                 size="large"
                 showSearch
+                onChange={(v) => handleSelectChange("class", v)}
                 filterOption={(i, o) =>
                   o.children.toLowerCase().includes(i.toLowerCase())
                 }
@@ -452,10 +301,10 @@ const AddIssue = ({ onClose, editIssueData }) => {
             </Form.Item>
             <Form.Item className="flex-1" label={t("Section")} name="section">
               <Select
-                onChange={(v) => handleSelectChange("section", v)}
-                loading={loading}
                 size="large"
                 disabled={loading}
+                onChange={(v) => handleSelectChange("section", v)}
+                loading={loading}
               >
                 {sectionList?.map((s) => (
                   <Option key={s._id} value={s._id}>
@@ -466,6 +315,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             </Form.Item>
           </div>
         )}
+
         {/* User */}
         <Form.Item
           label={t("User")}
@@ -476,23 +326,22 @@ const AddIssue = ({ onClose, editIssueData }) => {
             size="large"
             showSearch
             optionFilterProp="data-search"
-            filterOption={(i, o) =>
-              fuzzySearch(i, o.props["data-search"] || "")
+            filterOption={(inp, opt) =>
+              fuzzySearch(inp, opt?.props["data-search"] || "")
             }
             onChange={(v) => handleSelectChange("user", v)}
           >
             {(selectedRole === "student" ? studentsList : filteredUsers).map(
               (u) => {
-                const val = selectedRole === "student" ? u._id : u.userId;
+                const id = selectedRole === "student" ? u._id : u.userId;
                 const name =
                   selectedRole === "student"
                     ? `${u.firstName} ${u.lastName}`
                     : u.name;
                 const role = selectedRole === "student" ? "student" : u.role;
-                const searchStr = `${name} ${role}`;
                 return (
-                  <Option key={val} value={val} data-search={searchStr}>
-                    {name}{" "}
+                  <Option key={id} value={id} data-search={`${name} ${role}`}>
+                    {name}
                     <span className="ml-2 text-xs text-blue-600">{role}</span>
                   </Option>
                 );
@@ -500,6 +349,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             )}
           </Select>
         </Form.Item>
+
         {/* Book */}
         <Form.Item
           label={t("Book")}
@@ -510,6 +360,9 @@ const AddIssue = ({ onClose, editIssueData }) => {
             size="large"
             showSearch
             onChange={(v) => handleSelectChange("book", v)}
+            filterOption={(i, o) =>
+              o.children.toLowerCase().includes(i.toLowerCase())
+            }
           >
             {books?.map((b) => (
               <Option key={b._id} value={b._id}>
@@ -518,10 +371,12 @@ const AddIssue = ({ onClose, editIssueData }) => {
             ))}
           </Select>
         </Form.Item>
+
         {/* Author */}
         <Form.Item label={t("Author Name")} name="authorName">
-          <Input disabled size="large" />
+          <Input size="large" disabled />
         </Form.Item>
+
         {/* Dates */}
         <div className="flex gap-4">
           <Form.Item
@@ -534,11 +389,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             name="issueDate"
             rules={[{ required: true, message: t("Select Issue Date") }]}
           >
-            <DatePicker
-              format="DD-MM-YYYY"
-              size="large"
-              onChange={(d) => handleDateChange("issueDate", d)}
-            />
+            <DatePicker format="DD-MM-YYYY" size="large" />
           </Form.Item>
           <Form.Item
             className="flex-1"
@@ -549,10 +400,7 @@ const AddIssue = ({ onClose, editIssueData }) => {
             }
             name="returnDate"
             rules={[
-              {
-                required: true,
-                message: t("Select Return Date"),
-              },
+              { required: true, message: t("Select Return Date") },
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   const issue = getFieldValue("issueDate");
@@ -567,13 +415,10 @@ const AddIssue = ({ onClose, editIssueData }) => {
               }),
             ]}
           >
-            <DatePicker
-              format="DD-MM-YYYY"
-              size="large"
-              onChange={(d) => handleDateChange("returnDate", d)}
-            />
+            <DatePicker format="DD-MM-YYYY" size="large" />
           </Form.Item>
         </div>
+
         {/* Status */}
         <Form.Item
           label={
@@ -586,30 +431,32 @@ const AddIssue = ({ onClose, editIssueData }) => {
           <Radio.Group onChange={handleStatusChange} size="large">
             <Radio value="Pending">{t("Pending")}</Radio>
             <Radio value="Returned">
-              <div className="flex items-center gap-2">
+              <span className="flex items-center gap-2">
                 {t("Returned")}
-                {validationOK && (
+                {validationOK && hasBarcode && (
                   <Tag icon={<FaCheckCircle />} color="green">
                     {t("Verified")}
                   </Tag>
                 )}
-              </div>
+              </span>
             </Radio>
           </Radio.Group>
         </Form.Item>
       </div>
+
       {/* Submit */}
       <div className="sticky bottom-0 w-full bg-white pb-3 px-5">
         <Form.Item>
           <Button
             block
+            size="large"
             type="primary"
             htmlType="submit"
-            size="large"
             loading={submitting}
             disabled={
               submitting ||
-              (editIssueData &&
+              (hasBarcode &&
+                editIssueData &&
                 form.getFieldValue("status") === "Returned" &&
                 !validationOK)
             }
@@ -620,12 +467,10 @@ const AddIssue = ({ onClose, editIssueData }) => {
         </Form.Item>
       </div>
 
-      {/* Enhanced Scanner modal */}
       <BookScannerModal
         visible={showScanner}
         onClose={() => setShowScanner(false)}
         onScanComplete={handleScanComplete}
-        status={validationOK ? "success" : "error"}
       />
     </Form>
   );
