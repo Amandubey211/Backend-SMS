@@ -17,6 +17,7 @@ import {
   getDriverVehicleAssignments,
 } from "../../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignment.action";
 import { fetchHelperList } from "../../Store/Slices/Transportation/Helper/helper.action";
+import toast from "react-hot-toast";
 
 const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignment }) => {
   const dispatch = useDispatch();
@@ -58,6 +59,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
 
   useEffect(() => {
     if (initialData && selectedAssignment) {
+      // Edit mode - populate form
       setFormData({
         vehicleId: selectedAssignment?.vehicleId?._id || null,
         shiftId: selectedAssignment?.shiftId?._id || null,
@@ -71,6 +73,18 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
           : "",
         reason: selectedAssignment.reason || "Regular Duty",
         is_active: selectedAssignment.is_active !== undefined ? selectedAssignment.is_active : true,
+      });
+    } else {
+      // Add mode - clear form
+      setFormData({
+        vehicleId: null,
+        shiftId: null,
+        assigned_driver: null,
+        assigned_helper: null,
+        valid_from: new Date().toISOString().split("T")[0],
+        valid_to: "",
+        reason: "Regular Duty",
+        is_active: true,
       });
     }
   }, [initialData, selectedAssignment]);
@@ -100,7 +114,18 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
       ...formData,
       date: new Date().toISOString(),
     };
-    dispatch(createOrUpdateDriverVehicleAssignment(dataToSubmit));
+    const createAssignment = async () => {
+
+      const response = await dispatch(createOrUpdateDriverVehicleAssignment(dataToSubmit));
+      if (response.payload.success) {
+        toast.success("Assignment given successfully");
+      }
+      else {
+        toast.error(response.payload.message || "Failed to give assignment");
+      }
+    }
+    createAssignment()
+    onClose()
   };
 
   if (driversLoading || shiftsLoading || vehiclesLoading) {
