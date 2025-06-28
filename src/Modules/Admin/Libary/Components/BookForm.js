@@ -65,6 +65,8 @@ const BookForm = ({ book, onClose, setSidebarTitle }) => {
     existingBook: null,
   });
 
+  const [manualEntryMode, setManualEntryMode] = useState(false);
+
   const {
     bookData,
     imagePreview,
@@ -97,7 +99,13 @@ const BookForm = ({ book, onClose, setSidebarTitle }) => {
       googleBookData: null,
       existingBook: null,
     });
+    setManualEntryMode(false);
     setSidebarTitle?.(t("Add New Book"));
+  };
+
+  const handleContinueWithoutISBN = () => {
+    setManualEntryMode(true);
+    setSidebarTitle?.(t("Add New Book (Manual Entry)"));
   };
 
   /* ───────────────── effects ───────────────── */
@@ -339,26 +347,26 @@ const BookForm = ({ book, onClose, setSidebarTitle }) => {
     );
   }
 
-  if (!book && !scannedBarcode) {
+  if (!book && !scannedBarcode && !manualEntryMode) {
     return (
       <ScanModeView
         onScanComplete={handleScanComplete}
         onManualBarcodeEntry={handleManualBarcodeEntry}
         isbnLoading={isbnLoading}
-        onContinueWithoutBarcode={() =>
-          updateFormState({ scannedBarcode: "", existingBook: null })
-        }
+        onContinueWithoutBarcode={handleContinueWithoutISBN}
       />
     );
   }
 
   return (
     <BookFormView
+      manualEntryMode={manualEntryMode}
       scannedBarcode={scannedBarcode}
       googleBookData={googleBookData}
-      onToggleScanMode={() =>
-        updateFormState({ scannedBarcode: "", existingBook: null })
-      }
+      onToggleScanMode={() => {
+        setManualEntryMode(false);
+        updateFormState({ scannedBarcode: "", existingBook: null });
+      }}
       onHideGoogleData={() => updateFormState({ googleBookData: null })}
       imageKey={imageKey}
       imagePreview={imagePreview}

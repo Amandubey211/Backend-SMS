@@ -1,7 +1,7 @@
 import React from "react";
 import { Select, Input } from "antd";
 import { useTranslation } from "react-i18next";
-import { BsBook, BsArrowLeft } from "react-icons/bs";
+import { BsBook, BsArrowLeft, BsQrCodeScan } from "react-icons/bs";
 import { motion } from "framer-motion";
 import ImageUpload from "./ImageUpload";
 import FormInput from "../../Accounting/subClass/component/FormInput";
@@ -11,6 +11,7 @@ import { LANGUAGE_OPTIONS } from "../../Addmission/AdminAdmission/Configs/select
 const { Option } = Select;
 
 const BookFormView = ({
+  manualEntryMode,
   scannedBarcode,
   googleBookData,
   onToggleScanMode,
@@ -41,6 +42,28 @@ const BookFormView = ({
       onSubmit={onSubmit}
     >
       <div className="flex-1 overflow-auto">
+        {manualEntryMode && !scannedBarcode && (
+          <motion.div
+            initial={{ y: -10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className="bg-purple-50 p-3 mb-4 flex justify-end items-center rounded-lg border border-purple-100"
+          >
+            {/* <div className="flex items-center">
+              <BsQrCodeScan className="text-purple-600 mr-2" />
+              <span className="text-sm text-purple-700 font-medium">
+                {t("Manual Entry Mode")}
+              </span>
+            </div> */}
+            <button
+              type="button"
+              onClick={onToggleScanMode}
+              className="text-purple-600 hover:text-purple-800 text-sm font-medium flex items-center"
+            >
+              <BsQrCodeScan className="mr-1" /> {t("Scan ISBN Instead")}
+            </button>
+          </motion.div>
+        )}
+
         {scannedBarcode && (
           <motion.div
             initial={{ y: -10, opacity: 0 }}

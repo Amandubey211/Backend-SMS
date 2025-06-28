@@ -41,7 +41,6 @@ const ScanModeView = ({
   const submitBarcode = () => onManualBarcodeEntry(manualBarcode);
 
   const handleChange = (e) => {
-    /* strip non-digits but don’t auto-submit */
     const v = e.target.value.replace(/\D/g, "");
     setManualBarcode(v);
   };
@@ -51,10 +50,10 @@ const ScanModeView = ({
     focusInput();
   };
 
-  /* ───────────────── micro animations ───────────────── */
+  /* ───────────────── professional animations ───────────────── */
   const [hoverCycle, cycleHover] = useCycle(
     { scale: 1, rotate: 0 },
-    { scale: 1.12, rotate: 8 }
+    { scale: 1.05, rotate: 3 }
   );
 
   const cardVariants = {
@@ -62,12 +61,37 @@ const ScanModeView = ({
     visible: {
       opacity: 1,
       y: 0,
-      transition: { type: "spring", stiffness: 120, damping: 16 },
+      transition: {
+        type: "spring",
+        stiffness: 120,
+        damping: 14,
+        staggerChildren: 0.08,
+      },
     },
-    exit: { opacity: 0, y: 16 },
+    exit: {
+      opacity: 0,
+      y: 16,
+      transition: { ease: "easeInOut" },
+    },
   };
 
-  const pulseTransition = { yoyo: Infinity, ease: "easeInOut", duration: 0.8 };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", stiffness: 120 },
+    },
+  };
+
+  const iconFloat = {
+    y: [0, -4, 0],
+    transition: {
+      duration: 3.5,
+      repeat: Infinity,
+      ease: "easeInOut",
+    },
+  };
 
   /* ───────────────── render ───────────────── */
   return (
@@ -85,37 +109,45 @@ const ScanModeView = ({
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="bg-gradient-to-r from-[#C83B62]/10 to-[#7F35CD]/10 p-8 rounded-2xl mb-6 border border-gray-100 shadow-sm"
+            className="bg-white p-8 rounded-xl mb-6 border border-gray-100 shadow-sm"
           >
-            {/* icon */}
-            <div className="flex items-center justify-center mb-4">
-              <motion.div
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={pulseTransition}
-                whileHover={() => cycleHover()}
-                className="inline-block"
-              >
-                <motion.span animate={hoverCycle}>
-                  <BsQrCodeScan className="text-5xl text-[#C83B62]" />
-                </motion.span>
-              </motion.div>
-            </div>
+            {/* icon with subtle animation */}
+            <motion.div variants={itemVariants}>
+              <div className="flex items-center justify-center mb-5">
+                <motion.div
+                  animate={iconFloat}
+                  whileHover={() => cycleHover()}
+                  className="inline-block p-3 rounded-lg bg-gradient-to-br from-[#C83B62]/10 to-[#7F35CD]/10 border border-[#C83B62]/20"
+                >
+                  <motion.span animate={hoverCycle}>
+                    <BsQrCodeScan className="text-4xl text-[#7F35CD]" />
+                  </motion.span>
+                </motion.div>
+              </div>
+            </motion.div>
 
-            <h3 className="text-xl font-bold mb-2">{t("Scan Book Barcode")}</h3>
-            <p className="text-gray-600 mb-6">
+            {/* gradient text for heading */}
+            <motion.h3
+              variants={itemVariants}
+              className="text-xl font-semibold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
+            >
+              {t("Scan Book Barcode")}
+            </motion.h3>
+
+            <motion.p variants={itemVariants} className="text-gray-600 mb-6">
               {t("Scan the barcode using your scanner or enter manually")}
-            </p>
+            </motion.p>
 
             {/* ISBN input */}
-            <div className="relative mb-4">
+            <motion.div variants={itemVariants} className="relative mb-4">
               <Input
                 ref={inputRef}
-                autoFocus /* ensures browser attempts focus */
+                autoFocus
                 placeholder={t("Enter 10 or 13 digit ISBN")}
                 value={manualBarcode}
                 onChange={handleChange}
                 size="large"
-                className="pr-10 text-center font-mono"
+                className="pr-10 text-center font-mono hover:border-[#C83B62]/50 focus:border-[#7F35CD]"
                 maxLength={13}
               />
               <AnimatePresence>
@@ -127,25 +159,24 @@ const ScanModeView = ({
                     exit={{ scale: 0, opacity: 0 }}
                     transition={{
                       type: "spring",
-                      stiffness: 260,
+                      stiffness: 300,
                       damping: 20,
                     }}
                     onClick={clearInput}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#C83B62]"
+                    className="absolute right-3 top-0 h-full flex items-center justify-center text-gray-500 hover:text-[#C83B62]"
                     title={t("Clear")}
                   >
-                    <FiX />
+                    <FiX className="text-base" />
                   </motion.button>
                 )}
               </AnimatePresence>
-            </div>
-
+            </motion.div>
             {manualBarcode && !isValidISBN(manualBarcode) && (
               <motion.p
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                className="text-red-500 text-sm mb-2"
+                className="text-[#C83B62] text-sm mb-2"
               >
                 {t("ISBN must be 10 or 13 digits")}
               </motion.p>
@@ -153,7 +184,7 @@ const ScanModeView = ({
           </motion.div>
         </AnimatePresence>
 
-        {/* Buttons */}
+        {/* Buttons with refined gradient */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -163,23 +194,29 @@ const ScanModeView = ({
           <Button
             type="default"
             size="large"
-            className="flex-1"
+            className="flex-1 border-gray-300 hover:border-[#7F35CD]/50 hover:text-[#7F35CD]"
             onClick={onContinueWithoutBarcode}
           >
-            {t("Add Manually")}
+            {t("Continue Without ISBN")}
           </Button>
 
-          <Button
-            type="primary"
-            size="large"
-            className="flex-1 bg-gradient-to-r from-[#C83B62] to-[#7F35CD] border-none"
-            loading={isbnLoading}
-            disabled={!isValidISBN(manualBarcode)}
-            onClick={submitBarcode}
-            icon={<FiArrowRight />}
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex-1"
           >
-            {t("Continue")}
-          </Button>
+            <Button
+              type="primary"
+              size="large"
+              className="w-full bg-gradient-to-r from-[#C83B62] to-[#7F35CD] border-none hover:from-[#C83B62]/90 hover:to-[#7F35CD]/90"
+              loading={isbnLoading}
+              disabled={!isValidISBN(manualBarcode)}
+              onClick={submitBarcode}
+              icon={<FiArrowRight />}
+            >
+              {t("Continue")}
+            </Button>
+          </motion.div>
         </motion.div>
 
         <motion.div
