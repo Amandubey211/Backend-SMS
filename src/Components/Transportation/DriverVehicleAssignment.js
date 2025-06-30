@@ -1,5 +1,3 @@
-// Components/Transportation/DriverVehicleAssignment.js
-
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,12 +12,11 @@ import { getAllShifts } from "../../Store/Slices/Transportation/Shift/shift.acti
 import { getAllVehicles } from "../../Store/Slices/Transportation/Vehicles/vehicles.action";
 import {
   createOrUpdateDriverVehicleAssignment,
-  getDriverVehicleAssignments,
 } from "../../Store/Slices/Transportation/vehicleDriverAssignment/vehicleDriverAssignment.action";
 import { fetchHelperList } from "../../Store/Slices/Transportation/Helper/helper.action";
 import toast from "react-hot-toast";
 
-const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignment }) => {
+const DriverVehicleAssignment = ({ onSave, onClose, selectedAssignment, resetTrigger }) => {
   const dispatch = useDispatch();
 
   // Redux states for drivers, shifts, and vehicles
@@ -34,7 +31,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
   );
   const { helpers } = useSelector(
     (store) => store.transportation?.transportHelper
-  )
+  );
 
   // Form Data State
   const [formData, setFormData] = useState({
@@ -48,8 +45,6 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
     is_active: true,
   });
 
-
-
   useEffect(() => {
     dispatch(fetchDriverList());
     dispatch(getAllShifts());
@@ -58,8 +53,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
   }, [dispatch]);
 
   useEffect(() => {
-    if (initialData && selectedAssignment) {
-      // Edit mode - populate form
+    if (selectedAssignment) {
       setFormData({
         vehicleId: selectedAssignment?.vehicleId?._id || null,
         shiftId: selectedAssignment?.shiftId?._id || null,
@@ -75,7 +69,6 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
         is_active: selectedAssignment.is_active !== undefined ? selectedAssignment.is_active : true,
       });
     } else {
-      // Add mode - clear form
       setFormData({
         vehicleId: null,
         shiftId: null,
@@ -87,9 +80,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
         is_active: true,
       });
     }
-  }, [initialData, selectedAssignment]);
-
-
+  }, [selectedAssignment, resetTrigger]);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -99,6 +90,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,24 +107,21 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
       date: new Date().toISOString(),
     };
     const createAssignment = async () => {
-
       const response = await dispatch(createOrUpdateDriverVehicleAssignment(dataToSubmit));
       if (response.payload.success) {
         toast.success("Assignment given successfully");
-      }
-      else {
+        onSave(); // Notify parent to close sidebar
+      } else {
         toast.error(response.payload.message || "Failed to give assignment");
       }
-    }
-    createAssignment()
-    onClose()
+    };
+    createAssignment();
+    onClose();
   };
 
   if (driversLoading || shiftsLoading || vehiclesLoading) {
     return <div className="p-4 text-center">Loading...</div>;
   }
-
-
 
   return (
     <div className="bg-white rounded-lg overflow-hidden">
@@ -148,7 +137,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
               <select
                 id="vehicleId"
                 name="vehicleId"
-                value={formData.vehicleId}
+                value={formData.vehicleId || ""}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -171,7 +160,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
               <select
                 id="shiftId"
                 name="shiftId"
-                value={formData.shiftId}
+                value={formData.shiftId || ""}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
@@ -208,8 +197,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
                   />
                 </div>
-
-                {initialData && (
+                {selectedAssignment && (
                   <div className="flex flex-col">
                     <label
                       htmlFor="valid_to"
@@ -242,7 +230,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
               <select
                 id="assigned_driver"
                 name="assigned_driver"
-                value={formData.assigned_driver}
+                value={formData.assigned_driver || ""}
                 onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500"
@@ -254,11 +242,10 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
                   </option>
                 ))}
               </select>
-
               <select
                 id="assigned_helper"
                 name="assigned_helper"
-                value={formData.assigned_helper}
+                value={formData.assigned_helper || ""}
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md mt-3 focus:ring-purple-500 focus:border-purple-500"
                 disabled={!formData.assigned_driver}
@@ -319,7 +306,7 @@ const DriverVehicleAssignment = ({ onSave, onClose, initialData, selectedAssignm
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            {initialData ? "Edit Assignment" : "Save Assignment"}
+            {selectedAssignment ? "Edit Assignment" : "Save Assignment"}
           </button>
         </div>
       </form>
