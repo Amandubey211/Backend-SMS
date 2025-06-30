@@ -8,9 +8,9 @@ import ViewTripList from "../../../Components/Transportation/ViewTripList";
 const ViewTripsLogs = () => {
   const { t } = useTranslation();
 
-  useNavHeading(t("Transportation"), t("Trip Execution Logs"));
+  useNavHeading(t("Transportation"), t("Trip  Logs"));
   return (
-    <Layout title={t("Trip Execution Logs") + " | Student diwan"}>
+    <Layout title={t("Trip  Logs") + " | Student diwan"}>
       <DashLayout>
         <div className="p-2">
           <ViewTripList />
