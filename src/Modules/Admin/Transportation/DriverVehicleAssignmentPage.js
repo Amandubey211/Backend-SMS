@@ -1,4 +1,3 @@
-// Modules/Admin/Transportation/DriverVehicleAssignmentPage.js
 import React, { useState } from "react";
 import Layout from "../../../Components/Common/Layout";
 import DashLayout from "../../../Components/Admin/AdminDashLayout";
@@ -6,15 +5,16 @@ import Sidebar from "../../../Components/Common/Sidebar";
 import { useTranslation } from "react-i18next";
 import DriverVehicleAssignmentList from "../../../Components/Transportation/DriverVehicleAssignmentList";
 import DriverVehicleAssignment from "../../../Components/Transportation/DriverVehicleAssignment";
-import DriverVehicleAssignmentCard from "../../../Components/Transportation/DriverVehicleAssignmentCard";
 
 const DriverVehicleAssignmentPage = () => {
   const { t } = useTranslation("transportation");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [resetTrigger, setResetTrigger] = useState(0); // New state to trigger reset
 
   const handleCreateNew = () => {
-    setSelectedAssignment(null);
+    setSelectedAssignment(null); // Ensure selectedAssignment is null
+    setResetTrigger((prev) => prev + 1); // Increment to trigger reset
     setIsSidebarOpen(true);
   };
 
@@ -23,9 +23,10 @@ const DriverVehicleAssignmentPage = () => {
     setIsSidebarOpen(true);
   };
 
-  const handleSave = (formData) => {
-    // Close the sidebar after saving
+  const handleSave = () => {
     setIsSidebarOpen(false);
+    setSelectedAssignment(null); // Reset selectedAssignment after saving
+    setResetTrigger((prev) => prev + 1); // Increment to trigger reset after save
   };
 
   return (
@@ -65,25 +66,26 @@ const DriverVehicleAssignmentPage = () => {
             </div>
           </div>
 
-          {/* Stats Cards */}
-
-          {/* <DriverVehicleAssignmentCard/> */}
-
           {/* Assignment List */}
           <DriverVehicleAssignmentList onEdit={handleEdit} />
 
           {/* Assignment Sidebar */}
           <Sidebar
             isOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
+            onClose={() => {
+              setIsSidebarOpen(false);
+              setSelectedAssignment(null); // Reset on close
+              setResetTrigger((prev) => prev + 1); // Trigger reset on close
+            }}
             title={selectedAssignment ? "Edit Assignment" : "Add New Assignment"}
             width="60%"
           >
             <DriverVehicleAssignment
+              key={resetTrigger} // Force re-render on reset
               onSave={handleSave}
               onClose={() => setIsSidebarOpen(false)}
-              initialData={selectedAssignment}
               selectedAssignment={selectedAssignment}
+              resetTrigger={resetTrigger} // Pass reset trigger
             />
           </Sidebar>
         </div>
