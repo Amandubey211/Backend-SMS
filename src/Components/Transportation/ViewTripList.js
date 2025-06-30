@@ -1,24 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
-  FaClock,
-  FaPlay,
-  FaStop,
-  FaMapMarkedAlt,
-  FaHistory,
-  FaCalendarAlt,
-  FaSearch,
-  FaInfoCircle,
-} from "react-icons/fa";
-import { MdLocationOn, MdTimelapse } from "react-icons/md";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import {
-  endTripLog,
-  getTripLogsByVehicle,
-  startTripLog,
-} from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
-import {
-  Tabs,
   Table,
   Tag,
   Space,
@@ -30,26 +11,44 @@ import {
   DatePicker,
   Select,
   Modal,
-  message,
   Spin,
   Alert,
   Card,
-  Drawer /* ← added */,
+  Drawer,
+  Tabs,
+  message,
+  Tooltip,
 } from "antd";
 import {
-  PlayCircleOutlined,
-  StopOutlined,
-  InfoCircleOutlined,
-  ExclamationOutlined,
-} from "@ant-design/icons";
+  FaClock,
+  FaMapMarkedAlt,
+  FaHistory,
+  FaCalendarAlt,
+  FaSearch,
+  FaPlay,
+  FaStop,
+  FaSync,
+  FaExclamationTriangle,
+} from "react-icons/fa";
+import {
+  MdLocationOn,
+  MdTimelapse,
+  MdDirectionsBus,
+  MdPersonPin,
+} from "react-icons/md";
+import { InfoCircleOutlined, LoadingOutlined } from "@ant-design/icons";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+// import { io } from "socket.io-client"; // Commented out for now
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import MapView from "./MapView";
+import { getTripLogsByVehicle } from "../../Store/Slices/Transportation/TripExecutionLog/tripExecutionLog.action";
 import Pagination from "../Common/pagination";
 import { useTranslation } from "react-i18next";
-import { io } from "socket.io-client";
+import MapView from "./MapView";
+import TripStatusBadge from "./TripStatusBadge";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -57,279 +56,530 @@ dayjs.extend(advancedFormat);
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const { TabPane } = Tabs;
 
-/* ---------- colour / text helpers ---------- */
+// Status configuration
+const TRIP_STATUS = {
+  NOT_STARTED: "not_started",
+  IN_PROGRESS: "in_progress",
+  COMPLETED: "completed",
+  CANCELLED: "cancelled",
+};
+
 const statusColor = {
-  completed: "green",
-  in_progress: "gold",
-  pending: "orange",
-  skipped: "red",
-  cancelled: "gray",
-};
-const statusText = {
-  completed: "Completed",
-  in_progress: "In Progress",
-  pending: "Pending",
-  skipped: "Skipped",
-  cancelled: "Cancelled",
+  [TRIP_STATUS.NOT_STARTED]: "default",
+  [TRIP_STATUS.IN_PROGRESS]: "processing",
+  [TRIP_STATUS.COMPLETED]: "success",
+  [TRIP_STATUS.CANCELLED]: "error",
 };
 
-/* ========================================================================
-   Trip-details live-tracking drawer
-   ====================================================================== */
+const statusText = {
+  [TRIP_STATUS.NOT_STARTED]: "Scheduled",
+  [TRIP_STATUS.IN_PROGRESS]: "In Progress",
+  [TRIP_STATUS.COMPLETED]: "Completed",
+  [TRIP_STATUS.CANCELLED]: "Cancelled",
+};
+
 const TripDetailsSidebar = ({ trip, onClose }) => {
-  const [currentLocation, setCurrentLocation] = useState(null);
-  const [isMapLoading, setIsMapLoading] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [socket, setSocket] = useState(null);
+  const [mapLoading, setMapLoading] = useState(true);
+  const { t } = useTranslation();
 
-  /* open socket only when drawer is visible */
+  // Handle real-time updates (commented out for now)
+  /*
   useEffect(() => {
-    if (!trip?._id) return;
-
-    const newSocket = io("http://localhost:8080", {
-      transports: ["websocket"],
-      path: "/socket.io",
-    });
-    setSocket(newSocket);
-
-    /* initial fetch */
-    setLoading(true);
-    (async () => {
-      try {
-        const res = await fetch(`/transport/trip/${trip._id}`);
-        const data = await res.json();
-        if (data.success) setCurrentLocation(data.currentLocation);
-        else setError(data.message || "Failed to fetch trip data");
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+    if (!trip?._id || !socket) return;
+    const tripId = trip._id;
+    socket.emit("admin_join_trip", tripId);
+    const handleTripUpdate = (data) => {
+      if (data.tripId === tripId) {
+        setRealTimeData(data);
       }
-    })();
-
-    return () => newSocket.disconnect();
-  }, [trip?._id]);
-
-  /* live updates */
-  useEffect(() => {
-    if (!socket || !trip?._id) return;
-    const handler = (data) => {
-      if (data.tripId === trip._id) setCurrentLocation(data.location);
     };
-    socket.on("location_update", handler);
-    return () => socket.off("location_update", handler);
-  }, [socket, trip?._id]);
+    socket.on("trip_update", handleTripUpdate);
+    socket.on("error", (err) => {
+      console.error("Socket error:", err);
+      setError(err.message || "Connection error");
+    });
+    return () => {
+      socket.off("trip_update", handleTripUpdate);
+      socket.off("error");
+    };
+  }, [trip?._id, socket]);
+  */
 
-  /* Drawer remains mounted, but visible toggles on trip */
-  const visible = !!trip;
+  const formatTime = (date) => (date ? dayjs(date).format("h:mm A") : "--:--");
+
+  if (!trip) return null;
 
   return (
     <Drawer
       width="90%"
       onClose={onClose}
-      open={visible}
-      title={`Live Tracking: ${trip?.routeId?.routeName || "Trip"}`}
+      open={!!trip}
+      title={
+        <div className="flex items-center">
+          <span className="text-lg font-semibold">
+            Trip Details: {trip.routeId?.routeName || "Trip"}
+          </span>
+          <TripStatusBadge status={trip.status} className="ml-2" />
+        </div>
+      }
       destroyOnClose
+      extra={
+        <Button
+          icon={<FaSync />}
+          onClick={() => window.location.reload()}
+          size="small"
+          className="bg-gradient-to-r from-[#C83B62] to-[#7F35CD] text-white"
+        >
+          Refresh
+        </Button>
+      }
+      className="trip-details-drawer"
     >
-      {!trip ? null : loading ? (
+      {loading ? (
         <div className="flex justify-center items-center h-full">
-          <Spin tip="Loading trip data..." size="large" />
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />
         </div>
       ) : error ? (
-        <Alert message={error} type="error" showIcon />
+        <Alert
+          message="Error"
+          description={error}
+          type="error"
+          showIcon
+          closable
+          onClose={() => setError(null)}
+        />
       ) : (
-        <Card
-          title={
-            <div className="flex items-center">
-              <MdLocationOn className="mr-2 text-blue-600" />
-              <span className="font-semibold text-gray-800">
-                Vehicle Position
-              </span>
-              {currentLocation && (
-                <Tag color="green" className="ml-2">
-                  LIVE
-                </Tag>
-              )}
-            </div>
-          }
-          className="h-full"
-        >
-          <div className="flex flex-col h-full">
-            <div className="mb-4">
-              <div className="text-sm mb-2">
-                <strong>Latitude:</strong>{" "}
-                {currentLocation?.lat?.toFixed(6) || "N/A"}
-              </div>
-              <div className="text-sm mb-2">
-                <strong>Longitude:</strong>{" "}
-                {currentLocation?.lng?.toFixed(6) || "N/A"}
-              </div>
-              <div className="text-sm">
-                <strong>Last Update:</strong>{" "}
-                {currentLocation?.timestamp
-                  ? dayjs(currentLocation.timestamp).fromNow()
-                  : "N/A"}
-              </div>
-            </div>
-
-            <div className="flex-1 rounded-lg overflow-hidden relative border">
-              {currentLocation ? (
-                <>
-                  {isMapLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 z-10">
-                      <span className="text-sm text-gray-500 animate-pulse">
-                        Loading map...
-                      </span>
-                    </div>
-                  )}
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                    allowFullScreen
-                    referrerPolicy="no-referrer-when-downgrade"
-                    onLoad={() => setIsMapLoading(false)}
-                    src={`https://maps.google.com/maps?q=${currentLocation.lat},${currentLocation.lng}&z=15&output=embed`}
-                  />
-                </>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-sm text-gray-500">
-                    {trip.status === "in_progress"
-                      ? "Waiting for location data..."
-                      : "Trip not started or completed"}
-                  </span>
+        <div className="space-y-6">
+          {/* Trip Summary Card */}
+          <Card
+            title={
+              <span className="font-semibold text-[#7F35CD]">Trip Summary</span>
+            }
+            bordered={false}
+            className="shadow-sm"
+          >
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {[
+                {
+                  label: "Vehicle",
+                  value: trip.vehicleId?.vehicleNumber || "N/A",
+                },
+                { label: "Driver", value: trip.driverId?.name || "N/A" },
+                {
+                  label: "Trip Type",
+                  value:
+                    trip.tripType?.charAt(0).toUpperCase() +
+                      trip.tripType?.slice(1) || "N/A",
+                },
+                {
+                  label: "Shift",
+                  value: trip.shiftId
+                    ? `${trip.shiftId.shiftName} (${trip.shiftId.fromTime}-${trip.shiftId.toTime})`
+                    : "N/A",
+                },
+                {
+                  label: "Date",
+                  value: dayjs(trip.tripDate).format("MMMM D, YYYY"),
+                },
+                {
+                  label: "Status",
+                  value: (
+                    <Tag color={statusColor[trip.status]}>
+                      {statusText[trip.status]}
+                    </Tag>
+                  ),
+                },
+              ].map((item, index) => (
+                <div key={index}>
+                  <p className="text-sm font-medium text-gray-500">
+                    {item.label}
+                  </p>
+                  <p className="text-base mt-1">{item.value}</p>
                 </div>
-              )}
+              ))}
             </div>
-          </div>
-        </Card>
+          </Card>
+
+          {/* Stops Timeline */}
+          <Card
+            title={
+              <span className="font-semibold text-[#7F35CD]">
+                Stops Timeline
+              </span>
+            }
+            bordered={false}
+            className="shadow-sm"
+          >
+            <div className="space-y-4">
+              {trip.stopLogs?.map((stop, index) => {
+                const stopStatus = stop.status || "pending";
+                const statusConfig = {
+                  completed: {
+                    border: "border-green-500",
+                    iconColor: "text-green-500",
+                    icon: <MdLocationOn size={20} />,
+                  },
+                  arrived: {
+                    border: "border-blue-500",
+                    iconColor: "text-blue-500",
+                    icon: <MdPersonPin size={20} />,
+                  },
+                  departed: {
+                    border: "border-yellow-500",
+                    iconColor: "text-yellow-500",
+                    icon: <MdDirectionsBus size={20} />,
+                  },
+                  default: {
+                    border: "border-gray-300",
+                    iconColor: "text-gray-400",
+                    icon: <MdLocationOn size={20} />,
+                  },
+                };
+
+                const { border, iconColor, icon } =
+                  statusConfig[stopStatus] || statusConfig.default;
+
+                return (
+                  <div
+                    key={index}
+                    className={`border-l-4 pl-4 py-3 ${border} hover:bg-gray-50 transition-colors`}
+                  >
+                    <div className="flex items-start">
+                      <div className={`mr-3 mt-1 ${iconColor}`}>{icon}</div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="font-semibold">
+                              {stop.stopId?.stopName || `Stop ${index + 1}`}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Order: {stop.order || index + 1}
+                            </p>
+                          </div>
+                          <Tag
+                            color={
+                              stopStatus === "completed"
+                                ? "success"
+                                : stopStatus === "arrived"
+                                ? "processing"
+                                : stopStatus === "departed"
+                                ? "warning"
+                                : "default"
+                            }
+                          >
+                            {stopStatus}
+                          </Tag>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                          <div>
+                            <p className="text-xs text-gray-500">
+                              Scheduled Arrival
+                            </p>
+                            <p>{formatTime(stop.scheduledArrival)}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500">
+                              Scheduled Departure
+                            </p>
+                            <p>{formatTime(stop.scheduledDeparture)}</p>
+                          </div>
+                          {stop.actualArrival && (
+                            <div>
+                              <p className="text-xs text-gray-500">
+                                Actual Arrival
+                              </p>
+                              <p>{formatTime(stop.actualArrival)}</p>
+                            </div>
+                          )}
+                          {stop.actualDeparture && (
+                            <div>
+                              <p className="text-xs text-gray-500">
+                                Actual Departure
+                              </p>
+                              <p>{formatTime(stop.actualDeparture)}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+
+          {/* Location Map */}
+          <Card
+            title={
+              <span className="font-semibold text-[#7F35CD]">Location Map</span>
+            }
+            bordered={false}
+            className="shadow-sm"
+            extra={
+              trip.currentLocation && (
+                <span className="text-sm text-gray-500">
+                  Last updated: {dayjs().format("h:mm:ss A")}
+                </span>
+              )
+            }
+          >
+            {trip.currentLocation ? (
+              <div className="relative h-96 rounded-lg overflow-hidden border">
+                {mapLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
+                    <Spin
+                      tip="Loading map..."
+                      indicator={<LoadingOutlined spin />}
+                    />
+                  </div>
+                )}
+                <MapView
+                  currentLocation={trip.currentLocation}
+                  stops={trip.stopLogs}
+                  onLoad={() => setMapLoading(false)}
+                  onError={() => {
+                    setMapLoading(false);
+                    setError("Failed to load map");
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+                <FaExclamationTriangle size={32} className="mb-2" />
+                <p>No location data available</p>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
     </Drawer>
   );
 };
 
-/* ========================================================================
-   Main list component
-   ====================================================================== */
 const ViewTripsList = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { vehicleId } = useParams();
+
+  // State management
   const [activeTab, setActiveTab] = useState("today");
   const [searchText, setSearchText] = useState("");
   const [dateRange, setDateRange] = useState([]);
   const [statusFilter, setStatusFilter] = useState("all");
   const [tripTypeFilter, setTripTypeFilter] = useState("all");
-  const [showMapModal, setShowMapModal] = useState(false);
-  const [selectedTripForMap, setSelectedTripForMap] = useState(null);
-  const [selectedTripForDetails, setSelectedTripForDetails] = useState(null);
-  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [selectedTrip, setSelectedTrip] = useState(null);
+  const [mapModalVisible, setMapModalVisible] = useState(false);
+  // const [socket, setSocket] = useState(null); // Commented out for now
+  // const [socketConnected, setSocketConnected] = useState(false); // Commented out for now
 
+  // Redux state with safe defaults
   const {
-    loading,
+    loading = false,
     vehicleWiseLogs = [],
-    pagination = {},
-  } = useSelector((s) => s.transportation.tripExecutionLog);
+    pagination = { currentPage: 1, limit: 10, totalItems: 0, totalPages: 1 },
+    error: reduxError,
+  } = useSelector((s) => s.transportation?.tripExecutionLog || {});
 
-  const { vehicleId } = useParams();
-  const dispatch = useDispatch();
-
-  /* pagination helpers … (unchanged) */
-  const handlePageChange = (page) =>
-    dispatch(
-      getTripLogsByVehicle({
-        vehicleId,
-        page,
-        limit: pagination.limit,
-        type: activeTab,
-      })
-    );
-
-  const handleLimitChange = (limit) =>
-    dispatch(
-      getTripLogsByVehicle({
-        vehicleId,
-        page: 1,
-        limit,
-        type: activeTab,
-      })
-    );
-
-  /* load trips on mount / tab change */
+  // Initialize socket connection (commented out for now)
+  /*
   useEffect(() => {
-    dispatch(
-      getTripLogsByVehicle({
-        vehicleId,
-        page: pagination?.currentPage,
-        limit: pagination?.limit,
-        type: activeTab,
-      })
-    );
+    const newSocket = io(process.env.REACT_APP_API_URL, {
+      transports: ["websocket"],
+      path: "/socket.io",
+      reconnectionAttempts: 5,
+      reconnectionDelay: 1000,
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Socket connected");
+      setSocketConnected(true);
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Socket disconnected");
+      setSocketConnected(false);
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err);
+      message.error("Realtime connection failed - updates may be delayed");
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+  */
+
+  // Fetch trips when params change with error handling
+  useEffect(() => {
+    const fetchTrips = async () => {
+      try {
+        await dispatch(
+          getTripLogsByVehicle({
+            vehicleId,
+            page: pagination?.currentPage || 1,
+            limit: pagination?.limit || 10,
+            type: activeTab,
+          })
+        );
+      } catch (err) {
+        console.error("Failed to fetch trips:", err);
+        message.error("Failed to load trip data. Please try again later.");
+      }
+    };
+
+    fetchTrips();
   }, [vehicleId, activeTab, dispatch]);
 
-  /* ---------- filters ---------- */
+  // Filter trips based on search/filters with null checks
   const filteredTrips = useMemo(() => {
-    let trips = vehicleWiseLogs;
-    if (searchText)
-      trips = trips.filter(
-        (t) =>
-          t.routeId?.routeName
-            ?.toLowerCase()
-            .includes(searchText.toLowerCase()) ||
-          t.vehicleId?.vehicleNumber
-            ?.toLowerCase()
-            .includes(searchText.toLowerCase())
-      );
-    if (dateRange?.length === 2)
-      trips = trips.filter((t) =>
-        dayjs(t.tripDate).isBetween(dateRange[0], dateRange[1], "day", "[]")
-      );
-    if (statusFilter !== "all")
+    let trips = Array.isArray(vehicleWiseLogs) ? vehicleWiseLogs : [];
+
+    if (searchText) {
+      const searchLower = searchText.toLowerCase();
+      trips = trips.filter((t) => {
+        const routeName = t.routeId?.routeName?.toLowerCase() || "";
+        const vehicleNumber = t.vehicleId?.vehicleNumber?.toLowerCase() || "";
+        const driverName = t.driverId?.name?.toLowerCase() || "";
+        return (
+          routeName.includes(searchLower) ||
+          vehicleNumber.includes(searchLower) ||
+          driverName.includes(searchLower)
+        );
+      });
+    }
+
+    if (dateRange?.length === 2) {
+      trips = trips.filter((t) => {
+        const tripDate = t.tripDate ? dayjs(t.tripDate) : null;
+        return (
+          tripDate &&
+          tripDate.isBetween(
+            dateRange[0]?.startOf("day") || dayjs(),
+            dateRange[1]?.endOf("day") || dayjs(),
+            "day",
+            "[]"
+          )
+        );
+      });
+    }
+
+    if (statusFilter !== "all") {
       trips = trips.filter((t) => t.status === statusFilter);
-    if (tripTypeFilter !== "all")
+    }
+
+    if (tripTypeFilter !== "all") {
       trips = trips.filter((t) => t.tripType === tripTypeFilter);
+    }
+
     return trips;
   }, [vehicleWiseLogs, searchText, dateRange, statusFilter, tripTypeFilter]);
 
-  const formatTime = (d) => (d ? dayjs(d).format("h:mm A") : "N/A");
-  const formatDuration = (s, e) =>
-    !s || !e
-      ? "N/A"
-      : (() => {
-          const dur = dayjs.duration(dayjs(e).diff(dayjs(s)));
-          return `${dur.minutes()}m ${dur.seconds()}s`;
-        })();
+  // Handle pagination changes with error handling
+  const handlePageChange = useCallback(
+    (page) => {
+      try {
+        dispatch(
+          getTripLogsByVehicle({
+            vehicleId,
+            page,
+            limit: pagination.limit,
+            type: activeTab,
+          })
+        );
+      } catch (err) {
+        console.error("Failed to change page:", err);
+        message.error("Failed to load page. Please try again.");
+      }
+    },
+    [vehicleId, activeTab, pagination.limit, dispatch]
+  );
 
-  /* ---------- table columns ---------- */
+  const handleLimitChange = useCallback(
+    (limit) => {
+      try {
+        dispatch(
+          getTripLogsByVehicle({
+            vehicleId,
+            page: 1,
+            limit,
+            type: activeTab,
+          })
+        );
+      } catch (err) {
+        console.error("Failed to change limit:", err);
+        message.error("Failed to change items per page. Please try again.");
+      }
+    },
+    [vehicleId, activeTab, dispatch]
+  );
+
+  // Format duration between two dates with null checks
+  const formatDuration = (start, end) => {
+    if (!start || !end) return "--:--";
+    try {
+      const dur = dayjs.duration(dayjs(end).diff(dayjs(start)));
+      const hours = Math.floor(dur.asHours());
+      const minutes = dur.minutes();
+      return `${hours > 0 ? `${hours}h ` : ""}${minutes}m`;
+    } catch {
+      return "--:--";
+    }
+  };
+
+  // Table columns configuration with null checks
   const columns = [
-    /* Trip info, timing, stops … (unchanged code) */
     {
       title: "Trip Info",
       key: "tripInfo",
-      render: (_, r) => (
-        <div className="flex items-center">
-          <Badge
-            count={r.tripType === "pickup" ? "P" : "D"}
-            style={{
-              backgroundColor: r.tripType === "pickup" ? "#1890ff" : "#52c41a",
-            }}
-            title={r.tripType === "pickup" ? "Pickup" : "Drop"}
-            className="mr-3"
-          />
-          <div>
-            <div className="font-medium">
-              {r.tripType === "pickup" ? "Pick Up" : "Drop Off"}
+      render: (_, record) => {
+        const tripType = record.tripType || "unknown";
+        const routeName = record.routeId?.routeName || "Unnamed Route";
+        const tripDate = record.tripDate
+          ? dayjs(record.tripDate).format("MMM D, YYYY")
+          : "N/A";
+        const shiftInfo = record.shiftId
+          ? `${record.shiftId.shiftName} (${record.shiftId.fromTime}-${record.shiftId.toTime})`
+          : "No shift info";
+
+        return (
+          <div className="flex items-start">
+            <Badge
+              count={tripType === "pickup" ? "P" : "D"}
+              style={{
+                backgroundColor: tripType === "pickup" ? "#C83B62" : "#7F35CD",
+              }}
+              className="mr-3 mt-1"
+            />
+            <div>
+              <div className="font-medium">{routeName}</div>
+              <div className="text-xs text-gray-500">{tripDate}</div>
+              <div className="text-xs text-blue-600">{shiftInfo}</div>
             </div>
-            <div className="text-xs text-gray-500">
-              {dayjs(r.tripDate).format("MMM D, YYYY")}
-            </div>
-            {r.shiftId && (
-              <div className="text-xs text-blue-600">
-                {r.shiftId.shiftName} ({r.shiftId.fromTime}-{r.shiftId.toTime})
-              </div>
-            )}
+          </div>
+        );
+      },
+    },
+    {
+      title: "Driver/Vehicle",
+      key: "driverVehicle",
+      render: (_, record) => (
+        <div>
+          <div className="flex items-center">
+            <MdPersonPin className="mr-1 text-[#7F35CD]" />
+            <span>{record.driverId?.name || "N/A"}</span>
+          </div>
+          <div className="flex items-center mt-1">
+            <MdDirectionsBus className="mr-1 text-[#C83B62]" />
+            <span>{record.vehicleId?.vehicleNumber || "N/A"}</span>
           </div>
         </div>
       ),
@@ -337,278 +587,256 @@ const ViewTripsList = () => {
     {
       title: "Timing",
       key: "timing",
-      render: (_, r) => (
-        <div className="flex flex-col">
-          <div className="flex items-center">
-            <FaClock className="mr-1 text-gray-500" />
-            <span>Scheduled: {formatTime(r.createdAt)}</span>
+      render: (_, record) => {
+        const createdAt = record.createdAt
+          ? dayjs(record.createdAt).format("h:mm A")
+          : "N/A";
+        const startedAt = record.startedAt
+          ? dayjs(record.startedAt).format("h:mm A")
+          : null;
+        const endedAt = record.endedAt
+          ? dayjs(record.endedAt).format("h:mm A")
+          : null;
+
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center">
+              <FaClock className="mr-1 text-gray-500" />
+              <span>Scheduled: {createdAt}</span>
+            </div>
+            {startedAt && (
+              <div className="flex items-center">
+                <FaPlay className="mr-1 text-green-500" size={12} />
+                <span>Started: {startedAt}</span>
+              </div>
+            )}
+            {endedAt && (
+              <div className="flex items-center">
+                <FaStop className="mr-1 text-red-500" size={12} />
+                <span>Ended: {endedAt}</span>
+              </div>
+            )}
+            {startedAt && endedAt && (
+              <div className="flex items-center">
+                <MdTimelapse className="mr-1 text-blue-500" />
+                <span>
+                  Duration: {formatDuration(record.startedAt, record.endedAt)}
+                </span>
+              </div>
+            )}
           </div>
-          {r.startedAt && (
-            <div className="flex items-center mt-1">
-              <FaPlay className="mr-1 text-green-500" size={12} />
-              <span>Started: {formatTime(r.startedAt)}</span>
-            </div>
-          )}
-          {r.endedAt && (
-            <div className="flex items-center mt-1">
-              <FaStop className="mr-1 text-red-500" size={12} />
-              <span>Ended: {formatTime(r.endedAt)}</span>
-            </div>
-          )}
-          {r.startedAt && r.endedAt && (
-            <div className="flex items-center mt-1">
-              <MdTimelapse className="mr-1 text-blue-500" />
-              <span>Duration: {formatDuration(r.startedAt, r.endedAt)}</span>
-            </div>
-          )}
-        </div>
-      ),
+        );
+      },
     },
     {
       title: "Stops",
       key: "stops",
-      render: (_, r) => (
-        <Popover
-          content={
-            <div className="max-h-60 overflow-y-auto pr-1">
-              {r.stopLogs.map((s, i) => (
-                <div key={i} className="flex items-start space-x-2 mb-2">
-                  <MdLocationOn
-                    className={`mt-1 ${
-                      s.status === "completed"
-                        ? "text-blue-500"
-                        : s.status === "in_progress"
-                        ? "text-yellow-500"
-                        : s.status === "start_point"
-                        ? "text-green-500"
-                        : "text-gray-400"
-                    }`}
-                  />
-                  <div>
-                    <div className="font-medium text-sm">
-                      {s.stopId?.stopName || "Unknown Stop"}
+      render: (_, record) => {
+        const stops = record.stopLogs || [];
+        const completedStops = stops.filter(
+          (s) => s.status === "completed"
+        ).length;
+
+        return (
+          <Popover
+            content={
+              <div className="max-h-60 overflow-y-auto pr-1">
+                {stops.map((stop, index) => {
+                  const stopStatus = stop.status || "pending";
+                  const statusConfig = {
+                    completed: {
+                      color: "text-green-500",
+                      icon: <MdLocationOn size={16} />,
+                    },
+                    arrived: {
+                      color: "text-blue-500",
+                      icon: <MdPersonPin size={16} />,
+                    },
+                    departed: {
+                      color: "text-yellow-500",
+                      icon: <MdDirectionsBus size={16} />,
+                    },
+                    default: {
+                      color: "text-gray-400",
+                      icon: <MdLocationOn size={16} />,
+                    },
+                  };
+
+                  const { color, icon } =
+                    statusConfig[stopStatus] || statusConfig.default;
+
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-start space-x-2 mb-2"
+                    >
+                      <div className={`mt-1 ${color}`}>{icon}</div>
+                      <div>
+                        <div className="font-medium text-sm">
+                          {stop.stopId?.stopName || `Stop ${index + 1}`}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {stop.scheduledArrival
+                            ? dayjs(stop.scheduledArrival).format("h:mm A")
+                            : "--:--"}{" "}
+                          -{" "}
+                          {stop.scheduledDeparture
+                            ? dayjs(stop.scheduledDeparture).format("h:mm A")
+                            : "--:--"}
+                        </div>
+                        {stop.actualArrival && (
+                          <div className="text-xs text-green-600">
+                            Arrived:{" "}
+                            {dayjs(stop.actualArrival).format("h:mm A")}
+                          </div>
+                        )}
+                        {stop.actualDeparture && (
+                          <div className="text-xs text-blue-600">
+                            Departed:{" "}
+                            {dayjs(stop.actualDeparture).format("h:mm A")}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {formatTime(s.scheduledArrival)}-
-                      {formatTime(s.scheduledDeparture)}
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
+            }
+            trigger="hover"
+          >
+            <div className="flex items-center cursor-pointer hover:text-[#7F35CD] transition-colors">
+              <MdLocationOn className="mr-1 text-[#C83B62]" />
+              <span className="text-sm font-medium">
+                {completedStops}/{stops.length} stops
+              </span>
             </div>
-          }
-          trigger="hover"
-        >
-          <div className="flex items-center cursor-pointer hover:text-blue-600">
-            <MdLocationOn className="mr-1 text-red-500" />
-            <span className="text-sm font-medium">
-              {r.stopLogs.filter((s) => s.status !== "skipped").length}/
-              {r.stopLogs.length} stops
-            </span>
-          </div>
-        </Popover>
-      ),
+          </Popover>
+        );
+      },
     },
     {
       title: "Status",
-      dataIndex: "status",
       key: "status",
-      render: (s) => (
-        <Tag color={statusColor[s] || "default"} className="capitalize">
-          {statusText[s] || s}
-        </Tag>
+      render: (_, record) => (
+        <TripStatusBadge
+          status={record.status}
+          lastUpdated={record.lastUpdated}
+        />
       ),
     },
     {
       title: "Actions",
       key: "actions",
-      render: (_, r) => (
+      render: (_, record) => (
         <Space size="middle">
-          {r.status === "in_progress" ? (
+          <Tooltip title="View details">
             <Button
-              type="primary"
-              danger
-              icon={<StopOutlined />}
-              onClick={() => handleStop(r)}
+              icon={<InfoCircleOutlined />}
+              onClick={() => setSelectedTrip(record)}
               size="small"
-              style={{ width: 100 }}
-            >
-              End
-            </Button>
-          ) : r.status === "not_started" ? (
+              className="hover:bg-[#7F35CD] hover:text-white transition-colors"
+            />
+          </Tooltip>
+          <Tooltip title="View on map">
             <Button
-              type="primary"
-              icon={<PlayCircleOutlined />}
-              onClick={() => handleStart(r)}
-              size="small"
-              style={{
-                width: 100,
-                backgroundColor: "green",
-                borderColor: "green",
+              icon={<FaMapMarkedAlt />}
+              onClick={() => {
+                setSelectedTrip(record);
+                setMapModalVisible(true);
               }}
-            >
-              Start
-            </Button>
-          ) : (
-            <Button
-              type="dashed"
-              icon={<StopOutlined />}
-              disabled
               size="small"
-              style={{ width: 100 }}
-            >
-              Ended
-            </Button>
-          )}
-
-          <Button
-            icon={<InfoCircleOutlined />}
-            onClick={() => setSelectedTripForDetails(r)}
-            size="small"
-            style={{ width: 100 }}
-          >
-            Details
-          </Button>
-          <Button
-            icon={<FaMapMarkedAlt />}
-            onClick={() => {
-              setSelectedTripForMap(r);
-              setShowMapModal(true);
-            }}
-            size="small"
-            style={{ width: 100 }}
-          >
-            Map
-          </Button>
+              className="hover:bg-[#C83B62] hover:text-white transition-colors"
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
 
-  /* ---------- start / stop handlers ---------- */
-  const handleStart = (trip) =>
-    Modal.confirm({
-      title: "Confirm Start Trip",
-      icon: <ExclamationOutlined />,
-      content: `Start the ${trip.tripType} trip for ${trip.routeId?.routeName}?`,
-      okText: "Start Trip",
-      onOk: () => {
-        setConfirmLoading(true);
-        dispatch(startTripLog({ tripId: trip._id, vehicleId })).finally(() =>
-          setConfirmLoading(false)
-        );
-      },
-    });
-
-  const handleStop = (trip) =>
-    Modal.confirm({
-      title: "Confirm End Trip",
-      icon: <ExclamationOutlined />,
-      content: `End the ${trip.tripType} trip for ${trip.routeId?.routeName}?`,
-      okText: "End Trip",
-      okButtonProps: { danger: true },
-      onOk: () => {
-        setConfirmLoading(true);
-        dispatch(endTripLog({ tripId: trip._id, vehicleId }))
-          .then(() => message.success(`Trip ${trip._id} ended successfully`))
-          .finally(() => setConfirmLoading(false));
-      },
-    });
-
-  /* ---------- render ---------- */
   return (
-    <div className="p-6">
-      {/* filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-        <Input
-          placeholder="Search trips…"
-          prefix={<FaSearch className="text-gray-400" />}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          allowClear
-        />
-        <RangePicker
-          className="w-full"
-          onChange={setDateRange}
-          disabledDate={(c) => c && c > dayjs().endOf("day")}
-        />
-        <Select
-          className="w-full"
-          value={statusFilter}
-          onChange={setStatusFilter}
-          placeholder="Filter by status"
-          allowClear
-        >
-          {[
-            "all",
-            "pending",
-            "in_progress",
-            "completed",
-            "skipped",
-            "cancelled",
-          ].map((s) => (
-            <Option key={s} value={s}>
-              {s === "all" ? "All Statuses" : statusText[s]}
-            </Option>
-          ))}
-        </Select>
-        <Select
-          className="w-full"
-          value={tripTypeFilter}
-          onChange={setTripTypeFilter}
-          placeholder="Filter by trip type"
-          allowClear
-        >
-          <Option value="all">All Types</Option>
-          <Option value="pickup">Pickup</Option>
-          <Option value="drop">Drop</Option>
-        </Select>
+    <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      {/* Header with title and filters */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#7F35CD] mb-4">
+          Trip Management
+        </h1>
+
+        {/* Filters */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+          <Input
+            placeholder="Search trips..."
+            prefix={<FaSearch className="text-gray-400" />}
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            allowClear
+            className="rounded-lg"
+          />
+          <RangePicker
+            className="w-full rounded-lg"
+            onChange={(dates) => setDateRange(dates)}
+            disabledDate={(current) =>
+              current && current > dayjs().endOf("day")
+            }
+          />
+          <Select
+            className="w-full rounded-lg"
+            value={statusFilter}
+            onChange={setStatusFilter}
+            placeholder="Filter by status"
+            allowClear
+          >
+            <Option value="all">All Statuses</Option>
+            {Object.values(TRIP_STATUS).map((status) => (
+              <Option key={status} value={status}>
+                {statusText[status]}
+              </Option>
+            ))}
+          </Select>
+          <Select
+            className="w-full rounded-lg"
+            value={tripTypeFilter}
+            onChange={setTripTypeFilter}
+            placeholder="Filter by trip type"
+            allowClear
+          >
+            <Option value="all">All Types</Option>
+            <Option value="pickup">Pickup</Option>
+            <Option value="drop">Drop</Option>
+          </Select>
+        </div>
       </div>
 
-      {/* table tabs */}
+      {/* Error display */}
+      {reduxError && (
+        <Alert
+          message="Error"
+          description={reduxError}
+          type="error"
+          showIcon
+          closable
+          className="mb-4"
+        />
+      )}
+
+      {/* Tabs */}
       <Tabs
         activeKey={activeTab}
         onChange={setActiveTab}
-        animated={{ inkBar: true, tabPane: true }}
+        className="bg-white p-4 rounded-lg shadow-sm"
       >
-        <Tabs.TabPane
+        <TabPane
           key="today"
           tab={
             <span className="flex items-center">
-              <FaCalendarAlt className="mr-1" /> Today's Trips
+              <FaCalendarAlt className="mr-2 text-[#7F35CD]" />
+              <span className="font-medium">Today's Trips</span>
             </span>
           }
         >
           <Table
             columns={columns}
             dataSource={filteredTrips.filter((t) =>
-              dayjs(t.tripDate).isSame(dayjs(), "day")
-            )}
-            rowKey="_id"
-            pagination={false}
-            loading={loading || confirmLoading}
-            locale={{
-              emptyText: (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No trips scheduled for today"
-                />
-              ),
-            }}
-          />
-        </Tabs.TabPane>
-        <Tabs.TabPane
-          key="history"
-          tab={
-            <span className="flex items-center">
-              <FaHistory className="mr-1" /> Trip History
-            </span>
-          }
-        >
-          <Table
-            columns={columns}
-            dataSource={filteredTrips.filter(
-              (t) => !dayjs(t.tripDate).isSame(dayjs(), "day")
+              t.tripDate ? dayjs(t.tripDate).isSame(dayjs(), "day") : false
             )}
             rowKey="_id"
             pagination={false}
@@ -617,51 +845,116 @@ const ViewTripsList = () => {
               emptyText: (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No historical trips found"
+                  description={
+                    <div>
+                      <p className="text-gray-600">
+                        No trips scheduled for today
+                      </p>
+                      <Button
+                        type="primary"
+                        className="mt-2 bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
+                        onClick={() => window.location.reload()}
+                      >
+                        Refresh
+                      </Button>
+                    </div>
+                  }
                 />
               ),
             }}
+            className="rounded-lg overflow-hidden"
           />
-        </Tabs.TabPane>
+        </TabPane>
+        <TabPane
+          key="history"
+          tab={
+            <span className="flex items-center">
+              <FaHistory className="mr-2 text-[#7F35CD]" />
+              <span className="font-medium">Trip History</span>
+            </span>
+          }
+        >
+          <Table
+            columns={columns}
+            dataSource={filteredTrips.filter((t) =>
+              t.tripDate ? !dayjs(t.tripDate).isSame(dayjs(), "day") : false
+            )}
+            rowKey="_id"
+            pagination={false}
+            loading={loading}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    <div>
+                      <p className="text-gray-600">No historical trips found</p>
+                      <Button
+                        type="primary"
+                        className="mt-2 bg-gradient-to-r from-[#C83B62] to-[#7F35CD]"
+                        onClick={() => window.location.reload()}
+                      >
+                        Refresh
+                      </Button>
+                    </div>
+                  }
+                />
+              ),
+            }}
+            className="rounded-lg overflow-hidden"
+          />
+        </TabPane>
       </Tabs>
 
-      {/* live-tracking drawer */}
+      {/* Pagination */}
+      {filteredTrips.length > 0 && (
+        <div className="mt-4 bg-white p-4 rounded-lg shadow-sm">
+          <Pagination
+            page={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalRecords={pagination.totalItems}
+            limit={pagination.limit}
+            setPage={handlePageChange}
+            setLimit={handleLimitChange}
+            t={t}
+          />
+        </div>
+      )}
+
+      {/* Trip Details Drawer */}
       <TripDetailsSidebar
-        trip={selectedTripForDetails}
-        onClose={() => setSelectedTripForDetails(null)}
+        trip={selectedTrip}
+        onClose={() => setSelectedTrip(null)}
       />
 
-      {/* map modal */}
+      {/* Map Modal */}
       <Modal
-        title={`Route Map: ${selectedTripForMap?.routeId?.routeName || "Trip"}`}
-        open={showMapModal}
-        onCancel={() => setShowMapModal(false)}
+        title={
+          <div className="flex items-center">
+            <FaMapMarkedAlt className="mr-2 text-[#7F35CD]" />
+            <span className="font-semibold">
+              {selectedTrip?.routeId?.routeName || "Trip"} Route Map
+            </span>
+          </div>
+        }
+        open={mapModalVisible}
+        onCancel={() => setMapModalVisible(false)}
         footer={null}
         width="90%"
         style={{ top: 20 }}
         destroyOnClose
+        className="map-modal"
       >
-        {selectedTripForMap && (
+        {selectedTrip && (
           <div style={{ height: "70vh" }}>
             <MapView
-              trip={selectedTripForMap}
-              stops={selectedTripForMap.stopLogs}
+              trip={selectedTrip}
+              stops={selectedTrip.stopLogs}
+              currentLocation={selectedTrip.currentLocation}
             />
           </div>
         )}
       </Modal>
-
-      {!!vehicleWiseLogs.length && (
-        <Pagination
-          page={pagination.currentPage}
-          totalPages={pagination.totalPages}
-          totalRecords={pagination.totalItems}
-          limit={pagination.limit}
-          setPage={handlePageChange}
-          setLimit={handleLimitChange}
-          t={t}
-        />
-      )}
     </div>
   );
 };

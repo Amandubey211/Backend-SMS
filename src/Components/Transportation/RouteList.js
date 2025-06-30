@@ -140,14 +140,14 @@ const RouteList = ({ onEdit }) => {
         const isExpanded = expandedRowKeys.includes(r._id ?? r.routeId);
         return (
           <div className="flex items-center">
-            <Button
+            {/* <Button
               type="text"
               icon={isExpanded ? <UpOutlined /> : <DownOutlined />}
               onClick={(e) => {
                 e.stopPropagation();
                 handleExpand(!isExpanded, r);
               }}
-            />
+            /> */}
             <span className="ml-2 font-medium">{txt}</span>
           </div>
         );
@@ -308,6 +308,35 @@ const RouteList = ({ onEdit }) => {
                   <Tag color={status === "active" ? "green" : "red"}>
                     {status.charAt(0).toUpperCase() + status.slice(1)}
                   </Tag>
+                ),
+              },
+              {
+                title: "Actions",
+                render: (_, vehicle) => (
+                  <Space>
+                    <Tooltip title="Edit Vehicle">
+                      <Button
+                        type="text"
+                        icon={<EditOutlined className="text-blue-500" />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add your edit vehicle logic here
+                          console.log("Edit vehicle", vehicle);
+                        }}
+                      />
+                    </Tooltip>
+                    <Tooltip title="Delete Vehicle">
+                      <Button
+                        type="text"
+                        icon={<DeleteOutlined className="text-red-500" />}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Add your delete vehicle logic here
+                          console.log("Delete vehicle", vehicle);
+                        }}
+                      />
+                    </Tooltip>
+                  </Space>
                 ),
               },
             ]}
