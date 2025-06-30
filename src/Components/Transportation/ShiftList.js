@@ -85,7 +85,7 @@ const ShiftList = ({ onEdit }) => {
       title: "Actions",
       key: "actions",
       render: (_, shift) => (
-        <Space size="middle">
+        <Space size="10">
           <Button
             type="link"
             onClick={() => onEdit(shift)}
