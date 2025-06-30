@@ -38,7 +38,7 @@ const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
     }
   }, [selectedShift, form]);
 
-  const handleClose = ()=>{
+  const handleClose = () => {
     form.resetFields();
     onClose();
   }
@@ -51,14 +51,29 @@ const AddShift = ({ onSave, onClose, initialData, selectedShift }) => {
     };
 
     if (selectedShift) {
-      await dispatch(updateShift({ id: selectedShift._id, updatedData: dataToSubmit }));
+      const response = await dispatch(updateShift({ id: selectedShift._id, updatedData: dataToSubmit }));
+      console.log(response)
+      if (response?.payload?.success) {
+        message.success("Shift updated successfully!" || "Shift added successfully!");
+        form.resetFields(); // Clear the form after successful submission
+        if (onSave) onSave();
+      }
+      else {
+        message.error(response?.payload?.response?.data?.message || "Failed to update Shift")
+      }
     } else {
-      await dispatch(createShift(dataToSubmit));
+      const response = await dispatch(createShift(dataToSubmit));
+      if (response?.payload?.success) {
+        message.success("Shift added successfully!");
+        form.resetFields();
+        if (onSave) onSave();
+      }
+      else {
+        message.error(response?.payload?.message || "Failed to add Shift")
+      }
     }
 
-    message.success(selectedShift ? "Shift updated successfully!" : "Shift added successfully!");
-    form.resetFields(); // Clear the form after successful submission
-    if (onSave) onSave();
+
   };
 
   return (
